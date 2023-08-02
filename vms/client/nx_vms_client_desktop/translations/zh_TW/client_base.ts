@@ -38,6 +38,19 @@
     </message>
   </context>
   <context>
+    <name>CameraPickerStrings</name>
+    <message>
+      <source>Source Camera</source>
+      <translation>來源攝影機</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>來源與 %n 個以上的攝影機</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
@@ -149,14 +162,6 @@
       <translation>顯示歡迎畫面</translation>
     </message>
     <message>
-      <source>Tab</source>
-      <translation>頁籤</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>新增頁籤</translation>
-    </message>
-    <message>
       <source>Window</source>
       <translation>視窗</translation>
     </message>
@@ -169,16 +174,8 @@
       <translation>使用者…</translation>
     </message>
     <message>
-      <source>New User...</source>
-      <translation>新增使用者…</translation>
-    </message>
-    <message>
       <source>Video Wall...</source>
       <translation>電視牆...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>新增電視牆...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -496,10 +493,6 @@
       <translation>從佈局移除</translation>
     </message>
     <message>
-      <source>Stop Sharing Layout</source>
-      <translation>停止共用佈局</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>重新命名</translation>
     </message>
@@ -514,14 +507,6 @@
     <message>
       <source>User Settings...</source>
       <translation>使用者設定...</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>使用者角色...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>角色設定...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -594,10 +579,6 @@
     <message>
       <source>Video Wall Settings...</source>
       <translation>電視牆設定...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation>新增裝置...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
@@ -744,10 +725,6 @@
       <translation>幻燈片</translation>
     </message>
     <message>
-      <source>New Showreel...</source>
-      <translation>新增幻燈片</translation>
-    </message>
-    <message>
       <source>Remove from Showreel</source>
       <translation>從幻燈片中移除</translation>
     </message>
@@ -816,10 +793,6 @@
       <translation>虛擬攝影機...</translation>
     </message>
     <message>
-      <source>New Virtual Camera...</source>
-      <translation>新虛擬攝影機...</translation>
-    </message>
-    <message>
       <source>Show Tree</source>
       <translation>顯示樹狀表</translation>
     </message>
@@ -858,14 +831,6 @@
     <message>
       <source>Switch to Objects tab</source>
       <translation>切換至物件分頁</translation>
-    </message>
-    <message>
-      <source>Pin Calendar</source>
-      <translation>鎖定月曆</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>解鎖月曆</translation>
     </message>
     <message>
       <source>Page...</source>
@@ -966,10 +931,6 @@
       <translation>刪除群組</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page...</source>
-      <translation>新增網頁(透過伺服器Proxy連線)</translation>
-    </message>
-    <message>
       <source>Cell Spacing</source>
       <translation>影像排列間距</translation>
     </message>
@@ -991,7 +952,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>錄影資料過濾器</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1011,23 +972,91 @@
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>更換攝影機...</translation>
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation type="unfinished">Save Current Layout As Cloud...</translation>
+      <translation>將目前佈局儲存至Cloud...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
-      <translation type="unfinished">Save Layout As Cloud...</translation>
+      <translation>將佈局儲存至Cloud...</translation>
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>儲存Cloud佈局...</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>另存Cloud佈局為…</translation>
+    </message>
+    <message>
+      <source>Lookup Lists...</source>
+      <translation type="unfinished">Lookup Lists...</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>新增</translation>
+    </message>
+    <message>
+      <source>Device...</source>
+      <translation type="unfinished">Device...</translation>
+    </message>
+    <message>
+      <source>Add User...</source>
+      <translation>新增使用者...</translation>
+    </message>
+    <message>
+      <source>Integration...</source>
+      <translation type="unfinished">Integration...</translation>
+    </message>
+    <message>
+      <source>New Integration...</source>
+      <translation type="unfinished">New Integration...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>新 Web 頁面...</translation>
+    </message>
+    <message>
+      <source>Add Showreel...</source>
+      <translation type="unfinished">Add Showreel...</translation>
+    </message>
+    <message>
+      <source>Add Virtual Camera...</source>
+      <translation type="unfinished">Add Virtual Camera...</translation>
+    </message>
+    <message>
+      <source>Integration Settings...</source>
+      <translation type="unfinished">Integration Settings...</translation>
+    </message>
+    <message>
+      <source>Proxied Integration...</source>
+      <translation type="unfinished">Proxied Integration...</translation>
+    </message>
+    <message>
+      <source>Proxied Web Page...</source>
+      <translation type="unfinished">Proxied Web Page...</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>佈局</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>新佈局</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation type="unfinished">New Welcome Screen</translation>
+    </message>
+    <message>
+      <source>Show Proxied Resources</source>
+      <translation type="unfinished">Show Proxied Resources</translation>
+    </message>
+    <message>
+      <source>Import From Devices...</source>
+      <translation type="unfinished">Import From Devices...</translation>
     </message>
   </context>
   <context>
@@ -1074,6 +1103,41 @@
     <message>
       <source>Auto</source>
       <translation>自動</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>無</translation>
+    </message>
+    <message>
+      <source>Event Occurs</source>
+      <translation type="unfinished">Event Occurs</translation>
+    </message>
+    <message>
+      <source>Event Starts</source>
+      <translation type="unfinished">Event Starts</translation>
+    </message>
+    <message>
+      <source>Event Stops</source>
+      <translation type="unfinished">Event Stops</translation>
+    </message>
+  </context>
+  <context>
+    <name>DurationPickerWidgetStrings</name>
+    <message>
+      <source>Instant</source>
+      <translation>立即</translation>
+    </message>
+    <message>
+      <source>No more than once per</source>
+      <translation>一次以上</translation>
+    </message>
+    <message>
+      <source>Live</source>
+      <translation>即時</translation>
+    </message>
+    <message>
+      <source>Rewind for</source>
+      <translation type="unfinished">Rewind for</translation>
     </message>
   </context>
   <context>
@@ -1152,21 +1216,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>圖片</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>影像</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>所有檔案</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1187,6 +1236,25 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation>可執行的 %1媒體檔案</translation>
+    </message>
+  </context>
+  <context>
+    <name>FlagsPickerWidgetStrings</name>
+    <message>
+      <source>Error</source>
+      <translation>錯誤</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>警告</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>關於</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>未定義</translation>
     </message>
   </context>
   <context>
@@ -1220,18 +1288,24 @@
     </message>
   </context>
   <context>
+    <name>Groups</name>
+    <message>
+      <source>Delete group?</source>
+      <translation>刪除群組?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n group(s)?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n group(s)?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
       <translation>繁體中文</translation>
-    </message>
-  </context>
-  <context>
-    <name>LayoutTourTextFactory</name>
-    <message>
-      <source>Start Showreel</source>
-      <translation>啟動幻燈片</translation>
     </message>
   </context>
   <context>
@@ -1322,7 +1396,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>啟動免費授權失敗</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1331,20 +1405,20 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>硬體ID: %1
+授權序號: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>複製參數</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>若你的系統沒有對外網路連線，請將授權序號與硬體ID提供給%1 以取得離線授權啟用檔案。</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>若你的系統沒有對外網路連線，請將授權序號與硬體ID提供給當地經銷商或者授權支援團隊以取得離線授權啟用檔案。</translation>
     </message>
   </context>
   <context>
@@ -1481,20 +1555,12 @@ License Key: %2</translation>
       <translation>SSL</translation>
     </message>
     <message>
-      <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
-    </message>
-    <message>
       <source>Check</source>
       <translation>檢查</translation>
     </message>
     <message>
-      <source>Email is not valid.</source>
-      <translation>Email 無效</translation>
-    </message>
-    <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>URL 無效。</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -1502,11 +1568,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>啟用</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>尚未設定</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1514,34 +1580,30 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>請設置你的郵件伺服器(SMTP)</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 使用者正在接收電子郵件</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 目前無法使用</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>透過 %1 發送</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>透過SMTP伺服器發送</translation>
     </message>
     <message>
       <source>Success</source>
       <translation>成功</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>連線逾時</translation>
     </message>
     <message>
       <source>Authentication failed</source>
@@ -1552,13 +1614,29 @@ License Key: %2</translation>
       <translation>未知的錯誤</translation>
     </message>
     <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
-    </message>
-    <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>在套用這些設定後，%1 使用者將會開始收到電子郵件。</translation>
+    </message>
+    <message>
+      <source>Cannot reach the server</source>
+      <translation type="unfinished">Cannot reach the server</translation>
+    </message>
+    <message>
+      <source>Username or Password are incorrect</source>
+      <translation type="unfinished">Username or Password are incorrect</translation>
+    </message>
+    <message>
+      <source>Insecure</source>
+      <translation type="unfinished">Insecure</translation>
+    </message>
+    <message>
+      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
+      <translation>因伺服器皆無對外網路連線，故無法執行電子郵件測試。</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>連接失敗</translation>
     </message>
   </context>
   <context>
@@ -1636,26 +1714,6 @@ License Key: %2</translation>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>只允許拉丁字母、 數字和符號.</translation>
-    </message>
-  </context>
-  <context>
-    <name>PermissionsInfoTable</name>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>攝影機與資源</translation>
-    </message>
-    <message>
-      <source>Shared Layouts</source>
-      <translation>共用的佈局</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>權限</translation>
-    </message>
-    <message>
-      <source>All</source>
-      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation>全部</translation>
     </message>
   </context>
   <context>
@@ -1797,13 +1855,6 @@ License Key: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnAccessibleLayoutsWidget</name>
-    <message>
-      <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>給出佈局權限. 使用者也將可存取這些佈局上的新攝影機.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -1874,19 +1925,19 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>選擇資料夾...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
+      <translation>無法將日誌保存到所選資料夾</translation>
     </message>
     <message>
       <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
+      <translation>下載已完成！</translation>
     </message>
     <message>
       <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
+      <translation>NVIDIA 硬體加速功能目前仍為beta測試模式</translation>
     </message>
   </context>
   <context>
@@ -2194,22 +2245,22 @@ License Key: %2</translation>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>已連線至%1</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>已斷開與 %1 的連線</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
+      <translation>已透過%2 連線至 %1</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
+      <translation>%2 已中斷與 %1的連線。</translation>
     </message>
   </context>
   <context>
@@ -2358,7 +2409,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation>源攝影機</translation>
+      <translation>來源攝影機</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
@@ -2480,7 +2531,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>退出前是否套用變更?</translation>
     </message>
   </context>
   <context>
@@ -2522,7 +2573,7 @@ License Key: %2</translation>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1 執行中</translation>
     </message>
   </context>
   <context>
@@ -2907,6 +2958,10 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>系統無法中斷與 %1的連線</translation>
     </message>
+    <message>
+      <source>System will be accessible only through local network.</source>
+      <translation>系統將僅允許透過區域網路連線存取。</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3088,7 +3143,11 @@ to %1</source>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <translation>無法登入到系統 &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Log In...</source>
+      <translation type="unfinished">Log In...</translation>
     </message>
   </context>
   <context>
@@ -3116,6 +3175,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>要產生通用事件, 請參考 %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>圖片</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>影像</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>所有檔案</translation>
     </message>
   </context>
   <context>
@@ -3190,136 +3264,7 @@ to %1</source>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModel</name>
-    <message>
-      <source>Local user</source>
-      <translation>本地使用者</translation>
-    </message>
-    <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 使用者</translation>
-    </message>
-    <message>
-      <source>LDAP user</source>
-      <translation>LDAP使用者</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>啟用</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>停用</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>登入</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>名稱</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>角色</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModelPrivate</name>
-    <message>
-      <source>Owner</source>
-      <translation>擁有者</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>管理者</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation>瀏覽LIVE影像</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation>調整裝置設定</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>調整攝影機設定</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>使用PTZ控制</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>回放歷史影像</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>匯出影像</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>控制電視牆</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Edit</source>
-      <translation>編輯</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>所有使用者</translation>
-    </message>
-    <message>
-      <source>With enabled digest authentication</source>
-      <translation>啟用Digest認證的使用者帳號</translation>
-    </message>
-    <message>
-      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>使用者資訊可由 LDAP 伺服器匯入。但 LDAP 伺服器須保持連線並且該帳號狀態為啟用中, 才能夠登錄。</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-      <source>Could not find video encoder %1.</source>
-      <translation>找不到影像編碼器 '%1'。</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>無法初始化影像編碼器。</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器。</translation>
-    </message>
-    <message>
-      <source>Could not start primary audio device.</source>
-      <translation>無法啟動主要音效設備。</translation>
-    </message>
-    <message>
-      <source>Screen width must be a multiple of 8.</source>
-      <translation>螢幕寬度必須是 8 的倍數.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>無法初始化音源編碼器 &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Could not detect capturing resolution</source>
-      <translation>無法偵測到擷取之解析度</translation>
-    </message>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>未偵測到合適的音頻格式。請選擇其他音源裝置，或請在“螢幕錄影”設定中選擇 &quot;無&quot;。</translation>
+      <translation>資料庫已成功還原，伺服器應用程式將重新啟動。</translation>
     </message>
   </context>
   <context>
@@ -3542,7 +3487,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>選擇資料夾...</translation>
     </message>
   </context>
   <context>
@@ -3594,6 +3539,13 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>開啟攝影機列表</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnGenericTabbedDialog</name>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation>退出前是否套用變更?</translation>
     </message>
   </context>
   <context>
@@ -3700,92 +3652,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>未能開啟 I/O 埠 %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialog</name>
-    <message>
-      <source>Test</source>
-      <translation>測試</translation>
-    </message>
-    <message>
-      <source>Test failed</source>
-      <translation>測試失敗</translation>
-    </message>
-    <message numerus="yes">
-      <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>測試成功: 找到 %n 個使用者.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>除了 &quot;搜尋篩選器&quot; 更改其他的LDAP設定, 將導致所有 LDAP使用者的連接失敗</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialogPrivate</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>所提供的設定值無效.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>無法執行測試.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>逾時</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUserListModel</name>
-    <message>
-      <source>Login</source>
-      <translation>登入</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>DN</source>
-      <translation>DN</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>名稱</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUsersDialog</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>所提供的設定值無效.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>無法執行測試.</translation>
-    </message>
-    <message>
-      <source>Could not load users.</source>
-      <translation>無法讀取到使用者.</translation>
-    </message>
-    <message>
-      <source>Error while loading users.</source>
-      <translation>讀取使用者時發生錯誤.</translation>
-    </message>
-    <message>
-      <source>No new users found.</source>
-      <translation>找不到新的使用者.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>逾時</translation>
-    </message>
-    <message>
-      <source>Import Selected</source>
-      <translation>匯入所選</translation>
     </message>
   </context>
   <context>
@@ -3899,60 +3765,9 @@ to %1</source>
       <source>Channels</source>
       <translation>授權數</translation>
     </message>
-  </context>
-  <context>
-    <name>QnLicenseManagerWidget</name>
     <message>
-      <source>Export</source>
-      <translation>匯出</translation>
-    </message>
-    <message>
-      <source>Export licenses to a file</source>
-      <translation>匯出授權成檔案</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>要重置授權?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>移除</translation>
-    </message>
-    <message>
-      <source>Deactivate</source>
-      <translation>重置</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels.</source>
-      <translation>
-        <numerusform>%n 個授權.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 已被使用</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>最少需要 %1</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n deactivations remaining.</source>
-      <translation>
-        <numerusform>可重置次數: %n</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation>系統沒有可使用的授權，請先嘗試啟用試用授權或者專業版付費授權。</translation>
+      <source>Not verified</source>
+      <translation type="unfinished">Not verified</translation>
     </message>
   </context>
   <context>
@@ -4006,14 +3821,6 @@ to %1</source>
       <translation>進階</translation>
     </message>
     <message>
-      <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>設定檔為唯讀. 請連絡您的系統管理員. 所有變更在程式關閉後都將遺失.</translation>
-    </message>
-    <message>
-      <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>設定檔無法儲存. 請連絡您的系統管理員. 所有變更在程式關閉後都將遺失.</translation>
-    </message>
-    <message>
       <source>Restart required</source>
       <translation>需要重新啟動</translation>
     </message>
@@ -4028,6 +3835,10 @@ to %1</source>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
       <translation>某些變更將會在 %1 重新啟動後生效</translation>
+    </message>
+    <message>
+      <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
+      <translation type="unfinished">Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
     </message>
   </context>
   <context>
@@ -4154,6 +3965,10 @@ to %1</source>
       <source>Object Search</source>
       <translation>物件搜尋</translation>
     </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
   </context>
   <context>
     <name>QnMessageBox</name>
@@ -4271,49 +4086,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnPermissionsWidget</name>
-    <message>
-      <source>Edit camera settings</source>
-      <translation>編輯攝影機設定</translation>
-    </message>
-    <message>
-      <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>這是必需的, 用以新建/編輯 PTZ 預設點與巡曳.</translation>
-    </message>
-    <message>
-      <source>Control video walls</source>
-      <translation>控制電視牆</translation>
-    </message>
-    <message>
-      <source>View event log</source>
-      <translation>查看事件日誌</translation>
-    </message>
-    <message>
-      <source>View archive</source>
-      <translation>查看錄影資料</translation>
-    </message>
-    <message>
-      <source>Export archive</source>
-      <translation>匯出錄影資料</translation>
-    </message>
-    <message>
-      <source>View bookmarks</source>
-      <translation>查看書籤</translation>
-    </message>
-    <message>
-      <source>Modify bookmarks</source>
-      <translation>修改書籤</translation>
-    </message>
-    <message>
-      <source>User Input</source>
-      <translation>使用者輸入</translation>
-    </message>
-    <message>
-      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ, 設備輸出, 雙向語音, 觸發按鍵.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
@@ -4335,7 +4107,7 @@ to %1</source>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
+      <translation>這些設定僅套用於你目前登入的系統，且可能會在未來版本中移除。</translation>
     </message>
   </context>
   <context>
@@ -4346,7 +4118,7 @@ to %1</source>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>退出前是否套用變更?</translation>
     </message>
   </context>
   <context>
@@ -4496,41 +4268,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRecordingSettingsWidget</name>
-    <message>
-      <source>Screen %1 - %2x%3</source>
-      <translation>螢幕 %1 - %2x%3</translation>
-    </message>
-    <message>
-      <source>%1 (Primary)</source>
-      <translation>%1 (主要的)</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>最佳</translation>
-    </message>
-    <message>
-      <source>Average</source>
-      <translation>平均</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>效能</translation>
-    </message>
-    <message>
-      <source>Native</source>
-      <translation>原生</translation>
-    </message>
-    <message>
-      <source>Quarter Native</source>
-      <translation>1/4原生</translation>
-    </message>
-    <message>
-      <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
@@ -4596,23 +4333,6 @@ to %1</source>
   <context>
     <name>QnRequiredPermissionSubjectPolicy</name>
     <message>
-      <source>Role %1 has no %2 permission</source>
-      <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>角色 %1 沒有 %2 權限</translation>
-    </message>
-    <message>
-      <source>Selected roles have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>所選的角色沒有 %1 權限</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no %2 permission</source>
-      <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%1 個選定角色中有 %n 個角色沒有 %2 權限</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
       <translation>使用者 %1 沒有 %2 權限</translation>
@@ -4627,6 +4347,23 @@ to %1</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
       <translation>
         <numerusform>%1 個選定使用者中有 %n 個使用者沒有 %2 權限</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User group %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user group, %2 is permission name</comment>
+      <translation type="unfinished">User group %1 has no %2 permission</translation>
+    </message>
+    <message>
+      <source>Selected user groups have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation type="unfinished">Selected user groups have no %1 permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected user groups have no %2 permission</source>
+      <comment>%1 is number of selected user groups, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
       </translation>
     </message>
   </context>
@@ -4773,6 +4510,27 @@ to %1</source>
     <message>
       <source>Select cameras...</source>
       <translation>選擇攝影機...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSelectLayoutsButton</name>
+    <message>
+      <source>Any Layout</source>
+      <translation type="unfinished">Any Layout</translation>
+    </message>
+    <message>
+      <source>All Layouts</source>
+      <translation type="unfinished">All Layouts</translation>
+    </message>
+    <message>
+      <source>Select Layouts...</source>
+      <translation>選取佈局...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Layouts</source>
+      <translation>
+        <numerusform>%n 佈局</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4971,7 +4729,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
+      <translation>相同位置ID且啟用備援移轉的伺服器將自動接手離線伺服器上的攝影機。</translation>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
@@ -4987,6 +4745,10 @@ to %1</source>
     <message>
       <source>Save changes before exit?</source>
       <translation>保存變更之前退出嗎?</translation>
+    </message>
+    <message>
+      <source>Apply changes before exit?</source>
+      <translation>退出前是否套用變更?</translation>
     </message>
   </context>
   <context>
@@ -5118,15 +4880,11 @@ to %1</source>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>必要資訊</translation>
     </message>
     <message>
       <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
-    </message>
-    <message>
-      <source>ACCESS DENIED</source>
-      <translation>拒絕存取</translation>
+      <translation>提供</translation>
     </message>
   </context>
   <context>
@@ -5337,11 +5095,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>用於儲存分析與位移資料</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>儲存分析與位移資料</translation>
     </message>
   </context>
   <context>
@@ -5421,10 +5179,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>使用者</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>安全性</translation>
     </message>
@@ -5434,11 +5188,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Sync</source>
-      <translation type="unfinished">Time Sync</translation>
+      <translation>時間校正</translation>
     </message>
     <message>
       <source>Routing</source>
-      <translation type="unfinished">Routing</translation>
+      <translation>路由管理</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -5447,6 +5201,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Advanced</source>
       <translation>進階</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>整合</translation>
     </message>
   </context>
   <context>
@@ -5532,18 +5290,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>傳送郵件時發生錯誤</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been finished</source>
-      <translation>遠端錄影備份已結束</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is in progress</source>
-      <translation>遠端錄影備份進行中</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>下列設備已完成遠端錄影備份</translation>
-    </message>
-    <message>
       <source>Archive integrity problem detected</source>
       <translation>檢測到錄影檔案完整性問題</translation>
     </message>
@@ -5586,28 +5332,20 @@ If you intended to move analytics data to another storage location, please conta
       <translation>無效的錄影排程</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been stopped</source>
-      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
-    </message>
-    <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>尚未指定分析資料的儲存裝置</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>系統碟已用於儲存分析資料</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
       <translation>分析數據將佔用大量空間。</translation>
     </message>
     <message>
-      <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
-    </message>
-    <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>建議選擇另一個非系統分割磁區的儲存位置。</translation>
     </message>
   </context>
   <context>
@@ -5691,240 +5429,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>QnUserProfileWidget</name>
+    <name>QnUserRolesModel</name>
     <message>
-      <source>Login</source>
-      <translation>登入</translation>
+      <source>Custom</source>
+      <translation>自訂</translation>
     </message>
     <message>
-      <source>Name</source>
-      <translation>名稱</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>角色</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>To enable digest authentication password reset is required</source>
-      <translation>須重設密碼以啟用Digest驗證</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidget</name>
-    <message>
-      <source>Role name cannot be empty.</source>
-      <translation>角色名稱不能為空.</translation>
-    </message>
-    <message>
-      <source>Role with same name already exists.</source>
-      <translation>存在同樣名稱的角色</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidgetPrivate</name>
-    <message>
-      <source>No users have this role</source>
-      <translation>沒有使用者為這個角色</translation>
-    </message>
-    <message>
-      <source>Custom with no permissions</source>
-      <translation>沒有權限自訂</translation>
-    </message>
-    <message>
-      <source>Users will have no permissions unless changed later.</source>
-      <translation>除非稍後做變更, 否則使用者將沒有權限</translation>
-    </message>
-    <message>
-      <source>Assign a new role</source>
-      <translation>分配一個新的角色</translation>
-    </message>
-    <message>
-      <source>Delete such users</source>
-      <translation>刪除這使用者</translation>
-    </message>
-    <message numerus="yes">
-      <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>請選擇要對這 %n 使用者做的動作</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRolesDialog</name>
-    <message>
-      <source>Role Info</source>
-      <translation>角色資訊</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>權限</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>攝影機與資源</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>佈局</translation>
-    </message>
-    <message>
-      <source>New Role</source>
-      <translation>新角色</translation>
-    </message>
-    <message>
-      <source>New Role %1</source>
-      <translation>新角色 %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsDialog</name>
-    <message>
-      <source>User Information</source>
-      <translation>使用者資訊</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>權限</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>攝影機與資源</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>佈局</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>新增使用者…</translation>
-    </message>
-    <message>
-      <source>User Settings - %1 (readonly)</source>
-      <translation>使用者設置 -%1 (唯讀)</translation>
-    </message>
-    <message>
-      <source>User Settings - %1</source>
-      <translation>使用者設置 - %1</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>啟用</translation>
-    </message>
-    <message>
-      <source>User is disabled</source>
-      <translation>使用者已被停用</translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another user?</source>
-      <translation>在切換到另一個使用者之前套用變更嗎?</translation>
-    </message>
-    <message>
-      <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>此用戶尚未註冊 %1</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for this user</source>
-      <translation>允許此使用者帳號使用Digest驗證</translation>
-    </message>
-    <message>
-      <source>Learn More</source>
-      <translation>進一步瞭解</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsWidget</name>
-    <message>
-      <source>Local</source>
-      <translation>本地</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>登入</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty.</source>
-      <translation>登入不可以空白.</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists.</source>
-      <translation>指定的登入使用者已存在。</translation>
-    </message>
-    <message>
-      <source>User has been renamed. Password must be updated.</source>
-      <translation>使用者已更名. 密碼必須更新.</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>名稱</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>電子郵件不能為空.</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>密碼</translation>
-    </message>
-    <message>
-      <source>Confirm Password</source>
-      <translation>確認密碼</translation>
-    </message>
-    <message>
-      <source>Passwords do not match.</source>
-      <translation>密碼不匹配.</translation>
-    </message>
-    <message>
-      <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1電子信箱已被使用</translation>
-    </message>
-    <message>
-      <source>Local users</source>
-      <translation>本地用户</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 使用者</translation>
-    </message>
-    <message>
-      <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 僅屬於此系統，並由系統管理員完全管理</translation>
-    </message>
-    <message>
-      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 擁有可登入許多系統的權限。系統管理員只能管理其許可權</translation>
-    </message>
-    <message>
-      <source>Password reset is required</source>
-      <translation>需要重設密碼</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation>僅允許輸入字母、數字與 %1 符號。</translation>
+      <source>Custom access rights</source>
+      <translation type="unfinished">Custom access rights</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>電子郵件不能為空.</translation>
-    </message>
-    <message>
-      <source>Email is not valid.</source>
-      <translation>Email 無效</translation>
-    </message>
     <message>
       <source>Password cannot be empty.</source>
       <translation>密碼不可為空.</translation>
@@ -5932,6 +5448,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Avoid leading and trailing spaces.</source>
       <translation>避免前後空格.</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>電子郵件信箱為必填欄位</translation>
+    </message>
+    <message>
+      <source>Email is not valid</source>
+      <translation type="unfinished">Email is not valid</translation>
     </message>
   </context>
   <context>
@@ -5985,16 +5509,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>開啟此網頁?</translation>
     </message>
     <message>
-      <source>Web page</source>
-      <translation>網頁</translation>
-    </message>
-    <message>
       <source>Connect anyway</source>
       <translation>仍繼續連線</translation>
-    </message>
-    <message>
-      <source>Web page settings...</source>
-      <translation>網頁設定</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6004,6 +5520,37 @@ We recommend you not to open this web page. If you understand the risks, you can
       <comment>%1 is the web page address</comment>
       <translation>嘗試開啟的網頁 %1 使用了不安全的憑證。
 若仍然要前往此網頁，可能會有潛在的安全性問題。</translation>
+    </message>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>網頁:</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>Integration settings...</source>
+      <translation type="unfinished">Integration settings...</translation>
+    </message>
+    <message>
+      <source>Web Page settings...</source>
+      <translation type="unfinished">Web Page settings...</translation>
     </message>
   </context>
   <context>
@@ -6115,7 +5662,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>無法開啟檔案 &quot;%1&quot;，請檢查資料夾的路徑位置以及使用者的存取權限。</translation>
     </message>
   </context>
   <context>
@@ -6418,32 +5965,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>There is another layout with the same name.</source>
       <translation>有另一個具有相同名稱的佈局.</translation>
     </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>使用者仍然有 %n 刪除資源的權限:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>要移除存取權限, 請移至使用者設定頁面.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>這角色的所有使用者都將獲得 %n 資源的權限:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>要移除存取權限, 請移至角色設定頁面.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>這角色的所有使用者都將獲得 %n 刪除資源的權限:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Changes will affect other users</source>
       <translation>變更將影響其他使用者</translation>
@@ -6451,30 +5972,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
       <translation>這佈局已與其他使用者共用, 所以您也幫他們變更了.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>使用者將失去 %n 資源的權限:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>這角色的所有使用者都將失去 %n 資源的權限:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>刪除 %n 共用佈局?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>這 %n 佈局已與其他使用者共用, 所以您也幫他們刪除了.</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
@@ -6628,17 +6125,80 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Only some of the selected devices can be moved to %1</source>
-      <translation type="unfinished">Only some of the selected devices can be moved to %1</translation>
+      <translation>僅能將部分選定裝置移動到 %1</translation>
     </message>
     <message>
       <source>Move Partially</source>
-      <translation type="unfinished">Move Partially</translation>
+      <translation>部分移動</translation>
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      <translation>
+        <numerusform>這些伺服器代理轉送(proxy)的網頁即將被移動到伺服器 &quot;%1&quot;，其使用的代理伺服器亦將變更為&quot;%1&quot;。</numerusform>
       </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n layouts?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n layouts?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerical form depends on layouts count</comment>
+      <translation type="unfinished">
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>刪除使用者?</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n items were not deleted.</source>
+      <translation type="unfinished">
+        <numerusform>%n items were not deleted.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerPickerStrings</name>
+    <message>
+      <source>Any Server</source>
+      <translation>任何伺服器</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n 伺服器</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>選擇伺服器</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>源伺服器</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source Server and %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Source Server and %n Servers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>ShowreelTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>啟動幻燈片</translation>
     </message>
   </context>
   <context>
@@ -6673,7 +6233,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>SourcePickerWidgetStrings</name>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>請選擇至少一個伺服器</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -6689,7 +6249,43 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one I/O module</source>
-      <translation type="unfinished">Select at least one I/O module</translation>
+      <translation>請選擇至少一個I/O裝置</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>測試</translation>
+    </message>
+    <message>
+      <source>Also set on source camera</source>
+      <translation>亦顯示於來源攝影機</translation>
+    </message>
+    <message>
+      <source>Also trigger on source camera</source>
+      <translation>同時在來源攝影機上觸發</translation>
+    </message>
+    <message>
+      <source>Also record source camera</source>
+      <translation>同時錄製來源攝影機</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>來源攝影機</translation>
+    </message>
+    <message>
+      <source>Also play on source camera</source>
+      <translation>同時於來源攝影機播放</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>也顯示來源攝影機</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>同時顯示於來源攝影機</translation>
+    </message>
+    <message>
+      <source>Use event source camera</source>
+      <translation>使用事件來源攝影機</translation>
     </message>
   </context>
   <context>
@@ -6775,42 +6371,40 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>UserListModel</name>
+    <name>UserPickerHelper</name>
     <message>
-      <source>Owner</source>
-      <translation>擁有者</translation>
+      <source>All Users</source>
+      <translation>全部使用者</translation>
     </message>
     <message>
-      <source>Administrator</source>
-      <translation>管理者</translation>
+      <source>Select at least one user</source>
+      <translation>至少選擇一個使用者</translation>
     </message>
     <message>
-      <source>View live video</source>
-      <translation>瀏覽LIVE影像</translation>
+      <source>Group</source>
+      <translation type="unfinished">Group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n 使用者</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Adjust device settings</source>
-      <translation>調整裝置設定</translation>
+      <source>All Power Users</source>
+      <translation type="unfinished">All Power Users</translation>
     </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>調整攝影機設定</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>使用PTZ控制</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>回放歷史影像</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>匯出影像</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>控制電視牆</translation>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <translation>
+        <numerusform>%n 附加</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6838,6 +6432,21 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>若要在電視牆上顯示檔案, 請手動將檔案放到電視牆電腦上.</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialogHelper</name>
+    <message>
+      <source>Delete Rule?</source>
+      <translation>刪除規則?</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone</source>
+      <translation>此操作無法被復原</translation>
+    </message>
+    <message>
+      <source>Reset all rules to defaults?</source>
+      <translation type="unfinished">Reset all rules to defaults?</translation>
     </message>
   </context>
   <context>
@@ -6937,6 +6546,65 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::AccessRightsList</name>
+    <message>
+      <source>Has access to a resource, can view live footage from a camera</source>
+      <translation type="unfinished">Has access to a resource, can view live footage from a camera</translation>
+    </message>
+    <message>
+      <source>View Archive</source>
+      <translation type="unfinished">View Archive</translation>
+    </message>
+    <message>
+      <source>Can view archive footage</source>
+      <translation type="unfinished">Can view archive footage</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation type="unfinished">Export Archive</translation>
+    </message>
+    <message>
+      <source>Can export parts of archive</source>
+      <translation type="unfinished">Can export parts of archive</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation type="unfinished">View Bookmarks</translation>
+    </message>
+    <message>
+      <source>Can view bookmarks</source>
+      <translation type="unfinished">Can view bookmarks</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>管理書籤</translation>
+    </message>
+    <message>
+      <source>Can modify bookmarks</source>
+      <translation type="unfinished">Can modify bookmarks</translation>
+    </message>
+    <message>
+      <source>User Input</source>
+      <translation>使用者輸入</translation>
+    </message>
+    <message>
+      <source>Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</source>
+      <translation type="unfinished">Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</translation>
+    </message>
+    <message>
+      <source>Edit Settings</source>
+      <translation type="unfinished">Edit Settings</translation>
+    </message>
+    <message>
+      <source>View Live</source>
+      <translation type="unfinished">View Live</translation>
+    </message>
+    <message>
+      <source>Can edit device settings and video wall layouts</source>
+      <translation type="unfinished">Can edit device settings and video wall layouts</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>
     <message>
       <source>All Cameras &amp; Resources</source>
@@ -6951,7 +6619,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>日誌管理</translation>
     </message>
   </context>
   <context>
@@ -7259,7 +6927,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>當備份開始進行時，將顯示進度於此</translation>
     </message>
   </context>
   <context>
@@ -7284,6 +6952,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
       <translation>在時間軸上選取一段區間並點擊右鍵來建立書籤</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
+    <message>
+      <source>Calling...</source>
+      <translation>撥號中</translation>
     </message>
   </context>
   <context>
@@ -7317,7 +6992,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
+      <translation>開門</translation>
     </message>
   </context>
   <context>
@@ -7399,12 +7074,80 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Auto</source>
-      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>自動</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
+      <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
+      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotItem</name>
+    <message>
+      <source>Open Camera</source>
+      <translation type="unfinished">Open Camera</translation>
+    </message>
+    <message>
+      <source>Open Camera in new Tab</source>
+      <translation type="unfinished">Open Camera in new Tab</translation>
+    </message>
+    <message>
+      <source>Open Camera in place</source>
+      <translation type="unfinished">Open Camera in place</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsEditorWidget</name>
+    <message>
+      <source>Delete</source>
+      <translation>刪除</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>選取攝影機...</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation type="unfinished">Pointed</translation>
+    </message>
+    <message>
+      <source>Place Hotspot</source>
+      <translation type="unfinished">Place Hotspot</translation>
+    </message>
+    <message>
+      <source>NO DATA</source>
+      <translation>無資料</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
+    <message>
+      <source>Camera does not exist</source>
+      <translation type="unfinished">Camera does not exist</translation>
+    </message>
+    <message>
+      <source>Select Camera</source>
+      <translation>選擇攝影機</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>刪除</translation>
+    </message>
+    <message>
+      <source>#</source>
+      <translation type="unfinished">#</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>攝影機</translation>
+    </message>
+    <message>
+      <source>Color</source>
+      <translation type="unfinished">Color</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation type="unfinished">Pointed</translation>
     </message>
   </context>
   <context>
@@ -7490,19 +7233,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>更換攝影機失敗</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
+      <translation>是否停止相機更換?</translation>
     </message>
     <message>
       <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
+      <translation>將部份轉移:</translation>
     </message>
     <message>
       <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
+      <translation>將不會轉移:</translation>
     </message>
     <message>
       <source>Next</source>
@@ -7514,32 +7257,32 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
+      <translation>更換的攝影機</translation>
     </message>
     <message>
       <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
+      <translation>轉移的資料</translation>
     </message>
     <message>
       <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
+      <translation>已更換攝影機！</translation>
     </message>
     <message>
       <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
+      <translation>請確認是否要將舊攝影機的資料轉移至新攝影機。</translation>
     </message>
     <message>
       <source>Some data and settings may not be compatible with the new camera</source>
-      <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
+      <translation>某些資料和設定可能無法相容於新攝影機</translation>
     </message>
     <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
+      <translation>攝影機%1 將更換為選定的攝影機，並從系統中移除。</translation>
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
+      <translation>因伺服器目前無法連線，因此無法更換攝影機。</translation>
     </message>
   </context>
   <context>
@@ -7720,6 +7463,14 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Plugins</source>
       <translation>擴充套件</translation>
     </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>整合</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
@@ -7820,15 +7571,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
     <message>
       <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
+      <translation>無篩選條件</translation>
     </message>
     <message>
       <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
+      <translation>僅主要的儲存裝置</translation>
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>僅備份的儲存裝置</translation>
     </message>
   </context>
   <context>
@@ -7836,15 +7587,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+      <translation>須由你確認後才能提供token</translation>
     </message>
     <message>
       <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
+      <translation>允許</translation>
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
+      <translation>此網頁需要驗證以取得訪問權限</translation>
     </message>
   </context>
   <context>
@@ -7945,7 +7696,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>點擊以顯示攝影機</translation>
     </message>
   </context>
   <context>
@@ -7953,15 +7704,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Introducing %1 Layouts</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Introducing %1 Layouts</translation>
+      <translation>%1佈局功能介紹</translation>
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 為跨系統佈局，允許你加入不同系統的裝置。目前雖僅支援部分功能，但Nx會持續優化並加入新功能。</translation>
     </message>
     <message>
       <source>Read more on the %1</source>
-      <translation type="unfinished">Read more on the %1</translation>
+      <translation>請參閱 %1 以了解更多</translation>
     </message>
     <message>
       <source>help page</source>
@@ -7973,12 +7724,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (副本)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (副本 %2)</translation>
     </message>
   </context>
   <context>
@@ -8024,10 +7775,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>系統中沒有系統所有者帳戶或已被停用。</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>系統中的所有伺服器均無可用的網際網路連線</translation>
-    </message>
-    <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>系統連接到 %1</translation>
@@ -8060,6 +7807,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>發生內部錯誤，請稍後再嘗試連線。</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>所有伺服器皆無法連線至 %1。</translation>
     </message>
   </context>
   <context>
@@ -8145,7 +7897,42 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>未知的攝影機</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CustomAccessSummaryModel</name>
+    <message>
+      <source>View video archive</source>
+      <translation type="unfinished">View video archive</translation>
+    </message>
+    <message>
+      <source>Export video archive</source>
+      <translation type="unfinished">Export video archive</translation>
+    </message>
+    <message>
+      <source>View bookmarks</source>
+      <translation>查看書籤</translation>
+    </message>
+    <message>
+      <source>Modify bookmarks</source>
+      <translation>修改書籤</translation>
+    </message>
+    <message>
+      <source>User input</source>
+      <translation type="unfinished">User input</translation>
+    </message>
+    <message>
+      <source>Edit camera settings</source>
+      <translation>編輯攝影機設定</translation>
+    </message>
+    <message>
+      <source>View event log</source>
+      <translation>查看事件日誌</translation>
+    </message>
+    <message>
+      <source>View live</source>
+      <translation type="unfinished">View live</translation>
     </message>
   </context>
   <context>
@@ -8165,6 +7952,41 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Set Password</source>
       <translation>設定密碼</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DesktopDataProvider</name>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>未偵測到合適的音頻格式。請選擇其他音源裝置，或請在“螢幕錄影”設定中選擇 &quot;無&quot;。</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>無法偵測到擷取之解析度</translation>
+    </message>
+    <message>
+      <source>Could not find video encoder %1.</source>
+      <translation>找不到影像編碼器 '%1'。</translation>
+    </message>
+    <message>
+      <source>Screen width must be a multiple of 8.</source>
+      <translation>螢幕寬度必須是 8 的倍數.</translation>
+    </message>
+    <message>
+      <source>Could not initialize video encoder.</source>
+      <translation>無法初始化影像編碼器。</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio encoder.</source>
+      <translation>無法初始化聲音編碼器。</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio device &quot;%1&quot;.</source>
+      <translation>無法初始化音源編碼器 &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Could not start primary audio device.</source>
+      <translation>無法啟動主要音效設備。</translation>
     </message>
   </context>
   <context>
@@ -8291,6 +8113,86 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::EventLogDialog</name>
+    <message>
+      <source>Filter Similar Rows</source>
+      <translation>篩選相似行</translation>
+    </message>
+    <message>
+      <source>Copy Selection to Clipboard</source>
+      <translation>複製所選至剪貼簿</translation>
+    </message>
+    <message>
+      <source>Export Selection to File...</source>
+      <translation>匯出所選至檔案...</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation>選擇全部</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>清除篩選器</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>描述</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>沒有事件</translation>
+    </message>
+    <message>
+      <source>Any Action</source>
+      <translation>任何動作</translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - %n events found</source>
+      <comment>Dates are substituted</comment>
+      <translation>
+        <numerusform>事件日誌從 %1 到 %2的時段內 - 找到事件%n</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for %1 - %n events found</source>
+      <comment>Date is substituted</comment>
+      <translation>
+        <numerusform>%1 的事件日誌 - 找到事件 %n</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Export selected events to file</source>
+      <translation>匯出選擇的事件到檔案</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogModel</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>日期 / 時間</translation>
+    </message>
+    <message>
+      <source>Event</source>
+      <translation>事件</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>來源</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation>動作</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>目標</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>描述</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::EventPanel::Private</name>
     <message>
       <source>Notifications</source>
@@ -8322,7 +8224,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EventRibbon::Private</name>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>必要資訊</translation>
     </message>
   </context>
   <context>
@@ -8393,12 +8295,12 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>影片需要重新編碼。</translation>
     </message>
     <message>
-      <source>Archive is encrypted.</source>
-      <translation>錄影資料已加密。</translation>
-    </message>
-    <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>目前無法取得錄影資料，請稍後再試。</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
     </message>
   </context>
   <context>
@@ -8559,7 +8461,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>選擇資料夾...</translation>
     </message>
   </context>
   <context>
@@ -8606,6 +8508,76 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>
         <numerusform>共有%n 個設備</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GlobalPermissionsModel</name>
+    <message>
+      <source>View event log</source>
+      <translation>查看事件日誌</translation>
+    </message>
+    <message>
+      <source>Permission granted by %1 group</source>
+      <translation type="unfinished">Permission granted by %1 group</translation>
+    </message>
+    <message>
+      <source>Generate events</source>
+      <translation>產生事件</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GroupSettingsDialog</name>
+    <message>
+      <source>Group name cannot be empty.</source>
+      <translation type="unfinished">Group name cannot be empty.</translation>
+    </message>
+    <message>
+      <source>Group with the same name already exists.</source>
+      <translation type="unfinished">Group with the same name already exists.</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation type="unfinished">Apply changes?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>丟棄</translation>
+    </message>
+    <message>
+      <source>New Group</source>
+      <translation>新群組</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>新群組 %1</translation>
+    </message>
+    <message>
+      <source>Save changes</source>
+      <translation type="unfinished">Save changes</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>請輸入您的帳號密碼</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>儲存</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>套用變更時失敗</translation>
+    </message>
+    <message>
+      <source>Delete groups</source>
+      <translation type="unfinished">Delete groups</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>刪除</translation>
     </message>
   </context>
   <context>
@@ -8666,19 +8638,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Failed to merge %1 to our system.</source>
       <translation>無法將 %1 合併到我們的系統。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
-    <message>
-      <source>Access granted by:</source>
-      <translation>存取授權者:</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more</source>
-      <translation>
-        <numerusform>與另外 %n 個</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -8780,6 +8739,132 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::LdapSettingsWidget</name>
+    <message>
+      <source>Disconnect LDAP server?</source>
+      <translation type="unfinished">Disconnect LDAP server?</translation>
+    </message>
+    <message>
+      <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
+      <translation type="unfinished">All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>斷線</translation>
+    </message>
+    <message>
+      <source>Reset Settings</source>
+      <translation type="unfinished">Reset Settings</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>請輸入您的帳號密碼</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>重置</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>連接失敗</translation>
+    </message>
+    <message>
+      <source>Remove existing LDAP users and groups?</source>
+      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+    </message>
+    <message>
+      <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
+      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>是</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation>套用設定</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>套用</translation>
+    </message>
+    <message>
+      <source>Synchronize LDAP Users and Groups</source>
+      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+    </message>
+    <message>
+      <source>Synchronize</source>
+      <translation type="unfinished">Synchronize</translation>
+    </message>
+    <message>
+      <source>Connection OK</source>
+      <translation type="unfinished">Connection OK</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>套用變更時失敗</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation>LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n 個授權.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+      <translation>系統沒有可使用的授權，請先嘗試啟用試用授權或者專業版付費授權。</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>匯出</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 已被使用</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>最少需要 %1</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n deactivations remaining.</source>
+      <translation>
+        <numerusform>可重置次數: %n</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation>
+        <numerusform>要重置授權?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation>重置</translation>
+    </message>
+    <message>
+      <source>Export licenses to a file</source>
+      <translation>匯出授權成檔案</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>移除</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
@@ -8808,23 +8893,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
-      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
+      <translation>必須大於或等於各分割檔案大小的設定值</translation>
     </message>
     <message>
       <source>Must be less than or equal to the value set for Limit Max Volume</source>
-      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
+      <translation>必須小於或等於最大儲存容量的設定值</translation>
     </message>
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
-      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
-The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+      <translation>目前所選的日誌級別可能無法收集足夠的資訊。
+設定日誌級別為 &quot;%1&quot; 時，伺服器將收集更詳細的日誌內容。</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade your system&apos;s performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>目前所選的日誌級別可能會降低系統效能。
+在完成日誌收集後，建議將日誌級別改回為預設值。</translation>
     </message>
   </context>
   <context>
@@ -8842,11 +8927,11 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementModel</name>
     <message>
       <source>Unit</source>
-      <translation type="unfinished">Unit</translation>
+      <translation>伺服器</translation>
     </message>
     <message>
       <source>Current Level</source>
-      <translation type="unfinished">Current Level</translation>
+      <translation>目前日誌等級</translation>
     </message>
     <message>
       <source>Client</source>
@@ -8876,6 +8961,18 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>Verbose</source>
       <translation>詳細</translation>
     </message>
+    <message>
+      <source>Default Logging level</source>
+      <translation type="unfinished">Default Logging level</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to “info”</source>
+      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
+    </message>
+    <message>
+      <source>Logging level degrades the performance of the system</source>
+      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWatcher</name>
@@ -8891,7 +8988,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Pending download...</source>
-      <translation type="unfinished">Pending download...</translation>
+      <translation>等待下載...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -8901,37 +8998,37 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logs downloaded</source>
-      <translation type="unfinished">Logs downloaded</translation>
+      <translation>日誌已下載完成</translation>
     </message>
     <message>
       <source>Logs downloading failed</source>
-      <translation type="unfinished">Logs downloading failed</translation>
+      <translation>日誌下載失敗</translation>
     </message>
     <message>
       <source>Debug logging is enabled on the Client</source>
-      <translation type="unfinished">Debug logging is enabled on the Client</translation>
+      <translation>在客戶端上已啟用除錯日誌設定</translation>
     </message>
     <message>
       <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
+      <translation>目前已啟用除錯日誌，將可能降低系統效能。</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      <translation>
+        <numerusform>在 %n 伺服器上已啟用除錯日誌設定</numerusform>
       </translation>
     </message>
     <message>
       <source>Logs downloading canceled</source>
-      <translation type="unfinished">Logs downloading canceled</translation>
+      <translation>日誌下載已取消</translation>
     </message>
     <message>
       <source>Apply Settings</source>
-      <translation type="unfinished">Apply Settings</translation>
+      <translation>套用設定</translation>
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>請輸入您的帳號密碼</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -8942,7 +9039,14 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>選擇資料夾...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListActionHandler</name>
+    <message>
+      <source>Network request failed</source>
+      <translation type="unfinished">Network request failed</translation>
     </message>
   </context>
   <context>
@@ -9137,21 +9241,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>選定的系統(已連接至%1)分屬不同所有者，無法進行系統合併。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
-    <message>
-      <source>Motion</source>
-      <translation>位移</translation>
-    </message>
-    <message>
-      <source>deleted camera</source>
-      <translation>移除攝影機</translation>
-    </message>
-    <message>
-      <source>Bookmark it...</source>
-      <translation>加上書籤...</translation>
     </message>
   </context>
   <context>
@@ -9468,7 +9557,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Uploading client packages to Servers...</source>
-      <translation type="unfinished">Uploading client packages to Servers...</translation>
+      <translation>正在將客戶端更新檔上傳到服務器...</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
@@ -9492,22 +9581,18 @@ You can force it, but it may significantly increase CPU load.</source>
       <source>Acknowledge</source>
       <translation>確認</translation>
     </message>
-    <message>
-      <source>Calling...</source>
-      <translation>撥號中</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message numerus="yes">
       <source>%n notifications</source>
-      <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
+      <translation>
+        <numerusform>%n 則通知</numerusform>
       </translation>
     </message>
     <message>
       <source>Current System</source>
-      <translation type="unfinished">Current System</translation>
+      <translation>目前系統</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -9564,7 +9649,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>This tab will be available in future versions</source>
-      <translation type="unfinished">This tab will be available in future versions</translation>
+      <translation>此頁面功能將在未來版本中支援</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -9682,6 +9767,13 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::PlaybackPositionItem</name>
+    <message>
+      <source>video is paused</source>
+      <translation type="unfinished">video is paused</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
@@ -9793,22 +9885,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>網頁:</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page</source>
-      <translation>新增伺服器代理連線的網頁</translation>
-    </message>
-    <message>
-      <source>Add Web Page</source>
-      <translation>新增網頁</translation>
-    </message>
-    <message>
-      <source>Edit Proxied Web Page</source>
-      <translation>編輯伺服器代理的網頁</translation>
-    </message>
-    <message>
-      <source>Edit Web Page</source>
-      <translation>編輯 Web 頁面</translation>
-    </message>
-    <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation>在網頁設定(&lt;b&gt;一般&lt;/b&gt;頁面)中可啟用伺服器代理轉送服務</translation>
     </message>
@@ -9818,7 +9894,59 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+      <translation>可透過網頁操作桌面客戶端並請求存取使用者連線</translation>
+    </message>
+    <message>
+      <source>An integration may interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+    </message>
+    <message>
+      <source>Proxy this integration through the server</source>
+      <translation type="unfinished">Proxy this integration through the server</translation>
+    </message>
+    <message>
+      <source>Proxy this web page through the server</source>
+      <translation type="unfinished">Proxy this web page through the server</translation>
+    </message>
+    <message>
+      <source>Allow opening this integration without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>Allow opening this web page without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>New Web Page</source>
+      <translation>新 Web 頁面...</translation>
+    </message>
+    <message>
+      <source>Edit Web Page</source>
+      <translation>編輯 Web 頁面</translation>
+    </message>
+    <message>
+      <source>New Proxied Web Page</source>
+      <translation type="unfinished">New Proxied Web Page</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Web Page</source>
+      <translation>編輯伺服器代理的網頁</translation>
+    </message>
+    <message>
+      <source>New Integration</source>
+      <translation type="unfinished">New Integration</translation>
+    </message>
+    <message>
+      <source>Edit Integration</source>
+      <translation type="unfinished">Edit Integration</translation>
+    </message>
+    <message>
+      <source>New Proxied Integration</source>
+      <translation type="unfinished">New Proxied Integration</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Integration</source>
+      <translation type="unfinished">Edit Proxied Integration</translation>
     </message>
   </context>
   <context>
@@ -9854,6 +9982,41 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>
         <numerusform>要匯出縮時瀏覽, 影像長度應至少為 %n 秒.</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RecordingSettingsWidget</name>
+    <message>
+      <source>Screen %1 - %2x%3</source>
+      <translation>螢幕 %1 - %2x%3</translation>
+    </message>
+    <message>
+      <source>%1 (Primary)</source>
+      <translation>%1 (主要的)</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>最佳</translation>
+    </message>
+    <message>
+      <source>Average</source>
+      <translation>平均</translation>
+    </message>
+    <message>
+      <source>Performance</source>
+      <translation>效能</translation>
+    </message>
+    <message>
+      <source>Native</source>
+      <translation>原生</translation>
+    </message>
+    <message>
+      <source>Quarter Native</source>
+      <translation>1/4原生</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>選擇資料夾...</translation>
     </message>
   </context>
   <context>
@@ -9920,6 +10083,68 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
+    <message>
+      <source>Access granted by %1 group</source>
+      <translation type="unfinished">Access granted by %1 group</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n groups: %1</source>
+      <translation type="unfinished">
+        <numerusform>Access granted by %n groups: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Access granted by %1 layout</source>
+      <translation type="unfinished">Access granted by %1 layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n layouts: %1</source>
+      <translation type="unfinished">
+        <numerusform>Access granted by %n layouts: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Access granted by %1 video wall</source>
+      <translation type="unfinished">Access granted by %1 video wall</translation>
+    </message>
+    <message numerus="yes">
+      <source>Access granted by %n video walls: %1</source>
+      <translation type="unfinished">
+        <numerusform>Access granted by %n video walls: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>攝影機與設備</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation type="unfinished">Health Monitors</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>電視牆</translation>
+    </message>
+    <message>
+      <source>User&apos;s custom permissions</source>
+      <translation type="unfinished">User&apos;s custom permissions</translation>
+    </message>
+    <message>
+      <source>Group&apos;s custom permissions</source>
+      <translation type="unfinished">Group&apos;s custom permissions</translation>
+    </message>
+    <message>
+      <source>Access granted by %1</source>
+      <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
+      <translation type="unfinished">Access granted by %1</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
     <message>
       <source>add to current layout</source>
@@ -9936,6 +10161,28 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Health Monitor</source>
       <translation>資源檢視器</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ResourcesChangesManager</name>
+    <message>
+      <source>Resource list is empty</source>
+      <translation type="unfinished">Resource list is empty</translation>
+    </message>
+    <message>
+      <source>No connection</source>
+      <translation type="unfinished">No connection</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RestApiHelper</name>
+    <message>
+      <source>Password confirmation is required to apply changes</source>
+      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+    </message>
+    <message>
+      <source>Confirm</source>
+      <translation>確認</translation>
     </message>
   </context>
   <context>
@@ -10178,10 +10425,6 @@ You can still change quality and FPS directly on the camera.</source>
       <translation>小時</translation>
     </message>
     <message>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>水印僅顯示在非管理員使用者的即時影像，存檔和匯出影片上。您和其他管理員並不會看到。</translation>
-    </message>
-    <message>
       <source>Archive encryption password</source>
       <translation>錄影資料加密密碼</translation>
     </message>
@@ -10235,6 +10478,10 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <comment>%1 is the time span with time units</comment>
       <translation>使用者連線時間最大值建議設置為 %1(或更低)</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
@@ -10280,8 +10527,8 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+      <translation> %1 將有被冒充，並竊取您隱私資料的風險。
+若您沒有修改%2 伺服器的憑證，請不要綁定此憑證。</translation>
     </message>
     <message>
       <source>Custom Certificate</source>
@@ -10294,6 +10541,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Unknown Certificate</source>
       <translation>未知的憑證</translation>
+    </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation type="unfinished">Not Part Of Certificate</translation>
     </message>
   </context>
   <context>
@@ -10309,6 +10560,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Continue</source>
       <translation>繼續</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerListModel</name>
+    <message>
+      <source>Auto</source>
+      <translation>自動</translation>
     </message>
   </context>
   <context>
@@ -10476,6 +10734,57 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
+    <message>
+      <source>Showreel</source>
+      <translation>幻燈片</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation>幻燈片 %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Delete Showreel %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelDropPlaceholder</name>
+    <message>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation>拖曳佈局或攝影機到這裡以加入幻燈片</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation>使用鍵盤的方向鍵切換佈局. 退出幻燈片請按 Esc 鍵.</translation>
+    </message>
+    <message>
+      <source>Press Esc to stop the tour.</source>
+      <translation>按 Esc 來停止巡航。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelItemWidget</name>
+    <message>
+      <source>Switch by</source>
+      <comment>Arrows will follow</comment>
+      <translation>切換</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <comment>Time selector will follow</comment>
+      <translation>顯示</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <comment>Time will follow</comment>
+      <translation>顯示所選</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
@@ -10534,81 +10843,41 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
+      <translation>已找到用來更換的攝影機</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>攝影機%1已被更換為 %2。</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>點擊 &quot;取消更換&quot; 按鈕以同時使用兩個裝置。</translation>
     </message>
     <message>
       <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>匯出</translation>
-    </message>
-    <message>
-      <source>On-device recordings were found</source>
-      <translation>已找到設備上的錄影資料</translation>
-    </message>
-    <message>
-      <source>Import in progress...</source>
-      <translation type="unfinished">Import in progress...</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 completed</source>
-      <translation type="unfinished">Import archive from %1 completed</translation>
+      <translation>取消更換</translation>
     </message>
     <message>
       <source>Import archive from %1 failed</source>
-      <translation type="unfinished">Import archive from %1 failed</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 stopped</source>
-      <translation type="unfinished">Import archive from %1 stopped</translation>
-    </message>
-    <message>
-      <source>Import archive from %1</source>
-      <translation type="unfinished">Import archive from %1</translation>
+      <translation>從 %1 匯入錄影資料失敗</translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+      <translation>
+        <numerusform>%n 伺服器上尚未設定備份儲存裝置</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      <translation>
+        <numerusform>%n 伺服器尚未指定分析資料的儲存裝置</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+      <translation>
+        <numerusform>%n 伺服器的系統碟已用於儲存分析資料</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Not imported archive found on device %1</source>
-      <translation type="unfinished">Not imported archive found on device %1</translation>
-    </message>
-    <message>
-      <source>Not imported archive found on camera %1</source>
-      <translation type="unfinished">Not imported archive found on camera %1</translation>
-    </message>
-    <message>
-      <source>The archive stream settings have been changed by the user</source>
-      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
-    </message>
-    <message>
-      <source>The recording settings have been changed by the user</source>
-      <translation type="unfinished">The recording settings have been changed by the user</translation>
     </message>
   </context>
   <context>
@@ -10675,7 +10944,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>
-      <translation type="unfinished">This action is not supported for notifications from other Systems</translation>
+      <translation>此操作不支援來自其他系統的通知</translation>
     </message>
   </context>
   <context>
@@ -10782,15 +11051,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>LDAP群組</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>內建群組</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>自定群組</translation>
     </message>
     <message>
       <source>Name</source>
@@ -10802,7 +11071,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>隸屬於</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -10810,10 +11079,33 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::UserGroupRequestChain</name>
+    <message>
+      <source>Group does not exist</source>
+      <translation type="unfinished">Group does not exist</translation>
+    </message>
+    <message>
+      <source>User does not exist</source>
+      <translation type="unfinished">User does not exist</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::UserGroupsWidget</name>
     <message>
       <source>Delete</source>
       <translation>刪除</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>找不到任何群組</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation type="unfinished">Change search criteria or create a new group</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
     </message>
   </context>
   <context>
@@ -10836,20 +11128,20 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>登入</translation>
     </message>
     <message>
-      <source>Name</source>
-      <translation>名稱</translation>
-    </message>
-    <message>
       <source>Email</source>
       <translation>Email</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>群組</translation>
     </message>
     <message>
       <source>Custom</source>
       <translation>自訂</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>完整名稱</translation>
     </message>
   </context>
   <context>
@@ -10876,7 +11168,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
+      <translation>支援Digest驗證的使用者</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation>未找到此使用者</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation type="unfinished">Change search criteria or create a new user</translation>
+    </message>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
     </message>
   </context>
   <context>
@@ -10887,11 +11191,67 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>群組</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserSettingsDialog</name>
+    <message>
+      <source>To modify your password please enter the existing one.</source>
+      <translation>要修改您的密碼, 請輸入目前密碼.</translation>
+    </message>
+    <message>
+      <source>Invalid current password.</source>
+      <translation>目前的密碼無效。</translation>
+    </message>
+    <message>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1電子信箱已被使用</translation>
+    </message>
+    <message>
+      <source>Login cannot be empty.</source>
+      <translation>登入不可以空白.</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed.</source>
+      <translation>僅允許輸入字母、數字與 %1 符號。</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists.</source>
+      <translation>指定的登入使用者已存在。</translation>
+    </message>
+    <message>
+      <source>Save user</source>
+      <translation type="unfinished">Save user</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>請輸入您的帳號密碼</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>儲存</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>套用變更時失敗</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation type="unfinished">Apply changes?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>丟棄</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>電子郵件信箱為必填欄位</translation>
     </message>
   </context>
   <context>
@@ -10962,6 +11322,43 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
+    <message>
+      <source>Any event</source>
+      <translation>任一事件</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>攝影機問題</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation>伺服器事件</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>分析事件</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>任一分析事件</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>沒有事件</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or create an Event Rule</source>
+      <translation>請嘗試更改篩選條件或者新增事件規則</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n 事件</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
@@ -10970,6 +11367,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Select folder to upload</source>
       <translation>請選擇要上傳的資料夾</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
+    <message>
+      <source>Empty schedule is not allowed</source>
+      <translation type="unfinished">Empty schedule is not allowed</translation>
     </message>
   </context>
   <context>
@@ -11080,20 +11484,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>%1 可用版本</translation>
     </message>
     <message>
-      <source>Release Notes</source>
-      <translation>更新說明</translation>
-    </message>
-    <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
       <translation>主要問題已得到修復. 強烈建議更新.</translation>
     </message>
     <message>
-      <source>Update...</source>
-      <translation>更新...</translation>
+      <source>Updates</source>
+      <translation>更新</translation>
     </message>
     <message>
-      <source>Do not notify again about this update</source>
-      <translation>不要再次通知更新</translation>
+      <source>Release Notes...</source>
+      <translation>版本更新說明...</translation>
+    </message>
+    <message>
+      <source>%1 Version is available</source>
+      <translation type="unfinished">%1 Version is available</translation>
+    </message>
+    <message>
+      <source>%1</source>
+      <translation>%1</translation>
     </message>
   </context>
   <context>
@@ -11191,6 +11599,22 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Shared Layouts</source>
       <translation>共用的佈局</translation>
     </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation type="unfinished">Health Monitors</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>電視牆</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>整合</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
@@ -11201,6 +11625,45 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>New Group %1</source>
       <translation>新群組 %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
+    <message>
+      <source>No data</source>
+      <translation>無資料</translation>
+    </message>
+    <message>
+      <source>All imported</source>
+      <translation type="unfinished">All imported</translation>
+    </message>
+    <message>
+      <source>In progress... (%1 left)</source>
+      <translation type="unfinished">In progress... (%1 left)</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>停用</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>錯誤</translation>
+    </message>
+    <message>
+      <source>Failed to import. Retry in 1 minute.</source>
+      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名稱</translation>
+    </message>
+    <message>
+      <source>Imported up to</source>
+      <translation type="unfinished">Imported up to</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>狀態</translation>
     </message>
   </context>
   <context>
@@ -11302,60 +11765,131 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
-      <translation type="unfinished">Cannot find an item with the specified ID</translation>
+      <translation>無法找到與指定ID相關的項目</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
-      <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+      <translation>無法找到特定ID的資源項目</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
     <message>
-      <source>None</source>
-      <translation>無</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>分析事件功能可被設定於某些攝影機</translation>
     </message>
     <message>
-      <source>Starts</source>
-      <translation>開始</translation>
-    </message>
-    <message>
-      <source>Stops</source>
-      <translation>停止</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>立即</translation>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>選擇攝影機並點擊上方的按鈕以查看支援的事件清單</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
     <message>
-      <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <source>Event will trigger only if there are matches any of attributes.</source>
+      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+    </message>
+    <message>
+      <source>You can see the names of the attributes and their values on the Objects tab.</source>
+      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::RulesDialog</name>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectTypePicker</name>
     <message>
-      <source>Restore all rules to default?</source>
-      <translation>是否還原所有規則成預設值?</translation>
+      <source>Analytics object detection can be set up on a certain cameras.</source>
+      <translation>可於特定攝影機上啟用分析事件的物件偵測功能</translation>
     </message>
     <message>
-      <source>This action cannot be undone.</source>
-      <translation>此操作無法被復原.</translation>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>選擇攝影機並點擊上方的按鈕以查看支援的事件清單</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
+    <message>
+      <source>Schedule</source>
+      <translation>排程</translation>
     </message>
     <message>
-      <source>Failed to apply changes.</source>
-      <translation>套用變更時失敗.</translation>
+      <source>Delete</source>
+      <translation>刪除</translation>
     </message>
     <message>
-      <source>Failed to restore rules.</source>
-      <translation type="unfinished">Failed to restore rules.</translation>
+      <source>WHEN</source>
+      <translation type="unfinished">WHEN</translation>
     </message>
     <message>
-      <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <source>EVENT</source>
+      <translation type="unfinished">EVENT</translation>
+    </message>
+    <message>
+      <source>DO</source>
+      <translation type="unfinished">DO</translation>
+    </message>
+    <message>
+      <source>ACTION</source>
+      <translation type="unfinished">ACTION</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>啟用</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeywordsPicker</name>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>只有當來源欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>如果該欄位為空白, 事件將維持在觸發狀態</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
+    <message>
+      <source>Has attributes</source>
+      <translation type="unfinished">Has attributes</translation>
+    </message>
+    <message>
+      <source>Listed</source>
+      <translation type="unfinished">Listed</translation>
+    </message>
+    <message>
+      <source>Not listed</source>
+      <translation type="unfinished">Not listed</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>屬性</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
+    <message>
+      <source>Once in</source>
+      <translation type="unfinished">Once in</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation type="unfinished">For</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>數值</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OutputPortPicker</name>
+    <message>
+      <source>automatic</source>
+      <translation>自動</translation>
     </message>
   </context>
   <context>
@@ -11367,6 +11901,174 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Action</source>
       <translation>動作</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>來源</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>目標</translation>
+    </message>
+    <message>
+      <source>Comment</source>
+      <translation type="unfinished">Comment</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation>所有裝置</translation>
+    </message>
+    <message>
+      <source>All Cameras</source>
+      <translation>所有攝影機</translation>
+    </message>
+    <message>
+      <source>No source</source>
+      <translation type="unfinished">No source</translation>
+    </message>
+    <message>
+      <source>All Servers</source>
+      <translation>所有伺服器</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n 伺服器</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>來源攝影機</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>來源與 %n 個以上的攝影機</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No target</source>
+      <translation type="unfinished">No target</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n 佈局</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>全部使用者</translation>
+    </message>
+    <message>
+      <source>Group</source>
+      <translation type="unfinished">Group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n 使用者</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Power Users</source>
+      <translation type="unfinished">All Power Users</translation>
+    </message>
+    <message>
+      <source>All Server</source>
+      <translation type="unfinished">All Server</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation>源伺服器和%1</translation>
+    </message>
+    <message>
+      <source>System</source>
+      <translation>系統</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
+    <message>
+      <source>Select layout...</source>
+      <translation>選擇佈局</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners.</source>
+      <translation>本機佈局僅對其所有者顯示。</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SoundPicker</name>
+    <message>
+      <source>Manage</source>
+      <translation>管理</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
+    <message>
+      <source>Soft trigger</source>
+      <translation type="unfinished">Soft trigger</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
+    <message>
+      <source>Contains keywords</source>
+      <translation type="unfinished">Contains keywords</translation>
+    </message>
+    <message>
+      <source>Does not contain keywords</source>
+      <translation type="unfinished">Does not contain keywords</translation>
+    </message>
+    <message>
+      <source>Contains list entries</source>
+      <translation type="unfinished">Contains list entries</translation>
+    </message>
+    <message>
+      <source>Does not contain list entries</source>
+      <translation type="unfinished">Does not contain list entries</translation>
+    </message>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>關鍵字以空白鍵分隔</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
+    <message>
+      <source>Lookup lists network request failed</source>
+      <translation type="unfinished">Lookup lists network request failed</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
+    <message>
+      <source>Delete rule error: </source>
+      <translation type="unfinished">Delete rule error: </translation>
+    </message>
+    <message>
+      <source>Save rule error: </source>
+      <translation type="unfinished">Save rule error: </translation>
+    </message>
+    <message>
+      <source>Reset to defaults error: </source>
+      <translation type="unfinished">Reset to defaults error: </translation>
     </message>
   </context>
   <context>
@@ -11409,13 +12111,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
       <translation>當屬性相符時可觸發對應事件，您可以在"物件"頁面上查看偵測到的屬性名稱與數值</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-      <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>拖曳佈局或攝影機到這裡以加入幻燈片</translation>
     </message>
   </context>
   <context>
@@ -11465,36 +12160,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-      <source>Switch with Hotkeys</source>
-      <translation>以熱鍵切換</translation>
-    </message>
-    <message>
-      <source>Switch on Timer</source>
-      <translation>以計時器切換</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
-    <message>
-      <source>Stop Tour</source>
-      <translation>停止輪跳</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>停止幻燈片</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>開始巡航</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation>啟動幻燈片</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -11520,6 +12185,40 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Regions of Interest</source>
       <translation>感興趣區域 (ROI)</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowreelSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation>以熱鍵切換</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation>以計時器切換</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowreelTextFactory</name>
+    <message>
+      <source>Stop Tour</source>
+      <translation>停止輪跳</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>停止幻燈片</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>開始巡航</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>啟動幻燈片</translation>
     </message>
   </context>
   <context>
@@ -11576,7 +12275,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -11785,67 +12484,27 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>更換攝影機完成！</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>由於相容性問題，某些設定可能無法套用於欲更換的攝影機。</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>
-      <translation type="unfinished">Confirm undo replacement?</translation>
+      <translation>請確認是否取消更換攝影機?</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>選擇資料夾...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
-    <message>
-      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>使用鍵盤的方向鍵切換佈局. 退出幻燈片請按 Esc 鍵.</translation>
+      <translation>伺服器中找不到可以更換的攝影機</translation>
     </message>
     <message>
-      <source>Press Esc to stop the tour.</source>
-      <translation>按 Esc 來停止巡航。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget</name>
-    <message>
-      <source>Switch by</source>
-      <comment>Arrows will follow</comment>
-      <translation>切換</translation>
-    </message>
-    <message>
-      <source>Display for</source>
-      <comment>Time selector will follow</comment>
-      <translation>顯示</translation>
-    </message>
-    <message>
-      <source>Display selected for</source>
-      <comment>Time will follow</comment>
-      <translation>顯示所選</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
-    <message>
-      <source>Showreel</source>
-      <translation>幻燈片</translation>
-    </message>
-    <message>
-      <source>Showreel %1</source>
-      <translation>幻燈片 %1</translation>
-    </message>
-    <message>
-      <source>Delete Showreel %1?</source>
-      <translation>Delete Showreel %1?</translation>
+      <source>Not enough access rights</source>
+      <translation type="unfinished">Not enough access rights</translation>
     </message>
   </context>
   <context>
@@ -11867,12 +12526,8 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <translation>輸入要建立的佈局名稱:</translation>
     </message>
     <message>
-      <source>New Layout %1</source>
-      <translation>新佈局 %1</translation>
-    </message>
-    <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>將佈局儲存至Cloud</translation>
     </message>
   </context>
   <context>
@@ -11990,7 +12645,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
-      <translation type="unfinished">Rewind is not available for VMAX</translation>
+      <translation>倒帶不適用於 VMAX</translation>
     </message>
   </context>
   <context>
@@ -12052,7 +12707,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
+      <translation>目前無法檢查客戶端更新，請查看您的網路連線並重試。</translation>
     </message>
   </context>
 </TS>

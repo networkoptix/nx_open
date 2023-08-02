@@ -2,6 +2,68 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP" sourcelanguage="en">
   <context>
+    <name>AddLookupListEntryDialog</name>
+    <message>
+      <source>Add Entry</source>
+      <translation>エントリーを追加</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>追加</translation>
+    </message>
+  </context>
+  <context>
+    <name>AdvancedSettingsDialog</name>
+    <message>
+      <source>LDAP - Advanced Settings</source>
+      <translation>LDAP - 詳細設定</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>ユーザー</translation>
+    </message>
+    <message>
+      <source>Login Attribute</source>
+      <translation>ログイン属性</translation>
+    </message>
+    <message>
+      <source>Allow digest authentication for imported users</source>
+      <translation>インポートされるユーザーの Digest 認証を許可する</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>グループ</translation>
+    </message>
+    <message>
+      <source>Name Attribute</source>
+      <translation>名前属性</translation>
+    </message>
+    <message>
+      <source>Membership</source>
+      <translation>メンバーシップ</translation>
+    </message>
+    <message>
+      <source>Misc</source>
+      <translation>その他</translation>
+    </message>
+    <message>
+      <source>Group Attribute</source>
+      <translation type="unfinished">Group Attribute</translation>
+    </message>
+    <message>
+      <source>Synchronization&lt;br&gt;Interval</source>
+      <translation type="unfinished">Synchronization&lt;br&gt;Interval</translation>
+    </message>
+    <message>
+      <source>Search Timeout</source>
+      <translation type="unfinished">Search Timeout</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests&lt;br&gt;via server</source>
+      <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
+    </message>
+  </context>
+  <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
@@ -168,10 +230,87 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsSettingsMenu</name>
+    <message>
+      <source>Plugins</source>
+      <translation>プラグイン</translation>
+    </message>
+    <message>
+      <source>API Integrations</source>
+      <translation>APIインテグレーション</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsToolTipPreview</name>
     <message>
       <source>NO DATA</source>
       <translation>データがありません</translation>
+    </message>
+  </context>
+  <context>
+    <name>ApiIntegrations</name>
+    <message>
+      <source>API Integrations</source>
+      <translation>APIインテグレーション</translation>
+    </message>
+    <message>
+      <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
+      <translation>APIインテグレーションは、REST APIを介して %1 サーバーとやり取りし、メタデータを交換します</translation>
+    </message>
+    <message>
+      <source>New requests</source>
+      <translation>新規リクエスト</translation>
+    </message>
+    <message>
+      <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
+      <translation>API インテグレーションは、インテグレーションプロバイダーから受け取ったコードを確認すると有効になる可能性があります。不要な干渉を防ぐため、新規リクエストが無効になる可能性があります。</translation>
+    </message>
+    <message>
+      <source>Enable %1?</source>
+      <translation>%1 を有効にしますか?</translation>
+    </message>
+    <message>
+      <source>This Integration will be able to:
+ • change settings on cameras
+ • get access to archive
+ • process video streams
+ • exchange metadata over the network</source>
+      <translation>このインテグレーションにより、次のことが可能になります。
+ • カメラの設定変更
+ • アーカイブへのアクセス
+ • 映像ストリームの処理
+ • ネットワーク経由でのメタデータ交換</translation>
+    </message>
+    <message>
+      <source>Enable Integration</source>
+      <translation>インテグレーションを有効化</translation>
+    </message>
+    <message>
+      <source>Remove %1?</source>
+      <translation>%1 を削除しますか?</translation>
+    </message>
+    <message>
+      <source>This will remove Integration request</source>
+      <translation>これによりインテグレーションリクエストが削除されます</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>Remove Request</source>
+      <translation>リクエストを削除</translation>
+    </message>
+  </context>
+  <context>
+    <name>AutoTextField</name>
+    <message>
+      <source>This field cannot be empty</source>
+      <translation>このフィールドは空にできません</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>自動</translation>
     </message>
   </context>
   <context>
@@ -190,6 +329,13 @@
     <message>
       <source>Hotkey %1</source>
       <translation>ホットキー %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>各ボタンを数回押して、これらのボタンの名前を下の表に記入します。</translation>
     </message>
   </context>
   <context>
@@ -292,6 +438,53 @@
     </message>
   </context>
   <context>
+    <name>ConnectionSettingsDialog</name>
+    <message>
+      <source>LDAP - Connection Settings</source>
+      <translation>LDAP - 接続設定</translation>
+    </message>
+    <message>
+      <source>Host</source>
+      <translation>ホスト</translation>
+    </message>
+    <message>
+      <source>This field cannot be empty</source>
+      <translation>このフィールドは空にできません</translation>
+    </message>
+    <message>
+      <source>Login DN</source>
+      <translation>ログインDN</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>パスワード</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty.</source>
+      <translation>パスワードは空にできません。</translation>
+    </message>
+    <message>
+      <source>Ignore LDAP server certificate errors</source>
+      <translation>LDAPサーバーの証明書エラーを無視する</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>テスト</translation>
+    </message>
+    <message>
+      <source>Connecting...</source>
+      <translation>接続中...</translation>
+    </message>
+    <message>
+      <source>Login DN cannot be empty.</source>
+      <translation type="unfinished">Login DN cannot be empty.</translation>
+    </message>
+    <message>
+      <source>Use StartTLS</source>
+      <translation type="unfinished">Use StartTLS</translation>
+    </message>
+  </context>
+  <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
@@ -342,6 +535,49 @@
     <message>
       <source>360° Equirectangular</source>
       <translation>360°正距円筒図法</translation>
+    </message>
+  </context>
+  <context>
+    <name>EditLookupListDialog</name>
+    <message>
+      <source>List Settings</source>
+      <translation>リスト設定</translation>
+    </message>
+    <message>
+      <source>New List</source>
+      <translation>新規リスト</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名前</translation>
+    </message>
+    <message>
+      <source>Column Name</source>
+      <translation>カラム名</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>作成</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation>一般</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>タイプ</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>属性</translation>
     </message>
   </context>
   <context>
@@ -402,6 +638,29 @@
     <message>
       <source>NO PREVIEW</source>
       <translation>プレビューなし</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilterDialog</name>
+    <message>
+      <source>Edit Filter</source>
+      <translation>フィルターを編集</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名前</translation>
+    </message>
+    <message>
+      <source>Base DN</source>
+      <translation>ベースDN</translation>
+    </message>
+    <message>
+      <source>Base DN cannot be empty</source>
+      <translation>ベース DN は空にできません</translation>
+    </message>
+    <message>
+      <source>Filter</source>
+      <translation>フィルター</translation>
     </message>
   </context>
   <context>
@@ -491,11 +750,182 @@
     </message>
   </context>
   <context>
+    <name>GlobalPermissionsTab</name>
+    <message>
+      <source>On system level user has permissions to:</source>
+      <translation>システムレベルでは、ユーザーには以下の権限があります:</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateDialog</name>
+    <message>
+      <source>New Group</source>
+      <translation>新規グループ</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>全般</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>グループ</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>リソース</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>グローバル権限</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>メンバー</translation>
+    </message>
+    <message>
+      <source>Add Group</source>
+      <translation>グループを追加</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateTab</name>
+    <message>
+      <source>New Group</source>
+      <translation>新規グループ</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名前</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>説明</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>権限グループ</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupEditDialog</name>
+    <message>
+      <source>Group - %1</source>
+      <translation>グループ - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>全般</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>グループ</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>リソース</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>グローバル権限</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>メンバー</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupGeneralTab</name>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>情報</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>説明</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>グループ</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>メンバー</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>ユーザー</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>権限グループ</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupMembersTab</name>
+    <message>
+      <source>Users</source>
+      <translation>ユーザー</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>グループ</translation>
+    </message>
+    <message>
+      <source>No members</source>
+      <translation>メンバーなし</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add members</source>
+      <translation>メンバーを追加するには左側のコントロールを使用してください</translation>
+    </message>
+    <message>
+      <source>Members summary</source>
+      <translation>メンバー概要</translation>
+    </message>
+    <message>
+      <source>Inherits membership in current group</source>
+      <translation>現在のグループのメンバーシップを継承します</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupsComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>選択</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>検索</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>何も見つかりませんでした</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupsFlow</name>
+    <message>
+      <source>and %1 more...</source>
+      <translation>ほか %1 件...</translation>
+    </message>
+  </context>
+  <context>
     <name>HintItem</name>
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
       <translation>%1 を押し続けている間、アクションが有効になります</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportFromDeviceDialog</name>
+    <message>
+      <source>Import From Devices</source>
+      <translation type="unfinished">Import From Devices</translation>
     </message>
   </context>
   <context>
@@ -506,7 +936,40 @@
     </message>
   </context>
   <context>
-    <name>InformationPanel</name>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>ジョイスティックを選択してください。</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>デバイスは接続されていません。</translation>
+    </message>
+  </context>
+  <context>
+    <name>InsecureWarning</name>
+    <message>
+      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
+      <translation>アカウントのセキュリティは重要です。正当な理由がない限り、この設定を有効にしないでください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationHeader</name>
+    <message>
+      <source>OFFLINE</source>
+      <translation>オフライン</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>再読み込み</translation>
+    </message>
+    <message>
+      <source>Refreshing...</source>
+      <translation>更新中...</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
       <translation>バージョン</translation>
@@ -522,14 +985,6 @@
     <message>
       <source>Select video stream from the camera for analysis</source>
       <translation>分析に使うビデオストリームを選択</translation>
-    </message>
-    <message>
-      <source>Refresh</source>
-      <translation>再読み込み</translation>
-    </message>
-    <message>
-      <source>Refreshing...</source>
-      <translation>更新中...</translation>
     </message>
   </context>
   <context>
@@ -557,6 +1012,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>リピート切り替え</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>保存</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>前へ</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>次へ</translation>
     </message>
   </context>
   <context>
@@ -610,6 +1080,89 @@
     <message>
       <source>Default value:</source>
       <translation>デフォルト値：</translation>
+    </message>
+  </context>
+  <context>
+    <name>LdapSettings</name>
+    <message>
+      <source>LDAP is not configured yet</source>
+      <translation>LDAP はまだ設定されていません</translation>
+    </message>
+    <message>
+      <source>Connect your System to a LDAP server for easier user management</source>
+      <translation>システムを LDAP サーバーに接続すると、ユーザー管理が容易になります</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>接続</translation>
+    </message>
+    <message>
+      <source>ONLINE</source>
+      <translation>オンライン</translation>
+    </message>
+    <message>
+      <source>OFFLINE</source>
+      <translation>オフライン</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>ユーザー</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>グループ</translation>
+    </message>
+    <message>
+      <source>Last Sync</source>
+      <translation>前回の同期</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>編集</translation>
+    </message>
+    <message>
+      <source>Advanced Settings</source>
+      <translation>詳細設定</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>切断</translation>
+    </message>
+    <message>
+      <source>Continuous User Import</source>
+      <translation>連続ユーザーインポート</translation>
+    </message>
+    <message>
+      <source>VMS imports and synchronizes users and groups with LDAP in real time</source>
+      <translation>VMSは、リアルタイムでLDAPと同期してユーザーとグループをインポートします</translation>
+    </message>
+    <message>
+      <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
+      <translation>システムにログインしたことがない LDAP ユーザーは、ユーザーのリストには表示されません。グループを使用して、そのようなユーザーの権限を構成します。</translation>
+    </message>
+    <message>
+      <source>Filters</source>
+      <translation>フィルター</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>追加</translation>
+    </message>
+    <message>
+      <source>Add Filter</source>
+      <translation>フィルターを追加</translation>
+    </message>
+    <message>
+      <source>No filters</source>
+      <translation>フィルターなし</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP is disabled for this system. Some settings may be not available.</source>
+      <translation>このシステムでは、LDAPからの継続的なインポートが無効になっています。一部の設定が利用できない場合があります。</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the system’s DB. Make sure LDAP server parameters and filters are configured correctly. </source>
+      <translation>同期設定に一致するユーザーまたはグループが存在しないため、システムの DB には追加されません。 LDAP サーバーのパラメーターとフィルターが正しく構成されていることを確認してください。 </translation>
     </message>
   </context>
   <context>
@@ -699,6 +1252,55 @@
     </message>
   </context>
   <context>
+    <name>LookupListElementEditor</name>
+    <message>
+      <source>Any %1</source>
+      <translation type="unfinished">Any %1</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>はい</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>いいえ</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListTableCellDelegate</name>
+    <message>
+      <source>ANY</source>
+      <translation type="unfinished">ANY</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListsDialog</name>
+    <message>
+      <source>Lookup Lists</source>
+      <translation>検索リスト</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>追加</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>インポート</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>エクスポート</translation>
+    </message>
+    <message>
+      <source>Create New...</source>
+      <translation>新規作成</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>設定</translation>
+    </message>
+  </context>
+  <context>
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
@@ -707,6 +1309,21 @@
     <message>
       <source>Select an area on the video to filter results</source>
       <translation>映像領域を選択して結果をフィルタリングします</translation>
+    </message>
+  </context>
+  <context>
+    <name>NoListsPage</name>
+    <message>
+      <source>No Lists</source>
+      <translation>リストなし</translation>
+    </message>
+    <message>
+      <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
+      <translation>まだリストを作成していません。リストを使用すると、複数の値を保存してイベントルールで使用できます。エントリーの追加を始めるには新しいリストを作成してください。</translation>
+    </message>
+    <message>
+      <source>Create New...</source>
+      <translation>新規作成</translation>
     </message>
   </context>
   <context>
@@ -752,6 +1369,120 @@
     <message>
       <source>Remember me</source>
       <translation>ログイン情報を保持</translation>
+    </message>
+  </context>
+  <context>
+    <name>PanelBase</name>
+    <message>
+      <source>Approve</source>
+      <translation>承認</translation>
+    </message>
+    <message>
+      <source>Reject</source>
+      <translation>拒否</translation>
+    </message>
+  </context>
+  <context>
+    <name>ParentGroupsTab</name>
+    <message>
+      <source>Add Group</source>
+      <translation>グループを追加</translation>
+    </message>
+    <message>
+      <source>Built In</source>
+      <translation>ビルトイン</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>カスタム</translation>
+    </message>
+    <message>
+      <source>No custom groups yet</source>
+      <translation>カスタムグループはまだありません</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>グループが見つかりません</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>検索条件を変更するか、新しいグループを作成してください</translation>
+    </message>
+    <message>
+      <source>Selected groups</source>
+      <translation>選択されたグループ</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation>グループなし</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add to a group</source>
+      <translation>グループに追加するには左側のコントロールを使用してください</translation>
+    </message>
+    <message>
+      <source>LDAP group membership is managed in LDAP</source>
+      <translation>LDAP グループのメンバーシップは LDAP で管理されます</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordChangeDialog</name>
+    <message>
+      <source>Change password - %1</source>
+      <translation>パスワード変更 - %1</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>ログイン</translation>
+    </message>
+    <message>
+      <source>Current password</source>
+      <translation>現在のパスワード</translation>
+    </message>
+    <message>
+      <source>New password</source>
+      <translation>新しいパスワード</translation>
+    </message>
+    <message>
+      <source>Confirm password</source>
+      <translation>パスワードを再確認</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>パスワードが一致しません。</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionSummary</name>
+    <message>
+      <source>No custom permissions</source>
+      <translation>カスタム権限なし</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionsTab</name>
+    <message>
+      <source>No resources</source>
+      <translation>リソースなし</translation>
+    </message>
+    <message>
+      <source>Try changing search criteria</source>
+      <translation>検索条件の変更をお試しください</translation>
+    </message>
+    <message>
+      <source>Automatically add dependent access rights</source>
+      <translation type="unfinished">Automatically add dependent access rights</translation>
+    </message>
+  </context>
+  <context>
+    <name>Plugins</name>
+    <message>
+      <source>Plugins</source>
+      <translation>プラグイン</translation>
+    </message>
+    <message>
+      <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
+      <translation>プラグインは、 %1 サーバー上で実行されるプログラムで、シームレスな映像分析インテグレーションを可能にします。</translation>
     </message>
   </context>
   <context>
@@ -829,7 +1560,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation>次</translation>
+      <translation>次へ</translation>
     </message>
   </context>
   <context>
@@ -865,6 +1596,37 @@ PTZを行います</translation>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
       <translation>映像中央にドラッグマーカーを表示するには、ローカル設定を開いてください</translation>
+    </message>
+    <message>
+      <source>Target lock tracking</source>
+      <translation>ターゲットロック追跡</translation>
+    </message>
+    <message>
+      <source>Alt + Click to follow the object</source>
+      <translation>Alt + クリックでオブジェクトを追跡</translation>
+    </message>
+  </context>
+  <context>
+    <name>QuickIntervalPanel</name>
+    <message>
+      <source>today</source>
+      <translation>今日</translation>
+    </message>
+    <message>
+      <source>-1 hour</source>
+      <translation>-1時間</translation>
+    </message>
+    <message>
+      <source>-24 hours</source>
+      <translation>-24時間</translation>
+    </message>
+    <message>
+      <source>-7 days</source>
+      <translation>-7日</translation>
+    </message>
+    <message>
+      <source>-30 days</source>
+      <translation>-30日</translation>
     </message>
   </context>
   <context>
@@ -920,6 +1682,37 @@ PTZを行います</translation>
     </message>
   </context>
   <context>
+    <name>ResourceFilterButton</name>
+    <message>
+      <source>Available by Permissions</source>
+      <translation type="unfinished">Available by Permissions</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>カメラとデバイス</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>レイアウト</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
+    <message>
+      <source>Web Pages</source>
+      <translation>ウェブページ</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation>ヘルスモニター</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>ビデオウォール</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
@@ -946,10 +1739,6 @@ PTZを行います</translation>
       <translation>検索</translation>
     </message>
     <message>
-      <source>All Types</source>
-      <translation>全てのタイプ</translation>
-    </message>
-    <message>
       <source>Servers</source>
       <translation>サーバー</translation>
     </message>
@@ -974,12 +1763,12 @@ PTZを行います</translation>
       <translation>ウェブページ</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>ユーザー</translation>
-    </message>
-    <message>
       <source>Local Files</source>
       <translation>ローカルファイル</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>インテグレーション</translation>
     </message>
   </context>
   <context>
@@ -1014,6 +1803,21 @@ PTZを行います</translation>
     <message>
       <source>Analytics</source>
       <translation>分析</translation>
+    </message>
+  </context>
+  <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>保存するファイルを選択</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>JSONファイル (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>結果を保存するファイル:</translation>
     </message>
   </context>
   <context>
@@ -1108,7 +1912,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation>有効</translation>
+      <translation>有効化</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -1187,10 +1991,6 @@ PTZを行います</translation>
     <message>
       <source>Unsupported firmware version</source>
       <translation>サポートされていないファームウェアバージョンです</translation>
-    </message>
-    <message>
-      <source>Access denied</source>
-      <translation>アクセスが拒否されました</translation>
     </message>
   </context>
   <context>
@@ -1283,6 +2083,173 @@ PTZを行います</translation>
     </message>
   </context>
   <context>
+    <name>UserCreateDialog</name>
+    <message>
+      <source>New User</source>
+      <translation>新規ユーザー</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>全般</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>グループ</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>リソース</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>グローバル権限</translation>
+    </message>
+    <message>
+      <source>Add User</source>
+      <translation>ユーザーを追加</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserCreateTab</name>
+    <message>
+      <source>New User</source>
+      <translation>新規ユーザー</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>タイプ</translation>
+    </message>
+    <message>
+      <source>Local</source>
+      <translation>ローカル</translation>
+    </message>
+    <message>
+      <source>Cloud</source>
+      <translation>クラウド</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>ログイン</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>フルネーム</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Eメール</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>パスワード</translation>
+    </message>
+    <message>
+      <source>Confirm Password</source>
+      <translation>パスワード再確認</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>パスワードが一致しません。</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>安全でない (Digest) 認証を許可する</translation>
+    </message>
+    <message>
+      <source>You need to specify only user&apos;s email address.</source>
+      <translation>ユーザーのメールアドレスのみを指定する必要があります。</translation>
+    </message>
+    <message>
+      <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
+      <translation>ユーザーがすでにアカウントを持っている場合、このシステムが表示され、ログインできるようになります。そうでない場合は、このアドレスに招待メールが送信され、ユーザーがアカウントを作成するとこのシステムが表示されます。</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>権限グループ</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEditDialog</name>
+    <message>
+      <source>User - %1</source>
+      <translation>ユーザー - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>全般</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>グループ</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>リソース</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>グローバル権限</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEnabledSwitch</name>
+    <message>
+      <source>Enabled user</source>
+      <translation>有効なユーザー</translation>
+    </message>
+    <message>
+      <source>Disabled user</source>
+      <translation>無効なユーザー</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserGeneralTab</name>
+    <message>
+      <source>Audit Trail</source>
+      <translation>追跡記録</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>情報</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>フルネーム</translation>
+    </message>
+    <message>
+      <source>Account Settings</source>
+      <translation>アカウント設定</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Eメール</translation>
+    </message>
+    <message>
+      <source>Change password</source>
+      <translation>パスワードを変更</translation>
+    </message>
+    <message>
+      <source>Set password to enable insecure authentication</source>
+      <translation>安全でない認証を有効にするにはパスワードを設定してください</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>安全でない (Digest) 認証を許可する</translation>
+    </message>
+    <message>
+      <source>This user is not found in LDAP database and is not able to log in.</source>
+      <translation>このユーザーはLDAPデータベースに存在しないため、ログインできません。</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>権限グループ</translation>
+    </message>
+  </context>
+  <context>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
@@ -1295,6 +2262,37 @@ PTZを行います</translation>
     <message>
       <source>Favorites</source>
       <translation>お気に入り</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialog</name>
+    <message>
+      <source>Vms Rules</source>
+      <translation type="unfinished">Vms Rules</translation>
+    </message>
+    <message>
+      <source>Add Rule</source>
+      <translation type="unfinished">Add Rule</translation>
+    </message>
+    <message>
+      <source>Duplicate</source>
+      <translation type="unfinished">Duplicate</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation type="unfinished">No Entries</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>イベントログ...</translation>
+    </message>
+    <message>
+      <source>Reset To Defaults...</source>
+      <translation type="unfinished">Reset To Defaults...</translation>
     </message>
   </context>
   <context>
@@ -1314,6 +2312,27 @@ PTZを行います</translation>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation>%1 にアクセスできません。インターネット接続を確認してください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>ジョイスティックを左右に数回動かしてください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>ジョイスティックを上下に数回動かしてください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>ジョイスティックを時計回りと反時計回りに数回回転させてください。</translation>
     </message>
   </context>
 </TS>

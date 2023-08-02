@@ -2,6 +2,21 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP" sourcelanguage="en">
   <context>
+    <name>GroupStrings</name>
+    <message>
+      <source>Any event</source>
+      <translation>全イベント</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>全カメラ障害</translation>
+    </message>
+    <message>
+      <source>Any server issue</source>
+      <translation type="unfinished">Any server issue</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::AggregatedEvent</name>
     <message>
       <source>Multiple %1 events have occurred</source>
@@ -20,24 +35,24 @@
       <translation>%2 の %1</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>状態</translation>
+      <source>Begin When</source>
+      <translation type="unfinished">Begin When</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
     </message>
     <message>
-      <source>Event Type</source>
-      <translation>イベントタイプ</translation>
+      <source>Of Type</source>
+      <translation type="unfinished">Of Type</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>キャプション</translation>
+      <source>And Caption</source>
+      <translation type="unfinished">And Caption</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <source>And Description</source>
+      <translation type="unfinished">And Description</translation>
     </message>
   </context>
   <context>
@@ -56,16 +71,16 @@
       <translation>分析オブジェクト検出</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
+      <source>Occurs At</source>
+      <translation type="unfinished">Occurs At</translation>
     </message>
     <message>
-      <source>Object Type</source>
-      <translation>オブジェクトタイプ</translation>
+      <source>Of Type</source>
+      <translation type="unfinished">Of Type</translation>
     </message>
     <message>
-      <source>Attributes</source>
-      <translation>属性</translation>
+      <source>And Object</source>
+      <translation type="unfinished">And Object</translation>
     </message>
   </context>
   <context>
@@ -82,12 +97,54 @@
   <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
-      <source>Unknown event</source>
-      <translation>不明なイベント</translation>
-    </message>
-    <message>
       <source>%1 event has occurred</source>
       <translation>%1 イベントが発生しました</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BookmarkAction</name>
+    <message>
+      <source>Pre-recording</source>
+      <translation>プレ録画</translation>
+    </message>
+    <message>
+      <source>Post-recording</source>
+      <translation>ポスト録画</translation>
+    </message>
+    <message>
+      <source>Create Bookmark</source>
+      <translation type="unfinished">Create Bookmark</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>デバイス</translation>
+    </message>
+    <message>
+      <source>Fixed Duration</source>
+      <translation type="unfinished">Fixed Duration</translation>
+    </message>
+    <message>
+      <source>Add Tags</source>
+      <translation type="unfinished">Add Tags</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BuzzerAction</name>
+    <message>
+      <source>Buzzer</source>
+      <translation>ブザー</translation>
+    </message>
+    <message>
+      <source>Fixed duration</source>
+      <translation>固定期間</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>デバイス</translation>
+    </message>
+    <message>
+      <source>Action Throttling</source>
+      <translation type="unfinished">Action Throttling</translation>
     </message>
   </context>
   <context>
@@ -101,20 +158,20 @@
       <translation>入力ON %1</translation>
     </message>
     <message>
-      <source>Input Signal on Camera</source>
-      <translation>カメラのI/O入力</translation>
-    </message>
-    <message>
       <source>State</source>
       <translation>状態</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
+      <source>Input Signal on Device</source>
+      <translation type="unfinished">Input Signal on Device</translation>
     </message>
     <message>
-      <source>Input ID</source>
-      <translation>入力ID</translation>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
+    </message>
+    <message>
+      <source>With ID</source>
+      <translation type="unfinished">With ID</translation>
     </message>
   </context>
   <context>
@@ -148,31 +205,31 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>デバイス %1 切断</translation>
+      <translation>デバイス %1 が切断されました</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>カメラ %1 切断</translation>
+      <translation>カメラ %1 が切断されました</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>IOモジュール %1 切断</translation>
+      <translation>IOモジュール %1 が切断されました</translation>
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
       <translation>
-        <numerusform>デバイス切断</numerusform>
+        <numerusform>デバイスが切断されました</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Device ID</source>
-      <translation>デバイスID</translation>
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
       <translation>
         <numerusform>カメラ切断</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>デバイス</translation>
     </message>
   </context>
   <context>
@@ -188,7 +245,7 @@
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>デバイスIPが %1 と重複</translation>
+      <translation>デバイスのIPが %1 と重複</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
@@ -209,18 +266,110 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::DeviceOutputAction</name>
+    <message>
+      <source>Output ID</source>
+      <translation>出力ID</translation>
+    </message>
+    <message>
+      <source>Device Output</source>
+      <translation type="unfinished">Device Output</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>デバイス</translation>
+    </message>
+    <message>
+      <source>Fixed Duration</source>
+      <translation type="unfinished">Fixed Duration</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceRecordingAction</name>
+    <message>
+      <source>Quality</source>
+      <translation>映像品質</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>FPS</translation>
+    </message>
+    <message>
+      <source>Pre-recording</source>
+      <translation>プレ録画</translation>
+    </message>
+    <message>
+      <source>Post-recording</source>
+      <translation>ポスト録画</translation>
+    </message>
+    <message>
+      <source>Camera Recording</source>
+      <translation type="unfinished">Camera Recording</translation>
+    </message>
+    <message>
+      <source>On</source>
+      <translation>有効</translation>
+    </message>
+    <message>
+      <source>Fixed Duration</source>
+      <translation type="unfinished">Fixed Duration</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::EnterFullscreenAction</name>
+    <message>
+      <source>Camera</source>
+      <translation>カメラ</translation>
+    </message>
+    <message>
+      <source>On Layout</source>
+      <translation>レイアウト</translation>
+    </message>
+    <message>
+      <source>Set to Fullscreen</source>
+      <translation>フルスクリーンに設定</translation>
+    </message>
+    <message>
+      <source>Set for</source>
+      <translation type="unfinished">Set for</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation type="unfinished">Rewind</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ExitFullscreenAction</name>
+    <message>
+      <source>On Layout</source>
+      <translation>レイアウト</translation>
+    </message>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>フルスクリーン表示終了</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>宛先</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan error at %1</source>
       <translation>%1ファンエラー</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>ファンエラー</translation>
+      <source>Fan Failure</source>
+      <translation type="unfinished">Fan Failure</translation>
     </message>
     <message>
-      <source>Server</source>
-      <translation>サーバー</translation>
+      <source>At</source>
+      <translation>デバイス</translation>
     </message>
   </context>
   <context>
@@ -231,35 +380,31 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>一般的イベント %1</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>キーワード (スペース区切り)</translation>
+      <translation>%1 の汎用イベント</translation>
     </message>
     <message>
       <source>State</source>
       <translation>状態</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>ソース</translation>
+      <source>Omit logging</source>
+      <translation>ログ書込みを省略</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>キャプション</translation>
+      <source>And Source</source>
+      <translation type="unfinished">And Source</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <source>And Caption</source>
+      <translation type="unfinished">And Caption</translation>
+    </message>
+    <message>
+      <source>And Description</source>
+      <translation type="unfinished">And Description</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAction</name>
-    <message>
-      <source>Interval of action</source>
-      <translation>実行間隔</translation>
-    </message>
     <message>
       <source>Login</source>
       <translation>ログイン</translation>
@@ -269,24 +414,32 @@
       <translation>パスワード</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation>HTTP(S) リクエストを実行</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation>HTTP(S) URL</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation>HTTP(S) コンテンツ</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
+      <source>Content type</source>
       <translation>コンテンツタイプ</translation>
     </message>
     <message>
-      <source>Request Method</source>
-      <translation>リクエストメソッド</translation>
+      <source>HTTP(S) Request</source>
+      <translation type="unfinished">HTTP(S) Request</translation>
+    </message>
+    <message>
+      <source>URL</source>
+      <translation>URL</translation>
+    </message>
+    <message>
+      <source>Content</source>
+      <translation>コンテンツ</translation>
+    </message>
+    <message>
+      <source>Method</source>
+      <translation>方法</translation>
+    </message>
+    <message>
+      <source>Authentication Type</source>
+      <translation>認証タイプ</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
     </message>
   </context>
   <context>
@@ -319,16 +472,16 @@
       <translation>動体検知ON %1</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>状態</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
-    </message>
-    <message>
       <source>Motion on Camera</source>
       <translation>カメラのモーション</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation type="unfinished">Begin When</translation>
+    </message>
+    <message>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
     </message>
   </context>
   <context>
@@ -405,16 +558,8 @@
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Show Notification</source>
-      <translation>通知を表示</translation>
-    </message>
-    <message>
       <source>To</source>
       <translation>宛先</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>実行間隔</translation>
     </message>
     <message>
       <source>Force Acknowledgement</source>
@@ -432,6 +577,67 @@
       <source>Tooltip</source>
       <translation>ツールチップ</translation>
     </message>
+    <message>
+      <source>Show Desktop Notification</source>
+      <translation type="unfinished">Show Desktop Notification</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OpenLayoutAction</name>
+    <message>
+      <source>Open Layout</source>
+      <translation>レイアウトを開く</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>宛先</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation type="unfinished">Rewind</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PanicRecordingAction</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>パニック録画モードは、すべてのカメラの録画設定を最大FPS・最高品質に切り替えます。</translation>
+    </message>
+    <message>
+      <source>Panic Recording</source>
+      <translation type="unfinished">Panic Recording</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PlaySoundAction</name>
+    <message>
+      <source>Volume</source>
+      <translation>ボリューム</translation>
+    </message>
+    <message>
+      <source>Play Sound</source>
+      <translation type="unfinished">Play Sound</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>デバイス</translation>
+    </message>
+    <message>
+      <source>To Users</source>
+      <translation type="unfinished">To Users</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::PluginDiagnosticEvent</name>
@@ -440,24 +646,24 @@
       <translation>プラグイン診断イベント</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>ソース</translation>
+      <source>For Plugin</source>
+      <translation type="unfinished">For Plugin</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>キャプション</translation>
+      <source>And Caption</source>
+      <translation type="unfinished">And Caption</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>説明</translation>
+      <source>And Description</source>
+      <translation type="unfinished">And Description</translation>
     </message>
     <message>
-      <source>Level</source>
-      <translation>レベル</translation>
+      <source>And Level Is</source>
+      <translation type="unfinished">And Level Is</translation>
     </message>
   </context>
   <context>
@@ -473,42 +679,115 @@
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation>理由：電力制限を超えました（%1）</translation>
-    </message>
-    <message>
-      <source>PoE over Budget</source>
-      <translation>PoE給電容量超過</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>状態</translation>
+      <translation>理由：電力制限を超えました (%1)</translation>
     </message>
     <message>
       <source>Server</source>
       <translation>サーバー</translation>
     </message>
+    <message>
+      <source>PoE Over Budget</source>
+      <translation type="unfinished">PoE Over Budget</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation type="unfinished">Begin When</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PtzPresetAction</name>
+    <message>
+      <source>Execute PTZ Preset</source>
+      <translation type="unfinished">Execute PTZ Preset</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>デバイス</translation>
+    </message>
+    <message>
+      <source>PTZ Preset</source>
+      <translation type="unfinished">PTZ Preset</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
+    </message>
+    <message>
+      <source>Execute to users</source>
+      <translation type="unfinished">Execute to users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PushNotificationAction</name>
+    <message>
+      <source>To</source>
+      <translation>宛先</translation>
+    </message>
+    <message>
+      <source>Header</source>
+      <translation>ヘッダー</translation>
+    </message>
+    <message>
+      <source>Body</source>
+      <translation>本文</translation>
+    </message>
+    <message>
+      <source>Send Mobile Notification</source>
+      <translation type="unfinished">Send Mobile Notification</translation>
+    </message>
+    <message>
+      <source>Add Source Device name to Body</source>
+      <translation type="unfinished">Add Source Device name to Body</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::RepeatSoundAction</name>
+    <message>
+      <source>Sound</source>
+      <translation>サウンド</translation>
+    </message>
+    <message>
+      <source>Volume</source>
+      <translation>ボリューム</translation>
+    </message>
+    <message>
+      <source>Repeat Sound</source>
+      <translation type="unfinished">Repeat Sound</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>デバイス</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>宛先</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
-      <source>Send email</source>
+      <source>Email Message</source>
+      <translation>メールメッセージ</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
       <translation>メールを送信</translation>
     </message>
     <message>
-      <source>to</source>
+      <source>To</source>
       <translation>宛先</translation>
     </message>
     <message>
-      <source>Interval of action</source>
+      <source>Additional Recipients</source>
+      <translation type="unfinished">Additional Recipients</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
       <translation>実行間隔</translation>
-    </message>
-    <message>
-      <source>Additional recipients</source>
-      <translation>追加の受信者</translation>
-    </message>
-    <message>
-      <source>Email Message</source>
-      <translation>メールメッセージ</translation>
     </message>
   </context>
   <context>
@@ -526,12 +805,12 @@
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>重複サーバー: %1</translation>
+      <translation>競合サーバー: %1</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>重複サーバー #%1: %2</translation>
+      <translation>競合サーバー #%1: %2</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
@@ -544,7 +823,7 @@
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>サーバの競合</translation>
+      <translation>サーバー競合</translation>
     </message>
   </context>
   <context>
@@ -578,6 +857,29 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>アラームレイアウトに表示</translation>
+    </message>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>アラーム: %1</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>宛先</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation type="unfinished">Rewind</translation>
+    </message>
+    <message>
+      <source>Force Alarm Layout Opening</source>
+      <translation type="unfinished">Force Alarm Layout Opening</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
       <source>Trigger Name</source>
@@ -596,24 +898,20 @@
       <translation>ソフトトリガー</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>状態</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>カメラ</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>ユーザー</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>名前</translation>
     </message>
     <message>
       <source>Icon</source>
       <translation>アイコン</translation>
+    </message>
+    <message>
+      <source>Occurs at</source>
+      <translation type="unfinished">Occurs at</translation>
+    </message>
+    <message>
+      <source>By</source>
+      <translation type="unfinished">By</translation>
     </message>
   </context>
   <context>
@@ -623,24 +921,24 @@
       <translation>スピーク</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>カメラ</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>実行間隔</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>通知先ユーザー</translation>
-    </message>
-    <message>
-      <source>Speak the following</source>
-      <translation>読むテキスト</translation>
-    </message>
-    <message>
       <source>Volume</source>
       <translation>ボリューム</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>テキスト</translation>
+    </message>
+    <message>
+      <source>At Device</source>
+      <translation type="unfinished">At Device</translation>
+    </message>
+    <message>
+      <source>To users</source>
+      <translation type="unfinished">To users</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
     </message>
   </context>
   <context>
@@ -697,24 +995,24 @@
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
-      <source>Show text overlay</source>
-      <translation>テキストオーバーレイ表示</translation>
+      <source>Show Text Overlay</source>
+      <translation type="unfinished">Show Text Overlay</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>カメラ</translation>
+      <source>At</source>
+      <translation>デバイス</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>ソースカメラも表示する</translation>
+      <source>Fixed Duration</source>
+      <translation type="unfinished">Fixed Duration</translation>
     </message>
     <message>
-      <source>Display text for</source>
-      <translation>テキスト表示期間</translation>
+      <source>Custom Text</source>
+      <translation type="unfinished">Custom Text</translation>
     </message>
     <message>
-      <source>Text</source>
-      <translation>テキスト</translation>
+      <source>Show to</source>
+      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -741,6 +1039,17 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::WriteToLogAction</name>
+    <message>
+      <source>Write to Log</source>
+      <translation type="unfinished">Write to Log</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::utils::StringHelper</name>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -760,6 +1069,24 @@
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>時間: %1 時分 %2・月日</translation>
+    </message>
+    <message>
+      <source>All users</source>
+      <translation>全ユーザー</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Removed subjects</source>
+      <translation>
+        <numerusform>%n削除したサブジェクト</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Unknown event</source>
+      <translation>不明なイベント</translation>
+    </message>
+    <message>
+      <source>Unknown action</source>
+      <translation type="unfinished">Unknown action</translation>
     </message>
   </context>
 </TS>

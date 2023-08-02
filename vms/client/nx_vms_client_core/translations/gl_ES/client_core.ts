@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="gl_ES" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation type="unfinished">Primary audio device is not selected.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -105,10 +82,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">%1 user login is temporarily unavailable</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation type="unfinished">Connection timed out</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -212,6 +185,10 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation type="unfinished">Connection failed</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
@@ -266,6 +243,17 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation type="unfinished">To learn more about the current problem view the server&apos;s certificate:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation type="unfinished">Primary audio device is not selected.</translation>
     </message>
   </context>
 </TS>

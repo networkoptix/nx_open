@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr_TR" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Sahibi: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Sistem</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>%1 giriş cihazının örnek formatı desteklenmiyor.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Birincil ses cihazı seçili değil.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -105,10 +82,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 kullanıcı girişi geçici olarak kullanılamıyor</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Bağlantı zaman aşımına uğradı</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -212,6 +185,10 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>%1 için iki faktörlü kimlik doğrulamayı etkinleştirebilirsiniz.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Bağlantı başarısız</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
@@ -266,6 +243,17 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>Mevcut sorun hakkında daha fazla bilgi edinmek için sunucu&apos;sertifikasını görüntüleyin:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>%1 giriş cihazının örnek formatı desteklenmiyor.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>Birincil ses cihazı seçili değil.</translation>
     </message>
   </context>
 </TS>

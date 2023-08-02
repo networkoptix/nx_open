@@ -19,10 +19,6 @@
   <context>
     <name>AuthResultTranslations</name>
     <message>
-      <source>This user does not exist.</source>
-      <translation>Kullanıcı mevcut değil.</translation>
-    </message>
-    <message>
       <source>Wrong password.</source>
       <translation>Hatalı parola.</translation>
     </message>
@@ -57,6 +53,30 @@
     <message>
       <source>This user has been disabled by a system administrator.</source>
       <translation>Bu kullanıcı sistem yöneticisi tarafından devre dışı bırakıldı.</translation>
+    </message>
+    <message>
+      <source>This user does not exist or is unable to login.</source>
+      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+    </message>
+    <message>
+      <source>More than one user with the same login are presented.</source>
+      <translation type="unfinished">More than one user with the same login are presented.</translation>
+    </message>
+    <message>
+      <source>Unable to verify LDAP server SSL/TLS certificate.</source>
+      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkFacade</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Kaldırılmış Kamera</translation>
+    </message>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation>Sistem Olayı</translation>
     </message>
   </context>
   <context>
@@ -138,6 +158,57 @@
         <numerusform>Petabaytlık (lar)</numerusform>
         <numerusform>Petabaytlık (lar)</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>PredefinedUserGroups</name>
+    <message>
+      <source>Administrators</source>
+      <translation>Yöneticiler</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation type="unfinished">Power Users</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation>Gelişmiş İzleyiciler</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation>İzleyiciler</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation>Canlı İzleyiciler</translation>
+    </message>
+    <message>
+      <source>System Health Viewers</source>
+      <translation>Sistem Sağlığı Görüntüleyicileri</translation>
+    </message>
+    <message>
+      <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
+      <translation type="unfinished">Has full control of System configuration, but cannot create or modify other Power Users.</translation>
+    </message>
+    <message>
+      <source>Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
+      <translation>PTZ konumlarını ve PTZ Turlarını görebilir ve çalıştırabilir, 2 yönlü ses kullanabilir, G/Ç Modülü çalıştırabilir, Yer İşaretleri oluşturabilir ve düzenleyebilir ve Olay Günlüğünü görüntüleyebilir.</translation>
+    </message>
+    <message>
+      <source>Can view and export archive and Bookmarks.</source>
+      <translation>Arşivi ve Yer İşaretlerini görüntüleyebilir ve dışa aktarabilir.</translation>
+    </message>
+    <message>
+      <source>Can view live videos, I/O modules and web pages.</source>
+      <translation type="unfinished">Can view live videos, I/O modules and web pages.</translation>
+    </message>
+    <message>
+      <source>Can view System Health Monitoring information.</source>
+      <translation>Sistem Sağlığı İzleme bilgilerini görüntüleyebilir.</translation>
+    </message>
+    <message>
+      <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
+      <translation type="unfinished">This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</translation>
     </message>
   </context>
   <context>
@@ -243,14 +314,6 @@
       <translation>Bilinmeyen Kamera Sorunu.</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>%1 Aygıtından Geçersiz Veri Alındı.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>%1 Kamerasından Geçersiz Veri Alındı.</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
       <translation>Birden Fazla Medya Hatası. Daha Fazla Detay İçin Lütfen Aygıt Sorun Penceresini Açın.</translation>
     </message>
@@ -273,10 +336,6 @@
     <message>
       <source>Unknown I/O module issue.</source>
       <translation>Bilinmeyen I/O Mödülü Sorunu.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>%1 I/O Mödülünden Geçersiz Veri Alındı.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -373,6 +432,25 @@
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>Devre dışı ise, G/Ç Modülü Ayarlarında Kaydı etkinleştirmeyi deneyin (hata &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Kaldırılmış Kamera</translation>
     </message>
   </context>
   <context>
@@ -753,6 +831,27 @@
         <numerusform>%n/%1 NVR Lisansı</numerusform>
       </translation>
     </message>
+    <message>
+      <source>%1 Licenses</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n %1 Licenses</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">
+        <numerusform>%n %1 Licenses</numerusform>
+        <numerusform>%n %1 Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 %2 Licenses</source>
+      <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 %2 Licenses</numerusform>
+        <numerusform>%n/%1 %2 Licenses</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
@@ -1037,62 +1136,14 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>Sahip</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Yönetici</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>Gelişmiş Görüntüleyici</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>İzleyiciler</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>Canlı İzleyici</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>Özel roller</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>Özel Ayarlar</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>Tüm kameraları ve yer imlerini yönetebilirsiniz.</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>Bütün kameralar görüntüleyebilir ve Video dışa aktarabilir.</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>Tüm kameraların canlı görüntülerini izleyebilir.</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>Özel Kullanıcı yetkisi.</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>Özel izinler.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>Tüm sisteme erişebilir ve her işlemi gerçekleştirebilir.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>Tüm sisteme erişebilir ve her işlemi gerçekleştirebilir. Ve kullanıcıları yönetebilir.</translation>
+      <source>Multiple groups</source>
+      <translation type="unfinished">Multiple groups</translation>
     </message>
   </context>
   <context>
@@ -1157,7 +1208,7 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Oturum yetkilendirmesi gerekli.</translation>
     </message>
   </context>
   <context>
@@ -1169,74 +1220,6 @@
   </context>
   <context>
     <name>SystemSettings</name>
-    <message>
-      <source>SMTP host</source>
-      <translation>SMTP Sunucusu</translation>
-    </message>
-    <message>
-      <source>Email from</source>
-      <translation>Kimden</translation>
-    </message>
-    <message>
-      <source>SMTP user</source>
-      <translation>SMTP kullanıcı</translation>
-    </message>
-    <message>
-      <source>SMTP password</source>
-      <translation>SMTP şifre</translation>
-    </message>
-    <message>
-      <source>Email signature</source>
-      <translation>E-posta imzası</translation>
-    </message>
-    <message>
-      <source>Email support link</source>
-      <translation>Destek E-posta bağlantısı</translation>
-    </message>
-    <message>
-      <source>SMTP connection type</source>
-      <translation>SMTP bağlantı türü</translation>
-    </message>
-    <message>
-      <source>SMTP port</source>
-      <translation>SMTP portu</translation>
-    </message>
-    <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation>SMTP zaman aşımı (saniye)</translation>
-    </message>
-    <message>
-      <source>SMTP name</source>
-      <translation>SMTP adı</translation>
-    </message>
-    <message>
-      <source>LDAP URI</source>
-      <translation>LDAP URI</translation>
-    </message>
-    <message>
-      <source>LDAP Admin DN</source>
-      <translation>LDAP yönetici DN</translation>
-    </message>
-    <message>
-      <source>LDAP Admin password</source>
-      <translation>LDAP Yönetici şifresi</translation>
-    </message>
-    <message>
-      <source>LDAP search base</source>
-      <translation>LDAP veritabanı</translation>
-    </message>
-    <message>
-      <source>LDAP search filter</source>
-      <translation>LDAP arama filtresi</translation>
-    </message>
-    <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation>LDAP şifresinin geçerlilik süresi (milisaniye)</translation>
-    </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation>LDAP arama zaman aşımı (saniye)</translation>
-    </message>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Anonim istatistik raporuna izin verilir</translation>
@@ -1475,10 +1458,6 @@
       <translation>Filigran ayarları</translation>
     </message>
     <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation>Yetkilendirme Oturumu jeton ömrü (dakika)</translation>
-    </message>
-    <message>
       <source>Session token count limit on a single Server</source>
       <translation>Tek Sunucuda oturum belirteci sayısı sınırı</translation>
     </message>
@@ -1591,11 +1570,6 @@
       <translation>Kullanımdan kaldırılan API fonksiyonlarını etkinleştir (güvenli değil)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Şu anda %1 yazılım tarafından kullanılan, kullanımdan kaldırılmış API fonksiyonlarını etkinleştir (güvenli değil)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>Otomatik bulma için IP adreslerini açığa çıkarın</translation>
     </message>
@@ -1638,6 +1612,63 @@
     <message>
       <source>Update releases.json file URL</source>
       <translation>Releases.json dosya URL'sini güncelleyin</translation>
+    </message>
+    <message>
+      <source>Cloud storage update period in seconds</source>
+      <translation>Saniye cinsinden bulut depolama güncelleme süresi</translation>
+    </message>
+    <message>
+      <source>LDAP settings</source>
+      <translation>LDAP ayarları</translation>
+    </message>
+    <message>
+      <source>SMTP settings</source>
+      <translation type="unfinished">SMTP settings</translation>
+    </message>
+    <message>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Şu anda %1 tarafından kullanılan, kullanımdan kaldırılmış API fonksiyonlarını etkinleştir (güvenli değil)</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeFormat</name>
+    <message>
+      <source>just now</source>
+      <translation>şu anda</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minute(s) ago</source>
+      <translation type="unfinished">
+        <numerusform>%n minute(s) ago</numerusform>
+        <numerusform>%n minute(s) ago</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hour(s) ago</source>
+      <translation type="unfinished">
+        <numerusform>%n hour(s) ago</numerusform>
+        <numerusform>%n hour(s) ago</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>yesterday</source>
+      <translation>dün</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n day(s) ago</source>
+      <translation type="unfinished">
+        <numerusform>%n day(s) ago</numerusform>
+        <numerusform>%n day(s) ago</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>a week ago</source>
+      <translation type="unfinished">a week ago</translation>
     </message>
   </context>
   <context>
@@ -1690,16 +1721,13 @@
       <source>No data exported.</source>
       <translation>Dışa aktarılan veri yok.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
     <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Yanlış akış boyutu.</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Hasarlı akış başlığı.</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Arşiv şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
   </context>
   <context>
@@ -2038,27 +2066,12 @@
       <source>Trigger Name</source>
       <translation>Tetikleyici Adı</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>Yetki</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
         <numerusform>%n kullanıcı</numerusform>
         <numerusform>%n kullanıcı</numerusform>
       </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n Rolleri</numerusform>
-        <numerusform>%n Rolleri</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>Yöneticiler</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -2323,26 +2336,34 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Kaynak kamerada da ayarla</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Ayrıca kaynak kamerada tetikle</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Kaynak kamerayı da kaydedin</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Kaynak kamerada da oynat</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
     <message>
-      <source>Removed camera</source>
-      <translation>Kaldırılmış Kamera</translation>
+      <source>Group</source>
+      <translation>Grup</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Power Users</source>
+      <translation type="unfinished">All Power Users</translation>
     </message>
   </context>
 </TS>

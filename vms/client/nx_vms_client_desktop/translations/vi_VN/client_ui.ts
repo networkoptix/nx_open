@@ -37,13 +37,6 @@
     </message>
   </context>
   <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-      <source>Do</source>
-      <translation>Làm</translation>
-    </message>
-  </context>
-  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -666,20 +659,35 @@
       <translation>Hồ sơ luồng chính</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation>Nhập từ thiết bị</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation>Nhập video tự động</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>Trang Web</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation>Cổng trang web</translation>
+    </message>
+    <message>
+      <source>Disable import</source>
+      <translation type="unfinished">Disable import</translation>
+    </message>
+    <message>
+      <source>Import Video from Device</source>
+      <translation type="unfinished">Import Video from Device</translation>
+    </message>
+    <message>
+      <source>Import camera or server offline periods</source>
+      <translation type="unfinished">Import camera or server offline periods</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Thêm</translation>
     </message>
   </context>
   <context>
@@ -954,6 +962,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation>Hệ thống này được kết nối với</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1164,17 +1179,6 @@
     </message>
   </context>
   <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Khi nào</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation>Sự kiện chung</translation>
-    </message>
-  </context>
-  <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
@@ -1291,7 +1295,7 @@
     <name>FailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation>Failover ưu tiên</translation>
+      <translation>Ưu tiên chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -1306,7 +1310,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trong (M)</translation>
+      <translation>Trung bình (M)</translation>
     </message>
     <message>
       <source>High</source>
@@ -1318,7 +1322,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation>Không có chuyển đổi dự phòng</translation>
+      <translation>Không chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -1333,25 +1337,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Không tìm thấy kết quả nào</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>Thêm bình luận</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Đặt lịch</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation>Hành động thử nghiệm</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation>Thêm bình luận</translation>
     </message>
   </context>
   <context>
@@ -1524,13 +1509,6 @@
     </message>
   </context>
   <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>ID đầu vào</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
@@ -1577,7 +1555,7 @@
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation>&amp;Thay đổi tỉ lệ màn hình</translation>
+      <translation>Cắt theo tỷ lệ màn hình</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1601,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Không bắt buộc</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Thử nghiệm...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP Cài đặt</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>URL Máy chủ</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Mật khẩu</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Cơ sở tìm kiếm</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Bộ lọc Tìm kiếm</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Thời gian chờ tìm kiếm</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Quản trị DN hoặc CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Người dùng lấy từ LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Đang tải...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Lôi kêt nôi</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Gán vai trò của người dùng</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Vô hiệu hóa người dùng nhập</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Cho phép xác thực thông báo cho người dùng mới nhập vào</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1613,6 @@
     <message>
       <source>Features</source>
       <translation>Tính năng</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Giấy phép hoạt động (License)</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Tẩy</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Ủy quyền mới</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Chi tiết...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>Phần mềm được cấp phép</translation>
     </message>
   </context>
   <context>
@@ -2014,17 +1903,6 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Văn bản</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -2071,16 +1949,8 @@
       <translation>Cài đặt kết nối</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Mật khẩu</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Người sử dụng</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2102,13 +1972,17 @@
       <source>System Signature</source>
       <translation>Chữ ký hệ thống</translation>
     </message>
+    <message>
+      <source>Username</source>
+      <translation>Tên người dùng</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Đăng nhập</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Mật khẩu</translation>
@@ -2116,6 +1990,10 @@
     <message>
       <source>Username</source>
       <translation>Tên người dùng</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2207,17 +2085,6 @@
     <message>
       <source>Events</source>
       <translation>Sự kiện</translation>
-    </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Đặt trước</translation>
     </message>
   </context>
   <context>
@@ -2343,49 +2210,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Tìm kiếm người dùng</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Cho phép</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Vô hiệu hóa</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>&amp;xóa bỏ...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Bắt buộc xác thực an toàn</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Không tìm thấy kết quả nào</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Người dùng mới...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Chỉnh sửa Vai trò...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>Cài đặt LDAP...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Người dùng lấy từ LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2461,17 +2285,6 @@
     </message>
   </context>
   <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Hình ảnh</translation>
-    </message>
-  </context>
-  <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
@@ -2541,30 +2354,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Thư mục tạm thời</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Tùy chọn thêm</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Không được phép Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Chụp con trỏ chuột</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Một máy tính có cấu hình mạnh được khuyến khích sử dụng để cho chất lượng và độ phân giải "Best".</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Duyệt...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Nguồn</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2376,20 @@
       <translation>Chất lượng video</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Nguồn</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>Một máy tính có cấu hình mạnh được khuyến khích sử dụng để cho chất lượng và độ phân giải "Best".</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Màn</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Tùy chọn thêm</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Chụp con trỏ chuột</translation>
     </message>
   </context>
   <context>
@@ -2622,29 +2431,6 @@
     <message>
       <source>Live</source>
       <translation>Trực tiếp</translation>
-    </message>
-  </context>
-  <context>
-    <name>RulesDialog</name>
-    <message>
-      <source>Alarm/Event Rules</source>
-      <translation>Quy tắc cảnh báo/sự kiện</translation>
-    </message>
-    <message>
-      <source>New Rule</source>
-      <translation>Quy tắc mới</translation>
-    </message>
-    <message>
-      <source>Delete Rule</source>
-      <translation>Xoá quy tắc</translation>
-    </message>
-    <message>
-      <source>Select a Rule</source>
-      <translation>Chọn một quy tắc</translation>
-    </message>
-    <message>
-      <source>Reset Default Rules</source>
-      <translation>Đặt lại quy tắc mặc định</translation>
     </message>
   </context>
   <context>
@@ -2752,10 +2538,6 @@
       <translation>Hoạt động của người dùng</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Hiển thị máy chủ trong sơ đồ cây cho người dùng không phải quản trị viên</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Mã hóa Lưu trữ</translation>
     </message>
@@ -2786,6 +2568,10 @@
     <message>
       <source>Manage Users</source>
       <translation>Quản lý người dùng</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
     </message>
   </context>
   <context>
@@ -2857,11 +2643,11 @@
     </message>
     <message>
       <source>Failover</source>
-      <translation>Sao lưu</translation>
+      <translation>Chuyển đổi dự phòng</translation>
     </message>
     <message>
       <source>Failover Priority...</source>
-      <translation>Failover ưu tiên...</translation>
+      <translation>Ưu tiên chuyển đổi dự phòng...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2664,10 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Tự động phát hiện webcam USB và webcam tích hợp sẵn</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>ID vị trí máy chủ:</translation>
     </message>
   </context>
   <context>
@@ -2938,32 +2728,6 @@
     <message>
       <source>Icon</source>
       <translation>Biểu tượng</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation>Âm thanh</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation>Quản lý</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Tiểu bang</translation>
     </message>
   </context>
   <context>
@@ -3057,10 +2821,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Vai trò</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Hiển thị tất cả người dùng</translation>
     </message>
@@ -3071,6 +2831,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>Không có gì phù hợp với tìm kiếm của bạn.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
     </message>
   </context>
   <context>
@@ -3159,10 +2923,6 @@
       <source>+ Add Group</source>
       <translation>+ Thêm nhóm</translation>
     </message>
-    <message>
-      <source>No groups found</source>
-      <translation>Không tìm thấy nhóm nào</translation>
-    </message>
   </context>
   <context>
     <name>UserListWidget</name>
@@ -3173,77 +2933,6 @@
     <message>
       <source>+ Add User</source>
       <translation>+ Thêm người dùng</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>Không tìm thấy người dùng</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Thay đổi mật khẩu...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Tên</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Người sử dụng</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Xoá Vai trò</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Vai trò Người dùng</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Vai trò mới</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Vẫn chưa có người dùng nào dùng role này.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Nhấp vào nút &quot;Vai trò mới&quot; để tạo.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Người dùng này có thể sử dụng xác thực thông báo.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Bắt buộc xác thực an toàn</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Nhóm người dùng</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Vai trò</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Chỉnh sửa Vai trò...</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +2992,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Thể tích</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Kiểm tra</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Chung</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxy trang web này qua máy chủ</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3342,10 +3012,6 @@
     <message>
       <source>Proxy all requested contents</source>
       <translation>Proxy tất cả các nội dung yêu cầu</translation>
-    </message>
-    <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Cho phép mở trang web mà không cần kiểm tra chứng chỉ SSL</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3035,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Lưu ý: Lịch trình thời gian cho thời gian máy chủ.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Giấy phép hoạt động (License)</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Tẩy</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Chi tiết...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>Phần mềm được cấp phép</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Ủy quyền mới</translation>
     </message>
   </context>
   <context>

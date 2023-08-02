@@ -2,6 +2,68 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU" sourcelanguage="en">
   <context>
+    <name>AddLookupListEntryDialog</name>
+    <message>
+      <source>Add Entry</source>
+      <translation type="unfinished">Add Entry</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Добавить</translation>
+    </message>
+  </context>
+  <context>
+    <name>AdvancedSettingsDialog</name>
+    <message>
+      <source>LDAP - Advanced Settings</source>
+      <translation type="unfinished">LDAP - Advanced Settings</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Пользователи</translation>
+    </message>
+    <message>
+      <source>Login Attribute</source>
+      <translation type="unfinished">Login Attribute</translation>
+    </message>
+    <message>
+      <source>Allow digest authentication for imported users</source>
+      <translation type="unfinished">Allow digest authentication for imported users</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Name Attribute</source>
+      <translation type="unfinished">Name Attribute</translation>
+    </message>
+    <message>
+      <source>Membership</source>
+      <translation type="unfinished">Membership</translation>
+    </message>
+    <message>
+      <source>Misc</source>
+      <translation>Прочее</translation>
+    </message>
+    <message>
+      <source>Group Attribute</source>
+      <translation type="unfinished">Group Attribute</translation>
+    </message>
+    <message>
+      <source>Synchronization&lt;br&gt;Interval</source>
+      <translation type="unfinished">Synchronization&lt;br&gt;Interval</translation>
+    </message>
+    <message>
+      <source>Search Timeout</source>
+      <translation type="unfinished">Search Timeout</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests&lt;br&gt;via server</source>
+      <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
+    </message>
+  </context>
+  <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
@@ -174,10 +236,87 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsSettingsMenu</name>
+    <message>
+      <source>Plugins</source>
+      <translation>Плагины</translation>
+    </message>
+    <message>
+      <source>API Integrations</source>
+      <translation type="unfinished">API Integrations</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsToolTipPreview</name>
     <message>
       <source>NO DATA</source>
       <translation>НЕТ ДАННЫХ</translation>
+    </message>
+  </context>
+  <context>
+    <name>ApiIntegrations</name>
+    <message>
+      <source>API Integrations</source>
+      <translation type="unfinished">API Integrations</translation>
+    </message>
+    <message>
+      <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
+      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+    </message>
+    <message>
+      <source>New requests</source>
+      <translation type="unfinished">New requests</translation>
+    </message>
+    <message>
+      <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
+      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+    </message>
+    <message>
+      <source>Enable %1?</source>
+      <translation type="unfinished">Enable %1?</translation>
+    </message>
+    <message>
+      <source>This Integration will be able to:
+ • change settings on cameras
+ • get access to archive
+ • process video streams
+ • exchange metadata over the network</source>
+      <translation type="unfinished">This Integration will be able to:
+ • change settings on cameras
+ • get access to archive
+ • process video streams
+ • exchange metadata over the network</translation>
+    </message>
+    <message>
+      <source>Enable Integration</source>
+      <translation type="unfinished">Enable Integration</translation>
+    </message>
+    <message>
+      <source>Remove %1?</source>
+      <translation type="unfinished">Remove %1?</translation>
+    </message>
+    <message>
+      <source>This will remove Integration request</source>
+      <translation type="unfinished">This will remove Integration request</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Remove Request</source>
+      <translation type="unfinished">Remove Request</translation>
+    </message>
+  </context>
+  <context>
+    <name>AutoTextField</name>
+    <message>
+      <source>This field cannot be empty</source>
+      <translation type="unfinished">This field cannot be empty</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Авто</translation>
     </message>
   </context>
   <context>
@@ -196,6 +335,13 @@
     <message>
       <source>Hotkey %1</source>
       <translation>Горячая клавиша %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>Нажмите каждую кнопку несколько раз и запишите названия этих кнопок в таблице ниже.</translation>
     </message>
   </context>
   <context>
@@ -304,6 +450,53 @@
     </message>
   </context>
   <context>
+    <name>ConnectionSettingsDialog</name>
+    <message>
+      <source>LDAP - Connection Settings</source>
+      <translation type="unfinished">LDAP - Connection Settings</translation>
+    </message>
+    <message>
+      <source>Host</source>
+      <translation>Узел</translation>
+    </message>
+    <message>
+      <source>This field cannot be empty</source>
+      <translation type="unfinished">This field cannot be empty</translation>
+    </message>
+    <message>
+      <source>Login DN</source>
+      <translation type="unfinished">Login DN</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Пароль</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty.</source>
+      <translation>Пароль не может быть пустым.</translation>
+    </message>
+    <message>
+      <source>Ignore LDAP server certificate errors</source>
+      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Проверка</translation>
+    </message>
+    <message>
+      <source>Connecting...</source>
+      <translation>Соединение...</translation>
+    </message>
+    <message>
+      <source>Login DN cannot be empty.</source>
+      <translation type="unfinished">Login DN cannot be empty.</translation>
+    </message>
+    <message>
+      <source>Use StartTLS</source>
+      <translation type="unfinished">Use StartTLS</translation>
+    </message>
+  </context>
+  <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
@@ -354,6 +547,49 @@
     <message>
       <source>360° Equirectangular</source>
       <translation>360° Равноугольный</translation>
+    </message>
+  </context>
+  <context>
+    <name>EditLookupListDialog</name>
+    <message>
+      <source>List Settings</source>
+      <translation type="unfinished">List Settings</translation>
+    </message>
+    <message>
+      <source>New List</source>
+      <translation type="unfinished">New List</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Имя</translation>
+    </message>
+    <message>
+      <source>Column Name</source>
+      <translation type="unfinished">Column Name</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Создать</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation>Общее</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Тип</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>Атрибуты</translation>
     </message>
   </context>
   <context>
@@ -414,6 +650,29 @@
     <message>
       <source>NO PREVIEW</source>
       <translation>НЕТ ПРЕДПРОСМОТРА</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilterDialog</name>
+    <message>
+      <source>Edit Filter</source>
+      <translation type="unfinished">Edit Filter</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Имя</translation>
+    </message>
+    <message>
+      <source>Base DN</source>
+      <translation type="unfinished">Base DN</translation>
+    </message>
+    <message>
+      <source>Base DN cannot be empty</source>
+      <translation type="unfinished">Base DN cannot be empty</translation>
+    </message>
+    <message>
+      <source>Filter</source>
+      <translation>Поиск</translation>
     </message>
   </context>
   <context>
@@ -503,11 +762,182 @@
     </message>
   </context>
   <context>
+    <name>GlobalPermissionsTab</name>
+    <message>
+      <source>On system level user has permissions to:</source>
+      <translation type="unfinished">On system level user has permissions to:</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateDialog</name>
+    <message>
+      <source>New Group</source>
+      <translation>Новая группа</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Общие</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Ресурсы</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation type="unfinished">Global Permissions</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation type="unfinished">Members</translation>
+    </message>
+    <message>
+      <source>Add Group</source>
+      <translation type="unfinished">Add Group</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateTab</name>
+    <message>
+      <source>New Group</source>
+      <translation>Новая группа</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Имя</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>&amp;Описание</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation type="unfinished">Permission Groups</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupEditDialog</name>
+    <message>
+      <source>Group - %1</source>
+      <translation type="unfinished">Group - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Общие</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Ресурсы</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation type="unfinished">Global Permissions</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation type="unfinished">Members</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupGeneralTab</name>
+    <message>
+      <source>Delete</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Информация</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>&amp;Описание</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation type="unfinished">Members</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Пользователи</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation type="unfinished">Permission Groups</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupMembersTab</name>
+    <message>
+      <source>Users</source>
+      <translation>Пользователи</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>No members</source>
+      <translation type="unfinished">No members</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add members</source>
+      <translation type="unfinished">Use controls on the left to add members</translation>
+    </message>
+    <message>
+      <source>Members summary</source>
+      <translation type="unfinished">Members summary</translation>
+    </message>
+    <message>
+      <source>Inherits membership in current group</source>
+      <translation type="unfinished">Inherits membership in current group</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupsComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>Выбрать</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Поиск</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ничего не найдено</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupsFlow</name>
+    <message>
+      <source>and %1 more...</source>
+      <translation>и еще %1...</translation>
+    </message>
+  </context>
+  <context>
     <name>HintItem</name>
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
       <translation>Удерживайте %1 для активации действий</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportFromDeviceDialog</name>
+    <message>
+      <source>Import From Devices</source>
+      <translation type="unfinished">Import From Devices</translation>
     </message>
   </context>
   <context>
@@ -518,7 +948,40 @@
     </message>
   </context>
   <context>
-    <name>InformationPanel</name>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>Выберите джойстик.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>Нет подключенных устройств.</translation>
+    </message>
+  </context>
+  <context>
+    <name>InsecureWarning</name>
+    <message>
+      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
+      <translation type="unfinished">Account security is important. Do not enable this setting unless you have good reasons to do so.</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationHeader</name>
+    <message>
+      <source>OFFLINE</source>
+      <translation>НЕ В СЕТИ</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Обновить</translation>
+    </message>
+    <message>
+      <source>Refreshing...</source>
+      <translation>Обновление...</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
       <translation>Версия</translation>
@@ -534,14 +997,6 @@
     <message>
       <source>Select video stream from the camera for analysis</source>
       <translation>Выберите видеопоток с камеры для анализа</translation>
-    </message>
-    <message>
-      <source>Refresh</source>
-      <translation>Обновить</translation>
-    </message>
-    <message>
-      <source>Refreshing...</source>
-      <translation>Обновление...</translation>
     </message>
   </context>
   <context>
@@ -569,6 +1024,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Сменить повтор</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>Сохранить</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>Предыдущий</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Далее</translation>
     </message>
   </context>
   <context>
@@ -622,6 +1092,89 @@
     <message>
       <source>Default value:</source>
       <translation>Значение по умолчанию:</translation>
+    </message>
+  </context>
+  <context>
+    <name>LdapSettings</name>
+    <message>
+      <source>LDAP is not configured yet</source>
+      <translation type="unfinished">LDAP is not configured yet</translation>
+    </message>
+    <message>
+      <source>Connect your System to a LDAP server for easier user management</source>
+      <translation type="unfinished">Connect your System to a LDAP server for easier user management</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>Соединиться</translation>
+    </message>
+    <message>
+      <source>ONLINE</source>
+      <translation type="unfinished">ONLINE</translation>
+    </message>
+    <message>
+      <source>OFFLINE</source>
+      <translation>НЕ В СЕТИ</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Пользователи</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Last Sync</source>
+      <translation type="unfinished">Last Sync</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Изменить</translation>
+    </message>
+    <message>
+      <source>Advanced Settings</source>
+      <translation type="unfinished">Advanced Settings</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>Отключить</translation>
+    </message>
+    <message>
+      <source>Continuous User Import</source>
+      <translation type="unfinished">Continuous User Import</translation>
+    </message>
+    <message>
+      <source>VMS imports and synchronizes users and groups with LDAP in real time</source>
+      <translation type="unfinished">VMS imports and synchronizes users and groups with LDAP in real time</translation>
+    </message>
+    <message>
+      <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
+      <translation type="unfinished">LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</translation>
+    </message>
+    <message>
+      <source>Filters</source>
+      <translation type="unfinished">Filters</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Добавить</translation>
+    </message>
+    <message>
+      <source>Add Filter</source>
+      <translation type="unfinished">Add Filter</translation>
+    </message>
+    <message>
+      <source>No filters</source>
+      <translation type="unfinished">No filters</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP is disabled for this system. Some settings may be not available.</source>
+      <translation type="unfinished">Continuous import from LDAP is disabled for this system. Some settings may be not available.</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the system’s DB. Make sure LDAP server parameters and filters are configured correctly. </source>
+      <translation type="unfinished">No users or groups match synchronization settings and are added to the system’s DB. Make sure LDAP server parameters and filters are configured correctly. </translation>
     </message>
   </context>
   <context>
@@ -717,6 +1270,55 @@
     </message>
   </context>
   <context>
+    <name>LookupListElementEditor</name>
+    <message>
+      <source>Any %1</source>
+      <translation type="unfinished">Any %1</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Да</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Нет</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListTableCellDelegate</name>
+    <message>
+      <source>ANY</source>
+      <translation type="unfinished">ANY</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListsDialog</name>
+    <message>
+      <source>Lookup Lists</source>
+      <translation type="unfinished">Lookup Lists</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Добавить</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>Импорт</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Экспорт</translation>
+    </message>
+    <message>
+      <source>Create New...</source>
+      <translation type="unfinished">Create New...</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Настройки</translation>
+    </message>
+  </context>
+  <context>
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
@@ -725,6 +1327,21 @@
     <message>
       <source>Select an area on the video to filter results</source>
       <translation>Выберите область на видео для фильтрации результатов</translation>
+    </message>
+  </context>
+  <context>
+    <name>NoListsPage</name>
+    <message>
+      <source>No Lists</source>
+      <translation type="unfinished">No Lists</translation>
+    </message>
+    <message>
+      <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
+      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+    </message>
+    <message>
+      <source>Create New...</source>
+      <translation type="unfinished">Create New...</translation>
     </message>
   </context>
   <context>
@@ -770,6 +1387,120 @@
     <message>
       <source>Remember me</source>
       <translation>Запомнить</translation>
+    </message>
+  </context>
+  <context>
+    <name>PanelBase</name>
+    <message>
+      <source>Approve</source>
+      <translation type="unfinished">Approve</translation>
+    </message>
+    <message>
+      <source>Reject</source>
+      <translation>Отклонить</translation>
+    </message>
+  </context>
+  <context>
+    <name>ParentGroupsTab</name>
+    <message>
+      <source>Add Group</source>
+      <translation type="unfinished">Add Group</translation>
+    </message>
+    <message>
+      <source>Built In</source>
+      <translation type="unfinished">Built In</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Особые</translation>
+    </message>
+    <message>
+      <source>No custom groups yet</source>
+      <translation type="unfinished">No custom groups yet</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation type="unfinished">No groups found</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation type="unfinished">Change search criteria or create a new group</translation>
+    </message>
+    <message>
+      <source>Selected groups</source>
+      <translation type="unfinished">Selected groups</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation type="unfinished">No groups</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add to a group</source>
+      <translation type="unfinished">Use controls on the left to add to a group</translation>
+    </message>
+    <message>
+      <source>LDAP group membership is managed in LDAP</source>
+      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordChangeDialog</name>
+    <message>
+      <source>Change password - %1</source>
+      <translation type="unfinished">Change password - %1</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Логин</translation>
+    </message>
+    <message>
+      <source>Current password</source>
+      <translation>Текущий пароль</translation>
+    </message>
+    <message>
+      <source>New password</source>
+      <translation>Новый пароль</translation>
+    </message>
+    <message>
+      <source>Confirm password</source>
+      <translation type="unfinished">Confirm password</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>Введённые пароли не совпадают.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionSummary</name>
+    <message>
+      <source>No custom permissions</source>
+      <translation type="unfinished">No custom permissions</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionsTab</name>
+    <message>
+      <source>No resources</source>
+      <translation type="unfinished">No resources</translation>
+    </message>
+    <message>
+      <source>Try changing search criteria</source>
+      <translation type="unfinished">Try changing search criteria</translation>
+    </message>
+    <message>
+      <source>Automatically add dependent access rights</source>
+      <translation type="unfinished">Automatically add dependent access rights</translation>
+    </message>
+  </context>
+  <context>
+    <name>Plugins</name>
+    <message>
+      <source>Plugins</source>
+      <translation>Плагины</translation>
+    </message>
+    <message>
+      <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
+      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
     </message>
   </context>
   <context>
@@ -892,6 +1623,37 @@ to activate PTZ</source>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
       <translation>Перейдите в локальные настройки, чтобы включить перетаскивание маркера по центру видео</translation>
     </message>
+    <message>
+      <source>Target lock tracking</source>
+      <translation type="unfinished">Target lock tracking</translation>
+    </message>
+    <message>
+      <source>Alt + Click to follow the object</source>
+      <translation type="unfinished">Alt + Click to follow the object</translation>
+    </message>
+  </context>
+  <context>
+    <name>QuickIntervalPanel</name>
+    <message>
+      <source>today</source>
+      <translation>сегодня</translation>
+    </message>
+    <message>
+      <source>-1 hour</source>
+      <translation type="unfinished">-1 hour</translation>
+    </message>
+    <message>
+      <source>-24 hours</source>
+      <translation type="unfinished">-24 hours</translation>
+    </message>
+    <message>
+      <source>-7 days</source>
+      <translation type="unfinished">-7 days</translation>
+    </message>
+    <message>
+      <source>-30 days</source>
+      <translation type="unfinished">-30 days</translation>
+    </message>
   </context>
   <context>
     <name>RangeEditor</name>
@@ -946,6 +1708,37 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>ResourceFilterButton</name>
+    <message>
+      <source>Available by Permissions</source>
+      <translation type="unfinished">Available by Permissions</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Камеры и устройства</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>Раскладки</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
+    <message>
+      <source>Web Pages</source>
+      <translation>Web-страницы</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation type="unfinished">Health Monitors</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Видеостены</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
@@ -975,10 +1768,6 @@ to activate PTZ</source>
       <translation>Поиск</translation>
     </message>
     <message>
-      <source>All Types</source>
-      <translation>Все типы</translation>
-    </message>
-    <message>
       <source>Servers</source>
       <translation>Серверы</translation>
     </message>
@@ -1003,12 +1792,12 @@ to activate PTZ</source>
       <translation>Web-страницы</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>Пользователи</translation>
-    </message>
-    <message>
       <source>Local Files</source>
       <translation>Локальные файлы</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Интеграции</translation>
     </message>
   </context>
   <context>
@@ -1043,6 +1832,21 @@ to activate PTZ</source>
     <message>
       <source>Analytics</source>
       <translation>Аналитика</translation>
+    </message>
+  </context>
+  <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>Выберите файл для сохранения</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>Файлы JSON (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>Файл для сохранения результатов:</translation>
     </message>
   </context>
   <context>
@@ -1220,10 +2024,6 @@ to activate PTZ</source>
       <source>Unsupported firmware version</source>
       <translation>Неподдерживаемая версия прошивки</translation>
     </message>
-    <message>
-      <source>Access denied</source>
-      <translation>В доступе отказано</translation>
-    </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
@@ -1318,6 +2118,173 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>UserCreateDialog</name>
+    <message>
+      <source>New User</source>
+      <translation type="unfinished">New User</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Общие</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Ресурсы</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation type="unfinished">Global Permissions</translation>
+    </message>
+    <message>
+      <source>Add User</source>
+      <translation>Добавить пользователя</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserCreateTab</name>
+    <message>
+      <source>New User</source>
+      <translation type="unfinished">New User</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Тип</translation>
+    </message>
+    <message>
+      <source>Local</source>
+      <translation>Локальный</translation>
+    </message>
+    <message>
+      <source>Cloud</source>
+      <translation>Облачный</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Логин</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>Полное имя</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Пароль</translation>
+    </message>
+    <message>
+      <source>Confirm Password</source>
+      <translation>Подтверждение пароля</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>Введённые пароли не совпадают.</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+    </message>
+    <message>
+      <source>You need to specify only user&apos;s email address.</source>
+      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+    </message>
+    <message>
+      <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
+      <translation type="unfinished">If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation type="unfinished">Permission Groups</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEditDialog</name>
+    <message>
+      <source>User - %1</source>
+      <translation type="unfinished">User - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Общие</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Ресурсы</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation type="unfinished">Global Permissions</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEnabledSwitch</name>
+    <message>
+      <source>Enabled user</source>
+      <translation type="unfinished">Enabled user</translation>
+    </message>
+    <message>
+      <source>Disabled user</source>
+      <translation type="unfinished">Disabled user</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserGeneralTab</name>
+    <message>
+      <source>Audit Trail</source>
+      <translation>Аудит</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Информация</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>Полное имя</translation>
+    </message>
+    <message>
+      <source>Account Settings</source>
+      <translation>Настройки учетной записи</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>Change password</source>
+      <translation>Изменить пароль</translation>
+    </message>
+    <message>
+      <source>Set password to enable insecure authentication</source>
+      <translation type="unfinished">Set password to enable insecure authentication</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+    </message>
+    <message>
+      <source>This user is not found in LDAP database and is not able to log in.</source>
+      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation type="unfinished">Permission Groups</translation>
+    </message>
+  </context>
+  <context>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
@@ -1330,6 +2297,37 @@ to activate PTZ</source>
     <message>
       <source>Favorites</source>
       <translation>Избранное</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialog</name>
+    <message>
+      <source>Vms Rules</source>
+      <translation type="unfinished">Vms Rules</translation>
+    </message>
+    <message>
+      <source>Add Rule</source>
+      <translation type="unfinished">Add Rule</translation>
+    </message>
+    <message>
+      <source>Duplicate</source>
+      <translation type="unfinished">Duplicate</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation type="unfinished">No Entries</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>Журнал событий...</translation>
+    </message>
+    <message>
+      <source>Reset To Defaults...</source>
+      <translation type="unfinished">Reset To Defaults...</translation>
     </message>
   </context>
   <context>
@@ -1349,6 +2347,27 @@ to activate PTZ</source>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>Переместите джойстик влево и вправо несколько раз.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>Переместите джойстик вверх и вниз несколько раз.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>Несколько раз поверните джойстик по часовой стрелке и против часовой стрелки.</translation>
     </message>
   </context>
 </TS>

@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr_FR" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Propriétaire: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Votre système</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Format d'échantillon du périphérique d'entré %1 n'est pas supporté.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Périphérique audio principal non sélectionné.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -105,10 +82,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>La connexion de l'utilisateur %1 est temporairement indisponible</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Connexion expirée</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -212,6 +185,10 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Vous pouvez activer l'authentification à deux facteurs dans votre %1.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Échec de connexion</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
@@ -266,6 +243,17 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>Pour en savoir plus sur le problème actuel, consultez le certificat du serveur:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Format d'échantillon du périphérique d'entré %1 n'est pas supporté.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>Périphérique audio principal non sélectionné.</translation>
     </message>
   </context>
 </TS>

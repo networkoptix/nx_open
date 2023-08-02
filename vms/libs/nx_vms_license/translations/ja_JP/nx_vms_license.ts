@@ -6,7 +6,7 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%1 ライセンス中の %n %2 を使用します。</numerusform>
+        <numerusform>%1 ライセンス中の %n %2 が使用されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -49,7 +49,7 @@
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>ライセンスは %1 によって検証されていません</translation>
     </message>
     <message>
       <source>Invalid type</source>

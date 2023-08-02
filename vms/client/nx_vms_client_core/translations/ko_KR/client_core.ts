@@ -2,29 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko_KR" sourcelanguage="en">
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>소유자: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>귀하의 시스템</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>입력된 장치 %1의 샘플 형식은 지원 되지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>기본 오디오 장치가 선택 되지 않습니다.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
@@ -105,10 +82,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 사용자 로그인을 일시적으로 사용할 수 없습니다</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>연결 시간이 초과되었습니다.</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -212,6 +185,10 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>%1에서 2단계 인증을 사용할 수 있습니다.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>연결 실패</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
@@ -266,6 +243,17 @@
     <message>
       <source>To learn more about the current problem view the server&apos;s certificate:</source>
       <translation>현재 문제에 대해 자세히 알아보려면 서버의 인증서를 확인하십시오.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>입력된 장치 %1의 샘플 형식은 지원 되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>기본 오디오 장치가 선택 되지 않습니다.</translation>
     </message>
   </context>
 </TS>

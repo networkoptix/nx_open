@@ -37,13 +37,6 @@
     </message>
   </context>
   <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-      <source>Do</source>
-      <translation>Fazer</translation>
-    </message>
-  </context>
-  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -666,20 +659,35 @@
       <translation type="unfinished">Primary Stream Profile</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>Página da Web</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
+    </message>
+    <message>
+      <source>Disable import</source>
+      <translation type="unfinished">Disable import</translation>
+    </message>
+    <message>
+      <source>Import Video from Device</source>
+      <translation type="unfinished">Import Video from Device</translation>
+    </message>
+    <message>
+      <source>Import camera or server offline periods</source>
+      <translation type="unfinished">Import camera or server offline periods</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Adicionar</translation>
     </message>
   </context>
   <context>
@@ -954,6 +962,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation type="unfinished">This system is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1036,7 +1051,7 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
+      <translation type="unfinished">&lt;Message&gt;</translation>
     </message>
     <message>
       <source>Open Folder</source>
@@ -1161,17 +1176,6 @@
     <message>
       <source>Event Rules...</source>
       <translation>Regras do Evento...</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Quando</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation>Evento genérico</translation>
     </message>
   </context>
   <context>
@@ -1333,25 +1337,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Nada encontrado</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>Adicionar comentário</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Definir Agendamento</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation>Ação de teste</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1524,13 +1509,6 @@
     </message>
   </context>
   <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>ID de Input</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
@@ -1623,72 +1601,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Opcional</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Testando...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>Configurações de LDAP</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>URL Servidor</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Senha</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Base de pesquisa</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Filtro de pesquisa</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Tempo limite (s) de pesquisa</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Administrador DN ou CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Obter Usuário através do LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Carregando...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Erro de conexão</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Função a ser atribuída a usuários importados</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Desativar usuários importados</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Permitir autenticação digest para usuário importado</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1613,6 @@
     <message>
       <source>Features</source>
       <translation>Recursos</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Licenças ativas</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Remover</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Nova Licença</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Detalhes...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>O software está licenciado para</translation>
     </message>
   </context>
   <context>
@@ -2014,17 +1903,6 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Texto</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -2071,16 +1949,8 @@
       <translation>Configurações de conexão</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>E-mail</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Senha</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Usuário</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2102,13 +1972,17 @@
       <source>System Signature</source>
       <translation>Assinatura do sistema</translation>
     </message>
+    <message>
+      <source>Username</source>
+      <translation>Nome do usuário</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Iniciar sessão</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Senha</translation>
@@ -2116,6 +1990,10 @@
     <message>
       <source>Username</source>
       <translation>Nome do usuário</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2207,17 +2085,6 @@
     <message>
       <source>Events</source>
       <translation>Eventos</translation>
-    </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Predefinição</translation>
     </message>
   </context>
   <context>
@@ -2343,49 +2210,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Pesquisar usuários</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Activar</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Desativar</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Excluir...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Forçar autenticação segura</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Nada encontrado</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Novo usuário...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Editar Funções...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>Definições LDAP...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Obter Usuário através do LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2461,17 +2285,6 @@
     </message>
   </context>
   <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Qualidade</translation>
-    </message>
-  </context>
-  <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
@@ -2541,30 +2354,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Pasta Temporária</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Opções Adicionais</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Desabilitar Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Capturar Cursor</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Um computador poderoso é recomendado para &quot;Melhor&quot; qualidade e resolução.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Navegar...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Origem</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2376,20 @@
       <translation>Qualidade de Gravação</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Origem</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>Um computador poderoso é recomendado para &quot;Melhor&quot; qualidade e resolução.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Tela</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Opções Adicionais</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Capturar Cursor</translation>
     </message>
   </context>
   <context>
@@ -2622,29 +2431,6 @@
     <message>
       <source>Live</source>
       <translation>Ao vivo</translation>
-    </message>
-  </context>
-  <context>
-    <name>RulesDialog</name>
-    <message>
-      <source>Alarm/Event Rules</source>
-      <translation>Regras de alarme/evento</translation>
-    </message>
-    <message>
-      <source>New Rule</source>
-      <translation>Nova regra</translation>
-    </message>
-    <message>
-      <source>Delete Rule</source>
-      <translation>Excluir regra</translation>
-    </message>
-    <message>
-      <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
-    </message>
-    <message>
-      <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
     </message>
   </context>
   <context>
@@ -2752,10 +2538,6 @@
       <translation>Atividade do usuário</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Exibir servidores em árvore para usuários não administradores</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Criptografia de arquivo</translation>
     </message>
@@ -2786,6 +2568,10 @@
     <message>
       <source>Manage Users</source>
       <translation>Gerenciar usuários</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
     </message>
   </context>
   <context>
@@ -2879,6 +2665,10 @@
       <source>Autodetect built-in and USB webcams</source>
       <translation>Detecção automática de webcams integradas e USB</translation>
     </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
+    </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2938,32 +2728,6 @@
     <message>
       <source>Icon</source>
       <translation>Ícone</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation>Som</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation>Gerenciar</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Estado</translation>
     </message>
   </context>
   <context>
@@ -3057,10 +2821,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Funções</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Mostrar todos os usuários</translation>
     </message>
@@ -3071,6 +2831,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>Nada corresponde à sua pesquisa.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupos</translation>
     </message>
   </context>
   <context>
@@ -3159,10 +2923,6 @@
       <source>+ Add Group</source>
       <translation>+ Adicionar grupo</translation>
     </message>
-    <message>
-      <source>No groups found</source>
-      <translation>Nenhum grupo encontrado</translation>
-    </message>
   </context>
   <context>
     <name>UserListWidget</name>
@@ -3173,77 +2933,6 @@
     <message>
       <source>+ Add User</source>
       <translation>+ Adicionar usuário</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>Usuários não encontrados</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Mudar senha...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Nome</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Usuários</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Excluir Função</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Funções do usuário</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Nova função</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Ainda não há funções de usuário personalizadas.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Clique &quot;Nova função&quot; para criar uma.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Este usuário pode usar autenticação digest.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Forçar autenticação segura</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Tipo de usuário</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Função</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Editar Funções...</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +2992,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulário</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Volume</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Testar</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Geral</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxy esta página da web através do servidor</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3342,10 +3012,6 @@
     <message>
       <source>Proxy all requested contents</source>
       <translation>Proxy todos os conteúdos solicitados</translation>
-    </message>
-    <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Permitir a abertura de página da web sem verificação de certificado SSL</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3035,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Observação: O Agendamento é baseado no horário do servidor.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Licenças ativas</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Remover</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Detalhes...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>O software está licenciado para</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Nova Licença</translation>
     </message>
   </context>
   <context>

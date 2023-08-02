@@ -37,13 +37,6 @@
     </message>
   </context>
   <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-      <source>Do</source>
-      <translation>動作</translation>
-    </message>
-  </context>
-  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -666,20 +659,35 @@
       <translation>プライマリストリームのプロファイル</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation>デバイスからインポート</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation>映像を自動的にインポート</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>ウェブページ</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation>Webページポート</translation>
+    </message>
+    <message>
+      <source>Disable import</source>
+      <translation>インポートを無効化</translation>
+    </message>
+    <message>
+      <source>Import Video from Device</source>
+      <translation type="unfinished">Import Video from Device</translation>
+    </message>
+    <message>
+      <source>Import camera or server offline periods</source>
+      <translation type="unfinished">Import camera or server offline periods</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation>ホットスポット</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>追加</translation>
     </message>
   </context>
   <context>
@@ -954,6 +962,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation>このシステムは次のアカウントと連携しています。</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1164,17 +1179,6 @@
     </message>
   </context>
   <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>トリガー</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation>汎用イベント</translation>
-    </message>
-  </context>
-  <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
@@ -1336,25 +1340,6 @@
     </message>
   </context>
   <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>コメントを追加</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>スケジュールを設定</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation>アクションをテスト</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation>コメントを追加</translation>
-    </message>
-  </context>
-  <context>
     <name>FullscreenCameraActionWidget</name>
     <message>
       <source>On layout</source>
@@ -1474,7 +1459,7 @@
     </message>
     <message>
       <source>Opacity</source>
-      <translation>透過度</translation>
+      <translation>不透明度</translation>
     </message>
     <message>
       <source>Default</source>
@@ -1521,13 +1506,6 @@
     <message>
       <source>Delete</source>
       <translation>削除</translation>
-    </message>
-  </context>
-  <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>入力ID</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1601,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>オプション</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>テスト中...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP設定</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>サーバー URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>パスワード</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>検索ベース</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>検索フィルター</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>検索タイムアウト (秒)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>管理者 DN または CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>LDAPよりユーザー登録...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>ロード中...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>接続エラー</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>インポートしたユーザーに割り当てるロール</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>インポートしたユーザーを無効</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>インポートされたユーザーのDigest認証を許可する</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1613,6 @@
     <message>
       <source>Features</source>
       <translation>機能</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>アクティブライセンス</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>削除</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>新規ライセンス</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>詳細...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>ソフトウェアのライセンス</translation>
     </message>
   </context>
   <context>
@@ -1811,7 +1700,7 @@
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation>最大サイズを制限</translation>
+      <translation>合計容量制限</translation>
     </message>
   </context>
   <context>
@@ -2014,17 +1903,6 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>テキスト</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -2071,16 +1949,8 @@
       <translation>接続設定</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>Eメール</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>パスワード</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>ユーザー</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2102,13 +1972,17 @@
       <source>System Signature</source>
       <translation>システム識別情報</translation>
     </message>
+    <message>
+      <source>Username</source>
+      <translation>ユーザ名</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation>Eメール差出人</translation>
+    </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>サインイン</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>パスワード</translation>
@@ -2116,6 +1990,10 @@
     <message>
       <source>Username</source>
       <translation>ユーザ名</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2207,17 +2085,6 @@
     <message>
       <source>Events</source>
       <translation>イベント</translation>
-    </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>プリセット</translation>
     </message>
   </context>
   <context>
@@ -2343,49 +2210,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>ユーザーを検索</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>有効化</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>無効化</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>削除(&amp;D)...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>安全な認証を強制する</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>何も見つかりませんでした</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>新規ユーザー...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>ロールを編集...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP設定...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>LDAPよりユーザー登録...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2461,17 +2285,6 @@
     </message>
   </context>
   <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>映像品質</translation>
-    </message>
-  </context>
-  <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
@@ -2541,30 +2354,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>一時フォルダー</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>追加オプション</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Aero無効</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>カーソルを録画する</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>高解像度で&quot;最高&quot;品質の録画を行う場合、スペックの高いPCを推奨します。</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>参照...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>ソース</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2376,20 @@
       <translation>録画品質</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>ソース</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>高解像度で&quot;最高&quot;品質の録画を行う場合、スペックの高いPCを推奨します。</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>スクリーン</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>追加オプション</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>カーソルを録画する</translation>
     </message>
   </context>
   <context>
@@ -2622,29 +2431,6 @@
     <message>
       <source>Live</source>
       <translation>ライブ</translation>
-    </message>
-  </context>
-  <context>
-    <name>RulesDialog</name>
-    <message>
-      <source>Alarm/Event Rules</source>
-      <translation>アラーム/イベントルール</translation>
-    </message>
-    <message>
-      <source>New Rule</source>
-      <translation>新しいルール</translation>
-    </message>
-    <message>
-      <source>Delete Rule</source>
-      <translation>ルールを削除</translation>
-    </message>
-    <message>
-      <source>Select a Rule</source>
-      <translation>ルールを選択</translation>
-    </message>
-    <message>
-      <source>Reset Default Rules</source>
-      <translation>デフォルトのルールにリセット</translation>
     </message>
   </context>
   <context>
@@ -2752,10 +2538,6 @@
       <translation>ユーザーアクティビティ</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>サーバーを非管理者ユーザーのツリーにも表示する</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>アーカイブの暗号化</translation>
     </message>
@@ -2786,6 +2568,10 @@
     <message>
       <source>Manage Users</source>
       <translation>ユーザー管理</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation>パワーユーザー以外のツリーにもサーバーを表示する</translation>
     </message>
   </context>
   <context>
@@ -2879,6 +2665,10 @@
       <source>Autodetect built-in and USB webcams</source>
       <translation>内蔵およびUSB Webカメラの自動検出</translation>
     </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>サーバー所在地ID:</translation>
+    </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2938,32 +2728,6 @@
     <message>
       <source>Icon</source>
       <translation>アイコン</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation>サウンド</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation>管理</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>状態</translation>
     </message>
   </context>
   <context>
@@ -3057,10 +2821,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>ロール</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>すべてのユーザーを表示</translation>
     </message>
@@ -3071,6 +2831,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>検索で一致するものはありません</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>グループ</translation>
     </message>
   </context>
   <context>
@@ -3159,10 +2923,6 @@
       <source>+ Add Group</source>
       <translation>+ グループを追加</translation>
     </message>
-    <message>
-      <source>No groups found</source>
-      <translation>グループが見つかりません</translation>
-    </message>
   </context>
   <context>
     <name>UserListWidget</name>
@@ -3173,77 +2933,6 @@
     <message>
       <source>+ Add User</source>
       <translation>+ ユーザーを追加</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>ユーザーが見つかりません</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>パスワードの変更...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>名前</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>ユーザー</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>ロールを削除</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>ユーザーロール</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>新しいロール</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>カスタムのユーザーロールはまだありません。</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>作成するには、 &quot;新しいロール&quot; ボタンをクリックしてください。</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>このユーザーはDigest認証を使用できます。</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>安全な認証を強制する</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>ユーザーの種類</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>ロール</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>ロールを編集...</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +2992,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>音量</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>テスト</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>一般</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>サーバー経由でこのWebページをプロキシする</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3342,10 +3012,6 @@
     <message>
       <source>Proxy all requested contents</source>
       <translation>要求されたすべてのコンテンツをプロキシする</translation>
-    </message>
-    <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>SSL証明書を確認せずWebページを開くことを許可する</translation>
     </message>
   </context>
   <context>
@@ -3372,14 +3038,37 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>アクティブライセンス</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>詳細...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>ソフトウェアのライセンス</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>新規ライセンス</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::WatermarkPreviewDialog</name>
     <message>
       <source>Watermark preview</source>
-      <translation>透かし表示</translation>
+      <translation>透かしのプレビュー</translation>
     </message>
     <message>
       <source>Opacity</source>
-      <translation>透過度</translation>
+      <translation>不透明度</translation>
     </message>
     <message>
       <source>Frequency</source>

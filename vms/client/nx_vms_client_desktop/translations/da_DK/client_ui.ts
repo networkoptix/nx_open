@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>GPU Information</source>
-      <translation type="unfinished">GPU Information</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <source>Support</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>Systemserver</translation>
     </message>
     <message>
       <source>Developer</source>
@@ -37,25 +37,18 @@
     </message>
   </context>
   <context>
-    <name>ActionTypePickerWidget</name>
-    <message>
-      <source>Do</source>
-      <translation type="unfinished">Do</translation>
-    </message>
-  </context>
-  <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Billedforbedring:</translation>
     </message>
     <message>
       <source>Enable image enhancement</source>
-      <translation type="unfinished">Enable image enhancement</translation>
+      <translation>Aktiver billedforbedring</translation>
     </message>
     <message>
       <source>Gamma</source>
-      <translation type="unfinished">Gamma</translation>
+      <translation>Gamma</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -63,50 +56,50 @@
     </message>
     <message>
       <source>Black level</source>
-      <translation type="unfinished">Black level</translation>
+      <translation>Sort niveau</translation>
     </message>
     <message>
       <source>White level</source>
-      <translation type="unfinished">White level</translation>
+      <translation>Hvidt niveau</translation>
     </message>
   </context>
   <context>
     <name>AdvancedSettingsWidget</name>
     <message>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
+      <translation>Downmix lyd fra 5.1 til 2.1</translation>
     </message>
     <message>
       <source>Double Buffering</source>
-      <translation type="unfinished">Double Buffering</translation>
+      <translation>Dobbelt Buffering</translation>
     </message>
     <message>
       <source>Maximum Live Buffer Length</source>
-      <translation type="unfinished">Maximum Live Buffer Length</translation>
+      <translation>Maksimal Live Buffer Længde</translation>
     </message>
     <message>
       <source>Clear Local Cache</source>
-      <translation type="unfinished">Clear Local Cache</translation>
+      <translation>Ryd lokal cache</translation>
     </message>
     <message>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>Nulstil alle advarsler</translation>
     </message>
     <message>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Intel HD Graphics display kan få problemer, hvis sløring er aktiveret. Vi anbefaler kraftigt at efterlade indstillingen som det er.</translation>
     </message>
     <message>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Deaktivér sløring</translation>
     </message>
     <message>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Begræns billedhastighed for at spare CPU</translation>
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Brug hardware videoafkodning</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
@@ -141,34 +134,34 @@
     <name>AggregationWidget</name>
     <message>
       <source>Check to set aggregation period</source>
-      <translation type="unfinished">Check to set aggregation period</translation>
+      <translation>Vælg for at angive aggregationsperiode</translation>
     </message>
     <message>
       <source>Interval of action :</source>
-      <translation type="unfinished">Interval of action :</translation>
+      <translation>Handlingsinterval:</translation>
     </message>
     <message>
       <source>No more than once per</source>
-      <translation type="unfinished">No more than once per</translation>
+      <translation>Ikke mere end én gang pr.</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Øjeblikkelig</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSdkEventWidget</name>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Nøgleord adskilt af mellemrum</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Billedteksten indeholder:</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Beskrivelsen indeholder:</translation>
     </message>
     <message>
       <source>Event Type:</source>
@@ -209,7 +202,7 @@
     <name>AudioRedirectPickerWidget</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formular</translation>
     </message>
   </context>
   <context>
@@ -220,7 +213,7 @@
     </message>
     <message>
       <source>User actions</source>
-      <translation type="unfinished">User actions</translation>
+      <translation>Brugerhandlinger</translation>
     </message>
     <message>
       <source>Watching archive</source>
@@ -236,7 +229,7 @@
     </message>
     <message>
       <source>Login/logout</source>
-      <translation type="unfinished">Login/logout</translation>
+      <translation>Log ind/Log ud</translation>
     </message>
     <message>
       <source>Server actions</source>
@@ -248,7 +241,7 @@
     </message>
     <message>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>Vælg alt</translation>
     </message>
     <message>
       <source>Sessions</source>
@@ -260,7 +253,7 @@
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Handlings Log</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -276,7 +269,7 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regler For Begivenhed</translation>
     </message>
   </context>
   <context>
@@ -487,7 +480,7 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regler For Begivenhed</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -666,20 +659,35 @@
       <translation type="unfinished">Primary Stream Profile</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
+    </message>
+    <message>
+      <source>Disable import</source>
+      <translation type="unfinished">Disable import</translation>
+    </message>
+    <message>
+      <source>Import Video from Device</source>
+      <translation type="unfinished">Import Video from Device</translation>
+    </message>
+    <message>
+      <source>Import camera or server offline periods</source>
+      <translation type="unfinished">Import camera or server offline periods</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Tilføj</translation>
     </message>
   </context>
   <context>
@@ -752,7 +760,7 @@
     <name>CameraLicensePanelWidget</name>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivér licens...</translation>
     </message>
   </context>
   <context>
@@ -828,7 +836,7 @@
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivér licens...</translation>
     </message>
     <message>
       <source>Copying Schedule</source>
@@ -954,6 +962,13 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>This system is connected to</source>
+      <translation type="unfinished">This system is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -975,7 +990,7 @@
     <name>ContinuousActionAlertWidget</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formular</translation>
     </message>
     <message>
       <source>This action can be set only for instant events</source>
@@ -994,15 +1009,15 @@
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Nøgleord adskilt af mellemrum</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Billedteksten indeholder:</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Beskrivelsen indeholder:</translation>
     </message>
     <message>
       <source>Omit Logging</source>
@@ -1095,7 +1110,7 @@
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stop</translation>
     </message>
     <message>
       <source>Add all Devices</source>
@@ -1160,18 +1175,7 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation type="unfinished">When</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
+      <translation>Regler For Begivenhed...</translation>
     </message>
   </context>
   <context>
@@ -1333,25 +1337,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Intet fundet</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1524,17 +1509,10 @@
     </message>
   </context>
   <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formular</translation>
     </message>
     <message>
       <source>Enable tile interface</source>
@@ -1623,72 +1601,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation type="unfinished">Optional</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation type="unfinished">Testing...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation type="unfinished">LDAP Settings</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>Server URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Adgangskode</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation type="unfinished">Search Base</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation type="unfinished">Search Filter</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation type="unfinished">Fetch Users from LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Indlæser...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation type="unfinished">Connection error</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation type="unfinished">Role to assign to imported users</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation type="unfinished">Disable imported users</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Tillad digest-godkendelse for importeret bruger</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1613,6 @@
     <message>
       <source>Features</source>
       <translation type="unfinished">Features</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation type="unfinished">Active Licenses</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Fjern</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Ny License</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation type="unfinished">Details...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation type="unfinished">The software is licensed to</translation>
     </message>
   </context>
   <context>
@@ -1781,14 +1670,14 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Hardware ID</translation>
     </message>
   </context>
   <context>
     <name>LocalSettingsDialog</name>
     <message>
       <source>Local Settings</source>
-      <translation type="unfinished">Local Settings</translation>
+      <translation>Lokale indstillinger</translation>
     </message>
   </context>
   <context>
@@ -1935,7 +1824,7 @@
     <name>MergeSystemsDialog</name>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Flet systemer...</translation>
     </message>
     <message>
       <source>Server URL:</source>
@@ -1951,7 +1840,7 @@
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Tjek</translation>
     </message>
     <message>
       <source>Take system name and settings from:</source>
@@ -2014,17 +1903,6 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation type="unfinished">Text</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
@@ -2071,16 +1949,8 @@
       <translation type="unfinished">Connection Settings</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>E-mail</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Adgangskode</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Bruger</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2102,13 +1972,17 @@
       <source>System Signature</source>
       <translation type="unfinished">System Signature</translation>
     </message>
+    <message>
+      <source>Username</source>
+      <translation type="unfinished">Username</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation type="unfinished">Sign in</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Adgangskode</translation>
@@ -2117,12 +1991,16 @@
       <source>Username</source>
       <translation type="unfinished">Username</translation>
     </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
+    </message>
   </context>
   <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Håndter...</translation>
     </message>
     <message>
       <source>Volume:</source>
@@ -2145,15 +2023,15 @@
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Billedteksten indeholder:</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Nøgleord adskilt af mellemrum</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Beskrivelsen indeholder:</translation>
     </message>
     <message>
       <source>Level:</source>
@@ -2210,21 +2088,10 @@
     </message>
   </context>
   <context>
-    <name>PresetPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
-    </message>
-  </context>
-  <context>
     <name>PtzManageDialog</name>
     <message>
       <source>Save Current Position</source>
-      <translation type="unfinished">Save Current Position</translation>
+      <translation>Gem nuværende position</translation>
     </message>
     <message>
       <source>Go To Position</source>
@@ -2275,7 +2142,7 @@
     </message>
     <message>
       <source>Hotkey:</source>
-      <translation type="unfinished">Hotkey:</translation>
+      <translation>Genvejstast:</translation>
     </message>
   </context>
   <context>
@@ -2340,49 +2207,6 @@
     <message>
       <source>Restart to the updated version when ready</source>
       <translation type="unfinished">Restart to the updated version when ready</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Aktivér</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Deaktivér</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation type="unfinished">Delete...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Gennemtving Sikker Godkendelse</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Intet fundet</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Ny bruger...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation type="unfinished">LDAP Settings...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation type="unfinished">Fetch Users from LDAP...</translation>
     </message>
   </context>
   <context>
@@ -2461,17 +2285,6 @@
     </message>
   </context>
   <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kvalitet</translation>
-    </message>
-  </context>
-  <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
@@ -2541,30 +2354,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation type="unfinished">Temporary Folder</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation type="unfinished">Additional Options</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation type="unfinished">Disable Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation type="unfinished">Capture Cursor</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation type="unfinished">Browse...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2376,20 @@
       <translation type="unfinished">Recording Quality</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation type="unfinished">Screen</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation type="unfinished">Additional Options</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation type="unfinished">Capture Cursor</translation>
     </message>
   </context>
   <context>
@@ -2622,29 +2431,6 @@
     <message>
       <source>Live</source>
       <translation>Live</translation>
-    </message>
-  </context>
-  <context>
-    <name>RulesDialog</name>
-    <message>
-      <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
-    </message>
-    <message>
-      <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
-    </message>
-    <message>
-      <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
-    </message>
-    <message>
-      <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
-    </message>
-    <message>
-      <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
     </message>
   </context>
   <context>
@@ -2752,10 +2538,6 @@
       <translation>Brugeraktivitet</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Vis servere i træ for ikke-administratorbrugere</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Arkivkryptering</translation>
     </message>
@@ -2765,7 +2547,7 @@
     </message>
     <message>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Skift adgangskode...</translation>
     </message>
     <message>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
@@ -2786,6 +2568,10 @@
     <message>
       <source>Manage Users</source>
       <translation>Administrer brugere</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
     </message>
   </context>
   <context>
@@ -2861,7 +2647,7 @@
     </message>
     <message>
       <source>Failover Priority...</source>
-      <translation type="unfinished">Failover Priority...</translation>
+      <translation>Failover prioritet...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2664,10 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Registrer automatisk indbyggede og USB-webcams</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2731,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Status</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -2993,7 +2757,7 @@
     <name>StorageConfigWidget</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Tilføj Ekstern Lagerplads...</translation>
     </message>
     <message>
       <source>Storage Locations</source>
@@ -3035,7 +2799,7 @@
     <name>StorageUrlDialog</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Tilføj Ekstern Lagerplads...</translation>
     </message>
     <message>
       <source>Protocol:</source>
@@ -3057,10 +2821,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation type="unfinished">Show all users</translation>
     </message>
@@ -3072,12 +2832,16 @@
       <source>Nothing matches your search.</source>
       <translation type="unfinished">Nothing matches your search.</translation>
     </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
   </context>
   <context>
     <name>SystemSettingsWidget</name>
     <message>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(anbefalet)</translation>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
@@ -3159,10 +2923,6 @@
       <source>+ Add Group</source>
       <translation type="unfinished">+ Add Group</translation>
     </message>
-    <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
-    </message>
   </context>
   <context>
     <name>UserListWidget</name>
@@ -3173,77 +2933,6 @@
     <message>
       <source>+ Add User</source>
       <translation>+ Tilføj Bruger</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Brugere</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation type="unfinished">Delete Role</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation type="unfinished">User Roles</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation type="unfinished">New role</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Denne bruger kan bruge digest-godkendelse.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Gennemtving Sikker Godkendelse</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation type="unfinished">Role</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
     </message>
   </context>
   <context>
@@ -3272,7 +2961,7 @@
     <name>VirtualCameraTimeZoneWidget</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formular</translation>
     </message>
     <message>
       <source>Time</source>
@@ -3303,29 +2992,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation type="unfinished">Test</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Generelt</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxy denne webside via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3342,10 +3012,6 @@
     <message>
       <source>Proxy all requested contents</source>
       <translation>Proxy alt efterspurgt indhold</translation>
-    </message>
-    <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Tillad åbning af webside uden kontrol af SSL-certifikat</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3035,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation type="unfinished">Note: Schedule is based on server time.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation type="unfinished">Active Licenses</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Fjern</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation type="unfinished">Details...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation type="unfinished">The software is licensed to</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Ny License</translation>
     </message>
   </context>
   <context>
