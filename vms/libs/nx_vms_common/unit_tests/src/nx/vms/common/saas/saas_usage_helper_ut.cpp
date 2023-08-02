@@ -302,7 +302,7 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceLoaded)
 
     auto info = m_integrationsHelper->allInfo();
     ASSERT_EQ(1, info.size());
-    ASSERT_EQ(10, info.begin()->available);
+    ASSERT_EQ(10, info.begin()->second.available);
 }
 
 TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
@@ -315,26 +315,26 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
     m_integrationsHelper->invalidateCache();
     auto info = m_integrationsHelper->allInfo();
     ASSERT_FALSE(m_integrationsHelper->isOverflow());
-    ASSERT_EQ(1, info.begin()->inUse);
+    ASSERT_EQ(1, info.begin()->second.inUse);
 
     for (const auto& camera: cameras)
         camera->setUserEnabledAnalyticsEngines(engines);
     m_integrationsHelper->invalidateCache();
     info = m_integrationsHelper->allInfo();
     ASSERT_TRUE(m_integrationsHelper->isOverflow());
-    ASSERT_EQ(50, info.begin()->inUse);
+    ASSERT_EQ(50, info.begin()->second.inUse);
 
     std::vector<IntegrationServiceUsageHelper::Propose> propose;
     propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[0]->getId(), QSet<QnUuid>()});
 
     m_integrationsHelper->proposeChange(propose);
     info = m_integrationsHelper->allInfo();
-    ASSERT_EQ(49, info.begin()->inUse);
+    ASSERT_EQ(49, info.begin()->second.inUse);
 
     propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[1]->getId(), QSet<QnUuid>()});
     m_integrationsHelper->proposeChange(propose);
     info = m_integrationsHelper->allInfo();
-    ASSERT_EQ(48, info.begin()->inUse);
+    ASSERT_EQ(48, info.begin()->second.inUse);
 }
 
 TEST_F(SaasServiceUsageHelperTest, camerasByService)

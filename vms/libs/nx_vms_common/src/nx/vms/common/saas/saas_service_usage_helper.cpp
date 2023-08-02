@@ -80,7 +80,7 @@ void IntegrationServiceUsageHelper::invalidateCache()
 
 void IntegrationServiceUsageHelper::updateCacheUnsafe() const
 {
-    m_cache = QMap<QnUuid, nx::vms::api::LicenseSummaryData>();
+    m_cache = std::map<QnUuid, nx::vms::api::LicenseSummaryDataEx>();
 
     // Update integration info
     using namespace nx::vms::api;
@@ -104,22 +104,24 @@ void IntegrationServiceUsageHelper::updateCacheUnsafe() const
                 {
                     auto& value = (*m_cache)[r->getId()];
                     ++value.inUse;
+                    if (value.inUse > value.available)
+                        value.exceedDevices.insert(camera->getId());
                 }
             }
         }
     }
 }
 
-nx::vms::api::LicenseSummaryData IntegrationServiceUsageHelper::info(const QnUuid& id)
+nx::vms::api::LicenseSummaryDataEx IntegrationServiceUsageHelper::info(const QnUuid& id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
         updateCacheUnsafe();
-
-    return m_cache->value(id);
+    const auto it = m_cache->find(id);
+    return it != m_cache->end() ? it->second : nx::vms::api::LicenseSummaryDataEx();
 }
 
-QMap<QnUuid, nx::vms::api::LicenseSummaryData> IntegrationServiceUsageHelper::allInfo() const
+std::map<QnUuid, nx::vms::api::LicenseSummaryDataEx> IntegrationServiceUsageHelper::allInfo() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
@@ -171,6 +173,7 @@ void IntegrationServiceUsageHelper::proposeChange(const std::vector<Propose>& da
     }
 }
 
+#if 0
 std::set<QnUuid> IntegrationServiceUsageHelper::usedDevices() const
 {
     std::set<QnUuid> result;
@@ -182,13 +185,17 @@ std::set<QnUuid> IntegrationServiceUsageHelper::usedDevices() const
             if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId))
             {
                 if (r->plugin()->manifest().isLicenseRequired)
+                {
                     result.insert(r->getId());
+                    break;
+                }
             }
         }
     }
 
     return result;
 }
+#endif
 
 bool IntegrationServiceUsageHelper::isOverflow() const
 {
@@ -198,7 +205,7 @@ bool IntegrationServiceUsageHelper::isOverflow() const
 
     for (auto itr = m_cache->begin(); itr != m_cache->end(); ++itr)
     {
-        if (itr.value().inUse > itr.value().available)
+        if (itr->second.inUse > itr->second.available)
             return true;
     }
     return false;

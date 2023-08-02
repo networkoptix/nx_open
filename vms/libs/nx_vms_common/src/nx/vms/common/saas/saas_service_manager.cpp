@@ -236,11 +236,26 @@ std::map<QnUuid, nx::vms::api::SaasService> ServiceManager::services() const
     return m_services;
 }
 
+nx::vms::api::SaasState ServiceManager::state() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return m_data.state;
+}
+
 void ServiceManager::setState(nx::vms::api::SaasState state)
 {
     auto data = this->data();
     data.state = state;
     loadSaasData(data);
+}
+
+nx::vms::api::ServiceTypeStatus ServiceManager::serviceState(const QString& serviceName) const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+
+    using namespace nx::vms::api;
+    const auto it = m_data.security.status.find(serviceName);
+    return it == m_data.security.status.end() ? ServiceTypeStatus() : it->second;
 }
 
 } // nx::vms::common::saas

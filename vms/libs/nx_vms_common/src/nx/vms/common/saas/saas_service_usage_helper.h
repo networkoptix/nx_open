@@ -46,21 +46,20 @@ public:
      *  @param id Integration id.
      *  @return Information about available licenses per integration.
      */
-    nx::vms::api::LicenseSummaryData info(const QnUuid& id);
+    nx::vms::api::LicenseSummaryDataEx info(const QnUuid& id);
 
-    QMap<QnUuid, nx::vms::api::LicenseSummaryData> allInfo() const;
+    std::map<QnUuid, nx::vms::api::LicenseSummaryDataEx> allInfo() const;
 
     /*
      *  @return true if there are not enough licenses for any integration.
      */
     bool isOverflow() const;
 
-    std::set<QnUuid> usedDevices() const;
+    //std::set<QnUuid> usedDevices() const;
 
     /*
-     * @return Information about cameras which consumes SAAS services.
-     * key - cameraId, value - serviceId. If there is not enough services for some camera
-     * then the service value is an empty UUID.
+     * @return Information about cameras which consume SAAS integration services.
+     * key - cameraId, value - the list of consumed serviceId. 
      */
     std::map<QnUuid, std::set<QnUuid>> camerasByService() const;
 
@@ -84,7 +83,7 @@ private:
     void updateCacheUnsafe() const;
 private:
     //Summary by integrationId.
-    mutable std::optional<QMap<QnUuid, nx::vms::api::LicenseSummaryData>> m_cache;
+    mutable std::optional<std::map<QnUuid, nx::vms::api::LicenseSummaryDataEx>> m_cache;
     mutable nx::Mutex m_mutex;
 };
 
