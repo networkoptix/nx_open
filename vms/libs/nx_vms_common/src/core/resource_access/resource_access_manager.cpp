@@ -469,8 +469,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         && accessRights.testFlag(AccessRight::view);
 
     bool isFootageAllowed = accessRights.testFlag(AccessRight::viewArchive);
-    bool isExportAllowed = isFootageAllowed
-        && accessRights.testFlag(AccessRight::exportArchive);
+    bool isExportAllowed = accessRights.testFlag(AccessRight::exportArchive);
 
     if (!camera->isScheduleEnabled() && camera->isDtsBased())
     {
@@ -502,10 +501,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         result |= Qn::ViewFootagePermission;
 
     if (isExportAllowed)
-    {
-        NX_ASSERT(isFootageAllowed, "Server API cannot allow export without footage access.");
         result |= Qn::ExportPermission;
-    }
 
     if (accessRights.testFlag(AccessRight::viewBookmarks))
         result |= Qn::ViewBookmarksPermission;
