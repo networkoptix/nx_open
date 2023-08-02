@@ -10,8 +10,6 @@ const int SaasCloudStorageParameters::kUnlimitedResolution = std::numeric_limits
 
 bool fromString(const std::string& value, SaasDateTime* target)
 {
-    if (value.empty())
-        return false;
     *target = QDateTime::fromString(QString::fromUtf8(value), "yyyy-MM-dd hh:mm:ss");
     target->setTimeSpec(Qt::UTC);
     return true;

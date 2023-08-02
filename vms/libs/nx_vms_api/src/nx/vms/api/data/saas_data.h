@@ -138,6 +138,37 @@ struct NX_VMS_API SaasPurshase
 #define SaasPurshase_fields (quantity)
 NX_REFLECTION_INSTRUMENT(SaasPurshase, SaasPurshase_fields)
 
+/**%apidoc SaasState */
+NX_REFLECTION_ENUM_CLASS(UseStatus,
+
+    /**%apidoc Not initialized */
+    uninitialized,
+
+    /**%apidoc No issues */
+    ok,
+
+    /**%apidoc Service type should be blocked because of overuse. 
+     * The block date is in 'tmpExpirationDate' field
+     */
+    overUse
+);
+
+struct ServiceTypeStatus
+{
+    /**%apidoc Service status. If status is not 'ok'
+     * services will be blocked at 'issueExpirationDate'.
+     */
+    UseStatus status;
+
+    /**%apidoc There is issue with service overflow detected by license server.
+     * The issue should be fixed till this date underwise VMS will start to
+     * turn off services.
+     */
+    SaasDateTime issueExpirationDate;
+};
+#define ServiceTypeState_fields (status)(issueExpirationDate)
+NX_REFLECTION_INSTRUMENT(ServiceTypeStatus, ServiceTypeState_fields)
+
 /**%apidoc SaasSecurity */
 struct NX_VMS_API SaasSecurity
 {
@@ -156,19 +187,10 @@ struct NX_VMS_API SaasSecurity
      * UTC time string in format 'YYYY-MM-DD hh:mm:ss'.
      */
     SaasDateTime tmpExpirationDate;
-
-    /**%apidoc Empty string in case of there are no security issues.
-     * Otherwise error message from the license server with description why the license was blocked.
-     */
-    QString issue;
-
-    /**%apidoc There is issue with service overflow detected by license server.
-     * The issue should be fixed till this date underwise VMS will start to
-     * turn off services.
-     */
-    SaasDateTime issueExpirationDate;
+	
+    std::map<QString, ServiceTypeStatus> status;
 };
-#define SaasSecurity_fields (checkPeriodS)(lastCheck)(tmpExpirationDate)(issue)(issueExpirationDate)
+#define SaasSecurity_fields (checkPeriodS)(lastCheck)(tmpExpirationDate)(status)
 NX_REFLECTION_INSTRUMENT(SaasSecurity, SaasSecurity_fields)
 
 /**%apidoc SaasData from license server */

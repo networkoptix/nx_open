@@ -64,6 +64,12 @@ public:
     void updateLicenseV1();
 
     void setState(nx::vms::api::SaasState state);
+    nx::vms::api::SaasState state() const;
+
+    /**
+     * @return The status of the service (ok or has an issue).
+     */
+    nx::vms::api::ServiceTypeStatus serviceState(const QString& serviceName) const;
 
 signals:
     void dataChanged();
