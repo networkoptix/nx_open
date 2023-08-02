@@ -14,12 +14,10 @@ import nx.vms.client.desktop.analytics as Analytics
 Control
 {
     id: control
-    required property Analytics.StateView taxonomy
-    required property string objectTypeId
-    required property string attributeName
 
-    property Analytics.ObjectType objectType: taxonomy.objectTypeById(objectTypeId)
-    property Analytics.Attribute attribute: findAttribute()
+    required property Analytics.ObjectType objectType
+    required property Analytics.Attribute attribute
+
     property bool isGeneric: !objectType
     property string value
 
@@ -30,39 +28,27 @@ Control
         loader.item.forceActiveFocus()
     }
 
-    function findAttributeRecursive(objectType, nameParts)
+    component ComboBoxBasedEditor: ComboBox
     {
-        if (!objectType || nameParts.length < 1)
-            return null
-
-        const name = nameParts[0]
-        for (let i = 0; i < objectType.attributes.length; ++i)
+        Connections
         {
-            const attribute = objectType.attributes[i]
-            if (attribute.name == name)
-            {
-                if (nameParts.length == 1)
-                    return attribute
-
-                if (attribute.type !== Analytics.Attribute.Type.attributeSet)
-                {
-                    console.warn(loggingCategory,
-                        `Nested attribute ${attribute.name} is not an attribute set`)
-                    return null
-                }
-
-                return findAttributeRecursive(attribute.attributeSet, nameParts.slice(1))
-            }
+            target: control
+            function onValueChanged() { currentIndex = indexOfValue(control.value) }
         }
-        return null
-    }
 
-    function findAttribute()
-    {
-        if (!objectType)
-            return null
+        onActivated: (index) =>
+        {
+            control.value = valueAt(index)
+            control.editingFinished()
+        }
 
-        return findAttributeRecursive(objectType, attributeName.split('.'))
+        Component.onCompleted: currentIndex = indexOfValue(control.value)
+
+        onActiveFocusChanged:
+        {
+            if (!activeFocus)
+                control.editingFinished()
+        }
     }
 
     Component
@@ -102,7 +88,7 @@ Control
                 function onValueChanged() { setValue(control.value) }
             }
 
-            onValueChanged: control.value = value
+            onValueChanged: control.value = value || ""
             onEditingFinished: control.editingFinished()
             Component.onCompleted: setValue(control.value)
         }
@@ -112,29 +98,15 @@ Control
     {
         id: booleanDelegate
 
-        ComboBox
+        ComboBoxBasedEditor
         {
             textRole: "text"
             valueRole: "value"
             model: [
-                {"text": qsTr("Any %1").arg(attribute.name), "value": undefined},
+                {"text": qsTr("Any %1").arg(attribute.name), "value": ""},
                 {"text": qsTr("Yes"), "value": "true"},
                 {"text": qsTr("No"), "value": "false"}
             ]
-
-            Connections
-            {
-                target: control
-                function onValueChanged() { currentIndex = indexOfValue(control.value) }
-            }
-
-            onActivated:
-            {
-                control.value = value
-                control.editingFinished()
-            }
-
-            Component.onCompleted: currentIndex = indexOfValue(control.value)
         }
     }
 
@@ -142,31 +114,17 @@ Control
     {
         id: colorDelegate
 
-        ComboBox
+        ComboBoxBasedEditor
         {
             withColorSection: true
             textRole: "name"
             valueRole: "color"
             model:
             {
-                return [{"name": qsTr("Any %1").arg(attribute.name), "value": undefined}].concat(
+                return [{"name": qsTr("Any %1").arg(attribute.name), "value": ""}].concat(
                     Array.prototype.map.call(attribute.colorSet.items,
                         name => ({"name": name, "color": attribute.colorSet.color(name)})))
             }
-
-            Connections
-            {
-                target: control
-                function onValueChanged() { currentIndex = indexOfValue(control.value) }
-            }
-
-            onActivated:
-            {
-                control.value = value
-                control.editingFinished()
-            }
-
-            Component.onCompleted: currentIndex = indexOfValue(control.value)
         }
     }
 
@@ -174,44 +132,25 @@ Control
     {
         id: enumDelegate
 
-        ComboBox
+        ComboBoxBasedEditor
         {
+            id: enumCombobox
+
             textRole: "text"
             valueRole: "value"
             model:
             {
-                return [{"text": qsTr("Any %1").arg(attribute.name), "value": undefined}].concat(
+                return [{"text": qsTr("Any %1").arg(attribute.name), "value": ""}].concat(
                     Array.prototype.map.call(attribute.enumeration.items,
                         text => ({"text": text, "value": text})))
             }
-
-            Connections
-            {
-                target: control
-                function onValueChanged() { currentIndex = indexOfValue(control.value) }
-            }
-
-            onActivated:
-            {
-                control.value = value
-                control.editingFinished()
-            }
-
-            Component.onCompleted: currentIndex = indexOfValue(control.value)
         }
     }
 
     function calculateComponent()
     {
-        if (isGeneric)
+        if (isGeneric || !attribute)
             return textDelegate
-
-        if (!attribute)
-        {
-            console.warn(loggingCategory,
-                `Attribute ${attributeName} was not found in ${objectTypeId}`)
-            return textDelegate
-        }
 
         switch (attribute.type)
         {
@@ -229,10 +168,6 @@ Control
 
             case Analytics.Attribute.Type.enumeration:
                 return enumDelegate
-
-            default:
-                console.warn(loggingCategory,
-                    `Unknown analytics attribute type "${attributeEditor.attribute.type}"`)
         }
         return textDelegate
     }
@@ -240,13 +175,6 @@ Control
     contentItem: Loader
     {
         id: loader
-
         sourceComponent: calculateComponent()
-    }
-
-    LoggingCategory
-    {
-        id: loggingCategory
-        name: "Nx.LookupLists"
     }
 }

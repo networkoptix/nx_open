@@ -12,13 +12,17 @@ import Nx.Dialogs
 import nx.vms.client.desktop
 import nx.vms.client.desktop.analytics as Analytics
 
+import "taxonomy_utils.js" as TaxonomyUtils
+
 ModalDialog
 {
     id: dialog
 
     required property Analytics.StateView taxonomy
     required property LookupListModel model
-    property bool isGeneric: !taxonomy.objectTypeById(model.data.objectTypeId)
+
+    property Analytics.ObjectType objectType: taxonomy.objectTypeById(model.data.objectTypeId)
+    property bool isGeneric: !objectType
     property var entry: ({})
 
     function updateAddButton()
@@ -53,9 +57,8 @@ ModalDialog
                 }
                 LookupListElementEditor
                 {
-                    taxonomy: dialog.taxonomy
-                    objectTypeId: dialog.model.data.objectTypeId
-                    attributeName: modelData
+                    objectType: dialog.objectType
+                    attribute: TaxonomyUtils.findAttribute(objectType, modelData)
 
                     Layout.fillWidth: true
                     onValueChanged:
