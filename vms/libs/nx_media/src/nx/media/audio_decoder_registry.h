@@ -21,7 +21,7 @@ using AudioDecoderPtr = std::unique_ptr<AbstractAudioDecoder>;
 /*
 * This class allows to register various implementations of audio decoders. Exact list of decoders can be registered in runtime.
 */
-class AudioDecoderRegistry
+class NX_MEDIA_API AudioDecoderRegistry
 {
 public:
     static AudioDecoderRegistry* instance();

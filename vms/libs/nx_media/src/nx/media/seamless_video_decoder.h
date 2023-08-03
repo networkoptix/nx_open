@@ -19,7 +19,7 @@ class SeamlessVideoDecoderPrivate;
  * VideoDecoderFactory to instantiate compatible VideoDecoder to decode next frame if
  * video parameters have changed.
  */
-class SeamlessVideoDecoder: public QObject
+class NX_MEDIA_API SeamlessVideoDecoder: public QObject
 {
     Q_OBJECT
 

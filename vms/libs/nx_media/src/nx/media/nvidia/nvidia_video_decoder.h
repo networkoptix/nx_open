@@ -15,7 +15,7 @@ class Renderer;
 class NvidiaVideoFrame;
 struct NvidiaVideoDecoderImpl;
 
-class NvidiaVideoDecoder: public std::enable_shared_from_this<NvidiaVideoDecoder>
+class NX_MEDIA_API NvidiaVideoDecoder: public std::enable_shared_from_this<NvidiaVideoDecoder>
 {
 public:
     NvidiaVideoDecoder();

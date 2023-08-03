@@ -10,7 +10,7 @@
 
 namespace nx::media::nvidia {
 
-class NvidiaDriverDecoderProxy
+class NX_MEDIA_API NvidiaDriverDecoderProxy
 {
 public:
     bool load();

@@ -10,7 +10,7 @@
 
 namespace nx::media::nvidia {
 
-class FrameQueue
+class NX_MEDIA_API FrameQueue
 {
 public:
     ~FrameQueue();

@@ -13,7 +13,7 @@ namespace nx::media::nvidia {
 
 class NvidiaVideoFrame;
 
-class Renderer : public QOpenGLFunctions
+class NX_MEDIA_API Renderer : public QOpenGLFunctions
 {
 public:
     ~Renderer();
@@ -40,4 +40,3 @@ private:
 };
 
 } // nx::media::nvidia
-

@@ -4,5 +4,5 @@
 
 #include <QtGui/QImage>
 
-QImage decompressJpegImage(const char *data, size_t size);
-QImage decompressJpegImage(const QByteArray &data);
+NX_MEDIA_API QImage decompressJpegImage(const char *data, size_t size);
+NX_MEDIA_API QImage decompressJpegImage(const QByteArray &data);
