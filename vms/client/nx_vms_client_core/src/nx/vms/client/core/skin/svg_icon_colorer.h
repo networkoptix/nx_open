@@ -16,7 +16,6 @@ static const QString kInvalidColor = "invalidColor";
 class NX_VMS_CLIENT_CORE_API SvgIconColorer
 {
 public:
-
     struct ThemeColorsRemapData
     {
         QString primary = kInvalidColor;
@@ -27,6 +26,13 @@ public:
         bool contains(QString name) const
         {
             return name == "primary" || name == "secondary" || name == "tertiary";
+        }
+
+        bool empty() const
+        {
+            return primary == kInvalidColor
+                && secondary == kInvalidColor
+                && tertiary == kInvalidColor;
         }
 
         const QString operator[](QString name) const

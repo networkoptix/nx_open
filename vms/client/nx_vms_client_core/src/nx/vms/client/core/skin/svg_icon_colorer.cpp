@@ -59,26 +59,33 @@ QByteArray substituteColors(
 {
     QByteArray result = data;
 
-    for (int pos = 0; pos < data.size(); ++pos)
+    if (!colorSubstitutions.empty())
     {
-        pos = getNextColorPos(data, pos);
-        if (pos != data.size())
+        for (int pos = 0; pos < data.size(); ++pos)
         {
-            QString currentColor = QString::fromLatin1(
-                data.begin() + pos,
-                kColorValueStringLength).toLower();
-
-            if (colorSubstitutions.contains(currentColor))
+            pos = getNextColorPos(data, pos);
+            if (pos != data.size())
             {
-                result.replace(
-                    pos,
-                    kColorValueStringLength,
-                    colorSubstitutions[currentColor].name().toLatin1());
-            }
+                QString currentColor = QString::fromLatin1(
+                    data.begin() + pos,
+                    kColorValueStringLength).toLower();
 
-            pos += kColorValueStringLength;
+                if (colorSubstitutions.contains(currentColor))
+                {
+                    result.replace(
+                        pos,
+                        kColorValueStringLength,
+                        colorSubstitutions[currentColor].name().toLatin1());
+                }
+
+                pos += kColorValueStringLength;
+            }
         }
     }
+
+    if (themeSubstitutions.empty())
+        return result;
+
     QDomDocument doc;
     if (auto res = doc.setContent(result); !res)
     {
@@ -86,7 +93,7 @@ QByteArray substituteColors(
         return data;
     }
 
-    const auto updateElement = 
+    const auto updateElement =
         [&themeSubstitutions](QDomElement element)
         {
             if (auto _class = element.attribute("class", "");
@@ -105,13 +112,13 @@ QByteArray substituteColors(
                         ? Qt::transparent
                         : Qt::magenta;
                 }
-                
+
                 if (themeSubstitutions.alpha < 1.0)
                     element.setAttribute("opacity", themeSubstitutions.alpha);
                 element.setAttribute("fill", value.name().toLatin1());
             }
         };
-    
+
     auto recursiveDfs = nx::utils::y_combinator(
         [updateElement](auto recursiveDfs, QDomElement element) -> void
         {
@@ -208,7 +215,7 @@ QByteArray SvgIconColorer::makeIcon(QIcon::Mode mode) const
         (mode == QnIcon::Normal && !m_substitutions.contains(mode))
             ? colorTheme()->getColorSubstitutions()
             : colorMapFromStringMap(m_substitutions.value(mode));
-    
+
     const ThemeColorsRemapData themeSubstitutions = m_themeSubstitutions.value(mode, kUnspecified);
 
     const QString suffix = (mode == QnIcon::Normal)
