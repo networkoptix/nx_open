@@ -76,6 +76,7 @@ private:
     QAction* const m_removeBookmarkAction;
     QAction* const m_removeBookmarksAction;
     bool m_updatingParametersNow;
+    bool m_columnResizeRequired;
 
     const qint64 utcRangeStartMs;
     const qint64 utcRangeEndMs;
