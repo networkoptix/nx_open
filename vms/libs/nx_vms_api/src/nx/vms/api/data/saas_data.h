@@ -169,6 +169,18 @@ struct ServiceTypeStatus
 #define ServiceTypeState_fields (status)(issueExpirationDate)
 NX_REFLECTION_INSTRUMENT(ServiceTypeStatus, ServiceTypeState_fields)
 
+/**%apidoc Organization */
+struct NX_VMS_API Organization
+{
+    /**%apidoc Organization id */
+    QnUuid id;
+
+    /**%apidoc Organization name */
+    QString name;
+};
+#define Organization_fields (id)(name)
+NX_REFLECTION_INSTRUMENT(Organization, Organization_fields)
+
 /**%apidoc SaasSecurity */
 struct NX_VMS_API SaasSecurity
 {
@@ -199,6 +211,12 @@ struct NX_VMS_API SaasData
     /**%apidoc Cloud system Id */
     QnUuid cloudSystemId;
 
+    /**%apidoc Channel partner information */
+    Organization channelPartner;
+
+    /**%apidoc Organization information */
+    Organization organization;
+
     /**%apidoc Saas state */
     SaasState state = SaasState::uninitialized;
 
@@ -208,7 +226,7 @@ struct NX_VMS_API SaasData
     /**%apidoc Security data. It is used to validate saas data*/
     SaasSecurity security;
 };
-#define SaasData_fields (cloudSystemId)(state)(services)(security)
+#define SaasData_fields (cloudSystemId)(channelPartner)(organization)(state)(services)(security)
 NX_REFLECTION_INSTRUMENT(SaasData, SaasData_fields)
 
 struct NX_VMS_API UpdateCloudLicensesRequest
