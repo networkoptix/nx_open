@@ -30,6 +30,17 @@ Window
     readonly property real availableHeight:
         height - topPadding - bottomPadding - (buttonBox ? buttonBox.height : 0)
 
+    property real implicitWidth: leftPadding + rightPadding
+	+ Math.max(contentItem ? contentItem.implicitWidth : 0,
+            buttonBox ? buttonBox.implicitWidth : 0)
+
+    property real implicitHeight: topPadding + bottomPadding
+        + (contentItem ? contentItem.implicitHeight : 0)
+        + (buttonBox ? buttonBox.implicitHeight : 0)
+
+    property real fixedWidth: 0
+    property real fixedHeight: 0
+
     // Dig out the shadowed contentItem of Window.
     readonly property alias rootItem: dummy.parent
     Item { id: dummy; visible: false }
@@ -104,6 +115,38 @@ Window
             dialog.rejected()
             // Do not close the dialog here - it won't open again.
         }
+    }
+
+    Binding
+    {
+        target: dialog
+        when: dialog.fixedWidth > 0
+        property: "minimumWidth"
+        value: dialog.fixedWidth
+    }
+
+    Binding
+    {
+        target: dialog
+        when: dialog.fixedWidth > 0
+        property: "maximumWidth"
+        value: dialog.fixedWidth
+    }
+
+    Binding
+    {
+        target: dialog
+        when: dialog.fixedHeight > 0
+        property: "minimumHeight"
+        value: dialog.fixedHeight
+    }
+
+    Binding
+    {
+        target: dialog
+        when: dialog.fixedHeight > 0
+        property: "maximumHeight"
+        value: dialog.fixedHeight
     }
 
     function accept()

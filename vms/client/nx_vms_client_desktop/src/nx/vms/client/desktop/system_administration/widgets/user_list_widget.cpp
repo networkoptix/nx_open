@@ -17,12 +17,14 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/ldap.h>
-#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/control_bars.h>
@@ -56,12 +58,8 @@ namespace {
 
 static constexpr int kMaximumColumnWidth = 200;
 
-static const QColor klight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{klight16Color, "light16"}}},
-    {QIcon::Active, {{klight16Color, "light17"}}},
-    {QIcon::Selected, {{klight16Color, "light15"}}},
-};
+static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
+    kTextButtonColors = {{QIcon::Normal, {"light14"}}, {QIcon::Active, {"light13"}}};
 
 } // namespace
 
@@ -176,13 +174,14 @@ public:
 
     ControlBar* const selectionControls{new ControlBar(q)};
 
-    QPushButton* const enableSelectedButton{new QPushButton(tr("Enable"), selectionControls)};
-    QPushButton* const disableSelectedButton{new QPushButton(tr("Disable"), selectionControls)};
-    QPushButton* const deleteSelectedButton{
-        new QPushButton(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions),
-            tr("Delete"),
-            selectionControls)};
-    QPushButton* const forceSecureAuthButton{new QPushButton(tr("Force Secure Authentication"),
+    QPushButton* const deleteButton{new QPushButton(
+        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+        tr("Delete"),
+        selectionControls)};
+
+    QPushButton* const editButton{new QPushButton(
+        qnSkin->icon("text_buttons/edit_20.svg", kTextButtonColors),
+        tr("Edit"),
         selectionControls)};
 
     bool m_hasChanges = false;
@@ -196,13 +195,9 @@ public:
 
 private:
     void createUser();
-    void forceSecureAuth();
-
-    bool enableUser(const QnUserResourcePtr& user, bool enabled);
-    void setSelectedEnabled(bool enabled);
-    void enableSelected() { setSelectedEnabled(true); }
-    void disableSelected() { setSelectedEnabled(false); }
+    void editUser(const QnUserResourcePtr& user);
     void deleteSelected();
+    void editSelected();
 
     void modelUpdated();
     void updateSelection();
@@ -212,7 +207,12 @@ private:
     void handleHeaderCheckStateChanged(Qt::CheckState state);
     void handleUsersTableClicked(const QModelIndex& index);
 
-    bool canDisableDigest(const QnUserResourcePtr& user) const;
+    bool canDelete(const QnUserResourcePtr& user) const;
+    bool canDelete(const QnUserResourceList& users) const;
+    bool canEnableDisable(const QnUserResourcePtr& user) const;
+    bool canEnableDisable(const QnUserResourceList& users) const;
+    bool canChangeAuthentication(const QnUserResourcePtr& user) const;
+    bool canChangeAuthentication(const QnUserResourceList& users) const;
 
     QnUserResourceList visibleUsers() const;
     QnUserResourceList visibleSelectedUsers() const;
@@ -220,8 +220,6 @@ private:
     void visibleAdded(int first, int last);
     void visibleAboutToBeRemoved(int first, int last);
     void visibleModified(int first, int last);
-
-    nx::vms::client::core::AccessController* accessController() const;
 };
 
 UserListWidget::UserListWidget(QWidget* parent):
@@ -352,7 +350,7 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
             modelUpdated();
         });
 
-    connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
+    connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged,
         [this]() { sortModel->setSyncId(this->q->globalSettings()->ldap().syncId()); });
 }
 
@@ -404,26 +402,24 @@ void UserListWidget::Private::setupUi()
     connect(ui->usersTable, &QAbstractItemView::clicked, this, &Private::handleUsersTableClicked);
     connect(ui->createUserButton, &QPushButton::clicked, this, &Private::createUser);
 
-    enableSelectedButton->setFlat(true);
-    disableSelectedButton->setFlat(true);
-    deleteSelectedButton->setFlat(true);
-    forceSecureAuthButton->setFlat(true);
+    deleteButton->setFlat(true);
+    editButton->setFlat(true);
 
     constexpr int kButtonBarHeight = 32;
     selectionControls->setFixedHeight(kButtonBarHeight);
 
+    setPaletteColor(selectionControls, QPalette::Window, core::colorTheme()->color("dark11"));
+    setPaletteColor(selectionControls, QPalette::WindowText, core::colorTheme()->color("light14"));
+    setPaletteColor(selectionControls, QPalette::Dark, core::colorTheme()->color("dark15"));
+
     const auto buttonsLayout = selectionControls->horizontalLayout();
     buttonsLayout->setSpacing(16);
-    buttonsLayout->addWidget(enableSelectedButton);
-    buttonsLayout->addWidget(disableSelectedButton);
-    buttonsLayout->addWidget(deleteSelectedButton);
-    buttonsLayout->addWidget(forceSecureAuthButton);
+    buttonsLayout->addWidget(deleteButton);
+    buttonsLayout->addWidget(editButton);
     buttonsLayout->addStretch();
 
-    connect(enableSelectedButton, &QPushButton::clicked, this, &Private::enableSelected);
-    connect(disableSelectedButton, &QPushButton::clicked, this, &Private::disableSelected);
-    connect(deleteSelectedButton, &QPushButton::clicked, this, &Private::deleteSelected);
-    connect(forceSecureAuthButton, &QPushButton::clicked, this, &Private::forceSecureAuth);
+    connect(deleteButton, &QPushButton::clicked, this, &Private::deleteSelected);
+    connect(editButton, &QPushButton::clicked, this, &Private::editSelected);
 
     connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
         [this](const QString& text)
@@ -439,33 +435,7 @@ void UserListWidget::Private::setupUi()
             handleUsersTableClicked(index.sibling(index.row(), UserListModel::CheckBoxColumn));
         });
 
-    // By [Left] disable user, by [Right] enable user:
-    installEventHandler(ui->usersTable, QEvent::KeyPress, this,
-        [this](QObject* /*object*/, QEvent* event)
-        {
-            const int key = static_cast<QKeyEvent*>(event)->key();
-            switch (key)
-            {
-                case Qt::Key_Left:
-                case Qt::Key_Right:
-                {
-                    if (!ui->usersTable->currentIndex().isValid())
-                        break;
-                    const auto user = ui->usersTable->currentIndex().data(
-                        Qn::UserResourceRole).value<QnUserResourcePtr>();
-                    if (user)
-                        enableUser(user, key == Qt::Key_Right);
-                    break;
-                }
-
-                default:
-                    break;
-            }
-        });
-
     setHelpTopic(q, Qn::SystemSettings_UserManagement_Help);
-    setHelpTopic(enableSelectedButton, Qn::UserSettings_DisableUser_Help);
-    setHelpTopic(disableSelectedButton, Qn::UserSettings_DisableUser_Help);
 
     // Cursor changes with hover:
     connect(hoverTracker, &ItemViewHoverTracker::itemEnter, this,
@@ -529,66 +499,16 @@ void UserListWidget::Private::updateSelection()
             : Qt::PartiallyChecked;
     }
 
-    const auto canModifyUser =
-        [this](const QnUserResourcePtr& user)
-        {
-            const auto requiredPermissions = Qn::WriteAccessRightsPermission | Qn::SavePermission;
-            return accessController()->hasPermissions(user, requiredPermissions);
-        };
+    const auto canDelete = this->canDelete(users);
+    const auto canEdit = canEnableDisable(users) || canChangeAuthentication(users);
 
-    const bool canEnable = std::any_of(users.cbegin(), users.cend(),
-        [this, canModifyUser](const QnUserResourcePtr& user)
-        {
-            return canModifyUser(user) && !usersModel->isUserEnabled(user);
-        });
+    deleteButton->setVisible(canDelete);
+    editButton->setVisible(canEdit);
 
-    const bool canDisable = std::any_of(users.cbegin(), users.cend(),
-        [this, canModifyUser](const QnUserResourcePtr& user)
-        {
-            return canModifyUser(user) && usersModel->isUserEnabled(user);
-        });
-
-    const bool canDelete = std::any_of(users.cbegin(), users.cend(),
-        [this](const QnUserResourcePtr& user)
-        {
-            return accessController()->hasPermissions(user, Qn::RemovePermission);
-        });
-
-    const auto canForceSecureAuth = std::any_of(users.cbegin(), users.cend(),
-        [this](const QnUserResourcePtr& user)
-        {
-            return canDisableDigest(user) && usersModel->isDigestEnabled(user);
-        });
-
-    enableSelectedButton->setVisible(canEnable);
-    disableSelectedButton->setVisible(canDisable);
-    deleteSelectedButton->setVisible(canDelete);
-    forceSecureAuthButton->setVisible(canForceSecureAuth);
-
-    selectionControls->setDisplayed(canEnable || canDisable || canDelete || canForceSecureAuth);
+    selectionControls->setDisplayed(canDelete || canEdit);
     header->setCheckState(selectionState);
 
     q->update();
-}
-
-void UserListWidget::Private::forceSecureAuth()
-{
-    if (!ForceSecureAuthDialog::isConfirmed(q))
-        return;
-
-    const auto users = visibleSelectedUsers();
-    for (const auto& user: users)
-    {
-        if (!canDisableDigest(user))
-            continue;
-
-        usersModel->setDigestEnabled(user, false);
-    }
-
-    m_hasChanges = true;
-    emit q->hasChangesChanged();
-
-    updateSelection();
 }
 
 void UserListWidget::Private::createUser()
@@ -597,37 +517,10 @@ void UserListWidget::Private::createUser()
         action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 
-bool UserListWidget::Private::enableUser(const QnUserResourcePtr& user, bool enabled)
-{
-    if (!accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
-        return false;
-
-    usersModel->setUserEnabled(user, enabled);
-
-    m_hasChanges = true;
-    emit q->hasChangesChanged();
-
-    return true;
-}
-
-void UserListWidget::Private::setSelectedEnabled(bool enabled)
-{
-    const auto users = visibleSelectedUsers();
-    for (const auto& user: users)
-        enableUser(user, enabled);
-}
-
 void UserListWidget::Private::deleteSelected()
 {
-    QnUserResourceList usersToDelete;
-    const auto users = visibleSelectedUsers();
-    for (const auto& user: users)
-    {
-        if (!accessController()->hasPermissions(user, Qn::RemovePermission))
-            continue;
-
-        usersToDelete << user;
-    }
+    const auto usersToDelete = visibleSelectedUsers().filtered(
+        [this](const QnUserResourcePtr& user) { return canDelete(user); });
 
     if (usersToDelete.isEmpty())
         return;
@@ -654,6 +547,92 @@ void UserListWidget::Private::deleteSelected()
         }));
 
     q->setEnabled(false);
+}
+
+void UserListWidget::Private::editSelected()
+{
+    const auto usersToEdit = visibleSelectedUsers().filtered(
+        [this](const QnUserResourcePtr& user)
+        {
+            return canEnableDisable(user) || canChangeAuthentication(user);
+        });
+
+    if (usersToEdit.empty())
+        return;
+
+    if (usersToEdit.size() == 1)
+    {
+        editUser(usersToEdit.front());
+        return;
+    }
+
+    const QVariantMap dialogParameters{
+        {"usersCount", usersToEdit.size()},
+        {"enableUsersEditable", canEnableDisable(usersToEdit)},
+        {"digestEditable", canChangeAuthentication(usersToEdit)}};
+
+    QmlDialogWrapper batchUserEditDialog(
+        QUrl("Nx/Dialogs/UserManagement/BatchUserEditDialog.qml"), dialogParameters, q);
+
+    if (!batchUserEditDialog.exec())
+        return; //< Cancelled.
+
+    const auto enableUsers = batchUserEditDialog.window()->property("enableUsers")
+        .value<Qt::CheckState>();
+
+    const auto disableDigest = batchUserEditDialog.window()->property("disableDigest")
+        .value<Qt::CheckState>();
+
+    if (enableUsers == Qt::PartiallyChecked && disableDigest == Qt::PartiallyChecked)
+        return; //< No changes.
+
+    m_requestChain.reset(new UserGroupRequestChain(q->systemContext()));
+    for (auto user: usersToEdit)
+    {
+        UserGroupRequest::UpdateUser updateUser;
+        updateUser.id = user->getId();
+
+        // TODO: #vkutin #ikulaychuk These fields should be optional in the API request.
+        // Refactor the client side.
+        updateUser.enabled = enableUsers != Qt::PartiallyChecked
+            ? (enableUsers == Qt::Checked)
+            : user->isEnabled();
+
+        updateUser.enableDigest = disableDigest != Qt::PartiallyChecked
+            ? (disableDigest == Qt::Checked)
+            : user->shouldDigestAuthBeUsed();
+
+        m_requestChain->append(updateUser);
+    }
+
+    q->setEnabled(false);
+
+    m_requestChain->start(
+        [this](bool success, const QString& errorString)
+        {
+            q->setEnabled(true);
+            if (success)
+                return;
+
+            QnMessageBox messageBox(
+                QnMessageBoxIcon::Critical,
+                errorString,
+                {},
+                QDialogButtonBox::Ok,
+                QDialogButtonBox::Ok,
+                q);
+            messageBox.exec();
+        });
+}
+
+void UserListWidget::Private::editUser(const QnUserResourcePtr& user)
+{
+    if (!NX_ASSERT(user))
+        return;
+
+    q->menu()->trigger(action::UserSettingsAction, action::Parameters(user)
+        .withArgument(Qn::ForceRole, true)
+        .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 
 QnUserResourceList UserListWidget::Private::visibleUsers() const
@@ -730,9 +709,39 @@ QnUserResourceList UserListWidget::Private::visibleSelectedUsers() const
     return result;
 }
 
-bool UserListWidget::Private::canDisableDigest(const QnUserResourcePtr& user) const
+bool UserListWidget::Private::canDelete(const QnUserResourcePtr& user) const
 {
-    return accessController()->hasPermissions(user, Qn::WriteDigestPermission);
+    return q->accessController()->hasPermissions(user, Qn::RemovePermission);
+}
+
+bool UserListWidget::Private::canDelete(const QnUserResourceList& users) const
+{
+    return !users.empty() && std::all_of(users.cbegin(), users.cend(),
+        [this](const QnUserResourcePtr& user) { return canDelete(user); });
+}
+
+bool UserListWidget::Private::canEnableDisable(const QnUserResourcePtr& user) const
+{
+    return q->accessController()->hasPermissions(user,
+        Qn::WritePermission | Qn::WriteAccessRightsPermission | Qn::SavePermission);
+}
+
+bool UserListWidget::Private::canEnableDisable(const QnUserResourceList& users) const
+{
+    return !users.empty() && std::all_of(users.cbegin(), users.cend(),
+        [this](const QnUserResourcePtr& user) { return canEnableDisable(user); });
+}
+
+bool UserListWidget::Private::canChangeAuthentication(const QnUserResourcePtr& user) const
+{
+    return q->accessController()->hasPermissions(user,
+        Qn::WritePermission | Qn::WriteDigestPermission | Qn::SavePermission);
+}
+
+bool UserListWidget::Private::canChangeAuthentication(const QnUserResourceList& users) const
+{
+    return !users.empty() && std::all_of(users.cbegin(), users.cend(),
+        [this](const QnUserResourcePtr& user) { return canChangeAuthentication(user); });
 }
 
 void UserListWidget::Private::handleHeaderCheckStateChanged(Qt::CheckState state)
@@ -769,9 +778,7 @@ void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
 
         default:
         {
-            q->menu()->trigger(action::UserSettingsAction, action::Parameters(user)
-                .withArgument(Qn::ForceRole, true)
-                .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
+            editUser(user);
             break;
         }
     }
@@ -780,11 +787,6 @@ void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
 void UserListWidget::Private::loadData()
 {
     usersModel->resetUsers();
-}
-
-nx::vms::client::core::AccessController* UserListWidget::Private::accessController() const
-{
-    return q->systemContext()->accessController();
 }
 
 } // namespace nx::vms::client::desktop
