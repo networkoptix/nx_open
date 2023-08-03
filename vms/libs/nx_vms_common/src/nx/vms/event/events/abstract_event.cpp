@@ -314,7 +314,8 @@ bool isSourceServerRequired(EventType eventType)
 }
 
 std::optional<QnResourceList> sourceResources(
-    const EventParameters& params, QnResourcePool* resourcePool)
+    const EventParameters& params, QnResourcePool* resourcePool,
+    const std::function<void(const QString&)>& notFound)
 {
     if (params.eventResourceId.isNull() && params.metadata.cameraRefs.empty())
         return std::nullopt;
@@ -323,17 +324,29 @@ std::optional<QnResourceList> sourceResources(
     for (const auto& ref: params.metadata.cameraRefs)
     {
         if (auto r = camera_id_helper::findCameraByFlexibleId(resourcePool, ref))
+        {
             result.push_back(std::move(r));
+        }
         else
+        {
             NX_DEBUG(NX_SCOPE_TAG, "Unable to find event %1 resource ref %2", params.eventType, ref);
+            if (notFound)
+                notFound(ref);
+        }
     }
 
     if (const auto& id = params.eventResourceId; !id.isNull())
     {
         if (auto r = resourcePool->getResourceById(id))
+        {
             result.push_back(std::move(r));
+        }
         else
+        {
             NX_DEBUG(NX_SCOPE_TAG, "Unable to find event %1 resource id %2", params.eventType, id);
+            if (notFound)
+                notFound(id.toString());
+        }
     }
 
     return result;
