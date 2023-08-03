@@ -84,25 +84,25 @@ constexpr GlobalPermissions kAssignableGlobalPermissions =
 NX_REFLECTION_ENUM_CLASS(AccessRight,
 
     /**%apidoc Can see a resource. Can access live footage from a media resource. */
-    view = 0x0001,
+    view = 1 << 0,
 
     /**%apidoc Can view archive. */
-    viewArchive = 0x0004,
+    viewArchive = 1 << 2,
 
     /**%apidoc Can export archive. */
-    exportArchive = 0x0008,
+    exportArchive = 1 << 3,
 
     /**%apidoc Can view Bookmarks. */
-    viewBookmarks = 0x0010,
+    viewBookmarks = 1 << 4,
 
     /**%apidoc Can modify Bookmarks. */
-    manageBookmarks = 0x0020,
+    manageBookmarks = 1 << 5,
 
     /**%apidoc Can change the camera PTZ state, use 2-way audio and I/O buttons. */
-    userInput = 0x0080,
+    userInput = 1 << 7,
 
     /**%apidoc Can edit Device settings. */
-    edit = 0x0200
+    edit = 1 << 9
 )
 
 Q_DECLARE_FLAGS(AccessRights, AccessRight)

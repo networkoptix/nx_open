@@ -15,6 +15,7 @@ struct PermissionsV1
     GlobalPermissionsDeprecated permissions = Old::none;
     std::optional<std::vector<QnUuid>> accessibleResources;
     bool isOwner = false;
+    GlobalPermissions newPermissions{};
 };
 NX_REFLECTION_INSTRUMENT(PermissionsV1, (permissions)(accessibleResources))
 
@@ -22,20 +23,20 @@ TEST(Permissions, BackwardCompatibility)
 {
     const auto resourceId = QnUuid::createUuid();
     const std::vector<PermissionsV1> deprecatedPermissions{
-        {Old::customUser | Old::editCameras | Old::accessAllMedia, {}},
-        {Old::customUser | Old::editCameras, {{resourceId}}},
-        {Old::customUser | Old::viewArchive | Old::accessAllMedia, {}},
-        {Old::customUser | Old::viewArchive, {{resourceId}}},
-        {Old::customUser | Old::exportArchive | Old::accessAllMedia, {}},
-        {Old::customUser | Old::exportArchive, {{resourceId}}},
-        {Old::customUser | Old::viewBookmarks | Old::accessAllMedia, {}},
-        {Old::customUser | Old::viewBookmarks, {{resourceId}}},
-        {Old::customUser | Old::manageBookmarks | Old::accessAllMedia, {}},
-        {Old::customUser | Old::manageBookmarks, {{resourceId}}},
-        {Old::customUser | Old::userInput | Old::accessAllMedia, {}},
-        {Old::customUser | Old::userInput, {{resourceId}}},
-        {Old::customUser | Old::controlVideowall, {}},
-        {Old::accessAllMedia, {}},
+        {Old::customUser | Old::editCameras | Old::accessAllMedia, {}, false, {}},
+        {Old::customUser | Old::editCameras, {{resourceId}}, false, {}},
+        {Old::customUser | Old::viewArchive | Old::accessAllMedia, {}, false, {}},
+        {Old::customUser | Old::viewArchive, {{resourceId}}, false, {}},
+        {Old::customUser | Old::exportArchive | Old::accessAllMedia, {}, false, {}},
+        {Old::customUser | Old::exportArchive, {{resourceId}}, false, {}},
+        {Old::customUser | Old::viewBookmarks | Old::accessAllMedia, {}, false, {}},
+        {Old::customUser | Old::viewBookmarks, {{resourceId}}, false, {}},
+        {Old::customUser | Old::manageBookmarks | Old::accessAllMedia, {}, false, {}},
+        {Old::customUser | Old::manageBookmarks, {{resourceId}}, false, {}},
+        {Old::customUser | Old::userInput | Old::accessAllMedia, {}, false, {GlobalPermission::generateEvents}},
+        {Old::customUser | Old::userInput, {{resourceId}}, false, {GlobalPermission::generateEvents}},
+        {Old::customUser | Old::controlVideowall, {}, false, {}},
+        {Old::accessAllMedia, {}, false, {}},
     };
     const auto userId = QnUuid::createUuid();
     for (const auto& origin: deprecatedPermissions)
@@ -45,7 +46,7 @@ TEST(Permissions, BackwardCompatibility)
         std::map<QnUuid, AccessRights> resourceAccessRights;
         std::tie(permissions, groups, resourceAccessRights) = migrateAccessRights(
             origin.permissions, origin.accessibleResources.value_or(std::vector<QnUuid>{}));
-        ASSERT_EQ(permissions, GlobalPermission::none);
+        ASSERT_EQ(permissions, origin.newPermissions);
         PermissionsV1 convertedBack;
         std::tie(
             convertedBack.permissions, convertedBack.accessibleResources, convertedBack.isOwner) =
@@ -57,14 +58,13 @@ TEST(Permissions, BackwardCompatibility)
 TEST(Permissions, CasesNotPreservingBackwardCompatibility)
 {
     const std::vector<PermissionsV1> deprecatedPermissions{
-        {Old::editCameras, {}},
-        {Old::viewArchive, {}},
-        {Old::exportArchive, {}},
-        {Old::viewBookmarks, {}},
-        {Old::manageBookmarks, {}},
-        {Old::userInput, {}},
+        {Old::editCameras, {}, false, {}},
+        {Old::viewArchive, {}, false, {}},
+        {Old::exportArchive, {}, false, {}},
+        {Old::viewBookmarks, {}, false, {}},
+        {Old::manageBookmarks, {}, false, {}},
+        {Old::userInput, {}, false, {GlobalPermission::generateEvents}},
     };
-    const auto expectedNoPermissions = nx::reflect::json::serialize(PermissionsV1{Old::customUser});
     for (const auto& origin: deprecatedPermissions)
     {
         GlobalPermissions permissions;
@@ -72,12 +72,15 @@ TEST(Permissions, CasesNotPreservingBackwardCompatibility)
         std::map<QnUuid, AccessRights> resourceAccessRights;
         std::tie(permissions, groups, resourceAccessRights) = migrateAccessRights(
             origin.permissions, origin.accessibleResources.value_or(std::vector<QnUuid>{}));
-        ASSERT_EQ(permissions, GlobalPermission::none);
+        ASSERT_EQ(permissions, origin.newPermissions);
         PermissionsV1 convertedBack;
         std::tie(
             convertedBack.permissions, convertedBack.accessibleResources, convertedBack.isOwner) =
             extractFromResourceAccessRights(permissions, std::move(groups), resourceAccessRights);
-        ASSERT_EQ(expectedNoPermissions, nx::reflect::json::serialize(convertedBack));
+        PermissionsV1 expectedPermissions{Old::customUser};
+        if (origin.newPermissions.testFlag(GlobalPermission::generateEvents))
+            expectedPermissions.permissions |= Old::userInput;
+        ASSERT_EQ(nx::reflect::json::serialize(expectedPermissions), nx::reflect::json::serialize(convertedBack));
     }
 }
 

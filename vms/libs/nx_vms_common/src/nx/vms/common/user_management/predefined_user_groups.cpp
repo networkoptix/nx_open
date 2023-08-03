@@ -81,6 +81,7 @@ struct PredefinedUserGroups::Private
         {
             return GlobalPermission::powerUser
                 | GlobalPermission::viewLogs
+                | GlobalPermission::generateEvents
                 | GlobalPermission::systemHealth;
         }
 
