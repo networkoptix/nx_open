@@ -53,7 +53,8 @@ NX_VMS_COMMON_API bool isSourceServerRequired(EventType eventType);
  * incorrect id's in the list.
  */
 NX_VMS_COMMON_API std::optional<QnResourceList> sourceResources(
-    const EventParameters& params, QnResourcePool* resourcePool);
+    const EventParameters& params, QnResourcePool* resourcePool,
+    const std::function<void(const QString&)>& notFound = nullptr);
 
 /** Checks if the user has an access to this event. */
 NX_VMS_COMMON_API bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& user);
