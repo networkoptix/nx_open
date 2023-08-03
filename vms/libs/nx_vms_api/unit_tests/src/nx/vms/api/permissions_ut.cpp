@@ -49,7 +49,7 @@ TEST(Permissions, BackwardCompatibility)
         PermissionsV1 convertedBack;
         std::tie(
             convertedBack.permissions, convertedBack.accessibleResources, convertedBack.isOwner) =
-            extractFromResourceAccessRights(permissions, groups, resourceAccessRights);
+            extractFromResourceAccessRights(permissions, std::move(groups), resourceAccessRights);
         ASSERT_EQ(nx::reflect::json::serialize(origin), nx::reflect::json::serialize(convertedBack));
     }
 }
@@ -76,7 +76,7 @@ TEST(Permissions, CasesNotPreservingBackwardCompatibility)
         PermissionsV1 convertedBack;
         std::tie(
             convertedBack.permissions, convertedBack.accessibleResources, convertedBack.isOwner) =
-            extractFromResourceAccessRights(permissions, groups, resourceAccessRights);
+            extractFromResourceAccessRights(permissions, std::move(groups), resourceAccessRights);
         ASSERT_EQ(expectedNoPermissions, nx::reflect::json::serialize(convertedBack));
     }
 }

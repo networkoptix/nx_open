@@ -79,7 +79,7 @@ static GlobalPermissionsDeprecated accessRightsToGlobalPermissions(AccessRights 
 std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool>
     extractFromResourceAccessRights(
         GlobalPermissions permissions,
-        const std::vector<QnUuid>& groups,
+        std::vector<QnUuid> groups,
         const std::map<QnUuid, AccessRights>& resourceAccessRights)
 {
     GlobalPermissionsDeprecated deprecatedPermissions;
@@ -145,8 +145,14 @@ std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool
     if (permissions.testFlag(GlobalPermission::viewLogs))
         deprecatedPermissions |= GlobalPermissionDeprecated::viewLogs;
 
-    if (groups.empty() || !UserDataDeprecated::permissionPresetToGroupId(deprecatedPermissions))
-        deprecatedPermissions |= GlobalPermissionDeprecated::customUser;
+    const bool isDefaultLdapRights = deprecatedPermissions == GlobalPermissionDeprecated::none
+        && groups.size() == 1 && groups.front() == kDefaultLdapGroupId;
+    if (!isDefaultLdapRights)
+    {
+        std::erase(groups, kDefaultLdapGroupId);
+        if (groups.empty() || !UserDataDeprecated::permissionPresetToGroupId(deprecatedPermissions))
+            deprecatedPermissions |= GlobalPermissionDeprecated::customUser;
+    }
 
     return {
         deprecatedPermissions,
