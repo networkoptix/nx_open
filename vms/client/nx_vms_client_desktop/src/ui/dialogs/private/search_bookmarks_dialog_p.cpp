@@ -82,6 +82,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(
     m_removeBookmarkAction{new QAction(action(action::RemoveBookmarkAction)->text(), this)},
     m_removeBookmarksAction{new QAction(action(action::RemoveBookmarksAction)->text(), this)},
     m_updatingParametersNow(false),
+    m_columnResizeRequired(true),
 
     utcRangeStartMs(utcStartTimeMs),
     utcRangeEndMs(utcFinishTimeMs)
@@ -203,8 +204,15 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(
         [this, grid]()
         {
             ui->stackedWidget->setCurrentWidget(ui->gridPage);
-            for (int columnIdx = 0; columnIdx < QnSearchBookmarksModel::kColumnsCount; columnIdx++)
-                grid->resizeColumnToContents(columnIdx);
+            if (m_columnResizeRequired && m_model->rowCount() > 0)
+            {
+                for (int columnIdx = 0; columnIdx < QnSearchBookmarksModel::kColumnsCount;
+                     columnIdx++)
+                {
+                    grid->resizeColumnToContents(columnIdx);
+                }
+                m_columnResizeRequired = false;
+            }
         });
     ui->stackedWidget->setCurrentWidget(ui->progressPage);
 }
@@ -230,7 +238,7 @@ void QnSearchBookmarksDialogPrivate::setParameters(const QString &filterText
 {
     {
         QScopedValueRollback<bool> guard(m_updatingParametersNow, true);
-
+        m_columnResizeRequired = true;
         resetToAllAvailableCameras();
         ui->filterLineEdit->lineEdit()->setText(filterText);
         ui->dateRangeWidget->setRange(utcStartTimeMs, utcFinishTimeMs);
