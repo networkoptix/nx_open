@@ -2293,15 +2293,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Stops</source>
-      <translation>停止</translation>
+      <translation>停止時</translation>
     </message>
     <message>
       <source>Starts</source>
-      <translation>開始</translation>
+      <translation>開始時</translation>
     </message>
     <message>
       <source>Occurs</source>
-      <translation>発生</translation>
+      <translation>発生時</translation>
     </message>
     <message>
       <source>N/A</source>
@@ -11327,11 +11327,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Starts</source>
-      <translation>開始</translation>
+      <translation>開始時</translation>
     </message>
     <message>
       <source>Stops</source>
-      <translation>停止</translation>
+      <translation>停止時</translation>
     </message>
     <message>
       <source>Instant</source>
