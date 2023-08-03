@@ -73,6 +73,7 @@ struct NX_VMS_COMMON_API QnUserHash
 
     QByteArray hashPassword(const QString& password) const;
     bool checkPassword(const QString& password) const;
+    bool compareToPasswordHash(const QByteArray& passwordHash) const;
 
     // These should be refactored out with insecure LDAP password storage.
     QString toLdapPassword() const;
@@ -89,7 +90,7 @@ class NX_VMS_COMMON_API QnUserResource: public QnResource
 
 public:
     friend void ec2::fromResourceToApi(const QnUserResourcePtr&, nx::vms::api::UserData&);
-    friend void ec2::fromApiToResource(const nx::vms::api::UserData&, const QnUserResourcePtr&, bool);
+    friend void ec2::fromApiToResource(const nx::vms::api::UserData&, const QnUserResourcePtr&);
 
     static const QnUuid kAdminGuid;
     static const QString kIntegrationRequestDataProperty;
