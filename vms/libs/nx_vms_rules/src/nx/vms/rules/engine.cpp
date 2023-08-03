@@ -426,6 +426,7 @@ bool Engine::registerActionField(const QString& type, const ActionFieldConstruct
 std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
 {
     auto rule = std::make_unique<Rule>(serialized.id, this);
+    rule->moveToThread(thread());
 
     for (const auto& filterInfo: serialized.eventList)
     {
@@ -522,7 +523,7 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& se
     if (!NX_ASSERT(descriptor, "Descriptor for the '%1' type is not registered", serialized.type))
         return {};
 
-    auto filter = std::make_unique<EventFilter>(serialized.id, serialized.type);
+    auto filter = buildEventFilter(serialized.id, serialized.type);
 
     for (const auto& fieldDescriptor: descriptor->fields)
     {
@@ -564,9 +565,7 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const QString& eventType) 
 
 std::unique_ptr<EventFilter> Engine::buildEventFilter(const ItemDescriptor& descriptor) const
 {
-    const auto id = QUuid::createUuid();
-
-    auto filter = std::make_unique<EventFilter>(id, descriptor.id);
+    auto filter = buildEventFilter(QUuid::createUuid(), descriptor.id);
 
     for (const auto& fieldDescriptor: descriptor.fields)
     {
@@ -589,18 +588,23 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const ItemDescriptor& desc
     return filter;
 }
 
+std::unique_ptr<EventFilter> Engine::buildEventFilter(QnUuid id, const QString& type) const
+{
+    auto filter = std::make_unique<EventFilter>(id, type);
+    filter->moveToThread(thread());
+
+    return filter;
+}
+
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuilder& serialized) const
 {
     const auto descriptor = actionDescriptor(serialized.type);
     if (!NX_ASSERT(descriptor, "Descriptor for the '%1' type is not registered", serialized.type))
         return {};
 
-    ActionConstructor ctor = m_actionTypes.value(serialized.type);
-    //if (!ctor)
-    //    return nullptr;
-
-    auto  builder = std::make_unique<ActionBuilder>(serialized.id, serialized.type, ctor);
-    connect(builder.get(), &ActionBuilder::action, this, &Engine::processAction);
+    auto builder = buildActionBuilder(serialized.id, serialized.type);
+    if (!builder)
+        return {};
 
     for (const auto& fieldDescriptor: descriptor->fields)
     {
@@ -642,12 +646,9 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const QString& actionT
 
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& descriptor) const
 {
-    ActionConstructor constructor = m_actionTypes.value(descriptor.id);
-
-    auto builder =
-        std::make_unique<ActionBuilder>(QnUuid::createUuid(), descriptor.id, constructor);
-
-    connect(builder.get(), &ActionBuilder::action, this, &Engine::processAction);
+    auto builder = buildActionBuilder(QnUuid::createUuid(), descriptor.id);
+    if (!builder)
+        return {};
 
     for (const auto& fieldDescriptor: descriptor.fields)
     {
@@ -666,6 +667,19 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& 
 
         builder->addField(fieldDescriptor.fieldName, std::move(field));
     }
+
+    return builder;
+}
+
+std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(QnUuid id, const QString& type) const
+{
+    ActionConstructor ctor = m_actionTypes.value(type);
+    if (!NX_ASSERT(ctor, "Action constructor absent: %1", type))
+        return {};
+
+    auto builder = std::make_unique<ActionBuilder>(id, type, ctor);
+    builder->moveToThread(thread());
+    connect(builder.get(), &ActionBuilder::action, this, &Engine::processAction);
 
     return builder;
 }
