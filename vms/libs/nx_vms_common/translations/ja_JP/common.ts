@@ -56,15 +56,15 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>このユーザーは存在しないか、ログインできません。</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>同一のログイン名を持つ複数のユーザーが存在します。</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>LDAP サーバーの SSL/TLS 証明書を検証できません。</translation>
     </message>
   </context>
   <context>
@@ -1095,7 +1095,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>複数のグループ</translation>
     </message>
   </context>
   <context>
@@ -1575,11 +1575,11 @@
     </message>
     <message>
       <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
+      <translation>SMTP 設定</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>認証セッショントークンの有効期間 (秒)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>

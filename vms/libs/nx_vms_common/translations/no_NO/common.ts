@@ -56,15 +56,15 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Denne brukeren eksisterer ikke eller kan ikke logge på.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Mer enn én bruker med samme pålogging er presentert.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>Kan ikke bekrefte LDAP-serverens SSL/TLS-sertifikat.</translation>
     </message>
   </context>
   <context>
@@ -208,7 +208,7 @@
     </message>
     <message>
       <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
-      <translation type="unfinished">This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</translation>
+      <translation>Denne brukeren har ubegrensede systemrettigheter og kan ikke slettes. Kan opprette og endre administratorer, og kan slå sammen systemer og koble eller koble fra Nx Cloud-kontoer.</translation>
     </message>
   </context>
   <context>
@@ -1143,7 +1143,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Flere grupper</translation>
     </message>
   </context>
   <context>
@@ -1623,11 +1623,11 @@
     </message>
     <message>
       <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
+      <translation>SMTP-innstillinger</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>Levetid for autorisasjonsøkttoken (sekunder)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>

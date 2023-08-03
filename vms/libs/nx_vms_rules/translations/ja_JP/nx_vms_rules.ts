@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Any server issue</source>
-      <translation type="unfinished">Any server issue</translation>
+      <translation>全サーバー障害</translation>
     </message>
   </context>
   <context>
@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>トリガー</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -477,7 +477,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>トリガー</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -687,18 +687,18 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>PoE給電容量超過</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>トリガー</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>PTZプリセットを実行</translation>
     </message>
     <message>
       <source>At</source>
@@ -911,7 +911,7 @@
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>ユーザー</translation>
     </message>
   </context>
   <context>

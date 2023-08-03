@@ -56,15 +56,15 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Denna användare finns inte eller kan inte logga in.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Mer än en användare med samma inloggning visas.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>Det gick inte att verifiera LDAP-serverns SSL/TLS-certifikat.</translation>
     </message>
   </context>
   <context>
@@ -164,51 +164,51 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administratörer</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Expertanvändare</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Avancerade användare</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Användare</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Begränsad användare</translation>
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation type="unfinished">System Health Viewers</translation>
+      <translation>Visare av systemhälsa</translation>
     </message>
     <message>
       <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
-      <translation type="unfinished">Has full control of System configuration, but cannot create or modify other Power Users.</translation>
+      <translation>Har full kontroll över systemkonfigurationen, men kan inte skapa eller ändra andra avancerade användare.</translation>
     </message>
     <message>
       <source>Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
+      <translation>Kan se och köra PTZ-positioner och PTZ-turer, använda 2-vägsljud, använda I/O-modulknappar, skapa och redigera bokmärken och visa händelseloggen.</translation>
     </message>
     <message>
       <source>Can view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Can view and export archive and Bookmarks.</translation>
+      <translation>Kan visa och exportera arkiv och bokmärken.</translation>
     </message>
     <message>
       <source>Can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Can view live videos, I/O modules and web pages.</translation>
+      <translation>Kan se livevideor, I/O-moduler och webbsidor.</translation>
     </message>
     <message>
       <source>Can view System Health Monitoring information.</source>
-      <translation type="unfinished">Can view System Health Monitoring information.</translation>
+      <translation>Kan se information om systemhälsoövervakning.</translation>
     </message>
     <message>
       <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
-      <translation type="unfinished">This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</translation>
+      <translation>Den här användaren har obegränsade systemrättigheter och kan inte tas bort. Kan skapa och modifiera administratörer och kan slå samman system och länka eller koppla bort länkar till Nx Cloud konton.</translation>
     </message>
   </context>
   <context>
@@ -435,15 +435,15 @@
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>Ogiltig data togs emot från enheten. Detaljer: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Ogiltig data togs emot från kameran. Detaljer: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>Ogiltig data togs emot från I/O-modulen. Detaljer: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -834,22 +834,22 @@
     <message>
       <source>%1 Licenses</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Licenses</translation>
+      <translation>%1 licenser</translation>
     </message>
     <message numerus="yes">
       <source>%n %1 Licenses</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">
-        <numerusform>%n %1 Licenses</numerusform>
-        <numerusform>%n %1 Licenses</numerusform>
+      <translation>
+        <numerusform>%n %1 Licenser</numerusform>
+        <numerusform>%n %1 Licenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 %2 Licenses</source>
       <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 %2 Licenses</numerusform>
-        <numerusform>%n/%1 %2 Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 %2 Licenser</numerusform>
+        <numerusform>%n/%1 %2 Licenser</numerusform>
       </translation>
     </message>
   </context>
@@ -1143,7 +1143,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Flera grupper</translation>
     </message>
   </context>
   <context>
@@ -1615,19 +1615,19 @@
     </message>
     <message>
       <source>Cloud storage update period in seconds</source>
-      <translation type="unfinished">Cloud storage update period in seconds</translation>
+      <translation>Uppdateringsperiod för molnlagring i sekunder</translation>
     </message>
     <message>
       <source>LDAP settings</source>
-      <translation type="unfinished">LDAP settings</translation>
+      <translation>LDAP-inställningar</translation>
     </message>
     <message>
       <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
+      <translation>SMTP-inställningar</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>Livstid för auktoriseringssessionstoken (sekunder)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
@@ -1639,36 +1639,36 @@
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>precis nu</translation>
     </message>
     <message numerus="yes">
       <source>%n minute(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minute(s) ago</numerusform>
-        <numerusform>%n minute(s) ago</numerusform>
+      <translation>
+        <numerusform>%n minut(er) sedan</numerusform>
+        <numerusform>%n minut(er) sedan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hour(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hour(s) ago</numerusform>
-        <numerusform>%n hour(s) ago</numerusform>
+      <translation>
+        <numerusform>%n timmar sedan</numerusform>
+        <numerusform>%n timmar sedan</numerusform>
       </translation>
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>igår</translation>
     </message>
     <message numerus="yes">
       <source>%n day(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n day(s) ago</numerusform>
-        <numerusform>%n day(s) ago</numerusform>
+      <translation>
+        <numerusform>%n dag(ar) sedan</numerusform>
+        <numerusform>%n dag(ar) sedan</numerusform>
       </translation>
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>en vecka sedan</translation>
     </message>
   </context>
   <context>
@@ -1723,7 +1723,7 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Lås upp denna del av arkivet för att exportera dess innehåll.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -2352,18 +2352,18 @@
     </message>
     <message>
       <source>Group</source>
-      <translation type="unfinished">Group</translation>
+      <translation>Grupp</translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Grupper</numerusform>
+        <numerusform>%n Grupper</numerusform>
       </translation>
     </message>
     <message>
       <source>All Power Users</source>
-      <translation type="unfinished">All Power Users</translation>
+      <translation>Alla avancerade användare</translation>
     </message>
   </context>
 </TS>

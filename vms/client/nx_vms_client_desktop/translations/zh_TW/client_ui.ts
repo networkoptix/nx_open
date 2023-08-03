@@ -1051,7 +1051,7 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
+      <translation>&lt;Message&gt;</translation>
     </message>
     <message>
       <source>Open Folder</source>

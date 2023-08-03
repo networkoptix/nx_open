@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Any server issue</source>
-      <translation type="unfinished">Any server issue</translation>
+      <translation>Eventuella serverproblem</translation>
     </message>
   </context>
   <context>
@@ -36,23 +36,23 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Börja när</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Inträffar den</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Av typ</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Och bildtext</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Och Beskrivning</translation>
     </message>
   </context>
   <context>
@@ -72,15 +72,15 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Inträffar den</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Av typ</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>Och objekt</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Skapa bokmärke</translation>
     </message>
     <message>
       <source>At</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Fast varaktighet</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Lägg till taggar</translation>
     </message>
   </context>
   <context>
@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Åtgärd Strypning</translation>
     </message>
   </context>
   <context>
@@ -163,15 +163,15 @@
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>Ingångssignal på enheten</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Inträffar den</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>Med ID</translation>
     </message>
   </context>
   <context>
@@ -277,7 +277,7 @@
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Enhetsutgång</translation>
     </message>
     <message>
       <source>At</source>
@@ -285,7 +285,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Fast varaktighet</translation>
     </message>
   </context>
   <context>
@@ -308,7 +308,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>Kamerainspelning</translation>
     </message>
     <message>
       <source>On</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Fast varaktighet</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -339,11 +339,11 @@
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Ange för</translation>
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Spola tillbaka</translation>
     </message>
   </context>
   <context>
@@ -369,7 +369,7 @@
     </message>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Fläktfel</translation>
     </message>
     <message>
       <source>At</source>
@@ -396,15 +396,15 @@
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>Och Källa</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Och bildtext</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Och Beskrivning</translation>
     </message>
   </context>
   <context>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>HTTP(S)-förfrågan</translation>
     </message>
     <message>
       <source>URL</source>
@@ -435,7 +435,7 @@
     </message>
     <message>
       <source>Method</source>
-      <translation type="unfinished">Method</translation>
+      <translation>Metod</translation>
     </message>
     <message>
       <source>Authentication Type</source>
@@ -481,11 +481,11 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Börja när</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Inträffar den</translation>
     </message>
   </context>
   <context>
@@ -584,7 +584,7 @@
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Visa skrivbordsavisering</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -603,7 +603,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Spola tillbaka</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -618,7 +618,7 @@
     </message>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Panikinspelning</translation>
     </message>
   </context>
   <context>
@@ -629,7 +629,7 @@
     </message>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>Spela ljud</translation>
     </message>
     <message>
       <source>At</source>
@@ -637,7 +637,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Till Användare</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -652,23 +652,23 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Inträffar den</translation>
     </message>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>För plugin</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Och bildtext</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Och Beskrivning</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>Och nivå är</translation>
     </message>
   </context>
   <context>
@@ -692,18 +692,18 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>PoE över budget</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Börja när</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>Kör PTZ-förinställning</translation>
     </message>
     <message>
       <source>At</source>

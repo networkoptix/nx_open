@@ -48,19 +48,19 @@
     </message>
     <message>
       <source>Group Attribute</source>
-      <translation type="unfinished">Group Attribute</translation>
+      <translation>Gruppeattributt</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
-      <translation type="unfinished">Synchronization&lt;br&gt;Interval</translation>
+      <translation>Synkronisering&lt;br&gt;Intervall</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Søketidsavbrudd</translation>
     </message>
     <message>
       <source>Proxy LDAP requests&lt;br&gt;via server</source>
-      <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
+      <translation>Proxy LDAP ber om&lt;br&gt;via server</translation>
     </message>
   </context>
   <context>
@@ -308,7 +308,7 @@
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Dette feltet kan ikke være tomt</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -481,11 +481,11 @@
     </message>
     <message>
       <source>Login DN cannot be empty.</source>
-      <translation type="unfinished">Login DN cannot be empty.</translation>
+      <translation>Innloggings-DN kan ikke være tomt.</translation>
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Bruk StartTLS</translation>
     </message>
   </context>
   <context>
@@ -929,7 +929,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Importer fra enheter</translation>
     </message>
   </context>
   <context>
@@ -1261,7 +1261,7 @@
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Hvilken som helst %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1276,7 +1276,7 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>Hvilken som helst</translation>
     </message>
   </context>
   <context>
@@ -1477,7 +1477,7 @@
     </message>
     <message>
       <source>Automatically add dependent access rights</source>
-      <translation type="unfinished">Automatically add dependent access rights</translation>
+      <translation>Legg automatisk til avhengige tilgangsrettigheter</translation>
     </message>
   </context>
   <context>
@@ -1695,7 +1695,7 @@ for å aktivere PTZ</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Tilgjengelig med tillatelser</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -1707,7 +1707,7 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Nettsider og integrasjoner</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1715,7 +1715,7 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Statusmonitorer</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2281,15 +2281,15 @@ for å aktivere PTZ</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Vms Rules</source>
-      <translation type="unfinished">Vms Rules</translation>
+      <translation>Vms regler</translation>
     </message>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Legg til regel</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Duplisere</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2297,7 +2297,7 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Ingen oppføringer</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2305,7 +2305,7 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Tilbakestill til standardinnstillinger...</translation>
     </message>
   </context>
   <context>
