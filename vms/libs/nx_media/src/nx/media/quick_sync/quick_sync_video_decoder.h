@@ -9,7 +9,7 @@ namespace nx::media::quick_sync {
 
 class QuickSyncVideoDecoderImpl;
 
-class QuickSyncVideoDecoder: public AbstractVideoDecoder
+class NX_MEDIA_API QuickSyncVideoDecoder: public AbstractVideoDecoder
 {
 public:
     struct Config

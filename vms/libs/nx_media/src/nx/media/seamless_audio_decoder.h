@@ -19,7 +19,7 @@ namespace media {
  * PhysicalDecoderFactory to instantiate compatible PhysicalDecoder to decode next frame if audio
  * parameters have changed.
  */
-class SeamlessAudioDecoder: public QObject
+class NX_MEDIA_API SeamlessAudioDecoder: public QObject
 {
     Q_OBJECT
 

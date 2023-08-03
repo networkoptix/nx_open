@@ -13,7 +13,7 @@
 
 namespace nx::media::quick_sync {
 
-class VppScaler
+class NX_MEDIA_API VppScaler
 {
 public:
     VppScaler(MFXVideoSession& session, std::shared_ptr<MFXFrameAllocator> allocator);

@@ -6,7 +6,7 @@
 
 namespace nx::media::nvidia {
 
-class LibraryLoader
+class NX_MEDIA_API LibraryLoader
 {
 public:
     ~LibraryLoader();
@@ -25,7 +25,7 @@ private:
 
 namespace nx::media::nvidia {
 
-class LibraryLoader
+class NX_MEDIA_API LibraryLoader
 {
 public:
     ~LibraryLoader();

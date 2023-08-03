@@ -10,7 +10,7 @@
 namespace nx {
 namespace media {
 
-class DecoderRegistrar
+class NX_MEDIA_API DecoderRegistrar
 {
 public:
     /**

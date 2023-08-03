@@ -9,7 +9,7 @@
 namespace nx {
 namespace media {
 
-class SignalingMetadataConsumer:
+class NX_MEDIA_API SignalingMetadataConsumer:
     public QObject,
     public AbstractMetadataConsumer
 {

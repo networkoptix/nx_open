@@ -9,7 +9,7 @@
 namespace nx {
 namespace media {
 
-class AbstractMetadataConsumer
+class NX_MEDIA_API AbstractMetadataConsumer
 {
 public:
     virtual ~AbstractMetadataConsumer();

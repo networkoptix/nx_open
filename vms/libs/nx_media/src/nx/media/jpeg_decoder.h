@@ -17,10 +17,11 @@ class JpegDecoderPrivate;
 /**
  * Implements software JPEG video decoder either via libJpeg (if exists) or QT.
  */
-class JpegDecoder: public AbstractVideoDecoder
+class NX_MEDIA_API JpegDecoder: public AbstractVideoDecoder
 {
 public:
     JpegDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
+    virtual ~JpegDecoder() override;
 
     static bool isCompatible(
         const AVCodecID codec,

@@ -25,7 +25,7 @@ class SeamlessAudioDecoder;
 /**
  * Private class used in nx::media::Player.
  */
-class PlayerDataConsumer:
+class NX_MEDIA_API PlayerDataConsumer:
     public QnAbstractDataConsumer,
     public QnlTimeSource
 {

@@ -30,6 +30,10 @@ JpegDecoder::JpegDecoder(
 {
 }
 
+JpegDecoder::~JpegDecoder()
+{
+}
+
 bool JpegDecoder::isCompatible(
     const AVCodecID codec,
      const QSize& /*resolution*/,

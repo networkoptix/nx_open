@@ -25,7 +25,7 @@ class QnCommonModule;
 namespace nx {
 namespace media {
 
-struct PlayerStatistics
+struct NX_MEDIA_API PlayerStatistics
 {
 private:
     Q_GADGET
@@ -45,7 +45,7 @@ class PlayerPrivate;
 /**
  * Main facade class for the media player.
  */
-class Player: public QObject
+class NX_MEDIA_API Player: public QObject
 {
     Q_OBJECT
 
@@ -350,7 +350,7 @@ private:
  *     height in pixels, which denotes a custom quality. Note that to denote the frame height, the
  *     value must be greater or equal to Player::VideoQuality::CustomVideoQuality.
  */
-QString videoQualityToString(int videoQuality);
+NX_MEDIA_API QString videoQualityToString(int videoQuality);
 
 } // namespace media
 } // namespace nx
