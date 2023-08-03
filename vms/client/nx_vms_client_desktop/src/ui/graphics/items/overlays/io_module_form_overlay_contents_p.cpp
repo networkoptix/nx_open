@@ -263,7 +263,7 @@ void QnIoModuleFormOverlayContentsPrivate::OutputPortItem::paint(QPainter* paint
     paintLabel(painter, labelRect, Qt::AlignLeft);
 
     auto icon = qnSkin->icon(
-        "io/button_indicator_off_28.svg", kIoIconSubstitutions, "io/button_indicator_on_28.svg");
+        "io/button_indicator_off_24.svg", kIoIconSubstitutions, "io/button_indicator_on_24.svg");
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     auto iconRect = buttonRect;
     iconRect.setLeft(iconRect.right() - kIndicatorWidth);
