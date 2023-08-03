@@ -340,6 +340,8 @@ void ActionBuilder::addField(const QString& name, std::unique_ptr<ActionBuilderF
     if (!NX_ASSERT(field))
         return;
 
+    field->moveToThread(thread());
+
     if (name == utils::kIntervalFieldName)
     {
         auto optionalTimeField = dynamic_cast<OptionalTimeField*>(field.get());

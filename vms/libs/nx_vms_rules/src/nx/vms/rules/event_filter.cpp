@@ -110,6 +110,8 @@ bool EventFilter::updateFlatData(const std::map<QString, QVariant>& data)
 
 void EventFilter::addField(const QString& name, std::unique_ptr<EventFilterField> field)
 {
+    field->moveToThread(thread());
+
     nx::utils::watchOnPropertyChanges(
         field.get(),
         this,
