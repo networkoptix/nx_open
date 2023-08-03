@@ -200,9 +200,11 @@ private:
     void processAction(const ActionPtr& action);
 
     std::unique_ptr<EventFilter> buildEventFilter(const ItemDescriptor& descriptor) const;
+    std::unique_ptr<EventFilter> buildEventFilter(QnUuid id, const QString& type) const;
     std::unique_ptr<EventFilterField> buildEventField(const api::Field& serialized) const;
 
     std::unique_ptr<ActionBuilder> buildActionBuilder(const ItemDescriptor& descriptor) const;
+    std::unique_ptr<ActionBuilder> buildActionBuilder(QnUuid id, const QString& type) const;
     std::unique_ptr<ActionBuilderField> buildActionField(const api::Field& serialized) const;
 
     /**
