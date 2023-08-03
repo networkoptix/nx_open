@@ -98,8 +98,8 @@ public:
         return result;
     }
 
-    QnSharedResourcePointerList<Resource> filtered(
-        std::function<bool(const QnSharedResourcePointer<Resource>&)> filter) const
+    template<class Filter>
+    QnSharedResourcePointerList<Resource> filtered(Filter filter) const
     {
         QnSharedResourcePointerList<Resource> result;
         for (const auto& resource: *this)
@@ -110,9 +110,8 @@ public:
         return result;
     }
 
-    template<class OtherResource>
-    QnSharedResourcePointerList<OtherResource> filtered(
-        std::function<bool(const QnSharedResourcePointer<OtherResource>&)> filter) const
+    template<class OtherResource, class Filter>
+    QnSharedResourcePointerList<OtherResource> filtered(Filter filter) const
     {
         QnSharedResourcePointerList<OtherResource> result;
         for (const auto& resource: *this)
