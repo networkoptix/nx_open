@@ -16,7 +16,7 @@ class AudioOutputPrivate;
 /* Extends QT audio output and provides more flexible methods for time control. They are used for
  * audio/video sync.
  */
-class AudioOutput
+class NX_MEDIA_API AudioOutput
 {
 public:
 

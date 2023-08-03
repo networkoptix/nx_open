@@ -9,6 +9,6 @@ class AbstractVideoSurface;
 
 namespace nx::media::nvidia {
 
-bool renderToRgb(AbstractVideoSurface* frame, GLuint textureId, const QSize& textureSize);
+NX_MEDIA_API bool renderToRgb(AbstractVideoSurface* frame, GLuint textureId, const QSize& textureSize);
 
 } // namespace nx::media::nvidia

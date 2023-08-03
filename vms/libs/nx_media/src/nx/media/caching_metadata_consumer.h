@@ -11,7 +11,7 @@
 namespace nx::media {
 
 template<typename T>
-class CachingMetadataConsumer: public AbstractMetadataConsumer
+class NX_MEDIA_API CachingMetadataConsumer: public AbstractMetadataConsumer
 {
     using base_type = AbstractMetadataConsumer;
 

@@ -18,7 +18,7 @@ typedef std::unique_ptr<AbstractVideoDecoder, void(*)(AbstractVideoDecoder*)> Vi
  * Singleton. Allows to register various implementations for video decoders. The exact list of
  * decoders can be registered in runtime.
  */
-class VideoDecoderRegistry
+class NX_MEDIA_API VideoDecoderRegistry
 {
 public:
     static VideoDecoderRegistry* instance();

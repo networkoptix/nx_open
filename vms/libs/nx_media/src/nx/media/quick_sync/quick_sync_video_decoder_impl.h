@@ -16,7 +16,7 @@
 
 namespace nx::media::quick_sync {
 
-class QuickSyncVideoDecoderImpl : public std::enable_shared_from_this<QuickSyncVideoDecoderImpl>
+class NX_MEDIA_API QuickSyncVideoDecoderImpl : public std::enable_shared_from_this<QuickSyncVideoDecoderImpl>
 {
 public:
     QuickSyncVideoDecoderImpl();

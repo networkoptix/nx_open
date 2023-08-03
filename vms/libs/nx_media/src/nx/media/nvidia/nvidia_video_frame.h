@@ -8,7 +8,7 @@ namespace nx::media::nvidia {
 
 class NvidiaVideoDecoder;
 
-class NvidiaVideoFrame: public AbstractVideoSurface
+class NX_MEDIA_API NvidiaVideoFrame: public AbstractVideoSurface
 {
 public:
     ~NvidiaVideoFrame();

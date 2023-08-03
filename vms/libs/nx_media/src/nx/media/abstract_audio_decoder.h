@@ -13,7 +13,7 @@
 
 namespace nx {
 
-struct AudioFrame
+struct NX_MEDIA_API AudioFrame
 {
     AudioFrame();
 
@@ -27,7 +27,7 @@ namespace media {
 /*
 * Interface for video decoder implementation.
 */
-class AbstractAudioDecoder: public QObject
+class NX_MEDIA_API AbstractAudioDecoder: public QObject
 {
     Q_OBJECT
 public:

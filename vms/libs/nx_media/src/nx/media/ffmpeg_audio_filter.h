@@ -13,7 +13,7 @@ struct AVFrame;
 namespace nx {
 namespace media {
 
-class FfmpegAudioFilter
+class NX_MEDIA_API FfmpegAudioFilter
 {
 public:
     ~FfmpegAudioFilter();

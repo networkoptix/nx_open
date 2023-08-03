@@ -16,7 +16,7 @@ extern "C" {
 
 #include <nx/media/video_data_packet.h>
 
-class CompatibilityCache
+class NX_MEDIA_API CompatibilityCache
 {
 public:
     static bool isCompatible(

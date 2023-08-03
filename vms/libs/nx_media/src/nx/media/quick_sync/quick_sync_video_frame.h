@@ -9,7 +9,7 @@
 
 namespace nx::media::quick_sync { class QuickSyncVideoDecoderImpl; }
 
-class QuickSyncVideoFrame: public AbstractVideoSurface
+class NX_MEDIA_API QuickSyncVideoFrame: public AbstractVideoSurface
 {
 public:
     QuickSyncVideoFrame(

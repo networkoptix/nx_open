@@ -11,7 +11,7 @@ extern "C" {
 
 namespace nx::media::ffmpeg {
 
-class AudioEncoder
+class NX_MEDIA_API AudioEncoder
 {
 public:
     AudioEncoder();

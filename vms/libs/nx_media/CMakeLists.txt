@@ -76,7 +76,6 @@ endif()
 
 nx_add_target(nx_media
     LIBRARY
-    NO_API_MACROS
     GDI
     PUBLIC_LIBS
         nx_kit
@@ -90,6 +89,11 @@ nx_add_target(nx_media
     ADDITIONAL_SOURCES
         ${additional_sources}
     FOLDER client/libs
+)
+
+target_compile_definitions(nx_media
+    PRIVATE NX_MEDIA_API=${API_EXPORT_MACRO}
+    INTERFACE NX_MEDIA_API=${API_IMPORT_MACRO}
 )
 
 target_include_directories(nx_media

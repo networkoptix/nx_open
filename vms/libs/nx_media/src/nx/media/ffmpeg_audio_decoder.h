@@ -16,7 +16,7 @@ class FfmpegAudioDecoderPrivate;
 /**
  * Implements ffmpeg audio decoder.
  */
-class FfmpegAudioDecoder: public AbstractAudioDecoder
+class NX_MEDIA_API FfmpegAudioDecoder: public AbstractAudioDecoder
 {
 public:
     FfmpegAudioDecoder();

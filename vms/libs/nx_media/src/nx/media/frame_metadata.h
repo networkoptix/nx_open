@@ -21,7 +21,7 @@ NX_REFLECTION_ENUM_CLASS(DisplayHint,
 /**
  * Contains addition information associated with every decoded frame.
  */
-struct FrameMetadata
+struct NX_MEDIA_API FrameMetadata
 {
     FrameMetadata();
     FrameMetadata(const QnConstCompressedVideoDataPtr& frame);
