@@ -133,7 +133,7 @@ public:
     /**
      * Interface for the Message Bus connection.
      */
-    std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
+    virtual std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
 
     // FIXME: #sivanov Remove compatibility layer.
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const

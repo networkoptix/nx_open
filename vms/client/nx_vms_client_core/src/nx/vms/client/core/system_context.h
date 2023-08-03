@@ -112,7 +112,7 @@ public:
     /**
      * Established p2p connection (if any).
      */
-    ec2::AbstractECConnectionPtr messageBusConnection() const;
+    virtual ec2::AbstractECConnectionPtr messageBusConnection() const override;
 
     QnPtzControllerPool* ptzControllerPool() const;
 
