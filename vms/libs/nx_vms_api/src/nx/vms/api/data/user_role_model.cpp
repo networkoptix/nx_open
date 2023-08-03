@@ -33,10 +33,11 @@ std::vector<UserRoleModel> UserRoleModel::fromDbTypes(DbListTypes all)
         model.id = std::move(baseData.id);
         model.name = std::move(baseData.name);
         model.description = std::move(baseData.description);
-        bool _ = false;
-        std::tie(model.permissions, model.accessibleResources, _) =
+        std::tie(model.permissions, model.accessibleResources, std::ignore) =
             extractFromResourceAccessRights(
-                baseData.permissions, baseData.parentGroupIds, baseData.resourceAccessRights);
+                baseData.permissions,
+                std::move(baseData.parentGroupIds),
+                baseData.resourceAccessRights);
         result.emplace_back(std::move(model));
     }
     return result;

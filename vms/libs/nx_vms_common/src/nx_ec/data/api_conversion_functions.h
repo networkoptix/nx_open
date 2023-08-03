@@ -121,13 +121,11 @@ NX_VMS_COMMON_API void fromApiToResourceList(
     const nx::vms::api::ResourceTypeDataList& src,
     QnResourceTypeList& dst);
 
-NX_VMS_COMMON_API QnUserResourcePtr fromApiToResource(
-    const nx::vms::api::UserData& src, bool setPasswordHashes = true);
+NX_VMS_COMMON_API QnUserResourcePtr fromApiToResource(const nx::vms::api::UserData& src);
 NX_VMS_COMMON_API void fromApiToResource(
-    const nx::vms::api::UserData& src, const QnUserResourcePtr& dst, bool setPasswordHashes = true);
+    const nx::vms::api::UserData& src, const QnUserResourcePtr& dst);
 NX_VMS_COMMON_API void fromResourceToApi(
-    const QnUserResourcePtr& resource,
-    nx::vms::api::UserData& data);
+    const QnUserResourcePtr& resource, nx::vms::api::UserData& data);
 
 NX_VMS_COMMON_API void fromApiToResource(
     const nx::vms::api::VideowallData& src,

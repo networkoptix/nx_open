@@ -50,6 +50,9 @@ QByteArray QnUserHash::toString(const Type& type)
 
 QnUserHash::QnUserHash(const QByteArray& data)
 {
+    if (data.isEmpty())
+        return;
+
     bool isTemporaryUser = false;
     const auto temporaryToken = QJson::deserialized<nx::vms::api::TemporaryToken>(
         data, nx::vms::api::TemporaryToken(), &isTemporaryUser);
@@ -104,8 +107,7 @@ QnUserHash::QnUserHash(const QByteArray& data)
         }
     }
 
-    if (!data.isEmpty())
-        NX_WARNING(this, "Unable to parse hash: %1", data);
+    NX_WARNING(this, "Unable to parse hash: %1", data);
 }
 
 QByteArray QnUserHash::toString() const
@@ -200,6 +202,14 @@ bool QnUserHash::checkPassword(const QString& password) const
     return isCorrect;
 }
 
+bool QnUserHash::compareToPasswordHash(const QByteArray& passwordHash) const
+{
+    if (passwordHash.isEmpty())
+        return *this == QnUserHash();
+
+    return toString() == passwordHash;
+}
+
 QString QnUserHash::toLdapPassword() const
 {
     return nx::crypt::encodeSimple(QByteArray::fromHex(hash), QByteArray::fromHex(salt));
@@ -252,7 +262,6 @@ QString QnUserResource::getPassword() const
 void QnUserResource::setPasswordAndGenerateHash(const QString& password, DigestSupport digestSupport)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-
     const bool isNewPassword = !m_hash.checkPassword(password);
     if (isNewPassword || m_password.isEmpty())
         m_password = password;
@@ -331,7 +340,8 @@ void QnUserResource::setRawPermissions(GlobalPermissions permissions)
 void QnUserResource::setPasswordHashes(const PasswordHashes& hashes)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    const bool isNewPassword = m_hash.toString() != hashes.passwordHash;
+    const bool isNewPassword = m_userType != nx::vms::api::UserType::ldap
+        && !m_hash.compareToPasswordHash(hashes.passwordHash);
     const bool isNewDigest = m_digest != hashes.passwordDigest;
     setPasswordHashesInternal(hashes, isNewPassword);
     locker.unlock();
@@ -615,12 +625,20 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         }
 
         m_realm = localOther->m_realm;
-        if (m_digest != localOther->m_digest)
+        if ((m_digest != localOther->m_digest)
+            && (m_userType != nx::vms::api::UserType::ldap
+                || m_digest == nx::vms::api::UserData::kHttpIsDisabledStub
+                || !localOther->m_digest.isEmpty()))
         {
             m_digest = localOther->m_digest;
             notifiers << [r = toSharedPointer(this)] { emit r->digestChanged(r); };
         }
-        m_cryptSha512Hash = localOther->m_cryptSha512Hash;
+        if ((m_cryptSha512Hash != localOther->m_cryptSha512Hash)
+            && (m_userType != nx::vms::api::UserType::ldap
+                || !localOther->m_cryptSha512Hash.isEmpty()))
+        {
+            m_cryptSha512Hash = localOther->m_cryptSha512Hash;
+        }
 
         const auto newPermissions = localOther->m_permissions.load();
         const auto oldPermissions = m_permissions.exchange(newPermissions);
