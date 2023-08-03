@@ -532,14 +532,14 @@ void fromApiToResourceList(const ResourceTypeDataList& src, QnResourceTypeList& 
     }
 }
 
-QnUserResourcePtr fromApiToResource(const UserData& src, bool setPasswordHashes)
+QnUserResourcePtr fromApiToResource(const UserData& src)
 {
     QnUserResourcePtr dst(new QnUserResource(src.type, src.externalId));
-    fromApiToResource(src, dst, setPasswordHashes);
+    fromApiToResource(src, dst);
     return dst;
 }
 
-void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst, bool setPasswordHashes)
+void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst)
 {
     NX_ASSERT(dst->userType() == src.type, "Unexpected user type");
 
@@ -553,14 +553,12 @@ void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst, bool s
     dst->setAttributes(src.attributes);
     dst->setExternalId(src.externalId);
 
-    if (setPasswordHashes)
-    {
-        dst->setPasswordHashes({
-            QString::fromStdString(nx::network::AppInfo::realm()),
-            src.hash,
-            src.digest,
-            src.cryptSha512Hash});
-    }
+    NX_ASSERT(src.type != nx::vms::api::UserType::ldap || src.hash.isEmpty());
+    dst->setPasswordHashes({
+        QString::fromStdString(nx::network::AppInfo::realm()),
+        src.type != nx::vms::api::UserType::ldap ? src.hash : QnLatin1Array(),
+        src.digest,
+        src.cryptSha512Hash});
 
     dst->m_resourceAccessRights = src.resourceAccessRights;
 }
@@ -577,17 +575,19 @@ void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
     dst.parentId = src->m_parentId;
     dst.name = src->m_name;
     dst.url = src->m_url;
-    dst.hash = src->m_hash.toString();
-    dst.digest = src->m_digest;
     dst.email = src->m_email;
-    dst.cryptSha512Hash = src->m_cryptSha512Hash;
     dst.groupIds = src->m_groupIds;
     dst.externalId = src->m_externalId;
     dst.type = src->m_userType;
     dst.attributes = src->m_attributes;
+    dst.resourceAccessRights = src->m_resourceAccessRights;
+    dst.cryptSha512Hash = src->m_cryptSha512Hash;
+    dst.digest = src->m_digest;
+
     if (dst.fullName.isNull())
         dst.fullName = src->m_fullName;
-    dst.resourceAccessRights = src->m_resourceAccessRights;
+    if (src->m_userType != nx::vms::api::UserType::ldap)
+        dst.hash = src->m_hash.toString();
 }
 
 void fromApiToResource(const VideowallItemData& src, QnVideoWallItem& dst)
