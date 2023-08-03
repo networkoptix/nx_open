@@ -7,6 +7,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/common/palette.h>
@@ -19,7 +20,7 @@ namespace nx::vms::client::desktop {
 struct ControlBar::Private
 {
     ControlBar* const q;
-    QWidget* const background{new QWidget(q)};
+    CustomPainted<QWidget>* const background{new CustomPainted<QWidget>(q)};
     QVBoxLayout* const verticalLayout{new QVBoxLayout(background)};
     QHBoxLayout* const horizontalLayout{new QHBoxLayout()};
     bool retainSpaceWhenNotDisplayed = false;
@@ -43,12 +44,29 @@ ControlBar::ControlBar(QWidget* parent):
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
+    // Background color.
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color("brand_d5"));
+
+    // Frame color.
+    setPaletteColor(this, QPalette::Dark, QColor{});
+
+    // Hyperlink colors.
     setPaletteColor(this, QPalette::Link, core::colorTheme()->color("light4"));
     setPaletteColor(this, QPalette::LinkVisited, core::colorTheme()->color("light1"));
 
-    d->background->setAutoFillBackground(true);
+    d->background->setAutoFillBackground(false);
     d->background->setHidden(true);
+
+    d->background->setCustomPaintFunction(
+        [this](QPainter* painter, const QStyleOption* option, const QWidget* widget)
+        {
+            const auto frameColor = option->palette.color(QPalette::Dark);
+            const auto fillBrush = option->palette.brush(QPalette::Window);
+            painter->setPen(frameColor.isValid() ? QPen{frameColor} : QPen{Qt::NoPen});
+            painter->setBrush(fillBrush);
+            painter->drawRect(option->rect);
+            return true;
+        });
 
     d->verticalLayout->addLayout(d->horizontalLayout);
     d->horizontalLayout->setContentsMargins(0, 0, 0, 0);

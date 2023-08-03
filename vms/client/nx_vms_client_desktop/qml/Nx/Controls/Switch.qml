@@ -11,6 +11,8 @@ TextButton
 {
     id: button
 
+    property int checkState: Qt.Unchecked
+
     checkable: true
     spacing: 8
 
@@ -22,6 +24,8 @@ TextButton
 
         readonly property real spacing: button.text ? button.spacing : 0
 
+        property bool updating: false
+
         implicitWidth: switchText.implicitWidth + content.spacing + switchIcon.width
         implicitHeight: switchText.implicitHeight
 
@@ -31,7 +35,7 @@ TextButton
 
             height: 16
             anchors.verticalCenter: parent.verticalCenter
-            checkState: button.checked ? Qt.Checked : Qt.Unchecked
+            checkState: button.checkState
             hovered: button.hovered
         }
 
@@ -51,5 +55,25 @@ TextButton
                 ? button.pressedColor
                 : button.hovered ? button.hoveredColor : button.color
         }
+    }
+
+    onCheckStateChanged:
+    {
+        if (content.updating)
+            return
+
+        content.updating = true
+        checked = checkState === Qt.Checked
+        content.updating = false
+    }
+
+    onCheckedChanged:
+    {
+        if (content.updating)
+            return
+
+        content.updating = true
+        checkState = checked ? Qt.Checked : Qt.Unchecked
+        content.updating = false
     }
 }
