@@ -965,7 +965,7 @@
     <name>CloudManagementWidget</name>
     <message>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>이 시스템은 다음과 연결되어 있습니다.</translation>
     </message>
   </context>
   <context>

@@ -672,11 +672,11 @@
     </message>
     <message>
       <source>Import Video from Device</source>
-      <translation type="unfinished">Import Video from Device</translation>
+      <translation>Importer video fra enheten</translation>
     </message>
     <message>
       <source>Import camera or server offline periods</source>
-      <translation type="unfinished">Import camera or server offline periods</translation>
+      <translation>Importer kamera eller server offline perioder</translation>
     </message>
   </context>
   <context>
@@ -1993,7 +1993,7 @@
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>Logg på nettsiden</translation>
     </message>
   </context>
   <context>

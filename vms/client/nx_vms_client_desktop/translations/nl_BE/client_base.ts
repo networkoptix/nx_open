@@ -2994,7 +2994,7 @@ to %1</source>
     </message>
     <message>
       <source>System will be accessible only through local network.</source>
-      <translation type="unfinished">System will be accessible only through local network.</translation>
+      <translation>Het systeem zal alleen toegankelijk zijn via het lokale netwerk.</translation>
     </message>
   </context>
   <context>

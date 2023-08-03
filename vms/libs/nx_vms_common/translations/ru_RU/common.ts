@@ -56,15 +56,15 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Этот пользователь не существует или не может войти в систему.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Существует несколько пользователей с одинаковыми логинами.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>Не удалось проверить сертификат SSL/TLS сервера LDAP.</translation>
     </message>
   </context>
   <context>
@@ -1239,7 +1239,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Несколько групп</translation>
     </message>
   </context>
   <context>
@@ -1719,7 +1719,7 @@
     </message>
     <message>
       <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
+      <translation>Настройка SMTP</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>

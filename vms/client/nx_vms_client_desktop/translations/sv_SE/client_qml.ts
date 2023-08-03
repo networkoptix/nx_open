@@ -48,15 +48,15 @@
     </message>
     <message>
       <source>Group Attribute</source>
-      <translation type="unfinished">Group Attribute</translation>
+      <translation>Gruppattribut</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
-      <translation type="unfinished">Synchronization&lt;br&gt;Interval</translation>
+      <translation>Synkronisering&lt;br&gt;Intervall</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Sök timeout</translation>
     </message>
     <message>
       <source>Proxy LDAP requests&lt;br&gt;via server</source>

@@ -1051,15 +1051,15 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>Ny velkomstskjerm</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>Vis proxy-ressurser</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Importer fra enheter...</translation>
     </message>
   </context>
   <context>
@@ -1113,15 +1113,15 @@
     </message>
     <message>
       <source>Event Occurs</source>
-      <translation type="unfinished">Event Occurs</translation>
+      <translation>Hendelse inntreffer</translation>
     </message>
     <message>
       <source>Event Starts</source>
-      <translation type="unfinished">Event Starts</translation>
+      <translation>Hendelsen starter</translation>
     </message>
     <message>
       <source>Event Stops</source>
-      <translation type="unfinished">Event Stops</translation>
+      <translation>Hendelsen stopper</translation>
     </message>
   </context>
   <context>
@@ -1641,7 +1641,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>Utrygg</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
@@ -5591,11 +5591,11 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Åpne denne integrasjonen?</translation>
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integrasjon</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -5607,18 +5607,17 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+      <translation>Du prøver å åpne
+%1, men denne integrasjonen presenterte en uklarert sertifikatautentisering.
+Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, kan du åpne integrasjonen.</translation>
     </message>
     <message>
       <source>Integration settings...</source>
-      <translation type="unfinished">Integration settings...</translation>
+      <translation>Integrasjonsinnstillinger...</translation>
     </message>
     <message>
       <source>Web Page settings...</source>
-      <translation type="unfinished">Web Page settings...</translation>
+      <translation>Nettsideinnstillinger...</translation>
     </message>
   </context>
   <context>
@@ -6550,7 +6549,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
-      <translation type="unfinished">Reset all rules to defaults?</translation>
+      <translation>Vil du tilbakestille alle regler til standard?</translation>
     </message>
   </context>
   <context>
@@ -6703,11 +6702,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Se live</translation>
     </message>
     <message>
       <source>Can edit device settings and video wall layouts</source>
-      <translation type="unfinished">Can edit device settings and video wall layouts</translation>
+      <translation>Kan redigere enhetsinnstillinger og videoveggoppsett</translation>
     </message>
   </context>
   <context>
@@ -7190,22 +7189,22 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+      <translation>Bare kamera eller server offline perioder etter det første tillegget til systemet vil bli importert automatisk.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
     <message>
       <source>Open Camera</source>
-      <translation type="unfinished">Open Camera</translation>
+      <translation>Åpne kamera</translation>
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation type="unfinished">Open Camera in new Tab</translation>
+      <translation>Åpne Kamera i ny fane</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation type="unfinished">Open Camera in place</translation>
+      <translation>Åpne kamera på plass</translation>
     </message>
   </context>
   <context>
@@ -7259,7 +7258,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Punkt</translation>
     </message>
   </context>
   <context>
@@ -8054,7 +8053,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>View live</source>
-      <translation type="unfinished">View live</translation>
+      <translation>Se live</translation>
     </message>
   </context>
   <context>
@@ -8653,7 +8652,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Generate events</source>
-      <translation type="unfinished">Generate events</translation>
+      <translation>Generer hendelser</translation>
     </message>
   </context>
   <context>
@@ -9100,15 +9099,15 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
     </message>
     <message>
       <source>Default Logging level</source>
-      <translation type="unfinished">Default Logging level</translation>
+      <translation>Standard loggingsnivå</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
+      <translation>Ikke-standard loggingsnivå. Vi anbefaler å sette den til "info"</translation>
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
-      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+      <translation>Loggingsnivå forringer ytelsen til systemet</translation>
     </message>
   </context>
   <context>
@@ -10042,23 +10041,23 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+      <translation>En integrasjon kan samhandle med skrivebordsklienten og be om tilgang til brukerøkten</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation type="unfinished">Proxy this integration through the server</translation>
+      <translation>Proxy denne integrasjonen gjennom serveren</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
-      <translation type="unfinished">Proxy this web page through the server</translation>
+      <translation>Proxy denne nettsiden gjennom serveren</translation>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+      <translation>Tillat åpning av denne integrasjonen uten SSL-sertifikatkontroll</translation>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+      <translation>Tillat å åpne denne nettsiden uten SSL-sertifikatkontroll</translation>
     </message>
     <message>
       <source>New Web Page</source>
@@ -10070,7 +10069,7 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>Ny proxy-nettside</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -10078,19 +10077,19 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Ny integrasjon</translation>
     </message>
     <message>
       <source>Edit Integration</source>
-      <translation type="unfinished">Edit Integration</translation>
+      <translation>Rediger integrasjon</translation>
     </message>
     <message>
       <source>New Proxied Integration</source>
-      <translation type="unfinished">New Proxied Integration</translation>
+      <translation>Ny proxy-integrasjon</translation>
     </message>
     <message>
       <source>Edit Proxied Integration</source>
-      <translation type="unfinished">Edit Proxied Integration</translation>
+      <translation>Rediger proxy-integrasjon</translation>
     </message>
   </context>
   <context>
@@ -10268,11 +10267,11 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Nettsider og integrasjoner</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Statusmonitorer</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -10280,16 +10279,16 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
     <message>
       <source>User&apos;s custom permissions</source>
-      <translation type="unfinished">User&apos;s custom permissions</translation>
+      <translation>Bruker&apos;egendefinerte tillatelser</translation>
     </message>
     <message>
       <source>Group&apos;s custom permissions</source>
-      <translation type="unfinished">Group&apos;s custom permissions</translation>
+      <translation>Gruppe&apos;s egendefinerte tillatelser</translation>
     </message>
     <message>
       <source>Access granted by %1</source>
       <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
-      <translation type="unfinished">Access granted by %1</translation>
+      <translation>Tilgang gitt av %1</translation>
     </message>
   </context>
   <context>
@@ -10698,7 +10697,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>Ikke en del av sertifikatet</translation>
     </message>
   </context>
   <context>
@@ -11304,7 +11303,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Fullt navn</translation>
     </message>
   </context>
   <context>
@@ -11537,7 +11536,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
     <message>
       <source>Empty schedule is not allowed</source>
-      <translation type="unfinished">Empty schedule is not allowed</translation>
+      <translation>Tom timeplan er ikke tillatt</translation>
     </message>
   </context>
   <context>
@@ -11778,7 +11777,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Nettsider og integrasjoner</translation>
     </message>
   </context>
   <context>
@@ -11800,11 +11799,11 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>All imported</source>
-      <translation type="unfinished">All imported</translation>
+      <translation>Alt importert</translation>
     </message>
     <message>
       <source>In progress... (%1 left)</source>
-      <translation type="unfinished">In progress... (%1 left)</translation>
+      <translation>Pågår... (%1 igjen)</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -11816,7 +11815,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Failed to import. Retry in 1 minute.</source>
-      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+      <translation>Kunne ikke importere. Prøv igjen om 1 minutt.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11824,7 +11823,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Imported up to</source>
-      <translation type="unfinished">Imported up to</translation>
+      <translation>Importert opp til</translation>
     </message>
     <message>
       <source>Status</source>
@@ -11974,7 +11973,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Tidsplan</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -11982,19 +11981,19 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>WHEN</source>
-      <translation type="unfinished">WHEN</translation>
+      <translation>NÅR</translation>
     </message>
     <message>
       <source>EVENT</source>
-      <translation type="unfinished">EVENT</translation>
+      <translation>BEGIVENHET</translation>
     </message>
     <message>
       <source>DO</source>
-      <translation type="unfinished">DO</translation>
+      <translation>GJØR</translation>
     </message>
     <message>
       <source>ACTION</source>
-      <translation type="unfinished">ACTION</translation>
+      <translation>HANDLING</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -12016,15 +12015,15 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>Har attributter</translation>
     </message>
     <message>
       <source>Listed</source>
-      <translation type="unfinished">Listed</translation>
+      <translation>Listet</translation>
     </message>
     <message>
       <source>Not listed</source>
-      <translation type="unfinished">Not listed</translation>
+      <translation>Ikke listet</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -12039,7 +12038,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
     <message>
       <source>Once in</source>
-      <translation type="unfinished">Once in</translation>
+      <translation>Engang i</translation>
     </message>
     <message>
       <source>For</source>
@@ -12077,7 +12076,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Comment</source>
-      <translation type="unfinished">Comment</translation>
+      <translation>Kommentar</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -12089,7 +12088,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>No source</source>
-      <translation type="unfinished">No source</translation>
+      <translation>Ingen kilde</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -12115,7 +12114,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>No target</source>
-      <translation type="unfinished">No target</translation>
+      <translation>Ingen mål</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -12152,7 +12151,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>All Server</source>
-      <translation type="unfinished">All Server</translation>
+      <translation>Alle servere</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
@@ -12196,19 +12195,19 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>Inneholder nøkkelord</translation>
     </message>
     <message>
       <source>Does not contain keywords</source>
-      <translation type="unfinished">Does not contain keywords</translation>
+      <translation>Inneholder ikke nøkkelord</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>Inneholder listeoppføringer</translation>
     </message>
     <message>
       <source>Does not contain list entries</source>
-      <translation type="unfinished">Does not contain list entries</translation>
+      <translation>Inneholder ikke listeoppføringer</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -12223,22 +12222,22 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation type="unfinished">Lookup lists network request failed</translation>
+      <translation>Nettverksforespørselen for oppslagslister mislyktes</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: </source>
-      <translation type="unfinished">Delete rule error: </translation>
+      <translation>Slett regelfeil: </translation>
     </message>
     <message>
       <source>Save rule error: </source>
-      <translation type="unfinished">Save rule error: </translation>
+      <translation>Lagringsregelfeil: </translation>
     </message>
     <message>
       <source>Reset to defaults error: </source>
-      <translation type="unfinished">Reset to defaults error: </translation>
+      <translation>Tilbakestill til standardfeil: </translation>
     </message>
   </context>
   <context>
@@ -12684,7 +12683,7 @@ Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dial
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>Ikke nok tilgangsrettigheter</translation>
     </message>
   </context>
   <context>

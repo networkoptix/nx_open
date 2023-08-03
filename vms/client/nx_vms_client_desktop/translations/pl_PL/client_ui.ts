@@ -965,7 +965,7 @@
     <name>CloudManagementWidget</name>
     <message>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>Ten system jest podłączony do</translation>
     </message>
   </context>
   <context>
@@ -1051,7 +1051,7 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
+      <translation>&lt;Message&gt;</translation>
     </message>
     <message>
       <source>Open Folder</source>
