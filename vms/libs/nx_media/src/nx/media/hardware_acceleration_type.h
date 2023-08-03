@@ -11,6 +11,6 @@ enum class HardwareAccelerationType
     nvidia,
 };
 
-HardwareAccelerationType getHardwareAccelerationType();
+NX_MEDIA_API HardwareAccelerationType getHardwareAccelerationType();
 
 } // namespace nx::media

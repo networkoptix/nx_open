@@ -7,7 +7,7 @@
 
 namespace nx::media::nvidia { class NvidiaVideoDecoder; }
 
-class NvidiaVideoDecoderOldPlayer: public QnAbstractVideoDecoder
+class NX_MEDIA_API NvidiaVideoDecoderOldPlayer: public QnAbstractVideoDecoder
 {
 public:
     NvidiaVideoDecoderOldPlayer();

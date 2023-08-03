@@ -59,5 +59,3 @@ private:
 };
 
 } // namespace nx::media::quick_sync
-
-

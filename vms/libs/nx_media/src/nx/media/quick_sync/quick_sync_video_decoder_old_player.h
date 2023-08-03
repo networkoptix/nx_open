@@ -9,7 +9,7 @@ namespace nx::media::quick_sync {
     class QuickSyncVideoDecoderImpl;
 }
 
-class QuickSyncVideoDecoderOldPlayer: public QnAbstractVideoDecoder
+class NX_MEDIA_API QuickSyncVideoDecoderOldPlayer: public QnAbstractVideoDecoder
 {
 public:
     QuickSyncVideoDecoderOldPlayer();

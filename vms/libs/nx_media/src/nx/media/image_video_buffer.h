@@ -11,7 +11,7 @@ namespace nx::media {
 /**
  * This class implements Qt video buffer interface using underlying QImage data.
  */
-class ImageVideoBuffer: public QAbstractVideoBuffer
+class NX_MEDIA_API ImageVideoBuffer: public QAbstractVideoBuffer
 {
 public:
     ImageVideoBuffer(const QImage& image):

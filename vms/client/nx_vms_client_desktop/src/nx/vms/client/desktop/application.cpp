@@ -45,6 +45,7 @@
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/kit/output_redirector.h>
+#include <nx/media/decoder_registrar.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
@@ -53,7 +54,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/rlimit.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/vms/client/core/media/decoder_registrar.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -270,7 +270,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         qunsetenv("RESOURCE_NAME");
     #endif
 
-    nx::vms::client::core::DecoderRegistrar::registerDecoders({});
+    nx::media::DecoderRegistrar::registerDecoders({});
 
     // Window handle must exist before events processing. This is required to initialize the scene.
     volatile auto winId = mainWindow->winId();

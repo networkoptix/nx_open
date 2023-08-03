@@ -22,7 +22,7 @@ namespace media {
  * <pre> ...VideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution); </pre>
  *
  */
-class AbstractVideoDecoder: public QObject
+class NX_MEDIA_API AbstractVideoDecoder: public QObject
 {
     Q_OBJECT
 

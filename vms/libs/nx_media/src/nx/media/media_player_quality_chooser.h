@@ -26,7 +26,7 @@ class AbstractVideoDecoder;
  */
 namespace media_player_quality_chooser {
 
-Player::TranscodingSupportStatus transcodingSupportStatus(
+NX_MEDIA_API Player::TranscodingSupportStatus transcodingSupportStatus(
     const QnVirtualCameraResourcePtr& camera,
     qint64 positionMs,
     bool liveMode);
@@ -51,7 +51,7 @@ struct Params
     const std::vector<AbstractVideoDecoder*>* currentDecoders = nullptr;
 };
 
-struct Result: public boost::equality_comparable1<Result>
+struct NX_MEDIA_API Result: public boost::equality_comparable1<Result>
 {
     Player::VideoQuality quality = Player::UnknownVideoQuality;
     QSize frameSize;
@@ -75,7 +75,7 @@ struct Result: public boost::equality_comparable1<Result>
  *     camera aspect ratio, thus, the returned custom size width should be treated as specified
  *     in logical pixels.
  */
-Result chooseVideoQuality(int videoQuality, const Params& input);
+NX_MEDIA_API Result chooseVideoQuality(int videoQuality, const Params& input);
 
 } // namespace media_player_quality_chooser
 

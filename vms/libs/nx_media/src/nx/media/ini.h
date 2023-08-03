@@ -7,7 +7,7 @@
 namespace nx {
 namespace media {
 
-struct Ini: public nx::kit::IniConfig
+struct NX_MEDIA_API Ini: public nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_media.ini") { reload(); }
 
@@ -26,7 +26,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, allowSpeedupAudio, "Allow fast audio playing during x2 and x4 speed");
 };
 
-Ini& ini();
+NX_MEDIA_API Ini& ini();
 
 } // namespace media
 } // namespace nx

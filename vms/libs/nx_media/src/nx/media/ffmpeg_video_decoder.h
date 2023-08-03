@@ -17,7 +17,7 @@ class FfmpegVideoDecoderPrivate;
 /**
  * Implements ffmpeg video decoder.
  */
-class FfmpegVideoDecoder: public AbstractVideoDecoder
+class NX_MEDIA_API FfmpegVideoDecoder: public AbstractVideoDecoder
 {
 public:
     /** @param maxResolution Limits applicability of the decoder. If empty, there is no limit.
