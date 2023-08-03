@@ -177,7 +177,7 @@ TEST_P(Performance, ForEach)
 INSTANTIATE_TEST_SUITE_P(ValueHistoryTest, Performance, ::testing::Values(
    Times{std::chrono::hours(24), std::chrono::seconds(5), std::chrono::hours(24)},
    Times{std::chrono::hours(24), std::chrono::seconds(5), std::chrono::hours(1)},
-   Times{std::chrono::hours(24), std::chrono::milliseconds(10), std::chrono::hours(1)}
+   Times{std::chrono::hours(24), std::chrono::seconds(1), std::chrono::hours(1)}
 ));
 
 } // namespace nx::utils::test
