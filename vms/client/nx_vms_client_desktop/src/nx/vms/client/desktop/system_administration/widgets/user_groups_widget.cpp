@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
+#include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -47,12 +48,8 @@ constexpr int kMaximumColumnWidth = 200;
 constexpr int kMaximumInteractiveColumnWidth = 600;
 constexpr int kDefaultInteractiveColumnWidth = 200;
 
-static const QColor klight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{klight16Color, "light16"}}},
-    {QIcon::Active, {{klight16Color, "light17"}}},
-    {QIcon::Selected, {{klight16Color, "light15"}}},
-};
+static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
+    kTextButtonColors = {{QIcon::Normal, {"light14"}}, {QIcon::Active, {"light13"}}};
 
 } // namespace
 
@@ -177,10 +174,10 @@ public:
 
     ControlBar* const selectionControls{new ControlBar(q)};
 
-    QPushButton* const deleteSelectedButton{
-        new QPushButton(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions),
-            tr("Delete"),
-            selectionControls)};
+    QPushButton* const deleteSelectedButton{new QPushButton(
+        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+        tr("Delete"),
+        selectionControls)};
 
 public:
     explicit Private(UserGroupsWidget* q, UserGroupManager* manager);
@@ -342,6 +339,10 @@ void UserGroupsWidget::Private::setupUi()
     constexpr int kButtonBarHeight = 32;
     selectionControls->setFixedHeight(kButtonBarHeight);
 
+    setPaletteColor(selectionControls, QPalette::Window, core::colorTheme()->color("dark11"));
+    setPaletteColor(selectionControls, QPalette::WindowText, core::colorTheme()->color("light14"));
+    setPaletteColor(selectionControls, QPalette::Dark, core::colorTheme()->color("dark15"));
+
     const auto buttonsLayout = selectionControls->horizontalLayout();
     buttonsLayout->setSpacing(16);
     buttonsLayout->addWidget(deleteSelectedButton);
@@ -418,11 +419,9 @@ void UserGroupsWidget::Private::handleSelectionChanged()
     else
         header->setCheckState(Qt::PartiallyChecked);
 
-    const bool canDelete = std::any_of(checkedGroupIds.cbegin(), checkedGroupIds.cend(),
-        [this](const QnUuid& groupId)
-        {
-            return canDeleteGroup(groupId);
-        });
+    const bool canDelete = !checkedGroupIds.empty()
+        && std::all_of(checkedGroupIds.cbegin(), checkedGroupIds.cend(),
+            [this](const QnUuid& groupId) { return canDeleteGroup(groupId); });
 
     deleteSelectedButton->setVisible(canDelete);
     selectionControls->setDisplayed(canDelete);
