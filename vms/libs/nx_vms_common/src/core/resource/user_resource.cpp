@@ -140,9 +140,8 @@ QByteArray QnUserHash::toString() const
 bool QnUserHash::operator==(const QnUserHash& rhs) const
 {
     return type == rhs.type
-        && salt == rhs.salt
-        && options == rhs.options
-        && hash == rhs.hash;
+        && ((salt == rhs.salt && options == rhs.options && hash == rhs.hash)
+            || (type == Type::ldapPassword && toLdapPassword() == rhs.toLdapPassword()));
 }
 
 QByteArray QnUserHash::hashPassword(const QString& password) const
@@ -206,6 +205,9 @@ bool QnUserHash::compareToPasswordHash(const QByteArray& passwordHash) const
 {
     if (passwordHash.isEmpty())
         return *this == QnUserHash();
+
+    if (type == Type::ldapPassword)
+        return toLdapPassword() == QnUserHash(passwordHash).toLdapPassword();
 
     return toString() == passwordHash;
 }
