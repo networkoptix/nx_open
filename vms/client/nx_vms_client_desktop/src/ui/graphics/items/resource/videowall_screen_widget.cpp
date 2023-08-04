@@ -248,9 +248,9 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
     update();
 }
 
-void QnVideowallScreenWidget::at_itemDataChanged(int role)
+void QnVideowallScreenWidget::atItemDataChanged(Qn::ItemDataRole role)
 {
-    base_type::at_itemDataChanged(role);
+    base_type::atItemDataChanged(role);
     if (role != Qn::VideoWallItemIndicesRole)
         return;
 

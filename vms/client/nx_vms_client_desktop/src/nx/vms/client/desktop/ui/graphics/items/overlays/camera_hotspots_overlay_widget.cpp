@@ -94,8 +94,7 @@ void CameraHotspotsOverlayWidget::Private::initHotspotItems()
     if (!workbenchContext() || !resourceWidgetCamera())
         return;
 
-    const auto camera = resourceWidgetCamera();
-    if (!camera->cameraHotspotsEnabled())
+    if (!parentMediaResourceWidget->hotspotsVisible())
         return;
 
     const auto hotspotsData = resourceWidgetCamera()->cameraHotspots();
@@ -223,8 +222,12 @@ CameraHotspotsOverlayWidget::CameraHotspotsOverlayWidget(QnMediaResourceWidget* 
     if (!NX_ASSERT(camera))
         return;
 
-    connect(camera.get(), &QnVirtualCameraResource::cameraHotspotsEnabledChanged, this,
-        [this] { d->initHotspotItems(); });
+    connect(d->parentMediaResourceWidget, &QnMediaResourceWidget::optionsChanged, this,
+        [this](QnMediaResourceWidget::Options changedOptions)
+        {
+            if (changedOptions.testFlag(QnMediaResourceWidget::DisplayHotspots))
+                d->initHotspotItems();
+        });
 
     connect(camera.get(), &QnVirtualCameraResource::cameraHotspotsChanged, this,
         [this] { d->initHotspotItems(); });

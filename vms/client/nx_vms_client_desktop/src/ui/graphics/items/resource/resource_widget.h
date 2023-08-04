@@ -387,7 +387,7 @@ protected:
     void registerButtonStatisticsAlias(QnImageButtonWidget* button, const QString& alias);
     QnImageButtonWidget* createStatisticAwareButton(const QString& alias);
 
-    Q_SLOT virtual void at_itemDataChanged(int role);
+    virtual void atItemDataChanged(Qn::ItemDataRole role);
 
     float defaultAspectRatio() const;
 
