@@ -27,6 +27,8 @@ void appendNalUnit(std::vector<uint8_t>& result, const uint8_t* data, int size)
     result.insert(result.end(), data, data + size);
 }
 
+} // namespace
+
 // TODO: Code duplication with "h264_utils.cpp".
 std::vector<uint8_t> readH264SeqHeaderFromExtraData(const uint8_t* extraData, int extraDataSize)
 {
@@ -74,8 +76,6 @@ std::vector<uint8_t> readH264SeqHeaderFromExtraData(const uint8_t* extraData, in
     }
     return result;
 }
-
-} // namespace
 
 std::vector<uint8_t> readH265SeqHeaderFromExtraData(const uint8_t* extraData, int extraDataSize)
 {

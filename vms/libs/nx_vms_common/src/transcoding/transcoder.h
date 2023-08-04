@@ -169,6 +169,8 @@ public:
     * @return Returns OperationResult::Success if no error or error code otherwise
     */
     int finalize(nx::utils::ByteArray* const result);
+    //!Flushes codec buffer. Use after \a open() call to flush muxed header.
+    void flush(nx::utils::ByteArray* const result);
     //!Adds tag to the file. Maximum length of tags and allowed names are format dependent
     /*!
         This implementation always returns \a false
