@@ -342,8 +342,7 @@ void QnUserResource::setRawPermissions(GlobalPermissions permissions)
 void QnUserResource::setPasswordHashes(const PasswordHashes& hashes)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    const bool isNewPassword = m_userType != nx::vms::api::UserType::ldap
-        && !m_hash.compareToPasswordHash(hashes.passwordHash);
+    const bool isNewPassword = !m_hash.compareToPasswordHash(hashes.passwordHash);
     const bool isNewDigest = m_digest != hashes.passwordDigest;
     setPasswordHashesInternal(hashes, isNewPassword);
     locker.unlock();
@@ -594,7 +593,7 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
             "%1: User type was designed to be read-only", this);
 
         bool isEmptyOtherPasswordAcceptable = false;
-        if (m_hash != localOther->m_hash && m_userType != nx::vms::api::UserType::ldap)
+        if (m_hash != localOther->m_hash)
         {
             if (m_password.isEmpty() && localOther->m_password.isEmpty() && m_hash != QnUserHash())
             {
@@ -628,16 +627,14 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
 
         m_realm = localOther->m_realm;
         if ((m_digest != localOther->m_digest)
-            && (m_userType != nx::vms::api::UserType::ldap
-                || m_digest == nx::vms::api::UserData::kHttpIsDisabledStub
+            && (m_digest == nx::vms::api::UserData::kHttpIsDisabledStub
                 || !localOther->m_digest.isEmpty()))
         {
             m_digest = localOther->m_digest;
             notifiers << [r = toSharedPointer(this)] { emit r->digestChanged(r); };
         }
-        if ((m_cryptSha512Hash != localOther->m_cryptSha512Hash)
-            && (m_userType != nx::vms::api::UserType::ldap
-                || !localOther->m_cryptSha512Hash.isEmpty()))
+        if (m_cryptSha512Hash != localOther->m_cryptSha512Hash
+            && !localOther->m_cryptSha512Hash.isEmpty())
         {
             m_cryptSha512Hash = localOther->m_cryptSha512Hash;
         }
