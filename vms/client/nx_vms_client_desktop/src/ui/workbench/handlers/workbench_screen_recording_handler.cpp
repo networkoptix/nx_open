@@ -4,6 +4,7 @@
 
 #include <chrono>
 
+#include <QtCore/QStandardPaths>
 #include <QtGui/QAction>
 #include <QtMultimedia/QMediaDevices>
 #include <QtWidgets/QApplication>
@@ -206,7 +207,10 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
         return;
 
     QDateTime dt = QDateTime::currentDateTime();
-    QString filePath = screenRecordingSettings()->recordingFolder()
+    const auto recordingFolder = screenRecordingSettings()->recordingFolder.exists()
+        ? screenRecordingSettings()->recordingFolder()
+        : QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    QString filePath = recordingFolder
         + "/"
         + nx::utils::replaceNonFileNameCharacters(
             nx::format("video_recording_%1.avi",
