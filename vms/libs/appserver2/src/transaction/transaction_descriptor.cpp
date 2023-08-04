@@ -720,12 +720,6 @@ static Result checkSaveResourceAccess(
     return checkExistingResourceAccess(systemContext, accessData, resourceId, Qn::SavePermission);
 }
 
-static Result checkReadResourceParamAccess(
-    SystemContext* systemContext, const Qn::UserAccessData& accessData, const QnUuid& resourceId)
-{
-    return checkReadResourceAccess(systemContext, accessData, resourceId);
-}
-
 struct ModifyResourceAccess
 {
     ModifyResourceAccess() {}
@@ -1072,13 +1066,9 @@ struct ReadResourceParamAccess
         const Qn::UserAccessData& accessData,
         nx::vms::api::ResourceParamWithRefData& param)
     {
-        if (const auto r =
-            checkReadResourceParamAccess(systemContext, accessData, param.resourceId)
-            ;
-            !r)
-        {
+        if (const auto r = checkReadResourceAccess(systemContext, accessData, param.resourceId); !r)
             return r;
-        }
+
         operator()(
             systemContext,
             accessData,
@@ -1112,7 +1102,7 @@ struct ReadResourceParamAccessOut
         const Qn::UserAccessData& accessData,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
-        return checkReadResourceParamAccess(systemContext, accessData, param.resourceId)
+        return checkReadResourceAccess(systemContext, accessData, param.resourceId)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }

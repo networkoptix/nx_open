@@ -17,7 +17,7 @@ static QString toString(const nx::vms::json_rpc::detail::OutgoingProcessor::Id& 
 
 namespace nx::vms::json_rpc::detail {
 
-static OutgoingProcessor::Id toId(const std::variant<int, QString, std::nullptr_t>& id)
+static OutgoingProcessor::Id toId(const api::JsonRpcResponseId& id)
 {
     if (std::holds_alternative<int>(id))
         return std::get<int>(id);
@@ -28,10 +28,10 @@ using Error = nx::vms::api::JsonRpcError::Code;
 
 void OutgoingProcessor::clear(SystemError::ErrorCode error)
 {
-    api::JsonRpcResponse response;
-    response.error = api::JsonRpcError{Error::InternalError,
-        NX_FMT("Connection closed with error %1: %2", error, SystemError::toString(error))
-            .toStdString()};
+    auto response = api::JsonRpcResponse::makeError(std::nullptr_t(),
+        {Error::InternalError,
+            NX_FMT("Connection closed with error %1: %2", error, SystemError::toString(error))
+                .toStdString()});
     for (const auto& [id, handler]: m_awaitingResponses)
     {
         NX_DEBUG(this, "Terminating response with %1 id", id);
@@ -42,7 +42,7 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
             response.id = std::get<int>(id);
         else
             response.id = std::get<QString>(id);
-        handler(std::move(response));
+        handler(response);
     }
     m_awaitingResponses.clear();
     for (auto& [key, batchResponse]: m_awaitingBatchResponseHolder)
@@ -84,17 +84,12 @@ void OutgoingProcessor::processRequest(
     if (m_awaitingBatchResponses.contains(id) || m_awaitingResponses.contains(id))
     {
         NX_DEBUG(this, "Id %1 is already used", id);
-        if (!handler)
-            return;
-
-        nx::vms::api::JsonRpcResponse jsonRpcResponse;
-        if (std::holds_alternative<int>(id))
-            jsonRpcResponse.id = std::get<int>(id);
-        else
-            jsonRpcResponse.id = std::get<QString>(id);
-        jsonRpcResponse.error = nx::vms::api::JsonRpcError{
-            Error::InvalidRequest, "Invalid parameter 'id': Already used"};
-        return handler(std::move(jsonRpcResponse));
+        if (handler)
+        {
+            handler(api::JsonRpcResponse::makeError(jsonRpcRequest.responseId(),
+                {Error::InvalidRequest, "Invalid parameter 'id': Already used"}));
+        }
+        return;
     }
 
     NX_DEBUG(this, "Send request with %1 id", id);
@@ -120,28 +115,19 @@ void OutgoingProcessor::processBatchRequest(
         if (m_awaitingBatchResponses.contains(id) || m_awaitingResponses.contains(id))
         {
             NX_DEBUG(this, "Id %1 is already used", id);
-            nx::vms::api::JsonRpcResponse jsonRpcResponse;
-            if (std::holds_alternative<int>(id))
-                jsonRpcResponse.id = std::get<int>(id);
-            else
-                jsonRpcResponse.id = std::get<QString>(id);
-            jsonRpcResponse.error = nx::vms::api::JsonRpcError{
-                Error::InvalidRequest, "Invalid parameter 'id': Already used"};
-            awaitingResponse.errors.push_back(std::move(jsonRpcResponse));
+            awaitingResponse.errors.emplace_back(
+                api::JsonRpcResponse::makeError(jsonRpcRequest.responseId(),
+                    {Error::InvalidRequest, "Invalid parameter 'id': Already used"}));
             continue;
         }
 
         if (ids.contains(id))
         {
             NX_DEBUG(this, "Id %1 is already used in this batch request", id);
-            nx::vms::api::JsonRpcResponse jsonRpcResponse;
-            if (std::holds_alternative<int>(id))
-                jsonRpcResponse.id = std::get<int>(id);
-            else
-                jsonRpcResponse.id = std::get<QString>(id);
-            jsonRpcResponse.error = nx::vms::api::JsonRpcError{Error::InvalidRequest,
-                "Invalid parameter 'id': Already used in this batch request"};
-            awaitingResponse.errors.push_back(std::move(jsonRpcResponse));
+            awaitingResponse.errors.emplace_back(
+                api::JsonRpcResponse::makeError(jsonRpcRequest.responseId(),
+                    {Error::InvalidRequest,
+                        "Invalid parameter 'id': Already used in this batch request"}));
             continue;
         }
 

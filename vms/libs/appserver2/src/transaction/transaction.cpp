@@ -14,34 +14,60 @@
 
 namespace ec2 {
 
-namespace ApiCommand
+namespace ApiCommand {
+
+QString toString(Value value)
 {
-    QString toString(Value value)
+    switch (value)
     {
-        auto it = detail::transactionDescriptors.get<0>().find(value);
-        if (it == detail::transactionDescriptors.get<0>().end())
-            return QString::number((int) value);
-        return it->get()->getName();
+        #define CASE(VALUE, NAME, ...) case NAME: return NX_FMT(#NAME);
+        TRANSACTION_DESCRIPTOR_LIST(CASE)
+        #undef CASE
+        case CompositeSave: return NX_FMT("CompositeSave");
+        case NotDefined: return NX_FMT("NotDefined");
     }
 
-    Value fromString(const QString& value)
-    {
-        auto descriptor = getTransactionDescriptorByName(value);
-        return descriptor ? descriptor->getValue() : ApiCommand::NotDefined;
-    }
-
-    bool isSystem(Value value) { return getTransactionDescriptorByValue(value)->isSystem; }
-
-    bool isRemoveOperation(Value value)
-    {
-        return getTransactionDescriptorByValue(value)->isRemoveOperation;
-    }
-
-    bool isPersistent(Value value)
-    {
-        return value == CompositeSave || getTransactionDescriptorByValue(value)->isPersistent;
-    }
+    NX_ASSERT(false, "Unknown transaction value %1", (int) value);
+    return NX_FMT("Transation_%1", (int) value);
 }
+
+Value fromString(const QString& name)
+{
+    auto descriptor = getTransactionDescriptorByName(name);
+    return descriptor ? descriptor->getValue() : NotDefined;
+}
+
+bool isSystem(Value value)
+{
+    switch (value)
+    {
+        #define CASE(VALUE, NAME, TYPE, PERSISTENT, SYSTEM, ...) case NAME: return SYSTEM;
+        TRANSACTION_DESCRIPTOR_LIST(CASE)
+        #undef CASE
+        case CompositeSave: return false;
+        case NotDefined: return false;
+    }
+
+    NX_ASSERT(false, "Unknown transaction value %1", (int) value);
+    return false;
+}
+
+bool isPersistent(Value value)
+{
+    switch (value)
+    {
+        #define CASE(VALUE, NAME, TYPE, PERSISTENT, ...) case NAME: return PERSISTENT;
+        TRANSACTION_DESCRIPTOR_LIST(CASE)
+        #undef CASE
+        case CompositeSave: return true;
+        case NotDefined: return false;
+    }
+
+    NX_ASSERT(false, "Unknown transaction value %1", (int) value);
+    return false;
+}
+
+} // namespace ApiCommand
 
 int generateRequestID()
 {
