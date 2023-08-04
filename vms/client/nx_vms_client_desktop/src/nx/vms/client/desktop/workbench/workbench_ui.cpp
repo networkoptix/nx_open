@@ -67,7 +67,7 @@
 #include <ui/workbench/workbench_ui_globals.h>
 #include <utils/common/event_processors.h>
 
-#include <vx/resource/layout_functions.h>
+#include <vx/hooks/workbench_hooks.h>
 
 #include "panels/calendar_workbench_panel.h"
 #include "panels/left_workbench_panel.h"
@@ -577,8 +577,7 @@ void WorkbenchUi::updateControlsVisibility(bool animate)
         return;
     }
 
-    const bool notificationsAllowed = context()->user() != nullptr &&
-        (layout ? !vx::LayoutFunctions::isMonitoringLayout(layout->resource()) : true);
+    const bool notificationsAllowed = context()->user() != nullptr && vx::isNotificationsPanelVisible(layout);
 
     if (qnRuntime->isVideoWallMode())
     {
