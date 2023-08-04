@@ -427,7 +427,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>録画用の出力ストリームを割り当てることができません。</translation>
+      <translation>録画用の出力ストリームを割り当てることができませんでした。</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
@@ -1617,15 +1617,15 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>録画用の出力ストリームを割り当てることができません。</translation>
+      <translation>録画用の出力ストリームを割り当てることができませんでした。</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>音声出力ストリームを割り当てることができません。</translation>
+      <translation>音声出力ストリームを割り当てることができませんでした。</translation>
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation>メタデータ出力ストリームを割り当てられませんでした。</translation>
+      <translation>メタデータ出力ストリームを割り当てることができませんでした。</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -2011,7 +2011,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>全てのユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message>
       <source>Select at least one user</source>

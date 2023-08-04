@@ -248,7 +248,7 @@
     </message>
     <message>
       <source>Select all</source>
-      <translation>全て選択</translation>
+      <translation>すべて選択</translation>
     </message>
     <message>
       <source>Sessions</source>
@@ -272,7 +272,7 @@
     </message>
     <message>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation>全サーバーがオフラインの為、操作履歴が表示できません</translation>
+      <translation>すべてのサーバーがオフラインです。監査データは利用できません。</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>全サーバーがオフラインの為ログが表示できません.</translation>
+      <translation>すべてのサーバーがオフラインです。ログは利用できません。</translation>
     </message>
     <message>
       <source>Event Rules...</source>
@@ -1985,7 +1985,7 @@
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>ダウンロードとインストール</translation>
+      <translation>ダウンロードしてインストール</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -2205,7 +2205,7 @@
     <name>PopupSettingsWidget</name>
     <message>
       <source>Show all notifications</source>
-      <translation>全ての通知を表示する</translation>
+      <translation>すべての通知を表示</translation>
     </message>
     <message>
       <source>System Notifications</source>
