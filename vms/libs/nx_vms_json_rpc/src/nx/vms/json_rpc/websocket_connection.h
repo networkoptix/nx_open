@@ -3,8 +3,10 @@
 #pragma once
 
 #include <queue>
+#include <unordered_map>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/json_rpc.h>
 
 namespace nx::network::websocket { class WebSocket; }
@@ -30,12 +32,16 @@ public:
     virtual ~WebSocketConnection() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
+    void start();
     void send(nx::vms::api::JsonRpcRequest jsonRpcRequest, ResponseHandler handler = nullptr);
 
     using BatchResponseHandler =
         nx::utils::MoveOnlyFunc<void(std::vector<nx::vms::api::JsonRpcResponse>)>;
     void send(std::vector<nx::vms::api::JsonRpcRequest> jsonRpcRequests,
         BatchResponseHandler handler = nullptr);
+
+    void addGuard(const QString& id, nx::utils::Guard guard);
+    void removeGuard(const QString& id);
 
 private:
     virtual void stopWhileInAioThread() override;
@@ -51,6 +57,7 @@ private:
     std::unique_ptr<detail::OutgoingProcessor> m_outgoingProcessor;
     std::queue<QJsonValue> m_queuedRequests;
     std::unique_ptr<nx::network::websocket::WebSocket> m_socket;
+    std::unordered_map<QString, nx::utils::Guard> m_guards;
 };
 
 } // namespace nx::vms::json_rpc

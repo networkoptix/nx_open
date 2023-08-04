@@ -11,9 +11,12 @@
 #include <QtCore/QJsonValue>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/reflect/instrument.h>
 
 namespace nx::vms::api {
+
+using JsonRpcResponseId = std::variant<QString, int, std::nullptr_t>;
 
 struct NX_VMS_API JsonRpcRequest
 {
@@ -23,11 +26,44 @@ struct NX_VMS_API JsonRpcRequest
     std::string jsonrpc = "2.0";
 
     /**%apidoc
-     * %example rest.v2.system.info.get
+     * %example rest.v3.system.info.get
      */
     std::string method;
-    std::optional<std::variant<QJsonObject, QJsonArray>> params;
-    std::optional<std::variant<int, QString>> id;
+
+    /**%apidoc:{std::variant<QJsonObject, QJsonArray>} */
+    std::optional<QJsonValue> params;
+
+    std::optional<std::variant<QString, int>> id;
+
+    template<typename T>
+    T parseOrThrow() const
+    {
+        if (!params)
+        {
+            throw QJson::InvalidParameterException(
+                std::pair<QString, QString>("params", "Must be specified"));
+        }
+
+        QnJsonContext context;
+        context.setStrictMode(true);
+        if (method.starts_with("rest."))
+            context.setSerializeMapToObject(true);
+
+        return QJson::deserializeOrThrow<T>(&context, *params);
+    }
+
+    JsonRpcResponseId responseId() const
+    {
+        JsonRpcResponseId result{std::nullptr_t()};
+        if (id)
+        {
+            if (std::holds_alternative<int>(*id))
+                result = std::get<int>(*id);
+            else
+                result = std::get<QString>(*id);
+        }
+        return result;
+    }
 };
 #define JsonRpcRequest_Fields (jsonrpc)(method)(params)(id)
 QN_FUSION_DECLARE_FUNCTIONS(JsonRpcRequest, (json), NX_VMS_API)
@@ -61,9 +97,44 @@ struct NX_VMS_API JsonRpcResponse
      */
     std::string jsonrpc = "2.0";
 
-    std::variant<int, QString, std::nullptr_t> id{std::nullptr_t()};
+    // TODO: Use `JsonRpcResponseId` when apidoctool will support `using`.
+    std::variant<QString, int, std::nullptr_t> id{std::nullptr_t()};
     std::optional<QJsonValue> result;
     std::optional<JsonRpcError> error;
+
+    static JsonRpcResponse makeError(JsonRpcResponseId id, JsonRpcError error);
+
+    template<typename T>
+    static JsonRpcResponse makeResult(JsonRpcResponseId id, T&& data)
+    {
+        const auto serialized =
+            [](auto&& data)
+            {
+                QJsonValue value;
+                QnJsonContext context;
+                context.setChronoSerializedAsDouble(true);
+                context.setSerializeMapToObject(true);
+                QJson::serialize(&context, data, &value);
+                return value;
+            };
+        return {.id = id, .result = serialized(std::move(data))};
+    }
+
+    template<typename T>
+    T resultOrThrow(bool isSerializeMapToObject = true) const
+    {
+        if (!result)
+        {
+            throw QJson::InvalidParameterException(
+                std::pair<QString, QString>("result", "Must be provided"));
+        }
+
+        QnJsonContext context;
+        context.setStrictMode(true);
+        if (isSerializeMapToObject)
+            context.setSerializeMapToObject(true);
+        return QJson::deserializeOrThrow<T>(&context, *result);
+    }
 };
 #define JsonRpcResponse_Fields (jsonrpc)(id)(result)(error)
 QN_FUSION_DECLARE_FUNCTIONS(JsonRpcResponse, (json), NX_VMS_API)

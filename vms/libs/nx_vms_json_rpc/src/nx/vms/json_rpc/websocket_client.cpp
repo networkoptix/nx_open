@@ -105,6 +105,7 @@ void WebSocketClient::onUpgrade()
             m_connection.reset();
         },
         std::move(handler));
+    m_connection->start();
 }
 
 void WebSocketClient::sendAsync(api::JsonRpcRequest request, ResponseHandler handler)
@@ -128,19 +129,10 @@ void WebSocketClient::sendAsync(api::JsonRpcRequest request, ResponseHandler han
                         return;
                     }
 
-                    api::JsonRpcResponse response;
-                    if (request.id)
-                    {
-                        if (std::holds_alternative<int>(*request.id))
-                            response.id = std::get<int>(*request.id);
-                        else
-                            response.id = std::get<QString>(*request.id);
-                    }
-                    response.error = api::JsonRpcError{
-                        api::JsonRpcError::InternalError,
-                        NX_FMT("Failed to establish connnection to %1 with error %2",
-                            m_url, errorCode).toStdString()};
-                    handler(std::move(response));
+                    handler(api::JsonRpcResponse::makeError(request.responseId(),
+                        {api::JsonRpcError::InternalError,
+                            NX_FMT("Failed to establish connnection to %1 with error %2",
+                                m_url, errorCode).toStdString()}));
                 });
         });
 }
