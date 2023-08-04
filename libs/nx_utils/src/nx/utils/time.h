@@ -35,6 +35,11 @@ NX_UTILS_API std::chrono::milliseconds millisSinceEpoch();
 NX_UTILS_API std::chrono::steady_clock::time_point monotonicTime();
 
 /**
+ * @return system time and apply test timeShift value on it. It is used in UT only.
+ */
+NX_UTILS_API std::chrono::system_clock::time_point systemClockTime();
+
+/**
  * On Linux, set system time zone. On other platforms, do nothing, return true.
  * @param timeZoneId IANA id of a time zone.
  * @return False on error, unsupported timeZoneId or unsupported platform, true on success.

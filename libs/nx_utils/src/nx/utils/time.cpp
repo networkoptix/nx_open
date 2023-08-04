@@ -83,6 +83,11 @@ steady_clock::time_point monotonicTime()
     return steady_clock::now() + monotonicTimeShift;
 }
 
+std::chrono::system_clock::time_point systemClockTime()
+{
+    return std::chrono::system_clock::now() + monotonicTimeShift;
+}
+
 bool setTimeZone([[maybe_unused]] const QString& timeZoneId)
 {
     #if defined(Q_OS_LINUX)
