@@ -24,7 +24,13 @@ struct NX_VMS_API UserGroupData: IdData
     /**%apidoc[opt] */
     QString description;
 
-    /**%apidoc[opt] Type of the user group. */
+    /**%apidoc[opt]
+     * Only local User Groups are supposed to be created by the API.
+     * %value local This Group is managed by VMS.
+     * %value ldap This Group is imported from LDAP Server.
+     * %value[unused] cloud Unsupported.
+     * %value[unused] temporaryLocal Unsupported.
+     */
     UserType type = UserType::local;
 
     /**%apidoc[opt] Own user global permissions. */
