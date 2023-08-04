@@ -65,12 +65,10 @@
 
 namespace nx::vms::client::desktop {
 
-static const QColor klight16Color = "#698796";
-static const QColor klight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{klight16Color, "light16"}, {klight10Color, "light10"}}},
-    {QIcon::Active, {{klight16Color, "light17"}, {klight10Color, "light11"}}},
-    {QIcon::Selected, {{klight16Color, "light15"}, {klight10Color, "light9"}}},
+static const QMap<QIcon::Mode, core::SvgIconColorer::ThemeColorsRemapData> kThemeSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
+    {QIcon::Selected, {.primary = "light15"}},
 };
 
 using namespace std::chrono;
@@ -317,7 +315,7 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
 {
     m_typeSelectionButton->setDeactivatedText(tr("Any type"));
     m_typeSelectionButton->setIcon(
-        qnSkin->icon("text_buttons/analytics_20.svg", kIconSubstitutions));
+        qnSkin->icon("text_buttons/default_20x20.svg", kThemeSubstitutions));
 
     m_typeSelectionButton->setMenu(m_objectTypeMenu);
 
@@ -367,7 +365,7 @@ void AnalyticsSearchWidget::Private::updateTypeButton()
     else
     {
         m_typeSelectionButton->setIcon(
-            qnSkin->icon("text_buttons/analytics_20.svg", kIconSubstitutions));
+            qnSkin->icon("text_buttons/default_20x20.svg", kThemeSubstitutions));
         m_typeSelectionButton->deactivate();
     }
 }
@@ -427,7 +425,7 @@ void AnalyticsSearchWidget::Private::setupAreaSelection()
 {
     m_areaSelectionButton->setAccented(true);
     m_areaSelectionButton->setDeactivatedText(tr("Select area"));
-    m_areaSelectionButton->setIcon(qnSkin->icon("text_buttons/frame_20.svg", kIconSubstitutions));
+    m_areaSelectionButton->setIcon(qnSkin->icon("text_buttons/frame_20x20.svg", kThemeSubstitutions));
 
     connect(m_areaSelectionButton, &SelectableTextButton::stateChanged,
         [this](SelectableTextButton::State state)

@@ -85,7 +85,7 @@ Item
                 width: Math.min(implicitWidth, header.filtersColumn.width)
 
                 selectable: false
-                icon.source: "image://svg/skin/text_buttons/frame_20.svg"
+                icon.source: "image://svg/skin/text_buttons/frame_20x20.svg"
                 accented: eventModel.analyticsSetup.areaSelectionActive
 
                 desiredState: (eventModel.analyticsSetup.isAreaSelected
