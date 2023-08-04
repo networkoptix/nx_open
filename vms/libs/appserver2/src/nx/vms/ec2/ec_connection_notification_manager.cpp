@@ -45,4 +45,45 @@ ECConnectionNotificationManager::ECConnectionNotificationManager(
 {
 }
 
+nx::utils::Guard ECConnectionNotificationManager::addMonitor(
+    MonitorCallback callback, std::vector<ApiCommand::Value> commands)
+{
+    auto monitor = std::make_shared<MonitorCallback>(std::move(callback));
+    nx::utils::MoveOnlyFunc<void()> guard =
+        [this, monitor]()
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            auto commands = m_monitors.find(monitor);
+            if (commands != m_monitors.end())
+            {
+                for (auto c: commands->second)
+                {
+                    if (auto it = m_monitoredCommands.find(c); it != m_monitoredCommands.end())
+                    {
+                        it->second.erase(monitor.get());
+                        if (it->second.empty())
+                            m_monitoredCommands.erase(c);
+                    }
+                }
+                m_monitors.erase(monitor);
+            }
+        };
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    for (auto c: commands)
+        m_monitoredCommands[c].insert(monitor.get());
+    m_monitors.emplace(std::move(monitor), std::move(commands));
+    return guard;
+}
+
+void ECConnectionNotificationManager::callbackMonitors(const QnAbstractTransaction& transaction)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (auto monitors = m_monitoredCommands.find(transaction.command);
+        monitors != m_monitoredCommands.end())
+    {
+        for (const auto& callback: monitors->second)
+            (*callback)(transaction);
+    }
+}
+
 } // namespace ec2
