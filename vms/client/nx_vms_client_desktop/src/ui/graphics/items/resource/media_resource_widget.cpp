@@ -5,6 +5,7 @@
 #include <chrono>
 #include <iterator>
 
+#include <QtCore/QSignalBlocker>
 #include <QtCore/QTimer>
 #include <QtCore/QVarLengthArray>
 #include <QtGui/QAction>
@@ -254,6 +255,19 @@ void drawCrosshair(QPainter* painter, const QRectF& rect)
     }
 }
 
+// Change button checked state without activating button action.
+void setButtonCheckedSilent(QnImageButtonWidget* button, bool checked)
+{
+    if (!NX_ASSERT(button && button->isCheckable()))
+        return;
+
+    if (button->isChecked() == checked)
+        return;
+
+    QSignalBlocker signalBlocker(button->defaultAction());
+    button->setChecked(checked);
+}
+
 } // namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(
@@ -477,8 +491,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
     setAnalyticsObjectsVisible(item->displayAnalyticsObjects(), false);
     setRoiVisible(item->displayRoi(), false);
-    setHotspotsVisible(item->displayHotspots());
     updateButtonsVisibility();
+    updateHotspotsState();
 
     const auto triggerActionHandler =
         [this](const QnUuid& ruleId, bool success)
@@ -730,9 +744,11 @@ void QnMediaResourceWidget::initCameraHotspotsOverlay()
     if (!canDisplayHotspots())
         return;
 
+    connect(d->camera.get(), &QnClientCameraResource::cameraHotspotsEnabledChanged,
+        this, &QnMediaResourceWidget::updateHotspotsState);
+
     m_cameraHotspotsOverlayWidget = new CameraHotspotsOverlayWidget(this);
     m_cameraHotspotsOverlayWidget->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    m_cameraHotspotsOverlayWidget->setVisible(item()->displayHotspots());
 
     addOverlayWidget(m_cameraHotspotsOverlayWidget, {UserVisible, OverlayFlag::none, InfoLayer});
 }
@@ -922,14 +938,17 @@ void QnMediaResourceWidget::createButtons()
         Qn::ZoomWindowButton, "media_widget_zoom",
         &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
 
-    createActionAndButton(
-        "item/hotspots.svg",
-        item()->displayHotspots(),
-        QKeySequence::fromString("H"),
-        tr("Hotspots"),
-        Qn::Empty_Help,
-        Qn::HotspotsButton, "media_widget_hotspots",
-        &QnMediaResourceWidget::atHotspotsButtonToggled);
+    if (canDisplayHotspots())
+    {
+        createActionAndButton(
+            "item/hotspots.svg",
+            item()->displayHotspots() && d->camera->cameraHotspotsEnabled(),
+            QKeySequence::fromString("H"),
+            tr("Hotspots"),
+            Qn::Empty_Help,
+            Qn::HotspotsButton, "media_widget_hotspots",
+            &QnMediaResourceWidget::setHotspotsVisible);
+    }
 
     m_toggleImageEnhancementAction->setCheckable(true);
     m_toggleImageEnhancementAction->setChecked(item()->imageEnhancement().enabled);
@@ -2107,17 +2126,37 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 
         if (motionSearchEnabled)
         {
-            m_itemDewarpingStoredParams = item()->dewarpingParams();
+            // Since source frame area is expected for motion search, dewarping will be
+            // disabled, also Camera Hotspots will be hidden, since Hotspot items are mouse
+            // grabbers and may interfere selection process. Dewarped view params and Camera
+            // Hotspots enabled state are saved before engaging motion selection process.
+
+            const auto saveItemDataState =
+                [this](Qn::ItemDataRole role)
+                {
+                    m_savedItemDataState.insert(role, item()->data(role));
+                };
+
+            if (item()->dewarpingParams().enabled)
+                saveItemDataState(Qn::ItemImageDewarpingRole);
+
+            if (item()->displayHotspots())
+                saveItemDataState(Qn::ItemDisplayHotspotsRole);
+
             titleBar()->rightButtonsBar()->setButtonsChecked(
-                Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
+                Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton | Qn::HotspotsButton,
+                false);
 
             setAreaSelectionType(AreaType::motion);
         }
         else
         {
             unsetAreaSelectionType(AreaType::motion);
-            if (m_itemDewarpingStoredParams.enabled)
-                item()->setDewarpingParams(m_itemDewarpingStoredParams);
+
+            // Stored item parameters are applied back after exiting motion search mode.
+
+            for (const auto role: m_savedItemDataState.keys())
+                item()->setData(role, m_savedItemDataState.take(role));
         }
 
         if (motionSearchEnabled || options().testFlag(FullScreenMode))
@@ -2152,8 +2191,11 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
     if (changedFlags.testFlag(DisplayRoi))
         setRoiVisible(options().testFlag(DisplayRoi), false);
 
-    if (changedFlags.testFlag(DisplayHotspots))
-        setHotspotsVisible(options().testFlag(DisplayHotspots));
+    if (changedFlags.testFlags(DisplayHotspots))
+    {
+        const auto hotspotsButton = titleBar()->rightButtonsBar()->button(Qn::HotspotsButton);
+        setButtonCheckedSilent(hotspotsButton, options().testFlag(DisplayHotspots));
+    }
 
     base_type::optionsChangedNotify(changedFlags);
 }
@@ -2730,12 +2772,6 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
         updateHud(false);
 }
 
-void QnMediaResourceWidget::atHotspotsButtonToggled(bool checked)
-{
-    item()->setDisplayHotspots(checked);
-    m_cameraHotspotsOverlayWidget->setVisible(item()->displayHotspots());
-}
-
 void QnMediaResourceWidget::at_screenshotButton_clicked()
 {
     menu()->trigger(action::TakeScreenshotAction, this);
@@ -2906,6 +2942,13 @@ void QnMediaResourceWidget::updateAnalyticsVisibility(bool animate)
     setOverlayWidgetVisible(m_analyticsOverlayWidget,
         m_statusOverlay->opacity() == 0 && d->analyticsEnabled,
         animate);
+}
+
+void QnMediaResourceWidget::updateHotspotsState()
+{
+    setOption(DisplayHotspots, canDisplayHotspots()
+        && item()->displayHotspots()
+        && d->camera->cameraHotspotsEnabled());
 }
 
 void QnMediaResourceWidget::processDiagnosticsRequest()
@@ -3182,22 +3225,21 @@ bool QnMediaResourceWidget::canDisplayHotspots() const
 
 bool QnMediaResourceWidget::hotspotsVisible() const
 {
-    return canDisplayHotspots()
-        && d->camera->cameraHotspotsEnabled()
-        && options().testFlag(DisplayHotspots);
+    if (!(NX_ASSERT(canDisplayHotspots())))
+        return false;
+
+    return options().testFlag(DisplayHotspots);
 }
 
 void QnMediaResourceWidget::setHotspotsVisible(bool visible)
 {
+    if (!(NX_ASSERT(canDisplayHotspots())))
+        return;
+
     if (hotspotsVisible() == visible)
         return;
 
-    if (!NX_ASSERT(canDisplayHotspots() && d->camera->cameraHotspotsEnabled()))
-        return;
-
-    setOption(DisplayHotspots, visible);
     item()->setDisplayHotspots(visible);
-    m_cameraHotspotsOverlayWidget->setVisible(item()->displayHotspots());
 }
 
 void QnMediaResourceWidget::setAnalyticsModeEnabled(bool enabled, bool animate)
@@ -3218,14 +3260,27 @@ void QnMediaResourceWidget::setAnalyticsModeEnabled(bool enabled, bool animate)
     updateAnalyticsVisibility(animate);
 }
 
-void QnMediaResourceWidget::at_itemDataChanged(int role)
+void QnMediaResourceWidget::atItemDataChanged(Qn::ItemDataRole role)
 {
-    base_type::at_itemDataChanged(role);
+    base_type::atItemDataChanged(role);
 
-    if (role == Qn::ItemDisplayAnalyticsObjectsRole)
-        updateAnalyticsVisibility(false);
-    if (role == Qn::ItemDisplayRoiRole)
-        updateHud(false);
+    switch (role)
+    {
+        case Qn::ItemDisplayAnalyticsObjectsRole:
+            updateAnalyticsVisibility(/*animate*/ false);
+            break;
+
+        case Qn::ItemDisplayRoiRole:
+            updateHud(/*animate*/ false);
+            break;
+
+        case Qn::ItemDisplayHotspotsRole:
+            updateHotspotsState();
+            break;
+
+        default:
+            break;
+    }
 }
 
 QnClientCameraResourcePtr QnMediaResourceWidget::camera() const
@@ -3292,7 +3347,8 @@ QAction* QnMediaResourceWidget::createActionAndButton(const QString& iconName,
     const QKeySequence& shortcut,
     const QString& toolTip,
     Qn::HelpTopic helpTopic,
-    Qn::WidgetButtons buttonId, const QString& buttonName,
+    Qn::WidgetButtons buttonId,
+    const QString& buttonName,
     ButtonHandler executor)
 {
     auto action = new QAction(this);
