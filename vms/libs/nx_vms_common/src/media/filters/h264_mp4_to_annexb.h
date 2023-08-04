@@ -29,3 +29,6 @@ public:
 private:
     CodecParametersConstPtr m_newContext;
 };
+
+NX_VMS_COMMON_API std::vector<uint8_t> readH264SeqHeaderFromExtraData(const uint8_t* extraData, int extraDataSize);
+NX_VMS_COMMON_API std::vector<uint8_t> readH265SeqHeaderFromExtraData(const uint8_t* extraData, int extraDataSize);

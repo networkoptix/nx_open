@@ -6,6 +6,14 @@
 
 namespace nx::vms::api {
 
+/**%apidoc
+ * Media delivery method.
+ */
+NX_REFLECTION_ENUM_CLASS(WebRtcMethod,
+    srtp, /**<%apidoc Use Secure RTP (a standard way). */
+    mse /**<%apidoc Use media chunks via Data Channel (a non-standard way). */
+);
+
 struct NX_VMS_API WebRtcTrackerSettings: public MediaSettings
 {
     /**%apidoc
@@ -16,8 +24,11 @@ struct NX_VMS_API WebRtcTrackerSettings: public MediaSettings
      * %value unlimited Stream with the maximum possible speed.
      */
     std::optional<std::string> speed{"1.0"};
+
+    /**%apidoc[opt] */
+    WebRtcMethod deliveryMethod = WebRtcMethod::srtp;
 };
-#define WebRtcTrackerSettings_Fields MediaSettings_Fields(speed)
+#define WebRtcTrackerSettings_Fields MediaSettings_Fields(speed)(deliveryMethod)
 QN_FUSION_DECLARE_FUNCTIONS(WebRtcTrackerSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(WebRtcTrackerSettings, WebRtcTrackerSettings_Fields)
 

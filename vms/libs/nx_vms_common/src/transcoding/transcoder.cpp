@@ -475,6 +475,12 @@ int QnTranscoder::finalize(nx::utils::ByteArray* const result)
     return OperationResult::Success;
 }
 
+void QnTranscoder::flush(nx::utils::ByteArray* const result)
+{
+    if (result)
+        result->write(m_internalBuffer.data(), m_internalBuffer.size());
+}
+
 bool QnTranscoder::addTag( const QString& /*name*/, const QString& /*value*/ )
 {
     return false;
