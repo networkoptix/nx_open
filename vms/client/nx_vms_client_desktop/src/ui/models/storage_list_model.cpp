@@ -21,12 +21,11 @@ namespace
     const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
     const qreal kBytesInTb = 1024.0 * kBytesInGB;
 
-    static const QColor klight16Color = "#698796";
-    static const QColor klight10Color = "#A5B7C0";
-    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-        {QIcon::Normal, {{klight16Color, "light16"}, {klight10Color, "light10"}}},
-        {QIcon::Active, {{klight16Color, "light17"}, {klight10Color, "light11"}}},
-        {QIcon::Selected, {{klight16Color, "light15"}, {klight10Color, "light9"}}},
+    static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
+        kThemeSubstitutions = {
+            {QIcon::Normal, {.primary = "light16"}},
+            {QIcon::Active, {.primary = "light17"}},
+            {QIcon::Selected, {.primary = "light15"}},
     };
 
     int storageIndex(const QnStorageModelInfoList& list, const QnStorageModelInfo& storage)
@@ -343,17 +342,17 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
 
                 if (storage.id == m_metadataStorageId)
                 {
-                    return qnSkin->icon("text_buttons/analytics_20.svg", kIconSubstitutions)
+                    return qnSkin->icon("text_buttons/default_20x20.svg", kThemeSubstitutions)
                         .pixmap(QSize(20, 20));
                 }
 
                 if (canRemoveStorage(storage))
-                    return qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions)
+                    return qnSkin->icon("text_buttons/delete_20.svg", kThemeSubstitutions)
                         .pixmap(QSize(20, 20));
 
                 if (couldStoreAnalytics(storage))
                 {
-                    return qnSkin->icon("text_buttons/analytics_20.svg", kIconSubstitutions)
+                    return qnSkin->icon("text_buttons/default_20x20.svg", kThemeSubstitutions)
                         .pixmap(QSize(20, 20));
                 }
             }
