@@ -39,7 +39,14 @@ public:
 
     QSet<QnUuid> invalidateCache(); //< Returns all subject ids that were cached.
 
-    GlobalPermissions globalPermissions(const QnUuid& subjectId, QSet<QnUuid>& visitedIds) const;
+    GlobalPermissions globalPermissions(
+        const QnUuid& subjectId, QSet<QnUuid>& visitedSubjectIds) const;
+
+    ResourceAccessDetails accessDetails(
+        const QnUuid& subjectId,
+        const QnResourcePtr& resource,
+        nx::vms::api::AccessRight accessRight,
+        QSet<QnUuid>& visitedSubjectIds) const;
 
     mutable QHash<QnUuid, ResourceAccessData> cachedAccessData;
     mutable nx::Mutex mutex;
@@ -78,8 +85,8 @@ InheritedResourceAccessResolver::~InheritedResourceAccessResolver()
 
 GlobalPermissions InheritedResourceAccessResolver::globalPermissions(const QnUuid& subjectId) const
 {
-    QSet<QnUuid> visitedIds;
-    return d->globalPermissions(subjectId, visitedIds);
+    QSet<QnUuid> visitedSubjectIds;
+    return d->globalPermissions(subjectId, visitedSubjectIds);
 }
 
 AccessRights InheritedResourceAccessResolver::availableAccessRights(const QnUuid& subjectId) const
@@ -126,12 +133,8 @@ ResourceAccessDetails InheritedResourceAccessResolver::accessDetails(
     if (!d->subjectHierarchy || !d->baseResolver)
         return {};
 
-    auto details = d->baseResolver->accessDetails(subjectId, resource, accessRight);
-
-    for (const auto& parentId: d->subjectHierarchy->directParents(subjectId))
-        details += accessDetails(parentId, resource, accessRight);
-
-    return details;
+    QSet<QnUuid> visitedSubjectIds;
+    return d->accessDetails(subjectId, resource, accessRight, visitedSubjectIds);
 }
 
 // -----------------------------------------------------------------------------------------------
@@ -214,12 +217,12 @@ QSet<QnUuid> InheritedResourceAccessResolver::Private::invalidateCache()
 }
 
 GlobalPermissions InheritedResourceAccessResolver::Private::globalPermissions(
-    const QnUuid& subjectId, QSet<QnUuid>& visitedIds) const
+    const QnUuid& subjectId, QSet<QnUuid>& visitedSubjectIds) const
 {
-    if (visitedIds.contains(subjectId))
+    if (visitedSubjectIds.contains(subjectId))
         return {};
 
-    visitedIds.insert(subjectId);
+    visitedSubjectIds.insert(subjectId);
 
     auto result = baseResolver
         ? baseResolver->globalPermissions(subjectId)
@@ -229,9 +232,28 @@ GlobalPermissions InheritedResourceAccessResolver::Private::globalPermissions(
         return result;
 
     for (const auto& parentId: subjectHierarchy->directParents(subjectId))
-        result |= globalPermissions(parentId, visitedIds);
+        result |= globalPermissions(parentId, visitedSubjectIds);
 
     return result;
+}
+
+ResourceAccessDetails InheritedResourceAccessResolver::Private::accessDetails(
+    const QnUuid& subjectId,
+    const QnResourcePtr& resource,
+    nx::vms::api::AccessRight accessRight,
+    QSet<QnUuid>& visitedSubjectIds) const
+{
+    if (visitedSubjectIds.contains(subjectId))
+        return {};
+
+    visitedSubjectIds.insert(subjectId);
+
+    auto details = baseResolver->accessDetails(subjectId, resource, accessRight);
+
+    for (const auto& parentId: subjectHierarchy->directParents(subjectId))
+        details += accessDetails(parentId, resource, accessRight, visitedSubjectIds);
+
+    return details;
 }
 
 void InheritedResourceAccessResolver::Private::handleBaseAccessChanged(
