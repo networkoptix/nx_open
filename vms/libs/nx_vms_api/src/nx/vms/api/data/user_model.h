@@ -50,7 +50,7 @@ struct NX_VMS_API UserModelBase
     /**%apidoc The password for authorization. It's used only for `local` users. */
     std::optional<QString> password;
 
-    /**%apidoc[readonly] External identification data (currently used for LDAP only). */
+    /**%apidoc[proprietary] External identification data (currently used for LDAP only). */
     std::optional<UserExternalIdModel> externalId;
 
     /**%apidoc[readonly] */
@@ -170,8 +170,7 @@ NX_REFLECTION_INSTRUMENT(TemporaryToken, TemporaryToken_Fields)
 
 using TemporaryTokenList = std::vector<TemporaryToken>;
 
-/**%apidoc User information object
- */
+/**%apidoc User information object */
 struct NX_VMS_API UserModelV3: public UserModelBase
 {
     /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/userGroups`. */

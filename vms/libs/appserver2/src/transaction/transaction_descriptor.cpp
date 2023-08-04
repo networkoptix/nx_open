@@ -716,14 +716,10 @@ struct SaveUserAccess
                     "Change of the User with readonly attribute is forbidden for VMS."));
             }
 
-            if (!param.externalId.dn.isEmpty())
+            if (existingUser->externalId() != param.externalId)
             {
-                const auto existingExternalId = existingUser->externalId();
-                if (!existingExternalId.dn.isEmpty() && existingExternalId != param.externalId)
-                {
-                    return Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                        "Change of `externalId` is forbidden."));
-                }
+                return Result(ErrorCode::badRequest, ServerApiErrors::tr(
+                    "Change of `externalId` is forbidden."));
             }
 
             if (param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
@@ -746,6 +742,12 @@ struct SaveUserAccess
         }
         else
         {
+            if (param.type == nx::vms::api::UserType::ldap)
+            {
+                return Result(
+                    ErrorCode::forbidden, ServerApiErrors::tr("LDAP User creation is forbidden."));
+            }
+
             if (param.name.isEmpty())
             {
                 return Result(ErrorCode::badRequest, ServerApiErrors::tr(
@@ -1523,16 +1525,22 @@ struct SaveUserRoleAccess
                 cycledGroupNames.join("', '")));
         }
 
-        if (!hasSystemAccess(accessData))
+        if (hasSystemAccess(accessData))
+            return {};
+
+        if (param.type == nx::vms::api::UserType::ldap)
         {
-            if (!param.externalId.dn.isEmpty())
+            const auto group = systemContext->userGroupManager()->find(param.id);
+            if (!group)
             {
-                const auto group = systemContext->userGroupManager()->find(param.id);
-                if (group && !group->externalId.dn.isEmpty() && group->externalId != param.externalId)
-                {
-                    return Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                        "Change of `externalId` is forbidden."));
-                }
+                return Result(ErrorCode::forbidden,
+                    ServerApiErrors::tr("LDAP Group creation is forbidden."));
+            }
+
+            if (group->externalId != param.externalId)
+            {
+                return Result(ErrorCode::badRequest,
+                    ServerApiErrors::tr("Change of `externalId` is forbidden."));
             }
         }
 
