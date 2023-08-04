@@ -331,7 +331,7 @@
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>På layout</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
@@ -350,7 +350,7 @@
     <name>nx::vms::rules::ExitFullscreenAction</name>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>På layout</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -392,7 +392,7 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Utelämna loggning</translation>
     </message>
     <message>
       <source>And Source</source>
@@ -711,7 +711,7 @@
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>PTZ förinställning</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Utför till användare</translation>
     </message>
   </context>
   <context>
@@ -738,11 +738,11 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Skicka mobilavisering</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>Lägg till källenhetsnamn i Body</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -761,7 +761,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Upprepa ljud</translation>
     </message>
     <message>
       <source>At</source>
@@ -780,7 +780,7 @@
     </message>
     <message>
       <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
+      <translation>Skicka epost</translation>
     </message>
     <message>
       <source>To</source>
@@ -877,11 +877,11 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Spola tillbaka</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Tvinga öppning av larmlayout</translation>
     </message>
   </context>
   <context>
@@ -912,11 +912,11 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Inträffar den</translation>
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>Med</translation>
     </message>
   </context>
   <context>
@@ -935,11 +935,11 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>På Enhet</translation>
     </message>
     <message>
       <source>To users</source>
-      <translation type="unfinished">To users</translation>
+      <translation>Till användare</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1001,7 +1001,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>Visa textöverlägg</translation>
     </message>
     <message>
       <source>At</source>
@@ -1009,11 +1009,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Fast varaktighet</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>Anpassad text</translation>
     </message>
     <message>
       <source>Show to</source>
@@ -1047,7 +1047,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>Skriv till logg</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1094,7 +1094,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Okänd åtgärd</translation>
     </message>
   </context>
 </TS>

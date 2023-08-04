@@ -25,7 +25,7 @@
   <String Id="InstallAcceptCheckbox">同意します</String>
   <String Id="InstallLicenseLinkText">エンドユーザーライセンス契約</String>
   <String Id="OptionsHeader">セットアップオプション</String>
-  <String Id="OptionsLocationLabel">インストール場所:</String>
+  <String Id="OptionsLocationLabel">インストール先:</String>
   <String Id="OptionsBrowseButton">参照</String>
   <String Id="OptionsOkButton">OK</String>
   <String Id="OptionsCancelButton">キャンセル</String>
@@ -60,8 +60,8 @@
   <String Id="Options">オプション</String>
   <String Id="SelectApps">インストールするアプリケーションを選択:</String>
   <String Id="msierrFirewallCannotConnect">Windowsファイアウォールに接続できません。 ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Windowsファイアウォールの設定</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Windowsファイアウォールの設定</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Windowsファイアウォールを構成中</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Windowsファイアウォールを構成中</String>
   <String Id="WixRollbackFirewallExceptionsInstall">Windowsファイアウォールの設定のロールバック</String>
   <String Id="WixExecFirewallExceptionsInstall">Windowsファイアウォール設定のインストール</String>
   <String Id="WixRollbackFirewallExceptionsUninstall">Windowsファイアウォールの設定のロールバック</String>

@@ -48,19 +48,19 @@
     </message>
     <message>
       <source>Group Attribute</source>
-      <translation type="unfinished">Group Attribute</translation>
+      <translation>グループ属性</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
-      <translation type="unfinished">Synchronization&lt;br&gt;Interval</translation>
+      <translation>同期&lt;br&gt;間隔</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>検索タイムアウト</translation>
     </message>
     <message>
       <source>Proxy LDAP requests&lt;br&gt;via server</source>
-      <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
+      <translation>サーバー経由で LDAP リクエストをプロキシする</translation>
     </message>
   </context>
   <context>
@@ -477,11 +477,11 @@
     </message>
     <message>
       <source>Login DN cannot be empty.</source>
-      <translation type="unfinished">Login DN cannot be empty.</translation>
+      <translation>ログインDN は空にできません。</translation>
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>StartTLS を使用する</translation>
     </message>
   </context>
   <context>
@@ -925,7 +925,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>デバイスからインポート</translation>
     </message>
   </context>
   <context>
@@ -1255,7 +1255,7 @@
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>任意の %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1270,7 +1270,7 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>任意</translation>
     </message>
   </context>
   <context>
@@ -1471,7 +1471,7 @@
     </message>
     <message>
       <source>Automatically add dependent access rights</source>
-      <translation type="unfinished">Automatically add dependent access rights</translation>
+      <translation>依存するアクセス権を自動的に追加する</translation>
     </message>
   </context>
   <context>
@@ -1685,7 +1685,7 @@ PTZを行います</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>権限により利用可能</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -1697,7 +1697,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Web ページ &amp; インテグレーション</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1937,7 +1937,7 @@ PTZを行います</translation>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
       <translation>
-        <numerusform>全ての %n カメラに設定</numerusform>
+        <numerusform>全 %n カメラに設定</numerusform>
       </translation>
     </message>
     <message>
@@ -2268,15 +2268,15 @@ PTZを行います</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Vms Rules</source>
-      <translation type="unfinished">Vms Rules</translation>
+      <translation>VMS ルール</translation>
     </message>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>ルールを追加</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>複製</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2284,7 +2284,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>エントリーがありません</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2292,7 +2292,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>デフォルトにリセット...</translation>
     </message>
   </context>
   <context>
