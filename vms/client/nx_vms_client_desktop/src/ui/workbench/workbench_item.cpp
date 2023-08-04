@@ -434,6 +434,8 @@ QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
             return static_cast<int>(flags());
         case Qn::ItemRotationRole:
             return rotation();
+        case Qn::ItemDisplayHotspotsRole:
+            return displayHotspots();
         default:
             break;
     }
@@ -512,6 +514,12 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
                 currentLayout->setItemData(m_uuid, role, flip);
                 emit dataChanged(Qn::ItemFlipRole);
             }
+            break;
+        }
+        case Qn::ItemDisplayHotspotsRole:
+        {
+            if (NX_ASSERT(!value.isNull()))
+                setDisplayHotspots(value.toBool());
             break;
         }
         default:

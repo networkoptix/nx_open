@@ -6,6 +6,7 @@
 #include <functional>
 
 #include <QtCore/QByteArray>
+#include <QtCore/QHash>
 #include <QtGui/QStaticText>
 
 #include <api/server_rest_connection_fwd.h>
@@ -351,7 +352,7 @@ protected:
 
     void setAnalyticsModeEnabled(bool enabled, bool animate);
 
-    virtual void at_itemDataChanged(int role) override;
+    virtual void atItemDataChanged(Qn::ItemDataRole role) override;
 
     QnClientCameraResourcePtr camera() const;
 
@@ -362,7 +363,6 @@ private slots:
     void at_imageEnhancementButton_toggled(bool checked);
     void at_ioModuleButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
-    void atHotspotsButtonToggled(bool checked);
     void processSettingsRequest();
     void processDiagnosticsRequest();
     void processEnableLicenseRequest();
@@ -399,16 +399,17 @@ private:
 
     qreal calculateVideoAspectRatio() const;
 
-    Q_SLOT void updateDisplay();
-    Q_SLOT void updateAspectRatio();
-    Q_SLOT void updateIconButton();
-    Q_SLOT void updateRendererEnabled();
-    Q_SLOT void updateFisheye();
-    Q_SLOT void updateDewarpingParams();
-    Q_SLOT void updateCustomAspectRatio();
-    Q_SLOT void updateIoModuleVisibility(bool animate);
-    Q_SLOT void updateAnalyticsVisibility(bool animate = false);
-    Q_SLOT void handleSyncStateChanged(bool enabled);
+    void updateDisplay();
+    void updateAspectRatio();
+    void updateIconButton();
+    void updateRendererEnabled();
+    void updateFisheye();
+    void updateDewarpingParams();
+    void updateCustomAspectRatio();
+    void updateIoModuleVisibility(bool animate);
+    void updateAnalyticsVisibility(bool animate = false);
+    void handleSyncStateChanged(bool enabled);
+    void updateHotspotsState();
 
     void updateCompositeOverlayMode();
 
@@ -515,7 +516,8 @@ private:
     PtzEnabledBy m_ptzActivationReason = PtzEnabledBy::nothing;
 
     nx::vms::api::dewarping::MediaData m_dewarpingParams;
-    nx::vms::api::dewarping::ViewData m_itemDewarpingStoredParams;
+
+    QHash<Qn::ItemDataRole, QVariant> m_savedItemDataState;
 
     QnIoModuleOverlayWidget* m_ioModuleOverlayWidget = nullptr;
     bool m_ioCouldBeShown = false;

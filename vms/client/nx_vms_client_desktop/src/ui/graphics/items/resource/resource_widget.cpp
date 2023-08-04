@@ -201,9 +201,9 @@ QnResourceWidget::QnResourceWidget(
             if (id != itemId)
                 return;
 
-            at_itemDataChanged(role);
+            atItemDataChanged(role);
         });
-    connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
+    connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::atItemDataChanged);
 
     /* Videowall license changes helper */
 
@@ -1391,7 +1391,7 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags)
     updateButtonsVisibility();
 }
 
-void QnResourceWidget::at_itemDataChanged(int role)
+void QnResourceWidget::atItemDataChanged(Qn::ItemDataRole role)
 {
     if (role != Qn::ItemCheckedButtonsRole)
         return;
