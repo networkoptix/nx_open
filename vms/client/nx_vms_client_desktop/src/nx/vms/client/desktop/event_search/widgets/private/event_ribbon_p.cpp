@@ -960,6 +960,10 @@ void EventRibbon::Private::clear()
     m_tiles.clear();
     m_visible = {};
     m_hoveredIndex = QPersistentModelIndex();
+
+    if (m_tileHovered)
+        emit q->hovered({}, nullptr);
+
     m_tileHovered = false;
     m_endPosition = 0;
 
