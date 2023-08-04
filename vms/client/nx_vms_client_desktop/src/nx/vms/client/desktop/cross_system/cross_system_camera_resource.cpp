@@ -43,6 +43,7 @@ CrossSystemCameraResource::CrossSystemCameraResource(
     setPhysicalId(source.physicalId);
     setMAC(nx::utils::MacAddress(source.mac));
     setScheduleEnabled(source.scheduleEnabled);
+    setUserAttributes(source);
 
     m_name = source.name; //< Set resource name, but not camera name.
     m_url = source.url;
@@ -133,6 +134,7 @@ void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
         notifier();
 
     setScheduleEnabled(d->source->scheduleEnabled);
+    setUserAttributesAndNotify(*d->source);
 }
 
 QString CrossSystemCameraResource::systemId() const
