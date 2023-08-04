@@ -84,7 +84,7 @@
     </message>
     <message>
       <source>Installation completed</source>
-      <translation>インストール終了</translation>
+      <translation>インストール完了</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
@@ -127,7 +127,7 @@
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation>ビデオウォールコントロール</translation>
+      <translation>ビデオウォールの制御</translation>
     </message>
     <message>
       <source>Push my screen</source>
@@ -634,7 +634,7 @@
     </message>
     <message>
       <source>Close All But This</source>
-      <translation>全てを閉じる</translation>
+      <translation>これ以外をすべて閉じる</translation>
     </message>
     <message>
       <source>Play</source>
@@ -1048,15 +1048,15 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>新しいようこそ画面</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>プロキシされたリソースを表示</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>デバイスからインポート...</translation>
     </message>
   </context>
   <context>
@@ -1110,15 +1110,15 @@
     </message>
     <message>
       <source>Event Occurs</source>
-      <translation type="unfinished">Event Occurs</translation>
+      <translation>イベント発生時</translation>
     </message>
     <message>
       <source>Event Starts</source>
-      <translation type="unfinished">Event Starts</translation>
+      <translation>イベント開始時</translation>
     </message>
     <message>
       <source>Event Stops</source>
-      <translation type="unfinished">Event Stops</translation>
+      <translation>イベント停止時</translation>
     </message>
   </context>
   <context>
@@ -1628,7 +1628,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>安全でない</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
@@ -1971,7 +1971,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべて選択</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -2499,7 +2499,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>イベント ルールなし</translation>
+      <translation>イベントルールがありません</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -2699,7 +2699,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべて選択</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -3186,7 +3186,7 @@ to %1</source>
     </message>
     <message>
       <source>All Files</source>
-      <translation>全てのファイル</translation>
+      <translation>すべてのファイル</translation>
     </message>
   </context>
   <context>
@@ -3287,7 +3287,7 @@ to %1</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべて選択</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3356,7 +3356,7 @@ to %1</source>
     </message>
     <message>
       <source>All users</source>
-      <translation>全ユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
@@ -3947,7 +3947,7 @@ to %1</source>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
       <translation>
-        <numerusform>全ての %n カメラに設定</numerusform>
+        <numerusform>全 %n カメラに設定</numerusform>
       </translation>
     </message>
     <message>
@@ -4494,11 +4494,11 @@ to %1</source>
     </message>
     <message>
       <source>All Devices</source>
-      <translation>全デバイス</translation>
+      <translation>すべてのデバイス</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation>全カメラ</translation>
+      <translation>すべてのカメラ</translation>
     </message>
     <message>
       <source>Select devices...</source>
@@ -4559,7 +4559,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>全てのユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -4888,7 +4888,7 @@ to %1</source>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべて選択</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -5452,7 +5452,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email is not valid</source>
-      <translation type="unfinished">Email is not valid</translation>
+      <translation>メールアドレスが無効です</translation>
     </message>
   </context>
   <context>
@@ -5521,7 +5521,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>このインテグレーションを開きますか?</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -5537,18 +5537,17 @@ We recommend you not to open this web page. If you understand the risks, you can
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+      <translation>%1
+を開こうとしましたが、このインテグレーションは信頼できない証明書認証を提示しました。
+このインテグレーションを開かないことをお勧めします。リスクを理解していれば、インテグレーションを開いても構いません。</translation>
     </message>
     <message>
       <source>Integration settings...</source>
-      <translation type="unfinished">Integration settings...</translation>
+      <translation>インテグレーション設定...</translation>
     </message>
     <message>
       <source>Web Page settings...</source>
-      <translation type="unfinished">Web Page settings...</translation>
+      <translation>Web ページ設定...</translation>
     </message>
   </context>
   <context>
@@ -5778,7 +5777,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Enter the name of Video Wall to create:</source>
-      <translation>登録するビデオウォールの名前入力:</translation>
+      <translation>作成するビデオウォールの名前を入力してください:</translation>
     </message>
     <message>
       <source>Activate License...</source>
@@ -6372,7 +6371,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>UserPickerHelper</name>
     <message>
       <source>All Users</source>
-      <translation>全てのユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -6436,15 +6435,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>VmsRulesDialogHelper</name>
     <message>
       <source>Delete Rule?</source>
-      <translation>ルールを削除?</translation>
+      <translation>ルールを削除しますか?</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
-      <translation type="unfinished">This action cannot be undone</translation>
+      <translation>この操作は元に戻せません</translation>
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
-      <translation type="unfinished">Reset all rules to defaults?</translation>
+      <translation>すべてのルールをデフォルトにリセットしますか?</translation>
     </message>
   </context>
   <context>
@@ -6595,11 +6594,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>ライブを表示</translation>
     </message>
     <message>
       <source>Can edit device settings and video wall layouts</source>
-      <translation type="unfinished">Can edit device settings and video wall layouts</translation>
+      <translation>デバイス設定とビデオウォールのレイアウトを編集できます</translation>
     </message>
   </context>
   <context>
@@ -7076,7 +7075,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+      <translation>システム追加後のカメラまたはサーバーのオフライン期間のみが自動的にインポートされます。</translation>
     </message>
   </context>
   <context>
@@ -7739,7 +7738,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation>サーバーに接続できませんでした　ビデオウォールが閉じられます</translation>
+      <translation>サーバーに接続できませんでした。ビデオウォールを閉じます。</translation>
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
@@ -7931,7 +7930,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>View live</source>
-      <translation type="unfinished">View live</translation>
+      <translation>ライブを表示</translation>
     </message>
   </context>
   <context>
@@ -8127,7 +8126,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべて選択</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -8745,7 +8744,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation>すべての LDAP ユーザーとグループがシステムから削除されます。&lt;br&gt;&lt;br&gt;LDAP設定も削除されます。</translation>
+      <translation>すべての LDAP ユーザーとグループがシステムから削除されます。&lt;br&gt;&lt;br&gt;LDAP 設定も削除されます。</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -8962,15 +8961,15 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Default Logging level</source>
-      <translation type="unfinished">Default Logging level</translation>
+      <translation>デフォルトのログレベル</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
+      <translation>デフォルトではないログレベルです。「情報」に設定することをお勧めします</translation>
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
-      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+      <translation>ログレベルによりシステムのパフォーマンスが低下します</translation>
     </message>
   </context>
   <context>
@@ -9356,7 +9355,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation>更新をキャンセルしてダウンロードしたデータをすべて削除しますか？</translation>
+      <translation>更新をキャンセルし、ダウンロードしたすべてのデータを削除しますか？</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
@@ -9460,7 +9459,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>ダウンロードとインストール</translation>
+      <translation>ダウンロードしてインストール</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
@@ -9897,23 +9896,23 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+      <translation>インテグレーションはデスクトップクライアントと対話し、ユーザーセッションへのアクセスを要求する場合があります</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation type="unfinished">Proxy this integration through the server</translation>
+      <translation>サーバー経由でこのインテグレーションをプロキシする</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
-      <translation type="unfinished">Proxy this web page through the server</translation>
+      <translation>サーバー経由でこの Web ページをプロキシする</translation>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+      <translation>SSL証明書を確認せずにこのインテグレーションを開くことを許可する</translation>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+      <translation>SSL証明書を確認せずにこのWebページを開くことを許可する</translation>
     </message>
     <message>
       <source>New Web Page</source>
@@ -9925,7 +9924,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>プロキシされた新規 Web ページ</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -9933,19 +9932,19 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>新規インテグレーション</translation>
     </message>
     <message>
       <source>Edit Integration</source>
-      <translation type="unfinished">Edit Integration</translation>
+      <translation>インテグレーションを編集</translation>
     </message>
     <message>
       <source>New Proxied Integration</source>
-      <translation type="unfinished">New Proxied Integration</translation>
+      <translation>プロキシされた新規インテグレーション</translation>
     </message>
     <message>
       <source>Edit Proxied Integration</source>
-      <translation type="unfinished">Edit Proxied Integration</translation>
+      <translation>プロキシされたインテグレーションを編集</translation>
     </message>
   </context>
   <context>
@@ -10119,7 +10118,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Web ページ &amp; インテグレーション</translation>
     </message>
     <message>
       <source>Health Monitors</source>
@@ -10131,16 +10130,16 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>User&apos;s custom permissions</source>
-      <translation type="unfinished">User&apos;s custom permissions</translation>
+      <translation>ユーザーのカスタム権限</translation>
     </message>
     <message>
       <source>Group&apos;s custom permissions</source>
-      <translation type="unfinished">Group&apos;s custom permissions</translation>
+      <translation>グループのカスタム権限</translation>
     </message>
     <message>
       <source>Access granted by %1</source>
       <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
-      <translation type="unfinished">Access granted by %1</translation>
+      <translation>%1 によるアクセス許可</translation>
     </message>
   </context>
   <context>
@@ -10545,7 +10544,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>証明書の一部ではありません</translation>
     </message>
   </context>
   <context>
@@ -11165,7 +11164,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>All Users</source>
-      <translation>全てのユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message>
       <source>Users with Digest Authentication</source>
@@ -11374,7 +11373,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
     <message>
       <source>Empty schedule is not allowed</source>
-      <translation type="unfinished">Empty schedule is not allowed</translation>
+      <translation>空のスケジュールは許可されません</translation>
     </message>
   </context>
   <context>
@@ -11614,7 +11613,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Web ページ &amp; インテグレーション</translation>
     </message>
   </context>
   <context>
@@ -11636,11 +11635,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>All imported</source>
-      <translation type="unfinished">All imported</translation>
+      <translation>すべてインポート済み</translation>
     </message>
     <message>
       <source>In progress... (%1 left)</source>
-      <translation type="unfinished">In progress... (%1 left)</translation>
+      <translation>進行中... (残り %1)</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -11652,7 +11651,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Failed to import. Retry in 1 minute.</source>
-      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+      <translation>インポートに失敗しました。1分以内に再試行してください。</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11660,7 +11659,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Imported up to</source>
-      <translation type="unfinished">Imported up to</translation>
+      <translation>インポート済み:</translation>
     </message>
     <message>
       <source>Status</source>
@@ -11818,19 +11817,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>WHEN</source>
-      <translation type="unfinished">WHEN</translation>
+      <translation>トリガー</translation>
     </message>
     <message>
       <source>EVENT</source>
-      <translation type="unfinished">EVENT</translation>
+      <translation>イベント</translation>
     </message>
     <message>
       <source>DO</source>
-      <translation type="unfinished">DO</translation>
+      <translation>動作</translation>
     </message>
     <message>
       <source>ACTION</source>
-      <translation type="unfinished">ACTION</translation>
+      <translation>アクション</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -11852,15 +11851,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>属性あり</translation>
     </message>
     <message>
       <source>Listed</source>
-      <translation type="unfinished">Listed</translation>
+      <translation>リストに存在</translation>
     </message>
     <message>
       <source>Not listed</source>
-      <translation type="unfinished">Not listed</translation>
+      <translation>リストに存在しない</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -11875,7 +11874,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
     <message>
       <source>Once in</source>
-      <translation type="unfinished">Once in</translation>
+      <translation>実行間隔</translation>
     </message>
     <message>
       <source>For</source>
@@ -11913,19 +11912,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Comment</source>
-      <translation type="unfinished">Comment</translation>
+      <translation>コメント</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation>全デバイス</translation>
+      <translation>すべてのデバイス</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation>全カメラ</translation>
+      <translation>すべてのカメラ</translation>
     </message>
     <message>
       <source>No source</source>
-      <translation type="unfinished">No source</translation>
+      <translation>ソースがありません</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -11949,7 +11948,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>No target</source>
-      <translation type="unfinished">No target</translation>
+      <translation>対象がありません</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -11959,7 +11958,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>All Users</source>
-      <translation>全てのユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message>
       <source>Group</source>
@@ -11983,7 +11982,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>All Server</source>
-      <translation type="unfinished">All Server</translation>
+      <translation>すべてのサーバー</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
@@ -12027,19 +12026,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>キーワードを含む</translation>
     </message>
     <message>
       <source>Does not contain keywords</source>
-      <translation type="unfinished">Does not contain keywords</translation>
+      <translation>キーワードを含まない</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>リスト項目を含む</translation>
     </message>
     <message>
       <source>Does not contain list entries</source>
-      <translation type="unfinished">Does not contain list entries</translation>
+      <translation>リスト項目を含まない</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -12054,22 +12053,22 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation type="unfinished">Lookup lists network request failed</translation>
+      <translation>検索リストのネットワークリクエストが失敗しました</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: </source>
-      <translation type="unfinished">Delete rule error: </translation>
+      <translation>ルール削除時エラー: </translation>
     </message>
     <message>
       <source>Save rule error: </source>
-      <translation type="unfinished">Save rule error: </translation>
+      <translation>ルール保存時エラー: </translation>
     </message>
     <message>
       <source>Reset to defaults error: </source>
-      <translation type="unfinished">Reset to defaults error: </translation>
+      <translation>デフォルトへのリセット時のエラー: </translation>
     </message>
   </context>
   <context>
@@ -12144,7 +12143,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation>全てのユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message>
       <source>Users</source>
@@ -12348,7 +12347,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>All Supported</source>
-      <translation>すべてサポート</translation>
+      <translation>サポートされているすべて</translation>
     </message>
     <message>
       <source>Too short period selected</source>
@@ -12505,7 +12504,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>十分なアクセス権がありません</translation>
     </message>
   </context>
   <context>

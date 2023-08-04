@@ -40,19 +40,19 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>デバイス</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>種類</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>キャプション</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>内容</translation>
     </message>
   </context>
   <context>
@@ -72,15 +72,15 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>デバイス</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>種類</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>オブジェクト</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>ブックマークを作成</translation>
     </message>
     <message>
       <source>At</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>固定期間</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>タグを追加</translation>
     </message>
   </context>
   <context>
@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>アクションスロットリング</translation>
     </message>
   </context>
   <context>
@@ -163,15 +163,15 @@
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>デバイスのI/O入力</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>デバイス</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -273,7 +273,7 @@
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>デバイスI/O出力</translation>
     </message>
     <message>
       <source>At</source>
@@ -281,7 +281,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>固定期間</translation>
     </message>
   </context>
   <context>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>カメラ録画</translation>
     </message>
     <message>
       <source>On</source>
@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>固定期間</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -331,15 +331,15 @@
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation>フルスクリーンに設定</translation>
+      <translation>フルスクリーン表示</translation>
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>対象</translation>
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>巻き戻し</translation>
     </message>
   </context>
   <context>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>ファン故障</translation>
     </message>
     <message>
       <source>At</source>
@@ -392,15 +392,15 @@
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>ソース</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>キャプション</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>内容</translation>
     </message>
   </context>
   <context>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>HTTP(S) リクエスト</translation>
     </message>
     <message>
       <source>URL</source>
@@ -431,7 +431,7 @@
     </message>
     <message>
       <source>Method</source>
-      <translation>方法</translation>
+      <translation>メソッド</translation>
     </message>
     <message>
       <source>Authentication Type</source>
@@ -481,7 +481,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>デバイス</translation>
     </message>
   </context>
   <context>
@@ -579,7 +579,7 @@
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>デスクトップ通知を表示</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -598,7 +598,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>巻き戻し</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -613,7 +613,7 @@
     </message>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>パニック録画</translation>
     </message>
   </context>
   <context>
@@ -624,7 +624,7 @@
     </message>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>サウンド再生</translation>
     </message>
     <message>
       <source>At</source>
@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -647,23 +647,23 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>デバイス</translation>
     </message>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>プラグイン</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>キャプション</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>内容</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>レベル</translation>
     </message>
   </context>
   <context>
@@ -706,7 +706,7 @@
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>PTZ プリセット</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -714,7 +714,7 @@
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>実行対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -733,11 +733,11 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>モバイル通知を送信</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>本文にソースデバイス名を追加</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -756,7 +756,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>サウンド繰返し</translation>
     </message>
     <message>
       <source>At</source>
@@ -783,7 +783,7 @@
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation type="unfinished">Additional Recipients</translation>
+      <translation>追加の受信者</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -872,11 +872,11 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>巻き戻し</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>強制的にアラームレイアウトを開く</translation>
     </message>
   </context>
   <context>
@@ -907,7 +907,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>デバイス</translation>
     </message>
     <message>
       <source>By</source>
@@ -930,11 +930,11 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>デバイス</translation>
     </message>
     <message>
       <source>To users</source>
-      <translation type="unfinished">To users</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -996,7 +996,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>テキストオーバーレイを表示</translation>
     </message>
     <message>
       <source>At</source>
@@ -1004,11 +1004,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>固定期間</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>カスタムテキスト</translation>
     </message>
     <message>
       <source>Show to</source>
@@ -1042,7 +1042,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>ログ書込み</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1072,7 +1072,7 @@
     </message>
     <message>
       <source>All users</source>
-      <translation>全ユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
@@ -1086,7 +1086,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>不明なアクション</translation>
     </message>
   </context>
 </TS>
