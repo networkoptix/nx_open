@@ -19,6 +19,7 @@
 #include <managers/videowall_notification_manager.h>
 #include <managers/vms_rules_notification_manager.h>
 #include <managers/webpage_notification_manager.h>
+#include <nx/utils/scope_guard.h>
 #include <transaction/transaction_descriptor.h>
 
 namespace ec2 {
@@ -75,11 +76,19 @@ public:
 
         auto tdBase = getTransactionDescriptorByValue(tran.command);
         auto td = dynamic_cast<detail::TransactionDescriptor<T>*>(tdBase);
-        NX_ASSERT(td, "Downcast to TransactionDescriptor<TransactionParams>* failed");
-        if (td == nullptr)
-            return;
-        td->triggerNotificationFunc(tran, notificationParams);
+        if (NX_ASSERT(td,
+            "Downcast to TransactionDescriptor<TransactionParams>* failed for %1", tran.command))
+        {
+            td->triggerNotificationFunc(tran, notificationParams);
+            callbackMonitors(tran);
+        }
     }
+
+    using MonitorCallback = nx::utils::MoveOnlyFunc<void(const QnAbstractTransaction&)>;
+    nx::utils::Guard addMonitor(MonitorCallback callback, std::vector<ApiCommand::Value> commands);
+
+private:
+    void callbackMonitors(const QnAbstractTransaction& transaction);
 
 private:
     AbstractECConnection* m_ecConnection;
@@ -100,6 +109,11 @@ private:
     QnDiscoveryNotificationManager* m_discoveryManager;
     AnalyticsNotificationManager* m_analyticsManager;
     LookupListNotificationManager* m_lookupListManager;
+
+    nx::Mutex m_mutex;
+    std::unordered_map<ApiCommand::Value, std::set<MonitorCallback*>> m_monitoredCommands;
+    std::unordered_map<std::shared_ptr<MonitorCallback>, std::vector<ApiCommand::Value>>
+        m_monitors;
 };
 
 } // namespace ec2

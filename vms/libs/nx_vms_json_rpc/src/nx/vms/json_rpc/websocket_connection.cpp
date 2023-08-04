@@ -59,7 +59,7 @@ WebSocketConnection::WebSocketConnection(
                     std::move(request),
                     [this, handler = std::move(responseHandler)](auto response) mutable
                     {
-                        post(
+                        dispatch(
                             [response = std::move(response), handler = std::move(handler)]() mutable
                             {
                                 handler(std::move(response));
@@ -76,6 +76,10 @@ WebSocketConnection::WebSocketConnection(
         std::make_unique<OutgoingProcessor>([this](auto value) { send(std::move(value)); });
     base_type::bindToAioThread(m_socket->getAioThread());
     m_socket->start();
+}
+
+void WebSocketConnection::start()
+{
     readNextMessage();
 }
 
@@ -103,7 +107,7 @@ void WebSocketConnection::stopWhileInAioThread()
 void WebSocketConnection::send(
     nx::vms::api::JsonRpcRequest jsonRpcRequest, ResponseHandler handler)
 {
-    executeInAioThreadSync(
+    dispatch(
         [this, jsonRpcRequest = std::move(jsonRpcRequest), handler = std::move(handler)]() mutable
         {
             m_outgoingProcessor->processRequest(std::move(jsonRpcRequest), std::move(handler));
@@ -113,7 +117,7 @@ void WebSocketConnection::send(
 void WebSocketConnection::send(
     std::vector<nx::vms::api::JsonRpcRequest> jsonRpcRequests, BatchResponseHandler handler)
 {
-    executeInAioThreadSync(
+    dispatch(
         [this, jsonRpcRequests = std::move(jsonRpcRequests), handler = std::move(handler)]() mutable
         {
             m_outgoingProcessor->processBatchRequest(std::move(jsonRpcRequests), std::move(handler));
@@ -159,9 +163,8 @@ void WebSocketConnection::readHandler(const nx::Buffer& buffer)
     {
         NX_DEBUG(this, "Error %1 processing received message", QJson::serialized(e));
         QJsonValue serialized;
-        nx::vms::api::JsonRpcResponse jsonRpcResponse;
-        jsonRpcResponse.error = std::move(e);
-        QJson::serialize(jsonRpcResponse, &serialized);
+        QJson::serialize(
+            api::JsonRpcResponse::makeError(std::nullptr_t(), std::move(e)), &serialized);
         send(std::move(serialized));
     }
 }
@@ -200,6 +203,19 @@ void WebSocketConnection::send(QJsonValue data)
                 m_onDone(this);
             }
         });
+}
+
+void WebSocketConnection::addGuard(const QString& id, nx::utils::Guard guard)
+{
+    if (!NX_ASSERT(guard))
+        return;
+
+    dispatch([this, id, g = std::move(guard)]() mutable { m_guards[id] = std::move(g); });
+}
+
+void WebSocketConnection::removeGuard(const QString& id)
+{
+    dispatch([this, id]() mutable { m_guards.erase(id); });
 }
 
 } // namespace nx::vms::json_rpc

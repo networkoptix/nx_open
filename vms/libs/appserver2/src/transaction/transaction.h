@@ -84,6 +84,7 @@ struct NotDefinedApiData
  *     ShowreelData, //< Passed data structure.
  *     true, //< The transaction is persistent.
  *     false, //< The transaction is not system (handled in a common way).
+ *     false, //< The transaction does not remove anything.
  *     CreateHashByIdHelper(), //< The id is enough to generate a hash.
  *     ShowreelNotificationManagerHelper(), //< Notify other users that the Showreel was changed.
  *     ShowreelAccess(), //< Check the access to save.
@@ -1233,7 +1234,7 @@ APPLY(1403, removeDiscoveryInformation, nx::vms::api::DiscoveryData, \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
 APPLY(1404, getDiscoveryData, nx::vms::api::DiscoveryDataList, \
-    true, /*< isPersistent */ \
+    false, /*< isPersistent */ \
     false, /*< isSystem */ \
     false, /*< isRemoveOperation */ \
     InvalidGetHashHelper(), \
@@ -1429,7 +1430,9 @@ APPLY(9010, dumpDatabaseToFile, nx::vms::api::DatabaseDumpToFileData, \
     InvalidFilterFunc(), /*< filter read func */ \
     PowerUserAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-APPLY(9011, runtimeInfoRemoved, nx::vms::api::IdData, false, true, \
+APPLY(9011, runtimeInfoRemoved, nx::vms::api::IdData, \
+    false, /*< isPersistent */ \
+    true, /*< isSystem */ \
     true, /*< isRemoveOperation */ \
     InvalidGetHashHelper(), \
     [](const QnTransaction<nx::vms::api::IdData>& tran, \
@@ -1471,7 +1474,7 @@ APPLY(10100, saveMiscParam, nx::vms::api::MiscData, \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     LocalTransactionType()) /*< local transaction type */ \
 APPLY(10101, getMiscParam, nx::vms::api::MiscData, \
-    true, /*< isPersistent */ \
+    false, /*< isPersistent */ \
     false, /*< isSystem */ \
     false, /*< isRemoveOperation */ \
     InvalidGetHashHelper(), \
@@ -1494,7 +1497,7 @@ APPLY(10200, saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecor
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) \
 APPLY(10201, getSystemMergeHistory, nx::vms::api::SystemMergeHistoryRecordList, \
-    true, /*< isPersistent */ \
+    false, /*< isPersistent */ \
     false, /*< isSystem */ \
     false, /*< isRemoveOperation */ \
     InvalidGetHashHelper(), /*< getHash */ \
