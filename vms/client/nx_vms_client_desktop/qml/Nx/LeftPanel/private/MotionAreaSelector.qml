@@ -19,7 +19,7 @@ Item
         id: motionAreaButton
 
         text: qsTr("In selected area")
-        icon.source: "image://svg/skin/text_buttons/frame_20.svg"
+        icon.source: "image://svg/skin/text_buttons/frame_20x20.svg"
         selectable: false
         accented: true
         visible: state !== SelectableTextButton.Deactivated
