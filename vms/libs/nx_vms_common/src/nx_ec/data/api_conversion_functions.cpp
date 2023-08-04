@@ -553,10 +553,9 @@ void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst)
     dst->setAttributes(src.attributes);
     dst->setExternalId(src.externalId);
 
-    NX_ASSERT(src.type != nx::vms::api::UserType::ldap || src.hash.isEmpty());
     dst->setPasswordHashes({
         QString::fromStdString(nx::network::AppInfo::realm()),
-        src.type != nx::vms::api::UserType::ldap ? src.hash : QnLatin1Array(),
+        src.hash,
         src.digest,
         src.cryptSha512Hash});
 
@@ -583,11 +582,10 @@ void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
     dst.resourceAccessRights = src->m_resourceAccessRights;
     dst.cryptSha512Hash = src->m_cryptSha512Hash;
     dst.digest = src->m_digest;
+    dst.hash = src->m_hash.toString();
 
     if (dst.fullName.isNull())
         dst.fullName = src->m_fullName;
-    if (src->m_userType != nx::vms::api::UserType::ldap)
-        dst.hash = src->m_hash.toString();
 }
 
 void fromApiToResource(const VideowallItemData& src, QnVideoWallItem& dst)

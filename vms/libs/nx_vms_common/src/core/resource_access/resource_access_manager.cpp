@@ -1058,7 +1058,7 @@ bool QnResourceAccessManager::canModifyUser(
     if (target->getName() != update.name)
         requiredPermissions |= Qn::WriteNamePermission;
 
-    if (!userResource->isLdap() && !userResource->getHash().compareToPasswordHash(update.hash))
+    if (!userResource->getHash().compareToPasswordHash(update.hash))
         requiredPermissions |= Qn::WritePasswordPermission;
 
     if (permissionsChanged)
