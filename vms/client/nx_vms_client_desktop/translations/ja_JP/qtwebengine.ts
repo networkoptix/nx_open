@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>Select all</source>
-      <translation>全て選択</translation>
+      <translation>すべて選択</translation>
     </message>
     <message>
       <source>Paste and match style</source>
