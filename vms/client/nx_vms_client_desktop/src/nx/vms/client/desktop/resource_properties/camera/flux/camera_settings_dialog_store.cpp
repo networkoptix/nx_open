@@ -192,6 +192,12 @@ void CameraSettingsDialogStore::setHasPowerUserPermissions(bool value)
         [&](State state) { return Reducer::setHasPowerUserPermissions(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setHasEventLogPermission(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setHasEventLogPermission(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setHasEditAccessRightsForAllCameras(bool value)
 {
     d->executeAction(

@@ -27,6 +27,10 @@ CameraSettingsGlobalPermissionsWatcher::CameraSettingsGlobalPermissionsWatcher(
         {
             store->setHasPowerUserPermissions(
                 systemContext()->accessController()->hasPowerUserPermissions());
+
+            store->setHasEventLogPermission(
+                systemContext()->accessController()->hasGlobalPermissions(
+                    GlobalPermission::viewLogs));
         });
 
     connect(systemContext()->accessController(),

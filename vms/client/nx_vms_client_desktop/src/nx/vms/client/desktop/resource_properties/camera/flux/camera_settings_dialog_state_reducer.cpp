@@ -979,6 +979,16 @@ State CameraSettingsDialogStateReducer::setHasPowerUserPermissions(
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setHasEventLogPermission(
+    State state,
+    bool value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    state.hasEventLogPermission = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setHasEditAccessRightsForAllCameras(
     State state,
     bool value)

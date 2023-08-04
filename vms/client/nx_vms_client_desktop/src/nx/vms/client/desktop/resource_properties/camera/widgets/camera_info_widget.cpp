@@ -121,8 +121,9 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
 
     ui->stackedWidget->setVisible(singleNonVirtualCamera);
     ui->toggleInfoButton->setVisible(singleNonVirtualCamera);
-    ui->cameraRulesButton->setVisible(singleNonVirtualCamera);
-    ui->eventLogButton->setVisible(singleNonVirtualCamera);
+    ui->cameraRulesButton->setVisible(singleNonVirtualCamera && state.hasPowerUserPermissions);
+    ui->eventLogButton->setVisible(singleNonVirtualCamera && state.hasEventLogPermission);
+
     ui->controlsStackedWidget->setHidden(state.isSingleVirtualCamera());
 
     const QString rulesTitle = QnCameraDeviceStringSet(

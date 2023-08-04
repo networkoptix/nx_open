@@ -88,6 +88,7 @@ public:
     void setSelectedTab(CameraSettingsTab value);
     void setSettingsOptimizationEnabled(bool value);
     void setHasPowerUserPermissions(bool value);
+    void setHasEventLogPermission(bool value);
     void setHasEditAccessRightsForAllCameras(bool value);
     void setSingleVirtualCameraState(const VirtualCameraState& value);
     void setSingleCameraUserName(const QString& text);
