@@ -4,6 +4,8 @@
 
 #include <unordered_map>
 
+#include <nx/branding.h>
+
 using namespace nx::core::access;
 using namespace nx::vms::api;
 
@@ -43,7 +45,8 @@ struct PredefinedUserGroups::Private
         if (groupId == kAdministratorsGroupId)
             return tr("This user has unlimited System privileges and cannot be deleted."
                 " Can create and modify Administrators, and can merge Systems and link or unlink"
-                " to Nx Cloud accounts.");
+                " to %1 accounts.", "%1 is the cloud name (like Nx Cloud)")
+                .arg(nx::branding::cloudName());
 
         if (groupId == kPowerUsersGroupId)
             return tr("Has full control of System configuration, but cannot create or modify"
