@@ -157,7 +157,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(ui->goToPositionButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_goToPositionButton_clicked);
 
-    ui->addTourButton->setIcon(qnSkin->icon("buttons/plus_20.svg", kIconSubstitutions));
+    ui->addTourButton->setIcon(qnSkin->icon("buttons/add_20x20.svg", kIconSubstitutions));
     connect(ui->addTourButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_addTourButton_clicked);
 
