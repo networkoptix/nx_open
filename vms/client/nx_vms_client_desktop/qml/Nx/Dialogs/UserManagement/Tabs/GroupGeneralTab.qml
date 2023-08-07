@@ -77,7 +77,7 @@ Item
                 id: groupNameTextField
 
                 enabled: control.nameEditable && control.enabled
-                validateFunc: self ? self.validateName : null
+                validateFunc: self ? (text) => self.validateName(text) : null
 
                 anchors.left: groupTypeIcon.right
                 anchors.leftMargin: 24
