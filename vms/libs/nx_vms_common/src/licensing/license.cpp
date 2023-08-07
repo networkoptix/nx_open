@@ -110,7 +110,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
     LicenseTypeInfo{Qn::LC_Free, "free", /*allowedToShareChannel*/ true},
     LicenseTypeInfo{Qn::LC_Bridge, "bridge", false},
     LicenseTypeInfo{Qn::LC_Nvr, "nvr", /*allowedToShareChannel*/ true},
-    LicenseTypeInfo{Qn::LC_Cloud, "cloud", /*allowedToShareChannel*/ true},
+    LicenseTypeInfo{Qn::LC_SaasLocalRecording, "saas", /*allowedToShareChannel*/ true},
     LicenseTypeInfo{Qn::LC_Invalid, "", false},
 };
 
@@ -279,8 +279,8 @@ QString QnLicense::displayName(Qn::LicenseType licenseType)
             return tr("Bridge");
         case Qn::LC_Nvr:
             return tr("NVR");
-        case Qn::LC_Cloud:
-            return nx::branding::shortCloudName();
+        case Qn::LC_SaasLocalRecording:
+            return tr("Local Recording");
         case Qn::LC_Invalid:
             return tr("Invalid");
         default:
@@ -321,9 +321,8 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType)
             return tr("Bridge Licenses");
         case Qn::LC_Nvr:
             return tr("NVR Licenses");
-        case Qn::LC_Cloud:
-            return tr("%1 Licenses", "%1 is the short cloud name (like Cloud)")
-                .arg(nx::branding::shortCloudName());
+        case Qn::LC_SaasLocalRecording:
+            return tr("Local Recording service");
         case Qn::LC_Invalid:
             return tr("Invalid Licenses");
         default:
@@ -359,10 +358,8 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count)
             return tr("%n Bridge Licenses", "", count);
         case Qn::LC_Nvr:
             return tr("%n NVR Licenses", "", count);
-        case Qn::LC_Cloud:
-            return tr("%n %1 Licenses",
-                "%1 is the short cloud name (like Cloud)", count)
-                .arg(nx::branding::shortCloudName());
+        case Qn::LC_SaasLocalRecording:
+            return tr("%n Local Recording Services", "", count);
         case Qn::LC_Invalid:
             return tr("%n Invalid Licenses", "", count);
         default:
@@ -410,11 +407,9 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count, int total
         case Qn::LC_Nvr:
             return tr("%n/%1 NVR Licenses",
                 "%n will be replaced by the total count", count).arg(total);
-        case Qn::LC_Cloud:
-            return tr("%n/%1 %2 Licenses",
-                "%n will be replaced by the total count,"
-                "%2 is the short cloud name (like Cloud)", count).arg(total)
-                .arg(nx::branding::shortCloudName());
+        case Qn::LC_SaasLocalRecording:
+            return tr("%n/%1 Local Recording Services",
+                "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Invalid:
             return tr("%n/%1 Invalid Licenses",
                 "%n will be replaced by the total count", count).arg(total);
@@ -523,8 +518,8 @@ Qn::LicenseType QnLicense::type() const
 
     if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_VideoWall].className)
         return Qn::LC_VideoWall;
-    if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_Cloud].className)
-        return Qn::LC_Cloud;
+    if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_SaasLocalRecording].className)
+        return Qn::LC_SaasLocalRecording;
 
     // Saas licenses are supported.
     // Expiring non-saas licenses are demo licenses, which support provides by request.
@@ -547,7 +542,7 @@ QnLicensePtr QnLicense::createSaasLocalRecordingLicense()
     static const QByteArray kSaasLocalRecordingKey("saasLocalRecording");
     QnLicensePtr result(new QnLicense);
 
-    result->m_class = result->m_name = ::licenseTypeInfo[Qn::LC_Cloud].className;
+    result->m_class = result->m_name = ::licenseTypeInfo[Qn::LC_SaasLocalRecording].className;
     result->m_key = kSaasLocalRecordingKey;
     result->m_version = "2.0";
     result->m_brand = nx::branding::vmsName();
@@ -623,7 +618,7 @@ void QnLicense::parseLicenseBlock(
 
 void QnLicense::verify(const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock)
 {
-    if (type() == Qn::LC_Cloud)
+    if (type() == Qn::LC_SaasLocalRecording)
     {
         m_isValid1 = true;
     }

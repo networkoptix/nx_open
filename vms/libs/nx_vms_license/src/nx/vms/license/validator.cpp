@@ -51,7 +51,7 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
     const auto& manager = m_context->runtimeInfoManager();
     QnPeerRuntimeInfo info;
 
-    if (license->type() == Qn::LC_Cloud)
+    if (license->type() == Qn::LC_SaasLocalRecording)
     {
         const auto date = license->tmpExpirationDate();
         if (date.isValid() && date.toMSecsSinceEpoch() < qnSyncTime->currentMSecsSinceEpoch())

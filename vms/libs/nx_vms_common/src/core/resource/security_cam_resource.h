@@ -40,7 +40,6 @@ protected:
 
 public:
     static constexpr int kDefaultMaxFps = 15;
-    static const Qn::LicenseType kDefaultLicenseType;
     static QnUuid makeCameraIdFromPhysicalId(const QString& physicalId);
 
     using StreamIndex = nx::vms::api::StreamIndex;
