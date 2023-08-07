@@ -7,9 +7,10 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/utils/password_information.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
-#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/text/time_strings.h>
 
 namespace nx::vms::client::desktop {
 
@@ -101,6 +102,27 @@ UserSettingsGlobal::UserType UserSettingsGlobal::getUserType(const QnUserResourc
         return UserSettingsGlobal::LdapUser;
 
     return UserSettingsGlobal::LocalUser;
+}
+
+QString UserSettingsGlobal::humanReadableSeconds(int seconds)
+{
+    static const std::vector<std::pair<QnTimeStrings::Suffix, int>> multipliers = {
+        {QnTimeStrings::Suffix::Days, 60 * 60 * 24},
+        {QnTimeStrings::Suffix::Hours, 60 * 60},
+        {QnTimeStrings::Suffix::Minutes, 60}
+    };
+
+    for (const auto& [suffix, mult]: multipliers)
+    {
+        const auto value = seconds / mult;
+
+        if (value != 0 && seconds == value * mult)
+            return nx::format("%1 %2", value, QnTimeStrings::fullSuffix(suffix, value));
+    }
+
+    return nx::format("%1 %2",
+        seconds,
+        QnTimeStrings::fullSuffix(QnTimeStrings::Suffix::Seconds, seconds));
 }
 
 } // namespace nx::vms::client::desktop
