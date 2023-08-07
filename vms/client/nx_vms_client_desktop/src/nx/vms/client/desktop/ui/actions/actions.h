@@ -1097,6 +1097,11 @@ enum IDType
     NewMonitoringLayoutAction,
 
     /**
+     * Opens a new review layout for the provided system id.
+     */
+    OpenReviewLayoutAction,
+
+    /**
      * Dismisses all alerting from a system, provided a system id.
      */
     DismissSystemAlertAction,
