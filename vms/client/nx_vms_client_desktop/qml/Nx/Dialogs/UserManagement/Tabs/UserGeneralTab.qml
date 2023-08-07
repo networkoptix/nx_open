@@ -126,8 +126,8 @@ Item
                 anchors.rightMargin: 16
 
                 validateFunc: control.self
-                    ? (control.userType == UserSettingsGlobal.CloudUser
-                        ? control.self.validateEmail : control.self.validateLogin)
+                    ? (text) => (control.userType == UserSettingsGlobal.CloudUser
+                        ? control.self.validateEmail(text) : control.self.validateLogin(text))
                     : null
             }
 

@@ -125,7 +125,7 @@ Item
                 {
                     id: loginTextField
                     width: parent.width
-                    validateFunc: control.self ? control.self.validateLogin : null
+                    validateFunc: control.self ? (text) => control.self.validateLogin(text) : null
                     focus: control.userType != UserSettingsGlobal.CloudUser
                 }
             }
@@ -183,7 +183,7 @@ Item
                 {
                     id: passwordTextField
                     width: parent.width
-                    validateFunc: UserSettingsGlobal.validatePassword
+                    validateFunc: (text) => UserSettingsGlobal.validatePassword(text)
                     onTextChanged: confirmPasswordTextField.warningState = false
                 }
             }

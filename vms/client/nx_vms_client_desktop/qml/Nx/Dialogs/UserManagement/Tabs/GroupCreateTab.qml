@@ -51,7 +51,7 @@ Item
                 {
                     id: groupNameTextField
                     width: parent.width
-                    validateFunc: self ? self.validateName : null
+                    validateFunc: self ? (text) => self.validateName(text) : null
                 }
             }
 
