@@ -160,13 +160,13 @@ static std::vector<LicenseCompatibility> compatibleLicenseType =
     {Qn::LC_Trial, Qn::LC_AnalogEncoder},
     {Qn::LC_Trial, Qn::LC_Bridge},
 
-    {Qn::LC_Cloud, Qn::LC_Edge},
-    {Qn::LC_Cloud, Qn::LC_Professional},
-    {Qn::LC_Cloud, Qn::LC_Analog},
-    {Qn::LC_Cloud, Qn::LC_VMAX},
-    {Qn::LC_Cloud, Qn::LC_IO},
-    {Qn::LC_Cloud, Qn::LC_AnalogEncoder},
-    {Qn::LC_Cloud, Qn::LC_Bridge},
+    {Qn::LC_SaasLocalRecording, Qn::LC_Edge},
+    {Qn::LC_SaasLocalRecording, Qn::LC_Professional},
+    {Qn::LC_SaasLocalRecording, Qn::LC_Analog},
+    {Qn::LC_SaasLocalRecording, Qn::LC_VMAX},
+    {Qn::LC_SaasLocalRecording, Qn::LC_IO},
+    {Qn::LC_SaasLocalRecording, Qn::LC_AnalogEncoder},
+    {Qn::LC_SaasLocalRecording, Qn::LC_Bridge},
 
 };
 
@@ -547,7 +547,7 @@ QList<Qn::LicenseType> CamLicenseUsageHelper::calculateLicenseTypes() const
         << Qn::LC_IO
         << Qn::LC_Start
         << Qn::LC_Nvr
-        << Qn::LC_Cloud
+        << Qn::LC_SaasLocalRecording
         ;
 }
 

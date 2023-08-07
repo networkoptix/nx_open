@@ -291,7 +291,7 @@ TEST_F(SaasServiceUsageHelperTest, LocalRecordingServiceLoaded)
     auto licenses = systemContext()->licensePool()->getLicenses();
     ASSERT_EQ(1, licenses.size());
     ASSERT_EQ(10, licenses[0]->cameraCount());
-    ASSERT_EQ("cloud", licenses[0]->xclass());
+    ASSERT_EQ("saas", licenses[0]->xclass());
     const auto dateStr = licenses[0]->tmpExpirationDate().toString(Qt::ISODate);
     ASSERT_EQ("2023-06-05T20:40:52Z", dateStr);
 }
