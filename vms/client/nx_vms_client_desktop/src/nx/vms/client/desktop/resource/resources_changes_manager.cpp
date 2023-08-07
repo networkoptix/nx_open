@@ -27,7 +27,6 @@
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
@@ -181,20 +180,6 @@ ReplyProcessorFunction makeSaveResourceReplyProcessor(ResourcesChangesManager* m
     return makeReplyProcessor(manager, handler);
 }
 
-ReplyProcessorFunction makeReplyProcessorUpdatePassword(
-    SystemContext* systemContext, ReplyProcessorFunction replyProcessor, QString newPassword)
-{
-    return
-        [=](int reqId, ec2::ErrorCode errorCode)
-        {
-            auto currentSession = systemContext->session();
-            if (errorCode == ec2::ErrorCode::ok && currentSession)
-                currentSession->updatePassword(newPassword);
-
-            replyProcessor(reqId, errorCode);
-        };
-}
-
 template<typename ResourceType, typename BackupType>
 ReplyProcessorFunctionRest makeSaveResourceReplyProcessorRest(ResourcesChangesManager* manager,
     QnSharedResourcePointer<ResourceType> resource,
@@ -236,57 +221,6 @@ ReplyProcessorFunctionRest makeSaveResourceReplyProcessorRest(ResourcesChangesMa
         };
 
     return makeReplyProcessorRest(manager, handler);
-}
-
-ReplyProcessorFunctionRest makeReplyProcessorUpdatePasswordRest(
-    SystemContext* systemContext, ReplyProcessorFunctionRest replyProcessor, QString newPassword)
-{
-    return
-        [=](bool success, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty result)
-        {
-            auto currentSession = systemContext->session();
-            if (success && currentSession)
-                currentSession->updatePassword(newPassword);
-
-            replyProcessor(success, requestId, result);
-        };
-}
-
-std::optional<QString> passwordIfUpdateIsRequired(QString currentUserName,
-    const QnUserResourceList& users,
-    QnUserResource::DigestSupport digestSupport)
-{
-    const auto currentUser = std::find_if(users.begin(),
-        users.end(),
-        [&](const QnUserResourcePtr& user)
-        {
-            return QString::compare(currentUserName, user->getName(), Qt::CaseInsensitive) == 0;
-        });
-
-    if (currentUser != users.end())
-    {
-        // After successfull call completion users.front()->getPassword() is empty, so saving it
-        // here.
-        const auto newPassword = (*currentUser)->getPassword();
-        if (!newPassword.isEmpty() || digestSupport != QnUserResource::DigestSupport::keep)
-            return newPassword;
-    }
-
-    return std::nullopt;
-}
-
-vms::api::UserData fromResourceToApi(
-    QnUserResourcePtr user, QnUserResource::DigestSupport digestSupport)
-{
-    vms::api::UserData apiUser;
-    ec2::fromResourceToApi(user, apiUser);
-
-    if (digestSupport == QnUserResource::DigestSupport::disable)
-        apiUser.digest = nx::vms::api::UserData::kHttpIsDisabledStub;
-    if (digestSupport == QnUserResource::DigestSupport::enable && user->isLdap())
-        apiUser.digest.clear();
-
-    return apiUser;
 }
 
 template<class ResourcePtrType>
