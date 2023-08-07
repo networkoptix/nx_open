@@ -46,7 +46,7 @@ RowLayout
 
         implicitWidth: 120
 
-        text: getDateForDisplay().toLocaleDateString(control.locale, Locale.ShortFormat)
+        text: NxGlobals.dateInShortFormat(getDateForDisplay())
         readOnly: true
     }
 

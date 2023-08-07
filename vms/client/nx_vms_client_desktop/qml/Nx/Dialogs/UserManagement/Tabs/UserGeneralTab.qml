@@ -45,6 +45,13 @@ Item
     property bool enabled: true
     property int userType: UserSettingsGlobal.LocalUser
 
+    property alias linkValidFrom: temporaryUserText.linkValidFrom
+    property alias linkValidUntil: temporaryUserText.linkValidUntil
+    property alias expiresAfterLoginS: temporaryUserText.expiresAfterLoginS
+    property alias revokeAccessEnabled: temporaryUserText.revokeAccessEnabled
+
+    property alias displayOffsetMs: temporaryUserText.displayOffsetMs
+
     property bool ldapError: false
 
     property var self
@@ -370,6 +377,7 @@ Item
                         // Allow digest authentication.
 
                         visible: control.userType != UserSettingsGlobal.CloudUser
+                            && control.userType != UserSettingsGlobal.TemporaryUser
 
                         Component
                         {
@@ -457,6 +465,157 @@ Item
                             id: groupsComboBox
 
                             width: parent.width
+                        }
+                    }
+
+                    SectionHeader
+                    {
+                        id: accessLinkSection
+
+                        text: qsTr("Access Link")
+                        visible: control.userType == UserSettingsGlobal.TemporaryUser
+                    }
+
+                    ColumnLayout
+                    {
+                        id: accessLinkLayout
+
+                        visible: accessLinkSection.visible
+
+                        property date currentDate: new Date()
+                        property bool expired: currentDate > control.linkValidUntil
+
+                        Timer
+                        {
+                            interval: 1000
+                            running: accessLinkSection.visible
+                            repeat: true
+                            onTriggered: accessLinkLayout.currentDate = new Date()
+                        }
+
+                        width: parent.width
+                        spacing: 8
+
+                        function openNewLinkDialog(showWarning)
+                        {
+                            const newLinkDialog = newLinkDialogComponent.createObject(control)
+
+                            newLinkDialog.linkValidUntil = self.newValidUntilDate()
+                            newLinkDialog.showWarning = false
+
+                            newLinkDialog.openNew()
+                        }
+
+                        function openResetLinkDialog()
+                        {
+                            const newLinkDialog = newLinkDialogComponent.createObject(control)
+
+                            newLinkDialog.linkValidUntil = control.linkValidUntil
+                            if (control.revokeAccessEnabled)
+                            {
+                                newLinkDialog.revokeAccessEnabled = true
+                                newLinkDialog.expiresAfterLoginS = control.expiresAfterLoginS
+                            }
+
+                            newLinkDialog.showWarning = true
+                            newLinkDialog.openNew()
+                        }
+
+                        Component
+                        {
+                            id: newLinkDialogComponent
+
+                            NewLinkDialog
+                            {
+                                login: control.login
+                                displayOffsetMs: control.displayOffsetMs
+                                isSaving: !control.enabled
+                                transientParent: control.Window.window
+
+                                SessionAware.onTryClose: reject()
+
+                                onAccepted:
+                                {
+                                    control.self.onResetLink(
+                                        linkValidUntil,
+                                        revokeAccessEnabled
+                                            ? expiresAfterLoginS
+                                            : -1,
+                                        ok => { if (ok) close() })
+                                }
+
+                                onRejected:
+                                {
+                                    if (isSaving)
+                                        control.self.cancelRequest()
+                                }
+                            }
+                        }
+
+                        TemporaryLinkDatesText
+                        {
+                            id: temporaryUserText
+
+                            visible: !accessLinkLayout.expired
+                            width: parent.width
+                        }
+
+                        RowLayout
+                        {
+                            visible: !accessLinkLayout.expired
+
+                            spacing: 8
+
+                            Button
+                            {
+                                text: qsTr("Copy Link")
+                                onClicked: control.self.onCopyLink()
+                                enabled: control.enabled
+                            }
+
+                            TextButton
+                            {
+                                icon.source: "image://svg/skin/user_settings/terminate_link.svg"
+                                icon.width: 20
+                                icon.height: 20
+                                spacing: 4
+                                text: qsTr("Terminate")
+                                enabled: control.enabled
+
+                                onClicked: control.self.onTerminateLink()
+                            }
+
+                            TextButton
+                            {
+                                icon.source: "image://svg/skin/user_settings/reset_link.svg"
+                                icon.width: 20
+                                icon.height: 20
+                                spacing: 4
+                                text: qsTr("New Link...")
+                                enabled: control.enabled
+
+                                onClicked: accessLinkLayout.openResetLinkDialog()
+                            }
+                        }
+
+                        Text
+                        {
+                            Layout.alignment: Qt.AlignHCenter
+                            visible: accessLinkLayout.expired
+
+                            text: qsTr("No valid link for this user")
+                            color: ColorTheme.colors.light16
+                            font: Qt.font({pixelSize: 14, weight: Font.Normal})
+                        }
+
+                        Button
+                        {
+                            Layout.alignment: Qt.AlignHCenter
+                            visible: accessLinkLayout.expired
+                            enabled: control.enabled
+
+                            text: qsTr("New Link...")
+                            onClicked: accessLinkLayout.openNewLinkDialog()
                         }
                     }
                 }

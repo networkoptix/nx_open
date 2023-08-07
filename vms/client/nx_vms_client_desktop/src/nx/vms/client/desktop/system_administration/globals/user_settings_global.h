@@ -59,6 +59,8 @@ public:
 
     Q_INVOKABLE QUrl accountManagementUrl() const;
 
+    Q_INVOKABLE QString humanReadableSeconds(int seconds);
+
     static void registerQmlTypes();
 
     static UserType getUserType(const QnUserResourcePtr& user);

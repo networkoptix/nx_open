@@ -56,12 +56,18 @@ DialogWithState
     property alias sharedResources: membersModel.sharedResources
     property bool permissionsEditable: true  //< Not used by current dialog type.
 
+    property date linkValidFrom
+    property alias linkValidUntil: generalSettings.linkValidUntil
+    property alias expiresAfterLoginS: generalSettings.expiresAfterLoginS
+    property alias revokeAccessEnabled: generalSettings.revokeAccessEnabled
+
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
     property bool isSaving: false
     property bool ldapError: false
     property alias editingContext: membersModel.editingContext
     property var self
+    property alias displayOffsetMs: generalSettings.displayOffsetMs
 
     signal groupClicked(var id)
 

@@ -4,6 +4,7 @@
 
 #include <algorithm>
 
+#include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
 #include <QtWidgets/QPushButton>
 
@@ -23,10 +24,14 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/resource/server.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
+#include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
@@ -38,13 +43,17 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/synctime.h>
 
 #include "../globals/session_notifier.h"
 #include "../models/members_model.h"
+
+using namespace std::chrono;
 
 namespace {
 
@@ -52,6 +61,7 @@ namespace {
 static const QString cloudAuthInfoPropertyName("cloudUserAuthenticationInfo");
 
 static constexpr auto kAuditTrailDays = 7;
+static constexpr int kDefaultTempUserExpiresAfterLoginS = 60 * 60 * 8; //< 8 hours.
 
 static const QString kAllowedLoginSymbols = "!#$%&'()*+,-./:;<=>?[]^_`{|}~";
 
@@ -78,6 +88,13 @@ struct UserSettingsDialog::Private
     QmlProperty<bool> ldapError;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
+    QmlProperty<int> displayOffsetMs;
+
+    QmlProperty<QDateTime> linkValidFrom;
+    QmlProperty<QDateTime> linkValidUntil;
+    QmlProperty<int> expiresAfterLoginS;
+    QmlProperty<bool> revokeAccessEnabled;
+
     QnUserResourcePtr user;
     rest::Handle m_currentRequest = -1;
 
@@ -89,10 +106,157 @@ struct UserSettingsDialog::Private
         isSaving(q->rootObjectHolder(), "isSaving"),
         ldapError(q->rootObjectHolder(), "ldapError"),
         editingContext(q->rootObjectHolder(), "editingContext"),
-        self(q->rootObjectHolder(), "self")
+        self(q->rootObjectHolder(), "self"),
+        displayOffsetMs(q->rootObjectHolder(), "displayOffsetMs"),
+        linkValidFrom(q->rootObjectHolder(), "linkValidFrom"),
+        linkValidUntil(q->rootObjectHolder(), "linkValidUntil"),
+        expiresAfterLoginS(q->rootObjectHolder(), "expiresAfterLoginS"),
+        revokeAccessEnabled(q->rootObjectHolder(), "revokeAccessEnabled")
     {
         connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
             [this]() { syncId = q->globalSettings()->ldap().syncId(); });
+
+        const auto updateDisplayOffset = [this](){ displayOffsetMs = getDisplayOffsetMs(); };
+
+        connect(
+            parent->systemContext()->serverTimeWatcher(),
+            &core::ServerTimeWatcher::displayOffsetsChanged,
+            q,
+            updateDisplayOffset);
+
+        updateDisplayOffset();
+    }
+
+    QDateTime serverDate(milliseconds msecsSinceEpoch) const
+    {
+        const auto timeWatcher = q->systemContext()->serverTimeWatcher();
+        return timeWatcher->serverTime(
+            timeWatcher->currentServer().dynamicCast<core::ServerResource>(),
+            msecsSinceEpoch.count());
+    }
+
+    int getDisplayOffsetMs() const
+    {
+        const auto serverNow = serverDate(
+            duration_cast<milliseconds>(qnSyncTime->currentTimePoint()));
+
+        const auto clientNow = QDateTime::currentDateTime();
+
+        return duration_cast<milliseconds>(
+            seconds(serverNow.offsetFromUtc() - clientNow.offsetFromUtc())).count();
+    }
+
+    QString linkFromToken(const std::string& token) const
+    {
+        const auto server = q->systemContext()->currentServer();
+        return nx::format("%1/#/?token=%2", server->getUrl(), token);
+    }
+
+    nx::vms::api::TemporaryToken generateTemporaryToken(
+        const QDateTime& validUntil,
+        int expiresAfterLoginS = -1) const
+    {
+        nx::vms::api::TemporaryToken token;
+
+        token.startS = duration_cast<seconds>(qnSyncTime->currentTimePoint());
+        token.endS = seconds(validUntil.toSecsSinceEpoch());
+        if (expiresAfterLoginS != -1)
+            token.expiresAfterLoginS = seconds(expiresAfterLoginS);
+
+        return token;
+    }
+
+    void updateUiFromTemporaryToken(const nx::vms::api::TemporaryToken& temporaryToken)
+    {
+        linkValidFrom = serverDate(duration_cast<milliseconds>(temporaryToken.startS));
+        linkValidUntil = serverDate(duration_cast<milliseconds>(temporaryToken.endS));
+
+        revokeAccessEnabled = temporaryToken.expiresAfterLoginS.count() >= 0;
+
+        expiresAfterLoginS = revokeAccessEnabled
+            ? temporaryToken.expiresAfterLoginS.count()
+            : -1;
+    }
+
+    nx::vms::api::UserModelV3 apiDataFromState(const UserSettingsDialogState& state) const
+    {
+        nx::vms::api::UserModelV3 userData;
+
+        userData.type = (nx::vms::api::UserType) state.userType;
+
+        const bool createCloudUser = dialogType == CreateUser
+            && userData.type == nx::vms::api::UserType::cloud;
+
+        if (createCloudUser)
+        {
+            userData.id = QnUuid::fromArbitraryData(state.email);
+            userData.name = state.email;
+        }
+        else
+        {
+            userData.id = state.userId;
+            userData.name = state.login;
+        }
+
+        if (!state.password.isEmpty()
+            && !createCloudUser
+            && userData.type != nx::vms::api::UserType::temporaryLocal)
+        {
+            userData.password = state.password;
+        }
+        userData.email = userData.type == nx::vms::api::UserType::cloud ? userData.name : state.email;
+        userData.fullName = state.fullName;
+        userData.permissions = state.globalPermissions;
+        userData.isEnabled = state.userEnabled;
+        userData.isHttpDigestEnabled = state.allowInsecure;
+        for (const auto& group: state.parentGroups)
+            userData.groupIds.emplace_back(group.id);
+
+        const auto sharedResources = state.sharedResources.asKeyValueRange();
+        userData.resourceAccessRights = {sharedResources.begin(), sharedResources.end()};
+
+        return userData;
+    }
+
+    void showMessageBoxWithLink(const QString& text, const std::string& token)
+    {
+        const QString linkText = linkFromToken(token);
+
+        QnMessageBox messageBox(
+            QnMessageBoxIcon::Success,
+            text,
+            {},
+            QDialogButtonBox::Ok,
+            QDialogButtonBox::Ok,
+            parentWidget);
+
+        QPushButton* copyButton = new ClipboardButton(
+            tr("Copy Access Link"),
+            ClipboardButton::tr("Copied", "to Clipboard"));
+
+        QObject::connect(copyButton, &QPushButton::pressed,
+            [linkText]
+            {
+                QGuiApplication::clipboard()->setText(linkText);
+            });
+
+        messageBox.addCustomWidget(
+            copyButton, QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
+        messageBox.setWindowTitle(qApp->applicationDisplayName());
+        messageBox.exec();
+    }
+
+    void showServerError(const QString& message, const nx::network::rest::Result& error)
+    {
+        QnMessageBox messageBox(
+            QnMessageBoxIcon::Critical,
+            message,
+            error.errorString,
+            QDialogButtonBox::Ok,
+            QDialogButtonBox::Ok,
+            parentWidget);
+        messageBox.setWindowTitle(qApp->applicationDisplayName());
+        messageBox.exec();
     }
 };
 
@@ -263,6 +427,9 @@ QString UserSettingsDialog::validateLogin(const QString& login)
                 if (d->user && d->user->getName() == text)
                     continue;
 
+                if (d->dialogType == CreateUser && currentState().userId == user->getId())
+                    continue;
+
                 return ValidationResult(tr("User with specified login already exists."));
             }
 
@@ -343,6 +510,182 @@ void UserSettingsDialog::onAuditTrailRequested()
             .withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }
 
+void UserSettingsDialog::onTerminateLink()
+{
+    const QString mainText = tr("Are you sure you want to terminate access link?");
+    const QString infoText = tr("This will instantly remove an access to the system for this user");
+
+    QnSessionAwareMessageBox messageBox(d->parentWidget);
+
+    messageBox.setIcon(QnMessageBoxIcon::Question);
+    messageBox.setText(mainText);
+    messageBox.setInformativeText(infoText);
+    messageBox.setStandardButtons(
+        QDialogButtonBox::Discard
+        | QDialogButtonBox::Cancel);
+
+    messageBox.setDefaultButton(QDialogButtonBox::Discard, Qn::ButtonAccent::Warning);
+
+    messageBox.button(QDialogButtonBox::Discard)->setText(tr("Terminate"));
+
+    const auto ret = messageBox.exec();
+    if (ret == QDialogButtonBox::Cancel)
+        return;
+
+    nx::vms::api::UserModelV3 userData = d->apiDataFromState(originalState());
+
+    NX_ASSERT(userData.type == nx::vms::api::UserType::temporaryLocal);
+
+    // Generate expired token.
+    userData.temporaryToken = nx::vms::api::TemporaryToken{
+        .startS = 2s,
+        .endS = 1s,
+        .expiresAfterLoginS = 0s
+    };
+
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        d->parentWidget,
+        tr("Terminate access link"),
+        tr("Enter your account password"),
+        tr("Terminate"),
+        FreshSessionTokenHelper::ActionType::updateSettings);
+
+    if (d->m_currentRequest != -1)
+        connectedServerApi()->cancelRequest(d->m_currentRequest);
+
+    d->isSaving = true;
+
+    d->m_currentRequest = connectedServerApi()->saveUserAsync(
+        /*newUser=*/ false,
+        userData,
+        sessionTokenHelper,
+        nx::utils::guarded(this,
+            [this](
+                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
+            {
+                if (NX_ASSERT(handle == d->m_currentRequest))
+                    d->m_currentRequest = -1;
+
+                d->isSaving = false;
+
+                if (success)
+                    return;
+
+                if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                {
+                    d->showServerError(tr("Failed to apply changes"), *error);
+                    return;
+                }
+
+                if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
+                {
+                    NX_ASSERT(data->temporaryToken);
+                    d->updateUiFromTemporaryToken(*data->temporaryToken);
+                }
+            }), thread());
+}
+
+void UserSettingsDialog::onResetLink(
+    const QDateTime& validUntil,
+    int revokeAccessAfterS,
+    const QJSValue& callback)
+{
+    if (!NX_ASSERT(d->user)
+        || !NX_ASSERT(d->user->userType() == nx::vms::api::UserType::temporaryLocal))
+    {
+        if (callback.isCallable())
+            callback.call({false});
+        return;
+    }
+
+    nx::vms::api::UserModelV3 userData = d->apiDataFromState(originalState());
+
+    NX_ASSERT(userData.type == nx::vms::api::UserType::temporaryLocal);
+
+    userData.temporaryToken = d->generateTemporaryToken(validUntil, revokeAccessAfterS);
+
+    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
+        d->parentWidget,
+        tr("Create access link"),
+        tr("Enter your account password"),
+        tr("Create"),
+        FreshSessionTokenHelper::ActionType::updateSettings);
+
+    if (d->m_currentRequest != -1)
+        connectedServerApi()->cancelRequest(d->m_currentRequest);
+
+    d->isSaving = true;
+
+    d->m_currentRequest = connectedServerApi()->saveUserAsync(
+        /*newUser=*/ false,
+        userData,
+        sessionTokenHelper,
+        nx::utils::guarded(this,
+            [this, callback](
+                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
+            {
+                if (NX_ASSERT(handle == d->m_currentRequest))
+                    d->m_currentRequest = -1;
+
+                d->isSaving = false;
+
+                if (callback.isCallable())
+                    callback.call({success});
+
+                if (!success)
+                {
+                    if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                        d->showServerError(tr("Failed to apply changes"), *error);
+                    return;
+                }
+
+                if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
+                {
+                    NX_ASSERT(data->temporaryToken);
+
+                    d->showMessageBoxWithLink(
+                        tr("Access link has been successfully created!"),
+                        data->temporaryToken->token);
+
+                    d->updateUiFromTemporaryToken(*data->temporaryToken);
+                }
+            }), thread());
+}
+
+void UserSettingsDialog::cancelRequest()
+{
+    if (d->m_currentRequest != -1)
+        connectedServerApi()->cancelRequest(d->m_currentRequest);
+}
+
+void UserSettingsDialog::onCopyLink()
+{
+    if (!NX_ASSERT(d->user))
+        return;
+
+    const QnUserHash hash = d->user->getHash();
+    if (!NX_ASSERT(hash.type == QnUserHash::Type::temporary))
+        return;
+
+    if (!NX_ASSERT(hash.temporaryToken))
+        return;
+
+    if (!NX_ASSERT(!hash.temporaryToken->token.empty()))
+        return;
+
+    QGuiApplication::clipboard()->setText(d->linkFromToken(hash.temporaryToken->token));
+}
+
+QDateTime UserSettingsDialog::newValidUntilDate() const
+{
+    auto validUntil = d->serverDate(duration_cast<milliseconds>(qnSyncTime->currentTimePoint()))
+        .addMonths(1);
+
+    validUntil.setTime(QTime(23, 59, 59));
+
+    return validUntil;
+}
+
 UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr& user)
 {
     UserSettingsDialogState state;
@@ -355,6 +698,9 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
             state.userId = QnUuid::createUuid();
             if (isConnectedToCloud())
                 state.userType = UserSettingsGlobal::CloudUser;
+
+            d->expiresAfterLoginS = kDefaultTempUserExpiresAfterLoginS;
+            d->linkValidUntil = newValidUntilDate();
         }
         return state;
     }
@@ -394,6 +740,16 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     state.permissionsEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
 
+    if (user->userType() == nx::vms::api::UserType::temporaryLocal)
+    {
+        const QnUserHash hash = user->getHash();
+
+        NX_ASSERT(hash.type == QnUserHash::Type::temporary);
+        NX_ASSERT(hash.temporaryToken);
+
+        d->updateUiFromTemporaryToken(*hash.temporaryToken);
+    }
+
     d->ldapError =
         user->isLdap() && !user->externalId().dn.isEmpty() && user->externalId().syncId != d->syncId;
 
@@ -411,36 +767,16 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         return;
     }
 
-    nx::vms::api::UserModelV3 userData;
+    nx::vms::api::UserModelV3 userData = d->apiDataFromState(state);
 
-    userData.type = (nx::vms::api::UserType) state.userType;
-
-    const bool createCloudUser = d->dialogType == CreateUser
-        && userData.type == nx::vms::api::UserType::cloud;
-
-    if (createCloudUser)
+    if (userData.type == nx::vms::api::UserType::temporaryLocal && d->dialogType == CreateUser)
     {
-        userData.id = QnUuid::fromArbitraryData(state.email);
-        userData.name = state.email;
+        userData.temporaryToken = d->generateTemporaryToken(
+            d->linkValidUntil,
+            d->revokeAccessEnabled
+                ? d->expiresAfterLoginS
+                : -1);
     }
-    else
-    {
-        userData.id = state.userId;
-        userData.name = state.login;
-    }
-
-    if (!state.password.isEmpty() && !createCloudUser)
-        userData.password = state.password;
-    userData.email = userData.type == nx::vms::api::UserType::cloud ? userData.name : state.email;
-    userData.fullName = state.fullName;
-    userData.permissions = state.globalPermissions;
-    userData.isEnabled = state.userEnabled;
-    userData.isHttpDigestEnabled = state.allowInsecure;
-    for (const auto& group: state.parentGroups)
-        userData.groupIds.emplace_back(group.id);
-
-    const auto sharedResources = state.sharedResources.asKeyValueRange();
-    userData.resourceAccessRights = {sharedResources.begin(), sharedResources.end()};
 
     // When user changes his own password or digest support, current session credentials should be
     // updated correspondingly. Store actual password to update it in callback.
@@ -489,17 +825,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                 if (!success)
                 {
                     if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-                    {
-                        QnMessageBox messageBox(
-                            QnMessageBoxIcon::Critical,
-                            tr("Failed to apply changes"),
-                            error->errorString,
-                            QDialogButtonBox::Ok,
-                            QDialogButtonBox::Ok,
-                            d->parentWidget);
-                        messageBox.setWindowTitle(qApp->applicationDisplayName());
-                        messageBox.exec();
-                    }
+                        d->showServerError(tr("Failed to apply changes"), *error);
                     return;
                 }
 
@@ -511,6 +837,25 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 
                 if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
                 {
+                    if (data->type == nx::vms::api::UserType::temporaryLocal)
+                    {
+                        if (d->dialogType == CreateUser)
+                        {
+                            NX_ASSERT(data->temporaryToken);
+
+                            d->showMessageBoxWithLink(
+                                tr("User %1 has been successfully created!")
+                                    .arg(common::html::colored(
+                                        data->name,
+                                        core::colorTheme()->color("light4"))),
+                                data->temporaryToken->token);
+                        }
+                        else if (data->temporaryToken)
+                        {
+                            d->updateUiFromTemporaryToken(*data->temporaryToken);
+                        }
+                    }
+
                     if (d->user)
                     {
                         // Update user locally ahead of receiving update from the server
@@ -587,6 +932,17 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
         connect(user.get(), &QnUserResource::permissionsChanged, this, updateState);
         connect(user.get(), &QnUserResource::enabledChanged, this, updateState);
         connect(user.get(), &QnUserResource::attributesChanged, this, updateState);
+        connect(user.get(), &QnUserResource::temporaryTokenChanged, this,
+            [this]()
+            {
+                if (!d->user)
+                    return;
+
+                const auto hash = d->user->getHash();
+
+                if (hash.temporaryToken)
+                    d->updateUiFromTemporaryToken(*hash.temporaryToken);
+            });
     }
     else
     {

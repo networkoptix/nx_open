@@ -81,6 +81,8 @@ public:
     Q_INVOKABLE void invokeMethod(QObject* obj, const QString& methodName);
 
     Q_INVOKABLE QString modifierName(const Qt::KeyboardModifier modifier) const;
+
+    Q_INVOKABLE QString dateInShortFormat(const QDateTime& date);
 };
 
 } // namespace nx::vms::client::core
