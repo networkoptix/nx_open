@@ -102,6 +102,8 @@ Item
                     {
                         case UserSettingsGlobal.LocalUser:
                             return "image://svg/skin/user_settings/user_type_local.svg"
+                        case UserSettingsGlobal.TemporaryUser:
+                            return "image://svg/skin/user_settings/user_type_local_temp.svg"
                         case UserSettingsGlobal.CloudUser:
                             return "image://svg/skin/user_settings/user_type_cloud.svg"
                         case UserSettingsGlobal.LdapUser:

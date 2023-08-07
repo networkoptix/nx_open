@@ -32,6 +32,7 @@ public:
         QString description;
         bool isGroup = false;
         bool isLdap = false;
+        bool isTemporary = false;
     };
 
     struct Stats
