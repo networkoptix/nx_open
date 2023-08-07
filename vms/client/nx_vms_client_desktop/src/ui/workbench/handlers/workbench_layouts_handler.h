@@ -117,6 +117,7 @@ private:
         const StreamSynchronizationState& playbackState);
 
     friend class vx::MenuActionHandler;
+    friend class vx::MonitoringLayoutHandler;
 };
 
 } // namespace workbench
