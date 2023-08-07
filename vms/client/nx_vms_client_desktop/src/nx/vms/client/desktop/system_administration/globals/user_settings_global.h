@@ -49,6 +49,7 @@ public:
         LocalUser = (int) nx::vms::api::UserType::local,
         CloudUser = (int) nx::vms::api::UserType::cloud,
         LdapUser = (int) nx::vms::api::UserType::ldap,
+        TemporaryUser = (int) nx::vms::api::UserType::temporaryLocal,
     };
     Q_ENUM(UserType)
 

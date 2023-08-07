@@ -37,6 +37,7 @@ public:
         OffsetRole,
         IdRole,
         IsLdap,
+        IsTemporary,
     };
 
 public:
