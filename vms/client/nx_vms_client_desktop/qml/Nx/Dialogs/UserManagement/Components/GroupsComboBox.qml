@@ -290,23 +290,9 @@ Control
             radius: 1
         }
 
-        MultiEffect
+        PopupShadow
         {
             source: popupBack
-
-            z: -1
-
-            autoPaddingEnabled: true
-            shadowEnabled: true
-            shadowColor: ColorTheme.colors.dark4
-            shadowOpacity: 0.5
-
-            shadowVerticalOffset: 10
-
-            blurMax: 50
-
-            width: popupBack.width
-            height: popupBack.height
         }
 
         onVisibleChanged:
