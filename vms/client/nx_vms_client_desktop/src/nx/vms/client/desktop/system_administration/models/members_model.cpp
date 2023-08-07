@@ -557,6 +557,7 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     roles[MemberSectionRole] = "memberSection";
     roles[GroupSectionRole] = "groupSection";
     roles[IsLdap] = "isLdap";
+    roles[IsTemporary] = "isTemporary";
     roles[Cycle] = "cycle";
     roles[CanEditParents] = "canEditParents";
     roles[CanEditMembers] = "canEditMembers";
@@ -650,6 +651,9 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
 
         case IsLdap:
             return m_cache->info(id).isLdap;
+
+        case IsTemporary:
+            return m_cache->info(id).isTemporary;
 
         case Cycle:
             return m_groupsWithCycles.contains(id);

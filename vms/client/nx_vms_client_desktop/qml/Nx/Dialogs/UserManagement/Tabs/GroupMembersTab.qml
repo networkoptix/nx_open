@@ -70,7 +70,9 @@ MembershipSettings
         iconSource: model.isUser
             ? model.isLdap
                 ? "image://svg/skin/user_settings/user_ldap.svg"
-                : "image://svg/skin/user_settings/user_local.svg"
+                : (model.isTemporary
+                    ? "image://svg/skin/user_settings/user_local_temp.svg"
+                    : "image://svg/skin/user_settings/user_local.svg")
             : model.isLdap
                 ? "image://svg/skin/user_settings/group_ldap.svg"
                 : "image://svg/skin/user_settings/group_custom.svg"

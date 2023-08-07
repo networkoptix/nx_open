@@ -30,6 +30,7 @@ QHash<int, QByteArray> RecursiveMembersModel::roleNames() const
     roles[IsUserRole] = "isUser";
     roles[OffsetRole] = "offset";
     roles[IsLdap] = "isLdap";
+    roles[IsTemporary] = "isTemporary";
     return roles;
 }
 
@@ -47,6 +48,8 @@ QVariant RecursiveMembersModel::getMemberData(int offset, const QnUuid& id, int 
             return QVariant::fromValue(id);
         case IsLdap:
             return m_cache->info(id).isLdap;
+        case IsTemporary:
+            return m_cache->info(id).isTemporary;
     }
     return {};
 }
