@@ -2269,6 +2269,7 @@ void initialize(Manager* manager, Action* root)
     factory.endSubMenu();
 
     vx::registerDebugVxAction(factory);
+    vx::registerDismissSystemAlertAction(factory);
 
     // -- Developer mode actions end. Please do not add real actions afterwards.
 }

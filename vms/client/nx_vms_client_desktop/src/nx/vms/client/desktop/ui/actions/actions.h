@@ -1097,6 +1097,11 @@ enum IDType
     NewMonitoringLayoutAction,
 
     /**
+     * Dismisses all alerting from a system, provided a system id.
+     */
+    DismissSystemAlertAction,
+
+    /**
      * Sets spacing of current layout's cells to None.
      */
     SetCurrentLayoutItemSpacingNoneAction,
