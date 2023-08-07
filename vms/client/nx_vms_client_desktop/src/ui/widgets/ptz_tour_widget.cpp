@@ -40,11 +40,11 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
 
     connect(m_model, &QnPtzTourSpotsModel::spotsChanged, this, &QnPtzTourWidget::tourSpotsChanged);
 
-    ui->addSpotButton->setIcon(qnSkin->icon("buttons/plus_20.svg", kIconSubstitutions));
+    ui->addSpotButton->setIcon(qnSkin->icon("buttons/add_20x20.svg", kIconSubstitutions));
     connect(ui->addSpotButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_addSpotButton_clicked);
 
-    ui->deleteSpotButton->setIcon(qnSkin->icon("buttons/minus_20.svg", kIconSubstitutions));
+    ui->deleteSpotButton->setIcon(qnSkin->icon("buttons/minus_20x20.svg", kIconSubstitutions));
     connect(ui->deleteSpotButton, &QPushButton::clicked, this,
         &QnPtzTourWidget::at_deleteSpotButton_clicked);
 
