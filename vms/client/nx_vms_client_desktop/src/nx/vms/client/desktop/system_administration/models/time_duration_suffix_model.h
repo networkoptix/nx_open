@@ -8,7 +8,7 @@
 namespace nx::vms::client::desktop {
 
 /**
- * A model for displaying time duration suffixes: seconds, minutes, hours.
+ * A model for displaying time duration suffixes: seconds, minutes, hours, days, etc.
  */
 class TimeDurationSuffixModel: public QAbstractListModel
 {
@@ -19,15 +19,15 @@ class TimeDurationSuffixModel: public QAbstractListModel
     using base_type = QAbstractListModel;
 
     Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(QList<int> suffixes READ suffixes WRITE setSuffixes NOTIFY suffixesChanged)
 
 public:
     enum class Suffix
     {
-        secondsIndex = 0,
-        minutesIndex,
-        hoursIndex,
-
-        count
+        seconds = 0,
+        minutes,
+        hours,
+        days
     };
     Q_ENUM(Suffix)
 
@@ -41,15 +41,23 @@ public:
     int value() const { return m_value; }
     void setValue(int value);
 
-    Q_INVOKABLE static int multiplierAt(int row);
+    Q_INVOKABLE int multiplierAt(int row);
+
+    QList<int> suffixes() const;
+    void setSuffixes(const QList<int> &suffixes);
 
     static void registerQmlType();
 
 signals:
     void valueChanged();
+    void suffixesChanged();
 
 private:
     int m_value = 0;
+    QList<int> m_suffixes = {
+        (int) Suffix::seconds,
+        (int) Suffix::minutes,
+        (int) Suffix::hours};
 };
 
 } // namespace nx::vms::client::desktop
