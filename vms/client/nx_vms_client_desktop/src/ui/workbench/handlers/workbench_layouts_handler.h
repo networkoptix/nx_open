@@ -116,7 +116,7 @@ private:
         const LayoutResourceList& layouts,
         const StreamSynchronizationState& playbackState);
 
-    friend class vx::MenuActionHandler;
+    friend class vx::DebugHandler;
     friend class vx::MonitoringLayoutHandler;
 };
 
