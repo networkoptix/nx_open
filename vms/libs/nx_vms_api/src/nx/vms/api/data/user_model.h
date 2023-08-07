@@ -125,6 +125,7 @@ struct NX_VMS_API UserModelV1: public UserModelBase
 };
 #define UserModelV1_Fields UserModelBase_Fields(isOwner)(permissions)(userRoleId)(accessibleResources)
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV1, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(UserModelV1, UserModelV1_Fields)
 
 // -------------------------------------------------------------------------------------------------
 

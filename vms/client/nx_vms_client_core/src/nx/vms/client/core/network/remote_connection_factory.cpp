@@ -40,6 +40,7 @@ namespace {
 
 static const nx::utils::SoftwareVersion kRestApiSupportVersion(5, 0);
 static const nx::utils::SoftwareVersion kSimplifiedLoginSupportVersion(5, 1);
+static const nx::utils::SoftwareVersion kUserRightsRedesignVersion(6, 0);
 
 /**
  * Digest authentication requires username to be in lowercase.
@@ -174,7 +175,8 @@ struct RemoteConnectionFactory::Private
         ConnectionInfo connectionInfo{
             .address = context->address(),
             .credentials = context->credentials(),
-            .userType = context->userType()};
+            .userType = context->userType(),
+            .compatibilityUserModel = context->compatibilityUserModel};
 
         return std::make_shared<RemoteConnection>(
             peerType,
@@ -598,6 +600,22 @@ struct RemoteConnectionFactory::Private
         return true;
     }
 
+    /**
+     * Systems before 6.0 use old permissions model, where resource access is controlled by global
+     * permissions and there is a special `isAdmin` field.
+     */
+    bool isOldPermissionsModelUsed(ContextPtr context)
+    {
+        if (!context)
+            return false;
+
+        if (!context->moduleInformation.version.isNull())
+            return context->moduleInformation.version < kUserRightsRedesignVersion;
+
+        return context->expectedServerVersion()
+            && *context->expectedServerVersion() < kUserRightsRedesignVersion;
+    }
+
     void loginWithDigest(ContextPtr context)
     {
         if (context)
@@ -772,6 +790,31 @@ struct RemoteConnectionFactory::Private
                 nx::network::http::BearerAuthToken(session.token);
             context->sessionTokenExpirationTime =
                 qnSyncTime->currentTimePoint() + session.expiresInS;
+        }
+    }
+
+    void emulateCompatibilityUserModel(ContextPtr context)
+    {
+        if (!context)
+            return;
+
+        context->compatibilityUserModel = nx::vms::api::UserModelV1();
+        context->compatibilityUserModel->isOwner = true;
+    }
+
+    void requestCompatibilityUserPermissions(ContextPtr context)
+    {
+        if (!context)
+            return;
+
+        if (!NX_ASSERT(!context->credentials().username.empty()))
+            return;
+
+        nx::vms::api::UserModelV1 userModel = requestsManager->getUserModel(context);
+        if (!context->failed())
+        {
+            NX_VERBOSE(this, "Compatibility user model received");
+            context->compatibilityUserModel = userModel;
         }
     }
 
@@ -1002,6 +1045,9 @@ struct RemoteConnectionFactory::Private
         {
             NX_DEBUG(this, "Login with Digest to the System with no REST API support.");
             loginWithDigest(context()); //< GET /api/moduleInformationAuthenticated
+
+            /** Emulate admin user for the old systems. */
+            emulateCompatibilityUserModel(context());
             return;
         }
 
@@ -1046,6 +1092,14 @@ struct RemoteConnectionFactory::Private
                 else
                     issueLocalToken(context()); //< GET /rest/v1/login/sessions
             }
+        }
+
+        // For the older systems (before user rights redesign) expliticly request current user
+        // permissions.
+        if (isOldPermissionsModelUsed(context()))
+        {
+            //< GET /rest/v1/users/<username>
+            requestCompatibilityUserPermissions(context());
         }
     }
 };
