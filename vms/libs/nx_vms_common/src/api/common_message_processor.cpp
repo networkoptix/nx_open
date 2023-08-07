@@ -522,11 +522,16 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const FullInfoData& fullData)
 {
+    NX_DEBUG(this, "Full info received");
+    const auto start = qnSyncTime->currentTimePoint();
+
     onGotInitialNotification(fullData);
 
     // TODO: #sivanov Logic is not perfect, who will clean them on disconnect?
     resetEventRules(fullData.rules);
     resetVmsRules(fullData.vmsRules);
+
+    NX_DEBUG(this, "Full info processed in %1", qnSyncTime->currentTimePoint() - start);
 }
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(

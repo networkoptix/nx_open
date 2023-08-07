@@ -636,6 +636,7 @@ private:
     nx::utils::CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     nx::utils::CachedValue<nx::vms::api::DeviceType> m_cachedExplicitDeviceType;
     nx::utils::CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
+    nx::utils::CachedValue<QnIOPortDataList> m_cachedIoPorts;
 
 protected slots:
     virtual void resetCachedValues();
