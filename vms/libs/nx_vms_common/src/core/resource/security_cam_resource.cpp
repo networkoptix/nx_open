@@ -22,11 +22,13 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/backup_settings.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <recording/time_period_list.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/synctime.h>
+
 
 #define SAFE(expr) {NX_MUTEX_LOCKER lock( &m_mutex ); expr;}
 
@@ -68,8 +70,6 @@ bool cameraExists(QnResourcePool* resourcePool, const QnUuid& uuid)
 
 } // namespace
 
-const Qn::LicenseType QnSecurityCamResource::kDefaultLicenseType = Qn::LC_Professional;
-
 bool QnSecurityCamResource::MotionStreamIndex::operator==(const MotionStreamIndex& other) const
 {
     return index == other.index && isForced == other.isForced;
@@ -91,7 +91,10 @@ QnUuid QnSecurityCamResource::makeCameraIdFromPhysicalId(const QString& physical
 void QnSecurityCamResource::setSystemContext(nx::vms::common::SystemContext* systemContext)
 {
     if (auto context = this->systemContext())
+    {
         context->resourceDataPool()->disconnect(this);
+        context->saasServiceManager()->disconnect(this);
+    }
 
     base_type::setSystemContext(systemContext);
 
@@ -99,6 +102,12 @@ void QnSecurityCamResource::setSystemContext(nx::vms::common::SystemContext* sys
     {
         connect(context->resourceDataPool(), &QnResourceDataPool::changed, this,
             &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
+        connect(
+            context->saasServiceManager(),
+            &nx::vms::common::saas::ServiceManager::dataChanged,
+            this,
+            &QnSecurityCamResource::resetCachedValues,
+            Qt::DirectConnection);
         resetCachedValues();
     }
 }
@@ -453,8 +462,13 @@ bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* /*dataP
 
 Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
 {
+    using namespace nx::vms::api;
     const auto licenseType = getProperty(ResourcePropertyKey::kForcedLicenseType);
-    return nx::reflect::fromString(licenseType.toStdString(), kDefaultLicenseType);
+    const bool saasMode = systemContext() 
+        && systemContext()->saasServiceManager()->state() != SaasState::uninitialized;
+    if (saasMode)
+        return Qn::LC_SaasLocalRecording;
+    return nx::reflect::fromString(licenseType.toStdString(), Qn::LC_Professional);
 }
 
 QnSecurityCamResource::MotionStreamIndex QnSecurityCamResource::motionStreamIndex() const

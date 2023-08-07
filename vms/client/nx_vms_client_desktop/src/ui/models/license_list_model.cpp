@@ -146,7 +146,7 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
 
         case ServerColumn:
         {
-            if (license->type() == Qn::LC_Cloud)
+            if (license->type() == Qn::LC_SaasLocalRecording)
                 return nx::branding::cloudHost();
             auto server = serverByLicense(license);
             if (!server)

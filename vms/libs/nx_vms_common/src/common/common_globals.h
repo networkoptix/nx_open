@@ -327,9 +327,9 @@ namespace Qn {
         LC_Nvr,
 
         /**
-         * Cloud license. Can be used instead of any previous license type
+         * Saas local recording service.
          */
-        LC_Cloud,
+        LC_SaasLocalRecording,
 
         /**
          * Invalid license. Required when the correct license type is not known in current version.

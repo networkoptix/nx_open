@@ -112,7 +112,7 @@ bool ServiceManager::loadServiceData(const std::string_view& data)
 void ServiceManager::onDataChanged()
 {
     updateLicenseV1();
-    dataChanged();
+    emit dataChanged();
 }
 
 void ServiceManager::updateLicenseV1()
