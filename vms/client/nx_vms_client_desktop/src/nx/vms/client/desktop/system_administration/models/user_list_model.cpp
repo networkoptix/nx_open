@@ -35,6 +35,17 @@ bool isCustomUser(const QnUserResourcePtr& user)
             user->getId()).isEmpty();
 }
 
+nx::vms::api::UserType userTypeForSort(nx::vms::api::UserType userType)
+{
+    switch (userType) {
+        case nx::vms::api::UserType::temporaryLocal:
+            return nx::vms::api::UserType::local;
+
+        default:
+            return userType;
+    }
+}
+
 } // namespace
 
 class UserListModel::Private:
@@ -357,6 +368,8 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     {
                         case nx::vms::api::UserType::local:
                             return tr("Local user");
+                        case nx::vms::api::UserType::temporaryLocal:
+                            return tr("Temporary user");
                         case nx::vms::api::UserType::cloud:
                             return tr("%1 user", "%1 is the short cloud name (like Cloud)")
                                 .arg(nx::branding::shortCloudName());
@@ -412,6 +425,9 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
                         case nx::vms::api::UserType::local:
                             return QString("user_settings/user_local.svg");
+
+                        case nx::vms::api::UserType::temporaryLocal:
+                            return QString("user_settings/user_local_temp.svg");
 
                         default:
                             break;
@@ -674,8 +690,8 @@ bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& r
 
         case UserListModel::UserTypeColumn:
         {
-            const auto leftType = leftUser->userType();
-            const auto rightType = rightUser->userType();
+            const auto leftType = userTypeForSort(leftUser->userType());
+            const auto rightType = userTypeForSort(rightUser->userType());
             if (leftType != rightType)
                 return leftType < rightType;
 

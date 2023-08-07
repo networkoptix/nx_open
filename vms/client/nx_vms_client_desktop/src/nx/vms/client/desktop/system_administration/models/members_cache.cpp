@@ -50,7 +50,8 @@ MembersCache::Info MembersCache::infoFromContext(
             .name = user->getName(),
             .description = user->fullName(),
             .isGroup = false,
-            .isLdap = user->isLdap()};
+            .isLdap = user->isLdap(),
+            .isTemporary = user->isTemporary()};
     }
 
     return {};

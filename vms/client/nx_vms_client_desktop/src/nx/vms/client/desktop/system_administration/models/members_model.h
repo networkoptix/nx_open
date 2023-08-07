@@ -103,6 +103,7 @@ public:
         IsAllowedMember,
         IsAllowedParent,
         IsLdap,
+        IsTemporary,
         MemberSectionRole, //< IsUserRole ? "U" : "G"
         GroupSectionRole, // Built-in? "B" : "C"
         Cycle,
