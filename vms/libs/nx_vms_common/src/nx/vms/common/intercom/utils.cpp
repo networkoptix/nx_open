@@ -17,13 +17,13 @@ namespace nx::vms::common {
 bool checkIntercomCallPortExists(const QnVirtualCameraResourcePtr& camera)
 {
     const auto portDescriptions = camera->ioPortDescriptions();
-    const auto portIter = std::find_if(portDescriptions.begin(), portDescriptions.end(),
+    return std::any_of(
+        portDescriptions.begin(),
+        portDescriptions.end(),
         [](const auto& portData)
         {
             return portData.outputName == kOpenDoorPortName;
         });
-
-    return portIter != portDescriptions.end();
 }
 
 QnUuid calculateIntercomLayoutId(const QnResourcePtr& intercom)

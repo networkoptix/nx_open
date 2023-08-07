@@ -3,12 +3,12 @@
 #include "security_cam_resource.h"
 
 #include <api/model/api_ioport_data.h>
-#include <core/resource_management/resource_data_pool.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 #include <licensing/license.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/string_conversion.h>
@@ -159,7 +159,13 @@ QnSecurityCamResource::QnSecurityCamResource():
                 getProperty(ResourcePropertyKey::kDeviceType).toStdString(),
                 nx::vms::api::DeviceType::unknown);
         }),
-    m_cachedMotionStreamIndex([this]{ return calculateMotionStreamIndex(); })
+    m_cachedMotionStreamIndex([this]{ return calculateMotionStreamIndex(); }),
+    m_cachedIoPorts(
+        [this]()
+        {
+            return std::get<0>(nx::reflect::json::deserialize<QnIOPortDataList>(
+                nx::toBufferView(getProperty(ResourcePropertyKey::kIoSettings).toUtf8())));
+        })
 {
     NX_VERBOSE(this, "Creating");
     addFlags(Qn::live_cam);
@@ -690,19 +696,21 @@ bool QnSecurityCamResource::setIoPortDescriptions(QnIOPortDataList newPorts, boo
         hasOutputs |= supportedTypes.testFlag(Qn::PT_Output);
     }
 
-    setProperty(ResourcePropertyKey::kIoSettings, QString::fromUtf8(QJson::serialized(newPorts)));
+    setProperty(
+        ResourcePropertyKey::kIoSettings,
+        QString::fromStdString(nx::reflect::json::serialize(newPorts)));
     setCameraCapability(nx::vms::api::DeviceCapability::inputPort, hasInputs);
     setCameraCapability(nx::vms::api::DeviceCapability::outputPort, hasOutputs);
+
     return wasDataMerged;
 }
 
 QnIOPortDataList QnSecurityCamResource::ioPortDescriptions(Qn::IOPortType type) const
 {
-    auto ports = QJson::deserialized<QnIOPortDataList>(
-        getProperty(ResourcePropertyKey::kIoSettings).toUtf8());
+    auto ports = m_cachedIoPorts.get();
 
     if (type != Qn::PT_Unknown)
-        nx::utils::erase_if(ports, [&](auto p) { return p.portType != type; });
+        nx::utils::erase_if(ports, [type](auto p) { return p.portType != type; });
 
     return ports;
 }
@@ -1639,6 +1647,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedLicenseType.reset();
     m_cachedExplicitDeviceType.reset();
     m_cachedMotionStreamIndex.reset();
+    m_cachedIoPorts.reset();
 }
 
 bool QnSecurityCamResource::useBitratePerGop() const
