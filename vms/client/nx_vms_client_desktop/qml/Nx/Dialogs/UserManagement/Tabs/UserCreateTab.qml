@@ -26,6 +26,10 @@ Item
     property alias email: emailTextField.text
     property alias password: passwordTextField.text
     property alias allowInsecure: allowInsecureCheckBox.checked
+    property alias linkValidUntil: temporaryLinkSettings.linkValidUntil
+    property alias expiresAfterLoginS: temporaryLinkSettings.expiresAfterLoginS
+    property alias revokeAccessEnabled: temporaryLinkSettings.revokeAccessEnabled
+    property alias displayOffsetMs: temporaryLinkSettings.displayOffsetMs
 
     property int userType: UserSettingsGlobal.LocalUser
 
@@ -34,17 +38,24 @@ Item
 
     function validate()
     {
-        if (userType == UserSettingsGlobal.LocalUser)
+        switch (userType)
         {
-            return loginTextField.validate()
-                && emailTextField.validate()
-                && passwordTextField.validate()
-                && passwordTextField.strengthAccepted
-                && confirmPasswordTextField.validate()
+            case UserSettingsGlobal.LocalUser:
+                return loginTextField.validate()
+                    && emailTextField.validate()
+                    && passwordTextField.validate()
+                    && passwordTextField.strengthAccepted
+                    && confirmPasswordTextField.validate()
+
+            case UserSettingsGlobal.TemporaryUser:
+                return loginTextField.validate()
+                    && emailTextField.validate()
+
+            case UserSettingsGlobal.Cloud:
+                return emailTextField.validate()
         }
 
-        // Cloud user.
-        return emailTextField.validate()
+        return true
     }
 
     Scrollable
@@ -85,7 +96,9 @@ Item
                     onCheckedButtonChanged:
                     {
                         control.userType = localUserButton.checked
-                            ? UserSettingsGlobal.LocalUser
+                            ? (accessComboBox.currentIndex == 0
+                                ? UserSettingsGlobal.LocalUser
+                                : UserSettingsGlobal.TemporaryUser)
                             : UserSettingsGlobal.CloudUser
                     }
                 }
@@ -175,7 +188,52 @@ Item
 
             CenteredField
             {
+                visible: control.userType == UserSettingsGlobal.LocalUser
+                    || control.userType == UserSettingsGlobal.TemporaryUser
+
+                text: qsTr("Access")
+
+                ComboBox
+                {
+                    id: accessComboBox
+                    width: parent.width
+                    textRole: "text"
+                    valueRole: "value"
+
+                    model:
+                    [
+                        {
+                            text: qsTr("Regular user with credentials"),
+                            value: UserSettingsGlobal.LocalUser
+                        },
+                        {
+                            text: qsTr("Temporary with link"),
+                            value: UserSettingsGlobal.TemporaryUser
+                        },
+                    ]
+
+                    onCurrentValueChanged:
+                    {
+                        if (control.userType == UserSettingsGlobal.LocalUser
+                            || control.userType == UserSettingsGlobal.TemporaryUser)
+                        {
+                            control.userType = accessComboBox.currentValue
+                        }
+                    }
+                }
+            }
+
+            TemporaryLinkSettings
+            {
+                id: temporaryLinkSettings
+
+                visible: control.userType == UserSettingsGlobal.TemporaryUser
+            }
+
+            CenteredField
+            {
                 visible: control.userType != UserSettingsGlobal.CloudUser
+                    && control.userType != UserSettingsGlobal.TemporaryUser
 
                 text: qsTr("Password")
 
@@ -191,6 +249,7 @@ Item
             CenteredField
             {
                 visible: control.userType != UserSettingsGlobal.CloudUser
+                    && control.userType != UserSettingsGlobal.TemporaryUser
 
                 text: qsTr("Confirm Password")
 
@@ -211,6 +270,7 @@ Item
             CenteredField
             {
                 visible: control.userType != UserSettingsGlobal.CloudUser
+                    && control.userType != UserSettingsGlobal.TemporaryUser
 
                 CheckBox
                 {

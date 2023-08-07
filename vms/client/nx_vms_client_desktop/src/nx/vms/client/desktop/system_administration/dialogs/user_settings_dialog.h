@@ -132,10 +132,17 @@ public:
 
     Q_INVOKABLE bool isOkClicked() const { return acceptOnSuccess(); }
 
+    Q_INVOKABLE QDateTime newValidUntilDate() const;
+
+    Q_INVOKABLE void cancelRequest();
+
 public slots:
     void onDeleteRequested();
     void onAuditTrailRequested();
     void onGroupClicked(const QVariant& idVariant);
+    void onTerminateLink();
+    void onResetLink(const QDateTime& validUntil, int revokeAccessAfterS, const QJSValue& callback);
+    void onCopyLink();
 
 protected:
     virtual UserSettingsDialogState createState(const QnUserResourcePtr& user) override;
