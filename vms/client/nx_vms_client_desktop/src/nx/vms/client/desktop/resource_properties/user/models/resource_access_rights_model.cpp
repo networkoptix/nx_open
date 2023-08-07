@@ -468,28 +468,27 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
         if (details.contains(context->currentSubjectId()))
         {
             const auto providers = details.value(context->currentSubjectId());
-            if (providers.contains(resource))
-            {
-                const auto resourceGroupId =
-                    AccessSubjectEditingContext::specialResourceGroupFor(resource);
-
-                const auto accessViaResourceGroup = !resourceGroupId.isNull()
-                    && context->hasOwnAccessRight(resourceGroupId, accessRightList[i]);
-
-                if (accessViaResourceGroup)
-                    newInfo.parentResourceGroupId = resourceGroupId;
-
-                newInfo.providedVia = accessViaResourceGroup
-                    ? ResourceAccessInfo::ProvidedVia::ownResourceGroup
-                    : ResourceAccessInfo::ProvidedVia::own;
-            }
-
             for (const auto& provider: providers)
             {
                 if (!NX_ASSERT(provider))
                     continue;
 
-                if (newInfo.providedVia == ResourceAccessInfo::ProvidedVia::none)
+                if (provider == resource)
+                {
+                    const auto resourceGroupId =
+                        AccessSubjectEditingContext::specialResourceGroupFor(resource);
+
+                    const auto accessViaResourceGroup = !resourceGroupId.isNull()
+                        && context->hasOwnAccessRight(resourceGroupId, accessRightList[i]);
+
+                    if (accessViaResourceGroup)
+                        newInfo.parentResourceGroupId = resourceGroupId;
+
+                    newInfo.providedVia = accessViaResourceGroup
+                        ? ResourceAccessInfo::ProvidedVia::ownResourceGroup
+                        : ResourceAccessInfo::ProvidedVia::own;
+                }
+                else
                 {
                     static const auto priorityKey =
                         [](ResourceAccessInfo::ProvidedVia providerType)
@@ -508,15 +507,15 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
                     const auto providedVia = providerType(provider.get());
                     if (priorityKey(providedVia) > priorityKey(newInfo.providedVia))
                         newInfo.providedVia = providedVia;
+
+                    // Keep arrays sorted for easy comparison.
+                    const auto insertionPos = std::upper_bound(
+                        newInfo.indirectProviders.begin(),
+                        newInfo.indirectProviders.end(),
+                        provider.get());
+
+                    newInfo.indirectProviders.insert(insertionPos, provider);
                 }
-
-                // Keep arrays sorted for easy comparison.
-                const auto insertionPos = std::upper_bound(
-                    newInfo.indirectProviders.begin(),
-                    newInfo.indirectProviders.end(),
-                    provider.get());
-
-                newInfo.indirectProviders.insert(insertionPos, provider);
             }
         }
         else if (!details.empty())
