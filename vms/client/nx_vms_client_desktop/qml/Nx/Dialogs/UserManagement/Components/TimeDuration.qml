@@ -13,6 +13,12 @@ Row
     property int seconds: 0
     property bool enabled: true
 
+    property alias valueFrom: timeSpinBox.from
+    property alias valueTo: timeSpinBox.to
+
+    property alias suffixes: suffixModel.suffixes
+    onSuffixesChanged: updateSuffix()
+
     QtObject
     {
         id: privateImpl
@@ -25,16 +31,13 @@ Row
         if (privateImpl.blockUpdates)
             return
 
-        const state = getState(seconds)
-
-        timeSpinBox.value = state.value
-        suffixComboBox.currentIndex = state.index
+        updateSuffix()
     }
 
     function getState(seconds)
     {
         // Select the best suitable suffix.
-        for (let i = TimeDurationSuffixModel.Suffix.count - 1; i > 0; --i)
+        for (let i = suffixModel.suffixes.length - 1; i > 0; --i)
         {
             const mult = suffixModel.multiplierAt(i)
             const value = Math.floor(seconds / mult)
@@ -44,6 +47,14 @@ Row
         }
 
         return {"value": seconds, "index": 0}
+    }
+
+    function updateSuffix()
+    {
+        const state = getState(seconds)
+
+        timeSpinBox.value = state.value
+        suffixComboBox.currentIndex = state.index
     }
 
     function updateSeconds()
