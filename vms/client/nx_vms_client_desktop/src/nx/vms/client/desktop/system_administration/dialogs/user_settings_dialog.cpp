@@ -22,6 +22,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
@@ -441,6 +442,25 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
     const auto sharedResources = state.sharedResources.asKeyValueRange();
     userData.resourceAccessRights = {sharedResources.begin(), sharedResources.end()};
 
+    // When user changes his own password or digest support, current session credentials should be
+    // updated correspondingly. Store actual password to update it in callback.
+    std::optional<QString> actualPassword;
+    if (d->user == systemContext()->userWatcher()->user())
+    {
+        // Changing current user password OR enabling digest authentication.
+        if (userData.password)
+        {
+            actualPassword = userData.password;
+        }
+        // Disabling digest authentication.
+        else if (d->user->digestAuthorizationEnabled() && !userData.isHttpDigestEnabled)
+        {
+            const auto credentials = systemContext()->connectionCredentials();
+            if (NX_ASSERT(credentials.authToken.isPassword()))
+                actualPassword = QString::fromStdString(credentials.authToken.value);
+        }
+    }
+
     auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
         d->parentWidget,
         tr("Save user"),
@@ -458,7 +478,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         userData,
         sessionTokenHelper,
         nx::utils::guarded(this,
-            [this, state](
+            [this, state, actualPassword](
                 bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
             {
                 if (NX_ASSERT(handle == d->m_currentRequest))
@@ -481,6 +501,12 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                         messageBox.exec();
                     }
                     return;
+                }
+
+                if (actualPassword)
+                {
+                    if (auto currentSession = systemContext()->session())
+                        currentSession->updatePassword(*actualPassword);
                 }
 
                 if (auto data = std::get_if<nx::vms::api::UserModelV3>(&errorOrData))
