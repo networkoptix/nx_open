@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Window
 
 import Nx
 import Nx.Core
@@ -449,10 +450,15 @@ Item
 
             text: qsTr("Automatically add dependent access rights")
 
+            readonly property bool windowVisible: Window.visibility !== Window.Hidden
+
             Component.onCompleted:
                 checked = GlobalTemporaries.automaticAccessDependenciesEnabledByDefault
 
-            onCheckedChanged:
+            onWindowVisibleChanged:
+                checked = GlobalTemporaries.automaticAccessDependenciesEnabledByDefault
+
+            onToggled:
                 GlobalTemporaries.automaticAccessDependenciesEnabledByDefault = checked
         }
     }
