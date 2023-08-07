@@ -16,6 +16,7 @@
 #include <nx/network/ssl/helpers.h>
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/api/data/user_model.h>
 
 #include "logon_data.h"
 #include "remote_connection_error.h"
@@ -51,6 +52,9 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
 
     /** List of all Servers of the System (5.0+). */
     std::vector<nx::vms::api::ServerInformation> serversInfo;
+
+    /** User info for the pre-6.0 Systems where old permissions model is implemented. */
+    std::optional<nx::vms::api::UserModelV1> compatibilityUserModel;
 
     nx::network::ssl::CertificateChain handshakeCertificateChain;
     std::shared_ptr<CertificateCache> certificateCache;
