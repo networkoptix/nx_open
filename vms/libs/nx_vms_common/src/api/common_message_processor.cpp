@@ -31,20 +31,17 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/data/access_rights_data_deprecated.h>
 #include <nx/vms/api/data/full_info_data.h>
-#include <nx/vms/api/data/hardware_id_mapping.h>
 #include <nx/vms/api/data/runtime_data.h>
-#include <nx/vms/api/rules/event_info.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
-#include <nx/vms/time/abstract_time_sync_manager.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_analytics_manager.h>
@@ -943,14 +940,21 @@ void QnCommonMessageProcessor::resetVmsRules(const nx::vms::api::rules::RuleList
 void QnCommonMessageProcessor::resetUserGroups(const UserGroupDataList& userGroups)
 {
     m_context->userGroupManager()->resetAll(userGroups);
+
+    // Ensure group permissions cached
+    for (const auto& group: userGroups)
+    {
+        m_context->accessRightsManager()->setOwnResourceAccessMap(
+            group.getId(), {group.resourceAccessRights.begin(), group.resourceAccessRights.end()});
+    }
 }
 
-bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &, ec2::NotificationSource source)
+bool QnCommonMessageProcessor::canRemoveResource(const QnUuid&, ec2::NotificationSource)
 {
     return true;
 }
 
-void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
+void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid&)
 {
 }
 
