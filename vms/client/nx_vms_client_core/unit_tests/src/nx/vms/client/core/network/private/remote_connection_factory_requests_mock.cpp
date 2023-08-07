@@ -34,6 +34,13 @@ RemoteConnectionFactoryRequestsManager::ServersInfoReply
     return {.serversInfo = m_servers, .handshakeCertificateChain = m_handshakeCertificateChain};
 }
 
+nx::vms::api::UserModelV1
+    RemoteConnectionFactoryRequestsManager::getUserModel(ContextPtr context) const
+{
+    ++m_requestsCount;
+    return {};
+}
+
 nx::vms::api::LoginUser RemoteConnectionFactoryRequestsManager::getUserType(
     ContextPtr context) const
 {
