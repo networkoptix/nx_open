@@ -28,6 +28,8 @@ public:
 
     virtual ServersInfoReply getServersInfo(ContextPtr context) const override;
 
+    virtual nx::vms::api::UserModelV1 getUserModel(ContextPtr context) const override;
+
     virtual nx::vms::api::LoginUser getUserType(ContextPtr context) const override;
     virtual nx::vms::api::LoginSession createLocalSession(ContextPtr context) const override;
     virtual nx::vms::api::LoginSession getCurrentSession(ContextPtr context) const override;

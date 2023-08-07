@@ -390,6 +390,21 @@ RemoteConnectionFactoryRequestsManager::ServersInfoReply
     return reply;
 }
 
+nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::getUserModel(
+    ContextPtr context) const
+{
+    NX_DEBUG(this, "Requesting user %1 model from %2", context->credentials().username, context);
+
+    const auto encodedUsername =
+        QUrl::toPercentEncoding(QString::fromStdString(context->credentials().username))
+            .toStdString();
+
+    const auto url = makeUrl(context->address(), "/rest/v1/users/" + encodedUsername);
+    auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
+    request->setCredentials(context->credentials());
+    return d->doGet<nx::vms::api::UserModelV1>(url, context, std::move(request));
+}
+
 nx::vms::api::LoginUser RemoteConnectionFactoryRequestsManager::getUserType(
     ContextPtr context) const
 {

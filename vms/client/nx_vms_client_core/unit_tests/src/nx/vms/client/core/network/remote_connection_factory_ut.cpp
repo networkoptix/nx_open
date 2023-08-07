@@ -35,6 +35,7 @@ std::string makeCertificateAndKey()
 static const nx::utils::SoftwareVersion kVersion42(4, 2);
 static const nx::utils::SoftwareVersion kVersion50(5, 0);
 static const nx::utils::SoftwareVersion kVersion51(5, 1);
+static const nx::utils::SoftwareVersion kVersion60(6, 0);
 static const QnUuid kExpectedServerId = QnUuid::createUuid();
 static const QString kCloudSystemId = QnUuid::createUuid().toSimpleString();
 static const std::string kExpectedServerPem = makeCertificateAndKey();
@@ -319,7 +320,7 @@ private:
 
 TEST_F(RemoteConnectionFactoryTest, localSystemMinimalTest)
 {
-    givenSystem({.version = kVersion51});
+    givenSystem({.version = kVersion60});
     givenLogonData({});
     whenConnectToSystem();
     thenRequestsCountIs(3); //< serversInfo, userType, loginWithToken
@@ -329,7 +330,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystemMinimalTest)
 
 TEST_F(RemoteConnectionFactoryTest, localSystemNoTokenTest)
 {
-    givenSystem({.version = kVersion51});
+    givenSystem({.version = kVersion60});
     givenLogonData({.hasToken = false});
     whenConnectToSystem();
     thenRequestsCountIs(3); //< serversInfo, userType, issueToken
@@ -339,7 +340,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystemNoTokenTest)
 
 TEST_F(RemoteConnectionFactoryTest, localSystemNoUsernameTest)
 {
-    givenSystem({.version = kVersion51});
+    givenSystem({.version = kVersion60});
     givenLogonData({});
     logonData.credentials.username = {};
     whenConnectToSystem();
@@ -350,11 +351,21 @@ TEST_F(RemoteConnectionFactoryTest, localSystemNoUsernameTest)
 
 TEST_F(RemoteConnectionFactoryTest, localSystemNoVersionTest)
 {
-    givenSystem({.version = kVersion51});
+    givenSystem({.version = kVersion60});
     givenLogonData({.hasVersion = false});
     whenConnectToSystem();
     thenRequestsCountIs(4); //< moduleInformation, serversInfo, userType, loginWithToken
     thenConnectionSuccessful();
+}
+
+TEST_F(RemoteConnectionFactoryTest, localSystem51MinimalTest)
+{
+    givenSystem({.version = kVersion51});
+    givenLogonData({});
+    whenConnectToSystem();
+    thenRequestsCountIs(4); //< serversInfo, userType, loginWithToken, userModel
+    thenConnectionSuccessful();
+    thenAuthenticatedAsLocalUser();
 }
 
 TEST_F(RemoteConnectionFactoryTest, localSystem50MinimalTest)
@@ -362,7 +373,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystem50MinimalTest)
     givenSystem({.version = kVersion50});
     givenLogonData({});
     whenConnectToSystem();
-    thenRequestsCountIs(3); //< serversInfo, userType, loginWithToken
+    thenRequestsCountIs(4); //< serversInfo, userType, loginWithToken, userModel
     thenConnectionSuccessful();
 }
 
@@ -371,7 +382,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystem50MultiServerTest)
     givenSystem({.version = kVersion50, .serversCount = 2});
     givenLogonData({});
     whenConnectToSystem();
-    thenRequestsCountIs(3); //< serversInfo, userType, loginWithToken
+    thenRequestsCountIs(4); //< serversInfo, userType, loginWithToken, userModel
     thenConnectionSuccessful();
 }
 
@@ -380,7 +391,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystem50MultiServerNoIdTest)
     givenSystem({.version = kVersion50, .serversCount = 2});
     givenLogonData({.hasId = false});
     whenConnectToSystem();
-    thenRequestsCountIs(4); //< serversInfo, moduleInformation, userType, loginWithToken
+    thenRequestsCountIs(5); //< serversInfo, moduleInformation, userType, loginWithToken, userModel
     thenConnectionSuccessful();
 }
 
@@ -389,7 +400,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystem50NoVersionTest)
     givenSystem({.version = kVersion50, .serversCount = 2});
     givenLogonData({.hasVersion = false});
     whenConnectToSystem();
-    thenRequestsCountIs(4); //< moduleInformation, serversInfo, userType, loginWithToken
+    thenRequestsCountIs(5); //< moduleInformation, serversInfo, userType, loginWithToken, userModel
     thenConnectionSuccessful();
 }
 
@@ -413,7 +424,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystem42NoIdMultipleServersTest)
 
 TEST_F(RemoteConnectionFactoryTest, cloudSystemMinimalTest)
 {
-    givenSystem({.version = kVersion51});
+    givenSystem({.version = kVersion60});
     givenLogonData({.isCloud = true});
     whenConnectToSystem();
     thenRequestsCountIs(2); //< serversInfo, loginWithToken
@@ -422,7 +433,7 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystemMinimalTest)
 
 TEST_F(RemoteConnectionFactoryTest, cloudSystemNoIdTest)
 {
-    givenSystem({.version = kVersion51});
+    givenSystem({.version = kVersion60});
     givenLogonData({.hasId = false, .isCloud = true});
     whenConnectToSystem();
     thenRequestsCountIs(2); //< serversInfo, loginWithToken
@@ -431,7 +442,7 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystemNoIdTest)
 
 TEST_F(RemoteConnectionFactoryTest, cloudSystemNoIdMultipleServersTest)
 {
-    givenSystem({.version = kVersion51, .serversCount = 2});
+    givenSystem({.version = kVersion60, .serversCount = 2});
     givenLogonData({.hasId = false, .isCloud = true});
     whenConnectToSystem();
     thenRequestsCountIs(2); //< serversInfo, loginWithToken
@@ -443,7 +454,7 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystem50NoIdTest)
     givenSystem({.version = kVersion50});
     givenLogonData({.hasId = false, .isCloud = true});
     whenConnectToSystem();
-    thenRequestsCountIs(2); //< serversInfo, loginWithToken
+    thenRequestsCountIs(3); //< serversInfo, loginWithToken, userModel
     thenConnectionSuccessful();
 }
 
@@ -452,7 +463,7 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystem50NoIdMultipleServersTest)
     givenSystem({.version = kVersion50, .serversCount = 2});
     givenLogonData({.hasId = false, .isCloud = true});
     whenConnectToSystem();
-    thenRequestsCountIs(3); //< serversInfo, moduleInformation, loginWithToken
+    thenRequestsCountIs(4); //< serversInfo, moduleInformation, loginWithToken, userModel
     thenConnectionSuccessful();
 }
 
@@ -464,6 +475,8 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystem42Test)
     thenRequestsCountIs(2); //< moduleInformation, loginWithDigest
     thenConnectionSuccessful();
 }
+
+// Check whether compatibility model is not requested for 6.0 systems.
 
 // TODO: desktop client
 // TODO: videowall
