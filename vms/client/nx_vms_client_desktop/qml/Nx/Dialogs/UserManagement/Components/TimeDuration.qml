@@ -26,39 +26,41 @@ Row
         property bool blockUpdates: false
     }
 
-    onSecondsChanged:
-    {
-        if (privateImpl.blockUpdates)
-            return
-
-        updateSuffix()
-    }
+    onSecondsChanged: updateSuffix()
 
     function getState(seconds)
     {
         // Select the best suitable suffix.
-        for (let i = suffixModel.suffixes.length - 1; i > 0; --i)
+        for (let i = suffixModel.suffixes.length - 1; i >= 0; --i)
         {
             const mult = suffixModel.multiplierAt(i)
             const value = Math.floor(seconds / mult)
 
-            if (value != 0 && seconds == value * mult)
+            if ((value != 0 && seconds == value * mult) || i == 0)
                 return {"value": value, "index": i}
         }
-
-        return {"value": seconds, "index": 0}
     }
 
     function updateSuffix()
     {
+        if (privateImpl.blockUpdates)
+            return
+
+        privateImpl.blockUpdates = true
+
         const state = getState(seconds)
 
         timeSpinBox.value = state.value
         suffixComboBox.currentIndex = state.index
+
+        privateImpl.blockUpdates = false
     }
 
     function updateSeconds()
     {
+        if (privateImpl.blockUpdates)
+            return
+
         privateImpl.blockUpdates = true
 
         control.seconds = timeSpinBox.value * suffixModel.multiplierAt(suffixComboBox.currentIndex)

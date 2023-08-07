@@ -21,6 +21,9 @@ DialogButtonBox
         {
             const button = buttonBox.standardButton(buttonId)
 
+            if (!button)
+                continue
+
             // Data that would be captured in binding closure.
             const data =
             {

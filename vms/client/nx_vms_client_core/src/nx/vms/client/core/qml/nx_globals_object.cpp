@@ -13,6 +13,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/time/formatter.h>
 
 namespace nx::vms::client::core {
 
@@ -304,6 +305,11 @@ QString NxGlobalsObject::modifierName(const Qt::KeyboardModifier modifier) const
         default:
             return "";
     }
+}
+
+QString NxGlobalsObject::dateInShortFormat(const QDateTime& date)
+{
+    return nx::vms::time::toString(date, nx::vms::time::Format::dd_MM_yyyy);
 }
 
 } // namespace nx::vms::client::core
