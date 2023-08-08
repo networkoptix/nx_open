@@ -17,8 +17,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CurrentPasswordData, (json), CurrentPasswordDat
 PasswordHashes PasswordHashes::calculateHashes(
     const QString& username, const QString& password, bool isLdap)
 {
-    PasswordData result;
+    PasswordHashes result;
     result.realm = nx::network::AppInfo::realm().c_str();
+
+    if (password.isEmpty())
+        return result;
 
     result.passwordHash = isLdap
         ? QnUserHash::ldapPassword(password).toString()

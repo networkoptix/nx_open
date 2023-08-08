@@ -220,6 +220,7 @@ QString QnUserHash::toLdapPassword() const
 
 QnUserHash QnUserHash::ldapPassword(const QString& password)
 {
+    NX_ASSERT(!password.isEmpty());
     QnUserHash result;
     result.type = Type::ldapPassword;
     result.salt = QByteArray::number(nx::utils::random::number(), 16);
