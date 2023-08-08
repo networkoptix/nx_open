@@ -21,6 +21,11 @@ static const QnUuid kEngineId("bd0c8d99-5092-4db0-8767-1ae571250be9");
 static const QnUuid kEngineId2("bd0c8d99-5092-4db0-8767-1ae571250be8");
 static const QnUuid kAnalyticsServiceId("94ca45f8-4859-457a-bc17-f2f9394524fe");
 
+static const QnUuid kServiceUnlimitedMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dc");
+static const QnUuid kServiceTenMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dd");
+static const QnUuid kServiceFiveMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0de");
+
+
 static const std::string kServiceDataJson = R"json(
 [
   {
@@ -189,7 +194,7 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServicesLoaded)
 
     ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
 
-    auto info = m_cloudeStorageHelper->allInfo();
+    auto info = m_cloudeStorageHelper->allInfoByMegapixels();
     ASSERT_EQ(3, info.size());
 
     // 5 Megapixels licenses.
@@ -208,14 +213,14 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
 
     auto cameras1 = addCameras(/*size*/ 50, /* megapixels*/ 5, /*useBackup*/ true);
 
-    auto info = m_cloudeStorageHelper->allInfo();
+    auto info = m_cloudeStorageHelper->allInfoByMegapixels();
     ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
     ASSERT_EQ(cameras1.size(), info[5].inUse); //< 5 Megapixels licenses.
 
     m_cloudeStorageHelper->invalidateCache();
     auto cameras2 = addCameras(/*size*/ 200, /* megapixels*/ 6, /*useBackup*/ true);
     ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
-    info = m_cloudeStorageHelper->allInfo();
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
     ASSERT_EQ(cameras1.size(), info[5].inUse); //< 5 Megapixels licenses.
     ASSERT_EQ(100, info[10].inUse); //< 10 Megapixels licenses.
     ASSERT_EQ(100, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
@@ -223,7 +228,7 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
     m_cloudeStorageHelper->invalidateCache();
     addCameras(/*size*/ 200, /* megapixels*/ 6, /*useBackup*/ false);
     ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
-    info = m_cloudeStorageHelper->allInfo();
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
     ASSERT_EQ(cameras1.size(), info[5].inUse); //< 5 Megapixels licenses.
     ASSERT_EQ(100, info[10].inUse); //< 10 Megapixels licenses.
     ASSERT_EQ(100, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
@@ -247,10 +252,46 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
         devices.insert(camera->getId());
     m_cloudeStorageHelper->setUsedDevices(devices);
     ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
-    info = m_cloudeStorageHelper->allInfo();
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
     ASSERT_EQ(cameras1.size(), info[5].inUse); //< 5 Megapixels licenses.
     ASSERT_EQ(0, info[10].inUse); //< 10 Megapixels licenses.
     ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+    
+    auto serviceIdInfo = m_cloudeStorageHelper->allInfoByService();
+    ASSERT_EQ(3, serviceIdInfo.size());
+
+    // Unlimited Megapixels licenses.
+    ASSERT_EQ(0, serviceIdInfo[kServiceUnlimitedMegapixels].inUse);
+
+    // 10 Megapixels licenses.
+    ASSERT_EQ(0, serviceIdInfo[kServiceTenMegapixels].inUse);
+
+    // 5 Megapixels licenses.
+    ASSERT_EQ(cameras1.size(), serviceIdInfo[kServiceFiveMegapixels].inUse);
+
+    devices.clear();
+    for (const auto& camera: cameras2)
+        devices.insert(camera->getId());
+    m_cloudeStorageHelper->setUsedDevices(devices);
+    ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
+
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
+    ASSERT_EQ(0, info[5].inUse); //< 5 Megapixels licenses.
+    ASSERT_EQ(100, info[10].inUse); //< 10 Megapixels licenses.
+    ASSERT_EQ(100, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+
+    serviceIdInfo = m_cloudeStorageHelper->allInfoByService();
+    ASSERT_EQ(3, serviceIdInfo.size());
+
+    // Unlimited Megapixels licenses.
+    ASSERT_EQ(100, serviceIdInfo[kServiceUnlimitedMegapixels].inUse);
+
+    // 10 Megapixels licenses.
+    ASSERT_EQ(100, serviceIdInfo[kServiceTenMegapixels].inUse);
+
+    // 5 Megapixels licenses.
+    ASSERT_EQ(0, serviceIdInfo[kServiceFiveMegapixels].inUse);
+
 }
 
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
