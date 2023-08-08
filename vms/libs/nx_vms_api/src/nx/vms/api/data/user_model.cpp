@@ -44,7 +44,8 @@ UserDataEx UserModelBase::toUserData() &&
         user.password = std::move(*password);
     if (externalId)
         user.externalId = std::move(*externalId);
-    user.attributes = std::move(attributes);
+    if (attributes)
+        user.attributes = std::move(*attributes);
     if (!isHttpDigestEnabled)
         user.digest = UserData::kHttpIsDisabledStub;
     if (isHttpDigestEnabled && user.digest == UserData::kHttpIsDisabledStub)
@@ -64,7 +65,8 @@ UserModelBase UserModelBase::fromUserData(UserData&& baseData)
     model.isEnabled = std::move(baseData.isEnabled);
     if (!baseData.externalId.dn.isEmpty())
         model.externalId = std::move(baseData.externalId);
-    model.attributes = std::move(baseData.attributes);
+    if (baseData.attributes != UserAttributes{})
+        model.attributes = std::move(baseData.attributes);
     model.digest = std::move(baseData.digest);
     model.hash = std::move(baseData.hash);
     model.cryptSha512Hash = std::move(baseData.cryptSha512Hash);
