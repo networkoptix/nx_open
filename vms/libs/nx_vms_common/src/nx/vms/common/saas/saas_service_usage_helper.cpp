@@ -11,6 +11,8 @@
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
 
+using namespace nx::vms::api;
+
 namespace {
 
 int getMegapixels(const auto& camera)
@@ -20,7 +22,7 @@ int getMegapixels(const auto& camera)
     {
         // In case of device don't provide megapixel information then it requires license
         // without megapixels restriction.
-        megapixels = nx::vms::api::SaasCloudStorageParameters::kUnlimitedResolution;
+        megapixels = SaasCloudStorageParameters::kUnlimitedResolution;
     }
     return megapixels;
 }
@@ -80,10 +82,9 @@ void IntegrationServiceUsageHelper::invalidateCache()
 
 void IntegrationServiceUsageHelper::updateCacheUnsafe() const
 {
-    m_cache = std::map<QnUuid, nx::vms::api::LicenseSummaryDataEx>();
+    m_cache = std::map<QnUuid, LicenseSummaryDataEx>();
 
     // Update integration info
-    using namespace nx::vms::api;
     const auto saasData = m_context->saasServiceManager()->data();
 
     for (const auto& [serviceId, integration]: m_context->saasServiceManager()->analyticsIntegrations())
@@ -112,16 +113,16 @@ void IntegrationServiceUsageHelper::updateCacheUnsafe() const
     }
 }
 
-nx::vms::api::LicenseSummaryDataEx IntegrationServiceUsageHelper::info(const QnUuid& id)
+LicenseSummaryDataEx IntegrationServiceUsageHelper::info(const QnUuid& id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
         updateCacheUnsafe();
     const auto it = m_cache->find(id);
-    return it != m_cache->end() ? it->second : nx::vms::api::LicenseSummaryDataEx();
+    return it != m_cache->end() ? it->second : LicenseSummaryDataEx();
 }
 
-std::map<QnUuid, nx::vms::api::LicenseSummaryDataEx> IntegrationServiceUsageHelper::allInfo() const
+std::map<QnUuid, LicenseSummaryDataEx> IntegrationServiceUsageHelper::allInfo() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
@@ -216,7 +217,6 @@ std::map<QnUuid, std::set<QnUuid>> IntegrationServiceUsageHelper::camerasByServi
     std::map<QnUuid, std::set<QnUuid>> result;
 
     // Update integration info
-    using namespace nx::vms::api;
     QMap<QnUuid, QnUuid> serviceByIntegration;
     for (const auto& [serviceId, integration]: m_context->saasServiceManager()->analyticsIntegrations())
         serviceByIntegration[integration.integrationId] = serviceId;
@@ -237,6 +237,16 @@ std::map<QnUuid, std::set<QnUuid>> IntegrationServiceUsageHelper::camerasByServi
         }
     }
     return result;
+}
+
+// --------------------------- ServiceInfo --------------------------------------
+
+bool CloudStorageServiceUsageHelper::ServiceInfo::operator<(
+    const CloudStorageServiceUsageHelper::ServiceInfo& other) const
+{
+    if (megapixels != other.megapixels)
+        return megapixels < other.megapixels;
+    return serviceId < other.serviceId;
 }
 
 // --------------------------- CloudStorageServiceUsageHelper -------------------
@@ -263,14 +273,12 @@ void CloudStorageServiceUsageHelper::invalidateCache()
 
 void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
 {
-    using namespace nx::vms::api;
-
     auto& cache = *m_cache;
     const auto saasData = m_context->saasServiceManager()->data();
     auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
-    for (const auto& [_, parameters]: cloudStorageData)
+    for (const auto& [id, parameters]: cloudStorageData)
     {
-        auto& cacheData = cache[parameters.maxResolution];
+        auto& cacheData = cache[{parameters.maxResolution, id}];
         cacheData.total += parameters.totalChannelNumber;
         if (saasData.state == SaasState::active)
             cacheData.available += parameters.totalChannelNumber;
@@ -279,25 +287,22 @@ void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
 
 void CloudStorageServiceUsageHelper::updateCacheUnsafe() const
 {
-    using namespace nx::vms::api;
-
-    m_cache = std::map<int, nx::vms::api::LicenseSummaryData>();
+    m_cache = std::map<ServiceInfo, LicenseSummaryData>();
     calculateAvailableUnsafe();
     processUsedDevicesUnsafe(getAllCameras());
 }
 
 void CloudStorageServiceUsageHelper::processUsedDevicesUnsafe(const QnVirtualCameraResourceList& cameras) const
 {
-    using namespace nx::vms::api;
-
     for (const auto& camera: cameras)
     {
         if (camera->isBackupEnabled())
         {
             const int megapixels = getMegapixels(camera);
-            auto it = m_cache->lower_bound(megapixels);
+            ServiceInfo key{megapixels, QnUuid()};
+            auto it = m_cache->lower_bound(key);
             if (it == m_cache->end())
-                it = m_cache->emplace(megapixels, LicenseSummaryData()).first;
+                it = m_cache->emplace(key, LicenseSummaryData()).first;
             ++it->second.inUse;
         }
     }
@@ -306,11 +311,9 @@ void CloudStorageServiceUsageHelper::processUsedDevicesUnsafe(const QnVirtualCam
 
 void CloudStorageServiceUsageHelper::setUsedDevices(const QSet<QnUuid>& devices)
 {
-    using namespace nx::vms::api;
-
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    m_cache = std::map<int, nx::vms::api::LicenseSummaryData>();
+    m_cache = std::map<ServiceInfo, LicenseSummaryData>();
     calculateAvailableUnsafe();
 
     QnVirtualCameraResourceList cameras;
@@ -329,11 +332,9 @@ void CloudStorageServiceUsageHelper::proposeChange(
     const std::set<QnUuid>& devicesToAdd, 
     const std::set<QnUuid>& devicesToRemove)
 {
-    using namespace nx::vms::api;
-
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    m_cache = std::map<int, nx::vms::api::LicenseSummaryData>();
+    m_cache = std::map<ServiceInfo, LicenseSummaryData>();
     calculateAvailableUnsafe();
 
     auto cameras = systemContext()->resourcePool()->getAllCameras(
@@ -388,17 +389,31 @@ bool CloudStorageServiceUsageHelper::isOverflow() const
         });
 }
 
-std::map<int, nx::vms::api::LicenseSummaryData> CloudStorageServiceUsageHelper::allInfo() const
+
+std::map<int, LicenseSummaryData> CloudStorageServiceUsageHelper::allInfoByMegapixels() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
         updateCacheUnsafe();
-    return *m_cache;
+    std::map<int, LicenseSummaryData> result;
+    for (const auto& [key, value]: *m_cache)
+        result.emplace(key.megapixels, value);
+    return result;
+}
+
+std::map<QnUuid, LicenseSummaryData> CloudStorageServiceUsageHelper::allInfoByService() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!m_cache)
+        updateCacheUnsafe();
+    std::map<QnUuid, LicenseSummaryData> result;
+    for (const auto& [key, value]: *m_cache)
+        result.emplace(key.serviceId, value);
+    return result;
 }
 
 std::map<QnUuid, QnUuid> CloudStorageServiceUsageHelper::servicesByCameras() const
 {
-    using namespace nx::vms::api;
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     std::map<QnUuid, QnUuid> result;
@@ -465,7 +480,6 @@ std::map<QnUuid, std::set<QnUuid>> LocalRecordingUsageHelper::camerasByService()
     std::map<QnUuid, std::set<QnUuid>> result;
 
     // Update integration info
-    using namespace nx::vms::api;
     std::map<QnUuid, int> channelsByService;
     for (const auto& [serviceId, params]: m_context->saasServiceManager()->localRecording())
     {
