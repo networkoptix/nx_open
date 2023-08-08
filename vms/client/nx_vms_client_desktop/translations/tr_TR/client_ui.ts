@@ -672,18 +672,18 @@
     </message>
     <message>
       <source>Import Video from Device</source>
-      <translation type="unfinished">Import Video from Device</translation>
+      <translation>Cihazdan İçe Video Aktar</translation>
     </message>
     <message>
       <source>Import camera or server offline periods</source>
-      <translation type="unfinished">Import camera or server offline periods</translation>
+      <translation>Kamera veya sunucu çevrimdışı dönemlerini içe aktarın</translation>
     </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1993,7 +1993,7 @@
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>Web sayfasında oturum açın</translation>
     </message>
   </context>
   <context>

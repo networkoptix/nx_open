@@ -995,7 +995,7 @@
     </message>
     <message>
       <source>Lookup Lists...</source>
-      <translation type="unfinished">Lookup Lists...</translation>
+      <translation>Arama Listeleri...</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1035,11 +1035,11 @@
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>Proxy Entegrasyonu...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
-      <translation type="unfinished">Proxied Web Page...</translation>
+      <translation>Proxy Web Sayfası...</translation>
     </message>
     <message>
       <source>Layout</source>
@@ -1051,15 +1051,15 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>Yeni Karşılama Ekranı</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>Proxy Kaynaklarını Göster</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Cihazlardan İçe Aktar...</translation>
     </message>
   </context>
   <context>
@@ -1113,15 +1113,15 @@
     </message>
     <message>
       <source>Event Occurs</source>
-      <translation type="unfinished">Event Occurs</translation>
+      <translation>Etkinlik Oluşuyor</translation>
     </message>
     <message>
       <source>Event Starts</source>
-      <translation type="unfinished">Event Starts</translation>
+      <translation>Etkinlik Başlıyor</translation>
     </message>
     <message>
       <source>Event Stops</source>
-      <translation type="unfinished">Event Stops</translation>
+      <translation>Etkinlik Duruyor</translation>
     </message>
   </context>
   <context>
@@ -1140,7 +1140,7 @@
     </message>
     <message>
       <source>Rewind for</source>
-      <translation type="unfinished">Rewind for</translation>
+      <translation>Geri sar</translation>
     </message>
   </context>
   <context>
@@ -1301,7 +1301,7 @@
     <message numerus="yes">
       <source>Delete %n group(s)?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n group(s)?</numerusform>
+        <numerusform>%n grup(lar) silinsin mi?</numerusform>
         <numerusform>Delete %n group(s)?</numerusform>
       </translation>
     </message>
@@ -1640,7 +1640,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>Güvensiz</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
@@ -3181,7 +3181,7 @@ to %1</source>
     </message>
     <message>
       <source>Log In...</source>
-      <translation type="unfinished">Log In...</translation>
+      <translation>Giriş yap...</translation>
     </message>
   </context>
   <context>
@@ -3809,7 +3809,7 @@ to %1</source>
     </message>
     <message>
       <source>Not verified</source>
-      <translation type="unfinished">Not verified</translation>
+      <translation>Doğrulanmadı</translation>
     </message>
   </context>
   <context>
@@ -3880,7 +3880,7 @@ to %1</source>
     </message>
     <message>
       <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
+      <translation>Ayarlar salt okunurdur. Lütfen sistem yöneticinize başvurun. Program çıkışından sonra tüm değişiklikler kaybolacaktır.</translation>
     </message>
   </context>
   <context>
@@ -4402,12 +4402,12 @@ to %1</source>
     <message>
       <source>User group %1 has no %2 permission</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation type="unfinished">User group %1 has no %2 permission</translation>
+      <translation>%1 kullanıcı grubunun %2 izni yok</translation>
     </message>
     <message>
       <source>Selected user groups have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected user groups have no %1 permission</translation>
+      <translation>Seçilen kullanıcı gruplarının %1 izni yok</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected user groups have no %2 permission</source>
@@ -4567,7 +4567,7 @@ to %1</source>
     <name>QnSelectLayoutsButton</name>
     <message>
       <source>Any Layout</source>
-      <translation type="unfinished">Any Layout</translation>
+      <translation>Herhangi Bir Ekran Düzeni</translation>
     </message>
     <message>
       <source>All Layouts</source>
@@ -5585,7 +5585,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Bu entegrasyon açılsın mı?</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -5608,11 +5608,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Integration settings...</source>
-      <translation type="unfinished">Integration settings...</translation>
+      <translation>Entegrasyon ayarları...</translation>
     </message>
     <message>
       <source>Web Page settings...</source>
-      <translation type="unfinished">Web Page settings...</translation>
+      <translation>Web Sayfası ayarları...</translation>
     </message>
   </context>
   <context>
@@ -6229,7 +6229,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>Delete %n layouts?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>%n ekran düzen(leri) silinsin mi?</numerusform>
         <numerusform>Delete %n layouts?</numerusform>
       </translation>
     </message>
@@ -6255,7 +6255,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>%n items were not deleted.</source>
       <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n öğe silinmedi.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
       </translation>
     </message>
@@ -6284,7 +6284,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Kaynak Sunucu ve %n Sunucular</numerusform>
         <numerusform>Source Server and %n Servers</numerusform>
       </translation>
     </message>
@@ -6489,7 +6489,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>%n Groups</source>
       <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Gruplar</numerusform>
         <numerusform>%n Groups</numerusform>
       </translation>
     </message>
@@ -6544,7 +6544,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
-      <translation type="unfinished">Reset all rules to defaults?</translation>
+      <translation>Tüm kurallar varsayılanlara sıfırlansın mı?</translation>
     </message>
   </context>
   <context>
@@ -6665,7 +6665,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Can export parts of archive</source>
-      <translation type="unfinished">Can export parts of archive</translation>
+      <translation>Arşivin bazı kısımlarını dışa aktarabilir</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
@@ -6697,7 +6697,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Canlı Görüntüle</translation>
     </message>
     <message>
       <source>Can edit device settings and video wall layouts</source>
@@ -7195,11 +7195,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation type="unfinished">Open Camera in new Tab</translation>
+      <translation>Kamerayı yeni Sekmede aç</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation type="unfinished">Open Camera in place</translation>
+      <translation>Kamerayı yerleşimde aç</translation>
     </message>
   </context>
   <context>
@@ -8036,7 +8036,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>User input</source>
-      <translation type="unfinished">User input</translation>
+      <translation>Kullanıcı girişi</translation>
     </message>
     <message>
       <source>Edit camera settings</source>
@@ -8048,7 +8048,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>View live</source>
-      <translation type="unfinished">View live</translation>
+      <translation>Canlı görüntüle</translation>
     </message>
   </context>
   <context>
@@ -8654,7 +8654,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::GroupSettingsDialog</name>
     <message>
       <source>Group name cannot be empty.</source>
-      <translation type="unfinished">Group name cannot be empty.</translation>
+      <translation>Grup adı boş olamaz.</translation>
     </message>
     <message>
       <source>Group with the same name already exists.</source>
@@ -8867,11 +8867,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation type="unfinished">Disconnect LDAP server?</translation>
+      <translation>LDAP sunucusunun bağlantısı kesilsin mi?</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Tüm LDAP kullanıcıları ve grupları sistemden silinecektir.&lt;br&gt;&lt;br&gt;LDAP ayarları da silinecek.</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -8895,7 +8895,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
-      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+      <translation>Mevcut LDAP kullanıcıları ve grupları kaldırılsın mı?</translation>
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
@@ -9094,7 +9094,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>Default Logging level</source>
-      <translation type="unfinished">Default Logging level</translation>
+      <translation>Varsayılan Günlük Seviyesi</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to “info”</source>
@@ -9180,7 +9180,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
     <message>
       <source>Network request failed</source>
-      <translation type="unfinished">Network request failed</translation>
+      <translation>Ağ İsteği başarısız oldu</translation>
     </message>
   </context>
   <context>
@@ -9906,7 +9906,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <name>nx::vms::client::desktop::PlaybackPositionItem</name>
     <message>
       <source>video is paused</source>
-      <translation type="unfinished">video is paused</translation>
+      <translation>video duraklatıldı</translation>
     </message>
   </context>
   <context>
@@ -10064,7 +10064,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>Yeni Proxy Web Sayfası</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -10076,15 +10076,15 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>Edit Integration</source>
-      <translation type="unfinished">Edit Integration</translation>
+      <translation>Entegrasyonu Düzenle</translation>
     </message>
     <message>
       <source>New Proxied Integration</source>
-      <translation type="unfinished">New Proxied Integration</translation>
+      <translation>Yeni Proxy Entegrasyonu</translation>
     </message>
     <message>
       <source>Edit Proxied Integration</source>
-      <translation type="unfinished">Edit Proxied Integration</translation>
+      <translation>Proxy Entegrasyonunu Düzenle</translation>
     </message>
   </context>
   <context>
@@ -10225,12 +10225,12 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
       <source>Access granted by %1 group</source>
-      <translation type="unfinished">Access granted by %1 group</translation>
+      <translation>%1 grup tarafından verilen erişim</translation>
     </message>
     <message numerus="yes">
       <source>Access granted by %n groups: %1</source>
       <translation type="unfinished">
-        <numerusform>Access granted by %n groups: %1</numerusform>
+        <numerusform>%n gruplar tarafından verilen erişim: %1</numerusform>
         <numerusform>Access granted by %n groups: %1</numerusform>
       </translation>
     </message>
@@ -10262,7 +10262,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Web Sayfaları &amp; Entegrasyonlar</translation>
     </message>
     <message>
       <source>Health Monitors</source>
@@ -10283,7 +10283,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <message>
       <source>Access granted by %1</source>
       <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
-      <translation type="unfinished">Access granted by %1</translation>
+      <translation>%1 grup tarafından verilen erişim</translation>
     </message>
   </context>
   <context>
@@ -10309,7 +10309,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <name>nx::vms::client::desktop::ResourcesChangesManager</name>
     <message>
       <source>Resource list is empty</source>
-      <translation type="unfinished">Resource list is empty</translation>
+      <translation>Kaynak listesi boş</translation>
     </message>
     <message>
       <source>No connection</source>
@@ -10692,7 +10692,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>Sertifikanın Parçası Değil</translation>
     </message>
   </context>
   <context>
@@ -11531,7 +11531,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
     <message>
       <source>Empty schedule is not allowed</source>
-      <translation type="unfinished">Empty schedule is not allowed</translation>
+      <translation>Boş programa izin verilmez</translation>
     </message>
   </context>
   <context>
@@ -11660,7 +11660,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>%1</source>
-      <translation type="unfinished">%1</translation>
+      <translation>%1</translation>
     </message>
   </context>
   <context>
@@ -11772,7 +11772,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Web Sayfaları &amp; Entegrasyonlar</translation>
     </message>
   </context>
   <context>
@@ -12083,7 +12083,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>No source</source>
-      <translation type="unfinished">No source</translation>
+      <translation>Kaynak yok</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -12109,7 +12109,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>No target</source>
-      <translation type="unfinished">No target</translation>
+      <translation>Hedef yok</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -12190,11 +12190,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>Anahtar kelimeler içerir</translation>
     </message>
     <message>
       <source>Does not contain keywords</source>
-      <translation type="unfinished">Does not contain keywords</translation>
+      <translation>Anahtar kelime içermez</translation>
     </message>
     <message>
       <source>Contains list entries</source>
@@ -12210,7 +12210,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>İtibaren</translation>
     </message>
   </context>
   <context>

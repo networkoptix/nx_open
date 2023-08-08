@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Gelişmiş Ayarlar</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,11 +24,11 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Giriş Özniteliği</translation>
     </message>
     <message>
       <source>Allow digest authentication for imported users</source>
-      <translation type="unfinished">Allow digest authentication for imported users</translation>
+      <translation>İçe aktarılan kullanıcılar için özet kimlik doğrulamasına izin ver</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Üyelik</translation>
     </message>
     <message>
       <source>Misc</source>
@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Arama Zaman Aşımı</translation>
     </message>
     <message>
       <source>Proxy LDAP requests&lt;br&gt;via server</source>
@@ -261,7 +261,7 @@
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Yeni istekler</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
@@ -285,7 +285,7 @@
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Entegrasyonu Etkinleştir</translation>
     </message>
     <message>
       <source>Remove %1?</source>
@@ -301,14 +301,14 @@
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>İsteği Kaldır</translation>
     </message>
   </context>
   <context>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Bu alan boş bırakılamaz</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -445,7 +445,7 @@
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - Bağlantı Ayarları</translation>
     </message>
     <message>
       <source>Host</source>
@@ -453,11 +453,11 @@
     </message>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Bu alan boş olamaz</translation>
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Giriş DN'si</translation>
     </message>
     <message>
       <source>Password</source>
@@ -481,11 +481,11 @@
     </message>
     <message>
       <source>Login DN cannot be empty.</source>
-      <translation type="unfinished">Login DN cannot be empty.</translation>
+      <translation>Oturum Açma DN boş olamaz.</translation>
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>StartTLS'yi kullanın</translation>
     </message>
   </context>
   <context>
@@ -545,11 +545,11 @@
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Liste Ayarları</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Yeni Liste</translation>
     </message>
     <message>
       <source>Name</source>
@@ -648,7 +648,7 @@
     <name>FilterDialog</name>
     <message>
       <source>Edit Filter</source>
-      <translation type="unfinished">Edit Filter</translation>
+      <translation>Filtreyi Düzenle</translation>
     </message>
     <message>
       <source>Name</source>
@@ -656,11 +656,11 @@
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>Temel DN</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>Temel DN boş olamaz</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -780,11 +780,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Genel İzinler</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Üyeler</translation>
     </message>
     <message>
       <source>Add Group</source>
@@ -830,11 +830,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Genel İzinler</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Üyeler</translation>
     </message>
   </context>
   <context>
@@ -857,7 +857,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Üyeler</translation>
     </message>
     <message>
       <source>Users</source>
@@ -880,7 +880,7 @@
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Üye yok</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
@@ -888,7 +888,7 @@
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Üye özeti</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
@@ -929,7 +929,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Cihazlardan İçe Aktar</translation>
     </message>
   </context>
   <context>
@@ -1090,7 +1090,7 @@
     <name>LdapSettings</name>
     <message>
       <source>LDAP is not configured yet</source>
-      <translation type="unfinished">LDAP is not configured yet</translation>
+      <translation>LDAP henüz yapılandırılmadı</translation>
     </message>
     <message>
       <source>Connect your System to a LDAP server for easier user management</source>
@@ -1102,7 +1102,7 @@
     </message>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>ÇEVRİMİÇİ</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1118,7 +1118,7 @@
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Son Senkronizasyon</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1126,7 +1126,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Gelişmiş Ayarlar</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1134,7 +1134,7 @@
     </message>
     <message>
       <source>Continuous User Import</source>
-      <translation type="unfinished">Continuous User Import</translation>
+      <translation>Sürekli Kullanıcı İçe Aktarma</translation>
     </message>
     <message>
       <source>VMS imports and synchronizes users and groups with LDAP in real time</source>
@@ -1146,7 +1146,7 @@
     </message>
     <message>
       <source>Filters</source>
-      <translation type="unfinished">Filters</translation>
+      <translation>Filtreler</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1154,7 +1154,7 @@
     </message>
     <message>
       <source>Add Filter</source>
-      <translation type="unfinished">Add Filter</translation>
+      <translation>Filtre Ekle</translation>
     </message>
     <message>
       <source>No filters</source>
@@ -1283,7 +1283,7 @@
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Arama Listeleri</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1299,7 +1299,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Yeni Oluştur...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1321,7 +1321,7 @@
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Liste Yok</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
@@ -1329,7 +1329,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Yeni Oluştur...</translation>
     </message>
   </context>
   <context>
@@ -1381,7 +1381,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Onayla</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1396,7 +1396,7 @@
     </message>
     <message>
       <source>Built In</source>
-      <translation type="unfinished">Built In</translation>
+      <translation>Dahili</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1416,11 +1416,11 @@
     </message>
     <message>
       <source>Selected groups</source>
-      <translation type="unfinished">Selected groups</translation>
+      <translation>Seçili gruplar</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Grup yok</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
@@ -1462,14 +1462,14 @@
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Özel izin yok</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources</source>
-      <translation type="unfinished">No resources</translation>
+      <translation>Kaynak yok</translation>
     </message>
     <message>
       <source>Try changing search criteria</source>
@@ -1619,7 +1619,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>bugün</translation>
     </message>
     <message>
       <source>-1 hour</source>
@@ -2098,7 +2098,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Yeni Kullanıcı</translation>
     </message>
     <message>
       <source>General</source>
@@ -2114,7 +2114,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Genel İzinler</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2125,7 +2125,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Yeni Kullanıcı</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2200,18 +2200,18 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Genel İzinler</translation>
     </message>
   </context>
   <context>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Etkin kullanıcı</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Devre dışı kullanıcı</translation>
     </message>
   </context>
   <context>
@@ -2254,7 +2254,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Bu kullanıcı LDAP veritabanında bulunamadı ve oturum açamıyor.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2280,15 +2280,15 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Vms Rules</source>
-      <translation type="unfinished">Vms Rules</translation>
+      <translation>Vms Kuralları</translation>
     </message>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Kural Ekle</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Çoğalt</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2296,7 +2296,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Giriş Yok</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2304,7 +2304,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Varsayılanlara dön...</translation>
     </message>
   </context>
   <context>
