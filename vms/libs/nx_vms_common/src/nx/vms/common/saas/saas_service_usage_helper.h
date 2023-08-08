@@ -103,9 +103,16 @@ public:
     bool isOverflow() const;
 
     /*
-     *  @return Information about available license usages per megapixels.
+     * @return Information about available license usages per service.
+     *     key - megapixels, value - service usage info.
      */
-    std::map<int, nx::vms::api::LicenseSummaryData> allInfo() const;
+    std::map<int, nx::vms::api::LicenseSummaryData> allInfoByMegapixels() const;
+
+    /*
+     * @return Information about available license usages per service.
+     *     key - serviceId, value - service usage info.
+     */
+    std::map<QnUuid, nx::vms::api::LicenseSummaryData> allInfoByService() const;
 
     /*
      * @return Information about cameras which consumes SAAS services.
@@ -136,8 +143,17 @@ private:
     void calculateAvailableUnsafe() const;
     void processUsedDevicesUnsafe(const QnVirtualCameraResourceList& cameras) const;
 private:
-    //Summary by megapixels.
-    mutable std::optional<std::map<int, nx::vms::api::LicenseSummaryData>> m_cache;
+
+    struct ServiceInfo
+    {
+        bool operator<(const ServiceInfo& other) const;
+
+        int megapixels = 0;
+        QnUuid serviceId;
+    };
+
+    //Summary by megapixels and serviceId.
+    mutable std::optional<std::map<ServiceInfo, nx::vms::api::LicenseSummaryData>> m_cache;
     mutable nx::Mutex m_mutex;
 };
 
@@ -153,8 +169,8 @@ public:
 
     /*
      * @return Information about cameras which consumes SAAS services.
-     * key - cameraId, value - serviceId. If there is not enough services for some camera
-     * then the service value is an empty UUID.
+     *     key - serviceId, value - camera id list. If there is not enough services for some camera
+     *     then the service value is an empty UUID.
      */
     std::map<QnUuid, std::set<QnUuid>> camerasByService() const;
 
