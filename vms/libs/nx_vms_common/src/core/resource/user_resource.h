@@ -104,6 +104,10 @@ public:
     bool isLocal() const { return userType() == nx::vms::api::UserType::local; }
     bool isTemporary() const { return userType() == nx::vms::api::UserType::temporaryLocal; }
 
+    // Returns time span by the end of which the temporary user be expired. If the user is
+    // not temporary returns null.
+    std::optional<std::chrono::seconds> temporarySessionExpiresIn() const;
+
     QnUserHash getHash() const;
 
     enum class DigestSupport
@@ -184,6 +188,8 @@ signals:
     void userGroupsChanged(const QnUserResourcePtr& user, const std::vector<QnUuid>& previousRoleIds);
 
     void enabledChanged(const QnUserResourcePtr& user);
+
+    // Emitted if the password has been changed for cloud or local user.
     void passwordChanged(const QnUserResourcePtr& user);
     void digestChanged(const QnUserResourcePtr& user);
 
@@ -191,6 +197,9 @@ signals:
     void fullNameChanged(const QnResourcePtr& user);
     void externalIdChanged(const QnResourcePtr& user);
     void attributesChanged(const QnResourcePtr& user);
+
+    // Emitted if Temporary user has any changes in the token an/or lifetime bounds.
+    void temporaryTokenChanged(const QnUserResourcePtr& user);
 
 protected:
     virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;

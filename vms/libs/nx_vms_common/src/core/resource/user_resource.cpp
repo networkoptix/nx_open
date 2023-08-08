@@ -25,6 +25,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/id.h>
+#include <utils/common/synctime.h>
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 const QString QnUserResource::kIntegrationRequestDataProperty("integrationRequestData");
@@ -243,6 +244,36 @@ QnUserResource::QnUserResource(nx::vms::api::UserType userType, nx::vms::api::Us
 {
     addFlags(Qn::user | Qn::remote);
     setTypeId(nx::vms::api::UserData::kResourceTypeId);
+}
+
+std::optional<std::chrono::seconds> QnUserResource::temporarySessionExpiresIn() const
+{
+    if (!isTemporary())
+        return std::nullopt;
+
+    if (!NX_ASSERT(getHash().temporaryToken))
+        return std::nullopt;
+
+    using namespace std::chrono;
+    const auto now = duration_cast<seconds>(qnSyncTime->currentTimePoint());
+    const auto tmpToken = *getHash().temporaryToken;
+    auto tmpTokenExpiresIn = std::max(1s, duration_cast<seconds>(tmpToken.endS - now));
+
+    if (tmpToken.expiresAfterLoginS > 0s)
+    {
+        const auto firstLoginTimeStr =
+            getProperty(ResourcePropertyKey::kTemporaryUserFirstLoginTime);
+
+        if (!firstLoginTimeStr.isEmpty())
+        {
+            const auto firstLoginTime = seconds(firstLoginTimeStr.toLongLong());
+            tmpTokenExpiresIn = std::min(
+                tmpTokenExpiresIn,
+                std::max(1s, tmpToken.expiresAfterLoginS - duration_cast<seconds>(now - firstLoginTime)));
+        }
+    }
+
+    return tmpTokenExpiresIn;
 }
 
 QnUserResource::~QnUserResource()
@@ -595,27 +626,40 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         bool isEmptyOtherPasswordAcceptable = false;
         if (m_hash != localOther->m_hash)
         {
-            if (m_password.isEmpty() && localOther->m_password.isEmpty() && m_hash != QnUserHash())
+            if (m_userType == nx::vms::api::UserType::temporaryLocal)
             {
                 notifiers <<
                     [source, r = toSharedPointer(this)]
                     {
-                        NX_VERBOSE(r.data(), "Password is changed by update of hash from %1", source);
-                        emit r->passwordChanged(r);
+                        NX_VERBOSE(r.data(), "Temporary token changed by update from %1", source);
+                        emit r->temporaryTokenChanged(r);
                     };
             }
-            if (m_password != localOther->m_password
-                && !localOther->m_hash.checkPassword(m_password)
-                && !m_hash.checkPassword(localOther->m_password))
+            else
             {
-                isEmptyOtherPasswordAcceptable = true;
-                notifiers <<
-                    [source, r = toSharedPointer(this)]
-                    {
-                        NX_VERBOSE(r.data(), "Password is changed by update from %1", source);
-                        emit r->passwordChanged(r);
-                    };
+                if (m_password.isEmpty() && localOther->m_password.isEmpty() && m_hash != QnUserHash())
+                {
+                    notifiers <<
+                        [source, r = toSharedPointer(this)]
+                        {
+                            NX_VERBOSE(r.data(), "Password is changed by update of hash from %1", source);
+                            emit r->passwordChanged(r);
+                        };
+                }
+                if (m_password != localOther->m_password
+                    && !localOther->m_hash.checkPassword(m_password)
+                    && !m_hash.checkPassword(localOther->m_password))
+                {
+                    isEmptyOtherPasswordAcceptable = true;
+                    notifiers <<
+                        [source, r = toSharedPointer(this)]
+                        {
+                            NX_VERBOSE(r.data(), "Password is changed by update from %1", source);
+                            emit r->passwordChanged(r);
+                        };
+                }
             }
+
             m_hash = localOther->m_hash;
         }
 
