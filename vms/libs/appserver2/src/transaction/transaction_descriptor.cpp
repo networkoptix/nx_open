@@ -776,6 +776,17 @@ struct SaveUserAccess
                 nx::branding::shortCloudName()));
         }
 
+        if (param.type == nx::vms::api::UserType::temporaryLocal && existingUser)
+        {
+            const auto temporaryToken = QJson::deserialized<nx::vms::api::TemporaryToken>(param.hash);
+            if (!temporaryToken.isValid())
+            {
+                return Result(
+                    ErrorCode::forbidden,
+                    ServerApiErrors::tr("Invalid temporary token"));
+            }
+        }
+
         return ModifyResourceAccess()(systemContext, accessData, param);
     }
 
