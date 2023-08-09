@@ -71,7 +71,7 @@ private:
 
     QString title(const EventParameters& parameters) const;
     QString description(const EventParameters& parameters) const;
-    static QIcon icon(const EventParameters& parameters);
+    static QString iconPath(const EventParameters& parameters);
     static QColor color(const EventParameters& parameters);
     static bool hasPreview(EventType eventType);
 

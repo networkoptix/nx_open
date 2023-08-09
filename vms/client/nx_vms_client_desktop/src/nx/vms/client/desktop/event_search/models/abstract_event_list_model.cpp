@@ -7,6 +7,7 @@
 #include <client/client_globals.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -15,6 +16,16 @@
 #include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
+
+namespace {
+
+static const QColor kLight12Color = "#91A7B2";
+static const QColor kLight10Color = "#A5B7C0";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QnIcon::Normal, {{kLight12Color, "light12"}, {kLight10Color, "light10"}}},
+};
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -49,8 +60,14 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
             return index.data(Qn::DescriptionTextRole);
 
         case Qt::DecorationRole:
-            return index.data(Qn::DecorationPathRole).value<QIcon>().pixmap(QSize(20, 20));
-
+        {
+            const auto path = index.data(Qn::DecorationPathRole).toString();
+            return path.isEmpty()
+                ? QPixmap()
+                : path.endsWith(".svg")
+                    ? qnSkin->icon(path, kIconSubstitutions).pixmap(20)
+                    : qnSkin->pixmap(path);
+        }
         default:
             return QVariant();
     }

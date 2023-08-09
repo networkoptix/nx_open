@@ -38,7 +38,7 @@ public:
 
     QString text(int index) const;
     QString toolTip(int index) const;
-    QIcon decorationIcon(int index) const;
+    QString decorationPath(int index) const;
     QColor color(int index) const;
     QVariant timestamp(int index) const;
     QnResourceList displayedResourceList(int index) const;
@@ -66,7 +66,7 @@ private:
     QnResourceList getSortedResourceList(MessageType message) const;
 
     static int priority(MessageType message);
-    static QIcon decorationIcon(MessageType message);
+    static QString decorationPath(MessageType message);
 
 private:
     struct Item
