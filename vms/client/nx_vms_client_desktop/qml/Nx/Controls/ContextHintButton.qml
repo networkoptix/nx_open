@@ -28,7 +28,8 @@ Control
             ? ColorTheme.colors.dark14
             : ColorTheme.colors.dark15
 
-        source: "image://svg/skin/buttons/context_info_16.svg"
+        source: "image://svg/skin/buttons/context_hint_16.svg"
+        sourceSize: Qt.size(16, 16)
 
         baselineOffset: 12.5
         opacity: enabled ? 1.0 : 0.4
