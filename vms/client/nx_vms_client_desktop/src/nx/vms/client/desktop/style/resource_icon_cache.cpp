@@ -393,7 +393,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
         if (isVideoWallReviewLayout)
             key = VideoWall;
-        else if (layout->isIntercomLayout())
+        else if (layout->layoutType() == LayoutResource::LayoutType::intercom)
             key = IntercomLayout;
         else if (layout->isCrossSystem())
             key = CloudLayout;

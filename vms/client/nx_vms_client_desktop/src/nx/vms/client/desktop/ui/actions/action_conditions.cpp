@@ -657,7 +657,7 @@ ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, Q
                 return false;
 
             const auto layout = resource.dynamicCast<LayoutResource>();
-            if (layout && layout->isIntercomLayout())
+            if (layout && layout->layoutType() == LayoutResource::LayoutType::intercom)
                 return false;
 
             if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))

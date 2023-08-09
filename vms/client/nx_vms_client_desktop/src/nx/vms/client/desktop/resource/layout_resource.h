@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <QtCore/QHash>
 
 #include <client/client_globals.h>
@@ -100,9 +102,6 @@ public:
     /** Whether this layout is a Video Wall review layout. */
     bool isVideoWallReviewLayout() const;
 
-    /** Whether this Layout belongs to an Intercom Camera. Is valid for removed intercom. */
-    bool isIntercomLayout() const;
-
     /**
      * Whether this Layout is a Cross-System Layout. Such layouts are stored in the Cloud and can
      * contain Cameras from different Systems. Cross-System Layouts are personal and cannot be
@@ -110,9 +109,28 @@ public:
      **/
     bool isCrossSystem() const;
 
+    enum class LayoutType
+    {
+        invalid = -1,
+        unknown, //< Not yet known, because parent resource hasn't been loaded yet.
+        local, //< A private layout of some user.
+        shared,
+        videoWall, //< Not necessarily a videowall item; just a layout with a videowall parent.
+        intercom,
+        file //< Exported layout.
+    };
+    Q_ENUM(LayoutType);
+
+    /**
+     * Returns layout type, based on its parent resource, even after the parent resource is removed
+     * from the resource pool.
+     */
+    LayoutType layoutType() const;
+
 signals:
     void dataChanged(Qn::ItemDataRole role);
     void itemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void layoutTypeChanged(const LayoutResourcePtr& resource);
 
 protected:
     /** Virtual constructor for cloning. */
@@ -125,7 +143,9 @@ private:
     /** @return Whether data value was changed. */
     bool setItemDataUnderLock(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
 
-    void updateIsIntercomState();
+    LayoutType calculateLayoutType() const;
+    void setLayoutType(LayoutType value);
+    void updateLayoutType();
 
 private:
     QnTimePeriod m_localRange;
@@ -135,8 +155,7 @@ private:
     /** Saved state of the layout, which can be used to rollback unapplied changes. */
     nx::vms::api::LayoutData m_snapshot;
 
-    bool m_isIntercomLayout = false;
-
+    std::atomic<LayoutType> m_layoutType{LayoutType::unknown};
     nx::utils::ScopedConnection m_resourcePoolConnection;
 };
 

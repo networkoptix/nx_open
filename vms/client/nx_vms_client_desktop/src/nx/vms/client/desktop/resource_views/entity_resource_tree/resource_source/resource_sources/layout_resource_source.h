@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_source/abstract_resource_source.h>
 
 class QnResourcePool;
@@ -25,7 +26,7 @@ public:
 private:
     void onResourceAdded(const QnResourcePtr& resource);
     void onResourceRemoved(const QnResourcePtr& resource);
-    void onLayoutParentIdChanged(const QnResourcePtr& resource, const QnUuid& previousParentId);
+    void onLayoutTypeChanged(const LayoutResourcePtr& resource);
     void holdLocalLayout(const QnResourcePtr& resource);
     void processResource(const QnResourcePtr& resource, std::function<void()> successHandler);
 
@@ -33,7 +34,7 @@ private:
     const QnResourcePool* m_resourcePool;
     QSet<QnResourcePtr> m_localLayouts;
     QnUserResourcePtr m_parentUser;
-    bool m_includeShared;
+    const bool m_includeShared;
 };
 
 } // namespace entity_resource_tree

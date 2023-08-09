@@ -53,19 +53,21 @@ void IntercomLayoutResourceSource::onResourcesRemoved(const QnResourceList& reso
 {
     for (const auto& resource: resources)
     {
-        if (m_intercomLocalLayouts.contains(resource))
-        {
-            m_intercomLocalLayouts.remove(resource);
-            resource->disconnect(this);
+        if (!resource->hasFlags(Qn::layout))
+            continue;
+
+        resource->disconnect(this);
+
+        LayoutResourcePtr layout = resource.objectCast<LayoutResource>();
+        if (NX_ASSERT(layout) && layout->layoutType() == LayoutResource::LayoutType::intercom)
             emit resourceRemoved(resource);
-        }
-        else if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
-        {
-            LayoutResourcePtr layout = resource.dynamicCast<LayoutResource>();
-            if (NX_ASSERT(layout) && layout->isIntercomLayout())
-                emit resourceRemoved(resource);
-        }
     }
+}
+
+void IntercomLayoutResourceSource::onLayoutTypeChanged(const QnResourcePtr& resource)
+{
+    if (processResource(resource))
+        emit resourceAdded(resource);
 }
 
 bool IntercomLayoutResourceSource::processResource(const QnResourcePtr& resource)
@@ -76,29 +78,17 @@ bool IntercomLayoutResourceSource::processResource(const QnResourcePtr& resource
     if (resource->hasFlags(Qn::removed) || resource->hasFlags(Qn::exported))
         return false;
 
-    if (resource->hasFlags(Qn::local_intercom_layout))
-    {
-        if (!m_intercomLocalLayouts.contains(resource))
-        {
-            // Handling Qn::local flag change on layout saving.
-            connect(resource.get(), &QnResource::flagsChanged, this,
-                [this](const QnResourcePtr& resource)
-                {
-                    if (!resource->hasFlags(Qn::local))
-                    {
-                        resource->disconnect(this);
-                        m_intercomLocalLayouts.remove(resource);
-                    }
-                });
+    const auto layout = resource.objectCast<LayoutResource>();
+    if (!NX_ASSERT(layout))
+        return false;
 
-            m_intercomLocalLayouts.insert(resource);
-        }
-
+    if (layout->layoutType() == LayoutResource::LayoutType::intercom)
         return true;
-    }
 
-    const auto layout = resource.dynamicCast<LayoutResource>();
-    return NX_ASSERT(layout) && layout->isIntercomLayout();
+    connect(layout.get(), &LayoutResource::layoutTypeChanged, this,
+        &IntercomLayoutResourceSource::onLayoutTypeChanged, Qt::UniqueConnection);
+
+    return false;
 }
 
 } // namespace entity_resource_tree
