@@ -102,7 +102,7 @@ public:
     };
 
     QString getPassword() const;
-    void setPasswordAndGenerateHash(const QString& password, DigestSupport digestSupport = DigestSupport::keep);
+    bool setPasswordAndGenerateHash(const QString& password, DigestSupport digestSupport = DigestSupport::keep);
     void resetPassword();
 
     bool digestAuthorizationEnabled() const;
@@ -179,7 +179,7 @@ protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 
 private:
-    void setPasswordHashesInternal(const PasswordHashes& hashes, bool isNewPassword);
+    bool setPasswordHashesInternal(const PasswordHashes& hashes, bool isNewPassword);
 
 private:
     nx::vms::api::UserType m_userType;
