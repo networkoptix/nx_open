@@ -43,27 +43,29 @@ struct PredefinedUserGroups::Private
     static QString description(const QnUuid& groupId)
     {
         if (groupId == kAdministratorsGroupId)
-            return tr("This user has unlimited System privileges and cannot be deleted."
-                " Can create and modify Administrators, and can merge Systems and link or unlink"
-                " to %1 accounts.", "%1 is the cloud name (like Nx Cloud)")
+            return tr("Members of this group have unlimited System privileges. Administrators can"
+                " create and modify Power Users, and merge Systems and link or unlink to %1"
+                " accounts.", "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::branding::cloudName());
 
         if (groupId == kPowerUsersGroupId)
-            return tr("Has full control of System configuration, but cannot create or modify"
-                " other Power Users.");
+            return tr("Members of this group have control of most of System configuration, but"
+                " are not allowed to change any Administrator settings, delete or change their"
+                " own groups and permissions, and cannot create or edit other Power Users.");
 
         if (groupId == kAdvancedViewersGroupId)
-            return tr("Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate"
-                " I/O Module buttons, create and edit Bookmarks, and view the Event Log.");
+            return tr("Members of this group can see and run PTZ positions and PTZ Tours, use"
+                " 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view"
+                " the Event Log.");
 
         if (groupId == kViewersGroupId)
-            return tr("Can view and export archive and Bookmarks.");
+            return tr("Members of this group can view and export archive and Bookmarks.");
 
         if (groupId == kLiveViewersGroupId)
-            return tr("Can view live videos, I/O modules and web pages.");
+            return tr("Members of this group can view live videos, I/O modules and web pages.");
 
         if (groupId == kSystemHealthViewersGroupId)
-            return tr("Can view System Health Monitoring information.");
+            return tr("Members of this group can view System Health Monitoring information.");
 
         NX_ASSERT(false, "Not a predefined user group: %1", groupId);
         return {};
