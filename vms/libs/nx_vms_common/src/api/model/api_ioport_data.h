@@ -14,12 +14,12 @@ namespace nx::vms::api {
  * camera driver in non-standard way. Also, client may display separate UI controls for such ports.
  */
 NX_REFLECTION_ENUM_CLASS(ExtendedCameraOutput,
-    none,
-    heater,
-    fan,
-    wiper,
-    autoTracking,
-    powerRelay
+    none = 0x0,
+    heater = 1 << 0,
+    fan =  1 << 1,
+    wiper =  1 << 2,
+    autoTracking =  1 << 3,
+    powerRelay =  1 << 4
 );
 Q_DECLARE_FLAGS(ExtendedCameraOutputs, ExtendedCameraOutput)
 

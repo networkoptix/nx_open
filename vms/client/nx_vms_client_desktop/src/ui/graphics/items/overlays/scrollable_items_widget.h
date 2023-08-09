@@ -56,6 +56,9 @@ public:
     /** Count of items in scrollable area. */
     int count() const;
 
+    /** Return id of the item by index. */
+    QnUuid itemId(int index) const;
+
     /** Item by index in scrollable area. Returns nullptr if index is out of range. */
     QGraphicsWidget* item(int index) const;
 

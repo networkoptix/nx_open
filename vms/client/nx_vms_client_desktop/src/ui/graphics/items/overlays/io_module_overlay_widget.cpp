@@ -8,14 +8,14 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <api/server_rest_connection.h>
-#include <camera/iomodule/iomodule_monitor.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/camera_output_action.h>
@@ -54,7 +54,7 @@ public:
     QScopedPointer<QnIoModuleOverlayContents> contents;
 
     QnVirtualCameraResourcePtr module;
-    const QnIOModuleMonitorPtr monitor;
+    const IOModuleMonitorPtr monitor;
     bool userInputEnabled = false;
 
     struct StateData
@@ -71,7 +71,7 @@ public:
     QnIoModuleOverlayWidget::Style overlayStyle = QnIoModuleOverlayWidget::Style();
 
     QnIoModuleOverlayWidgetPrivate(
-        const QnIOModuleMonitorPtr& monitor,
+        const IOModuleMonitorPtr& monitor,
         QnIoModuleOverlayWidget* widget);
 
     void setContents(QnIoModuleOverlayContents* newContents);
@@ -98,7 +98,7 @@ QnIoModuleOverlayWidgetPrivate
 */
 
 QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(
-    const QnIOModuleMonitorPtr& monitor,
+    const IOModuleMonitorPtr& monitor,
     QnIoModuleOverlayWidget* widget)
     :
     base_type(widget),
@@ -180,11 +180,11 @@ void QnIoModuleOverlayWidgetPrivate::initIOModule(const QnVirtualCameraResourceP
         return;
     }
 
-    connect(monitor.get(), &QnIOModuleMonitor::connectionOpened,
+    connect(monitor.get(), &IOModuleMonitor::connectionOpened,
         this, &QnIoModuleOverlayWidgetPrivate::at_connectionOpened);
-    connect(monitor.get(), &QnIOModuleMonitor::connectionClosed,
+    connect(monitor.get(), &IOModuleMonitor::connectionClosed,
         this, &QnIoModuleOverlayWidgetPrivate::at_connectionClosed);
-    connect(monitor.get(), &QnIOModuleMonitor::ioStateChanged,
+    connect(monitor.get(), &IOModuleMonitor::ioStateChanged,
         this, &QnIoModuleOverlayWidgetPrivate::at_stateChanged);
 
     connect(module.get(), &QnResource::propertyChanged,
@@ -395,7 +395,7 @@ QnIoModuleOverlayWidget
 
 QnIoModuleOverlayWidget::QnIoModuleOverlayWidget(
     const QnVirtualCameraResourcePtr& module,
-    const QnIOModuleMonitorPtr& monitor,
+    const IOModuleMonitorPtr& monitor,
     QGraphicsWidget* parent)
     :
     base_type(parent),

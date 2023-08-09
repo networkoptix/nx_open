@@ -11,7 +11,6 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
-#include <camera/iomodule/iomodule_monitor.h>
 #include <client/client_globals.h>
 #include <core/ptz/ptz_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -24,6 +23,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
+#include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/software_trigger/software_triggers_watcher.h>
@@ -42,7 +42,6 @@ using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 
 namespace nx::vms::client::desktop {
 
-class ObjectTrackingButtonController;
 class CameraButtonController;
 class RecordingStatusHelper;
 class MediaResourceWidgetPrivate;
@@ -53,6 +52,7 @@ class WatermarkPainter;
 class SoftwareTriggerButton;
 class EncryptedArchivePasswordDialog;
 class CameraHotspotsOverlayWidget;
+class CameraButtonManager;
 
 } // namespace nx::vms::client::desktop
 
@@ -67,8 +67,6 @@ class QnGraphicsStackedWidget;
 struct QnHtmlTextItemOptions;
 
 namespace nx::analytics::db { struct Filter; }
-
-namespace nx::vms::client::core { class SoftwareTriggersController; }
 
 /**
  * Widget to show media from a camera or disk file (from QnMediaResource).
@@ -247,9 +245,11 @@ public:
     void setSpeed(double value);
     double speed() const;
 
-    QnIOModuleMonitorPtr getIOModuleMonitor();
+    nx::vms::client::core::IOModuleMonitorPtr getIOModuleMonitor();
 
     bool isTitleUnderMouse() const;
+
+    nx::vms::client::desktop::RewindOverlay* rewindOverlay() const;
 
 signals:
     void speedChanged();
@@ -342,7 +342,6 @@ protected:
     virtual bool forceShowPosition() const override;
     virtual void updateHud(bool animate) override;
 
-    void updateCameraButtons();
     bool animationAllowed() const;
 
     rest::Handle invokeTrigger(
@@ -374,19 +373,6 @@ private slots:
 
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
-
-    void at_triggerRemoved(QnUuid id);
-
-    void at_triggerAdded(
-        QnUuid id,
-        const QString& iconPath,
-        const QString& name,
-        bool prolonged,
-        bool enabled);
-
-    void at_triggerFieldsChanged(
-        QnUuid id,
-        nx::vms::client::core::SoftwareTriggersWatcher::TriggerFields fields);
 
 private:
     void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
@@ -435,11 +421,6 @@ private:
         const QRectF& sourceSubRect,
         const QRectF& targetRect);
 
-    bool capabilityButtonsAreVisible() const;
-    void updateCapabilityButtons() const;
-    void updateTwoWayAudioButton() const;
-    void updateIntercomButtons();
-
 private:
     struct SoftwareTriggerInfo
     {
@@ -453,26 +434,11 @@ private:
 
     void initRenderer();
     void initDisplay();
-    void initSoftwareTriggers();
     void initIoModuleOverlay();
     void initAreaSelectOverlay();
     void initAnalyticsOverlays();
     void initStatusOverlayController();
     void initCameraHotspotsOverlay();
-
-    void createTrigger(const SoftwareTriggerInfo& info);
-
-    void configureTriggerButton(
-        nx::vms::client::desktop::SoftwareTriggerButton* button,
-        const SoftwareTriggerInfo& info);
-
-    int triggerIndex(const QnUuid& ruleId) const;
-
-    void removeTrigger(int index);
-
-    void updateTriggerButtonTooltip(
-        nx::vms::client::desktop::SoftwareTriggerButton* button,
-        const SoftwareTriggerInfo& info);
 
     void updateWatermark();
 
@@ -524,8 +490,6 @@ private:
 
     qint64 m_posUtcMs;
 
-    QnScrollableItemsWidget* m_objectTrackingButtonContainer = nullptr;
-    QnScrollableItemsWidget* m_triggersContainer = nullptr;
     QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;
     QnScrollableTextItemsWidget* m_textOverlayWidget = nullptr;
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
@@ -546,12 +510,7 @@ private:
 
     QnUuid m_itemId;
 
-    QList<SoftwareTriggerInfo> m_triggers;
-    nx::vms::client::core::SoftwareTriggersWatcher* m_triggerWatcher = nullptr;
-    nx::vms::client::core::SoftwareTriggersController* m_triggersController = nullptr;
-
-    nx::vms::client::desktop::CameraButtonController* m_buttonController = nullptr;
-    nx::vms::client::desktop::ObjectTrackingButtonController* m_objectTrackingButtonController = nullptr;
-
     QAction* const m_toggleImageEnhancementAction;
+    using ButtonManager = nx::vms::client::desktop::CameraButtonManager;
+    std::unique_ptr<ButtonManager> m_buttonManager;
 };

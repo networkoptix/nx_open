@@ -76,9 +76,8 @@
 #include <nx/vms/client/desktop/scene/resource_widget/dialogs/encrypted_archive_password_dialog.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
-#include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_controller.h>
+#include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_manager.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
-#include <nx/vms/client/desktop/scene/resource_widget/private/object_tracking_button_controller.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -161,10 +160,6 @@ static constexpr int kNoTimeValue = 0;
 
 static constexpr qreal kMaxForwardSpeed = 16.0;
 static constexpr qreal kMaxBackwardSpeed = 16.0;
-
-static constexpr int kTriggersSpacing = 4;
-static constexpr int kTriggerButtonSize = 40;
-static constexpr int kTriggersMargin = 8; // overlaps HUD margin, i.e. does not sum up with it
 
 static const auto kUpdateDetailsInterval = 1s;
 
@@ -282,12 +277,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     m_posUtcMs(DATETIME_INVALID),
     m_watermarkPainter(new WatermarkPainter),
     m_itemId(item->uuid()),
-    m_triggerWatcher(new SoftwareTriggersWatcher(systemContext, this)),
-    m_triggersController(
-        new nx::vms::client::core::SoftwareTriggersController(systemContext, this)),
-    m_buttonController(new CameraButtonController(this)),
-    m_objectTrackingButtonController(new ObjectTrackingButtonController(this)),
-    m_toggleImageEnhancementAction(new QAction(this))
+    m_toggleImageEnhancementAction(new QAction(this)),
+    m_buttonManager(layoutResource()->isPreviewSearchLayout() || qnRuntime->isVideoWallMode()
+        ? nullptr
+        : new ButtonManager(this))
 {
     NX_ASSERT(d->mediaResource, "Media resource widget was created with a non-media resource.");
     d->isExportedLayout = layoutResource()->isFile();
@@ -400,7 +393,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 
     /* Set up overlays */
     initIoModuleOverlay();
-    updateCameraButtons();
     initAnalyticsOverlays();
     initAreaSelectOverlay();
     initCameraHotspotsOverlay();
@@ -452,8 +444,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     updateOverlayButton();
     setImageEnhancement(item->imageEnhancement());
 
-    initSoftwareTriggers();
-
     updateWatermark();
     connect(systemContext->globalSettings(),
         &nx::vms::common::SystemSettings::watermarkChanged,
@@ -493,31 +483,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     setRoiVisible(item->displayRoi(), false);
     updateButtonsVisibility();
     updateHotspotsState();
-
-    const auto triggerActionHandler =
-        [this](const QnUuid& ruleId, bool success)
-        {
-            const auto button = static_cast<SoftwareTriggerButton*>(
-                m_triggersContainer->item(ruleId));
-            if (!button)
-            {
-                NX_ASSERT(false, "Can't find button for specified trigger rule id!");
-                return;
-            }
-
-            button->setEnabled(true);
-            button->setState(success
-                ? SoftwareTriggerButton::State::Success
-                : SoftwareTriggerButton::State::Failure);
-        };
-
-    // Local files dropped onto layout are not virtual cameras.
-    if (d->camera)
-        m_triggersController->setResourceId(d->camera->getId());
-
-    using Controller = nx::vms::client::core::SoftwareTriggersController;
-    connect(m_triggersController, &Controller::triggerActivated, this, triggerActionHandler);
-    connect(m_triggersController, &Controller::triggerDeactivated, this, triggerActionHandler);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -594,32 +559,6 @@ void QnMediaResourceWidget::initDisplay()
     setDisplay(zoomTargetWidget
         ? zoomTargetWidget->display()
         : QnResourceDisplayPtr(new QnResourceDisplay(d->resource)));
-}
-
-void QnMediaResourceWidget::initSoftwareTriggers()
-{
-    if (!display()->camDisplay()->isRealTimeSource())
-        return;
-
-    if (d->isPreviewSearchLayout)
-        return;
-
-    static const auto kUpdateTriggersInterval = 1000;
-    const auto updateTriggersAvailabilityTimer = new QTimer(this);
-    updateTriggersAvailabilityTimer->setInterval(kUpdateTriggersInterval);
-
-    connect(updateTriggersAvailabilityTimer, &QTimer::timeout,
-        m_triggerWatcher, &SoftwareTriggersWatcher::updateTriggersAvailability);
-
-    connect(m_triggerWatcher, &SoftwareTriggersWatcher::triggerAdded,
-        this, &QnMediaResourceWidget::at_triggerAdded);
-    connect(m_triggerWatcher, &SoftwareTriggersWatcher::triggerRemoved,
-        this, &QnMediaResourceWidget::at_triggerRemoved);
-    connect(m_triggerWatcher, &SoftwareTriggersWatcher::triggerFieldsChanged,
-        this, &QnMediaResourceWidget::at_triggerFieldsChanged);
-
-    m_triggerWatcher->setResourceId(d->resource->getId());
-    updateTriggersAvailabilityTimer->start();
 }
 
 void QnMediaResourceWidget::initIoModuleOverlay()
@@ -1296,92 +1235,9 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
     return result;
 }
 
-bool QnMediaResourceWidget::capabilityButtonsAreVisible() const
-{
-    static const Qn::Permissions kInputPermissions = Qn::Permission::SoftTriggerPermission
-            | Qn::Permission::DeviceInputPermission
-            | Qn::Permission::WritePtzPermission;
-
-    return !d->isPreviewSearchLayout
-        // Video wall has userInput permission but no actual user.
-        && !qnRuntime->isVideoWallMode()
-        && d->camera
-        && (accessController()->permissions(d->camera) & kInputPermissions) != 0;
-}
-
-void QnMediaResourceWidget::updateCapabilityButtons() const
-{
-    if (capabilityButtonsAreVisible())
-    {
-        m_objectTrackingButtonController->createButtons();
-        m_buttonController->createButtons();
-    }
-    else
-    {
-        m_objectTrackingButtonController->removeButtons();
-        m_buttonController->removeButtons();
-    }
-}
-
-void QnMediaResourceWidget::updateTwoWayAudioButton() const
-{
-    const bool twoWayAudioButtonVisible =
-        capabilityButtonsAreVisible()
-        && !d->camera->hasFlags(Qn::cross_system)
-        && d->camera->audioOutputDevice()->hasTwoWayAudio()
-        && d->camera->isTwoWayAudioEnabled()
-        && !d->camera->isIntercom();
-
-    if (twoWayAudioButtonVisible)
-        m_buttonController->createTwoWayAudioButton();
-    else
-        m_buttonController->removeTwoWayAudioButton();
-}
-
-void QnMediaResourceWidget::updateIntercomButtons()
-{
-    const bool intercomButtonVisible =
-        capabilityButtonsAreVisible()
-        && !d->camera->hasFlags(Qn::cross_system)
-        && d->camera->isIntercom();
-
-    if (intercomButtonVisible)
-        m_buttonController->createIntercomButtons();
-    else
-        m_buttonController->removeIntercomButtons();
-}
-
 void QnMediaResourceWidget::setupHud()
 {
     static const int kScrollLineHeight = 8;
-
-    m_objectTrackingButtonContainer = new QnScrollableItemsWidget(m_hudOverlay->left());
-    m_objectTrackingButtonContainer->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
-    m_objectTrackingButtonContainer->setLineHeight(kScrollLineHeight);
-    m_objectTrackingButtonContainer->setContentsMargins(8, 0, 0, 0);
-    setOverlayWidgetVisible(m_objectTrackingButtonContainer, false, /*animate=*/false);
-
-    m_objectTrackingButtonController->setButtonContainer(m_objectTrackingButtonContainer);
-    connect(
-        m_objectTrackingButtonController, &ObjectTrackingButtonController::requestButtonCreation,
-        this, &QnMediaResourceWidget::updateCameraButtons);
-
-    auto leftLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_hudOverlay->left());
-    leftLayout->addItem(m_objectTrackingButtonContainer);
-
-    m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
-    m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
-    m_triggersContainer->setLineHeight(kScrollLineHeight);
-    m_buttonController->setButtonContainer(m_triggersContainer);
-
-    qreal right = 0.0;
-    m_hudOverlay->content()->getContentsMargins(nullptr, nullptr, &right, nullptr);
-    const auto triggersMargin = kTriggersMargin - right;
-
-    m_triggersContainer->setSpacing(kTriggersSpacing);
-    m_triggersContainer->setMaximumWidth(kTriggerButtonSize + triggersMargin);
-    m_triggersContainer->setContentsMargins(0, 0, triggersMargin, 0);
-    setOverlayWidgetVisible(m_triggersContainer, false, /*animate=*/false);
 
     m_compositeOverlay = new QnGraphicsStackedWidget(m_hudOverlay->right());
 
@@ -1400,52 +1256,41 @@ void QnMediaResourceWidget::setupHud()
 
     auto rightLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_hudOverlay->right());
     rightLayout->addItem(m_compositeOverlay);
-    rightLayout->addItem(m_triggersContainer);
 
-    m_compositeOverlay->stackBefore(m_triggersContainer);
+    if (m_buttonManager)
+    {
+        if (const auto objectTrackingContainer = m_buttonManager->objectTrackingContainer())
+        {
+            setOverlayWidgetVisible(objectTrackingContainer, false, /*animate=*/false);
+            auto leftLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_hudOverlay->left());
+            leftLayout->addItem(objectTrackingContainer);
+        }
+
+        if (const auto cameraButtonsContainer = m_buttonManager->container())
+        {
+            setOverlayWidgetVisible(cameraButtonsContainer, false, /*animate=*/false);
+            rightLayout->addItem(cameraButtonsContainer);
+            m_compositeOverlay->stackBefore(cameraButtonsContainer);
+        }
+    }
 
     setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
-
-    // During the widget destruction the following scenario occurs: m_hudOverlay is destroyed, then
-    // triggers container resizes, and we've got a crash in updateTriggersMinHeight().
-    QPointer<QnViewportBoundWidget> content(m_hudOverlay->content());
-    QPointer<QnViewportBoundWidget> rewindContent(m_rewindOverlay->content());
-    QPointer<QnScrollableItemsWidget> triggersContainer(m_triggersContainer);
-    const auto updateTriggersMinHeight =
-        [content, triggersContainer, rewindContent]()
-        {
-            if (!content || !triggersContainer || !rewindContent)
-                return;
-
-            // Calculate minimum height for downscale no more than kMaxDownscaleFactor times.
-            static const qreal kMaxDownscaleFactor = 2.0;
-            const qreal available = content->fixedSize().height() / content->sceneScale();
-            const qreal desired = triggersContainer->effectiveSizeHint(Qt::PreferredSize).height();
-            const qreal extra = content->size().height() - triggersContainer->size().height();
-            const qreal min = qMin(desired, available * kMaxDownscaleFactor - extra);
-            triggersContainer->setMinimumHeight(min);
-
-            rewindContent->setScale(content->sceneScale());
-        };
-
-    connect(m_hudOverlay->content(), &QnViewportBoundWidget::scaleChanged,
-        this, updateTriggersMinHeight);
-
-    connect(m_triggersContainer, &QnScrollableItemsWidget::contentHeightChanged,
-        this, updateTriggersMinHeight);
-
-    connect(m_rewindOverlay->content(), &QnViewportBoundWidget::scaleChanged,
-        this, updateTriggersMinHeight);
 }
 
 void QnMediaResourceWidget::updateHud(bool animate)
 {
     base_type::updateHud(animate);
-    setOverlayWidgetVisible(
-        m_objectTrackingButtonContainer,
-        isOverlayWidgetVisible(titleBar()),
-        animate);
-    setOverlayWidgetVisible(m_triggersContainer, isOverlayWidgetVisible(titleBar()), animate);
+    if (m_buttonManager)
+    {
+        const bool visible = isOverlayWidgetVisible(titleBar());
+        for (const auto& container:
+            {m_buttonManager->objectTrackingContainer(), m_buttonManager->container()})
+        {
+            if (container)
+                setOverlayWidgetVisible(container, visible, animate);
+        }
+    }
+
     if (m_roiFiguresOverlayWidget)
     {
         setOverlayWidgetVisible(m_roiFiguresOverlayWidget,
@@ -1453,13 +1298,6 @@ void QnMediaResourceWidget::updateHud(bool animate)
             animate);
     }
     updateCompositeOverlayMode();
-}
-
-void QnMediaResourceWidget::updateCameraButtons()
-{
-    updateCapabilityButtons();
-    updateTwoWayAudioButton();
-    updateIntercomButtons();
 }
 
 bool QnMediaResourceWidget::animationAllowed() const
@@ -2332,7 +2170,7 @@ double QnMediaResourceWidget::speed() const
         : reader->getSpeed();
 }
 
-QnIOModuleMonitorPtr QnMediaResourceWidget::getIOModuleMonitor()
+nx::vms::client::core::IOModuleMonitorPtr QnMediaResourceWidget::getIOModuleMonitor()
 {
     return d->ioModuleMonitor;
 }
@@ -2698,13 +2536,6 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
     {
         updateCustomAspectRatio();
     }
-    else if (key == ResourcePropertyKey::kCameraCapabilities
-        || key == ResourcePropertyKey::kTwoWayAudioEnabled
-        || key == ResourcePropertyKey::kAudioOutputDeviceId
-        || key == ResourcePropertyKey::kIoSettings)
-    {
-        updateCameraButtons();
-    }
     else if (key == ResourcePropertyKey::kMediaStreams)
     {
         updateAspectRatio();
@@ -3037,10 +2868,13 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
     const bool animate = m_compositeOverlay->scene() != nullptr;
     setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
 
-    for (int i = 0; i < m_triggersContainer->count(); ++i)
+    if (const auto buttonsContainer = m_buttonManager ? m_buttonManager->container() : nullptr)
     {
-        if (auto button = qobject_cast<SoftwareTriggerButton*>(m_triggersContainer->item(i)))
-            button->setLive(isLive);
+        for (int i = 0; i < buttonsContainer->count(); ++i)
+        {
+            if (auto button = qobject_cast<SoftwareTriggerButton*>(buttonsContainer->item(i)))
+                button->setLive(isLive);
+        }
     }
 }
 
@@ -3371,228 +3205,6 @@ QAction* QnMediaResourceWidget::createActionAndButton(const QString& iconName,
     return action;
 }
 
-// ------------------------------------------------------------------------------------------------
-// Soft Triggers
-
-void QnMediaResourceWidget::createTrigger(const SoftwareTriggerInfo& info)
-{
-    const auto lowerBoundPredicate =
-        [](const SoftwareTriggerInfo& left, const SoftwareTriggerInfo& right)
-        {
-            return left.name < right.name
-                || (left.name == right.name
-                    && left.icon < right.icon);
-        };
-
-    const int index = std::lower_bound(m_triggers.cbegin(), m_triggers.cend(), info,
-        lowerBoundPredicate) - m_triggers.cbegin();
-
-    const auto button = new SoftwareTriggerButton(this);
-    configureTriggerButton(button, info);
-
-    m_triggersContainer->insertItem(index, button, info.ruleId);
-    m_triggers.insert(index, info);
-}
-
-void QnMediaResourceWidget::updateTriggerButtonTooltip(
-    SoftwareTriggerButton* button,
-    const SoftwareTriggerInfo& info)
-{
-    if (!button)
-    {
-        NX_ASSERT(false, "Trigger button is null");
-        return;
-    }
-
-    if (info.enabled)
-    {
-        const auto name = nx::vms::event::StringsHelper::getSoftwareTriggerName(info.name);
-        button->setToolTip(info.prolonged
-            ? nx::format("%1 (%2)").args(name, tr("press and hold", "Soft Trigger")).toQString()
-            : name);
-        return;
-    }
-    else
-    {
-        button->setToolTip(tr("Disabled by schedule"));
-    }
-}
-
-void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button,
-    const SoftwareTriggerInfo& info)
-{
-    NX_ASSERT(button);
-
-    button->setIcon(info.icon);
-    button->setProlonged(info.prolonged);
-
-    const bool buttonEnabled = !button->isLive() || info.enabled;
-    if (button->isEnabled() != buttonEnabled)
-    {
-        if (!buttonEnabled)
-        {
-            const bool longPressed = info.prolonged &&
-                button->state() == SoftwareTriggerButton::State::Waiting;
-            if (longPressed)
-                button->setState(SoftwareTriggerButton::State::Failure);
-        }
-
-        button->setEnabled(buttonEnabled);
-    }
-
-    updateTriggerButtonTooltip(button, info);
-
-    button->disconnect(this);
-
-    if (info.prolonged)
-    {
-        connect(button, &SoftwareTriggerButton::pressed, this,
-            [this, button, handler = info.clientSideHandler, ruleId = info.ruleId]()
-            {
-                if (!button->isLive())
-                    return;
-
-                const bool success = m_triggersController->activateTrigger(ruleId);
-                button->setState(success
-                    ? SoftwareTriggerButton::State::Waiting
-                    : SoftwareTriggerButton::State::Failure);
-
-                if (success && handler)
-                    handler();
-
-                menu()->triggerIfPossible(action::SuspendCurrentShowreelAction);
-            });
-
-        connect(button, &SoftwareTriggerButton::released, this,
-            [this, button]()
-            {
-                if (!button->isLive())
-                    return;
-
-                /* In case of activation error don't try to deactivate: */
-                if (button->state() == SoftwareTriggerButton::State::Failure)
-                    return;
-
-                button->setState(m_triggersController->deactivateTrigger()
-                    ? SoftwareTriggerButton::State::Default
-                    : SoftwareTriggerButton::State::Failure);
-
-                menu()->triggerIfPossible(action::ResumeCurrentShowreelAction);
-            });
-    }
-    else
-    {
-        connect(button, &SoftwareTriggerButton::clicked, this,
-            [this, button, handler = info.clientSideHandler, ruleId = info.ruleId]()
-            {
-                if (!button->isLive())
-                    return;
-
-                const bool success = m_triggersController->activateTrigger(ruleId);
-                button->setEnabled(!success);
-                button->setState(success
-                    ? SoftwareTriggerButton::State::Waiting
-                    : SoftwareTriggerButton::State::Failure);
-
-                if (success && handler)
-                    handler();
-            });
-    }
-
-    // Go-to-live handler.
-    connect(button, &SoftwareTriggerButton::clicked, this,
-        [this, button, workbenchDisplay = WindowContextAware::display()]()
-        {
-            if (!button->isLive())
-                menu()->trigger(action::JumpToLiveAction, this);
-        });
-
-    connect(button, &SoftwareTriggerButton::isLiveChanged, this,
-        [this, ruleId = info.ruleId]()
-        {
-            m_triggerWatcher->updateTriggerAvailability(ruleId);
-        });
-}
-
-int QnMediaResourceWidget::triggerIndex(const QnUuid& ruleId) const
-{
-    const auto it = std::find_if(m_triggers.cbegin(), m_triggers.cend(),
-        [ruleId](const auto& val) { return val.ruleId == ruleId; });
-
-    return (it != m_triggers.end()) ? (it - m_triggers.cbegin()) : -1;
-}
-
-void QnMediaResourceWidget::removeTrigger(int index)
-{
-    if (!NX_ASSERT(index >= 0 && index < m_triggers.size()))
-        return;
-
-    m_triggersContainer->deleteItem(m_triggers[index].ruleId);
-    m_triggers.removeAt(index);
-}
-
-void QnMediaResourceWidget::at_triggerRemoved(QnUuid id)
-{
-    removeTrigger(triggerIndex(id));
-}
-
-void QnMediaResourceWidget::at_triggerAdded(
-    QnUuid id,
-    const QString& iconPath,
-    const QString& name,
-    bool prolonged,
-    bool enabled)
-{
-    auto info = SoftwareTriggerInfo{
-        .ruleId = id,
-        .name = name,
-        .icon = iconPath,
-        .enabled = enabled,
-        .prolonged = prolonged,
-    };
-
-    // TODO: #amalov Fill client side handler.
-    createTrigger(info);
-}
-
-void QnMediaResourceWidget::at_triggerFieldsChanged(
-    QnUuid id,
-    SoftwareTriggersWatcher::TriggerFields fields)
-{
-    if (!fields)
-        return;
-
-    int index = triggerIndex(id);
-    if (!NX_ASSERT(index >= 0 && index < m_triggers.size()))
-        return;
-
-    auto info = m_triggers[index];
-
-    if (fields.testFlag(SoftwareTriggersWatcher::NameField))
-        info.name = m_triggerWatcher->triggerName(id);
-    if (fields.testFlag(SoftwareTriggersWatcher::IconField))
-        info.icon = m_triggerWatcher->triggerIcon(id);
-    if (fields.testFlag(SoftwareTriggersWatcher::ProlongedField))
-        info.prolonged = m_triggerWatcher->prolongedTrigger(id);
-    if (fields.testFlag(SoftwareTriggersWatcher::EnabledField))
-        info.enabled = m_triggerWatcher->triggerEnabled(id);
-
-    if (fields & SoftwareTriggersWatcher::TriggerFields{
-        SoftwareTriggersWatcher::NameField,
-        SoftwareTriggersWatcher::IconField})
-    {
-        // Recreate trigger to maintain alphabetic order.
-        removeTrigger(index);
-        createTrigger(info);
-    }
-    else
-    {
-        configureTriggerButton(
-            static_cast<SoftwareTriggerButton*>(m_triggersContainer->item(index)),
-            info);
-    }
-}
-
 void QnMediaResourceWidget::handleSyncStateChanged(bool enabled)
 {
     updateHud(enabled);
@@ -3605,3 +3217,9 @@ bool QnMediaResourceWidget::isTitleUnderMouse() const
 
     return m_hudOverlay->title()->isUnderMouse();
 }
+
+nx::vms::client::desktop::RewindOverlay* QnMediaResourceWidget::rewindOverlay() const
+{
+    return m_rewindOverlay;
+}
+
