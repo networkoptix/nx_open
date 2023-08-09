@@ -267,7 +267,7 @@ namespace Qn
         HasExternalBestShotRole,                    /**< Whether object detection track has an external best shot image (bool). */
         ForcePreviewLoaderRole,                     /**< Display loading indicator on tile preview. */
 
-        DecorationPathRole,                         /**< Role for icon (QIcon). */
+        DecorationPathRole,                         /**< Role for icon path (QString). */
 
         SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
 
