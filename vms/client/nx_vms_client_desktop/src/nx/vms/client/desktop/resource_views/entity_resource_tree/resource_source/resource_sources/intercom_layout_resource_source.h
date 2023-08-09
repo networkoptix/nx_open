@@ -22,11 +22,11 @@ public:
 private:
     void onResourcesAdded(const QnResourceList& resources);
     void onResourcesRemoved(const QnResourceList& resources);
+    void onLayoutTypeChanged(const QnResourcePtr& resource);
     bool processResource(const QnResourcePtr& resource);
 
 private:
     const QnResourcePool* m_resourcePool;
-    QSet<QnResourcePtr> m_intercomLocalLayouts;
 };
 
 } // namespace entity_resource_tree

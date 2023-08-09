@@ -396,12 +396,12 @@ LayoutResourcePtr ResourceTreeModelTest::addIntercomLayout(
     if (parentId.isNull())
     {
         NX_ASSERT(!nx::vms::common::isIntercomLayout(layout));
-        NX_ASSERT(!layout->isIntercomLayout());
+        NX_ASSERT(layout->layoutType() != LayoutResource::LayoutType::intercom);
     }
     else
     {
         NX_ASSERT(nx::vms::common::isIntercomLayout(layout));
-        NX_ASSERT(layout->isIntercomLayout());
+        NX_ASSERT(layout->layoutType() == LayoutResource::LayoutType::intercom);
     }
 
     return layout;
