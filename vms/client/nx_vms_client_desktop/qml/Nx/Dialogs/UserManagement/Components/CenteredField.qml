@@ -1,9 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
+import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
 
 Item
 {
@@ -20,6 +21,9 @@ Item
 
     property real labelHeight: 28
 
+    property alias hint: textHint.data
+    readonly property real labelImplicitWidth: labelRow.width
+
     Item
     {
         id: innerItem
@@ -33,21 +37,44 @@ Item
         }
     }
 
-    Text
+    RowLayout
     {
-        id: label
-
-        horizontalAlignment: Qt.AlignRight
-        verticalAlignment: Qt.AlignVCenter
-
-        height: control.labelHeight > 0 ? control.labelHeight : implicitHeight
+        id: labelRow
 
         anchors.top: parent.top
         anchors.bottom: control.labelHeight > 0 ? undefined : parent.bottom
         anchors.right: innerItem.left
         anchors.rightMargin: 8
 
-        font: Qt.font({pixelSize: 14, weight: Font.Normal})
-        color: ColorTheme.colors.light16
+        spacing: 4
+
+        height: control.labelHeight > 0 ? control.labelHeight : label.implicitHeight
+
+        Text
+        {
+            id: label
+
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            horizontalAlignment: Text.AlignRight
+            verticalAlignment: Qt.AlignVCenter
+
+            font: Qt.font({pixelSize: 14, weight: Font.Normal})
+            color: ColorTheme.colors.light16
+        }
+
+        Item
+        {
+            id: textHint
+
+            Layout.alignment: Qt.AlignVCenter
+
+            implicitWidth: childrenRect.width
+            implicitHeight: childrenRect.height
+
+            visible: children.length > 0
+        }
     }
 }
