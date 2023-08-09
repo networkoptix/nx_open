@@ -292,7 +292,7 @@ QString QnUserResource::getPassword() const
     return m_password;
 }
 
-void QnUserResource::setPasswordAndGenerateHash(const QString& password, DigestSupport digestSupport)
+bool QnUserResource::setPasswordAndGenerateHash(const QString& password, DigestSupport digestSupport)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     const bool isNewPassword = !m_hash.checkPassword(password);
@@ -309,7 +309,7 @@ void QnUserResource::setPasswordAndGenerateHash(const QString& password, DigestS
     }
 
     const bool digestHasChanged = (m_digest != hashes.passwordDigest);
-    setPasswordHashesInternal(hashes, isNewPassword);
+    const bool isChanged = setPasswordHashesInternal(hashes, isNewPassword);
     locker.unlock();
     if (isNewPassword)
     {
@@ -319,6 +319,8 @@ void QnUserResource::setPasswordAndGenerateHash(const QString& password, DigestS
     }
     if (digestHasChanged)
         emit digestChanged(::toSharedPointer(this));
+
+    return isChanged;
 }
 
 void QnUserResource::resetPassword()
@@ -386,7 +388,7 @@ void QnUserResource::setPasswordHashes(const PasswordHashes& hashes)
         emit digestChanged(::toSharedPointer(this));
 }
 
-void QnUserResource::setPasswordHashesInternal(const PasswordHashes& hashes, bool isNewPassword)
+bool QnUserResource::setPasswordHashesInternal(const PasswordHashes& hashes, bool isNewPassword)
 {
     const bool isNewRealm = m_realm != hashes.realm;
     if (isNewRealm)
@@ -424,6 +426,8 @@ void QnUserResource::setPasswordHashesInternal(const PasswordHashes& hashes, boo
         NX_VERBOSE(this, "Updated crypt SHA512 hash: %1", hashes.cryptSha512Hash);
 
     m_mutex.lock();
+
+    return isNewRealm || isNewHash || isNewDigest || isNewCryptSha512Hash;
 }
 
 bool QnUserResource::isBuiltInAdmin() const

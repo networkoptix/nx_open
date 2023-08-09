@@ -24,7 +24,8 @@ struct QtDirectConnectScope
  * is destroyed.
  */
 template<typename Object, typename Signal, typename Handler>
-nx::utils::SharedGuardPtr qtDirectConnect(const Object& object, Signal signal, Handler handler)
+[[nodiscard]] nx::utils::SharedGuardPtr qtDirectConnect(
+    const Object& object, Signal signal, Handler handler)
 {
     const auto scope = std::make_shared<detail::QtDirectConnectScope>();
     const auto connection = QObject::connect(
