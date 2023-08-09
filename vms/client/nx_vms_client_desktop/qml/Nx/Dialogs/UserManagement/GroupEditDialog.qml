@@ -100,6 +100,7 @@ DialogWithState
                 enabled: !dialog.isSaving
 
                 nameEditable: !dialog.isLdap && !dialog.isPredefined && !dialog.isSaving
+                descriptionEditable: !dialog.isPredefined && !dialog.isSaving
                 isLdap: dialog.isLdap
                 isPredefined: dialog.isPredefined
                 groups: dialog.parentGroups
