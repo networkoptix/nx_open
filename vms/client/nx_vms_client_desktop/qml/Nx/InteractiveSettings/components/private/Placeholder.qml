@@ -34,6 +34,8 @@ Control
             Layout.preferredHeight: 64
             Layout.preferredWidth: 64
             Layout.alignment: Qt.AlignCenter
+
+            sourceSize: Qt.size(Layout.preferredWidth, Layout.preferredHeight)
         }
 
         Text
