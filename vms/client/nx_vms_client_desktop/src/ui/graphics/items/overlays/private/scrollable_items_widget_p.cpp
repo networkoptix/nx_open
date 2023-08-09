@@ -11,6 +11,12 @@
 #include <ui/graphics/items/generic/graphics_scroll_area.h>
 #include <ui/graphics/items/overlays/scrollable_items_widget.h>
 
+namespace {
+
+static const char* kIdProperty = "item_id_property_name";
+
+} // namespace
+
 QnScrollableItemsWidgetPrivate::QnScrollableItemsWidgetPrivate(
     QnScrollableItemsWidget* parent)
     :
@@ -116,6 +122,7 @@ QnUuid QnScrollableItemsWidgetPrivate::insertItem(int index, QGraphicsWidget* it
     if (m_items.contains(id))
         return QnUuid();
 
+    item->setProperty(kIdProperty, QVariant::fromValue(id));
     item->setParent(m_scrollArea->contentWidget());
     item->setParentItem(m_scrollArea->contentWidget());
 
@@ -174,6 +181,14 @@ int QnScrollableItemsWidgetPrivate::count() const
 {
     NX_ASSERT(m_items.size() == m_contentLayout->count());
     return m_contentLayout->count();
+}
+
+QnUuid QnScrollableItemsWidgetPrivate::itemId(int index) const
+{
+    const auto resultItem = item(index);
+    return resultItem
+        ? resultItem->property(kIdProperty).value<QnUuid>()
+        : QnUuid{};
 }
 
 QGraphicsWidget* QnScrollableItemsWidgetPrivate::item(int index) const

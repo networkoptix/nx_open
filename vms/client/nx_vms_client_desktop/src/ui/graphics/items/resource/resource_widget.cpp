@@ -359,6 +359,11 @@ QIcon QnResourceWidget::loadSvgIcon(const QString& name) const
     return icon;
 }
 
+QnHudOverlayWidget* QnResourceWidget::hudOverlay() const
+{
+    return m_hudOverlay;
+}
+
 void QnResourceWidget::createButtons()
 {
     auto leftButtonsBar = titleBar()->leftButtonsBar();

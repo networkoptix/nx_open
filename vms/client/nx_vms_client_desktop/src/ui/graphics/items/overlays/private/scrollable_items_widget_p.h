@@ -36,6 +36,7 @@ public:
 
     int count() const;
 
+    QnUuid itemId(int index) const;
     QGraphicsWidget* item(int index) const;
     QGraphicsWidget* item(const QnUuid& id) const;
 

@@ -41,7 +41,7 @@ static ApplicationContext* s_instance = nullptr;
 
 struct ApplicationContext::Private
 {
-    void initializeSettings(Mode mode)
+    void initializeSettings()
     {
         // Make sure application is initialized correctly for settings to be loaded.
         NX_ASSERT(!QCoreApplication::applicationName().isEmpty());
@@ -50,7 +50,7 @@ struct ApplicationContext::Private
         // Disable secure settings in unit tests.
         settings = std::make_unique<Settings>(
             Settings::InitializationOptions{.useKeychain = (mode != Mode::unitTests)});
-}
+    }
 
     void initializeQmlEngine()
     {
@@ -90,6 +90,7 @@ struct ApplicationContext::Private
     }
 
     ApplicationContext* const q;
+    const ApplicationContext::Mode mode;
     QQmlEngine* qmlEngine = nullptr;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
@@ -107,7 +108,7 @@ ApplicationContext::ApplicationContext(
     QObject* parent)
     :
     common::ApplicationContext(peerType, customCloudHost, parent),
-    d(new Private{.q = this})
+    d(new Private{.q = this, .mode = mode})
 {
     if (NX_ASSERT(!s_instance))
         s_instance = this;
@@ -116,7 +117,7 @@ ApplicationContext::ApplicationContext(
     initializeExternalResources(customExternalResourceFile);
     initializeMetaTypes();
 
-    d->initializeSettings(mode);
+    d->initializeSettings();
     d->initializeQmlEngine();
 
     switch (mode)

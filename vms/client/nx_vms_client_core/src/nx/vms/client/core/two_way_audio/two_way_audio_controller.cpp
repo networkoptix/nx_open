@@ -13,7 +13,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/common/utils/ordered_requests_helper.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_availability_watcher.h>
 
@@ -124,15 +123,9 @@ bool TwoWayAudioController::start(OperationCallback&& callback)
     return !started() && d->setActive(true, std::move(callback));
 }
 
-bool TwoWayAudioController::start()
+bool TwoWayAudioController::stop(OperationCallback&& callback)
 {
-    return !started() && d->setActive(true);
-}
-
-void TwoWayAudioController::stop()
-{
-    if (started())
-        d->setActive(false);
+    return started() && d->setActive(false, std::move(callback));
 }
 
 void TwoWayAudioController::setSourceId(const QString& value)
@@ -155,6 +148,11 @@ QnUuid TwoWayAudioController::resourceId() const
 void TwoWayAudioController::setResourceId(const QnUuid& id)
 {
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+    d->availabilityWatcher->setCamera(camera);
+}
+
+void TwoWayAudioController::setCamera(const QnVirtualCameraResourcePtr& camera)
+{
     d->availabilityWatcher->setCamera(camera);
 }
 

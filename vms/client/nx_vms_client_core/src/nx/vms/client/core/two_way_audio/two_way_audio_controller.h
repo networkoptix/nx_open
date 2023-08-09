@@ -33,10 +33,9 @@ public:
 
     static void registerQmlType();
 
-    using OperationCallback = std::function<void (bool callback)>;
-    bool start(OperationCallback&& callback);
-    Q_INVOKABLE bool start();
-    Q_INVOKABLE void stop();
+    using OperationCallback = std::function<void (bool success)>;
+    bool start(OperationCallback&& callback = {});
+    bool stop(OperationCallback&& callback = {});
 
     bool started() const;
 
@@ -46,6 +45,7 @@ public:
 
     QnUuid resourceId() const;
     void setResourceId(const QnUuid& value);
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
 
 signals:
     void startedChanged();

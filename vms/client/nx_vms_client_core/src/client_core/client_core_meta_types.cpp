@@ -21,6 +21,7 @@
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
+#include <nx/vms/client/core/camera/buttons/abstract_camera_button_controller.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/common/helpers/texture_size_helper.h>
 #include <nx/vms/client/core/common/utils/collator.h>
@@ -154,6 +155,8 @@ void initializeMetaTypes()
     ColorTheme::registerQmlType();
     GlobalTemporaries::registerQmlType();
     analytics::IconManager::registerQmlType();
+    AbstractCameraButtonController::registerQmlType();
+    CameraButton::registerQmlType();
 
     MediaPlayer::registerQmlTypes();
 

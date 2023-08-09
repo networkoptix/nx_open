@@ -150,7 +150,7 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
 
     NX_ASSERT(mediaResource && m_accessController && m_accessNotifier);
 
-    ioModuleMonitor.reset(new QnIOModuleMonitor(camera));
+    ioModuleMonitor.reset(new core::IOModuleMonitor(camera));
 
     connect(resource.get(), &QnResource::statusChanged, this,
         &MediaResourceWidgetPrivate::updateIsOffline);

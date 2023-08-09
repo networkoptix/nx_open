@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <camera/iomodule/iomodule_monitor.h>
 #include <core/ptz/ptz_constants.h>
 #include <core/resource/client_resource_fwd.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/media/abstract_metadata_consumer_owner.h>
 #include <nx/vms/client/core/media/abstract_motion_metadata_provider.h>
@@ -51,7 +51,7 @@ public:
     bool isAnalyticsSupported = false;
     QnUuid twoWayAudioWidgetId;
 
-    QnIOModuleMonitorPtr ioModuleMonitor;
+    core::IOModuleMonitorPtr ioModuleMonitor;
 
     QScopedPointer<nx::vms::client::core::ConsumingMotionMetadataProvider> motionMetadataProvider;
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;

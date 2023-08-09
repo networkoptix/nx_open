@@ -5,8 +5,8 @@
 #include <qt_graphics_items/graphics_widget.h>
 
 #include <api/model/api_ioport_data.h>
-#include <camera/iomodule/iomodule_monitor.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
 
 class QnIoModuleOverlayWidgetPrivate;
 class QnIoModuleOverlayContents;
@@ -22,7 +22,7 @@ class QnIoModuleOverlayWidget: public GraphicsWidget
 public:
     QnIoModuleOverlayWidget(
         const QnVirtualCameraResourcePtr& module,
-        const QnIOModuleMonitorPtr& monitor,
+        const nx::vms::client::core::IOModuleMonitorPtr& monitor,
         QGraphicsWidget* parent = nullptr);
     virtual ~QnIoModuleOverlayWidget();
 

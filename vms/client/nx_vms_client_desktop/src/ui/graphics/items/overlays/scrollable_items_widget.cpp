@@ -79,6 +79,12 @@ int QnScrollableItemsWidget::count() const
     return d->count();
 }
 
+QnUuid QnScrollableItemsWidget::itemId(int index) const
+{
+    Q_D(const QnScrollableItemsWidget);
+    return d->itemId(index);
+}
+
 QGraphicsWidget* QnScrollableItemsWidget::item(int index) const
 {
     Q_D(const QnScrollableItemsWidget);
