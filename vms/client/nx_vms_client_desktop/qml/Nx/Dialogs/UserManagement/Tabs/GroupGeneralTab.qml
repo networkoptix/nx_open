@@ -22,6 +22,7 @@ Item
 
     property alias name: groupNameTextField.text
     property bool nameEditable: true
+    property bool descriptionEditable: true
     property bool isLdap: false
     property bool isPredefined: false
     property alias description: descriptionTextArea.text
@@ -143,7 +144,7 @@ Item
 
                         width: parent.width
                         height: 64
-                        readOnly: !control.nameEditable
+                        readOnly: !control.descriptionEditable
                         wrapMode: TextEdit.Wrap
                     }
                 }
