@@ -58,11 +58,19 @@ Dialog
 
         spacing: 8
 
+        readonly property real leftSideMargin: Math.max(
+            nameField.labelImplicitWidth,
+            baseDnField.labelImplicitWidth,
+            filterField.labelImplicitWidth,
+            78)
+
         CenteredField
         {
+            id: nameField
+
             text: qsTr("Name")
 
-            leftSideMargin: 78
+            leftSideMargin: content.leftSideMargin
             rightSideMargin: 0
 
             TextFieldWithValidator
@@ -76,10 +84,17 @@ Dialog
 
         CenteredField
         {
+            id: baseDnField
+
             text: qsTr("Base DN")
 
-            leftSideMargin: 78
+            leftSideMargin: content.leftSideMargin
             rightSideMargin: 0
+
+            hint: ContextHintButton
+            {
+                toolTipText: "TBD" // TODO: VMS-41034
+            }
 
             TextFieldWithValidator
             {
@@ -96,10 +111,17 @@ Dialog
 
         CenteredField
         {
+            id: filterField
+
             text: qsTr("Filter")
 
-            leftSideMargin: 78
+            leftSideMargin: content.leftSideMargin
             rightSideMargin: 0
+
+            hint: ContextHintButton
+            {
+                toolTipText: "TBD" // TODO: VMS-41034
+            }
 
             TextFieldWithValidator
             {
