@@ -771,7 +771,7 @@ bool LayoutsHandler::confirmLayoutChange(
         return confirmChangeSharedLayout(change);
 
     // Never ask for intercom layouts.
-    if (change.layout->isIntercomLayout())
+    if (change.layout->layoutType() == LayoutResource::LayoutType::intercom)
         return true;
 
     NX_ASSERT(false, "Editing of private layouts of other users is no longer supported.");

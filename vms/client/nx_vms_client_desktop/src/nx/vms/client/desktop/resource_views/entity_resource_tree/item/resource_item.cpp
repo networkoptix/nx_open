@@ -12,7 +12,9 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -215,9 +217,6 @@ QVariant ResourceItem::resourceIconKeyData() const
                     discardIconCache));
             }
 
-            const bool nonExportedLayout = m_resource->hasFlags(Qn::layout)
-                && !m_resource->hasFlags(Qn::exported_layout);
-
             if (const auto server = m_resource.staticCast<QnMediaServerResource>())
             {
                 m_connectionsGuard.add(server->connect(server.get(),
@@ -225,19 +224,25 @@ QVariant ResourceItem::resourceIconKeyData() const
                     discardIconCache));
             }
 
-            if (nonExportedLayout || m_resource->hasFlags(Qn::web_page))
+            const auto layout = m_resource.objectCast<LayoutResource>();
+            if (layout && !m_resource->hasFlags(Qn::exported_layout))
             {
-                const auto layout = m_resource.staticCast<QnLayoutResource>().get();
-
-                m_connectionsGuard.add(layout->connect(layout, &QnResource::parentIdChanged,
-                    discardIconCache));
+                m_connectionsGuard.add(layout->connect(
+                    layout.get(), &LayoutResource::layoutTypeChanged, discardIconCache));
             }
 
-            if (m_resource->hasFlags(Qn::web_page))
+            if (m_resource.objectCast<QnWebPageResource>())
             {
                 m_connectionsGuard.add(
+                    m_resource->connect(m_resource.get(), &QnResource::parentIdChanged,
+                        discardIconCache));
+
+                m_connectionsGuard.add(
                     m_resource->connect(m_resource.get(), &QnResource::propertyChanged,
-                    [this] { discardCache(m_resourceIconKeyCache, {Qn::ResourceIconKeyRole}); }));
+                        [this]
+                        {
+                            discardCache(m_resourceIconKeyCache, {Qn::ResourceIconKeyRole});
+                        }));
             }
         };
 
