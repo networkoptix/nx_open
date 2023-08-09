@@ -67,26 +67,21 @@ void LayoutResourceSource::onResourceRemoved(const QnResourcePtr& resource)
 {
     resource->disconnect(this);
 
-    if (m_localLayouts.contains(resource))
-        m_localLayouts.remove(resource);
+    if (m_localLayouts.remove(resource))
+        return;
 
     if (resource->hasFlags(Qn::layout))
     {
         const auto layout = resource.dynamicCast<LayoutResource>();
-        if (NX_ASSERT(layout) && !layout->isIntercomLayout())
+        if (NX_ASSERT(layout)) //< Sending `resourceRemoved` for a not added resource is OK.
             emit resourceRemoved(resource);
     }
 }
 
-void LayoutResourceSource::onLayoutParentIdChanged(
-    const QnResourcePtr& layoutResource,
-    const QnUuid& previousParentId)
+void LayoutResourceSource::onLayoutTypeChanged(const LayoutResourcePtr& layoutResource)
 {
-    if (layoutResource->getParentId().isNull() && !layoutResource->hasFlags(Qn::removed)
-        && m_includeShared)
-    {
-        emit resourceAdded(layoutResource);
-    }
+    emit resourceRemoved(layoutResource);
+    onResourceAdded(layoutResource);
 }
 
 void LayoutResourceSource::processResource(
@@ -101,8 +96,13 @@ void LayoutResourceSource::processResource(
 
     const auto layout = resource.dynamicCast<LayoutResource>();
 
-    if (layout->isServiceLayout())
+    if (layout->isServiceLayout()
+        || layout->layoutType() == LayoutResource::LayoutType::intercom
+        || layout->layoutType() == LayoutResource::LayoutType::videoWall
+        || layout->layoutType() == LayoutResource::LayoutType::invalid)
+    {
         return;
+    }
 
     if (layout->hasFlags(Qn::local) && !layout->hasFlags(Qn::local_intercom_layout))
     {
@@ -110,10 +110,10 @@ void LayoutResourceSource::processResource(
         return;
     }
 
-    connect(resource.get(), &QnResource::parentIdChanged,
-        this, &LayoutResourceSource::onLayoutParentIdChanged);
+    connect(layout.get(), &LayoutResource::layoutTypeChanged,
+        this, &LayoutResourceSource::onLayoutTypeChanged, Qt::UniqueConnection);
 
-    if (layout->isIntercomLayout())
+    if (layout->layoutType() == LayoutResource::LayoutType::unknown)
         return;
 
     if (!m_parentUser

@@ -51,7 +51,7 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
 
     const auto layoutResource = item->layout()->resource().dynamicCast<LayoutResource>();
     const bool itemIsIntercomLayout = resource->hasFlags(Qn::media)
-        && layoutResource && layoutResource->isIntercomLayout();
+        && layoutResource && layoutResource->layoutType() == LayoutResource::LayoutType::intercom;
 
     const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
         ? Qn::ViewContentPermission

@@ -3,6 +3,8 @@
 #include "layout_resource.h"
 
 #include <core/resource/client_camera.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/layout_data.h>
@@ -28,11 +30,10 @@ qreal LayoutResource::cellSpacingValue(Qn::CellSpacing spacing)
     return nx::vms::api::LayoutData::kDefaultCellSpacing;
 }
 
-LayoutResource::LayoutResource():
-    m_isIntercomLayout(nx::vms::common::isIntercom(getParentResource()))
+LayoutResource::LayoutResource()
 {
     connect(this, &LayoutResource::parentIdChanged,
-        this, &LayoutResource::updateIsIntercomState,
+        this, &LayoutResource::updateLayoutType,
         Qt::DirectConnection);
 }
 
@@ -164,6 +165,7 @@ void LayoutResource::setItemData(const QnUuid& id, Qn::ItemDataRole role, const 
         NX_MUTEX_LOCKER lock(&m_mutex);
         notify = setItemDataUnderLock(id, role, data);
     }
+
     if (notify)
          emit itemDataChanged(id, role, data);
 }
@@ -198,9 +200,9 @@ bool LayoutResource::isVideoWallReviewLayout() const
     return m_data.contains(Qn::VideoWallResourceRole);
 }
 
-bool LayoutResource::isIntercomLayout() const
+LayoutResource::LayoutType LayoutResource::layoutType() const
 {
-    return m_isIntercomLayout;
+    return m_layoutType;
 }
 
 bool LayoutResource::isCrossSystem() const
@@ -245,22 +247,8 @@ LayoutResourcePtr LayoutResource::create() const
 void LayoutResource::setSystemContext(nx::vms::common::SystemContext* systemContext)
 {
     QnLayoutResource::setSystemContext(systemContext);
-    updateIsIntercomState();
-
-    m_resourcePoolConnection.reset(connect(resourcePool(), &QnResourcePool::resourcesAdded, this,
-        [this](const QnResourceList& resources)
-        {
-            for (const QnResourcePtr& resource: resources)
-            {
-                if (resource->getId() == getId())
-                {
-                    updateIsIntercomState();
-                    return;
-                }
-            }
-        }));
-
     storeSnapshot();
+    updateLayoutType();
 }
 
 void LayoutResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
@@ -272,14 +260,62 @@ void LayoutResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         m_localRange = localOther->m_localRange;
 }
 
-void LayoutResource::updateIsIntercomState()
+void LayoutResource::setLayoutType(LayoutType value)
 {
-    const auto parentCamera = getParentResource().dynamicCast<QnClientCameraResource>();
-    if (!parentCamera || !parentCamera->isIntercom())
+    if (m_layoutType == value)
         return;
 
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    m_isIntercomLayout = true;
+    m_layoutType = value;
+    emit layoutTypeChanged(toSharedPointer().staticCast<LayoutResource>());
+}
+
+LayoutResource::LayoutType LayoutResource::calculateLayoutType() const
+{
+    if (isFile())
+        return LayoutType::file;
+
+    if (isShared())
+        return LayoutType::shared;
+
+    const auto parentResource = getParentResource();
+    if (!parentResource)
+        return LayoutType::unknown;
+
+    if (const auto parentUser = parentResource.objectCast<QnUserResource>())
+        return LayoutType::local;
+
+    if (const auto parentVideoWall = parentResource.objectCast<QnVideoWallResource>())
+        return LayoutType::videoWall;
+
+    if (const auto parentCamera = parentResource.objectCast<QnClientCameraResource>())
+    {
+        return NX_ASSERT(parentCamera->isIntercom())
+            ? LayoutType::intercom
+            : LayoutType::invalid;
+    }
+
+    NX_ASSERT(false, "Unexpected layout parent: %1", parentResource);
+    return LayoutType::invalid;
+}
+
+void LayoutResource::updateLayoutType()
+{
+    setLayoutType(calculateLayoutType());
+
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    m_resourcePoolConnection.reset();
+
+    if (m_layoutType == LayoutType::unknown && resourcePool())
+    {
+        m_resourcePoolConnection.reset(
+            connect(resourcePool(), &QnResourcePool::resourcesAdded, this,
+                [this]()
+                {
+                    if (getParentResource())
+                        updateLayoutType();
+                },
+                Qt::DirectConnection));
+    }
 }
 
 } // namespace nx::vms::client::desktop
