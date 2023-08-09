@@ -31,6 +31,12 @@ Column
 
         text: qsTr("Link Valid until")
 
+        hint: ContextHintButton
+        {
+            toolTipText: qsTr("The link will remain accessible until the date specified"
+             + " (including, based on the Server time)")
+        }
+
         DatePicker
         {
             id: datePicker
@@ -44,21 +50,38 @@ Column
         leftSideMargin: validUntilField.leftSideMargin
         rightSideMargin: validUntilField.rightSideMargin
 
-        CheckBox
+        RowLayout
         {
-            id: revokeAccessCheckBox
-
-            text: qsTr("Revoke access after login")
-
-            font.pixelSize: 14
-            wrapMode: Text.WordWrap
-            enabled: control.enabled
+            spacing: 2
 
             anchors
             {
                 left: parent.left
                 right: parent.right
                 leftMargin: -3
+            }
+
+            CheckBox
+            {
+                id: revokeAccessCheckBox
+
+                text: qsTr("Revoke access after login")
+
+                font.pixelSize: 14
+                wrapMode: Text.WordWrap
+                enabled: control.enabled
+            }
+
+            Item
+            {
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+
+                ContextHintButton
+                {
+                    toolTipText: qsTr("Access may be revoked earlier if the link validity"
+                        + " period ends")
+                }
             }
         }
     }
