@@ -43,12 +43,6 @@ namespace {
 
 static constexpr auto kLiveUpdateInterval = 15s;
 
-static const QColor kLight12Color = "#91A7B2";
-static const QColor kLight10Color = "#A5B7C0";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kLight12Color, "light12"}, {kLight10Color, "light10"}}},
-};
-
 static milliseconds startTime(const ActionData& event)
 {
     return duration_cast<milliseconds>(microseconds(event.eventParams.eventTimestampUsec));
@@ -168,7 +162,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             return title(eventParams);
 
         case Qn::DecorationPathRole:
-            return icon(eventParams);
+            return iconPath(eventParams);
 
         case Qt::DecorationRole:
             if (eventParams.eventType == EventType::softwareTriggerEvent)
@@ -481,58 +475,58 @@ QString EventSearchListModel::Private::description(
         .join(common::html::kLineBreak);
 }
 
-QIcon EventSearchListModel::Private::icon(const vms::event::EventParameters& parameters)
+QString EventSearchListModel::Private::iconPath(const vms::event::EventParameters& parameters)
 {
     switch (parameters.eventType)
     {
         case EventType::storageFailureEvent:
-            return qnSkin->icon("events/storage_red.png");
+            return "events/storage_red.png";
 
         case EventType::backupFinishedEvent:
-            return qnSkin->icon("events/storage_green.png");
+            return "events/storage_green.png";
 
         case EventType::serverStartEvent:
-            return qnSkin->icon("events/server_20.svg", kIconSubstitutions);
+            return "events/server_20.svg";
 
         case EventType::serverFailureEvent:
         case EventType::serverCertificateError:
-            return qnSkin->icon("events/server_red.png");
+            return "events/server_red.png";
 
         case EventType::serverConflictEvent:
-            return qnSkin->icon("events/server_yellow.png");
+            return "events/server_yellow.png";
 
         case EventType::licenseIssueEvent:
-            return qnSkin->icon("events/license_red.png");
+            return "events/license_red.png";
 
         case EventType::cameraDisconnectEvent:
-            return qnSkin->icon("events/connection_red.png");
+            return "events/connection_red.png";
 
         case EventType::networkIssueEvent:
         case EventType::cameraIpConflictEvent:
-            return qnSkin->icon("events/connection_yellow.png");
+            return "events/connection_yellow.png";
 
         case EventType::softwareTriggerEvent:
-            return qnSkin->icon(SoftwareTriggerPixmaps::pixmapsPath() + parameters.description + ".png");
+            return SoftwareTriggerPixmaps::pixmapsPath() + parameters.description + ".png";
 
         case EventType::pluginDiagnosticEvent:
         {
             switch (QnNotificationLevel::valueOf(parameters))
             {
                 case QnNotificationLevel::Value::CriticalNotification:
-                    return qnSkin->icon("events/alert_red.png");
+                    return "events/alert_red.png";
                 case QnNotificationLevel::Value::ImportantNotification:
-                    return qnSkin->icon("events/alert_yellow.png");
+                    return "events/alert_yellow.png";
                 default:
-                    return qnSkin->icon("events/alert_20.svg", kIconSubstitutions);
+                    return "events/alert_20.svg";
             }
         }
 
         case EventType::cameraMotionEvent:
-            return qnSkin->icon("events/motion.svg");
+            return "events/motion.svg";
 
         // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
         case EventType::cameraInputEvent:
-            return qnSkin->icon("tree/camera.svg");
+            return "tree/camera.svg";
 
         case EventType::analyticsSdkEvent:
         case EventType::analyticsSdkObjectDetected:
