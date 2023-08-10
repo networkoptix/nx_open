@@ -463,16 +463,29 @@ void UserGroupsWidget::Private::deleteSelected()
         return;
 
     GroupSettingsDialog::removeGroups(q->systemContext(), toDelete, nx::utils::guarded(q,
-        [this](bool success, const QString& errorString)
+        [this, toDelete](bool success, const QString& errorString)
         {
             q->setEnabled(true);
 
             if (success)
                 return;
 
+            QString text;
+            if (const auto count = toDelete.count(); count == 1)
+            {
+                if (const auto group = groupsModel->findGroup(toDelete.values()[0]))
+                    text = tr("Failed to delete group \"%1\".").arg(group->name.toHtmlEscaped());
+                else
+                    text = tr("Failed to delete group.");
+            }
+            else
+            {
+                text = tr("Failed to delete %n groups.", /*comment*/ "", count);
+            }
+
             QnMessageBox messageBox(
                 QnMessageBoxIcon::Critical,
-                tr("Delete failed"),
+                text,
                 errorString,
                 QDialogButtonBox::Ok,
                 QDialogButtonBox::Ok,
