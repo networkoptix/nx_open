@@ -529,16 +529,27 @@ void UserListWidget::Private::deleteSelected()
         return;
 
     qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
-        [this](bool success, const QString& errorString)
+        [this, usersToDelete](bool success, const QString& errorString)
         {
             q->setEnabled(true);
 
             if (success)
                 return;
 
+            QString text;
+            if (const auto count = usersToDelete.count(); count == 1)
+            {
+                text = tr("Failed to delete user \"%1\".")
+                    .arg(usersToDelete[0]->getName().toHtmlEscaped());
+            }
+            else
+            {
+                text = tr("Failed to delete %n users", /*comment*/ "", count);
+            }
+
             QnMessageBox messageBox(
                 QnMessageBoxIcon::Critical,
-                tr("Delete failed"),
+                text,
                 errorString,
                 QDialogButtonBox::Ok,
                 QDialogButtonBox::Ok,
