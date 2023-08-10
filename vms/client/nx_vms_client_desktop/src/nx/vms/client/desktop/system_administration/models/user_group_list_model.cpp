@@ -410,6 +410,12 @@ QSet<QnUuid> UserGroupListModel::groupIds() const
     return result;
 }
 
+std::optional<api::UserGroupData> UserGroupListModel::findGroup(const QnUuid& groupId) const
+{
+    const auto it = d->findGroup(groupId);
+    return it == d->orderedGroups.cend() ? std::nullopt : std::make_optional(*it);
+}
+
 QSet<QnUuid> UserGroupListModel::checkedGroupIds() const
 {
     return d->checkedGroupIds;
