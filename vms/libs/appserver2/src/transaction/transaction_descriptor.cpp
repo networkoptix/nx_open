@@ -703,7 +703,7 @@ struct SaveUserAccess
             if (hasUserWithSameName)
             {
                 return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                    "User '%1' will not be saved because of the name duplication."), param.name));
+                    "User '%1' will not be saved because of the login duplication."), param.name));
             }
         }
 
