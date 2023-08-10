@@ -20,9 +20,9 @@ public:
 
 protected:
     virtual void onResourceStatusChanged(
-        const QnResourcePtr &resource,
-        nx::vms::api::ResourceStatus status,
-        ec2::NotificationSource source) override
+        const QnResourcePtr&,
+        nx::vms::api::ResourceStatus,
+        ec2::NotificationSource) override
     {
     };
 
