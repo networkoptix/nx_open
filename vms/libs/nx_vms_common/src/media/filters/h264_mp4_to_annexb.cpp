@@ -20,20 +20,25 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
 
     if (!videoData)
         return data;
-    return processVideoData(videoData);
+
+    auto result = processVideoData(videoData);
+    if (!result)
+        return data;
+
+    return result;
 }
 
-QnConstCompressedVideoDataPtr H2645Mp4ToAnnexB::processVideoData(
+QnCompressedVideoDataPtr H2645Mp4ToAnnexB::processVideoData(
     const QnConstCompressedVideoDataPtr& videoData)
 {
     auto codecId = videoData->compressionType;
     if (codecId != AV_CODEC_ID_H264 && codecId != AV_CODEC_ID_H265)
-        return videoData;
+        return nullptr;
 
     if (!videoData->context)
     {
         NX_DEBUG(this, "Invalid video stream, failed to convert to AnnexB format, no extra data");
-        return videoData;
+        return nullptr;
     }
 
     std::vector<uint8_t> header;
@@ -43,13 +48,13 @@ QnConstCompressedVideoDataPtr H2645Mp4ToAnnexB::processVideoData(
     if (extraData && extraDataSize)
     {
         if (nx::media::nal::isStartCode(extraData, extraDataSize))
-            return videoData;
+            return nullptr;
     }
     else
     {
         // Some sizes of NAL units can start from 001, so we try to check extradata first.
         if (nx::media::nal::isStartCode(videoData->data(), videoData->dataSize()))
-            return videoData;
+            return nullptr;
     }
 
     if (!m_newContext || videoData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
@@ -63,7 +68,7 @@ QnConstCompressedVideoDataPtr H2645Mp4ToAnnexB::processVideoData(
         {
             NX_DEBUG(this,
                 "Invalid video stream, failed to convert to AnnexB format, invalid extra data");
-            return videoData;
+            return nullptr;
         }
 
         auto context = std::make_shared<CodecParameters>(
