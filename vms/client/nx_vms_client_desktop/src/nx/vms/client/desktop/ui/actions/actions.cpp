@@ -835,6 +835,12 @@ void initialize(Manager* manager, Action* root)
         .role(QAction::AboutRole)
         .condition(!condition::showreelIsRunning());
 
+    factory(UserManualAction)
+        .flags(Main)
+        .mode(DesktopMode)
+        .text(ContextMenu::tr("User Manual..."))
+        .condition(!condition::showreelIsRunning());
+
     factory()
         .flags(Main)
         .separator();
