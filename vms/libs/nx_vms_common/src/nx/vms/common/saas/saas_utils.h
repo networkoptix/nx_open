@@ -6,6 +6,8 @@ namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::common::saas {
 
-NX_VMS_COMMON_API bool saasIsActive(SystemContext* context);
+NX_VMS_COMMON_API bool saasIsActive(SystemContext* systemContext);
+
+NX_VMS_COMMON_API bool saasIsInitialized(SystemContext* systemContext);
 
 } // nx::vms::common::saas

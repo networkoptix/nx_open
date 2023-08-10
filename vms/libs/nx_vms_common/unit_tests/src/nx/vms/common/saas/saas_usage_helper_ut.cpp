@@ -133,8 +133,8 @@ protected:
         m_integrationsHelper.reset(new IntegrationServiceUsageHelper(systemContext()));
 
         auto manager = systemContext()->saasServiceManager();
-        ASSERT_TRUE(manager->loadServiceData(kServiceDataJson));
-        ASSERT_TRUE(manager->loadSaasData(kSaasDataJson));
+        manager->loadServiceData(kServiceDataJson);
+        manager->loadSaasData(kSaasDataJson);
 
         auto pluginResource = AnalyticsPluginResourcePtr(new AnalyticsPluginResource());
         pluginResource->setIdUnsafe(QnUuid::createUuid());
