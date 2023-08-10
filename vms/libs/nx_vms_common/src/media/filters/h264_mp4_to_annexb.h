@@ -24,7 +24,7 @@ public:
         const QnConstAbstractDataPacketPtr& data) override;
 
     // Same as processData, but return QnCompressedVideoDataPtr.
-    QnConstCompressedVideoDataPtr processVideoData(const QnConstCompressedVideoDataPtr& data);
+    QnCompressedVideoDataPtr processVideoData(const QnConstCompressedVideoDataPtr& data);
 
 private:
     CodecParametersConstPtr m_newContext;
