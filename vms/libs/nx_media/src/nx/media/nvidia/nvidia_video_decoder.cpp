@@ -184,7 +184,10 @@ bool NvidiaVideoDecoder::decode(const QnConstCompressedVideoDataPtr& packet)
         return false;
     }
 
-    auto packetAnnexB = m_impl->filterAnnexB.processVideoData(packet);
+    QnConstCompressedVideoDataPtr packetAnnexB;
+    packetAnnexB = m_impl->filterAnnexB.processVideoData(packet);
+    if (!packetAnnexB)
+        packetAnnexB = packet;
 
     try
     {
