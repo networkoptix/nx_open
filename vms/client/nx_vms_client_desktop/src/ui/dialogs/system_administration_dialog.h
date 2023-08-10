@@ -21,6 +21,7 @@ public:
         UserManagement,
         UpdatesPage,
         LicensesPage,
+        SaasInfoPage,
         MailSettingsPage,
         SecurityPage,
         CloudManagement,

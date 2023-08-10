@@ -110,6 +110,8 @@ struct NX_VMS_API SaasService
 
     /**%apidoc Configurable service parameters.  Different block for each service type. */
     SaasServiceParameters parameters;
+
+    bool operator==(const SaasService&) const = default;
 };
 #define SaasService_fields (id)(type)(state)(displayName)(description)(createdByChannelPartner)(parameters)
 NX_REFLECTION_INSTRUMENT(SaasService, SaasService_fields)
@@ -134,6 +136,8 @@ struct NX_VMS_API SaasPurshase
 {
     /**%apidoc Quantity of purchased service */
     int quantity = 0;
+
+    bool operator==(const SaasPurshase&) const = default;
 };
 #define SaasPurshase_fields (quantity)
 NX_REFLECTION_INSTRUMENT(SaasPurshase, SaasPurshase_fields)
@@ -165,6 +169,8 @@ struct ServiceTypeStatus
      * turn off services.
      */
     SaasDateTime issueExpirationDate;
+
+    bool operator==(const ServiceTypeStatus&) const = default;
 };
 #define ServiceTypeState_fields (status)(issueExpirationDate)
 NX_REFLECTION_INSTRUMENT(ServiceTypeStatus, ServiceTypeState_fields)
@@ -177,6 +183,8 @@ struct NX_VMS_API Organization
 
     /**%apidoc Organization name */
     QString name;
+
+    bool operator==(const Organization&) const = default;
 };
 #define Organization_fields (id)(name)
 NX_REFLECTION_INSTRUMENT(Organization, Organization_fields)
@@ -201,6 +209,8 @@ struct NX_VMS_API SaasSecurity
     SaasDateTime tmpExpirationDate;
 	
     std::map<QString, ServiceTypeStatus> status;
+
+    bool operator==(const SaasSecurity&) const = default;
 };
 #define SaasSecurity_fields (checkPeriodS)(lastCheck)(tmpExpirationDate)(status)
 NX_REFLECTION_INSTRUMENT(SaasSecurity, SaasSecurity_fields)
@@ -225,6 +235,8 @@ struct NX_VMS_API SaasData
 
     /**%apidoc Security data. It is used to validate saas data*/
     SaasSecurity security;
+
+    bool operator==(const SaasData&) const = default;
 };
 #define SaasData_fields (cloudSystemId)(channelPartner)(organization)(state)(services)(security)
 NX_REFLECTION_INSTRUMENT(SaasData, SaasData_fields)

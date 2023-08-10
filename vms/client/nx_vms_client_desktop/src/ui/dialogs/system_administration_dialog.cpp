@@ -22,6 +22,8 @@
 #include <nx/vms/client/desktop/system_administration/widgets/user_management_tab_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/system_settings/cloud_management_widget.h>
@@ -29,6 +31,7 @@
 #include <ui/widgets/system_settings/general_system_administration_widget.h>
 #include <ui/widgets/system_settings/license_manager_widget.h>
 #include <ui/widgets/system_settings/routing_management_widget.h>
+#include <ui/widgets/system_settings/saas_info_widget.h>
 
 using namespace std::chrono;
 using namespace nx::vms::client::desktop;
@@ -54,6 +57,19 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     addPage(UpdatesPage, multiUpdatesWidget, tr("Updates"));
 
     addPage(LicensesPage, new LicenseManagerWidget(this), tr("Licenses"));
+    addPage(SaasInfoPage, new SaasInfoWidget(systemContext(), this), tr("Services"));
+
+    const auto updateLicenseAndSaasInfoPagesVisibility =
+        [this]
+        {
+            const bool saasInitialized = nx::vms::common::saas::saasIsInitialized(systemContext());
+            setPageVisible(LicensesPage, !saasInitialized);
+            setPageVisible(SaasInfoPage, saasInitialized);
+        };
+    connect(systemContext()->saasServiceManager(),
+        &nx::vms::common::saas::ServiceManager::dataChanged,
+        this,
+        updateLicenseAndSaasInfoPagesVisibility);
 
     auto outgoingMailSettingsWidget = new OutgoingMailSettingsWidget(systemContext(), this);
     addPage(MailSettingsPage, outgoingMailSettingsWidget, tr("Email"));
@@ -98,6 +114,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
 
     loadDataToUi();
     updateAnalyticsSettingsWidgetVisibility();
+    updateLicenseAndSaasInfoPagesVisibility();
 
     autoResizePagesToContents(
         ui->tabWidget, {QSizePolicy::Preferred, QSizePolicy::Preferred}, true);

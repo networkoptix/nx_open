@@ -2,16 +2,43 @@
 
 #include "saas_service_manager.h"
 
+#include <optional>
+
 #include <core/resource_management/resource_properties.h>
 #include <licensing/license.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/reflect/string_conversion.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/system_context.h>
 
 static const QString kSaasDataPropertyKey("saasData");
 static const QString kSaasServicesPropertyKey("saasServices");
+
+namespace {
+
+void setJsonToDictionary(
+    QnResourcePropertyDictionary* dictionary,
+    const QString& propertyKey,
+    const std::string_view& json)
+{
+    if (dictionary->setValue(QnUuid(), propertyKey, QString::fromUtf8(json)))
+        dictionary->saveParamsAsync(QnUuid());
+}
+
+template <typename T>
+std::optional<T> getObjectFromDictionary(
+    QnResourcePropertyDictionary* dictionary,
+    const QString& propertyKey)
+{
+    const auto array = dictionary->value(QnUuid(), propertyKey).toUtf8();
+    T result;
+    return nx::reflect::json::deserialize(std::string_view(array.data(), array.size()), &result)
+        ? result
+        : std::optional<T>();
+}
+
+} // namespace
 
 namespace nx::vms::common::saas {
 
@@ -19,59 +46,173 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
     QObject(parent),
     SystemContextAware(context)
 {
-        connect(
-            context->resourcePropertyDictionary(),
-            &QnResourcePropertyDictionary::propertyChanged,
-            [this](const QnUuid& resourceId, const QString& key)
-            {
-                if (!resourceId.isNull())
-                    return;
+    using namespace nx::vms::api;
 
-                if (key == kSaasDataPropertyKey)
+    connect(context->resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged,
+        [this](const QnUuid& resourceId, const QString& key)
+        {
+            if (!resourceId.isNull())
+                return;
+
+            const auto dictionary = systemContext()->resourcePropertyDictionary();
+            if (key == kSaasDataPropertyKey)
+            {
+                if (const auto saasData = getObjectFromDictionary<api::SaasData>(dictionary, key))
+                    setData(saasData.value());
+                else
+                    NX_ASSERT(false, "Could not deserialize nx::vms::api::SaasData structure");
+            }
+            else if (key == kSaasServicesPropertyKey)
+            {
+                if (const auto services =
+                    getObjectFromDictionary<std::vector<api::SaasService>>(dictionary, key))
                 {
-                    const auto dict = systemContext()->resourcePropertyDictionary();
-                    const auto value = dict->value(QnUuid(), kSaasDataPropertyKey).toUtf8();
-                    loadSaasData(std::string_view(value.data(), value.size()));
+                    setServices(services.value());
                 }
-                else if (key == kSaasServicesPropertyKey)
+                else
                 {
-                    const auto dict = systemContext()->resourcePropertyDictionary();
-                    const auto value = dict->value(QnUuid(), kSaasServicesPropertyKey).toUtf8();
-                    loadServiceData(std::string_view(value.data(), value.size()));
+                    NX_ASSERT(false,
+                        "Could not deserialize list of nx::vms::api::SaasService structures");
                 }
-            });
+            }
+        });
+
+    connect(context->resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyRemoved,
+        [this](const QnUuid& resourceId, const QString& key)
+        {
+            if (!resourceId.isNull())
+                return;
+
+            if (key == kSaasDataPropertyKey)
+                setData({});
+            else if (key == kSaasServicesPropertyKey)
+                setServices({});
+        });
+}
+
+void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
+{
+    setJsonToDictionary(
+        systemContext()->resourcePropertyDictionary(),
+        kSaasDataPropertyKey,
+        saasDataJson);
+}
+
+void ServiceManager::loadServiceData(const std::string_view& servicesJson)
+{
+    setJsonToDictionary(
+        systemContext()->resourcePropertyDictionary(),
+        kSaasServicesPropertyKey,
+        servicesJson);
+}
+
+nx::vms::api::SaasData ServiceManager::data() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return m_data;
+}
+
+std::map<QnUuid, nx::vms::api::SaasService> ServiceManager::services() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return m_services;
+}
+
+api::SaasState ServiceManager::saasState() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return m_data.state;
+}
+
+void ServiceManager::setSaasState(api::SaasState saasState)
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    auto updatedSaasData = m_data;
+    updatedSaasData.state = saasState;
+    mutexLocker.unlock();
+
+    loadSaasData(nx::reflect::json::serialize(updatedSaasData));
+}
+
+std::map<QnUuid, nx::vms::api::SaasAnalyticsParameters> ServiceManager::analyticsIntegrations() const
+{
+    using namespace nx::vms::api;
+    return purchasedServices<SaasAnalyticsParameters>(SaasService::kAnalyticsIntegrationServiceType);
+}
+
+std::map<QnUuid, nx::vms::api::SaasLocalRecordingParameters> ServiceManager::localRecording() const
+{
+    using namespace nx::vms::api;
+    return purchasedServices<SaasLocalRecordingParameters>(SaasService::kLocalRecordingServiceType);
+}
+
+std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloudStorageData() const
+{
+    using namespace nx::vms::api;
+    return purchasedServices<SaasCloudStorageParameters>(SaasService::kCloudRecordingType);
+}
+
+std::pair<bool, QString> ServiceManager::isBlocked() const
+{
+    using namespace nx::vms::api;
+
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    const auto state = m_data.state;
+    if (state == SaasState::suspend || state == SaasState::shutdown)
+    {
+        const QString message = NX_FMT(
+            "Access for cloud users is forbiden because of System "
+            "is in '%1' state", toString(state));
+        return {true, message};
+    }
+
+    return {false, QString()};
+}
+
+void ServiceManager::updateLocalRecordingLicenseV1()
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    updateLocalRecordingLicenseV1Unsafe();
+}
+
+nx::vms::api::ServiceTypeStatus ServiceManager::serviceStatus(const QString& serviceType) const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return m_data.security.status.contains(serviceType)
+        ? m_data.security.status.at(serviceType)
+        : nx::vms::api::ServiceTypeStatus();
 }
 
 void ServiceManager::setData(const nx::vms::api::SaasData& data)
 {
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    m_data = data;
-}
-
-void ServiceManager::loadSaasData(const nx::vms::api::SaasData& data)
-{
-    setData(data);
-    saveSaasDataToProperty(nx::reflect::json::serialize(data));
-}
-
-void ServiceManager::saveSaasDataToProperty(const std::string_view& data)
-{
-    auto propertyDict = systemContext()->resourcePropertyDictionary();
-    if (propertyDict->setValue(QnUuid(), kSaasDataPropertyKey, QString::fromUtf8(data)))
     {
-        propertyDict->saveParamsAsync(QnUuid());
-        onDataChanged();
+        NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+        if (m_data == data)
+            return;
+
+        m_data = data;
+        updateLocalRecordingLicenseV1Unsafe();
     }
+
+    emit dataChanged();
 }
 
-bool ServiceManager::loadSaasData(const std::string_view& data)
+void ServiceManager::setServices(const std::vector<nx::vms::api::SaasService>& services)
 {
-    nx::vms::api::SaasData value;
-    if (!nx::reflect::json::deserialize(data, &value))
-        return false;
-    setData(value);
-    saveSaasDataToProperty(data);
-    return true;
+    {
+        NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+        std::map<QnUuid, nx::vms::api::SaasService> servicesMap;
+        for (const auto& service: services)
+            servicesMap.emplace(service.id, service);
+
+        if (m_services == servicesMap)
+            return;
+
+        m_services = servicesMap;
+        updateLocalRecordingLicenseV1Unsafe();
+    }
+
+    emit dataChanged();
 }
 
 void ServiceManager::setEnabled(bool value)
@@ -82,55 +223,6 @@ void ServiceManager::setEnabled(bool value)
 bool ServiceManager::isEnabled() const
 {
     return m_enabled;
-}
-
-bool ServiceManager::loadServiceData(const std::string_view& data)
-{
-    std::vector<nx::vms::api::SaasService> services;
-    bool result = nx::reflect::json::deserialize(data, &services);
-    if (result)
-    {
-        {
-            NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-            m_services.clear();
-            for (const auto& service: services)
-                m_services.emplace(service.id, service);
-        }
-
-        updateLicenseV1();
-
-        auto propertyDict = systemContext()->resourcePropertyDictionary();
-        if (propertyDict->setValue(QnUuid(), kSaasServicesPropertyKey, QString::fromUtf8(data)))
-        {
-            propertyDict->saveParamsAsync(QnUuid());
-            onDataChanged();
-        }
-    }
-    return result;
-}
-
-void ServiceManager::onDataChanged()
-{
-    updateLicenseV1();
-    emit dataChanged();
-}
-
-void ServiceManager::updateLicenseV1()
-{
-    using namespace nx::vms::api;
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-
-    const auto license = localRecordingLicenseV1Unsafe();
-    if (m_data.state != SaasState::uninitialized)
-        systemContext()->licensePool()->addLicense(license);
-    else
-        systemContext()->licensePool()->removeLicense(license);
-}
-
-QnLicensePtr ServiceManager::localRecordingLicenseV1() const
-{
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    return localRecordingLicenseV1Unsafe();
 }
 
 QnLicensePtr ServiceManager::localRecordingLicenseV1Unsafe() const
@@ -164,10 +256,23 @@ QnLicensePtr ServiceManager::localRecordingLicenseV1Unsafe() const
     return license;
 }
 
+void ServiceManager::updateLocalRecordingLicenseV1Unsafe()
+{
+    using namespace nx::vms::api;
+
+    const auto license = localRecordingLicenseV1Unsafe();
+    if (m_data.state != SaasState::uninitialized)
+        systemContext()->licensePool()->addLicense(license);
+    else
+        systemContext()->licensePool()->removeLicense(license);
+}
+
 template <typename ServiceParamsType>
-std::map<QnUuid, ServiceParamsType> ServiceManager::purchasedServices(const QString& serviceType) const
+std::map<QnUuid, ServiceParamsType> ServiceManager::purchasedServices(
+    const QString& serviceType) const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+
     std::map<QnUuid, ServiceParamsType> result;
 
     for (const auto& [serviceId, purshase]: m_data.services)
@@ -187,75 +292,8 @@ std::map<QnUuid, ServiceParamsType> ServiceManager::purchasedServices(const QStr
                 itResult->second.totalChannelNumber += params.totalChannelNumber;
         }
     }
+
     return result;
-}
-
-std::map<QnUuid, nx::vms::api::SaasAnalyticsParameters> ServiceManager::analyticsIntegrations() const
-{
-    using namespace nx::vms::api;
-    return purchasedServices<SaasAnalyticsParameters>(SaasService::kAnalyticsIntegrationServiceType);
-}
-
-std::map<QnUuid, nx::vms::api::SaasLocalRecordingParameters> ServiceManager::localRecording() const
-{
-    using namespace nx::vms::api;
-    return purchasedServices<SaasLocalRecordingParameters>(SaasService::kLocalRecordingServiceType);
-}
-
-std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloudStorageData() const
-{
-    using namespace nx::vms::api;
-    return purchasedServices<SaasCloudStorageParameters>(SaasService::kCloudRecordingType);
-}
-
-nx::vms::api::SaasData ServiceManager::data() const
-{
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    return m_data;
-}
-
-std::pair<bool, QString> ServiceManager::isBlocked() const
-{
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    using namespace nx::vms::api;
-    const auto state = m_data.state;
-    if (state == SaasState::suspend || state == SaasState::shutdown)
-    {
-        const QString message = NX_FMT(
-            "Access for cloud users is forbiden because of System "
-            "is in '%1' state", toString(state));
-        return {true, message};
-    }
-
-    return {false, QString()};
-}
-
-std::map<QnUuid, nx::vms::api::SaasService> ServiceManager::services() const
-{
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    return m_services;
-}
-
-nx::vms::api::SaasState ServiceManager::state() const
-{
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    return m_data.state;
-}
-
-void ServiceManager::setState(nx::vms::api::SaasState state)
-{
-    auto data = this->data();
-    data.state = state;
-    loadSaasData(data);
-}
-
-nx::vms::api::ServiceTypeStatus ServiceManager::serviceState(const QString& serviceName) const
-{
-    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-
-    using namespace nx::vms::api;
-    const auto it = m_data.security.status.find(serviceName);
-    return it == m_data.security.status.end() ? ServiceTypeStatus() : it->second;
 }
 
 } // nx::vms::common::saas

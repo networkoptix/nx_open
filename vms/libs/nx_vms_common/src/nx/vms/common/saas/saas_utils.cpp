@@ -8,10 +8,16 @@
 
 namespace nx::vms::common::saas {
 
-bool saasIsActive(SystemContext* context)
+using namespace nx::vms::api;
+
+bool saasIsActive(SystemContext* systemContext)
 {
-    return context->saasServiceManager()->data().state == nx::vms::api::SaasState::active;
+    return systemContext->saasServiceManager()->saasState() == SaasState::active;
+}
+
+bool saasIsInitialized(SystemContext* systemContext)
+{
+    return systemContext->saasServiceManager()->saasState() != SaasState::uninitialized;
 }
 
 } // nx::vms::common::saas
-

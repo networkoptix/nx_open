@@ -916,7 +916,7 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
 void QnCommonMessageProcessor::resetLicenses(const LicenseDataList& licenses)
 {
     m_context->licensePool()->replaceLicenses(licenses);
-    m_context->saasServiceManager()->updateLicenseV1();
+    m_context->saasServiceManager()->updateLocalRecordingLicenseV1();
 }
 
 void QnCommonMessageProcessor::resetCamerasWithArchiveList(

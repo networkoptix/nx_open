@@ -470,10 +470,10 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
 {
     using namespace nx::vms::api;
     const auto licenseType = getProperty(ResourcePropertyKey::kForcedLicenseType);
-    const bool saasMode = systemContext() 
-        && systemContext()->saasServiceManager()->state() != SaasState::uninitialized;
-    if (saasMode)
+
+    if (systemContext()->saasServiceManager()->saasState() != SaasState::uninitialized)
         return Qn::LC_SaasLocalRecording;
+
     return nx::reflect::fromString(licenseType.toStdString(), Qn::LC_Professional);
 }
 
