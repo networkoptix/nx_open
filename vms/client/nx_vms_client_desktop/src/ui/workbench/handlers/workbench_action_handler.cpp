@@ -155,6 +155,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/help/help_handler.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_list_model.h>
@@ -180,7 +181,7 @@
 #include <utils/unity_launcher_workaround.h>
 
 #if defined(Q_OS_MACX)
-#include <utils/mac_utils.h>
+    #include <utils/mac_utils.h>
 #endif
 
 // TODO: #sivanov remove this include
@@ -225,6 +226,11 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
 
     connect(action(action::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
+
+    connect(action(action::UserManualAction), &QAction::triggered, this,
+        [] { QnHelpHandler::openHelpTopic(Qn::MainWindow_Scene_Help); },
+        Qt::QueuedConnection);
+
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(action::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
