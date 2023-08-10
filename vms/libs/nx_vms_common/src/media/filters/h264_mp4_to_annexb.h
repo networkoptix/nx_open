@@ -23,7 +23,7 @@ public:
     virtual QnConstAbstractDataPacketPtr processData(
         const QnConstAbstractDataPacketPtr& data) override;
 
-    // Same as processData, but return QnCompressedVideoDataPtr.
+    // Returns nullptr if the video frame cannot be converted, otherwise the converted frame.
     QnCompressedVideoDataPtr processVideoData(const QnConstCompressedVideoDataPtr& data);
 
 private:
