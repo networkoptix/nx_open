@@ -44,6 +44,7 @@ std::function<void()> insertOrUpdateResource(const T& resource, QHash<QnUuid, T>
 QnResourcePool::QnResourcePool(nx::vms::common::SystemContext* systemContext, QObject* parent):
     base_type(parent),
     d(new Private(this, systemContext)),
+    m_resourcesMutex(nx::ReadWriteLock::Recursive),
     m_tranInProgress(false)
 {
     m_threadPool.reset(new QThreadPool());
