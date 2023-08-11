@@ -16,6 +16,9 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/exception.h>
+#include <nx/kit/utils.h>
+
+using nx::kit::utils::isSpaceOrControlChar;
 
 namespace nx::utils {
 
@@ -624,62 +627,91 @@ QString trimAndUnquote(const QString& v)
     return trimAndUnquote(v, '\"');
 }
 
-static int doFormatJsonString(const char* srcPtr, const char* srcEnd, char* dstPtr)
+static QByteArray doFormatJsonString(std::string_view data)
 {
-    static const int INDENT_SIZE = 4; //< How many spaces to add to formatting.
-    static const char INDENT_SYMBOL = ' '; //< Space filler.
-    static QByteArray OUTPUT_DELIMITER("\n"); //< New line.
-    static const QByteArray INPUT_DELIMITERS("[]{},"); //< Delimiters in the input string.
-    static const int INDENTS[] = {1, -1, 1, -1, 0}; //< Indentation offset for INPUT_DELIMITERS.
-    const char* dstPtrBase = dstPtr;
     int indent = 0;
     bool quoted = false;
     bool escaped = false;
-    for (; srcPtr < srcEnd; ++srcPtr)
+    bool indentExpected = false;
+    QByteArray result;
+    result.reserve(data.size() * 2);
+
+    for (char c: data)
     {
-        if (*srcPtr == '"' && !escaped)
+        if (c == '"' && !escaped)
             quoted = !quoted;
 
-        escaped = *srcPtr == '\\' && !escaped;
+        escaped = c == '\\' && !escaped;
 
-        int symbolIdx = INPUT_DELIMITERS.indexOf(*srcPtr);
-        bool isDelimBefore = symbolIdx >= 0 && INDENTS[symbolIdx] < 0;
-        if (!dstPtrBase)
-            dstPtr++;
-        else if (!isDelimBefore)
-            *dstPtr++ = *srcPtr;
-
-        if (symbolIdx >= 0 && !quoted)
+        if (indentExpected)
         {
-            if (dstPtrBase)
-                memcpy(dstPtr, OUTPUT_DELIMITER.data(), OUTPUT_DELIMITER.size());
-            dstPtr += OUTPUT_DELIMITER.size();
-            indent += INDENT_SIZE * INDENTS[symbolIdx];
-            if (dstPtrBase)
-                memset(dstPtr, INDENT_SYMBOL, indent);
-            dstPtr += indent;
+            if (isSpaceOrControlChar(c))
+                continue;
+
+            indentExpected = false;
+            if (c != ']' && c != '}')
+            {
+                result.append('\n');
+                indent += 4;
+                result.append(indent, ' ');
+            }
+            else
+            {
+                result.append(c);
+                continue;
+            }
         }
 
-        if (dstPtrBase && isDelimBefore)
-            *dstPtr++ = *srcPtr;
+        if (quoted)
+        {
+            result.append(c);
+        }
+        else
+        {
+            if (isSpaceOrControlChar(c))
+                continue;
+
+            switch (c)
+            {
+                case ':':
+                    result.append(c);
+                    result.append(' ');
+                    break;
+                case '{':
+                case '[':
+                    result.append(c);
+                    indentExpected = true;
+                    break;
+                case '}':
+                case ']':
+                    result.append('\n');
+                    indent -= 4;
+                    result.append(indent, ' ');
+                    result.append(c);
+                    break;
+                case ',':
+                    result.append(c);
+                    result.append('\n');
+                    result.append(indent, ' ');
+                    break;
+                default:
+                    result.append(c);
+                    break;
+            }
+        }
     }
-    return (int) (dstPtr - dstPtrBase);
+    return result;
 }
+
 
 QByteArray formatJsonString(const QByteArray& data)
 {
-    QByteArray result;
-    result.resize(doFormatJsonString(data.data(), data.data() + data.size(), 0));
-    doFormatJsonString(data.data(), data.data() + data.size(), result.data());
-    return result;
+    return doFormatJsonString(std::string_view(data.data(), data.size()));
 }
 
 nx::Buffer formatJsonString(const nx::Buffer& data)
 {
-    nx::Buffer result;
-    result.resize(doFormatJsonString(data.data(), data.data() + data.size(), 0));
-    doFormatJsonString(data.data(), data.data() + data.size(), result.data());
-    return result;
+    return nx::Buffer(doFormatJsonString(std::string_view(data.data(), data.size())));
 }
 
 int stricmp(const QByteArray& left, const QByteArray& right)
