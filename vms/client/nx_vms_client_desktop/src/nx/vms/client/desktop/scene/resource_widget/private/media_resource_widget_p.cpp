@@ -184,6 +184,12 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
         connect(camera.get(), &QnVirtualCameraResource::motionRegionChanged, this,
             [this] { m_motionSkipMaskCache.reset(); } );
 
+        if (taxonomyManager)
+        {
+            connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
+                this, &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
+        }
+
         updateAccess();
         updateIsAnalyticsSupported();
 
@@ -456,7 +462,7 @@ void MediaResourceWidgetPrivate::setHasAccess(bool value)
 bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
 {
     // Quick check if there are no objects-supporting Analytics Engines in the System.
-    if (taxonomyManager->relevantEngines().empty())
+    if (!taxonomyManager || taxonomyManager->relevantEngines().empty())
         return false;
 
     // Check whether at least one Analytics Engine in the System supports this Camera and also

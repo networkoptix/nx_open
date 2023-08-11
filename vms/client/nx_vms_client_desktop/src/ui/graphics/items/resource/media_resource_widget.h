@@ -56,7 +56,6 @@ class EncryptedArchivePasswordDialog;
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
-class QnFisheyeHomePtzController;
 class QnIoModuleOverlayWidget;
 class QnScrollableItemsWidget;
 class QnScrollableTextItemsWidget;
@@ -497,7 +496,6 @@ private:
     nx::vms::client::desktop::RecordingStatusHelper* m_recordingStatusHelper;
 
     QnPtzControllerPtr m_ptzController;
-    QnFisheyeHomePtzController* m_homePtzController = nullptr;
 
     PtzEnabledBy m_ptzActivationReason = PtzEnabledBy::nothing;
 
