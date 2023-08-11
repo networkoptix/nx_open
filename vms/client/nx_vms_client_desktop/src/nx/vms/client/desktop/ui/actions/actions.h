@@ -414,6 +414,11 @@ enum IDType
     AboutAction,
 
     /**
+     * Opens user manual dialog.
+     */
+    UserManualAction,
+
+    /**
      * Save full session state (i.e. windows configuration for the current system-user pair).
      */
     SaveSessionState,
