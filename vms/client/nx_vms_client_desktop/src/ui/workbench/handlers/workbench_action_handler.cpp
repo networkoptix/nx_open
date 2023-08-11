@@ -452,8 +452,7 @@ void ActionHandler::addToLayout(
     if (!layout)
         return;
 
-    if (accessController()->hasPermissions(layout, Qn::SavePermission)
-        && !canAddToLayout(layout, resource))
+    if (!ResourceAccessManager::hasPermissions(layout, Qn::ModifyLayoutPermission))
     {
         m_accessDeniedMessage = SceneBanner::show(tr("Not enough access rights"));
         return;
@@ -3349,22 +3348,6 @@ void ActionHandler::deleteDialogs() {
 
     if (systemAdministrationDialog())
         delete systemAdministrationDialog();
-}
-
-bool ActionHandler::canAddToLayout(
-    const QnLayoutResourcePtr& layout, const QnResourcePtr& resource) const
-{
-    if (!NX_ASSERT(layout && resource))
-        return false;
-
-    api::LayoutData data;
-    ec2::fromResourceToApi(layout, data);
-
-    api::LayoutItemData item;
-    item.resourceId = resource->getId();
-    data.items.push_back(item);
-
-    return resourceAccessManager()->canModifyLayout(accessController()->user(), layout, data);
 }
 
 } // namespace workbench
