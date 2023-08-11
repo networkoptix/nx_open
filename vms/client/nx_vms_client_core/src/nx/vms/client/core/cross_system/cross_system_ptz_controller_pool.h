@@ -21,7 +21,7 @@ public:
         nx::vms::common::SystemContext* systemContext,
         QObject* parent = nullptr);
 
-    QnPtzControllerPtr ensureControllerExists(const QnResourcePtr& resource);
+    void createControllerIfNeeded(const QnResourcePtr& resource);
 
 protected:
     virtual QnPtzControllerPtr createController(const QnResourcePtr& resource) const override;
