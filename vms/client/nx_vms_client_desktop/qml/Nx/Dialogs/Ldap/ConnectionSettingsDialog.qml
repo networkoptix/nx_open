@@ -33,7 +33,7 @@ Dialog
     property alias adminDn: adminDnTextField.text
     property string originalAdminDn: ""
     property alias password: passwordTextField.text
-    property alias useStarTls: starTlsCheckbox.checked
+    property alias startTls: startTlsCheckbox.checked
     property alias ignoreCertErrors: ignoreCertErrorsCheckbox.checked
     property bool showFakePassword: false
 
@@ -185,7 +185,7 @@ Dialog
 
                 CheckBox
                 {
-                    id: starTlsCheckbox
+                    id: startTlsCheckbox
                     text: qsTr("Use StartTLS")
                     wrapMode: Text.WordWrap
 
@@ -244,7 +244,9 @@ Dialog
                             self.testConnection(
                                 dialog.ldapScheme + dialog.hostAndPort,
                                 dialog.adminDn,
-                                dialog.password)
+                                dialog.password,
+                                dialog.startTls,
+                                dialog.ignoreCertErrors)
                         }
                     }
                 }

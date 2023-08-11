@@ -35,6 +35,8 @@ struct LdapSettings
     Q_PROPERTY(QString uri MEMBER uri)
     Q_PROPERTY(QString adminDn MEMBER adminDn)
     Q_PROPERTY(QString password MEMBER password)
+    Q_PROPERTY(bool startTls MEMBER startTls)
+    Q_PROPERTY(bool ignoreCertErrors MEMBER ignoreCertErrors)
     Q_PROPERTY(QList<LdapFilter> filters MEMBER filters)
     Q_PROPERTY(bool continuousSync MEMBER continuousSync)
     Q_PROPERTY(bool continuousSyncEditable MEMBER continuousSyncEditable)
@@ -53,6 +55,8 @@ public:
     QString uri;
     QString adminDn;
     QString password;
+    bool startTls = false;
+    bool ignoreCertErrors = false;
     QList<LdapFilter> filters;
     bool continuousSync = true;
     bool continuousSyncEditable = true;
