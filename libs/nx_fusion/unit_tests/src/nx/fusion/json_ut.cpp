@@ -693,34 +693,32 @@ TEST_F(QnJsonTextFixture, serializeStructWithStdMapsWithDefaultSerialization)
     const QByteArray jsonStr = /*suppress newline*/ 1 + (const char*)
 R"json(
 {
-    "intItems":[
+    "intItems": [
         {
-            "key":{
-                "a":661,
-                "b":662,
-                "c":663
+            "key": {
+                "a": 661,
+                "b": 662,
+                "c": 663
             },
-            "value":0
+            "value": 0
         }
     ],
-    "nestedItems":[
+    "nestedItems": [
         {
-            "key":{
-                "intItems":[
+            "key": {
+                "intItems": [
                     {
-                        "key":{
-                            "a":661,
-                            "b":662,
-                            "c":663
+                        "key": {
+                            "a": 661,
+                            "b": 662,
+                            "c": 663
                         },
-                        "value":0
+                        "value": 0
                     }
                 ],
-                "nestedItems":[
-                    
-                ]
+                "nestedItems": []
             },
-            "value":0
+            "value": 0
         }
     ]
 })json";
@@ -740,11 +738,9 @@ TEST_F(QnJsonTextFixture, serializeStructWithStringMapsWithDefaultSerialization)
     const QByteArray jsonStr = /*suppress newline*/ 1 + (const char*)
 R"json(
 {
-    "items":{
-        "":{
-            "items":{
-                
-            }
+    "items": {
+        "": {
+            "items": {}
         }
     }
 })json";
