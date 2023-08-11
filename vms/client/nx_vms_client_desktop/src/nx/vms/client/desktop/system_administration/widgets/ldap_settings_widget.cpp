@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/system_administration/globals/results_reporter.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
+#include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -74,7 +75,6 @@ struct LdapSettingsWidget::Private
     nx::vms::api::LdapSettings initialSettings;
 
     rest::Handle currentHandle = 0;
-    rest::Handle statusHandle = 0;
 
     QTimer statusUpdateTimer;
 
@@ -154,6 +154,9 @@ struct LdapSettingsWidget::Private
             {
                 mergeUpdate(q->globalSettings()->ldap());
             });
+
+        q->connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::refreshFinished,
+            [this]() { handleLdapStatusUpdate(); });
     }
 
     void mergeUpdate(const nx::vms::api::LdapSettings& incoming)
@@ -275,6 +278,25 @@ struct LdapSettingsWidget::Private
         groupCount = getLdapGroupCount();
     }
 
+    void handleLdapStatusUpdate()
+    {
+        checkingOnlineStatus = false;
+
+        const auto status = q->systemContext()->ldapStatusWatcher()->status();
+        if (!status)
+        {
+            online = false;
+            return;
+        }
+
+        online = (status->state == api::LdapStatus::State::online);
+        lastSync = status->timeSinceSyncS
+            ? time::fromNow(*status->timeSinceSyncS)
+            : QString();
+        syncIsRunning = status->isRunning;
+        updateUserAndGroupCount();
+    }
+
     int getLdapUserCount() const
     {
         const auto ldapUsers = q->systemContext()->resourcePool()->getResources<QnUserResource>(
@@ -331,53 +353,12 @@ void LdapSettingsWidget::discardChanges()
         d->currentHandle = 0;
     }
 
-    if (d->statusHandle)
-    {
-        connectedServerApi()->cancelRequest(d->statusHandle);
-        d->statusHandle = 0;
-    }
-
     d->setState(d->initialSettings);
 }
 
 void LdapSettingsWidget::checkOnlineAndSyncStatus()
 {
-    // Do not set d->checkingOnlineStatus = true here to avoid showing the spinner periodically.
-
-    const auto statusCallback = nx::utils::guarded(this,
-        [this](
-            bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapStatus> errorOrData)
-        {
-            if (handle == d->statusHandle)
-                d->statusHandle = 0;
-
-            d->checkingOnlineStatus = false;
-
-            if (auto status = std::get_if<nx::vms::api::LdapStatus>(&errorOrData))
-            {
-                NX_ASSERT(success);
-
-                d->online = status->state == nx::vms::api::LdapStatus::State::online;
-                d->lastSync = status->timeSinceSyncS
-                    ? nx::vms::time::fromNow(*status->timeSinceSyncS)
-                    : QString();
-
-                d->syncIsRunning = status->isRunning;
-
-                d->updateUserAndGroupCount();
-            }
-            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-            {
-                d->online = false;
-            }
-        });
-
-    if (d->statusHandle)
-        connectedServerApi()->cancelRequest(d->statusHandle);
-
-    d->statusHandle = connectedServerApi()->getLdapStatusAsync(
-        statusCallback,
-        thread());
+    systemContext()->ldapStatusWatcher()->refresh();
 }
 
 void LdapSettingsWidget::loadDataToUi()

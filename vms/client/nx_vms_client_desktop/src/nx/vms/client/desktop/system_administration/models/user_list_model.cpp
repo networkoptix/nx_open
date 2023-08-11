@@ -4,6 +4,7 @@
 
 #include <boost/container/flat_set.hpp>
 
+#include <api/server_rest_connection.h>
 #include <client/client_globals.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
@@ -15,9 +16,10 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
@@ -66,6 +68,9 @@ public:
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
 
+    rest::Handle ldapStatusRequestHandle = 0;
+    bool ldapServerOnline = true;
+
     Private(UserListModel* q):
         SystemContextAware(q->systemContext()),
         model(q),
@@ -106,6 +111,13 @@ public:
 
         connect(globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
             [this]() { syncId = globalSettings()->ldap().syncId(); });
+
+        connect(systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::statusChanged, this,
+            [this]()
+            {
+                if (const auto status = systemContext()->ldapStatusWatcher()->status())
+                    ldapServerOnline = (status->state == api::LdapStatus::State::online);
+            });
     }
 
     void at_resourcePool_resourceChanged(const QnResourcePtr& resource);
@@ -114,6 +126,7 @@ public:
 
     QnUserResourcePtr user(const QModelIndex& index) const;
     bool isUnique(const QnUserResourcePtr& user) const;
+    bool ldapUserNotFound(const QnUserResourcePtr& user) const;
 
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState state, const QnUserResourcePtr& user = QnUserResourcePtr());
@@ -171,6 +184,11 @@ QnUserResourcePtr UserListModel::Private::user(const QModelIndex& index) const
 bool UserListModel::Private::isUnique(const QnUserResourcePtr& user) const
 {
     return sameNameUsers[user->getName().toLower()].size() <= 1;
+}
+
+bool UserListModel::Private::ldapUserNotFound(const QnUserResourcePtr& user) const
+{
+    return !user->externalId().dn.isEmpty() && user->externalId().syncId != syncId;
 }
 
 Qt::CheckState UserListModel::Private::checkState() const
@@ -362,6 +380,22 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
         {
             switch (index.column())
             {
+                case UserWarningColumn:
+                {
+                    if (user->userType() == nx::vms::api::UserType::ldap)
+                    {
+                        if (!d->ldapServerOnline)
+                            return tr("LDAP server is offline. Users are not able to log in.");
+                        if (d->ldapUserNotFound(user))
+                            return tr("User is not found in the LDAP database.");
+                    }
+
+                    if (!d->isUnique(user))
+                        return tr("There are multiple users with the same login in the system.");
+
+                    break;
+                }
+
                 case UserTypeColumn:
                 {
                     switch (user->userType())
@@ -407,10 +441,14 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             {
                 case UserWarningColumn:
                 {
-                    if (user->externalId().dn.isEmpty() || user->externalId().syncId == d->syncId)
-                        return {};
-
-                    return QString("user_settings/user_alert.svg");
+                    if (user->userType() == nx::vms::api::UserType::ldap
+                        && (!d->ldapServerOnline
+                            || d->ldapUserNotFound(user)
+                            || !d->isUnique(user)))
+                    {
+                        return QString("user_settings/user_alert.svg");
+                    }
+                    break;
                 }
 
                 case UserTypeColumn:

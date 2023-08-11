@@ -187,6 +187,8 @@ struct NX_VMS_API LdapStatus
     bool isRunning = false;
     QString message;
     std::optional<std::chrono::seconds> timeSinceSyncS;
+
+    bool operator==(const LdapStatus&) const = default;
 };
 #define LdapStatus_Fields (state)(isRunning)(message)(timeSinceSyncS)
 NX_VMS_API_DECLARE_STRUCT_EX(LdapStatus, (json))
