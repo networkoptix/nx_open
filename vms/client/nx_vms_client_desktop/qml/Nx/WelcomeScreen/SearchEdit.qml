@@ -72,7 +72,7 @@ TextField
         font.pixelSize: 14
         color: ColorTheme.windowText
 
-        visible: !control.text
+        visible: !control.displayText
 
         text: qsTr("Search")
 
