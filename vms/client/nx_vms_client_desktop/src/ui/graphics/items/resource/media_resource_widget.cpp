@@ -268,6 +268,25 @@ void setButtonCheckedSilent(QnImageButtonWidget* button, bool checked)
     button->setChecked(checked);
 }
 
+template<class T>
+T* findPtzController(QnPtzControllerPtr controller)
+{
+    if (auto instance = qobject_cast<T*>(controller.data()))
+        return instance;
+
+    if (auto proxy = qobject_cast<QnProxyPtzController*>(controller.data()))
+        return findPtzController<T>(proxy->baseController());
+
+    if (auto fallback = qobject_cast<QnFallbackPtzController*>(controller.data()))
+    {
+        if (auto main = findPtzController<T>(fallback->mainController()))
+            return main;
+
+        return findPtzController<T>(fallback->fallbackController());
+    }
+    return nullptr;
+}
+
 } // namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(
@@ -326,7 +345,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
             updateButtonsVisibility();
         });
 
-    connect(d->taxonomyManager, &TaxonomyManager::currentTaxonomyChanged, this,
+    connect(d.get(), &MediaResourceWidgetPrivate::analyticsSupportChanged, this,
         &QnMediaResourceWidget::updateButtonsVisibility);
 
     connect(d.get(), &MediaResourceWidgetPrivate::analyticsSupportChanged, this,
@@ -350,6 +369,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(
             });
 
         auto ptzPool = systemContext->ptzControllerPool();
+        if (d->camera->hasFlags(Qn::cross_system))
+        {
+            auto crossSystemControllerPool =
+                dynamic_cast<nx::vms::client::core::CrossSystemPtzControllerPool*>(ptzPool);
+            // For the cross-system cameras PTZ controller is initialized on demand.
+            if (NX_ASSERT(crossSystemControllerPool))
+                crossSystemControllerPool->createControllerIfNeeded(d->camera);
+        }
         connect(ptzPool, &QnPtzControllerPool::controllerChanged, this,
             [this](const QnResourcePtr& resource)
             {
@@ -1087,25 +1114,12 @@ void QnMediaResourceWidget::updatePtzController()
     if (item() && item()->zoomRect().isNull())
     {
         // Zoom items are not allowed to return home.
-        m_homePtzController = new QnFisheyeHomePtzController(fisheyeController);
-        fisheyeController.reset(m_homePtzController);
+        fisheyeController.reset(new QnFisheyeHomePtzController(fisheyeController));
     }
 
     if (d->camera)
     {
-        auto ptzPool = systemContext()->ptzControllerPool();
-        QnPtzControllerPtr serverController = ptzPool->controller(d->camera);
-
-        // Camera is opened for the first time, initialize controller.
-        if (d->camera->hasFlags(Qn::cross_system) && !serverController)
-        {
-            auto crossSystemControllerPool =
-                dynamic_cast<nx::vms::client::core::CrossSystemPtzControllerPool*>(ptzPool);
-            if (NX_ASSERT(crossSystemControllerPool))
-                serverController = crossSystemControllerPool->ensureControllerExists(d->camera);
-        }
-
-        if (serverController)
+        if (auto serverController = systemContext()->ptzControllerPool()->controller(d->camera))
         {
             serverController.reset(new QnActivityPtzController(
                 QnActivityPtzController::Client,
@@ -1233,8 +1247,8 @@ QPoint QnMediaResourceWidget::channelGridOffset(int channel) const
 
 void QnMediaResourceWidget::suspendHomePtzController()
 {
-    if (m_homePtzController)
-        m_homePtzController->suspend();
+    if (auto homePtzController = findPtzController<QnFisheyeHomePtzController>(m_ptzController))
+        homePtzController->suspend();
 }
 
 void QnMediaResourceWidget::hideTextOverlay(const QnUuid& id)
@@ -1469,9 +1483,11 @@ bool QnMediaResourceWidget::animationAllowed() const
 
 void QnMediaResourceWidget::resumeHomePtzController()
 {
-    if (m_homePtzController && options().testFlag(DisplayDewarped)
-        && display()->camDisplay()->isRealTimeSource())
-            m_homePtzController->resume();
+    if (auto homePtzController = findPtzController<QnFisheyeHomePtzController>(m_ptzController))
+    {
+        if (options().testFlag(DisplayDewarped) && display()->camDisplay()->isRealTimeSource())
+            homePtzController->resume();
+    }
 }
 
 bool QnMediaResourceWidget::forceShowPosition() const
