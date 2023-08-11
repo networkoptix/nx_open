@@ -10,6 +10,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/ini.h>
 #include <utils/common/synctime.h>
 
 #include "flat_camera_data_loader.h"
@@ -17,7 +18,10 @@
 
 namespace {
 
-const qint64 requestIntervalMs = 30 * 1000;
+qint64 requestIntervalMs()
+{
+    return nx::vms::client::core::ini().cameraDataLoadingIntervalMs;
+}
 
 } // namespace
 
@@ -42,7 +46,7 @@ CachingCameraDataLoader::CachingCameraDataLoader(
     QTimer* loadTimer = new QTimer(this);
     // Time period will be loaded no often than once in 30 seconds,
     // but timer should check it much more often.
-    loadTimer->setInterval(requestIntervalMs / 10);
+    loadTimer->setInterval(requestIntervalMs() / 10);
     loadTimer->setSingleShot(false);
     connect(loadTimer, &QTimer::timeout, this,
         [this]
@@ -297,7 +301,7 @@ void CachingCameraDataLoader::discardCachedData()
 
 void CachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodType, bool forced) {
     // TODO: #sivanov Make sure we are not sending requests while loader is disabled.
-    if (forced || m_previousRequestTime[periodType].hasExpired(requestIntervalMs))
+    if (forced || m_previousRequestTime[periodType].hasExpired(requestIntervalMs()))
     {
         if (forced)
             NX_VERBOSE(this, "updateTimePeriods %1 (forced)", periodType);
