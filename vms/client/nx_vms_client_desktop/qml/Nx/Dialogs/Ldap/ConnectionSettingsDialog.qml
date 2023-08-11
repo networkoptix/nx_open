@@ -304,9 +304,11 @@ Dialog
 
     function validate()
     {
-        return ldapUri.validate()
-            && adminDnTextField.validate()
-            && passwordTextField.validate()
+        const isTrue = v => !!v
+
+        return [ldapUri.validate(),
+            adminDnTextField.validate(),
+            passwordTextField.validate()].every(isTrue)
     }
 
     function accept()
