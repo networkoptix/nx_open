@@ -291,8 +291,6 @@ private:
     void openInBrowser(const QnMediaServerResourcePtr& server,
         nx::utils::Url targetUrl, std::string auth, AuthMethod authMethod) const;
 
-    bool canAddToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource) const;
-
 private:
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
