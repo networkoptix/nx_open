@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
+#include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
@@ -47,6 +48,7 @@ struct SystemContext::Private
 {
     SystemContext* const q;
     std::unique_ptr<VideoWallOnlineScreensWatcher> videoWallOnlineScreensWatcher;
+    std::unique_ptr<LdapStatusWatcher> ldapStatusWatcher;
     std::unique_ptr<QnIncompatibleServerWatcher> incompatibleServerWatcher;
     std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;
     std::unique_ptr<QnServerStorageManager> serverStorageManager;
@@ -116,6 +118,7 @@ SystemContext::SystemContext(
             d->restApiHelper = std::make_unique<RestApiHelper>(this);
             d->delayedDataLoader = std::make_unique<DelayedDataLoader>(this);
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
+            d->ldapStatusWatcher = std::make_unique<LdapStatusWatcher>(this);
             break;
 
         case Mode::crossSystem:
@@ -156,6 +159,11 @@ SystemContext* SystemContext::fromResource(const QnResourcePtr& resource)
 VideoWallOnlineScreensWatcher* SystemContext::videoWallOnlineScreensWatcher() const
 {
     return d->videoWallOnlineScreensWatcher.get();
+}
+
+LdapStatusWatcher* SystemContext::ldapStatusWatcher() const
+{
+    return d->ldapStatusWatcher.get();
 }
 
 ServerRuntimeEventConnector* SystemContext::serverRuntimeEventConnector() const

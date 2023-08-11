@@ -56,6 +56,9 @@ public:
      */
     bool isWithin(const QnUuid& subject, const QSet<QnUuid>& subjects) const;
 
+    QList<QSet<QnUuid>> findCycledGroupSets() const;
+    QList<QSet<QnUuid>> findCycledGroupSetsForSpecificGroups(const QSet<QnUuid>& groups) const;
+
     /** Clears the entire hierarchy. Emits `reset` signal. */
     void clear();
 

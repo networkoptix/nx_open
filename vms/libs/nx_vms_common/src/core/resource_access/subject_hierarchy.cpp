@@ -3,6 +3,7 @@
 #include "subject_hierarchy.h"
 
 #include <QtCore/QHash>
+#include <QtCore/QStack>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -21,6 +22,18 @@ struct SubjectHierarchy::Private
     QSet<QnUuid> recursiveParents(const QSet<QnUuid>& subjects) const;
     QSet<QnUuid> recursiveMembers(const QSet<QnUuid>& subjects) const;
     bool isRecursiveMember(const QnUuid& subject, const QSet<QnUuid>& groups) const;
+
+    struct DfsContext
+    {
+        QStack<QnUuid> stack;
+        QSet<QnUuid> onStack;
+        QHash<QnUuid, int> indexes;
+        QHash<QnUuid, int> lowLink;
+
+        QList<QSet<QnUuid>> cycledGroupSets;
+    };
+
+    void findCycledGroupSetRecurse(const QnUuid& id, DfsContext& context) const;
 
 private:
     void calculateRecursiveParents(const QnUuid& group, QSet<QnUuid>& result) const;
@@ -125,11 +138,76 @@ bool SubjectHierarchy::isWithin(const QnUuid& subject, const QSet<QnUuid>& subje
     return subjects.contains(subject) || isRecursiveMember(subject, subjects);
 }
 
+QList<QSet<QnUuid>> SubjectHierarchy::findCycledGroupSets() const
+{
+    Private::DfsContext context;
+
+    // We need to check the groups only. The keys of `d->directMembers` may not represent all the
+    // groups in the hierarchy, but that does not matter. If a group does not have any members, it
+    // cannot be in a cycle and can be safely skipped.
+    for (const auto& [id, _]: d->directMembers.asKeyValueRange())
+        d->findCycledGroupSetRecurse(id, context);
+
+    return context.cycledGroupSets;
+}
+
+QList<QSet<QnUuid>> SubjectHierarchy::findCycledGroupSetsForSpecificGroups(
+    const QSet<QnUuid>& groups) const
+{
+    Private::DfsContext context;
+
+    for (const auto& id: groups)
+        d->findCycledGroupSetRecurse(id, context);
+
+    return context.cycledGroupSets;
+}
+
 bool SubjectHierarchy::Private::isRecursiveMember(
     const QnUuid& subject, const QSet<QnUuid>& groups) const
 {
     QSet<QnUuid> alreadyVisited;
     return isRecursiveMember(subject, groups, alreadyVisited);
+}
+
+void SubjectHierarchy::Private::findCycledGroupSetRecurse(
+    const QnUuid& id, DfsContext& context) const
+{
+    // This is an implementation of Tarjan's strongly connected components algorithm.
+
+    const int index = context.indexes.size();
+    context.lowLink[id] = index;
+    context.indexes[id] = index;
+    context.stack.push(id);
+    context.onStack.insert(id);
+
+    for (const QnUuid& parentId: directParents.value(id))
+    {
+        if (!context.indexes.contains(parentId))
+        {
+            findCycledGroupSetRecurse(parentId, context);
+            context.lowLink[id] = std::min(context.lowLink[id], context.lowLink[parentId]);
+        }
+        else if (context.onStack.contains(id))
+        {
+            context.lowLink[id] = std::min(context.lowLink[id], context.indexes[parentId]);
+        }
+    }
+
+    if (context.lowLink[id] == context.indexes[id])
+    {
+        QSet<QnUuid> cycledGroupSet;
+
+        QnUuid id1;
+        do
+        {
+            id1 = context.stack.pop();
+            context.onStack.remove(id1);
+            cycledGroupSet.insert(id1);
+        } while (id1 != id);
+
+        if (cycledGroupSet.size() > 1)
+            context.cycledGroupSets.append(cycledGroupSet);
+    }
 }
 
 bool SubjectHierarchy::Private::isRecursiveMember(
