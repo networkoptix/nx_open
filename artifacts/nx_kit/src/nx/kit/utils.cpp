@@ -587,20 +587,14 @@ std::string trimString(const std::string& s)
     return s.substr(start, end - start + 1);
 }
 
-namespace {
-
 //-------------------------------------------------------------------------------------------------
 // Parsing utils.
 
-static bool isWhitespace(char c)
-{
-    // NOTE: Chars 128..255 should be treated as non-whitespace, thus, isprint() will not do.
-    return (((unsigned char) c) <= 32) || (c == 127);
-}
+namespace {
 
 static void skipWhitespace(const char** const pp)
 {
-    while (**pp != '\0' && isWhitespace(**pp))
+    while (**pp != '\0' && isSpaceOrControlChar(**pp))
         ++(*pp);
 }
 
@@ -620,7 +614,7 @@ static ParsedNameValue parseNameValue(const std::string& lineStr)
     skipWhitespace(&p);
     if (*p == '\0' || *p == '#') //< Empty or comment line.
         return result;
-    while (*p != '\0' && *p != '=' && !isWhitespace(*p))
+    while (*p != '\0' && *p != '=' && !isSpaceOrControlChar(*p))
         result.name += *(p++);
     if (result.name.empty())
     {
@@ -641,7 +635,7 @@ static ParsedNameValue parseNameValue(const std::string& lineStr)
 
     // Trim trailing whitespace in the value.
     int i = (int) result.value.size() - 1;
-    while (i >= 0 && isWhitespace(result.value[i]))
+    while (i >= 0 && isSpaceOrControlChar(result.value[i]))
         --i;
     result.value = result.value.substr(0, i + 1);
 

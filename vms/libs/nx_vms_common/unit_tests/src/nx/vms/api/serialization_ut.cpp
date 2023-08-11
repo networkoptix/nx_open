@@ -71,23 +71,23 @@ TEST(QnAuditRecord, serialization)
     result.reply.push_back(record);
     const std::string expected = /*suppress newline*/ 1 + R"json(
 {
-    "error":"0",
-    "errorString":"",
-    "reply":[
+    "error": "0",
+    "errorString": "",
+    "reply": [
         {
-            "createdTimeSec":0,
-            "rangeStartSec":0,
-            "rangeEndSec":0,
-            "eventType":"AR_NotDefined",
-            "resources":[
+            "createdTimeSec": 0,
+            "rangeStartSec": 0,
+            "rangeEndSec": 0,
+            "eventType": "AR_NotDefined",
+            "resources": [
                 "{00000000-0000-0000-0000-000000000000}"
             ],
-            "params":"name=value",
-            "authSession":{
-                "id":"{00000000-0000-0000-0000-000000000000}",
-                "userName":"",
-                "userHost":"",
-                "userAgent":""
+            "params": "name=value",
+            "authSession": {
+                "id": "{00000000-0000-0000-0000-000000000000}",
+                "userName": "",
+                "userHost": "",
+                "userAgent": ""
             }
         }
     ]

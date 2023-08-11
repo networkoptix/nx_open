@@ -522,6 +522,19 @@ TEST(utils, trimString)
     ASSERT_EQ("a\nb", trimString("a\nb\n\n"));
 }
 
+TEST(utils, isSpaceOrControlChar)
+{
+    for (char c = 0; c <= 32; ++c) 
+    {
+        ASSERT_TRUE(isSpaceOrControlChar(c));
+    }
+    ASSERT_TRUE(isSpaceOrControlChar(127));
+    ASSERT_FALSE(isSpaceOrControlChar('a'));
+    ASSERT_FALSE(isSpaceOrControlChar('A'));
+    ASSERT_FALSE(isSpaceOrControlChar('\x9C'));
+    ASSERT_FALSE(isSpaceOrControlChar('\xEA'));
+}
+
 } // namespace test
 } // namespace utils
 } // namespace kit
