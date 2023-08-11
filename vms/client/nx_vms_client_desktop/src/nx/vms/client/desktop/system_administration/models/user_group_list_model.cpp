@@ -9,8 +9,10 @@
 
 #include <client/client_globals.h>
 #include <core/resource_access/access_rights_manager.h>
+#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -30,6 +32,9 @@ struct UserGroupListModel::Private
 
     UserGroupDataList orderedGroups;
     QSet<QnUuid> checkedGroupIds;
+    QHash<QString, int> sameNameGroups;
+    QList<QSet<QnUuid>> cycledGroupSets;
+    QSet<QnUuid> cycledGroups;
 
     Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId())
     {
@@ -67,6 +72,16 @@ struct UserGroupListModel::Private
     QString getParentGroupNamesText(const UserGroupData& group) const
     {
         return getParentGroupNames(group).join(", ");
+    }
+
+    bool ldapGroupNotFound(const UserGroupData& group) const
+    {
+        return !group.externalId.dn.isEmpty() && group.externalId.syncId != syncId;
+    }
+
+    bool isUnique(const UserGroupData& group) const
+    {
+        return sameNameGroups.value(group.name.toLower()) == 1;
     }
 
     bool isChecked(const UserGroupData& group) const
@@ -187,6 +202,44 @@ struct UserGroupListModel::Private
             ? position
             : orderedGroups.cend();
     }
+
+    void refreshCycledGroupSets(const QSet<QnUuid>& groupsToCheck = {})
+    {
+        if (groupsToCheck.isEmpty())
+        {
+            cycledGroupSets = q->systemContext()->accessSubjectHierarchy()->findCycledGroupSets();
+        }
+        else
+        {
+            // Remove all group sets containing the specified groups.
+
+            auto groups = groupsToCheck;
+
+            while (!groups.empty())
+            {
+                const QnUuid group = *groups.begin();
+                for (auto it = cycledGroupSets.begin(); it != cycledGroupSets.end();
+                    /*no increment*/)
+                {
+                    if (!it->contains(group))
+                    {
+                        ++it;
+                        continue;
+                    }
+
+                    groups -= *it;
+                    it = cycledGroupSets.erase(it);
+                }
+            }
+
+            cycledGroupSets += q->systemContext()->accessSubjectHierarchy()
+                ->findCycledGroupSetsForSpecificGroups(groupsToCheck);
+        }
+
+        cycledGroups.clear();
+        for (const QSet<QnUuid>& cycledGroupSet: cycledGroupSets)
+            cycledGroups.unite(cycledGroupSet);
+    }
 };
 
 // -----------------------------------------------------------------------------------------------
@@ -244,6 +297,25 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
         {
             switch (index.column())
             {
+                case GroupWarningColumn:
+                {
+                    if (d->ldapGroupNotFound(group))
+                        return tr("Group is not found in the LDAP database.");
+                    if (!d->isUnique(group))
+                    {
+                        return tr("There are multiple groups with the same name in the system. "
+                            "Rename or delete non-unique groups.");
+                    }
+                    if (d->cycledGroups.contains(group.id))
+                    {
+                        return tr("Group has another group as both its parent, and as a child "
+                            "member, or is a part of such circular reference chain. This can lead "
+                            "to an incorrect calculation of permissions.");
+                    }
+
+                    return {};
+                }
+
                 case GroupTypeColumn:
                 {
                     if (group.type == nx::vms::api::UserType::ldap)
@@ -268,10 +340,14 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             {
                 case GroupWarningColumn:
                 {
-                    if (group.externalId.dn.isEmpty() || group.externalId.syncId == d->syncId)
-                        return {};
+                    if (d->ldapGroupNotFound(group)
+                        || !d->isUnique(group)
+                        || d->cycledGroups.contains(group.id))
+                    {
+                        return QString("user_settings/user_alert.svg");
+                    }
 
-                    return QString("user_settings/user_alert.svg");
+                    return {};
                 }
 
                 case GroupTypeColumn:
@@ -444,10 +520,17 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
 
     if (!NX_ASSERT(newEnd == d->orderedGroups.end()))
         d->orderedGroups.erase(newEnd, d->orderedGroups.end());
+
+    d->sameNameGroups.clear();
+    for (const auto& group: d->orderedGroups)
+        ++d->sameNameGroups[group.name.toLower()];
+    d->refreshCycledGroupSets();
 }
 
 bool UserGroupListModel::addOrUpdateGroup(const UserGroupData& group)
 {
+    const auto lowerCaseName = group.name.toLower();
+
     const auto position = d->findPosition(group.id);
     if (position == d->orderedGroups.end() || position->id != group.id)
     {
@@ -455,11 +538,25 @@ bool UserGroupListModel::addOrUpdateGroup(const UserGroupData& group)
         const int row = position - d->orderedGroups.begin();
         const ScopedInsertRows insertRows(this, row, row);
         d->orderedGroups.insert(position, group);
+        ++d->sameNameGroups[lowerCaseName];
+        d->refreshCycledGroupSets(utils::toQSet(group.parentGroupIds) + QSet{group.id});
         return true;
     }
 
     // Update.
+    --d->sameNameGroups[position->name.toLower()];
+    ++d->sameNameGroups[lowerCaseName];
+    const auto oldParentGroupIds = position->parentGroupIds;
+
     *position = group;
+
+    if (oldParentGroupIds != group.parentGroupIds)
+    {
+        const auto groupsToCheck = QSet{group.id}
+            + utils::toQSet(oldParentGroupIds)
+            + utils::toQSet(group.parentGroupIds);
+        d->refreshCycledGroupSets(groupsToCheck);
+    }
     const int row = position - d->orderedGroups.begin();
     emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
     return false;
@@ -477,6 +574,8 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
         return false;
     }
 
+    --d->sameNameGroups[it->name.toLower()];
+
     const int row = it - d->orderedGroups.begin();
 
     const ScopedRemoveRows removeRows(this, row, row);
@@ -490,6 +589,10 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
         if (groupIt != group.parentGroupIds.end())
             group.parentGroupIds.erase(groupIt);
     }
+
+    if (d->cycledGroups.contains(groupId))
+        d->refreshCycledGroupSets({groupId});
+
     return true;
 }
 

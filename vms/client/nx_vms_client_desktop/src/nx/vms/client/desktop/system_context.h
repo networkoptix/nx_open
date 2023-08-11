@@ -18,6 +18,7 @@ class QnServerStorageManager;
 namespace nx::vms::client::desktop {
 
 class LayoutSnapshotManager;
+class LdapStatusWatcher;
 class LogsManagementWatcher;
 class RestApiHelper;
 class ShowreelStateManager;
@@ -58,6 +59,7 @@ public:
     static SystemContext* fromResource(const QnResourcePtr& resource);
 
     VideoWallOnlineScreensWatcher* videoWallOnlineScreensWatcher() const;
+    LdapStatusWatcher* ldapStatusWatcher() const;
     ServerRuntimeEventConnector* serverRuntimeEventConnector() const;
     QnServerStorageManager* serverStorageManager() const;
     QnCameraBookmarksManager* cameraBookmarksManager() const;
