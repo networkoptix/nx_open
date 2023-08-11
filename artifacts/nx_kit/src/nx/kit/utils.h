@@ -42,6 +42,12 @@ inline bool isAsciiPrintable(int c)
     return c >= 32 && c <= 126;
 }
 
+inline bool isSpaceOrControlChar(char c)
+{
+    // NOTE: Chars 128..255 should be treated as non-whitespace, thus, isprint() will not do.
+    return (((unsigned char) c) <= 32) || (c == 127);
+}
+
 /**
  * Decodes a string encoded using C/C++ string literal rules: enquoted, potentially containing
  * escape sequences. Supports concatenation of consecutive literals, thus, fully compatible with

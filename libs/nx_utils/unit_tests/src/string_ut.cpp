@@ -267,4 +267,180 @@ static std::vector<GenerateUniqueStringInput> kGenerateUniqueStringInput {
 INSTANTIATE_TEST_SUITE_P(String, GenerateUniqueString,
     ::testing::ValuesIn(kGenerateUniqueStringInput));
 
+//-------------------------------------------------------------------------------------------------
+
+struct JsonFormatInput
+{
+    QString unformattedJson;
+    QString formattedJson;
+};
+
+class JsonFormatting:
+    public ::testing::Test,
+    public ::testing::WithParamInterface<JsonFormatInput>
+{
+};
+
+TEST_P(JsonFormatting, validateFormat)
+{
+    const JsonFormatInput input = GetParam();
+    EXPECT_STREQ(
+        formatJsonString(input.unformattedJson.toUtf8()).data(),
+        input.formattedJson.toStdString().c_str());
+}
+
+static std::vector<JsonFormatInput> kJsonFormatInput {
+    {
+        "{}", 
+        "{}",
+    },
+    {
+        "[]", 
+        "[]",
+    },
+    {
+        "{", 
+        "{",
+    },
+    {
+        "[", 
+        "[",
+    },
+    {
+        "}", 
+        "\n}"
+    },
+    {
+        "]", 
+        "\n]"
+    },
+    {
+        "{{", 
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    {)json"
+    },
+    {
+R"json({"someKey":0})json",
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "someKey": 0
+})json"
+    },
+    {
+R"json({"someKey\"":0})json",
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "someKey\"": 0
+})json"
+    },
+    {
+R"json({"someKey\\\"":0})json",
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "someKey\\\"": 0
+})json"
+    },
+    {
+R"json("someKey":{"foo":"bar"})json",
+/*suppress newline*/ 1 + (const char*) R"json(
+"someKey": {
+    "foo": "bar"
+})json"
+    },
+    {
+R"json({"someKey: [ 3, 4, 5]":0})json",
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "someKey: [ 3, 4, 5]": 0
+})json"
+    },
+    {
+R"json({"someKey\"{":0})json",
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "someKey\"{": 0
+})json"
+    },
+    {
+R"json({"random":"10","random float":"37.234","bool":"true","date":"1991-06-12","regEx":"ooooooooooooooooooooooooooooooooooo what","enum":"generator","firstname":"Priscilla","lastname":"Wu","city":"Forked River","country":"Lebanon","countryCode":"GQ","email uses current data":"Priscilla.Wu@gmail.com","email from expression":"Priscilla.Wu@yopmail.com","array":["Adore","Orsola","Elka","Edyth","Bobbi"],"array of objects":[{"index":"0","index start at 5":"5"},{"index":"1","index start at 5":"6"},{"index":"2","index start at 5":"7"}],"Ardeen":{"age":"83"}})json",
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "random": "10",
+    "random float": "37.234",
+    "bool": "true",
+    "date": "1991-06-12",
+    "regEx": "ooooooooooooooooooooooooooooooooooo what",
+    "enum": "generator",
+    "firstname": "Priscilla",
+    "lastname": "Wu",
+    "city": "Forked River",
+    "country": "Lebanon",
+    "countryCode": "GQ",
+    "email uses current data": "Priscilla.Wu@gmail.com",
+    "email from expression": "Priscilla.Wu@yopmail.com",
+    "array": [
+        "Adore",
+        "Orsola",
+        "Elka",
+        "Edyth",
+        "Bobbi"
+    ],
+    "array of objects": [
+        {
+            "index": "0",
+            "index start at 5": "5"
+        },
+        {
+            "index": "1",
+            "index start at 5": "6"
+        },
+        {
+            "index": "2",
+            "index start at 5": "7"
+        }
+    ],
+    "Ardeen": {
+        "age": "83"
+    }
+})json"
+    },
+    {
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "already":     "slightly",
+    "formatted": [
+      "input"   ,
+      "with",
+      "bad whitespace"
+    ]
+})json",
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "already": "slightly",
+    "formatted": [
+        "input",
+        "with",
+        "bad whitespace"
+    ]
+})json",
+    },
+    {
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "emptyContainerButWhiteSpace": [    ],
+    "anotherEmpty": {
+
+    }
+})json",
+/*suppress newline*/ 1 + (const char*) R"json(
+{
+    "emptyContainerButWhiteSpace": [],
+    "anotherEmpty": {}
+})json",
+    },
+};
+
+INSTANTIATE_TEST_SUITE_P(String, JsonFormatting, ::testing::ValuesIn(kJsonFormatInput));
+
 } // namespace nx::utils::test
