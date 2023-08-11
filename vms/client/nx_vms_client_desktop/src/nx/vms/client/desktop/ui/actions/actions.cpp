@@ -833,6 +833,12 @@ void initialize(Manager* manager, Action* root)
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
+    factory(UserManualAction)
+        .flags(Main)
+        .mode(DesktopMode)
+        .text(ContextMenu::tr("User Manual..."))
+        .condition(!condition::tourIsRunning());
+
     factory()
         .flags(Main)
         .separator();
