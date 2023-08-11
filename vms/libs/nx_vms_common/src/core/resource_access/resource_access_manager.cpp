@@ -956,9 +956,14 @@ bool QnResourceAccessManager::canModifyLayout(
             if (oldResourceIds.contains(item.resourceId))
                 continue;
 
+            // We should not allow user to place some camera, which does not exist in the system
+            // right now, but can potentially be added in the future. From the other side, we
+            // should allow user to save layouts with local files. Also this can lead to issues
+            // only when camera is added to the shared layout, but only power users can do it, so
+            // it can be considered safe. Allow adding not-existent resources for now.
             const auto resource = resourcePool()->getResourceById(item.resourceId);
-            if (!resource || resource->hasFlags(Qn::local))
-                continue; //< TODO: #vkutin #muskov Is it OK?
+            if (!resource)
+                continue;
 
             if (!hasAccessRights(subject, resource, layoutAccessRights))
                 return false;
