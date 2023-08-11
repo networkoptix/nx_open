@@ -60,7 +60,7 @@
     </message>
     <message>
       <source>Proxy LDAP requests&lt;br&gt;via server</source>
-      <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
+      <translation>Proxy LDAP-förfrågningar&lt;br&gt;via server</translation>
     </message>
   </context>
   <context>
@@ -308,7 +308,7 @@
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Detta fält kan inte vara tomt</translation>
     </message>
     <message>
       <source>Auto</source>
