@@ -153,6 +153,8 @@ struct LdapSettingsWidget::Private
         state.uri = settings.uri.toString();
         state.adminDn = settings.adminDn;
         state.password = settings.adminPassword.value_or("");
+        state.startTls = settings.startTls;
+        state.ignoreCertErrors = settings.ignoreCertificateErrors;
         state.syncIntervalS = settings.continuousSyncIntervalS.count();
         state.searchTimeoutS = settings.searchTimeoutS.count();
         for (const auto& filter: settings.filters)
@@ -189,6 +191,8 @@ struct LdapSettingsWidget::Private
         settings.adminPassword = state.password.isEmpty()
             ? std::nullopt
             : std::optional<QString>(state.password);
+        settings.startTls = state.startTls;
+        settings.ignoreCertificateErrors = state.ignoreCertErrors;
         settings.continuousSyncIntervalS = std::chrono::seconds(state.syncIntervalS);
         settings.searchTimeoutS = std::chrono::seconds(state.searchTimeoutS);
 
@@ -374,7 +378,9 @@ void LdapSettingsWidget::loadSettings(bool forceUpdate)
                     testOnline(
                         state.uri.toString(),
                         state.adminDn,
-                        state.adminPassword.value_or(""));
+                        state.adminPassword.value_or(""),
+                        state.startTls,
+                        state.ignoreCertificateErrors);
                 }
                 else if (settings->isValid(/*checkPassword=*/ false))
                 {
@@ -588,7 +594,9 @@ bool LdapSettingsWidget::hasChanges() const
 void LdapSettingsWidget::testConnection(
     const QString& url,
     const QString& adminDn,
-    const QString& password)
+    const QString& password,
+    bool startTls,
+    bool ignoreCertErrors)
 {
     d->testMessage = "";
 
@@ -596,6 +604,8 @@ void LdapSettingsWidget::testConnection(
     settings.uri = nx::utils::Url::fromUserInput(url);
     settings.adminDn = adminDn;
     settings.adminPassword = password.isEmpty() ? std::nullopt : std::make_optional(password);
+    settings.startTls = startTls;
+    settings.ignoreCertificateErrors = ignoreCertErrors;
 
     if (d->currentHandle)
         connectedServerApi()->cancelRequest(d->currentHandle);
@@ -641,7 +651,9 @@ void LdapSettingsWidget::testConnection(
 void LdapSettingsWidget::testOnline(
     const QString& url,
     const QString& adminDn,
-    const QString& password)
+    const QString& password,
+    bool startTls,
+    bool ignoreCertErrors)
 {
     d->checkingStatus = true;
 
@@ -649,6 +661,8 @@ void LdapSettingsWidget::testOnline(
     settings.uri = nx::utils::Url::fromUserInput(url);
     settings.adminDn = adminDn;
     settings.adminPassword = password;
+    settings.startTls = startTls;
+    settings.ignoreCertificateErrors = ignoreCertErrors;
 
     if (d->currentHandle)
         connectedServerApi()->cancelRequest(d->currentHandle);

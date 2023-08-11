@@ -38,12 +38,16 @@ public:
     Q_INVOKABLE void testConnection(
         const QString& url,
         const QString& adminDn,
-        const QString& password);
+        const QString& password,
+        bool startTls,
+        bool ignoreCertErrors);
 
     Q_INVOKABLE void testOnline(
         const QString& url,
         const QString& adminDn,
-        const QString& password);
+        const QString& password,
+        bool startTls,
+        bool ignoreCertErrors);
 
     Q_INVOKABLE void cancelCurrentRequest();
 

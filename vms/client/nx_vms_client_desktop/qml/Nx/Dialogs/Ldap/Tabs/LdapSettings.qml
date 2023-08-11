@@ -22,6 +22,8 @@ Rectangle
     property string uri
     property string adminDn
     property string password
+    property bool startTls: false
+    property bool ignoreCertErrors: false
     property alias filters: filtersModel.filters
     property bool continuousSync: true
     property bool continuousSyncEditable: true
@@ -99,6 +101,8 @@ Rectangle
             property string initUri
             property string initAdminDn
             property string initPassword
+            property bool initStartTls: false
+            property bool initIgnoreCertErrors: false
 
             SessionAware.onTryClose: reject()
 
@@ -120,13 +124,23 @@ Rectangle
                 control.uri = ldapScheme + hostAndPort
                 control.adminDn = adminDn
                 control.password = password
+                control.startTls = startTls
+                control.ignoreCertErrors = ignoreCertErrors
+
                 control.testMessage = ""
 
                 if (control.uri != initUri
                     || control.adminDn != initAdminDn
-                    || control.password != initPassword)
+                    || control.password != initPassword
+                    || control.startTls != initStartTls
+                    || control.ignoreCertErrors != initIgnoreCertErrors)
                 {
-                    self.testOnline(control.uri, control.adminDn, control.password)
+                    self.testOnline(
+                        control.uri,
+                        control.adminDn,
+                        control.password,
+                        control.startTls,
+                        control.ignoreCertErrors)
                 }
             }
         }
@@ -193,11 +207,15 @@ Rectangle
                 connectionSettingsDialog.uri = control.uri
                 connectionSettingsDialog.adminDn = control.adminDn
                 connectionSettingsDialog.password = control.password
+                connectionSettingsDialog.startTls = control.startTls
+                connectionSettingsDialog.ignoreCertErrors = control.ignoreCertErrors
 
                 // For checking ONLINE state without Apply.
                 connectionSettingsDialog.initUri = control.uri
                 connectionSettingsDialog.initAdminDn = control.adminDn
                 connectionSettingsDialog.initPassword = control.password
+                connectionSettingsDialog.initStartTls = control.startTls
+                connectionSettingsDialog.initIgnoreCertErrors = control.ignoreCertErrors
 
                 connectionSettingsDialog.show()
             }
@@ -449,6 +467,8 @@ Rectangle
                             connectionSettingsDialog.adminDn = control.adminDn
                             connectionSettingsDialog.originalAdminDn = control.adminDn
                             connectionSettingsDialog.password = control.password
+                            connectionSettingsDialog.startTls = control.startTls
+                            connectionSettingsDialog.ignoreCertErrors = control.ignoreCertErrors
                             connectionSettingsDialog.showFakePassword = control.hasConfig
                             connectionSettingsDialog.show()
                         }
