@@ -184,9 +184,12 @@ struct NX_VMS_API Organization
     /**%apidoc Organization name */
     QString name;
 
+    /**%apidoc Organization web page */
+    QString webPage;
+
     bool operator==(const Organization&) const = default;
 };
-#define Organization_fields (id)(name)
+#define Organization_fields (id)(name)(webPage)
 NX_REFLECTION_INSTRUMENT(Organization, Organization_fields)
 
 /**%apidoc SaasSecurity */
