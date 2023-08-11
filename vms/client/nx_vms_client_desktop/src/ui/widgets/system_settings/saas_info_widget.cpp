@@ -5,6 +5,8 @@
 
 #include <memory>
 
+#include <QtGui/QDesktopServices>
+
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/saas/services_usage_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -51,6 +53,11 @@ int purchasedServicesCount(const nx::vms::common::saas::ServiceManager* serviceM
     return servicesCount;
 }
 
+QUrl channelPartnerUrl(const nx::vms::common::saas::ServiceManager* serviceManager)
+{
+    return QUrl(serviceManager->data().channelPartner.webPage);
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -83,10 +90,9 @@ void SaasInfoWidget::Private::setupPlaceholderPageUi()
     ui->placeholderMessageCaptionLabel->setFont(placeholderMessageCaptionFont());
     ui->placeholderMessageLabel->setFont(placeholderMessageFont());
     q->connect(ui->channelPartnerContactButton, &QPushButton::clicked, q,
-        []
+        [this]
         {
-            // FIXME: #vbreus Open link to the Channel Partner portal or display any provided
-            // contact information.
+            QDesktopServices::openUrl(channelPartnerUrl(q->systemContext()->saasServiceManager()));
         });
 }
 
@@ -109,9 +115,10 @@ void SaasInfoWidget::Private::setupServicesUsagePageUi()
 
 void SaasInfoWidget::Private::updateUi()
 {
-    const auto hasPurchasedServices =
-        purchasedServicesCount(q->systemContext()->saasServiceManager()) > 0;
+    const auto serviceManager = q->systemContext()->saasServiceManager();
 
+    const auto hasPurchasedServices = purchasedServicesCount(serviceManager) > 0;
+    ui->channelPartnerContactButton->setHidden(!channelPartnerUrl(serviceManager).isValid());
     ui->stackedWidget->setCurrentWidget(hasPurchasedServices
         ? ui->servicesUsagePage
         : ui->placeholderPage);
