@@ -24,12 +24,10 @@ CrossSystemPtzControllerPool::CrossSystemPtzControllerPool(
         &CrossSystemPtzControllerPool::unregisterResource);
 }
 
-QnPtzControllerPtr CrossSystemPtzControllerPool::ensureControllerExists(const QnResourcePtr& resource)
+void CrossSystemPtzControllerPool::createControllerIfNeeded(const QnResourcePtr& resource)
 {
-    auto result = controller(resource);
-    if (!result)
+    if (!controller(resource))
         registerResource(resource);
-    return controller(resource);
 }
 
 QnPtzControllerPtr CrossSystemPtzControllerPool::createController(

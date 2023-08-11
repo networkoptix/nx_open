@@ -52,7 +52,7 @@ protected:
 private:
     void at_adaptor_valueChanged();
 
-public:
+protected:
     QnResourcePropertyAdaptor<QnPtzObject>* m_adaptor;
     QnHomePtzExecutor* m_executor;
 };
