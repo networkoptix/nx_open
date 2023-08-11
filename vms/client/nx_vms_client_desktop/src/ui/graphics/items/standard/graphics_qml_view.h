@@ -62,6 +62,7 @@ protected:
     virtual void focusInEvent(QFocusEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
     virtual bool focusNextPrevChild(bool next) override;
+    virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const override;
 
 private:
     struct Private;

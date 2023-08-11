@@ -265,6 +265,8 @@ struct GraphicsQmlView::Private
 GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     QGraphicsWidget(parent, wFlags), d(new Private(this))
 {
+    setFlags(flags() | QGraphicsItem::ItemAcceptsInputMethod);
+
     d->renderControl.reset(new RenderControl(this));
 
     connect(d->renderControl.data(), &QQuickRenderControl::renderRequested, this,
@@ -467,6 +469,13 @@ bool GraphicsQmlView::event(QEvent* event)
     }
 
     return base_type::event(event);
+}
+
+QVariant GraphicsQmlView::inputMethodQuery(Qt::InputMethodQuery query) const
+{
+    return d->quickWindow->activeFocusItem()
+        ? d->quickWindow->activeFocusItem()->inputMethodQuery(query)
+        : base_type::inputMethodQuery(query);
 }
 
 void GraphicsQmlView::setSource(const QUrl& url)
