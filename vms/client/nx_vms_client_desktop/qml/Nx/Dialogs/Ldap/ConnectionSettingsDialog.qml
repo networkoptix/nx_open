@@ -313,6 +313,18 @@ Dialog
 
     function accept()
     {
+        // If all fields are empty the OK should close the dialog (accodring to the specification).
+        if (!ldapUri.text
+            && !adminDnTextField.text
+            && !passwordTextField.text
+            && !dialog.showFakePassword
+            && !startTlsCheckbox.checked
+            && !ignoreCertErrorsCheckbox.checked)
+        {
+            dialog.close()
+            return
+        }
+
         if (validate())
         {
             dialog.accepted()
