@@ -297,6 +297,9 @@ nx::vms::api::UserGroupModel UserGroupRequestChain::fromGroupId(const QnUuid& gr
     groupData.type = userGroup->type;
     groupData.permissions = userGroup->permissions;
     groupData.parentGroupIds = userGroup->parentGroupIds;
+    const auto ownResourceAccessMap = systemContext()->accessRightsManager()->ownResourceAccessMap(
+        userGroup->id).asKeyValueRange();
+    groupData.resourceAccessRights = {ownResourceAccessMap.begin(), ownResourceAccessMap.end()};
     return groupData;
 }
 
@@ -320,6 +323,10 @@ nx::vms::api::UserModelV3 UserGroupRequestChain::fromUserId(const QnUuid& userId
         user->getDigest() != nx::vms::api::UserData::kHttpIsDisabledStub;
 
     userData.groupIds = user->groupIds();
+
+    const auto ownResourceAccessMap = systemContext()->accessRightsManager()->ownResourceAccessMap(
+        user->getId()).asKeyValueRange();
+    userData.resourceAccessRights = {ownResourceAccessMap.begin(), ownResourceAccessMap.end()};
 
     return userData;
 }
