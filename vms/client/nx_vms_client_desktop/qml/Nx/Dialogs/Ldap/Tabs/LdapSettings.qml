@@ -49,6 +49,7 @@ Rectangle
     readonly property bool showEmptyLdapWarning: userCount <= 0 && groupCount <= 0 && lastSync
     readonly property int kDefaultSyncIntervalS: 3600 //< 1 hour.
     readonly property int kDefaultSearchTimeoutS: 60 //< 1 minute.
+    readonly property int kShortSyncIntervalS: 60 //< 1 minute.
 
     property var self
     property var testState: LdapSettings.TestState.initial
@@ -433,6 +434,7 @@ Rectangle
                                 && control.online
                                 && !control.syncRequested
                                 && !control.syncIsRunning
+                                && control.syncIntervalS > control.kShortSyncIntervalS
 
                             icon.source: "image://svg/skin/user_settings/sync_ldap.svg"
                             icon.width: width
