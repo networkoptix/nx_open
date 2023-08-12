@@ -64,8 +64,8 @@ Dialog
         anchors.leftMargin: 16
         anchors.right: parent.right
         anchors.rightMargin: 16
-
         spacing: 8
+        enabled: dialog.testState != LdapSettings.TestState.connecting
 
         CenteredField
         {
@@ -234,8 +234,6 @@ Dialog
                     Layout.alignment: Qt.AlignTop | Qt.AlignLeft
                     Layout.minimumWidth: 80
                     text: qsTr("Test")
-
-                    enabled: dialog.testState != LdapSettings.TestState.connecting
 
                     onClicked:
                     {
