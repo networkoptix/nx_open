@@ -232,7 +232,10 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
             d->ui->hotspotsItemView->setEnabled(hotspotsEnabled);
             d->ui->addHotspotButton->setEnabled(hotspotsEnabled);
             if (!hotspotsEnabled)
-                d->ui->hotspotsEditorWidget->setSelectedHotspotIndex({});            
+            {
+                d->ui->hotspotsEditorWidget->setSelectedHotspotIndex({});
+                d->ui->hotspotsItemView->scrollToTop();
+            }
         });
 
     connect(d->ui->addHotspotButton, &QPushButton::clicked, this,
