@@ -75,9 +75,12 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
         switch (index.column())
         {
             case CameraColumn:
-                return camera
-                    ? qnResIconCache->icon(camera)
-                    : qnResIconCache->icon(QnResourceIconCache::Cameras);
+                if (camera)
+                    return qnResIconCache->icon(camera);
+                else if (!cameraId.isNull())
+                    return qnResIconCache->icon(QnResourceIconCache::Camera);
+                else
+                    return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
             case DeleteButtonColumn:
                 return qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions);
