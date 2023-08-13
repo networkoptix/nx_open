@@ -65,10 +65,7 @@ void setupStyleOptionColors(
     const QColor& color,
     const QColor& selectedColor)
 {
-    using nx::style::Hints;
-
-    if (!itemViewOption->state.testFlag(QStyle::State_Enabled))
-        return;
+    using namespace nx::vms::client::core;
 
     if (!itemViewOption->icon.isNull())
     {
@@ -82,8 +79,15 @@ void setupStyleOptionColors(
         itemViewOption->icon = colorizedIcon;
     }
 
-    itemViewOption->palette.setColor(QPalette::Text, color);
-    itemViewOption->palette.setColor(QPalette::HighlightedText, selectedColor);
+    const auto itemIsEnabled = itemViewOption->state.testFlag(QStyle::State_Enabled);
+
+    itemViewOption->palette.setColor(QPalette::Text, itemIsEnabled
+        ? color
+        : ColorTheme::transparent(color, nx::style::Hints::kDisabledItemOpacity));
+
+    itemViewOption->palette.setColor(QPalette::HighlightedText, itemIsEnabled
+        ? selectedColor
+        : ColorTheme::transparent(selectedColor, nx::style::Hints::kDisabledItemOpacity));
 }
 
 } // namespace
@@ -244,20 +248,54 @@ void CameraHotspotsItemDelegate::initStyleOption(
             static const auto kSelectedInvalidCameraColor = core::colorTheme()->color("red_l2");
             setupStyleOptionColors(option, kInvalidCameraColor, kSelectedInvalidCameraColor);
         }
+
+        if (!option->state.testFlag(QStyle::State_Enabled))
+        {
+            // Camera icon in QIcon::Disabled mode looks wrong, so make icons in the disabled item
+            // view appear like anywhere in the app, as icon in QIcon::Normal mode with opacity
+            // defined by nx::style::Hints::kDisabledItemOpacity constant.
+            auto disabledIconPixmap = option->icon.pixmap(option->rect.size(), QIcon::Normal);
+            QPainter disabledPixmapPainter(&disabledIconPixmap);
+            disabledPixmapPainter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+            disabledPixmapPainter.fillRect(disabledIconPixmap.rect(),
+                QColor::fromRgbF(0, 0, 0, nx::style::Hints::kDisabledItemOpacity));
+            option->icon.addPixmap(disabledIconPixmap, QIcon::Disabled);
+        }
+    }
+
+    if (index.column() == CameraHotspotsItemModel::PointedCheckBoxColumn)
+    {
+        const auto checkStateData = index.data(Qt::CheckStateRole);
+        const bool isChecked = !checkStateData.isNull()
+            && checkStateData.value<Qt::CheckState>() != Qt::Unchecked;
+
+        if (option->state.testFlag(QStyle::State_Selected) || isChecked)
+        {
+            option->palette.setColor(
+                QPalette::Text,
+                option->palette.color(QPalette::HighlightedText));
+        }
     }
 
     if (index.column() == CameraHotspotsItemModel::DeleteButtonColumn)
     {
-        static const auto kColor = option->palette.color(QPalette::WindowText);
-        static const auto kSelectedColor = core::colorTheme()->color("light10");
+        auto color = option->palette.color(QPalette::WindowText);
+        auto selectedColor = option->palette.color(QPalette::Text);
 
-        static const auto kHoveredColor = core::colorTheme()->color("light14");
-        static const auto kHoveredSelectedColor = core::colorTheme()->color("light8");
+        auto makeColorsLigther =
+            [&color, &selectedColor]
+            {
+                color = core::colorTheme()->lighter(color, 2);
+                selectedColor = core::colorTheme()->lighter(selectedColor, 2);
+            };
+
+        if (option->state.testFlag(QStyle::State_MouseOver))
+            makeColorsLigther(); //< Whole row is hovered.
 
         if (m_hoverTracker && m_hoverTracker->hoveredIndex() == index)
-            setupStyleOptionColors(option, kHoveredColor, kHoveredSelectedColor);
-        else
-            setupStyleOptionColors(option, kColor, kSelectedColor);
+            makeColorsLigther(); //< In addition, 'Delete' button-alike item is hovered.
+
+        setupStyleOptionColors(option, color, selectedColor);
     }
 }
 
