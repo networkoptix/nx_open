@@ -61,7 +61,7 @@ struct LdapSettingsWidget::Private
     QmlProperty<int> userCount;
     QmlProperty<int> groupCount;
 
-    QmlProperty<bool> checkingStatus;
+    QmlProperty<bool> checkingOnlineStatus;
     QmlProperty<bool> online;
     QmlProperty<bool> syncIsRunning;
     QmlProperty<bool> syncRequested;
@@ -87,7 +87,7 @@ struct LdapSettingsWidget::Private
         lastSync(quickWidget, "lastSync"),
         userCount(quickWidget, "userCount"),
         groupCount(quickWidget, "groupCount"),
-        checkingStatus(quickWidget, "checkingStatus"),
+        checkingOnlineStatus(quickWidget, "checkingOnlineStatus"),
         online(quickWidget, "online"),
         syncIsRunning(quickWidget, "syncIsRunning"),
         syncRequested(quickWidget, "syncRequested"),
@@ -141,12 +141,49 @@ struct LdapSettingsWidget::Private
         q->connect(&statusUpdateTimer, &QTimer::timeout,
             [this]
             {
-                if (currentHandle <= 0)
-                    q->loadSettings(/*force*/ false);
+                if (!modified
+                    && q->globalSettings()->ldap().isValid(/*checkPassword=*/ false)
+                    && currentHandle == 0)
+                {
+                    q->checkOnlineAndSyncStatus();
+                }
+            });
+
+        connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
+            [this]()
+            {
+                mergeUpdate(q->globalSettings()->ldap());
             });
     }
 
-    void setState(const nx::vms::api::LdapSettings& settings)
+    void mergeUpdate(const nx::vms::api::LdapSettings& incoming)
+    {
+        const auto newState = LdapState::mergeStates(
+            stateFromApi(initialSettings),
+            LdapState::objectToState(quickWidget->rootObject()),
+            stateFromApi(incoming));
+
+        LdapState::stateToObject(newState, quickWidget->rootObject());
+        initialSettings = incoming;
+        modified = getState() != initialSettings;
+
+        const bool serverChanged = initialSettings.uri.toString() != newState.uri;
+        if (serverChanged)
+        {
+            userCount = -1;
+            groupCount = -1;
+            lastSync = "";
+
+            q->testOnline(
+                newState.uri,
+                newState.adminDn,
+                newState.password,
+                newState.startTls,
+                newState.ignoreCertErrors);
+        }
+    }
+
+    static LdapSettings stateFromApi(const nx::vms::api::LdapSettings& settings)
     {
         LdapSettings state;
 
@@ -177,7 +214,12 @@ struct LdapSettingsWidget::Private
         state.preferredSyncServer = settings.preferredMasterSyncServer;
         state.isHttpDigestEnabledOnImport = settings.isHttpDigestEnabledOnImport;
 
-        LdapState::stateToObject(state, quickWidget->rootObject());
+        return state;
+    }
+
+    void setState(const nx::vms::api::LdapSettings& settings)
+    {
+        LdapState::stateToObject(stateFromApi(settings), quickWidget->rootObject());
     }
 
     nx::vms::api::LdapSettings getState() const
@@ -298,14 +340,18 @@ void LdapSettingsWidget::discardChanges()
     d->setState(d->initialSettings);
 }
 
-void LdapSettingsWidget::checkStatus()
+void LdapSettingsWidget::checkOnlineAndSyncStatus()
 {
+    // Do not set d->checkingOnlineStatus = true here to avoid showing the spinner periodically.
+
     const auto statusCallback = nx::utils::guarded(this,
         [this](
             bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapStatus> errorOrData)
         {
             if (handle == d->statusHandle)
                 d->statusHandle = 0;
+
+            d->checkingOnlineStatus = false;
 
             if (auto status = std::get_if<nx::vms::api::LdapStatus>(&errorOrData))
             {
@@ -336,76 +382,14 @@ void LdapSettingsWidget::checkStatus()
 
 void LdapSettingsWidget::loadDataToUi()
 {
-    loadSettings();
-}
+    d->initialSettings = globalSettings()->ldap();
+    d->setState(d->initialSettings);
+    d->modified = false;
 
-void LdapSettingsWidget::loadSettings(bool forceUpdate)
-{
-    if (!d->isAdmin())
-        return;
+    d->updateUserAndGroupCount();
 
-    const auto loadSettingsCallback = nx::utils::guarded(this,
-        [this, forceUpdate](
-            bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapSettings> errorOrData)
-        {
-            if (handle == d->currentHandle)
-                d->currentHandle = 0;
-
-            if (auto settings = std::get_if<nx::vms::api::LdapSettings>(&errorOrData))
-            {
-                NX_ASSERT(success);
-
-                if (forceUpdate || !d->modified)
-                {
-                    d->initialSettings = *settings;
-                    d->setState(d->initialSettings);
-                    d->modified = false;
-                }
-                else
-                {
-                    d->initialSettings = *settings;
-                    d->modified = d->getState() != d->initialSettings;
-                }
-
-                const auto state = d->getState();
-
-                const bool serverChanged = d->initialSettings.uri != state.uri;
-                if (serverChanged)
-                {
-                    d->userCount = -1;
-                    d->groupCount = -1;
-                    d->lastSync = "";
-                    testOnline(
-                        state.uri.toString(),
-                        state.adminDn,
-                        state.adminPassword.value_or(""),
-                        state.startTls,
-                        state.ignoreCertificateErrors);
-                }
-                else if (settings->isValid(/*checkPassword=*/ false))
-                {
-                    // Status request only shows results for settings already saved on the server.
-                    if (!d->modified)
-                        checkStatus();
-                }
-            }
-            else
-            {
-                // This callback is triggered periodically, so avoid showing a messagebox with
-                // the error. Most likely the server is disconnected.
-                if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-                    NX_ERROR(this, "Unable to load LDAP settings: %1", error);
-                else
-                    NX_ERROR(this, "Unable to load LDAP settings");
-
-                d->online = false;
-            }
-        });
-
-    if (d->currentHandle)
-        connectedServerApi()->cancelRequest(d->currentHandle);
-
-    d->currentHandle = connectedServerApi()->getLdapSettingsAsync(loadSettingsCallback, thread());
+    d->checkingOnlineStatus = true;
+    checkOnlineAndSyncStatus();
 }
 
 void LdapSettingsWidget::resetLdap()
@@ -433,8 +417,11 @@ void LdapSettingsWidget::resetLdap()
         tr("Reset"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
+    nx::vms::api::LdapSettings settingsBackup = globalSettings()->ldap();
+
     const auto resetCallback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle handle, const rest::ErrorOrEmpty& result)
+        [this, settingsBackup = std::move(settingsBackup)](
+            bool success, rest::Handle handle, const rest::ErrorOrEmpty& result)
         {
             if (handle == d->currentHandle)
                 d->currentHandle = 0;
@@ -447,18 +434,19 @@ void LdapSettingsWidget::resetLdap()
                 return;
             }
 
+            globalSettings()->setLdap(settingsBackup);
+
             if (auto error = std::get_if<nx::network::rest::Result>(&result))
-            {
                 showError(error->errorString);
-            }
             else
-            {
                 showError(tr("Connection failed"));
-            }
         });
 
     if (d->currentHandle)
         connectedServerApi()->cancelRequest(d->currentHandle);
+
+    // Clear the settings immediately but rollback on error.
+    globalSettings()->setLdap({});
 
     d->currentHandle = connectedServerApi()->resetLdapAsync(
         sessionTokenHelper,
@@ -512,11 +500,13 @@ void LdapSettingsWidget::applyChanges()
         tr("Apply"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
+    nx::vms::api::LdapSettings settingsBackup = globalSettings()->ldap();
+
     nx::vms::api::LdapSettingsChange settingsChange = {d->getState()};
     settingsChange.removeRecords = removeExisting;
 
     const auto settingsCallback = nx::utils::guarded(this,
-        [this](
+        [this, settingsBackup = std::move(settingsBackup)](
             bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapSettings> errorOrData)
         {
             if (handle == d->currentHandle)
@@ -530,20 +520,28 @@ void LdapSettingsWidget::applyChanges()
                 d->setState(d->initialSettings);
                 d->modified = false;
 
-                checkStatus();
-            }
-            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-            {
-                showError(error->errorString);
+                globalSettings()->setLdap(*settings);
+
+                checkOnlineAndSyncStatus();
             }
             else
             {
-                showError(tr("Connection failed"));
+                d->checkingOnlineStatus = false;
+                globalSettings()->setLdap(settingsBackup);
+
+                if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                    showError(error->errorString);
+                else
+                    showError(tr("Connection failed"));
             }
         });
 
     if (d->currentHandle)
         connectedServerApi()->cancelRequest(d->currentHandle);
+
+    // Apply the settings immediately but rollback on error.
+    globalSettings()->setLdap(settingsChange);
+    d->checkingOnlineStatus = true;
 
     d->currentHandle = connectedServerApi()->modifyLdapSettingsAsync(
         settingsChange,
@@ -577,7 +575,7 @@ void LdapSettingsWidget::requestSync()
                 d->syncRequested = false;
 
                 if (success)
-                    checkStatus();
+                    checkOnlineAndSyncStatus();
                 else if (auto error = std::get_if<nx::network::rest::Result>(&result))
                     showError(error->errorString);
                 else
@@ -655,7 +653,7 @@ void LdapSettingsWidget::testOnline(
     bool startTls,
     bool ignoreCertErrors)
 {
-    d->checkingStatus = true;
+    d->checkingOnlineStatus = true;
 
     nx::vms::api::LdapSettings settings;
     settings.uri = nx::utils::Url::fromUserInput(url);
@@ -674,11 +672,9 @@ void LdapSettingsWidget::testOnline(
                 bool success, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
             {
                 if (handle == d->currentHandle)
-                {
                     d->currentHandle = 0;
-                    d->checkingStatus = false;
-                }
 
+                d->checkingOnlineStatus = false;
                 d->online = success && std::get_if<std::vector<QString>>(&errorOrData);
                 d->updateUserAndGroupCount();
             }),
