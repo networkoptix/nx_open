@@ -201,6 +201,12 @@ void CameraSettingsDialogStore::setHasEditAccessRightsForAllCameras(bool value)
         });
 }
 
+void CameraSettingsDialogStore::setSaasInitialized(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setSaasInitialized(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setSingleVirtualCameraState(const VirtualCameraState& value)
 {
     d->executeAction(

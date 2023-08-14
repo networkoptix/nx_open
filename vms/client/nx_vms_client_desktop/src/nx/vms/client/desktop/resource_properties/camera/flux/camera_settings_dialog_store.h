@@ -89,6 +89,7 @@ public:
     void setSettingsOptimizationEnabled(bool value);
     void setHasPowerUserPermissions(bool value);
     void setHasEditAccessRightsForAllCameras(bool value);
+    void setSaasInitialized(bool value);
     void setSingleVirtualCameraState(const VirtualCameraState& value);
     void setSingleCameraUserName(const QString& text);
     void setSingleCameraIsOnline(bool isOnline);
