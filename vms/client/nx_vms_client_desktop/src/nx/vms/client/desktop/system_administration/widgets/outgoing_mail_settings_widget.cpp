@@ -33,7 +33,6 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/email/email.h>
-#include <utils/email/email_fwd.h>
 
 namespace nx::vms::client::desktop {
 
@@ -109,8 +108,6 @@ public:
     bool useCloudServiceChanged() const;
 
     bool ignoreInputNotifications() const;
-
-    bool canApplyChanges() const;
 
 private:
     OutgoingMailSettingsWidget* const q;
@@ -385,7 +382,7 @@ void OutgoingMailSettingsWidget::Private::updateSmtpConfigurationStatus()
 
 void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
 {
-    if (!q->currentServer() || !canApplyChanges())
+    if (!q->currentServer())
         return;
 
     std::optional<QnUuid> proxyServerId;
@@ -709,28 +706,6 @@ bool OutgoingMailSettingsWidget::Private::useCloudServiceChanged() const
     return q->systemSettings()->useCloudServiceToSendEmail() != getUseCloudServiceFromDialog();
 }
 
-bool OutgoingMailSettingsWidget::Private::canApplyChanges() const
-{
-    ui->emailInput->reset();
-    ui->userInput->reset();
-    ui->passwordInput->reset();
-    // Test Mail From
-    ui->emailInput->validate();
-
-    // Test Username and Password
-    if (ui->protocolComboBox->currentIndex()
-        != ui->protocolComboBox->findData(QVariant::fromValue(QnEmail::ConnectionType::insecure)))
-    {
-        // Check that Username and Password non empty
-        if (ui->userInput->text().isEmpty())
-            ui->userInput->setInvalidValidationResult(tr("Username cannot be empty"));
-        if (ui->passwordInput->text().isEmpty())
-            ui->passwordInput->setInvalidValidationResult(tr("Password cannot be empty"));
-    }
-
-    return ui->emailInput->isValid() && ui->userInput->isValid() && ui->passwordInput->isValid();
-}
-
 //-------------------------------------------------------------------------------------------------
 // OutgoingMailSettingsWidget definition.
 
@@ -753,11 +728,6 @@ void OutgoingMailSettingsWidget::loadDataToUi()
     d->loadEmailSettingsToDialog();
     d->setUseCloudServiceToDialog(systemSettings()->useCloudServiceToSendEmail());
     d->updateConfigurationStatus();
-}
-
-bool OutgoingMailSettingsWidget::canApplyChanges() const
-{
-    return d->canApplyChanges();
 }
 
 void OutgoingMailSettingsWidget::applyChanges()
