@@ -60,8 +60,7 @@ protected:
     virtual void hideEvent(QHideEvent* event) override;
 
 private:
-    void checkStatus();
-    void loadSettings(bool forceUpdate = true);
+    void checkOnlineAndSyncStatus();
     void showError(const QString& errorMessage);
 
 signals:

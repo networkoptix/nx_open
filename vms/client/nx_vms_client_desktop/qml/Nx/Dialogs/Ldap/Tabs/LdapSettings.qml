@@ -58,7 +58,7 @@ Rectangle
     property int userCount: -1
     property int groupCount: -1
 
-    property bool checkingStatus: false
+    property bool checkingOnlineStatus: false
 
     property bool online: false
 
@@ -250,14 +250,14 @@ Rectangle
                     rightMargin: 12
                 }
 
-                running: control.checkingStatus
+                running: control.checkingOnlineStatus
             }
 
             Rectangle
             {
                 id: statusTag
 
-                visible: !control.checkingStatus
+                visible: !control.checkingOnlineStatus
 
                 radius: 2
                 height: 20
