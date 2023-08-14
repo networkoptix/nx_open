@@ -67,7 +67,7 @@ TEST(RtpParser, NoPacketLossWhenChangeType) // For some buggy cameras
 
 // See https://www.onvif.org/specs/stream/ONVIF-Streaming-Spec-v1606.pdf
 // 6.2.2 Compatibility with the JPEG header extension
-TEST(RtpParser, JpegHeaderExtensionfAfterOnvifExtension) // For some buggy cameras
+TEST(RtpParser, JpegHeaderExtensionfAfterOnvifExtension)
 {
     bool packetLost = false;
     bool gotData = false;
