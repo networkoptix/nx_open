@@ -270,19 +270,27 @@ distrib_copySystemLibs() # dest_dir libs_to_copy...
 #
 distrib_copyServerSystemLibs() # destination_path
 {
-    local -r destination_path="$1"
+    local -r destination_path="$1" && shift
+    # Use an empty string as the default argument value to avoid "unbound variable" error if the
+    # function is called with only one argument.
+    local -a additional_runtime_libs=("${@-}")
 
     echo ""
     echo "Copying system libs"
 
-    echo "Copying cpp runtime libs: ${CPP_RUNTIME_LIBS[@]}"
+    echo "  Copying cpp runtime libs: ${CPP_RUNTIME_LIBS[@]}"
     distrib_copySystemLibs "${destination_path}" "${CPP_RUNTIME_LIBS[@]}"
 
-    echo "Copying libicu"
+    if (( ${#additional_runtime_libs} > 0 )); then
+        echo "  Copying additional runtime libs: ${additional_runtime_libs[@]}"
+        distrib_copySystemLibs "${destination_path}" "${additional_runtime_libs[@]}"
+    fi
+
+    echo "  Copying libicu"
     distrib_copySystemLibs "${destination_path}" "${ICU_RUNTIME_LIBS[@]}"
 
     if [[ "${ARCH}" != "arm" ]]; then
-        echo "Copying other system libs"
+        echo "  Copying other system libs"
 
         local -a libs_to_copy=(
             libpng16.so.16
