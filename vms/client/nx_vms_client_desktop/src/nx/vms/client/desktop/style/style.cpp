@@ -353,6 +353,22 @@ int rightIndent(const QWidget* widget)
         : Metrics::kStandardPadding;
 }
 
+template<class T>
+T* isWidgetOwnedBy(const QWidget* widget)
+{
+    if (!widget)
+        return nullptr;
+
+    for (QWidget* parent = widget->parentWidget(); parent != nullptr;
+         parent = parent->parentWidget())
+    {
+        if (auto desiredParent = qobject_cast<T*>(parent))
+            return desiredParent;
+    }
+
+    return nullptr;
+}
+
 QnIndents itemViewItemIndents(const QStyleOptionViewItem* item)
 {
     static const QnIndents kDefaultIndents(Metrics::kStandardPadding, Metrics::kStandardPadding);
@@ -360,6 +376,10 @@ QnIndents itemViewItemIndents(const QStyleOptionViewItem* item)
     auto view = qobject_cast<const QAbstractItemView*>(item->widget);
     if (!view)
         return kDefaultIndents;
+
+    // Enforce zero indents for calendar cells to avoid text being elided.
+    if (isWidgetOwnedBy<QCalendarWidget>(item->widget))
+        return {0, 0};
 
     if (item->viewItemPosition == QStyleOptionViewItem::Middle)
         return kDefaultIndents;
@@ -420,22 +440,6 @@ QnIndents itemViewItemIndents(const QStyleOptionViewItem* item)
     }
 
     return Indents;
-}
-
-template<class T>
-T* isWidgetOwnedBy(const QWidget* widget)
-{
-    if (!widget)
-        return nullptr;
-
-    for (QWidget* parent = widget->parentWidget(); parent != nullptr;
-         parent = parent->parentWidget())
-    {
-        if (auto desiredParent = qobject_cast<T*>(parent))
-            return desiredParent;
-    }
-
-    return nullptr;
 }
 
 bool isIconListCombo(const QComboBox* combo)
