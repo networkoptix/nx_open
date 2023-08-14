@@ -2,8 +2,7 @@
 
 #include "ffmpeg_transcoder.h"
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/opt.h>
 }
 
@@ -465,8 +464,24 @@ int QnFfmpegTranscoder::transcodePacketInternal(
 
     if (transcoder)
     {
+        /* TODO
+         * Summary: API Transcoder::transcodePacket() is a bit confused and should be rewritten
+         * into FFmpeg-like sendFrame() / receivePacket() pattern.
+         *
+         * Details: Transcoder's API should provide a methods for:
+         * 1) send frame into transcoder;
+         * 2) get next frame from transcoder (0, 1 or more frames can be received per frame sent
+         * due to an internal decoder reasons or due to resampling for audio of fps change for
+         * video);
+         * 3) flush transcoder on transcoding stop;
+         * Current video and audio transcoders API use a null pointer as an output for a 2) and 3)
+         * methods. But audio transcoder implementation treat a null output as a method 2), and
+         * have no API for method 3). And video transcoder implementation treat a null output as a
+         * method 3), and have no API for method 2). That's why we break transcoding cycle only
+         * for video.
+         * */
         QnConstAbstractMediaDataPtr packet = media;
-        while (1)
+        do
         {
             QnAbstractMediaDataPtr transcodedPacket;
             int errCode = transcoder->transcodePacket(packet, &transcodedPacket);
@@ -479,7 +494,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(
                 break;
             muxPacket(transcodedPacket);
             packet.reset();
-        }
+        } while (transcoder == m_aTranscoder);
     }
     else
     {
