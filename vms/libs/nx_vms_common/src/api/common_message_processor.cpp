@@ -1100,7 +1100,7 @@ void QnCommonMessageProcessor::updateResource(
     const nx::vms::api::UserData& user,
     ec2::NotificationSource source)
 {
-    QnUserResourcePtr qnUser(ec2::fromApiToResource(user));
+    QnUserResourcePtr qnUser = getResourceFactory()->createUser(systemContext(), user);
     updateResource(qnUser, source);
 }
 
