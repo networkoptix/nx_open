@@ -195,6 +195,22 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(
         });
 
     grid->setItemDelegateForColumn(QnSearchBookmarksModel::kCamera, boldItemDelegate);
+
+    auto nonFoundCreatorItemDelegate = new CustomizableItemDelegate(this);
+    nonFoundCreatorItemDelegate->setCustomInitStyleOption(
+        [](QStyleOptionViewItem* option, const QModelIndex& /*index*/)
+        {
+            if (option->text.isEmpty())
+            {
+                option->text = tr("N/A");
+                option->palette.setColor(
+                    QPalette::Text, nx::vms::client::core::colorTheme()->color("light16"));
+                option->icon = QIcon();
+                option->decorationSize = QSize();
+            }
+        });
+
+    grid->setItemDelegateForColumn(QnSearchBookmarksModel::kCreator, nonFoundCreatorItemDelegate);
     grid->setStyleSheet(lit("QTableView::item { padding-right: 24px }"));
 
     connect(m_model, &QAbstractItemModel::modelAboutToBeReset, this,
