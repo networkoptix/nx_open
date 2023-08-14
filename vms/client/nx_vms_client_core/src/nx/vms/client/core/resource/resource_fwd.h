@@ -21,5 +21,9 @@ class Camera;
 using CameraPtr = QnSharedResourcePointer<Camera>;
 class DesktopResource;
 using DesktopResourcePtr = QnSharedResourcePointer<DesktopResource>;
+class ServerResource;
+using ServerResourcePtr = QnSharedResourcePointer<ServerResource>;
+class UserResource;
+using UserResourcePtr = QnSharedResourcePointer<UserResource>;
 
 } // namespace nx::vms::client::core

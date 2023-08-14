@@ -7,14 +7,12 @@
 #include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
 #include <client_core/client_core_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <finders/systems_finder.h>
 #include <licensing/license.h>
 #include <network/system_helpers.h>
-#include <nx_ec/data/api_conversion_functions.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/camera_data_ex.h>
@@ -26,11 +24,13 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
 
 #include "cloud_cross_system_context_data_loader.h"
@@ -180,7 +180,7 @@ struct CloudCrossSystemContext::Private
     Status status = Status::uninitialized;
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
     std::unique_ptr<SystemContext> systemContext;
-    QnUserResourcePtr user;
+    core::UserResourcePtr user;
     CrossSystemServerResourcePtr server;
 
     /**
@@ -308,6 +308,9 @@ struct CloudCrossSystemContext::Private
         systemContext->resourcePool()->addResource(server);
         server->setStatus(nx::vms::api::ResourceStatus::online);
 
+        if (const auto userModel = connection->connectionInfo().compatibilityUserModel)
+            addUserToResourcePool(*userModel);
+
         dataLoader = std::make_unique<CloudCrossSystemContextDataLoader>(
             connection->serverApi(),
             QString::fromStdString(connection->credentials().username));
@@ -335,6 +338,7 @@ struct CloudCrossSystemContext::Private
             {
                 addCamerasToResourcePool(dataLoader->cameras());
             });
+        dataLoader->start(/*requestUser*/ !user);
     }
 
     void addServersToResourcePool(nx::vms::api::ServerInformationList servers)
@@ -417,17 +421,15 @@ struct CloudCrossSystemContext::Private
         }
     }
 
-    void addUserToResourcePool(nx::vms::api::UserModelV3 model)
+    template<class UserModelData>
+    void addUserToResourcePool(UserModelData model)
     {
-        NX_ASSERT(model.type == nx::vms::api::UserType::cloud);
-
+        // Compatibility mode user can already be added to resource pool.
         if (user)
             return;
 
-        // TODO: #sivanov Check this logic according to API changes.
-        const auto modelPermissions = model.permissions;
-        const auto modelData = std::move(model).toDbTypes();
-        user = ec2::fromApiToResource(std::get<0>(modelData));
+        NX_ASSERT(model.type == nx::vms::api::UserType::cloud);
+        user = core::UserResourcePtr(new core::UserResource(model));
 
         auto resourcePool = systemContext->resourcePool();
         resourcePool->addResource(user);

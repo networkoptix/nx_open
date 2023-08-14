@@ -552,7 +552,6 @@ private:
     AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
 
-    void at_adminUserAdded(const QnResourcePtr& resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
 private:
