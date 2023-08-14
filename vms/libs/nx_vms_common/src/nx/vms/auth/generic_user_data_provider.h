@@ -35,11 +35,5 @@ public:
         const nx::network::http::header::Authorization& authorizationHeader,
         nx::network::http::HttpHeaders* const responseHeaders) override;
 
-private:
-    mutable nx::Mutex m_mutex;
-    QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
 
-private slots:
-    void at_resourcePool_resourceAdded(const QnResourcePtr& res);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr& res);
 };
