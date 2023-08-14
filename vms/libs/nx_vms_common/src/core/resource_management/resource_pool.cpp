@@ -495,16 +495,11 @@ QnUserResourcePtr QnResourcePool::getAdministrator() const
     if (m_adminResource)
         return m_adminResource;
 
-    for (const QnResourcePtr& resource: m_resources)
-    {
-        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (user && user->isBuiltInAdmin())
-        {
-            m_adminResource = user;
-            return user;
-        }
-    }
-    return QnUserResourcePtr();
+    auto itr = m_resources.find(QnUserResource::kAdminGuid);
+    if (itr != m_resources.end())
+        m_adminResource = itr.value().dynamicCast<QnUserResource>();
+
+    return m_adminResource;
 }
 
 std::pair<QnUserResourcePtr, bool> QnResourcePool::userByName(const QString& name) const

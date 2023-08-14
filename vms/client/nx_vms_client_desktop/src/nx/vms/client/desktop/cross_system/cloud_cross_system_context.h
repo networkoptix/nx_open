@@ -6,12 +6,12 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 
 class QnBaseSystemDescription;
 using QnSystemDescriptionPtr = QSharedPointer<QnBaseSystemDescription>;

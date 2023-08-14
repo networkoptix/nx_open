@@ -79,12 +79,8 @@ SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
         }
     }
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (resource->getId() == QnUserResource::kAdminGuid)
-                at_adminUserAdded(resource);
-        }, Qt::DirectConnection);
+    connect(resourcePool(), &QnResourcePool::resourcesAdded, this, &SystemSettings::initialize,
+        Qt::DirectConnection);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &SystemSettings::at_resourcePool_resourceRemoved, Qt::DirectConnection);
@@ -101,10 +97,18 @@ void SystemSettings::initialize()
     if (isInitialized())
         return;
 
-    const auto& resource = resourcePool()->getResourceById(QnUserResource::kAdminGuid);
+    // TODO: #rvasilenko Refactor this. System settings should be moved out from admin user.
+    const auto user = resourcePool()->getAdministrator();
+    if (!user)
+        return;
 
-    if (resource)
-        at_adminUserAdded(resource);
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        m_admin = user;
+        for (auto adaptor: m_allAdaptors)
+            adaptor->setResource(user);
+    }
+    emit initialized();
 }
 
 bool SystemSettings::isInitialized() const
@@ -1218,29 +1222,6 @@ bool SystemSettings::isAutoDiscoveryResponseEnabled() const
 void SystemSettings::setAutoDiscoveryResponseEnabled(bool enabled)
 {
     m_autoDiscoveryResponseEnabledAdaptor->setValue(enabled);
-}
-
-void SystemSettings::at_adminUserAdded(const QnResourcePtr& resource)
-{
-    if (m_admin)
-        return;
-
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if (!user)
-        return;
-
-    // TODO: Refactor this. Global settings should be moved from admin user to another place.
-    if (!user->isBuiltInAdmin())
-        return;
-
-    {
-        NX_MUTEX_LOCKER locker(&m_mutex);
-
-        m_admin = user;
-        for (auto adaptor: m_allAdaptors)
-            adaptor->setResource(user);
-    }
-    emit initialized();
 }
 
 void SystemSettings::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
