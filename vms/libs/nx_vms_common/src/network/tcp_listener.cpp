@@ -3,6 +3,7 @@
 #include "tcp_listener.h"
 
 #include <atomic>
+#include <regex>
 
 #include <common/common_module.h>
 #include <nx/metrics/metrics_storage.h>
@@ -454,4 +455,21 @@ const QString& QnTcpListener::pathIgnorePrefix() const
 {
     Q_D(const QnTcpListener);
     return d->pathIgnorePrefix;
+}
+
+bool QnTcpListener::isLargeRequestAllowed(const QString& path)
+{
+    const auto toMatch = path.toStdString();
+    for (const auto& [pattern, regex]: m_allowedLargeRequestPatterns)
+    {
+        if (std::regex_match(toMatch, regex))
+            return true;
+    }
+
+    return false;
+}
+
+void QnTcpListener::allowLargeRequest(const QString& pattern)
+{
+    m_allowedLargeRequestPatterns.emplace(pattern.toStdString(), pattern.toStdString());
 }

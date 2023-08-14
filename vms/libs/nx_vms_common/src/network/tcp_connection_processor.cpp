@@ -27,6 +27,8 @@
 
 namespace {
 
+const qint64 kLargeTcpRequestSize = 4 * 1024 * 1024 * 1024ll;
+
 void copyAndReplaceHeader(
     const nx::network::http::HttpHeaders* srcHeaders,
     nx::network::http::HttpHeaders* dstHeaders,
@@ -164,6 +166,27 @@ int QnTCPConnectionProcessor::isFullMessage(
     std::optional<qint64>* const fullMessageSize)
 {
     return isFullMessage(message.toRawByteArray(), fullMessageSize);
+}
+
+bool QnTCPConnectionProcessor::isLargeRequestAllowed(const nx::utils::Url& url)
+{
+    Q_D(QnTCPConnectionProcessor);
+    return d->owner->isLargeRequestAllowed(url.path());
+}
+
+bool QnTCPConnectionProcessor::isLargeRequestAllowed(const QByteArray& message)
+{
+    int pos = message.indexOf('\n');
+    if (pos == -1)
+        return false;
+    if (pos > 0 && message[pos-1] == '\r')
+        pos--;
+
+    nx::network::http::RequestLine line;
+    if (!line.parse(QByteArray(message.data(), pos)))
+        return false;
+
+    return isLargeRequestAllowed(line.url);
 }
 
 int QnTCPConnectionProcessor::checkForBinaryProtocol(const QByteArray& message)
@@ -526,6 +549,7 @@ QnTCPConnectionProcessor::ReadResult QnTCPConnectionProcessor::readRequest()
     d->requestBody.clear();
     d->requestLogged = false;
 
+    qint64 maxTcpRequestSize = m_maxTcpRequestSize;
     std::optional<qint64> fullHttpMessageSize;
     while (!needToStop())
     {
@@ -545,11 +569,19 @@ QnTCPConnectionProcessor::ReadResult QnTCPConnectionProcessor::readRequest()
             {
                 return ReadResult::ok;
             }
-            else if (d->clientRequest.size() > m_maxTcpRequestSize)
+            else if (d->clientRequest.size() > maxTcpRequestSize)
             {
-                NX_WARNING(this, "Too large HTTP client request (%1 bytes, %2 allowed). Ignoring...",
-                    d->clientRequest.size(), m_maxTcpRequestSize);
-                return ReadResult::error;
+                if (maxTcpRequestSize < kLargeTcpRequestSize
+                    && isLargeRequestAllowed(d->clientRequest))
+                {
+                    maxTcpRequestSize = kLargeTcpRequestSize;
+                }
+                else
+                {
+                    NX_WARNING(this, "Too large HTTP client request (%1 bytes, %2 allowed). Ignoring...",
+                        d->clientRequest.size(), maxTcpRequestSize);
+                    return ReadResult::error;
+                }
             }
             if (fullHttpMessageSize)
                 d->clientRequest.reserve(*fullHttpMessageSize);
@@ -587,6 +619,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
         d->interleavedMessageDataPos = 0;
     }
 
+    qint64 maxTcpRequestSize = m_maxTcpRequestSize;
     while (!needToStop() && d->socket->isConnected())
     {
         if (d->interleavedMessageDataPos == (size_t) d->interleavedMessageData.size())
@@ -620,11 +653,20 @@ bool QnTCPConnectionProcessor::readSingleRequest()
         d->currentRequestSize += bytesParsed;
         d->interleavedMessageDataPos += bytesParsed;
 
-        if (d->currentRequestSize > m_maxTcpRequestSize)
+        if (d->currentRequestSize > maxTcpRequestSize)
         {
-            qWarning() << "Too large HTTP client request (" << d->currentRequestSize << " bytes"
-                ", " << m_maxTcpRequestSize << " allowed). Ignoring...";
-            return false;
+            if (maxTcpRequestSize < kLargeTcpRequestSize
+                && d->httpStreamReader.message().type == nx::network::http::MessageType::request
+                && isLargeRequestAllowed(d->httpStreamReader.message().request->requestLine.url))
+            {
+                maxTcpRequestSize = kLargeTcpRequestSize;
+            }
+            else
+            {
+                qWarning() << "Too large HTTP client request (" << d->currentRequestSize << " bytes"
+                    ", " << maxTcpRequestSize << " allowed). Ignoring...";
+                return false;
+            }
         }
 
         if (d->httpStreamReader.state() ==

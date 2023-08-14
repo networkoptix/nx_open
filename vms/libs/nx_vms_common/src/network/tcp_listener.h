@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include <QtCore/QObject>
 #include <QtNetwork/QNetworkInterface>
 
@@ -70,6 +72,9 @@ public:
     void setPathIgnorePrefix(const QString& path);
     const QString& pathIgnorePrefix() const;
 
+    bool isLargeRequestAllowed(const QString& path);
+    void allowLargeRequest(const QString& pattern);
+
     /**
      * Normalize url path, cut off web prefix and '/' chars.
      */
@@ -111,4 +116,5 @@ protected:
 
 private:
     int m_maxTcpRequestSize;
+    std::unordered_map<std::string, std::regex> m_allowedLargeRequestPatterns;
 };
