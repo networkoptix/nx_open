@@ -3,9 +3,12 @@
 #pragma once
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/api/data/user_data.h>
 #include <utils/common/id.h>
 
 #include "resource_fwd.h"
+
+namespace nx::vms::common { class SystemContext; }
 
 struct QnResourceParams
 {
@@ -31,6 +34,10 @@ public:
     virtual QnMediaServerResourcePtr createServer() const;
 
     virtual QnLayoutResourcePtr createLayout() const;
+
+    virtual QnUserResourcePtr createUser(
+        nx::vms::common::SystemContext* systemContext,
+        const nx::vms::api::UserData& data) const;
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams &params) = 0;

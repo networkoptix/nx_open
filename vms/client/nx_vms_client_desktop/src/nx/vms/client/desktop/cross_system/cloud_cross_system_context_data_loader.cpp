@@ -9,9 +9,9 @@
 #include <QtCore/QTimer>
 
 #include <api/server_rest_connection.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
-#include <nx/reflect/json.h>
 
 using namespace std::chrono;
 using namespace nx::vms::api;
@@ -30,6 +30,7 @@ struct CloudCrossSystemContextDataLoader::Private
     CloudCrossSystemContextDataLoader* const q;
     rest::ServerConnectionPtr const connection;
     const QString username;
+    bool doRequestUser = true;
 
     std::optional<rest::Handle> currentRequest;
     std::optional<UserModel> user;
@@ -72,7 +73,7 @@ struct CloudCrossSystemContextDataLoader::Private
             });
 
         return connection->getRawResult(
-            QString("/rest/v1/users/") + QUrl::toPercentEncoding(username),
+            QString("/rest/v3/users/") + QUrl::toPercentEncoding(username),
             {},
             std::move(callback),
             q->thread());
@@ -286,7 +287,7 @@ struct CloudCrossSystemContextDataLoader::Private
         {
             NX_VERBOSE(this, "Request %1 is in progress", *currentRequest);
         }
-        else if (!user)
+        else if (!user && doRequestUser)
         {
             currentRequest = requestUser();
         }
@@ -326,15 +327,21 @@ CloudCrossSystemContextDataLoader::CloudCrossSystemContextDataLoader(
         .username = username
         })
 {
+}
+
+CloudCrossSystemContextDataLoader::~CloudCrossSystemContextDataLoader()
+{
+}
+
+void CloudCrossSystemContextDataLoader::start(bool requestUser)
+{
+    d->doRequestUser = requestUser;
+
     auto requestDataTimer = new QTimer(this);
     requestDataTimer->setInterval(kRequestDataRetryTimeout);
     requestDataTimer->callOnTimeout([this]() {d->requestData(); });
     requestDataTimer->start();
     d->requestData();
-}
-
-CloudCrossSystemContextDataLoader::~CloudCrossSystemContextDataLoader()
-{
 }
 
 UserModel CloudCrossSystemContextDataLoader::user() const
