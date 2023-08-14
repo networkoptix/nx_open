@@ -400,12 +400,20 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
     m_system2faEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::system2faEnabled, false, this, [] { return tr("Enable 2FA for the System"); });
 
+    m_masterCloudSyncAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        "masterCloudSyncList", QString(), this,
+        [] { return tr("Semicolon-separated list of Servers designated to connect to the Cloud."
+            "Servers at the top of the list have higher priority. If the list is empty a Server "
+            "for the Cloud connection is selected automatically."); });
+
+
     AdaptorList result;
     result
         << m_cloudAccountNameAdaptor
         << m_cloudSystemIdAdaptor
         << m_cloudAuthKeyAdaptor
-        << m_system2faEnabledAdaptor;
+        << m_system2faEnabledAdaptor
+        << m_masterCloudSyncAdaptor;
 
     for (auto adaptor: result)
     {
@@ -1048,6 +1056,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
         &SystemSettings::showMouseTimelinePreviewChanged,
+        Qt::QueuedConnection);
+
+    connect(
+        m_masterCloudSyncAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::masterCloudSyncChanged,
         Qt::QueuedConnection);
 
     AdaptorList result;
@@ -2212,6 +2227,22 @@ void SystemSettings::setShowMouseTimelinePreview(bool value)
 bool SystemSettings::system2faEnabled() const
 {
     return m_system2faEnabledAdaptor->value();
+}
+
+std::vector<QnUuid> SystemSettings::masterCloudSyncList() const
+{
+    std::vector<QnUuid> result;
+    for (const auto& value: m_masterCloudSyncAdaptor->value().split(";", Qt::SkipEmptyParts))
+        result.push_back(QnUuid(value));
+    return result;
+}
+
+void SystemSettings::setMasterCloudSyncList(const std::vector<QnUuid>& idList) const
+{
+    QStringList result;
+    for (const auto& id: idList)
+        result << id.toString();
+    m_masterCloudSyncAdaptor->setValue(result.join(";"));
 }
 
 std::map<QString, int> SystemSettings::specificFeatures() const

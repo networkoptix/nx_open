@@ -495,6 +495,9 @@ public:
 
     bool system2faEnabled() const;
 
+    std::vector<QnUuid> masterCloudSyncList() const;
+    void setMasterCloudSyncList(const std::vector<QnUuid>& idList) const;
+
     void update(const vms::api::SystemSettings& value);
 
 signals:
@@ -546,6 +549,7 @@ signals:
     void showServersInTreeForNonAdminsChanged();
     void backupSettingsChanged();
     void showMouseTimelinePreviewChanged();
+    void masterCloudSyncChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -582,6 +586,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_timeSynchronizationEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_synchronizeTimeWithInternetAdaptor = nullptr;
     QnResourcePropertyAdaptor<QnUuid> *m_primaryTimeServerAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_masterCloudSyncAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_osTimeChangeCheckPeriodAdaptor = nullptr;
