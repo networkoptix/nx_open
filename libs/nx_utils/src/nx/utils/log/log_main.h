@@ -237,11 +237,105 @@ inline void setLevelReducerEnabled(bool value)
         args_required /*< Chosen when called without arguments; leads to an error. */ \
     )(__VA_ARGS__))
 
+/**
+ * Prints a critical error that is likely to cause a complete service interruption. The message
+ * text must be clear and make sense to the end-user.
+ *
+ * Example:
+ * <pre><code>
+ *     NX_ERROR(this, "Connection to the DB has been lost: %1", err);
+ * </code></pre>
+ */
 #define NX_ERROR(...) NX_UTILS_LOG(nx::utils::log::Level::error, __VA_ARGS__)
+
+/**
+ * Prints a non-critical error/warning that may cause issues with limited impact. The message text
+ * must be clear and make sense to the end-user.
+ *
+ * Example:
+ * <pre><code>
+ *     NX_WARNING(this, "Camera %1 went offline", camera->id());
+ * </code></pre>
+ */
 #define NX_WARNING(...) NX_UTILS_LOG(nx::utils::log::Level::warning, __VA_ARGS__)
+
+/**
+ * Prints an information message about the service's state. The number of such messages must not be
+ * large regardless of the load. The message text must be clear and make sense to the end-user.
+ *
+ * Example:
+ * <pre><code>
+ *     NX_INFO(this, "Bound to https port %1 and listening", server->port());
+ * </code></pre>
+ */
 #define NX_INFO(...) NX_UTILS_LOG(nx::utils::log::Level::info, __VA_ARGS__)
+
+/**
+ * Prints a message that is useful for understanding how a service is operating. Some examples are:
+ * user authentication result, API request processing result. Bad examples are: tracing details of
+ * a request processing, logging the network traffic.
+ *
+ * The message should be understandable by a QA/support person, but may also contain information
+ * targeted solely for developers.
+ *
+ * There should not be too many of such messages (though, it may depend on the load). Generally,
+ * it should be possible to enable these messages in a production environment for a prolonged
+ * period of time without an impact on the service.
+ *
+ * Example:
+ * <pre><code>
+ *     NX_DEBUG(this, "User %1 added to a system %2 with role %3", username, systemId, role);
+ * </code></pre>
+ */
 #define NX_DEBUG(...) NX_UTILS_LOG(nx::utils::log::Level::debug, __VA_ARGS__)
+
+/**
+ * Prints a message that is helpful to a developer for understanding the details of a service
+ * behavior.
+ *
+ * A good example is logging the details of an HTTP request/response exchange:
+ * - "connection to %1 is established"
+ * - "request headers were sent, sending body"
+ * - "full message was sent, waiting for reply"
+ *
+ * The number of messages at this log level may be huge. It must be expected that enabling this log
+ * level on a production system will have a significant impact on the system performance. It is
+ * recommended to enable these messages for a short period, only while providing a targeted message
+ * filter.
+ *
+ * Example:
+ * <pre><code>
+ *     NX_VERBOSE(this, "%1 response headers from %2 have been received. Waiting for a body",
+ *         response.headers.size(), connection->getForeignAddress());
+ * </code></pre>
+ */
 #define NX_VERBOSE(...) NX_UTILS_LOG(nx::utils::log::Level::verbose, __VA_ARGS__)
+
+/**
+ * Prints a message with very low-level information.
+ *
+ * The message is likely to make sense only to those developers who are familiar with the given
+ * block of code. Can be used to trace an execution where the debugger is not available.
+ *
+ * It is recommended to use this for messages in huge quantities that can be useful rarely to
+ * certain developers only. An example is tracing an SSL socket: logging each read, write,
+ * encryption, decryption.
+ *
+ * The `trace` log level can only be enabled with a non-empty filter. The filter should be limited
+ * to the specific class or a small namespace.
+ *
+ * The number of log messages is likely to be huge in a production environment. It must be expected
+ * that enabling this level even with a narrow filter will have a negative impact on the
+ * performance.
+ *
+ * If you decide to use this log level, do not expect that someone else will collect these logs for
+ * you or analyze them.
+ *
+ * Example:
+ * <pre><code>
+ *     NX_TRACE(this, "Read %1 bytes out of %2 requested", result, size);
+ * </code></pre>
+ */
 #define NX_TRACE(...) NX_UTILS_LOG(nx::utils::log::Level::trace, __VA_ARGS__)
 
 /** Use as a logging tag in functions without "this". */
