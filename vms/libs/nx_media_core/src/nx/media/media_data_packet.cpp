@@ -14,7 +14,7 @@
 
 bool isLowMediaQuality(MediaQuality q)
 {
-    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
+    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly || q == MEDIA_Quality_ForceLow;
 }
 
 QnAbstractMediaData::QnAbstractMediaData( DataType _dataType ):
