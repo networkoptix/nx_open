@@ -996,6 +996,17 @@ State CameraSettingsDialogStateReducer::setHasEditAccessRightsForAllCameras(
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setSaasInitialized(
+    State state,
+    bool value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    state.saasInitialized = value;
+
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setSingleVirtualCameraState(
     State state, const VirtualCameraState& value)
 {
