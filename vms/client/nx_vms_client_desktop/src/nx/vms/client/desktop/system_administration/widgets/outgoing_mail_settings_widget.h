@@ -19,7 +19,6 @@ public:
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
-    virtual bool canApplyChanges() const override;
     virtual bool hasChanges() const override;
 
 protected:
