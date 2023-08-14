@@ -38,6 +38,7 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -62,7 +63,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
 #include <utils/common/delayed.h>
 
@@ -485,8 +485,8 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
                             break;
 
                         case HeaderItem::creator:
-                            cellValue = helpers::getBookmarkCreatorName(
-                                bookmark.creatorId, resourcePool());
+                            cellValue =
+                                getBookmarkCreatorName(bookmark.creatorId, systemContext());
                             break;
 
                         case HeaderItem::tags:
