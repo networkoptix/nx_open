@@ -226,6 +226,10 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     bool hasEditAccessRightsForAllCameras = false;
     CameraSettingsTab selectedTab = CameraSettingsTab::general;
 
+    // System info.
+
+    bool saasInitialized = false;
+
     // Generic cameras info.
 
     int devicesCount = 0;
