@@ -378,7 +378,8 @@ void CameraScheduleWidget::updateLicensesButton(const CameraSettingsDialogState&
 {
     ui->licensesButton->setVisible(m_licenseUsageProvider
         && m_licenseUsageProvider->limitExceeded()
-        && state.hasPowerUserPermissions);
+        && state.hasPowerUserPermissions
+        && !state.saasInitialized);
 }
 
 } // namespace nx::vms::client::desktop
