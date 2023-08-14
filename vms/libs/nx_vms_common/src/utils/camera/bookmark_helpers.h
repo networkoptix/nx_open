@@ -11,9 +11,6 @@ class QnCommonModule;
 
 namespace helpers {
 
-NX_VMS_COMMON_API QString getBookmarkCreatorName(
-    const QnUuid& creatorId, QnResourcePool* resourcePool);
-
 NX_VMS_COMMON_API QnCameraBookmark bookmarkFromAction(
     const nx::vms::event::AbstractActionPtr& action,
     const QnSecurityCamResourcePtr& camera);

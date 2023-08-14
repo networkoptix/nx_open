@@ -16,7 +16,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
 #include <nx/vms/api/data/bookmark_models.h>
-#include <utils/camera/bookmark_helpers.h>
 
 using nx::vms::api::BookmarkSortField;
 
@@ -25,6 +24,21 @@ namespace {
 struct BookmarkSort //< Just a context for translation functions.
 {
     Q_DECLARE_TR_FUNCTIONS(BookmarkSort)
+protected:
+    static QString creatorName(const QnUuid& creatorId, QnResourcePool* resourcePool)
+    {
+        if (creatorId.isNull())
+            return QString();
+
+        if (creatorId == QnCameraBookmark::systemUserId())
+        {
+            return BookmarkSort::tr(
+                "System Event", "Shows that the bookmark was created by a system event");
+        }
+
+        const auto userResource = resourcePool->getResourceById<QnUserResource>(creatorId);
+        return userResource ? userResource->getName() : QString();
+    }
 };
 
 template<typename Bookmark>
@@ -55,7 +69,7 @@ struct BookmarkFacade<QnCameraBookmark>: public BookmarkSort
 
     static QString creatorName(const Bookmark& bookmark, QnResourcePool* resourcePool)
     {
-        return helpers::getBookmarkCreatorName(bookmark.creatorId, resourcePool);
+        return BookmarkSort::creatorName(bookmark.creatorId, resourcePool);
     }
 
     static QString cameraName(const Bookmark& bookmark, QnResourcePool* resourcePool)
@@ -68,7 +82,7 @@ struct BookmarkFacade<QnCameraBookmark>: public BookmarkSort
 
         return cameraResource
             ? QnResourceDisplayInfo(cameraResource).toString(Qn::RI_NameOnly)
-            : nx::format("<%1>", tr("Removed camera")).toQString();
+            : nx::format("<%1>", BookmarkSort::tr("Removed camera")).toQString();
     }
 };
 
@@ -92,16 +106,7 @@ struct BookmarkFacade<nx::vms::api::Bookmark>: public BookmarkSort
 
     static QString creatorName(const Bookmark& bookmark, QnResourcePool* resourcePool)
     {
-        if (bookmark.creatorUserId.isNull())
-            return QString();
-
-        if (bookmark.creatorUserId == QnCameraBookmark::systemUserId())
-            return tr("System Event", "Shows that the bookmark was created by a system event");
-
-        const auto userResource = resourcePool->getResourceById<QnUserResource>(
-            bookmark.creatorUserId);
-
-        return userResource ? userResource->getName() : QString();
+        return BookmarkSort::creatorName(bookmark.creatorUserId, resourcePool);
     }
 
     static QString cameraName(const Bookmark& bookmark, QnResourcePool* resourcePool)
@@ -114,7 +119,7 @@ struct BookmarkFacade<nx::vms::api::Bookmark>: public BookmarkSort
 
         return cameraResource
             ? QnResourceDisplayInfo(cameraResource).toString(Qn::RI_NameOnly)
-            : nx::format("<%1>", tr("Removed camera")).toQString();
+            : nx::format("<%1>", BookmarkSort::tr("Removed camera")).toQString();
     }
 };
 
