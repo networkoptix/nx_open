@@ -60,6 +60,9 @@ public:
         const nx::Buffer& message,
         std::optional<qint64>* const fullMessageSize = nullptr );
 
+    bool isLargeRequestAllowed(const nx::utils::Url& url);
+    bool isLargeRequestAllowed(const QByteArray& message);
+
     /**
      * Check for some known binary protocol(s)
      * If yes, fill 'protocol' and 'size' field

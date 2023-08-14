@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <atomic>
+#include <regex>
 
 #include "tcp_connection_processor.h"
 #include "tcp_listener.h"
@@ -455,4 +456,21 @@ const QString& QnTcpListener::pathIgnorePrefix() const
 {
     Q_D(const QnTcpListener);
     return d->pathIgnorePrefix;
+}
+
+bool QnTcpListener::isLargeRequestAllowed(const QString& path)
+{
+    const auto toMatch = path.toStdString();
+    for (const auto& [pattern, regex]: m_allowedLargeRequestPatterns)
+    {
+        if (std::regex_match(toMatch, regex))
+            return true;
+    }
+
+    return false;
+}
+
+void QnTcpListener::allowLargeRequest(const QString& pattern)
+{
+    m_allowedLargeRequestPatterns.emplace(pattern.toStdString(), pattern.toStdString());
 }
