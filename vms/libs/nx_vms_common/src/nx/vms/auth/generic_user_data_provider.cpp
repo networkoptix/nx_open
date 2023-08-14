@@ -18,15 +18,6 @@ using namespace nx::vms::common;
 GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
-    Qn::directConnect(
-        resourcePool(), &QnResourcePool::resourceAdded,
-        this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
-    Qn::directConnect(
-        resourcePool(), &QnResourcePool::resourceChanged,
-        this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
-    Qn::directConnect(
-        resourcePool(), &QnResourcePool::resourceRemoved,
-        this, &GenericUserDataProvider::at_resourcePool_resourceRemoved);
 }
 
 GenericUserDataProvider::~GenericUserDataProvider()
@@ -40,12 +31,10 @@ std::pair<QnResourcePtr, bool> GenericUserDataProvider::findResByName(
     if (auto r = resourcePool()->userByName(nxUserName); r.first || r.second)
         return r;
 
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    for (const QnMediaServerResourcePtr& server : m_servers)
-    {
-        if (server->getId() == QnUuid::fromStringSafe(nxUserName))
-            return {server, /*hasClash*/ false};
-    }
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        QnUuid::fromStringSafe(nxUserName));
+    if (server)
+        return {server, /*hasClash*/ false};
 
     NX_VERBOSE(this, nx::format("Unable to get user by name: %1").arg(nxUserName));
     return {};
@@ -143,20 +132,4 @@ std::tuple<AuthResult, QnResourcePtr> GenericUserDataProvider::authorize(
         res.first);
 }
 
-void GenericUserDataProvider::at_resourcePool_resourceAdded(const QnResourcePtr& res)
-{
-    if (auto server = res.dynamicCast<QnMediaServerResource>())
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_servers.insert(server->getId(), server);
-    }
-}
 
-void GenericUserDataProvider::at_resourcePool_resourceRemoved(const QnResourcePtr& res)
-{
-    if (res.dynamicCast<QnMediaServerResource>())
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_servers.remove(res->getId());
-    }
-}
