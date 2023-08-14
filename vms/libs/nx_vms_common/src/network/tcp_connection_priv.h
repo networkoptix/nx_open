@@ -129,6 +129,6 @@ private:
     nx::Mutex sendDataMutex;
     QByteArray interleavedMessageData;
     size_t interleavedMessageDataPos;
-    size_t currentRequestSize;
+    qint64 currentRequestSize;
     std::optional<std::chrono::time_point<std::chrono::steady_clock>> lastSendTime;
 };
