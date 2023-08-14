@@ -73,15 +73,13 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
     if (!layoutIsAccessible)
         apiLayout.items = {};
 
-    QnUuid layoutId = guidFromArbitraryData(layoutUrl);
+    apiLayout.id = guidFromArbitraryData(layoutUrl);
+    apiLayout.parentId = QnUuid();
+    apiLayout.url = layoutUrl;
+    apiLayout.name = QFileInfo(layoutUrl).fileName();
 
     auto layoutBase = layout.staticCast<QnLayoutResource>();
     ec2::fromApiToResource(apiLayout, layoutBase);
-
-    layout->setIdUnsafe(layoutId);
-    layout->setParentId(QnUuid());
-    layout->setName(QFileInfo(layoutUrl).fileName());
-    layout->setUrl(layoutUrl);
 
     if (fileInfo.isCrypted)
         layout->setIsEncrypted(true);
