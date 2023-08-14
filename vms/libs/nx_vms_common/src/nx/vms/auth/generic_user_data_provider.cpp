@@ -37,18 +37,16 @@ GenericUserDataProvider::~GenericUserDataProvider()
 QnResourcePtr GenericUserDataProvider::findResByName(const nx::String& nxUserName) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    const auto& lowerName = nxUserName.toLower();
-    for (const QnUserResourcePtr& user: m_users)
-    {
-        if (user->getName().toUtf8().toLower() == lowerName)
-            return user;
-    }
 
-    for (const QnMediaServerResourcePtr& server : m_servers)
-    {
-        if (server->getId() == QnUuid::fromStringSafe(nxUserName))
-            return server;
-    }
+    const auto& lowerName = nxUserName.toLower();
+    const auto it = m_users.lower_bound(FindUserType{lowerName, QnUuid()});
+    if (it != m_users.end() && it->first.first == lowerName)
+        return it->second;
+
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        QnUuid::fromStringSafe(nxUserName));
+    if (server)
+        return server;
 
     NX_VERBOSE(this, nx::format("Unable to get user by name: %1").arg(nxUserName));
     return QnResourcePtr();
@@ -151,15 +149,12 @@ void GenericUserDataProvider::at_resourcePool_resourceAdded(const QnResourcePtr&
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     if (auto user = res.dynamicCast<QnUserResource>())
-        m_users.insert(user->getId(), user);
-    else if (auto server = res.dynamicCast<QnMediaServerResource>())
-        m_servers.insert(server->getId(), server);
+        m_users.emplace(FindUserType{user->getName().toLower(), user->getId()}, user);
 }
 
 void GenericUserDataProvider::at_resourcePool_resourceRemoved(const QnResourcePtr& res)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-
-    m_users.remove(res->getId());
-    m_servers.remove(res->getId());
+    if (auto user = res.dynamicCast<QnUserResource>())
+        m_users.erase(FindUserType{ user->getName().toLower(), user->getId()});
 }
