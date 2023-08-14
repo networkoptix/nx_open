@@ -38,8 +38,8 @@ public:
 
 private:
     mutable nx::Mutex m_mutex;
-    QMap<QnUuid, QnUserResourcePtr> m_users;
-    QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
+    using FindUserType = std::pair<QString, QnUuid>;
+    std::map<FindUserType, QnUserResourcePtr> m_users;
 
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr& res);
