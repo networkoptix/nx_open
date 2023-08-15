@@ -95,7 +95,9 @@ T.TextField
 
         Rectangle
         {
-            anchors.fill: parent
+            width: parent.contentWidth
+            height: parent.height
+
             z: -1
             color: control.selectionColor
             visible: control.selectPlaceholderOnFocus && control.activeFocus
