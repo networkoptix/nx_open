@@ -13,6 +13,7 @@
 
 #include "account_manager.h"
 #include "auth_provider.h"
+#include "batch_user_processing_manager.h"
 #include "maintenance_manager.h"
 #include "module_info.h"
 #include "oauth_manager.h"
@@ -84,6 +85,7 @@ public:
 
     virtual api::OauthManager* oauthManager() = 0;
     virtual api::TwoFactorAuthManager* twoFactorAuthManager() = 0;
+    virtual api::BatchUserProcessingManager* batchUserProcessingManager() = 0;
 
     /** Pings cloud_db with current credentials. */
     virtual void ping(std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) = 0;

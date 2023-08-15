@@ -481,4 +481,87 @@ struct Attribute
 /**%apidoc Array of Attributes. */
 using AttributesList = std::vector<Attribute>;
 
+/**
+* One system users batch item.
+*/
+struct SystemUsersBatchItem
+{
+    /**%apidoc Users emails */
+    std::vector<std::string> users;
+    
+    /**%apidoc System ids */
+    std::vector<std::string> systems;
+    
+    /**%apidoc Access role to be assigned. */
+    SystemAccessRole accessRole = SystemAccessRole::none;
+    
+    /**%apidoc Custom attributes to assign */
+    std::map<std::string, std::string> attributes; 
+};
+
+/**
+* Create async processing batch request.
+*/
+struct CreateBatchRequest 
+{
+    /**%apidoc Batch items to process */
+    std::vector<SystemUsersBatchItem> items;
+};
+
+/**
+ * Create batch response with request traking id assigned. 
+*/
+struct CreateBatchResponse
+{
+    /**%apidoc Batch traking id*/
+    std::string batchId;
+};
+
+/**
+*  Current batch status.
+*/
+enum class BatchStatus
+{
+    /**apidoc Processing in progress*/
+    inProgress = 1,
+    /**apidoc Successfully processed all items*/
+    success,
+    /**apidoc Processed all items but contains some errors*/
+    failure
+};
+
+/**
+*  Batch state response.
+*  Contains number of operations by status: pending, failed, complete
+*  Batch has been processed completely if pending operations is zero
+*  Batch hase been processed without errors if failed operations is zero
+*/
+struct BatchState 
+{
+    /**%apidoc Current batch status. */
+    BatchStatus status = BatchStatus::inProgress;
+    /**%apidoc Number of operations by status: pending, failed, complete */
+    std::map<std::string, int> operations;
+};
+
+/**
+*  Failed to prcess batch item with error description.
+*/
+struct BatchItemErrorInfo
+{
+    /**apidoc Error description*/
+    std::string description;
+
+    /**apidoc Uncommitted item*/
+    SystemUsersBatchItem item;
+};
+
+/**
+*  Batch error response.
+*/
+struct BatchErrorInfo
+{
+    /**%apidoc Uncommited batch items */
+    std::vector<BatchItemErrorInfo> uncommitted;
+};
 } // namespace nx::cloud::db::api

@@ -7,6 +7,7 @@
 #include "account_manager.h"
 #include "async_http_requests_executor.h"
 #include "auth_provider.h"
+#include "batch_user_processing_manager.h"
 #include "maintenance_manager.h"
 #include "oauth_manager.h"
 #include "system_manager.h"
@@ -26,6 +27,8 @@ public:
     virtual api::MaintenanceManager* maintenanceManager() override;
     virtual api::OauthManager* oauthManager() override;
     virtual api::TwoFactorAuthManager* twoFactorAuthManager() override;
+    
+    virtual api::BatchUserProcessingManager* batchUserProcessingManager() override;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -53,6 +56,7 @@ private:
     MaintenanceManager m_maintenanceManager;
     OauthManager m_oauthManager;
     TwoFactorAuthManager m_twoFactorAuthManager;
+    BatchUserProcessingManager m_batchUserProcessingManager;
 };
 
 } // namespace nx::cloud::db::client
