@@ -4,6 +4,8 @@
 
 #include <algorithm>
 
+#include <QtCore/QThread>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -12,14 +14,12 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/access_rights_manager.h>
-#include <core/resource_access/access_rights_resolver.h>
 #include <core/resource_access/global_permissions_watcher.h>
 #include <core/resource_access/permissions_cache.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
@@ -40,7 +40,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <utils/common/scoped_timer.h>
 
 using namespace nx::core::access;
 using namespace nx::vms::api;
@@ -331,38 +330,72 @@ void QnResourceAccessManager::handleResourcesAdded(const QnResourceList& resourc
     for (const auto& resource: resources)
     {
         connect(resource.get(), &QnResource::flagsChanged,
-            this, &QnResourceAccessManager::permissionsDependencyChanged);
+            this, &QnResourceAccessManager::handleResourceUpdated);
 
         if (const auto& camera = resource.objectCast<QnVirtualCameraResource>())
         {
             connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged,
-                this, &QnResourceAccessManager::permissionsDependencyChanged);
+                this, &QnResourceAccessManager::handleResourceUpdated);
 
             connect(camera.get(), &QnVirtualCameraResource::licenseTypeChanged,
-                this, &QnResourceAccessManager::permissionsDependencyChanged);
+                this, &QnResourceAccessManager::handleResourceUpdated);
 
             connect(camera.get(), &QnVirtualCameraResource::capabilitiesChanged,
-                this, &QnResourceAccessManager::permissionsDependencyChanged);
+                this, &QnResourceAccessManager::handleResourceUpdated);
         }
 
         if (const auto& layout = resource.objectCast<QnLayoutResource>())
         {
             connect(layout.get(), &QnLayoutResource::lockedChanged,
-                this, &QnResourceAccessManager::permissionsDependencyChanged);
+                this, &QnResourceAccessManager::handleResourceUpdated);
         }
 
         if (const auto& user = resource.objectCast<QnUserResource>())
         {
             connect(user.get(), &QnUserResource::attributesChanged,
-                this, &QnResourceAccessManager::permissionsDependencyChanged);
+                this, &QnResourceAccessManager::handleResourceUpdated);
         }
     }
 }
 
+void QnResourceAccessManager::checkOwnThread()
+{
+    NX_ASSERT(
+        QThread::currentThread() == thread(),
+        "Unexpected thread: %1",
+        QThread::currentThread()->objectName());
+}
+
 void QnResourceAccessManager::handleResourcesRemoved(const QnResourceList& resources)
 {
+    checkOwnThread();
+
     for (const auto& resource: resources)
+    {
         resource->disconnect(this);
+        m_updatingResources.remove(resource);
+    }
+}
+
+void QnResourceAccessManager::handleResourceUpdated(const QnResourcePtr& resource)
+{
+    checkOwnThread();
+
+    if (isUpdating())
+        m_updatingResources.insert(resource);
+    else
+        emit permissionsDependencyChanged({resource});
+}
+
+void QnResourceAccessManager::afterUpdate()
+{
+    checkOwnThread();
+
+    if (!m_updatingResources.empty())
+    {
+        emit permissionsDependencyChanged(m_updatingResources.values());
+        m_updatingResources.clear();
+    }
 }
 
 bool QnResourceAccessManager::canCreateResourceInternal(

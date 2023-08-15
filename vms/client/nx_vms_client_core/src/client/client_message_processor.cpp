@@ -229,11 +229,8 @@ void QnClientMessageProcessor::onGotInitialNotification(const nx::vms::api::Full
         return;
     }
 
-    NX_DEBUG(this, lit("resources received, state -> Ready"));
-    QnCommonMessageProcessor::onGotInitialNotification(fullData);
+    base_type::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);
-    NX_DEBUG(this, lit("Received initial notification while connected to %1")
-            .arg(connection()->moduleInformation().id.toString()));
 
     auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(
         connection()->moduleInformation().id);

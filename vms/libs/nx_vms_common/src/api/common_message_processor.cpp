@@ -103,6 +103,9 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     if (!connection)
         return;
 
+    NX_DEBUG(this, "Starting connection to %1",
+        connection->moduleInformation().id.toSimpleString());
+
     qnSyncTime->setTimeNotificationManager(connection->timeNotificationManager());
     connectToConnection(connection);
     connection->startReceivingNotifications();
@@ -150,7 +153,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         connection.get(),
         &ec2::AbstractECConnection::initNotification,
         this,
-        &QnCommonMessageProcessor::onGotInitialNotification,
+        &QnCommonMessageProcessor::on_initNotification,
         connectionType);
     connect(
         connection.get(),
@@ -370,7 +373,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         licenseManager.get(),
         &ec2::AbstractLicenseNotificationManager::licenseChanged,
         this,
-        &QnCommonMessageProcessor::on_licenseChanged,
+        &QnCommonMessageProcessor::updateLicense,
         connectionType);
     connect(
         licenseManager.get(),
@@ -835,7 +838,7 @@ void QnCommonMessageProcessor::on_cameraHistoryChanged(
     m_context->cameraHistoryPool()->setServerFootageData(serverFootageData);
 }
 
-void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr& license)
+void QnCommonMessageProcessor::updateLicense(const QnLicensePtr& license)
 {
     m_context->licensePool()->addLicense(license);
 }
@@ -949,6 +952,18 @@ void QnCommonMessageProcessor::resetUserGroups(const UserGroupDataList& userGrou
     }
 }
 
+void QnCommonMessageProcessor::resetAccessRights(const FullInfoData& fullData)
+{
+    QHash<QnUuid, nx::core::access::ResourceAccessMap> accessMaps;
+
+    for (const auto& u: fullData.users)
+        accessMaps.insert(u.id, {u.resourceAccessRights.begin(), u.resourceAccessRights.end()});
+    for (const auto& g: fullData.userGroups)
+        accessMaps.insert(g.id, {g.resourceAccessRights.begin(), g.resourceAccessRights.end()});
+
+    m_context->accessRightsManager()->resetAccessRights(accessMaps);
+}
+
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid&, ec2::NotificationSource)
 {
     return true;
@@ -1056,6 +1071,20 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
     }
 }
 
+void QnCommonMessageProcessor::on_initNotification(const FullInfoData& fullData)
+{
+    NX_DEBUG(this, "Received initial notification while connecting to %1",
+        connection()->moduleInformation().id.toSimpleString());
+
+    nx::utils::ElapsedTimer timer(nx::utils::ElapsedTimerState::started);
+
+    onGotInitialNotification(fullData);
+
+    NX_DEBUG(this, "Initial notification processed in %1", timer.elapsed());
+
+    emit initialResourcesReceived();
+}
+
 void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& fullData)
 {
     m_context->resourceAccessManager()->beginUpdate();
@@ -1078,16 +1107,8 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
 
     m_context->showreelManager()->resetShowreels(fullData.showreels);
 
-    QHash<QnUuid, nx::core::access::ResourceAccessMap> accessMaps;
-    for (const auto& u: fullData.users)
-        accessMaps.insert(u.id, {u.resourceAccessRights.begin(), u.resourceAccessRights.end()});
-    for (const auto& g: fullData.userGroups)
-        accessMaps.insert(g.id, {g.resourceAccessRights.begin(), g.resourceAccessRights.end()});
-    m_context->accessRightsManager()->resetAccessRights(accessMaps);
-
+    resetAccessRights(fullData);
     m_context->resourceAccessManager()->endUpdate();
-
-    emit initialResourcesReceived();
 }
 
 void QnCommonMessageProcessor::updateResource(
