@@ -476,6 +476,27 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::createLocalSe
         }));
 }
 
+nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::createTemporaryLocalSession(
+    ContextPtr context) const
+{
+    NX_DEBUG(this, "Creating temporary session for user %1 on %2",
+        context->credentials().username,
+        context);
+
+    const auto url = makeUrl(context->address(), "/rest/v3/login/temporaryToken");
+
+    nx::vms::api::TemporaryLoginSessionRequest request;
+    request.token = QString::fromStdString(context->credentials().authToken.value);
+    return d->doPost<nx::vms::api::LoginSession>(
+        url,
+        context,
+        nx::reflect::json::serialize(request),
+        expectedErrorCodes({
+            {StatusCode::unprocessableEntity, RemoteConnectionErrorCode::unauthorized},
+            {StatusCode::badRequest, RemoteConnectionErrorCode::unauthorized}
+        }));
+}
+
 nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSession(
     ContextPtr context) const
 {

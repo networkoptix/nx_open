@@ -69,6 +69,12 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::createLocalSe
     return {};
 }
 
+nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::createTemporaryLocalSession(
+    ContextPtr context) const
+{
+    return createLocalSession(context);
+}
+
 nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSession(
     ContextPtr context) const
 {

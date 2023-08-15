@@ -17,6 +17,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/thread_util.h>
 #include <nx/vms/api/data/login.h>
+#include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/common/resource/server_host_priority.h>
@@ -625,9 +626,11 @@ struct RemoteConnectionFactory::Private
         }
     }
 
-    bool hasToken(ContextPtr context) const
+    bool canLoginWithSavedToken(ContextPtr context) const
     {
-        return context && context->credentials().authToken.isBearerToken();
+        return context
+            && context->credentials().authToken.isBearerToken()
+            && context->logonData.userType != nx::vms::api::UserType::temporaryLocal;
     }
 
     void loginWithToken(ContextPtr context)
@@ -658,11 +661,19 @@ struct RemoteConnectionFactory::Private
             // Username may be not passed if logging in as local user by token.
             if (context->credentials().username.empty())
             {
-                if (context->credentials().authToken.isBearerToken() &&
-                    context->credentials().authToken.value.starts_with(
-                        nx::vms::api::LoginSession::kTokenPrefix))
+                if (const auto token = context->credentials().authToken; token.isBearerToken())
                 {
-                    return {.type = nx::vms::api::UserType::local};
+                    if (token.value.starts_with(nx::vms::api::LoginSession::kTokenPrefix))
+                    {
+                        context->logonData.userType = nx::vms::api::UserType::local;
+                        return {.type = context->logonData.userType};
+                    }
+
+                    if (token.value.starts_with(nx::vms::api::TemporaryToken::kPrefix))
+                    {
+                        context->logonData.userType = nx::vms::api::UserType::temporaryLocal;
+                        return {.type = context->logonData.userType};
+                    }
                 }
             }
 
@@ -782,7 +793,13 @@ struct RemoteConnectionFactory::Private
         if (!context)
             return;
 
-        nx::vms::api::LoginSession session = requestsManager->createLocalSession(context);
+        const bool isTemporaryUser =
+            context->logonData.userType == nx::vms::api::UserType::temporaryLocal;
+
+        nx::vms::api::LoginSession session = isTemporaryUser
+            ? requestsManager->createTemporaryLocalSession(context)
+            : requestsManager->createLocalSession(context);
+
         if (!context->failed())
         {
             context->logonData.credentials.username = session.username.toStdString();
@@ -1097,8 +1114,9 @@ struct RemoteConnectionFactory::Private
             else
             {
                 NX_DEBUG(this, "Logging in with a token.");
-                // Try to login with an already saved token if present.
-                if (hasToken(context()))
+
+                // Try to login with an already saved token.
+                if (canLoginWithSavedToken(context()))
                     loginWithToken(context()); //< GET /rest/v1/login/sessions/current
                 else
                     issueLocalToken(context()); //< GET /rest/v1/login/sessions
