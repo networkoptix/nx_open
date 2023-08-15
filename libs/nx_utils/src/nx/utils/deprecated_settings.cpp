@@ -72,20 +72,6 @@ QVariant QnSettings::value(
     return defaultValue;
 }
 
-QVariant QnSettings::value(
-    const std::string_view& key,
-    const QVariant& defaultValue) const
-{
-    return value(QString::fromUtf8(key.data(), key.size()), defaultValue);
-}
-
-QVariant QnSettings::value(
-    const char* key,
-    const QVariant& defaultValue) const
-{
-    return value(QString::fromUtf8(key), defaultValue);
-}
-
 std::multimap<QString, QString> QnSettings::allArgs() const
 {
     std::multimap<QString, QString> args = m_args.allArgs();
@@ -98,6 +84,20 @@ std::multimap<QString, QString> QnSettings::allArgs() const
     }
 
     return args;
+}
+
+QVariant QnSettings::value(
+    const std::string_view& key,
+    const QVariant& defaultValue) const
+{
+    return value(QString::fromUtf8(key.data(), key.size()), defaultValue);
+}
+
+QVariant QnSettings::value(
+    const char* key,
+    const QVariant& defaultValue) const
+{
+    return value(QString::fromUtf8(key), defaultValue);
 }
 
 void QnSettings::initializeSystemSettings()
@@ -153,4 +153,21 @@ QVariant QnSettingsGroupReader::value(
 {
     QString key = m_groupName.isEmpty() ? keyName : m_groupName + "/" + keyName;
     return m_settings.value(key, defaultValue);
+}
+
+std::multimap<QString, QString> QnSettingsGroupReader::allArgs() const
+{
+    const QString prefix = m_groupName.isEmpty() ? QString() : m_groupName + "/";
+    const auto args = m_settings.allArgs();
+
+    std::multimap<QString, QString> result;
+    for (auto it = args.lower_bound(prefix); it != args.end(); ++it)
+    {
+        if (!it->first.startsWith(prefix))
+            break;
+
+        result.emplace(it->first.mid(prefix.size()), it->second);
+    }
+
+    return result;
 }

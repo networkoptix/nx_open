@@ -13,11 +13,10 @@
 namespace nx::cloud::db::client {
 
 class AccountManager:
-    public api::AccountManager,
-    public AsyncRequestsExecutor
+    public api::AccountManager
 {
 public:
-    AccountManager(network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher);
+    AccountManager(AsyncRequestsExecutor* requestsExecutor);
 
     virtual void registerNewAccount(
         api::AccountRegistrationData accountData,
@@ -66,6 +65,9 @@ public:
 
     virtual void getSecuritySettings(
         std::function<void(api::ResultCode, api::AccountSecuritySettings)> completionHandler) override;
+
+private:
+    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // nx::cloud::db::client

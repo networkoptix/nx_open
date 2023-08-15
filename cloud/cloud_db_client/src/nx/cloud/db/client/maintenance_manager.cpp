@@ -7,17 +7,15 @@
 
 namespace nx::cloud::db::client {
 
-MaintenanceManager::MaintenanceManager(
-    network::cloud::CloudModuleUrlFetcher* const cloudModuleEndpointFetcher)
-    :
-    AsyncRequestsExecutor(cloudModuleEndpointFetcher)
+MaintenanceManager::MaintenanceManager(AsyncRequestsExecutor* requestsExecutor):
+    m_requestsExecutor(requestsExecutor)
 {
 }
 
 void MaintenanceManager::getConnectionsFromVms(
     std::function<void(api::ResultCode, api::VmsConnectionDataList)> completionHandler)
 {
-    executeRequest<api::VmsConnectionDataList>(
+    m_requestsExecutor->executeRequest<api::VmsConnectionDataList>(
         kMaintenanceGetVmsConnections,
         std::move(completionHandler));
 }
@@ -25,7 +23,7 @@ void MaintenanceManager::getConnectionsFromVms(
 void MaintenanceManager::getStatistics(
     std::function<void(api::ResultCode, api::Statistics)> completionHandler)
 {
-    executeRequest<api::Statistics>(
+    m_requestsExecutor->executeRequest<api::Statistics>(
         kMaintenanceGetStatistics,
         std::move(completionHandler));
 }

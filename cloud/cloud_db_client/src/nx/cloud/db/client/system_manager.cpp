@@ -11,9 +11,9 @@
 namespace nx::cloud::db::client {
 
 SystemManager::SystemManager(
-    network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher)
+    AsyncRequestsExecutor* requestsExecutor)
     :
-    AsyncRequestsExecutor(cloudModuleUrlFetcher)
+    m_requestsExecutor(requestsExecutor)
 {
 }
 
@@ -24,7 +24,7 @@ void SystemManager::bindSystem(
     if (registrationData.customization.empty())
         registrationData.customization = nx::branding::customization().toStdString();
 
-    executeRequest<api::SystemData>(
+    m_requestsExecutor->executeRequest<api::SystemData>(
         nx::network::http::Method::post,
         kSystemBindPath,
         std::move(registrationData),
@@ -35,7 +35,7 @@ void SystemManager::unbindSystem(
     const std::string& systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::delete_,
         nx::network::http::rest::substituteParameters(kSystemPath, {systemId}),
         std::move(completionHandler));
@@ -55,7 +55,7 @@ void SystemManager::getSystemsFiltered(
     const api::Filter& filter,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
-    executeRequest<api::SystemDataExList>(
+    m_requestsExecutor->executeRequest<api::SystemDataExList>(
         nx::network::http::Method::get,
         kSystemsPath,
         filter,
@@ -66,7 +66,7 @@ void SystemManager::getSystem(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemDataEx)> completionHandler)
 {
-    executeRequest<api::SystemDataEx>(
+    m_requestsExecutor->executeRequest<api::SystemDataEx>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemPath, {systemId}),
         std::move(completionHandler));
@@ -76,7 +76,7 @@ void SystemManager::getSystems(
     api::SystemIdList systemIdList,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
-    executeRequest<api::SystemDataExList>(
+    m_requestsExecutor->executeRequest<api::SystemDataExList>(
         nx::network::http::Method::get,
         kSystemsPath,
         std::move(systemIdList),
@@ -88,7 +88,7 @@ void SystemManager::shareSystem(
     std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
 {
     auto systemId = sharingData.systemId;
-    executeRequest<api::SystemSharing>(
+    m_requestsExecutor->executeRequest<api::SystemSharing>(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
         std::move(sharingData),
@@ -100,7 +100,7 @@ void SystemManager::revokeUserAccess(
     const std::string& email,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::delete_,
         nx::network::http::rest::substituteParameters(kSystemUserPath, {systemId, email}),
         std::move(completionHandler));
@@ -110,7 +110,7 @@ void SystemManager::getCloudUsersOfSystem(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
-    executeRequest<std::vector<api::SystemSharingEx>>(
+    m_requestsExecutor->executeRequest<std::vector<api::SystemSharingEx>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
         [completionHandler = std::move(completionHandler)](
@@ -124,7 +124,7 @@ void SystemManager::getAccessRoleList(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
 {
-    executeRequest<api::SystemAccessRoleList>(
+    m_requestsExecutor->executeRequest<api::SystemAccessRoleList>(
         nx::network::http::Method::get,
         kSystemGetAccessRoleListPath,
         api::SystemId(systemId),
@@ -136,7 +136,7 @@ void SystemManager::update(
     const api::SystemAttributesUpdate& updatedData,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::put,
         nx::network::http::rest::substituteParameters(kSystemPath, {systemId}),
         updatedData,
@@ -158,7 +158,7 @@ void SystemManager::recordUserSessionStart(
     api::UserSessionDescriptor userSessionDescriptor;
     userSessionDescriptor.systemId = systemId;
 
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::post,
         kSystemRecordUserSessionStartPath,
         std::move(userSessionDescriptor),
@@ -169,7 +169,7 @@ void SystemManager::getSystemHealthHistory(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler)
 {
-    executeRequest<api::SystemHealthHistory>(
+    m_requestsExecutor->executeRequest<api::SystemHealthHistory>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(
             kSystemHealthHistoryPath, {systemId}),
@@ -181,7 +181,7 @@ void SystemManager::startMerge(
     const std::string& idOfSystemBeingMerged,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(
             kSystemsMergedToASpecificSystem, {idOfSystemToMergeTo}),
@@ -194,7 +194,7 @@ void SystemManager::startMerge(
     const api::MergeRequest& request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(
             kSystemsMergedToASpecificSystem, {idOfSystemToMergeTo}),
@@ -207,7 +207,7 @@ void SystemManager::validateMSSignature(
     const api::ValidateMSSignatureRequest& request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest<void>(
+    m_requestsExecutor->executeRequest<void>(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(
             kSystemsValidateMSSignature, {systemId}),
@@ -219,7 +219,7 @@ void SystemManager::offerSystem(
     api::CreateSystemOfferRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Reply*/ void>(
+    m_requestsExecutor->executeRequest</*Reply*/ void>(
         nx::network::http::Method::post,
         kSystemOwnershipOffers,
         request,
@@ -233,7 +233,7 @@ void SystemManager::acceptSystemOffer(
     api::SystemOfferPatch request;
     request.status = api::OfferStatus::accepted;
 
-    executeRequest</*Reply*/ void>(
+    m_requestsExecutor->executeRequest</*Reply*/ void>(
         nx::network::http::Method::put,
         nx::network::http::rest::substituteParameters(kSystemOwnershipOffer, {systemId}),
         std::move(request),
@@ -247,7 +247,7 @@ void SystemManager::rejectSystemOffer(
     api::SystemOfferPatch request;
     request.status = api::OfferStatus::rejected;
 
-    executeRequest</*Reply*/ void>(
+    m_requestsExecutor->executeRequest</*Reply*/ void>(
         nx::network::http::Method::put,
         nx::network::http::rest::substituteParameters(kSystemOwnershipOffer, {systemId}),
         std::move(request),
@@ -258,7 +258,7 @@ void SystemManager::deleteSystemOffer(
     const std::string& systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Reply*/ void>(
+    m_requestsExecutor->executeRequest</*Reply*/ void>(
         nx::network::http::Method::delete_,
         nx::network::http::rest::substituteParameters(kSystemOwnershipOffer, {systemId}),
         std::move(completionHandler));
@@ -267,7 +267,7 @@ void SystemManager::deleteSystemOffer(
 void SystemManager::getSystemOffers(
     std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler)
 {
-    executeRequest<std::vector<api::SystemOffer>>(
+    m_requestsExecutor->executeRequest<std::vector<api::SystemOffer>>(
         nx::network::http::Method::get,
         kSystemOwnershipOffers,
         std::move(completionHandler));
@@ -278,7 +278,7 @@ void SystemManager::addSystemAttributes(
     const std::vector<api::Attribute>& attributes,
     std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
 {
-    executeRequest<std::vector<api::Attribute>>(
+    m_requestsExecutor->executeRequest<std::vector<api::Attribute>>(
         nx::network::http::Method::post,
          nx::network::http::rest::substituteParameters(
             kSystemAttributesPath, {systemId}),
@@ -291,7 +291,7 @@ void SystemManager::updateSystemAttributes(
     const std::vector<api::Attribute>& attributes,
     std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
 {
-    executeRequest<std::vector<api::Attribute>>(
+    m_requestsExecutor->executeRequest<std::vector<api::Attribute>>(
         nx::network::http::Method::put,
          nx::network::http::rest::substituteParameters(
             kSystemAttributesPath, {systemId}),
@@ -304,9 +304,10 @@ void SystemManager::addSystemAttribute(
     const api::Attribute& attribute,
     std::function<void(api::ResultCode, api::Attribute)> completionHandler)
 {
-    executeRequest<api::Attribute>(
+    m_requestsExecutor->executeRequest<api::Attribute>(
         nx::network::http::Method::post,
-        nx::network::http::rest::substituteParameters(kSystemAttributePath, {systemId, attribute.name}),
+        nx::network::http::rest::substituteParameters(
+            kSystemAttributePath, {systemId, attribute.name}),
         std::move(attribute),
         std::move(completionHandler));
 }
@@ -316,7 +317,7 @@ void SystemManager::updateSystemAttribute(
     const api::Attribute& attribute,
     std::function<void(api::ResultCode, api::Attribute)> completionHandler)
 {
-    executeRequest<api::Attribute>(
+    m_requestsExecutor->executeRequest<api::Attribute>(
         nx::network::http::Method::put,
         nx::network::http::rest::substituteParameters(kSystemAttributePath, {systemId, attribute.name}),
         std::move(attribute),
@@ -327,7 +328,7 @@ void SystemManager::getSystemAttributes(
     const std::string& systemId,
     std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
 {
-     executeRequest<std::vector<api::Attribute>>(
+    m_requestsExecutor->executeRequest<std::vector<api::Attribute>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(
             kSystemAttributesPath, {systemId}),
@@ -339,10 +340,10 @@ void SystemManager::deleteSystemAttribute(
     const std::string& attrName,
     std::function<void(api::ResultCode)> completionHandler)
 {
-   executeRequest</*Reply*/ void>(
+    m_requestsExecutor->executeRequest</*Reply*/ void>(
         nx::network::http::Method::delete_,
         nx::network::http::rest::substituteParameters(kSystemAttributePath, {systemId, attrName}),
-        std::move(completionHandler)); 
+        std::move(completionHandler));
 }
 
 void SystemManager::updateUserAttributes(
@@ -351,7 +352,7 @@ void SystemManager::updateUserAttributes(
     const std::vector<api::Attribute>& attributes,
     std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
 {
-    executeRequest<std::vector<api::Attribute>>(
+    m_requestsExecutor->executeRequest<std::vector<api::Attribute>>(
         nx::network::http::Method::put,
          nx::network::http::rest::substituteParameters(
             kSystemUserAttributesPath, {systemId, email}),
@@ -364,7 +365,7 @@ void SystemManager::getUserAttributes(
     const std::string& email,
     std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler)
 {
-    executeRequest<std::vector<api::Attribute>>(
+    m_requestsExecutor->executeRequest<std::vector<api::Attribute>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(
             kSystemUserAttributesPath, {systemId, email}),
@@ -377,9 +378,10 @@ void SystemManager::updateUserAttribute(
     const api::Attribute& attribute,
     std::function<void(api::ResultCode, api::Attribute)> completionHandler)
 {
-    executeRequest<api::Attribute>(
+    m_requestsExecutor->executeRequest<api::Attribute>(
         nx::network::http::Method::put,
-        nx::network::http::rest::substituteParameters(kSystemUserAttributePath, {systemId, email, attribute.name}),
+        nx::network::http::rest::substituteParameters(
+            kSystemUserAttributePath, {systemId, email, attribute.name}),
         std::move(attribute),
         std::move(completionHandler));
 }
@@ -390,9 +392,10 @@ void SystemManager::deleteUserAttribute(
     const std::string& attrName,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Reply*/ void>(
+    m_requestsExecutor->executeRequest</*Reply*/ void>(
         nx::network::http::Method::delete_,
-        nx::network::http::rest::substituteParameters(kSystemUserAttributePath, {systemId, email, attrName}),
+        nx::network::http::rest::substituteParameters(
+            kSystemUserAttributePath, {systemId, email, attrName}),
         std::move(completionHandler));
 }
 
