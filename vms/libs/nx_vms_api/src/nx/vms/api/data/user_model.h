@@ -160,9 +160,10 @@ struct NX_VMS_API TemporaryToken
      */
     std::string token;
 
+    static constexpr auto kPrefix = "vmsTmp-";
+
     void generateToken();
     bool isValid() const;
-    static std::string prefix();
     bool operator==(const TemporaryToken& other) const = default;
 };
 #define TemporaryToken_Fields (startS)(endS)(expiresAfterLoginS)(token)

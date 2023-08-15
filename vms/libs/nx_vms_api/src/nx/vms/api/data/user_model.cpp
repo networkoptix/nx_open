@@ -171,14 +171,9 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
     return result;
 }
 
-std::string TemporaryToken::prefix()
-{
-    return "vmsTmp-";
-}
-
 void TemporaryToken::generateToken()
 {
-    token = prefix() + nx::utils::random::generateName(10);
+    token = kPrefix + nx::utils::random::generateName(10);
 }
 
 bool TemporaryToken::isValid() const
