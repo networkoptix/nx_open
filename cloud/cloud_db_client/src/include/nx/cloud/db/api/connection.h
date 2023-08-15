@@ -50,11 +50,9 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
 
-    /**
-     * Set credentials to use.
-     * This method does not try to connect to cloud_db check credentials.
-     */
+    /** Set credentials to be used in every subsequent request. */
     virtual void setCredentials(nx::network::http::Credentials credentials) = 0;
+
     virtual void setProxyVia(
         const std::string& proxyHost,
         std::uint16_t proxyPort,
@@ -71,9 +69,13 @@ public:
     virtual void setRequestTimeout(std::chrono::milliseconds) = 0;
     virtual std::chrono::milliseconds requestTimeout() const = 0;
 
+    /** Set headers to be added to every subsequent request. */
+    virtual void setAdditionalHeaders(nx::network::http::HttpHeaders headers) = 0;
+
     virtual api::AccountManager* accountManager() = 0;
     virtual api::SystemManager* systemManager() = 0;
     virtual api::AuthProvider* authProvider() = 0;
+
     /**
      * Maintenance manager is for accessing cloud internal data for maintenance/debug purposes.
      * NOTE: Available only in debug environment.

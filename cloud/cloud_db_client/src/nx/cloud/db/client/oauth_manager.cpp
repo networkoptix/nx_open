@@ -9,8 +9,8 @@
 
 namespace nx::cloud::db::client {
 
-OauthManager::OauthManager(network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher):
-    AsyncRequestsExecutor(cloudModuleUrlFetcher)
+OauthManager::OauthManager(AsyncRequestsExecutor* requestsExecutor):
+    m_requestsExecutor(requestsExecutor)
 {
 }
 
@@ -18,7 +18,7 @@ void OauthManager::issueToken(
     const api::IssueTokenRequest& request,
     nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
 {
-    executeRequest<api::IssueTokenResponse>(
+    m_requestsExecutor->executeRequest<api::IssueTokenResponse>(
         nx::network::http::Method::post,
         kOauthTokenPath,
         request,
@@ -29,7 +29,7 @@ void OauthManager::issueAuthorizationCode(
     const api::IssueTokenRequest& request,
     nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueCodeResponse)> completionHandler)
 {
-    executeRequest<api::IssueCodeResponse>(
+    m_requestsExecutor->executeRequest<api::IssueCodeResponse>(
         nx::network::http::Method::post,
         kOauthTokenPath,
         request,
@@ -43,31 +43,33 @@ void OauthManager::validateToken(
     auto requestPath =
         nx::network::http::rest::substituteParameters(kOauthTokenValidatePath, {token});
 
-    executeRequest<api::ValidateTokenResponse>(
+    m_requestsExecutor->executeRequest<api::ValidateTokenResponse>(
         nx::network::http::Method::get,
         requestPath,
         std::move(completionHandler));
 }
 
 void OauthManager::deleteToken(
-    const std::string& token, nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    const std::string& token,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     auto requestPath =
         nx::network::http::rest::substituteParameters(kOauthTokenValidatePath, {token});
 
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::delete_,
         requestPath,
         std::move(completionHandler));
 }
 
 void OauthManager::deleteTokens(
-    const std::string& clientId, nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    const std::string& clientId,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     auto requestPath =
         nx::network::http::rest::substituteParameters(kOauthTokensDeletePath, {clientId});
 
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::delete_,
         requestPath,
         std::move(completionHandler));
@@ -75,16 +77,17 @@ void OauthManager::deleteTokens(
 
 void OauthManager::logout(nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::delete_,
         kOauthLogoutPath,
         std::move(completionHandler));
 }
 
-void OauthManager::issueStunToken(const api::IssueStunTokenRequest& request,
+void OauthManager::issueStunToken(
+    const api::IssueStunTokenRequest& request,
     nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)> completionHandler)
 {
-    executeRequest<api::IssueStunTokenResponse>(
+    m_requestsExecutor->executeRequest<api::IssueStunTokenResponse>(
         nx::network::http::Method::post,
         kOauthStunTokenPath,
         request,

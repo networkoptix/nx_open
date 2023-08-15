@@ -9,10 +9,8 @@
 
 namespace nx::cloud::db::client {
 
-AccountManager::AccountManager(
-    network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher)
-    :
-    AsyncRequestsExecutor(cloudModuleUrlFetcher)
+AccountManager::AccountManager(AsyncRequestsExecutor* requestsExecutor):
+    m_requestsExecutor(requestsExecutor)
 {
 }
 
@@ -22,7 +20,7 @@ void AccountManager::registerNewAccount(
 {
     accountData.customization = nx::branding::customization().toStdString();
 
-    executeRequest<api::AccountConfirmationCode>(
+    m_requestsExecutor->executeRequest<api::AccountConfirmationCode>(
         nx::network::http::Method::post,
         kAccountRegisterPath,
         std::move(accountData),
@@ -33,7 +31,7 @@ void AccountManager::activateAccount(
     api::AccountConfirmationCode activationCode,
     std::function<void(api::ResultCode, api::AccountEmail)> completionHandler)
 {
-    executeRequest<api::AccountEmail>(
+    m_requestsExecutor->executeRequest<api::AccountEmail>(
         nx::network::http::Method::post,
         kAccountActivatePath,
         std::move(activationCode),
@@ -43,7 +41,7 @@ void AccountManager::activateAccount(
 void AccountManager::getAccount(
     std::function<void(api::ResultCode, api::AccountData)> completionHandler)
 {
-    executeRequest<api::AccountData>(
+    m_requestsExecutor->executeRequest<api::AccountData>(
         kAccountSelfPath,
         std::move(completionHandler));
 }
@@ -55,7 +53,7 @@ void AccountManager::getAccountForSharing(
 {
     auto requestPath = nx::network::http::rest::substituteParameters(
         kAccountForSharingPath, {accountEmail});
-    executeRequest<api::AccountForSharing>(
+    m_requestsExecutor->executeRequest<api::AccountForSharing>(
         nx::network::http::Method::get,
         requestPath,
         std::move(accountRequest),
@@ -66,7 +64,7 @@ void AccountManager::updateAccount(
     api::AccountUpdateData accountData,
     std::function<void(api::ResultCode, api::AccountData)> completionHandler)
 {
-    executeRequest<api::AccountData>(
+    m_requestsExecutor->executeRequest<api::AccountData>(
         nx::network::http::Method::put,
         kAccountSelfPath,
         std::move(accountData),
@@ -77,7 +75,7 @@ void AccountManager::resetPassword(
     api::PasswordResetRequest request,
     std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler)
 {
-    executeRequest<api::AccountConfirmationCode>(
+    m_requestsExecutor->executeRequest<api::AccountConfirmationCode>(
         nx::network::http::Method::post,
         kAccountPasswordResetPath,
         std::move(request),
@@ -90,7 +88,7 @@ void AccountManager::reactivateAccount(
         api::ResultCode,
         api::AccountConfirmationCode)> completionHandler)
 {
-    executeRequest<api::AccountConfirmationCode>(
+    m_requestsExecutor->executeRequest<api::AccountConfirmationCode>(
         nx::network::http::Method::post,
         kAccountReactivatePath,
         std::move(accountEmail),
@@ -100,7 +98,7 @@ void AccountManager::reactivateAccount(
 void AccountManager::deleteAccount(
     std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::delete_,
         nx::network::http::rest::substituteParameters(kAccountPath, {"self"}).c_str(),
         std::move(completionHandler));
@@ -110,7 +108,7 @@ void AccountManager::createTemporaryCredentials(
     api::TemporaryCredentialsParams params,
     std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler)
 {
-    executeRequest<api::TemporaryCredentials>(
+    m_requestsExecutor->executeRequest<api::TemporaryCredentials>(
         nx::network::http::Method::post,
         kAccountCreateTemporaryCredentialsPath,
         std::move(params),
@@ -121,7 +119,7 @@ void AccountManager::updateSecuritySettings(
     api::AccountSecuritySettings settings,
     std::function<void(api::ResultCode, api::AccountSecuritySettings)> completionHandler)
 {
-    executeRequest<api::AccountSecuritySettings>(
+    m_requestsExecutor->executeRequest<api::AccountSecuritySettings>(
         nx::network::http::Method::put,
         nx::network::http::rest::substituteParameters(
             kAccountSecuritySettingsPath, {"self"}).c_str(),
@@ -132,7 +130,7 @@ void AccountManager::updateSecuritySettings(
 void AccountManager::getSecuritySettings(
     std::function<void(api::ResultCode, api::AccountSecuritySettings)> completionHandler)
 {
-    executeRequest<api::AccountSecuritySettings>(
+    m_requestsExecutor->executeRequest<api::AccountSecuritySettings>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(
             kAccountSecuritySettingsPath, {"self"}).c_str(),

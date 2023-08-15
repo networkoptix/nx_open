@@ -10,17 +10,19 @@
 namespace nx::cloud::db::client {
 
 class MaintenanceManager:
-    public api::MaintenanceManager,
-    public AsyncRequestsExecutor
+    public api::MaintenanceManager
 {
 public:
-    MaintenanceManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndpointFetcher);
+    MaintenanceManager(AsyncRequestsExecutor* requestsExecutor);
 
     virtual void getConnectionsFromVms(
         std::function<void(api::ResultCode, api::VmsConnectionDataList)> completionHandler) override;
 
     virtual void getStatistics(
         std::function<void(api::ResultCode, api::Statistics)> completionHandler) override;
+
+private:
+    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client

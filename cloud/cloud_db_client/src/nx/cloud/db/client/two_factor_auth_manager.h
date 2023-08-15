@@ -8,10 +8,11 @@
 
 namespace nx::cloud::db::client {
 
-class TwoFactorAuthManager: public api::TwoFactorAuthManager, public AsyncRequestsExecutor
+class TwoFactorAuthManager:
+    public api::TwoFactorAuthManager
 {
 public:
-    TwoFactorAuthManager(network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher);
+    TwoFactorAuthManager(AsyncRequestsExecutor* requestsExecutor);
 
     virtual void generateTotpKey(
         std::function<void(api::ResultCode, api::GenerateKeyResponse)> completionHandler) override;
@@ -36,8 +37,11 @@ public:
 
     virtual void deleteTotpKey(std::function<void(api::ResultCode)> completionHandler) override;
 
-    virtual void getBackupCodes(std::function<void(api::ResultCode, api::BackupCodes)>
-                                    completionHandler) override;
+    virtual void getBackupCodes(
+        std::function<void(api::ResultCode, api::BackupCodes)> completionHandler) override;
+
+private:
+    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client
