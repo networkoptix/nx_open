@@ -3,6 +3,7 @@
 #include "user_access_data.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/login.h>
 
 namespace Qn {
 

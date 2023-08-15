@@ -44,6 +44,11 @@ enum Value
     urlQuerySessionToken = 1 << 9,
 
     /**
+     * URL Query: _ticket
+     */
+    urlQueryTicket = 1 << 10,
+
+    /**
      * Normally all GET requests do not requires SCRF token, but we could not allow that, because of
      * poorly designed requests changing information (including passwords).
      * TODO: Remove this property as soon as all these requests are terminated.
@@ -51,7 +56,7 @@ enum Value
     allowWithoutCsrf = 1 << 30,
     urlQueryDigestWithoutCsrf = urlQueryDigest | allowWithoutCsrf,
 
-    defaults = http | cookie | urlQueryDigest | xRuntimeGuid | urlQuerySessionToken,
+    defaults = http | cookie | urlQueryDigest | xRuntimeGuid | urlQuerySessionToken | urlQueryTicket,
 };
 
 Q_DECLARE_FLAGS(Values, Value);
