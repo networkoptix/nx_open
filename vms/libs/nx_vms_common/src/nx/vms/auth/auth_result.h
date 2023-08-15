@@ -25,7 +25,8 @@ NX_REFLECTION_ENUM(AuthResult,
     Auth_DisabledUser, /**< Disabled user. */
     Auth_InvalidCsrfToken, /**< For cookie login. */
     Auth_LockedOut, /**< Locked out for a period of time. */
-    Auth_WrongSessionToken, /**< session token is invalid or expired. */
+    Auth_WrongSessionToken, /**< Session token is invalid or expired. */
+    Auth_WrongTicketToken, /**< Ticket token is invalid or expired. */
     Auth_DisabledBasicAndDigest, /**< HTTP basic and digest are disabled. */
     Auth_ClashedLogin, /**< More than one user with the same login are presented. */
     Auth_LdapTlsError /**< Error related to upgrading LDAP session to TLS */

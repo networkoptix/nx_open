@@ -94,6 +94,7 @@ NX_VMS_API_DECLARE_STRUCT_EX(LoginSessionFilter, (json))
 struct NX_VMS_API LoginSession
 {
     static constexpr std::string_view kTokenPrefix = "vms-";
+    static constexpr std::string_view kTicketPrefix = "vmsTicket-";
 
     QnUuid id;
     QString username;
@@ -107,6 +108,8 @@ struct NX_VMS_API LoginSession
 #define LoginSession_Fields (id)(username)(token)(ageS)(expiresInS)
 NX_VMS_API_DECLARE_STRUCT_EX(LoginSession, (json))
 NX_REFLECTION_INSTRUMENT(LoginSession, LoginSession_Fields);
+
+using Ticket = LoginSession;
 
 struct NX_VMS_API CloudSignature
 {
