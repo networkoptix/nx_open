@@ -493,8 +493,10 @@ Rectangle
                             advancedSettingsDialog.groupObjectClass = control.groupObjectClass
                             advancedSettingsDialog.groupObjectClassAuto =
                                 control.groupObjectClass == ""
-
                             advancedSettingsDialog.memberAttribute = control.memberAttribute
+                            advancedSettingsDialog.memberAttributeAuto =
+                                control.memberAttribute == ""
+
                             advancedSettingsDialog.syncIntervalS = control.syncIntervalS
                             advancedSettingsDialog.searchTimeoutS = control.searchTimeoutS
                             advancedSettingsDialog.preferredSyncServer = control.preferredSyncServer
