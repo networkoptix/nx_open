@@ -8,6 +8,7 @@
 #include <QtGui/QDesktopServices>
 
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/saas/services_sort_model.h>
 #include <nx/vms/client/desktop/saas/services_usage_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -70,9 +71,11 @@ struct SaasInfoWidget::Private
     SaasInfoWidget* const q;
     std::unique_ptr<Ui::SaasInfoWidget> ui = std::make_unique<Ui::SaasInfoWidget>();
 
-    // TODO: #vbreus Add sort proxy model which defines services order.
     std::unique_ptr<saas::ServicesUsageModel> servicesUsageModel =
         std::make_unique<saas::ServicesUsageModel>(q->systemContext()->saasServiceManager());
+
+    std::unique_ptr<saas::ServicesSortModel> servicesSortModel =
+        std::make_unique<saas::ServicesSortModel>();
 
     void setupPlaceholderPageUi();
     void setupServicesUsagePageUi();
@@ -99,7 +102,10 @@ void SaasInfoWidget::Private::setupPlaceholderPageUi()
 void SaasInfoWidget::Private::setupServicesUsagePageUi()
 {
     ui->servicesUsagePage->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
-    ui->servicesUsageItemView->setModel(servicesUsageModel.get());
+
+    servicesSortModel->setSourceModel(servicesUsageModel.get());
+    servicesSortModel->sort(saas::ServicesUsageModel::ServiceNameColumn);
+    ui->servicesUsageItemView->setModel(servicesSortModel.get());
 
     const auto header = ui->servicesUsageItemView->header();
     header->setMinimumSectionSize(kServiceUsageTableMinimumColumnWidth);

@@ -4,6 +4,7 @@
 
 #include <QtCore/QAbstractItemModel>
 
+#include <client/client_globals.h>
 #include <nx/utils/impl_ptr.h>
 
 class QnResourcePool;
@@ -26,6 +27,11 @@ public:
         UsedQantityColumn,
 
         ColumnCount,
+    };
+
+    enum Role
+    {
+        ServiceTypeRole = Qn::ItemDataRoleCount + 1
     };
 
     ServicesUsageModel(
