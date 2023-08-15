@@ -29,7 +29,8 @@ struct ServicesUsageModel::Private
 
     // Displayed values for the given service.
     QString serviceName(const QnUuid& serviceId) const;
-    QString serviceType(const QnUuid& serviceId) const;
+    QString serviceType(const QnUuid& serviceId) const; //< As in license server replies.
+    QString serviceTypeDisplay(const QnUuid& serviceId) const;
     int totalServiceQuantity(const QnUuid& serviceId) const;
     int usedServiceQuantity(const QnUuid& serviceId) const;
 };
@@ -64,6 +65,14 @@ QString ServicesUsageModel::Private::serviceName(const QnUuid& serviceId) const
 }
 
 QString ServicesUsageModel::Private::serviceType(const QnUuid& serviceId) const
+{
+    if (!NX_ASSERT(servicesInfo.contains(serviceId)))
+        return {};
+
+    return servicesInfo.at(serviceId).type;
+}
+
+QString ServicesUsageModel::Private::serviceTypeDisplay(const QnUuid& serviceId) const
 {
     if (!NX_ASSERT(servicesInfo.contains(serviceId)))
         return {};
@@ -154,7 +163,7 @@ QVariant ServicesUsageModel::data(const QModelIndex& index, int role) const
                 return d->serviceName(rowServiceId);
 
             case ServiceTypeColumn:
-                return d->serviceType(rowServiceId);
+                return d->serviceTypeDisplay(rowServiceId);
 
             case TotalQantityColumn:
                 return d->totalServiceQuantity(rowServiceId);
@@ -167,6 +176,9 @@ QVariant ServicesUsageModel::data(const QModelIndex& index, int role) const
                 return {};
         }
     }
+
+    if (role == ServiceTypeRole)
+        return d->serviceType(rowServiceId);
 
     return {};
 }
