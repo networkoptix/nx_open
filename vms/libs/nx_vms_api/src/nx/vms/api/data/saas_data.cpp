@@ -7,12 +7,18 @@
 namespace nx::vms::api {
 
 const int SaasCloudStorageParameters::kUnlimitedResolution = std::numeric_limits<int>::max();
+static const QString kSaasDateTimeFormat("yyyy-MM-dd hh:mm:ss");
 
 bool fromString(const std::string& value, SaasDateTime* target)
 {
-    *target = QDateTime::fromString(QString::fromUtf8(value), "yyyy-MM-dd hh:mm:ss");
+    *target = QDateTime::fromString(QString::fromUtf8(value), kSaasDateTimeFormat);
     target->setTimeSpec(Qt::UTC);
     return true;
+}
+
+QString SaasDateTime::toString() const
+{
+    return QDateTime::toString(kSaasDateTimeFormat);
 }
 
 const QString SaasService::kLocalRecordingServiceType("local_recording");

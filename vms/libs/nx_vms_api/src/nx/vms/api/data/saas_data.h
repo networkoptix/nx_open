@@ -18,11 +18,13 @@
 
 namespace nx::vms::api {
 
-class SaasDateTime: public QDateTime
+class NX_VMS_API SaasDateTime: public QDateTime
 {
 public:
     SaasDateTime() = default;
     SaasDateTime(const QDateTime& value): QDateTime(value) {}
+
+    QString toString() const;
 };
 
 bool NX_VMS_API fromString(const std::string& value, SaasDateTime* target);
