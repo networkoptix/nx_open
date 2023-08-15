@@ -3,12 +3,14 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 
 #include <QtCore/QScopedPointer>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/client/core/network/connection_info.h>
 #include <nx/vms/discovery/manager.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -35,7 +37,9 @@ protected:
     virtual void showEvent(QShowEvent* event) override;
 
 private:
-    void sendTestConnectionRequest(const nx::utils::Url& url);
+    void sendTestConnectionRequest();
+
+    bool isCredentialsTab() const;
 
     void updateAcceptibility();
     void updateFocus();
@@ -45,7 +49,7 @@ private:
 
     void setupIntroView();
 
-    nx::utils::Url currentUrl() const;
+    nx::vms::client::core::ConnectionInfo connectionInfo() const;
     bool isValid() const;
 
 private:

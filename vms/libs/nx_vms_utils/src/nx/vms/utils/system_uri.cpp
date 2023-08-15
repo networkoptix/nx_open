@@ -9,6 +9,7 @@
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/login.h>
+#include <nx/vms/api/data/user_model.h>
 
 using namespace nx::vms::utils;
 
@@ -133,7 +134,8 @@ void parseParameters(const nx::utils::Url& url, SystemUri* uri)
     const QString authKey = parameters.take(kAuthKey);
     if (!authKey.isEmpty())
     {
-        if (authKey.toStdString().starts_with(nx::vms::api::LoginSession::kTokenPrefix))
+        if (authKey.toStdString().starts_with(nx::vms::api::LoginSession::kTokenPrefix)
+            || authKey.toStdString().starts_with(nx::vms::api::TemporaryToken::kPrefix))
         {
             uri->credentials = nx::network::http::BearerAuthToken(authKey.toStdString());
         }
@@ -443,5 +445,3 @@ QString SystemUri::toString(SystemUri::ReferralContext value)
 {
     return referralContextToString[value];
 }
-
-

@@ -6,6 +6,7 @@
 #include <thread>
 
 #include <QtCore/QEvent>
+#include <QtCore/QUrlQuery>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
@@ -20,11 +21,13 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+#include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/utils/system_uri.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -130,6 +133,9 @@ LoginDialog::LoginDialog(QWidget *parent):
         &LoginDialog::updateAcceptibility);
     connect(ui->portSpinBox, QnSpinboxIntValueChanged, this,
         &LoginDialog::updateAcceptibility);
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &LoginDialog::updateAcceptibility);
+    connect(ui->linkLineEdit, &InputField::textChanged, this, &LoginDialog::updateAcceptibility);
+
 
     const auto url = nx::utils::Url(appContext()->localSettings()->lastLocalConnectionUrl());
     if (url.host().isEmpty()) //< No last used connection.
@@ -199,40 +205,77 @@ void LoginDialog::updateFocus()
     ui->passwordEdit->setFocus();
 }
 
-nx::utils::Url LoginDialog::currentUrl() const
+ConnectionInfo LoginDialog::connectionInfo() const
 {
-    nx::utils::Url url;
-    url.setScheme(nx::network::http::kSecureUrlSchemeName);
-    url.setHost(ui->hostnameLineEdit->text().trimmed());
-    url.setPort(ui->portSpinBox->value());
-    url.setUserName(ui->loginLineEdit->text().trimmed());
-    url.setPassword(ui->passwordEdit->text());
-    return url;
+    if (isCredentialsTab())
+    {
+        const auto host = ui->hostnameLineEdit->text().trimmed().toStdString();
+        uint16_t port = ui->portSpinBox->value();
+
+        if (!nx::utils::Url::isValidHost(host) || port == 0)
+            return {};
+
+        nx::network::SocketAddress address(host, port);
+
+        nx::network::http::PasswordCredentials credentials(
+            ui->loginLineEdit->text().trimmed().toLower().toStdString(),
+            ui->passwordEdit->text().toStdString());
+
+        return {address, credentials};
+    }
+    else
+    {
+        const auto url = nx::utils::Url::fromUserInput(ui->linkLineEdit->text());
+
+        if (!url.isValid())
+            return {};
+
+        const QString fragment = url.fragment();
+        const QUrlQuery query{fragment.mid(fragment.indexOf("?") + 1)};
+        const auto authToken = query.queryItemValue("token").toStdString();
+
+        nx::network::SocketAddress address(url.host(), url.port());
+        return {address, nx::network::http::BearerAuthToken{authToken}};
+    }
 }
 
 bool LoginDialog::isValid() const
 {
-    nx::utils::Url url = currentUrl();
-    return !ui->passwordEdit->text().isEmpty()
-        && !ui->loginLineEdit->text().trimmed().isEmpty()
-        && !ui->hostnameLineEdit->text().trimmed().isEmpty()
-        && ui->portSpinBox->value() != 0
-        && url.isValid()
-        && !url.host().isEmpty();
+    const ConnectionInfo info = connectionInfo();
+    const nx::network::http::AuthToken authToken = info.credentials.authToken;
+    return !info.address.isNull()
+        && !authToken.empty()
+        && (authToken.isBearerToken() || !info.credentials.username.empty());
 }
 
-void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
+void LoginDialog::sendTestConnectionRequest()
 {
-    nx::network::SocketAddress address(url.host(), url.port());
-    nx::network::http::Credentials credentials(
-        url.userName().toLower().toStdString(),
-        nx::network::http::PasswordAuthToken(url.password().toStdString()));
+    const ConnectionInfo info = connectionInfo();
 
     d->scenarioGuard = statisticsModule()->certificates()->beginScenario(
-            QnCertificateStatisticsModule::Scenario::connectFromDialog);
+        QnCertificateStatisticsModule::Scenario::connectFromDialog);
+
+    auto showError =
+        [this](const RemoteConnectionError& error)
+        {
+            if (isCredentialsTab())
+            {
+                QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
+                    context(),
+                    error,
+                    d->connectionProcess->context->moduleInformation,
+                    appContext()->version(),
+                    this);
+            }
+            else
+            {
+                ui->linkLineEdit->setInvalidValidationResult(
+                    tr("The provided link is not valid or has expired"));
+            }
+        };
 
     auto callback = nx::utils::guarded(this,
-        [url, this] (RemoteConnectionFactory::ConnectionOrError result)
+        [this, showError] (RemoteConnectionFactory::ConnectionOrError result)
         {
             if (!d->connectionProcess)
                 return;
@@ -267,12 +310,7 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
                         break;
                     }
                     default:
-                        QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
-                            context(),
-                            *error,
-                            d->connectionProcess->context->moduleInformation,
-                            appContext()->version(),
-                            this);
+                        showError(*error);
                         break;
                 }
             }
@@ -291,19 +329,26 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
         });
 
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+
+    // User type will be verified during the connection.
     const core::LogonData logonData{
-        .address = address,
-        .credentials = credentials,
+        .address = info.address,
+        .credentials = info.credentials,
         .userType = nx::vms::api::UserType::local};
     d->connectionProcess = remoteConnectionFactory->connect(logonData, callback);
 
     updateUsability();
 }
 
+bool LoginDialog::isCredentialsTab() const
+{
+    return ui->tabWidget->currentWidget() == ui->credentialsTab;
+}
+
 void LoginDialog::accept()
 {
     if (NX_ASSERT(isValid()))
-        sendTestConnectionRequest(currentUrl());
+        sendTestConnectionRequest();
 }
 
 void LoginDialog::reject()
@@ -394,12 +439,8 @@ void LoginDialog::at_testButton_clicked()
     connect(dialog.get(), &ConnectionTestingDialog::loginToCloudRequested, this,
         [this]() { menu()->trigger(ui::action::LoginToCloud); });
 
-    nx::utils::Url url = currentUrl();
-    nx::network::SocketAddress address(url.host(), url.port());
-    nx::network::http::PasswordCredentials credentials(
-        url.userName().toLower().toStdString(),
-        url.password().toStdString());
-    dialog->testConnection(address, credentials, appContext()->version());
+    const ConnectionInfo info = connectionInfo();
+    dialog->testConnection(info.address, info.credentials, appContext()->version());
 
     updateFocus();
     if (requestedConnection)
@@ -413,8 +454,8 @@ void LoginDialog::at_testButton_clicked()
     else if (setupNewServerRequested)
     {
         LogonData logonData(core::LogonData{
-            .address = address,
-            .credentials = credentials,
+            .address = info.address,
+            .credentials = info.credentials,
             .expectedServerId = expectedNewServerId});
 
         menu()->trigger(ui::action::SetupFactoryServerAction,

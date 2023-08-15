@@ -42,7 +42,7 @@ QByteArray QnUserHash::toString(const Type& type)
         case Type::ldapPassword: return "LDAP";
         case Type::scrypt: return "scrypt";
         case Type::temporary:
-            return QByteArray::fromStdString(nx::vms::api::TemporaryToken::prefix());
+            return QByteArray::fromStdString(nx::vms::api::TemporaryToken::kPrefix);
     };
 
     NX_ASSERT(false, "Unexpected value: %1", static_cast<int>(type));
