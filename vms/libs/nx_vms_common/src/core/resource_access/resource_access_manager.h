@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <shared_mutex>
-
 #include <QtCore/QObject>
 
 #include <common/common_globals.h>
@@ -16,7 +14,6 @@
 #include <utils/common/updatable.h>
 
 class QnResourceAccessSubject;
-namespace nx::core::access { class PermissionsCache; }
 
 namespace nx::vms::api {
 
@@ -280,7 +277,10 @@ public:
 
 signals:
     void resourceAccessReset();
-    void permissionsDependencyChanged(const QnResourcePtr& resource);
+    void permissionsDependencyChanged(const QnResourceList& resources);
+
+protected:
+    virtual void afterUpdate() override;
 
 private:
     bool canCreateResourceInternal(
@@ -310,9 +310,13 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnResourceAccessSubject& subject,
         const nx::vms::api::UserGroupData& targetGroup) const;
 
+    void handleResourceUpdated(const QnResourcePtr& resource);
     void handleResourcesAdded(const QnResourceList& resources);
     void handleResourcesRemoved(const QnResourceList& resources);
 
+    void checkOwnThread();
+
 private:
     const std::unique_ptr<nx::core::access::AccessRightsResolver> m_accessRightsResolver;
+    QSet<QnResourcePtr> m_updatingResources;
 };

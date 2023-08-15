@@ -9,8 +9,7 @@
 class NX_VMS_CLIENT_CORE_API QnClientMessageProcessor: public QnCommonMessageProcessor
 {
     Q_OBJECT
-
-    typedef QnCommonMessageProcessor base_type;
+    using base_type = QnCommonMessageProcessor;
 
 public:
     enum class HoldConnectionPolicy
