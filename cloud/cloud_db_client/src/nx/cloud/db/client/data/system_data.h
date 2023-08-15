@@ -209,4 +209,18 @@ NX_REFLECTION_INSTRUMENT(SystemOfferPatch, (comment)(status))
 
 NX_REFLECTION_INSTRUMENT(Attribute, (name)(value))
 
+NX_REFLECTION_INSTRUMENT(SystemUsersBatchItem, (users)(systems)(accessRole)(attributes))
+
+NX_REFLECTION_INSTRUMENT(CreateBatchRequest, (items))
+
+NX_REFLECTION_INSTRUMENT(CreateBatchResponse, (batchId))
+
+NX_REFLECTION_INSTRUMENT(BatchState, (status) (operations))
+
+NX_REFLECTION_INSTRUMENT_ENUM(BatchStatus, inProgress, success, failure)
+
+NX_REFLECTION_INSTRUMENT(BatchErrorInfo, (uncommitted))
+
+NX_REFLECTION_INSTRUMENT(BatchItemErrorInfo, (description)(item))
+
 } // namespace nx::cloud::db::api

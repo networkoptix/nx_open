@@ -18,7 +18,8 @@ Connection::Connection(
     m_authProvider(&m_requestExecutor),
     m_maintenanceManager(&m_requestExecutor),
     m_oauthManager(&m_requestExecutor),
-    m_twoFactorAuthManager(&m_requestExecutor)
+    m_twoFactorAuthManager(&m_requestExecutor),
+    m_batchUserProcessingManager(&m_requestExecutor)
 {
     bindToAioThread(m_requestExecutor.getAioThread());
 }
@@ -51,6 +52,11 @@ api::OauthManager* Connection::oauthManager()
 api::TwoFactorAuthManager* Connection::twoFactorAuthManager()
 {
     return &m_twoFactorAuthManager;
+}
+
+api::BatchUserProcessingManager* Connection::batchUserProcessingManager()
+{
+    return &m_batchUserProcessingManager;
 }
 
 void Connection::bindToAioThread(

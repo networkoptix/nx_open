@@ -73,6 +73,13 @@ static constexpr char kSystemOwnershipOffer[] = "/cdb/offered-systems/{systemId}
 
 //-------------------------------------------------------------------------------------------------
 
+static constexpr char kSystemUsersBatchPath[] = "/cdb/systems/users/batch";
+static constexpr char kSystemUsersBatchStatePath[] = "/cdb/systems/users/batch/{batchId}/state";
+static constexpr char kSystemUsersBatchErrorInfoPath[] = "/cdb/systems/users/batch/{batchId}/error";
+static constexpr char kBatchIdParam[] = "batchId";
+
+//-------------------------------------------------------------------------------------------------
+
 static constexpr char kPingPath[] = "/cdb/ping";
 
 static constexpr char kEc2TransactionConnectionPathPrefix[] = "/cdb/ec2/";
