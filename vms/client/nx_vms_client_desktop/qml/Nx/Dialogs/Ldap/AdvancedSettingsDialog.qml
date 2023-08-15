@@ -25,6 +25,7 @@ Dialog
     property alias groupObjectClass: groupAttributeTextField.text
     property alias groupObjectClassAuto: groupAttributeTextField.auto
     property alias memberAttribute: userMembershipAttributeTextField.text
+    property alias memberAttributeAuto: userMembershipAttributeTextField.auto
 
     property alias syncIntervalS: syncIntervalSpinBox.seconds
     property alias searchTimeoutS: searchTimeoutSpinBox.seconds
@@ -126,23 +127,10 @@ Dialog
             leftSideMargin: 180
             rightSideMargin: 0
 
-            RowLayout
+            AutoTextField
             {
+                id: userMembershipAttributeTextField
                 width: parent.width
-
-                TextFieldWithValidator
-                {
-                    id: userMembershipAttributeTextField
-
-                    Layout.fillWidth: true
-                    textField.placeholderText: "member"
-                }
-
-                Item
-                {
-                    implicitWidth: loginAttributeTextField.checkBoxWidth
-                    implicitHeight: userMembershipAttributeTextField.height
-                }
             }
         }
 
