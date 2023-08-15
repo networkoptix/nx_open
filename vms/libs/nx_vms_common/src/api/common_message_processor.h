@@ -26,10 +26,10 @@ class NX_VMS_COMMON_API QnCommonMessageProcessor:
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
+    using base_type = QObject;
 
-    typedef QObject base_type;
 public:
-    explicit QnCommonMessageProcessor(
+    QnCommonMessageProcessor(
         nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
     virtual ~QnCommonMessageProcessor();
@@ -71,6 +71,8 @@ public:
     virtual void updateResource(
         const nx::vms::api::StorageData& storage,
         ec2::NotificationSource source);
+
+    void updateLicense(const QnLicensePtr& license);
 
     void resetServerUserAttributesList(
         const nx::vms::api::MediaServerUserAttributesDataList& serverUserAttributesList);
@@ -133,6 +135,7 @@ protected:
     void resetResources(const nx::vms::api::FullInfoData& fullData);
     void resetLicenses(const nx::vms::api::LicenseDataList& licenses);
     void resetCamerasWithArchiveList(const nx::vms::api::ServerFootageDataList& cameraHistoryList);
+    void resetAccessRights(const nx::vms::api::FullInfoData& fullData);
 
     virtual bool canRemoveResource(const QnUuid& resourceId, ec2::NotificationSource source);
     virtual void removeResourceIgnored(const QnUuid& resourceId);
@@ -147,11 +150,8 @@ protected:
         const nx::vms::api::ResourceParamWithRefData& param,
         ec2::NotificationSource source);
 
-public slots:
-    void on_licenseChanged(const QnLicensePtr &license);
-    void on_licenseRemoved(const QnLicensePtr &license);
-
-private slots:
+private:
+    void on_initNotification(const nx::vms::api::FullInfoData& fullData);
     void on_gotDiscoveryData(const nx::vms::api::DiscoveryData& discoveryData, bool addInformation);
 
     void on_remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
@@ -179,6 +179,8 @@ private slots:
     void on_mediaServerUserAttributesChanged(
         const nx::vms::api::MediaServerUserAttributesData& userAttributes);
     void on_mediaServerUserAttributesRemoved(const QnUuid& serverId);
+
+    void on_licenseRemoved(const QnLicensePtr &license);
 
     void on_businessEventRemoved(const QnUuid &id);
     void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
