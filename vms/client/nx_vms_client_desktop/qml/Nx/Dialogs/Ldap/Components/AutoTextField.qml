@@ -65,6 +65,9 @@ RowLayout
             anchors.verticalCenterOffset: 3
 
             text: qsTr("Auto")
+
+            // Focus the textField when user unchecks this checkbox.
+            onCheckedChanged: if (!checked && visible) textField.forceActiveFocus()
         }
     }
 }
