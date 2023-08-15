@@ -49,9 +49,11 @@ const std::string kEmptyUser("");
 const std::string kUser("user");
 const std::string kPassword("password");
 const std::string kToken("vms-a9e6c2caf6f34942a3aa414375295d29-DvU3vLK9c7");
+const std::string kTemporaryToken("vmsTmp-abcde01234");
 const QString kAuthCode("nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753");
 const auto kPasswordCredentials = PasswordCredentials(kUser, kPassword);
 const auto kTokenCredentials = Credentials(BearerAuthToken(kToken));
+const auto kTemporaryTokenCredentials = Credentials(BearerAuthToken(kTemporaryToken));
 
 // Url-encoded key for 'user:password' string in base64 encoding.
 const QString kEncodedAuthKey("dXNlcjpwYXNzd29yZA%3D%3D");
@@ -464,6 +466,22 @@ TEST_F(SystemUriTest, supportBearerTokenAuth)
         .arg(kCloudHost)
         .arg(kLocalSystemAddress)
         .arg(QString::fromStdString(kToken)));
+}
+
+// nx-vms://example.com/client/localhost:7001?auth=vmsTmp-abcde01234
+TEST_F(SystemUriTest, supportTemporaryBearerTokenAuth)
+{
+    m_uri.protocol = SystemUri::Protocol::Native;
+    m_uri.cloudHost = kCloudHost;
+    m_uri.clientCommand = SystemUri::ClientCommand::Client;
+    m_uri.systemAddress = kLocalSystemAddress;
+    m_uri.credentials = kTemporaryTokenCredentials;
+
+    validateLink(QString("%1://%2/client/%3?auth=%4")
+        .arg(nx::branding::nativeUriProtocol())
+        .arg(kCloudHost)
+        .arg(kLocalSystemAddress)
+        .arg(QString::fromStdString(kTemporaryToken)));
 }
 
 /* Referral links */

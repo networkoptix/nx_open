@@ -936,13 +936,20 @@ void ConnectActionsHandler::at_connectAction_triggered()
         auto connection = actionParameters.argument<RemoteConnectionPtr>(
             Qn::RemoteConnectionRole);
 
-        nx::utils::Url lastUrlForLoginDialog = nx::network::url::Builder()
-            .setScheme(nx::network::http::kSecureUrlSchemeName)
-            .setEndpoint(connection->address())
-            .setUserName(QString::fromStdString(connection->credentials().username))
-            .toUrl();
+        const bool isTemporaryUser =
+            connection->userType() == nx::vms::api::UserType::temporaryLocal;
 
-        appContext()->localSettings()->lastLocalConnectionUrl = lastUrlForLoginDialog.toString();
+        if (!isTemporaryUser)
+        {
+            nx::utils::Url lastUrlForLoginDialog = nx::network::url::Builder()
+                .setScheme(nx::network::http::kSecureUrlSchemeName)
+                .setEndpoint(connection->address())
+                .setUserName(QString::fromStdString(connection->credentials().username))
+                .toUrl();
+
+            appContext()->localSettings()->lastLocalConnectionUrl =
+                lastUrlForLoginDialog.toString();
+        }
 
         const auto savedCredentials = CredentialsManager::credentials(
             connection->moduleInformation().localSystemId,
@@ -952,11 +959,12 @@ void ConnectActionsHandler::at_connectAction_triggered()
 
         // In most cases we will connect succesfully by this url. So we can store it.
         const bool storePasswordForTile = appContext()->localSettings()->saveCredentialsAllowed()
-            && (passwordIsAlreadySaved || appContext()->localSettings()->autoLogin());
+            && (passwordIsAlreadySaved || appContext()->localSettings()->autoLogin())
+            && !isTemporaryUser;
 
-        ConnectionOptions options(StoreSession);
-        if (storePasswordForTile)
-            options.setFlag(StorePassword);
+        ConnectionOptions options;
+        options.setFlag(StoreSession, !isTemporaryUser);
+        options.setFlag(StorePassword, storePasswordForTile);
 
         storeConnectionRecord(
             connection->connectionInfo(),

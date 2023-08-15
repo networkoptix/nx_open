@@ -32,6 +32,9 @@ public:
 
     virtual nx::vms::api::LoginUser getUserType(ContextPtr context) const override;
     virtual nx::vms::api::LoginSession createLocalSession(ContextPtr context) const override;
+    virtual nx::vms::api::LoginSession createTemporaryLocalSession(
+        ContextPtr context) const override;
+
     virtual nx::vms::api::LoginSession getCurrentSession(ContextPtr context) const override;
     virtual void checkDigestAuthentication(ContextPtr context) const override;
 
