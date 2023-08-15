@@ -57,9 +57,9 @@ public:
     UsageHelper(common::SystemContext* context, QObject* parent = nullptr);
     virtual ~UsageHelper() override;
 
-    bool isValid() const;
+    virtual bool isValid() const;
 
-    bool isValid(Qn::LicenseType licenseType) const;
+    virtual bool isValid(Qn::LicenseType licenseType) const;
 
     /**
      *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for the selected type.
@@ -227,6 +227,9 @@ class VideoWallLicenseUsageHelper: public UsageHelper
     using base_type = UsageHelper;
 public:
     VideoWallLicenseUsageHelper(common::SystemContext* context, QObject* parent = nullptr);
+
+    virtual bool isValid() const override;
+    virtual bool isValid(Qn::LicenseType licenseType) const override;
 
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);

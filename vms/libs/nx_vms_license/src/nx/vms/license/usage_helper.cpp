@@ -14,6 +14,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
@@ -654,6 +655,22 @@ VideoWallLicenseUsageHelper::VideoWallLicenseUsageHelper(
         connect(watcher, &nx::vms::common::LicenseUsageWatcher::licenseUsageChanged, this,
             &UsageHelper::invalidate);
     }
+}
+
+bool VideoWallLicenseUsageHelper::isValid() const
+{
+    const auto state = systemContext()->saasServiceManager()->saasState();
+    if (state != nx::vms::api::SaasState::uninitialized)
+        return state == nx::vms::api::SaasState::active;
+    return base_type::isValid();
+}
+
+bool VideoWallLicenseUsageHelper::isValid(Qn::LicenseType licenseType) const
+{
+    const auto state = systemContext()->saasServiceManager()->saasState();
+    if (state != nx::vms::api::SaasState::uninitialized)
+        return state == nx::vms::api::SaasState::active;
+    return base_type::isValid(licenseType);
 }
 
 QList<Qn::LicenseType> VideoWallLicenseUsageHelper::calculateLicenseTypes() const
