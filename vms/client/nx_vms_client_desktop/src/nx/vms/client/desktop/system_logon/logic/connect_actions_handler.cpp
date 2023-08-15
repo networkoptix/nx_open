@@ -1259,6 +1259,8 @@ void ConnectActionsHandler::showLoginDialog()
 
 void ConnectActionsHandler::clearConnection()
 {
+    NX_DEBUG(this, "Clear connection: starting");
+
     hideReconnectDialog();
     d->currentConnectionProcess.reset();
     statisticsModule()->certificates()->resetScenario();
@@ -1299,7 +1301,7 @@ void ConnectActionsHandler::clearConnection()
     for (const auto& res: resourcesToRemove)
         idList.push_back(res->getId());
 
-    NX_DEBUG(this, "Clear connection");
+    NX_DEBUG(this, "Clear connection: removing resources");
     resourcePool()->removeResources(resourcesToRemove);
 
     systemContext()->resourcePropertyDictionary()->clear(idList);
@@ -1309,6 +1311,8 @@ void ConnectActionsHandler::clearConnection()
     resourceAccessManager()->endUpdate();
 
     systemContext()->lookupListManager()->deinitialize();
+
+    NX_DEBUG(this, "Clear connection: finished");
 }
 
 void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptions options)

@@ -104,7 +104,7 @@ void AccessController::setUser(const QnUserResourcePtr& value)
     d->user = newUser;
 
     if (d->resourceAccessNotifier)
-        d->resourceAccessNotifier->setSubjectId(value ? value->getId() : QnUuid{});
+        d->resourceAccessNotifier->setSubjectId(newUser ? newUser->getId() : QnUuid{});
 
     d->updateAllPermissions();
     emit userChanged();
@@ -223,8 +223,8 @@ AccessController::Private::Private(AccessController* q):
     connect(resourceAccessManager, &QnResourceAccessManager::resourceAccessReset,
         this, &Private::updateAllPermissions);
 
-    connect(resourceAccessManager, &QnResourceAccessManager::permissionsDependencyChanged, this,
-        [this](const QnResourcePtr& resource) { updatePermissions({resource}); });
+    connect(resourceAccessManager, &QnResourceAccessManager::permissionsDependencyChanged,
+        this, &Private::updatePermissions);
 }
 
 Qn::Permissions AccessController::Private::permissions(const QnResourcePtr& targetResource) const
