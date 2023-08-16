@@ -21,8 +21,8 @@ UserGroupRequestChain::UserGroupRequestChain(
     nx::vms::common::SystemContext* systemContext,
     QObject* parent)
     :
-    base_type(systemContext),
-    QObject(parent)
+    QObject(parent),
+    base_type(systemContext)
 {
 }
 

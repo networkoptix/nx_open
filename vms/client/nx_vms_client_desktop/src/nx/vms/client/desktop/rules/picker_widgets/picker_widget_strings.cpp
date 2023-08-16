@@ -80,6 +80,11 @@ QString DropdownTextPickerWidgetStrings::autoValue()
     return tr("Auto");
 }
 
+QString DropdownTextPickerWidgetStrings::automaticValue()
+{
+    return tr("automatic");
+}
+
 QString DropdownTextPickerWidgetStrings::state(api::rules::State value)
 {
     switch (value)
