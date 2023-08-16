@@ -7241,7 +7241,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>#</source>
-      <translation type="unfinished">#</translation>
+      <translation>#</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -11794,7 +11794,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>All imported</source>
-      <translation type="unfinished">All imported</translation>
+      <translation>Tümü içe alındı</translation>
     </message>
     <message>
       <source>In progress... (%1 left)</source>
@@ -12146,7 +12146,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>All Server</source>
-      <translation type="unfinished">All Server</translation>
+      <translation>Tüm Sunucular</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
@@ -12198,11 +12198,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>Liste girişlerini içerir</translation>
     </message>
     <message>
       <source>Does not contain list entries</source>
-      <translation type="unfinished">Does not contain list entries</translation>
+      <translation>Liste girişleri içermez</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -12224,15 +12224,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: </source>
-      <translation type="unfinished">Delete rule error: </translation>
+      <translation>Kural silme hatası: </translation>
     </message>
     <message>
       <source>Save rule error: </source>
-      <translation type="unfinished">Save rule error: </translation>
+      <translation>Kural kaydetme hatası: </translation>
     </message>
     <message>
       <source>Reset to defaults error: </source>
-      <translation type="unfinished">Reset to defaults error: </translation>
+      <translation>Varsayılanlara sıfırla hatası: </translation>
     </message>
   </context>
   <context>
