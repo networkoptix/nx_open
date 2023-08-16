@@ -46,9 +46,9 @@ public:
      *  @param id Integration id.
      *  @return Information about available licenses per integration.
      */
-    nx::vms::api::LicenseSummaryDataEx info(const QnUuid& id);
+    nx::vms::api::LicenseSummaryDataEx info(const QString& integrationId);
 
-    std::map<QnUuid, nx::vms::api::LicenseSummaryDataEx> allInfo() const;
+    std::map<QString, nx::vms::api::LicenseSummaryDataEx> allInfo() const;
 
     /*
      *  @return true if there are not enough licenses for any integration.
@@ -59,7 +59,7 @@ public:
 
     /*
      * @return Information about cameras which consume SAAS integration services.
-     * key - cameraId, value - the list of consumed serviceId. 
+     * key - serviceId, value - the list of consumed cameras. 
      */
     std::map<QnUuid, std::set<QnUuid>> camerasByService() const;
 
@@ -83,7 +83,7 @@ private:
     void updateCacheUnsafe() const;
 private:
     //Summary by integrationId.
-    mutable std::optional<std::map<QnUuid, nx::vms::api::LicenseSummaryDataEx>> m_cache;
+    mutable std::optional<std::map<QString, nx::vms::api::LicenseSummaryDataEx>> m_cache;
     mutable nx::Mutex m_mutex;
 };
 

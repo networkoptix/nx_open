@@ -17,8 +17,17 @@
 
 namespace nx::vms::common::saas::test {
 
-static const QnUuid kEngineId("bd0c8d99-5092-4db0-8767-1ae571250be9");
-static const QnUuid kEngineId2("bd0c8d99-5092-4db0-8767-1ae571250be8");
+struct TestPluginData
+{
+    QString pluginId;
+    QnUuid engineId;
+};
+
+static const std::array<TestPluginData, 2> testPluginData = {
+    TestPluginData{"testAnalyticsPlugin", QnUuid("bd0c8d99-5092-4db0-8767-1ae571250be9")},
+    TestPluginData{"testAnalyticsPlugin2", QnUuid("bd0c8d99-5092-4db0-8767-1ae571250be8")},
+};
+
 static const QnUuid kAnalyticsServiceId("94ca45f8-4859-457a-bc17-f2f9394524fe");
 
 static const QnUuid kServiceUnlimitedMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dc");
@@ -85,7 +94,7 @@ static const std::string kServiceDataJson = R"json(
     "description": "",
     "createdByChannelPartner": "5f124fdd-9fc7-43c1-898a-0dabde021894",
     "parameters": {
-      "integrationId": "bd0c8d99-5092-4db0-8767-1ae571250be9",
+      "integrationId": "testAnalyticsPlugin",
       "totalChannelNumber": 5
     }
   }
@@ -128,6 +137,8 @@ protected:
 
     virtual void SetUp()
     {
+        using namespace nx::vms::common;
+
         m_server = addServer();
         m_cloudeStorageHelper.reset(new CloudStorageServiceUsageHelper(systemContext()));
         m_integrationsHelper.reset(new IntegrationServiceUsageHelper(systemContext()));
@@ -136,19 +147,19 @@ protected:
         manager->loadServiceData(kServiceDataJson);
         manager->loadSaasData(kSaasDataJson);
 
-        auto pluginResource = AnalyticsPluginResourcePtr(new AnalyticsPluginResource());
-        pluginResource->setIdUnsafe(QnUuid::createUuid());
-        systemContext()->resourcePool()->addResource(pluginResource);
-
-        for (const auto& engineId: {kEngineId, kEngineId2} )
+        for (const auto& data: testPluginData)
         {
+            auto pluginResource = AnalyticsPluginResourcePtr(new AnalyticsPluginResource());
+            pluginResource->setIdUnsafe(AnalyticsPluginResource::uuidFromManifest(data.pluginId));
+            systemContext()->resourcePool()->addResource(pluginResource);
+
             auto engineResource = AnalyticsEngineResourcePtr(new AnalyticsEngineResource());
-            engineResource->setIdUnsafe(engineId);
+            engineResource->setIdUnsafe(data.engineId);
             engineResource->setParentId(pluginResource->getId());
             systemContext()->resourcePool()->addResource(engineResource);
 
             vms::api::analytics::PluginManifest manifest;
-            manifest.id = "Test plugin resource";
+            manifest.id = data.pluginId;
             manifest.isLicenseRequired = true;
             pluginResource->setManifest(manifest);
         }
@@ -350,7 +361,7 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
 {
     auto cameras = addCameras(/*size*/ 50);
     QSet<QnUuid> engines;
-    engines.insert(kEngineId);
+    engines.insert(testPluginData[0].engineId);
 
     cameras[0]->setUserEnabledAnalyticsEngines(engines);
     m_integrationsHelper->invalidateCache();
@@ -382,14 +393,14 @@ TEST_F(SaasServiceUsageHelperTest, camerasByService)
 {
     auto cameras = addCameras(/*size*/ 50);
     QSet<QnUuid> engines;
-    engines.insert(kEngineId);
-    engines.insert(kEngineId2);
+    for (const auto& data: testPluginData)
+        engines.insert(data.engineId);
 
     for (const auto& camera: cameras)
         camera->setUserEnabledAnalyticsEngines(engines);
     m_integrationsHelper->invalidateCache();
     auto info = m_integrationsHelper->camerasByService();
-    ASSERT_EQ(2, info.size());
+    ASSERT_EQ(testPluginData.size(), info.size());
     ASSERT_EQ(QnUuid(), info.begin()->first);
     ASSERT_EQ(kAnalyticsServiceId, info.rbegin()->first);
     ASSERT_EQ(50, info[kAnalyticsServiceId].size());
