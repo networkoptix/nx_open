@@ -61,10 +61,11 @@ struct UserGroupRequest
  * request changes are applied immediately to avoid waiting for data from message bus.
  */
 class UserGroupRequestChain:
+    public QObject,
     public RequestChain<UserGroupRequest::Type>,
-    SystemContextAware,
-    public QObject
+    SystemContextAware
 {
+    Q_OBJECT
     using base_type = SystemContextAware;
 
 public:
