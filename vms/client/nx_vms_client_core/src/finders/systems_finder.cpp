@@ -118,9 +118,11 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder* finder, int prio
 
 void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, int priority)
 {
-    const auto it = m_systems.find(system->id());
+    const auto it = m_systems.find(system->localId());
     if (it != m_systems.end())
     {
+        m_systemToLocalId[system->id()] = system->localId();
+
         const auto existingSystem = *it;
         existingSystem->mergeSystem(priority, system);
         return;
@@ -148,8 +150,10 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
     if (systemHideOptions.testFlag(SystemHideFlag::nonLocalHost) && !system->hasLocalServer())
         return;
 
+    m_systemToLocalId[system->id()] = system->localId();
+
     const AggregatorPtr target(new QnSystemDescriptionAggregator(priority, system));
-    m_systems.insert(target->id(), target);
+    m_systems.insert(target->localId(), target);
     connect(target.get(), &QnBaseSystemDescription::systemNameChanged, this,
         [this, target]() { updateRecentConnections(target->localId(), target->name()); });
 
@@ -175,7 +179,11 @@ void QnSystemsFinder::updateRecentConnections(const QnUuid& localSystemId, const
 
 void QnSystemsFinder::onSystemLost(const QString& systemId, int priority)
 {
-    const auto it = m_systems.find(systemId);
+    const auto localIdIter = m_systemToLocalId.find(systemId);
+    if (localIdIter == m_systemToLocalId.end())
+        return;
+
+    const auto it = m_systems.find(*localIdIter);
     if (it == m_systems.end())
         return;
 
@@ -188,6 +196,7 @@ void QnSystemsFinder::onSystemLost(const QString& systemId, int priority)
         return;
     }
 
+    m_systemToLocalId.erase(localIdIter);
     m_systems.erase(it);
     emit systemLost(systemId);
 }
@@ -201,9 +210,13 @@ QnAbstractSystemsFinder::SystemDescriptionList QnSystemsFinder::systems() const
     return result;
 }
 
-QnSystemDescriptionPtr QnSystemsFinder::getSystem(const QString &id) const
+QnSystemDescriptionPtr QnSystemsFinder::getSystem(const QString& systemId) const
 {
-    const auto it = m_systems.find(id);
+    const auto localIdIter = m_systemToLocalId.find(systemId);
+    if (localIdIter == m_systemToLocalId.end())
+        return QnSystemDescriptionPtr();
+
+    const auto it = m_systems.find(*localIdIter);
     return (it == m_systems.end()
         ? QnSystemDescriptionPtr()
         : it->dynamicCast<QnBaseSystemDescription>());
