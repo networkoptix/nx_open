@@ -258,7 +258,7 @@ void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
     auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
     for (const auto& [id, parameters]: cloudStorageData)
     {
-        auto& cacheData = cache[{parameters.maxResolution, id}];
+        auto& cacheData = cache[{parameters.maxResolutionMP, id}];
         cacheData.total += parameters.totalChannelNumber;
         if (saasData.state == SaasState::active)
             cacheData.available += parameters.totalChannelNumber;
@@ -408,7 +408,7 @@ std::map<QnUuid, QnUuid> CloudStorageServiceUsageHelper::servicesByCameras() con
             if (parameters.totalChannelNumber > 0)
             {
                 availableChannels.emplace(
-                    parameters.maxResolution, Data{id, parameters.totalChannelNumber});
+                    parameters.maxResolutionMP, Data{id, parameters.totalChannelNumber});
             }
         }
     }
