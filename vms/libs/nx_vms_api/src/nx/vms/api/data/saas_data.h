@@ -39,7 +39,7 @@ NX_REFLECTION_ENUM_CLASS(SaasServiceState,
     obsolete
 );
 
-using SaasServiceParameters = std::map<std::string, std::variant<std::string, int>>;
+using SaasServiceParameters = std::map<std::string, std::variant<QString, int>>;
 
 /**%apidoc Saas service parameters for 'localRecording' service type */
 struct NX_VMS_API SaasLocalRecordingParameters
@@ -74,11 +74,10 @@ NX_REFLECTION_INSTRUMENT(SaasCloudStorageParameters, SaasCloudStorageParameters_
 /**%apidoc Saas service parameters for 'analytics' service type */
 struct NX_VMS_API SaasAnalyticsParameters
 {
-    /**%apidoc Amount of channels */
     int totalChannelNumber = 0;
 
-    /**%apidoc Guid of analytics engine Id */
-    QnUuid integrationId;
+    /**%apidoc Analytics Plugin id. */
+    QString integrationId;
 
     static SaasAnalyticsParameters fromParams(const SaasServiceParameters& parameters);
 };
