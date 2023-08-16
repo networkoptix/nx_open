@@ -528,34 +528,25 @@ void UserListWidget::Private::deleteSelected()
     if (!messages::Resources::deleteResources(q, usersToDelete, /*allowSilent*/ false))
         return;
 
-    qnResourcesChangesManager->deleteResources(usersToDelete, nx::utils::guarded(this,
-        [this, usersToDelete](bool success, const QString& errorString)
+    auto callback = nx::utils::mutableGuarded(q,
+        [this, n = usersToDelete.size(), nonDeletedResources = QnResourceList()](
+            bool success,
+            const QnResourcePtr& resource) mutable
         {
-            q->setEnabled(true);
+            if (!success)
+                nonDeletedResources.push_back(resource);
 
-            if (success)
+            if (--n != 0)
                 return;
 
-            QString text;
-            if (const auto count = usersToDelete.count(); count == 1)
-            {
-                text = tr("Failed to delete user \"%1\".")
-                    .arg(usersToDelete[0]->getName().toHtmlEscaped());
-            }
-            else
-            {
-                text = tr("Failed to delete %n users", /*comment*/ "", count);
-            }
+            q->setEnabled(true);
 
-            QnMessageBox messageBox(
-                QnMessageBoxIcon::Critical,
-                text,
-                errorString,
-                QDialogButtonBox::Ok,
-                QDialogButtonBox::Ok,
-                q);
-            messageBox.exec();
-        }));
+            if (!nonDeletedResources.isEmpty())
+                ui::messages::Resources::deleteResourcesFailed(q, nonDeletedResources);
+        });
+
+    for (const auto& resource: usersToDelete)
+        qnResourcesChangesManager->deleteResource(resource, callback);
 
     q->setEnabled(false);
 }
