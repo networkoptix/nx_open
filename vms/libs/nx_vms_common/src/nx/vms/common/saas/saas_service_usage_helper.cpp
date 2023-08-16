@@ -82,7 +82,7 @@ void IntegrationServiceUsageHelper::invalidateCache()
 
 void IntegrationServiceUsageHelper::updateCacheUnsafe() const
 {
-    m_cache = std::map<QnUuid, LicenseSummaryDataEx>();
+    m_cache = std::map<QString, LicenseSummaryDataEx>();
 
     // Update integration info
     const auto saasData = m_context->saasServiceManager()->data();
@@ -101,9 +101,10 @@ void IntegrationServiceUsageHelper::updateCacheUnsafe() const
         {
             if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId))
             {
-                if (r->plugin()->manifest().isLicenseRequired)
+                const auto manifest = r->plugin()->manifest();
+                if (manifest.isLicenseRequired)
                 {
-                    auto& value = (*m_cache)[r->getId()];
+                    auto& value = (*m_cache)[manifest.id];
                     ++value.inUse;
                     if (value.inUse > value.available)
                         value.exceedDevices.insert(camera->getId());
@@ -113,16 +114,16 @@ void IntegrationServiceUsageHelper::updateCacheUnsafe() const
     }
 }
 
-LicenseSummaryDataEx IntegrationServiceUsageHelper::info(const QnUuid& id)
+LicenseSummaryDataEx IntegrationServiceUsageHelper::info(const QString& integrationId)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
         updateCacheUnsafe();
-    const auto it = m_cache->find(id);
+    const auto it = m_cache->find(integrationId);
     return it != m_cache->end() ? it->second : LicenseSummaryDataEx();
 }
 
-std::map<QnUuid, LicenseSummaryDataEx> IntegrationServiceUsageHelper::allInfo() const
+std::map<QString, LicenseSummaryDataEx> IntegrationServiceUsageHelper::allInfo() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_cache)
@@ -153,9 +154,10 @@ void IntegrationServiceUsageHelper::proposeChange(const std::vector<Propose>& da
         {
             if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
             {
-                if (r->plugin()->manifest().isLicenseRequired)
+                const auto manifest = r->plugin()->manifest();
+                if (manifest.isLicenseRequired)
                 {
-                    auto& value = (*m_cache)[r->getId()];
+                    auto& value = (*m_cache)[manifest.id];
                     --value.inUse;
                 }
             }
@@ -164,39 +166,16 @@ void IntegrationServiceUsageHelper::proposeChange(const std::vector<Propose>& da
         {
             if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
             {
-                if (r->plugin()->manifest().isLicenseRequired)
+                const auto manifest = r->plugin()->manifest();
+                if (manifest.isLicenseRequired)
                 {
-                    auto& value = (*m_cache)[r->getId()];
+                    auto& value = (*m_cache)[manifest.id];
                     ++value.inUse;
                 }
             }
         }
     }
 }
-
-#if 0
-std::set<QnUuid> IntegrationServiceUsageHelper::usedDevices() const
-{
-    std::set<QnUuid> result;
-
-    for (const auto& camera: getAllCameras())
-    {
-        for (const auto& engineId: camera->userEnabledAnalyticsEngines())
-        {
-            if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId))
-            {
-                if (r->plugin()->manifest().isLicenseRequired)
-                {
-                    result.insert(r->getId());
-                    break;
-                }
-            }
-        }
-    }
-
-    return result;
-}
-#endif
 
 bool IntegrationServiceUsageHelper::isOverflow() const
 {
@@ -217,7 +196,7 @@ std::map<QnUuid, std::set<QnUuid>> IntegrationServiceUsageHelper::camerasByServi
     std::map<QnUuid, std::set<QnUuid>> result;
 
     // Update integration info
-    QMap<QnUuid, QnUuid> serviceByIntegration;
+    QMap<QString, QnUuid> serviceByIntegration;
     for (const auto& [serviceId, integration]: m_context->saasServiceManager()->analyticsIntegrations())
         serviceByIntegration[integration.integrationId] = serviceId;
 
@@ -228,9 +207,10 @@ std::map<QnUuid, std::set<QnUuid>> IntegrationServiceUsageHelper::camerasByServi
         {
             if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId))
             {
-                if (r->plugin()->manifest().isLicenseRequired)
+                const auto manufest = r->plugin()->manifest();
+                if (manufest.isLicenseRequired)
                 {
-                    const auto& serviceId = serviceByIntegration.value(r->getId());
+                    const auto& serviceId = serviceByIntegration.value(manufest.id);
                     result[serviceId].insert(camera->getId());
                 }
             }
