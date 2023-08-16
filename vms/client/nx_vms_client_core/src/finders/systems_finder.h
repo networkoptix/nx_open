@@ -25,7 +25,7 @@ public:
 
 public: //overrides
     SystemDescriptionList systems() const override;
-    QnSystemDescriptionPtr getSystem(const QString& id) const override;
+    QnSystemDescriptionPtr getSystem(const QString& systemId) const override;
 
     static QnSystemsFinder* instance();
 
@@ -37,10 +37,11 @@ private:
 private:
     using SystemsFinderList = QMap<QnAbstractSystemsFinder*, nx::utils::ScopedConnectionsPtr>;
     using AggregatorPtr = QSharedPointer<QnSystemDescriptionAggregator>;
-    using AggregatorsList = QHash<QString, AggregatorPtr>;
+    using AggregatorsList = QHash<QnUuid, AggregatorPtr>;
 
     SystemsFinderList m_finders;
     AggregatorsList m_systems;
+    QHash<QString, QnUuid> m_systemToLocalId;
 };
 
 #define qnSystemsFinder QnSystemsFinder::instance()

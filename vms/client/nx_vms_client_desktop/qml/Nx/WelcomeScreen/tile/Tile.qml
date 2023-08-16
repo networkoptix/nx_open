@@ -567,6 +567,8 @@ Button
                     tryToInitIndex()
                 else if (count == 0)
                     index = -1
+
+                updateOutputProperties()
             }
         }
 
