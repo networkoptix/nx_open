@@ -170,64 +170,6 @@ void parseParameters(const nx::utils::Url& url, SystemUri* uri)
     uri->referral.context = referralContextToString.key(referralContext);
 }
 
-void parse(const nx::utils::Url& url, SystemUri* uri)
-{
-    if (!NX_ASSERT(uri))
-        return;
-
-    // For now we support parsing of generic links only
-    uri->scope = SystemUri::Scope::generic;
-    uri->protocol = protocolToString.key(url.scheme().toLower(), SystemUri::Protocol::Native);
-    uri->cloudHost = url.host();
-    int port = url.port(kDefaultPort);
-    if (port != kDefaultPort)
-        uri->cloudHost += ':' + QString::number(port);
-
-    QStringList path = url.path().split('/', Qt::SkipEmptyParts);
-    if (path.isEmpty())
-    {
-        uri->clientCommand = SystemUri::ClientCommand::Client;
-    }
-    else
-    {
-        QString clientCommandStr = path.takeFirst().toLower();
-        uri->clientCommand = clientCommandToString.key(clientCommandStr,
-            SystemUri::ClientCommand::None);
-    }
-
-    parseParameters(url, uri);
-
-    switch (uri->clientCommand)
-    {
-        // No more parameters are required for these commands
-        case SystemUri::ClientCommand::None:
-        case SystemUri::ClientCommand::LoginToCloud:
-            return;
-
-        // Client opens such links as usual client links
-        case SystemUri::ClientCommand::OpenOnPortal:
-            NX_ASSERT(uri->protocol == SystemUri::Protocol::Native);
-            uri->clientCommand = SystemUri::ClientCommand::Client;
-            break;
-
-        default:
-            break;
-    }
-
-    if (!path.isEmpty())
-    {
-        QString systemAddressOrAction = path.takeFirst();
-        if (systemActionToString.values().contains(systemAddressOrAction))
-        {
-            uri->systemAddress = uri->cloudHost;
-        }
-        else
-        {
-            uri->systemAddress = systemAddressOrAction;
-        }
-    }
-}
-
 bool isValidSystemAddress(const SystemUri& uri)
 {
     if (uri.systemAddress.isEmpty())
@@ -266,6 +208,91 @@ QString encodePasswordCredentials(const nx::network::http::Credentials& credenti
         + ':'
         + QString::fromStdString(credentials.authToken.value))
         .toUtf8().toBase64();
+}
+
+void parse(const nx::utils::Url& url, SystemUri* uri)
+{
+    if (!NX_ASSERT(uri))
+        return;
+
+    // Our URI scheme describes two link formats that are strongly entangled: direct links to some
+    // System (format is "{proto}://{system}/[action]?{params}" with optional action) and general
+    // links. Some of them could lead to a System ("{proto}://{cloudHost}/{command}/{system}/..."),
+    // while the others just launch the Client or login it into the Cloud.
+    //
+    // Here we parse some parts of the link and try to decide, if it is a valid direct link to some
+    // System or not. If in the future we'll have a more complex URI scheme, it could be better to
+    // construct every type of URI and validate them. But now we can parse Url just once to guess.
+    // See also SystemUri::isValid() for more details.
+    QStringList path = url.path().split('/', Qt::SkipEmptyParts);
+    bool isDirectLink = path.isEmpty() || systemActionToString.values().contains(path.first());
+
+    // Parse protocol. Check if it's supported by direct links.
+    uri->protocol = protocolToString.key(url.scheme().toLower(), SystemUri::Protocol::Native);
+    if (uri->protocol != SystemUri::Protocol::Native)
+        isDirectLink = false;
+
+    // Parse host.
+    auto host = url.host();
+    int port = url.port(kDefaultPort);
+    if (port != kDefaultPort)
+        host += ':' + QString::number(port);
+
+    // Parse parameters and check if the link has a valid authorization data.
+    parseParameters(url, uri);
+    if (isCloudHostname(host))
+    {
+        if (uri->authCode.isEmpty())
+            isDirectLink = false;
+    }
+    else
+    {
+        if (!hasValidAuth(*uri))
+            isDirectLink = false;
+    }
+
+    if (isDirectLink)
+    {
+        uri->scope = SystemUri::Scope::direct;
+        uri->systemAddress = host;
+        uri->clientCommand = SystemUri::ClientCommand::Client;
+    }
+    else
+    {
+        uri->scope = SystemUri::Scope::generic;
+        uri->cloudHost = host;
+
+        if (path.isEmpty())
+        {
+            uri->clientCommand = SystemUri::ClientCommand::Client;
+        }
+        else
+        {
+            QString clientCommandStr = path.takeFirst().toLower();
+            uri->clientCommand = clientCommandToString.key(clientCommandStr,
+                SystemUri::ClientCommand::None);
+        }
+
+        switch (uri->clientCommand)
+        {
+            // No more parameters are required for these commands
+            case SystemUri::ClientCommand::None:
+            case SystemUri::ClientCommand::LoginToCloud:
+                return;
+
+            // Client opens such links as usual client links
+            case SystemUri::ClientCommand::OpenOnPortal:
+                NX_ASSERT(uri->protocol == SystemUri::Protocol::Native);
+                uri->clientCommand = SystemUri::ClientCommand::Client;
+                break;
+
+            default:
+                break;
+        }
+
+        if (!path.isEmpty())
+            uri->systemAddress = path.takeFirst();
+    }
 }
 
 } // namespace
