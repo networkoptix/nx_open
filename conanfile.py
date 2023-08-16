@@ -105,7 +105,7 @@ class NxOpenConan(ConanFile):
 
         if self.isWindows or self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("cuda-toolkit/11.7" "#78798fb75c85a676d43c9d1a8af4fe18")
+                self.requires("cuda-toolkit/11.7" "#85c06d4043d49e1fb06b75b5bf9bd20e")
                 self.requires("zlib/1.2.12" "#bb959a1d68d4c35d0fba4cc66f5bb25f")
 
         if self.isLinux:
@@ -248,6 +248,10 @@ class NxOpenConan(ConanFile):
     @property
     def haveMobileClient(self):
         return self.isAndroid or self.isIos
+
+    @property
+    def haveAnalyticsServer(self):
+        return self.isLinux and self.settings.arch == "x86_64"
 
     @property
     def _lib_path(self):
