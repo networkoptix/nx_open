@@ -15,6 +15,7 @@ namespace nx::vms::client::desktop {
 
 class CameraHotspotItem: public QGraphicsObject
 {
+    Q_OBJECT
     using base_type = QGraphicsObject;
 
 public:

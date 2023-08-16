@@ -35,6 +35,7 @@ class DropdownTextPickerWidgetStrings
 
 public:
     static QString autoValue();
+    static QString automaticValue();
     static QString state(api::rules::State value);
 };
 
