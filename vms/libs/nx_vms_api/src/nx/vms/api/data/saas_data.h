@@ -58,7 +58,7 @@ struct NX_VMS_API SaasCloudStorageParameters
     static const int kUnlimitedResolution;
 
     /**%apidoc Amount of channels */
-    int totalChannelNumber = 0;
+    int totalChannelNumber = 1;
 
     /**%apidoc Archive duration in days */
     int days = 0;
@@ -74,7 +74,7 @@ NX_REFLECTION_INSTRUMENT(SaasCloudStorageParameters, SaasCloudStorageParameters_
 /**%apidoc Saas service parameters for 'analytics' service type */
 struct NX_VMS_API SaasAnalyticsParameters
 {
-    int totalChannelNumber = 0;
+    int totalChannelNumber = 1;
 
     /**%apidoc Analytics Plugin id. */
     QString integrationId;
