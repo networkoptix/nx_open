@@ -380,6 +380,7 @@ void UserListWidget::Private::setupUi()
     header->setVisible(true);
     header->setHighlightCheckedIndicator(true);
     header->setMaximumSectionSize(kMaximumColumnWidth);
+    header->setResizeContentsPrecision(0); //< Calculate resize using only the visible area.
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(UserListModel::UserGroupsColumn, QHeaderView::Stretch);
     header->setSectionsClickable(true);

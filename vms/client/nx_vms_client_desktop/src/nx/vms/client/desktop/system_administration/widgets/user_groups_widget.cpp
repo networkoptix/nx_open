@@ -305,6 +305,7 @@ void UserGroupsWidget::Private::setupUi()
     header->setHighlightCheckedIndicator(true);
     header->setMaximumSectionSize(kMaximumInteractiveColumnWidth);
     header->setDefaultSectionSize(kDefaultInteractiveColumnWidth);
+    header->setResizeContentsPrecision(0); //< Calculate resize using only the visible area.
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(UserGroupListModel::DescriptionColumn, QHeaderView::Interactive);
     header->setSectionResizeMode(UserGroupListModel::ParentGroupsColumn, QHeaderView::Stretch);
