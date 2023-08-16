@@ -144,19 +144,28 @@ QString ImportFromDeviceDialogModel::Private::getStatusText(const QModelIndex& i
     if (iter != deviceData.end())
         state = iter->second.state;
 
-    const auto timeLeftString =
-        nx::vms::time::toString(iter->second.importTimeLeft.count(), nx::vms::time::Format::hhh_mm);
-
     switch (state)
     {
         case State::allImported:
+        {
             return ImportFromDeviceDialogModel::tr("All imported");
+        }
         case State::inProgress:
+        {
+            NX_ASSERT(iter != deviceData.end());
+            const auto timeLeftString = nx::vms::time::toString(
+                iter->second.importTimeLeft.count(), nx::vms::time::Format::hhh_mm);
+
             return ImportFromDeviceDialogModel::tr("In progress... (%1 left)").arg(timeLeftString);
+        }
         case State::disabled:
+        {
             return ImportFromDeviceDialogModel::tr("Disabled");
+        }
         case State::error:
+        {
             return ImportFromDeviceDialogModel::tr("Error");
+        }
     }
 
     NX_ASSERT(false, "Unexpected state");
@@ -297,7 +306,7 @@ QVariant ImportFromDeviceDialogModel::data(const QModelIndex& index, int role) c
         }
     }
 
-    return base_type::data(index, role);
+    return base_type::data(ImportFromDeviceDialogModel::index(index.row(), 0), role);
 }
 
 QModelIndex ImportFromDeviceDialogModel::mapToSource(const QModelIndex& proxyIndex) const
