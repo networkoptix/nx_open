@@ -35,6 +35,8 @@ public:
     virtual nx::vms::api::analytics::IntegrationType integrationType() const;
 
     virtual QString idForToStringFromPtr() const override;
+
+    static QnUuid uuidFromManifest(const QString& id);
 };
 
 } // namespace nx::vms::common

@@ -2,7 +2,10 @@
 
 #include "plugin.h"
 
+#include <nx/kit/utils.h>
+
 #include "engine.h"
+#include "stub_analytics_plugin_object_detection_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -20,15 +23,18 @@ Result<IEngine*> Plugin::doObtainEngine()
 
 std::string Plugin::manifestString() const
 {
-    return /*suppress newline*/ 1 + (const char*)R"json(
-{
-    "id": "nx.stub.object_detection",
-    "name": "Stub: Object Detection",
-    "description": "An example Plugin for demonstrating the Base Library of Taxonomy and providing examples of object metadata generation.",
-    "version": "1.0.0",
-    "vendor": "Plugin vendor"
-}
-)json";
+    const static std::string manifest = /*suppress newline*/ 1 + (const char*) R"json(
+    {
+        "id": "nx.stub.object_detection",
+        "name": "Stub: Object Detection",
+        "description": "An example Plugin for demonstrating the Base Library of Taxonomy and providing examples of object metadata generation.",
+        "version": "1.0.0",
+        "vendor": "Plugin vendor",
+        "isLicenseRequired": %s
+    }
+    )json";
+
+    return nx::kit::utils::format(manifest, ini().isLicenseRequired ? "true" : "false");
 }
 
 } // namespace object_detection
