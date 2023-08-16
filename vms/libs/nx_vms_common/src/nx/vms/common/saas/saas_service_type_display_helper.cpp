@@ -12,13 +12,13 @@ using namespace nx::vms::api;
 QString ServiceTypeDisplayHelper::serviceTypeDisplayString(const QString& serviceType)
 {
     if (serviceType == SaasService::kLocalRecordingServiceType)
-        return tr("Local recording service");
+        return tr("Local recording");
 
     if (serviceType == SaasService::kAnalyticsIntegrationServiceType)
-        return tr("Integration service");
+        return tr("Integration");
 
     if (serviceType == SaasService::kCloudRecordingType)
-        return tr("Cloud storage service");
+        return tr("Cloud storage");
 
     NX_ASSERT(false, "No localized display name for unexpected SaaS service type");
     return serviceType;

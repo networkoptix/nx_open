@@ -109,8 +109,9 @@ void SaasInfoWidget::Private::setupServicesUsagePageUi()
 
     const auto header = ui->servicesUsageItemView->header();
     header->setMinimumSectionSize(kServiceUsageTableMinimumColumnWidth);
+    header->setSectionsMovable(false);
     header->setSectionResizeMode(
-        saas::ServicesUsageModel::ServiceNameColumn, QHeaderView::ResizeToContents);
+        saas::ServicesUsageModel::ServiceNameColumn, QHeaderView::Stretch);
     header->setSectionResizeMode(
         saas::ServicesUsageModel::ServiceTypeColumn, QHeaderView::Stretch);
     header->setSectionResizeMode(
