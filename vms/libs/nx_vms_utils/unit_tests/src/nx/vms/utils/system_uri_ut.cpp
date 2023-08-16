@@ -435,6 +435,47 @@ TEST_F(SystemUriTest, nativeLinkLocalSystem)
         .arg(kEncodedAuthKey));
 }
 
+// nx-vms://localhost:7001?auth=YWJyYTprYWRhYnJh
+// nx-vms://localhost:7001/view?auth=YWJyYTprYWRhYnJh
+TEST_F(SystemUriTest, directLinkLocalSystem)
+{
+    m_uri.protocol = SystemUri::Protocol::Native;
+    m_uri.scope = SystemUri::Scope::direct;
+    m_uri.systemAddress = kLocalSystemAddress; //< Make sure port is parsed ok.
+    m_uri.clientCommand = SystemUri::ClientCommand::Client;
+    m_uri.credentials = kPasswordCredentials;
+
+    validateLink(QString("%1://%2?auth=%3")
+        .arg(nx::branding::nativeUriProtocol())
+        .arg(kLocalSystemAddress)
+        .arg(kEncodedAuthKey));
+    validateLink(QString("%1://%2/view?auth=%3")
+        .arg(nx::branding::nativeUriProtocol())
+        .arg(kLocalSystemAddress)
+        .arg(kEncodedAuthKey));
+}
+
+// nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08?code=nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753
+// nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/view?code=nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753
+TEST_F(SystemUriTest, directLinkCloudSystem)
+{
+    m_uri.scope = SystemUri::Scope::direct;
+    m_uri.protocol = SystemUri::Protocol::Native;
+    m_uri.clientCommand = SystemUri::ClientCommand::Client;
+    m_uri.authCode = kAuthCode;
+    m_uri.systemAddress = kCloudSystemAddress;
+
+    validateLink(QString("%1://%2?code=%3")
+        .arg(nx::branding::nativeUriProtocol())
+        .arg(kCloudSystemAddress)
+        .arg(kAuthCode));
+    validateLink(QString("%1://%2/view?code=%3")
+        .arg(nx::branding::nativeUriProtocol())
+        .arg(kCloudSystemAddress)
+        .arg(kAuthCode));
+}
+
+
 // Open the client and login to the Cloud System.
 // nx-vms://nxvms.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08?code=nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753
 TEST_F(SystemUriTest, nativeLinkCloudSystem)
