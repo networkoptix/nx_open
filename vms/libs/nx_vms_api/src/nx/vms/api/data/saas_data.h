@@ -64,11 +64,11 @@ struct NX_VMS_API SaasCloudStorageParameters
     int days = 0;
 
     /**%apidoc Maxumum camera resolution in megapixels */
-    int maxResolution = kUnlimitedResolution;
+    int maxResolutionMP = kUnlimitedResolution;
 
     static SaasCloudStorageParameters fromParams(const SaasServiceParameters& parameters);
 };
-#define SaasCloudStorageParameters_fields (totalChannelNumber)(days)(maxResolution)
+#define SaasCloudStorageParameters_fields (totalChannelNumber)(days)(maxResolutionMP)
 NX_REFLECTION_INSTRUMENT(SaasCloudStorageParameters, SaasCloudStorageParameters_fields)
 
 /**%apidoc Saas service parameters for 'analytics' service type */
