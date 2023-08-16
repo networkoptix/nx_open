@@ -2,8 +2,11 @@
 
 #include "application_context.h"
 
+#include <chrono>
+
 #include <QtCore/QStandardPaths>
 #include <QtCore/QThread>
+#include <QtCore/QTimer>
 #include <QtQml/QQmlEngine>
 #include <QtWidgets/QApplication>
 
@@ -73,7 +76,7 @@
 #include <platform/platform_abstraction.h>
 
 #if defined(Q_OS_MACOS)
-#include <ui/workaround/mac_utils.h>
+    #include <ui/workaround/mac_utils.h>
 #endif
 
 #include "system_context.h"
@@ -84,6 +87,8 @@ static void initializeResources()
 {
     Q_INIT_RESOURCE(nx_vms_client_desktop);
 }
+
+using namespace std::chrono;
 
 namespace nx::vms::client::desktop {
 
@@ -150,7 +155,7 @@ void initDeveloperOptions(const QnStartupParameters& startupParameters)
 {
     // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
     #if defined(Q_OS_WIN)
-        if (ini().profilerMode)
+        if (ini().profilerMode || ini().developerMode)
             win32_exception::setCreateFullCrashDump(true);
     #endif
 
@@ -509,6 +514,20 @@ struct ApplicationContext::Private
             startupParameters);
     }
 
+    void initializeExceptionHandlerGuard()
+    {
+#if defined(Q_OS_WIN)
+        // Intel graphics drivers call `SetUnhandledExceptionFilter` and therefore overwrite our
+        // crash dumps collecting implementation. Thus we repeat installation when client window is
+        // drawn already, and all driver libraries are loaded.
+        // https://community.intel.com/t5/Graphics/igdumdim64-dll-shouldn-t-call-SetUnhandledExceptionFilter/m-p/1494853
+        static constexpr auto kReinstallExceptionHandlerPeriod = 30s;
+        auto timer = new QTimer(q);
+        timer->callOnTimeout([] { win32_exception::installGlobalUnhandledExceptionHandler(); });
+        timer->start(kReinstallExceptionHandlerPeriod);
+#endif
+    }
+
     ApplicationContext* const q;
     const Mode mode;
     const QnStartupParameters startupParameters;
@@ -585,6 +604,7 @@ ApplicationContext::ApplicationContext(
     initializeExternalResources();
     QnClientMetaTypes::initialize();
     d->initializeSettings();
+    d->initializeExceptionHandlerGuard();
 
     switch (mode)
     {
