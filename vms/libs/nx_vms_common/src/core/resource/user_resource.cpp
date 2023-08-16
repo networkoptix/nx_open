@@ -54,15 +54,18 @@ QnUserHash::QnUserHash(const QByteArray& data)
     if (data.isEmpty())
         return;
 
-    bool isTemporaryUser = false;
-    const auto temporaryToken = QJson::deserialized<nx::vms::api::TemporaryToken>(
-        data, nx::vms::api::TemporaryToken(), &isTemporaryUser);
+    bool isTemporaryUser = data.contains(nx::vms::api::TemporaryToken::kPrefix);
     if (isTemporaryUser)
     {
-        this->temporaryToken = temporaryToken;
-        type = Type::temporary;
-        hash = data;
-        return;
+        const auto temporaryToken = QJson::deserialized<nx::vms::api::TemporaryToken>(
+            data, nx::vms::api::TemporaryToken(), &isTemporaryUser);
+        if (isTemporaryUser)
+        {
+            this->temporaryToken = temporaryToken;
+            type = Type::temporary;
+            hash = data;
+            return;
+        }
     }
 
     if (data == nx::vms::api::UserData::kCloudPasswordStub)
