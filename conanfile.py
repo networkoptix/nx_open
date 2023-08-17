@@ -74,6 +74,8 @@ class NxOpenConan(ConanFile):
         # The open-source Customization Package coming from Conan has the name "opensource-meta",
         # but its id (the "id" field in description.json inside the zip) is "metavms".
         self.options["customization"].customization = "opensource-meta"
+        self.options["vms_help"].customization = "metavms"
+        self.options["quick_start_guide"].customization = "metavms"
 
     def generate(self):
         generate_conan_package_paths(self)
