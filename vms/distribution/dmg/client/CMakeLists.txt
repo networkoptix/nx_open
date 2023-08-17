@@ -145,10 +145,19 @@ if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
             nx_branding
             nx_build_info
             nx_monitoring
+            nx_media_core
+            nx_codec
+            nx_rtp
             nx_kit
             udt
         )
 
+        if(TARGET nx_media)
+            list(APPEND libs_debug_dependencies nx_media)
+        endif()
+        if(TARGET nx_vms_json_rpc)
+            list(APPEND libs_debug_dependencies nx_vms_json_rpc)
+        endif()
         if(TARGET vms_gateway_core)
             list(APPEND libs_debug_dependencies vms_gateway_core)
         endif()
@@ -168,6 +177,7 @@ if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
             CONFIG_FILES ${distribution_config_file}
             WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
             DEPENDENCIES ${libs_debug_dependencies}
+            TARGETS ${libs_debug_dependencies}
         )
     endif()
 
