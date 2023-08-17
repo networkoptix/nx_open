@@ -1010,7 +1010,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Users</source>
-      <translation>Người sử dụng</translation>
+      <translation>Người dùng</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -1040,7 +1040,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation>Dấu trang</translation>
     </message>
     <message>
       <source>Events</source>
