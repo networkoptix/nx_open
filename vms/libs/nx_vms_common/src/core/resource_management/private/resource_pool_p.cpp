@@ -52,13 +52,15 @@ void QnResourcePool::Private::handleResourceAdded(const QnResourcePtr& resource)
                 removeUser(*name, user);
                 *name = user->getName().toLower();
                 usersByName[*name].add(user);
-            });
+            },
+            Qt::DirectConnection);
         QObject::connect(user.data(), &QnUserResource::enabledChanged, q,
             [this, user]()
             {
                 NX_WRITE_LOCKER lk(&q->m_resourcesMutex);
                 usersByName[user->getName().toLower()].selectMainUser();
-            });
+            },
+            Qt::DirectConnection);
     }
 }
 
