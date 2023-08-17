@@ -83,16 +83,35 @@ void QnResourceTitleItem::paint(QPainter* painter,
 
 void QnResourceTitleItem::setSimpleMode(bool isSimpleMode, bool animate)
 {
-    const auto targetValue = isSimpleMode ? 0.0 : 1.0;
+    if (m_isSimpleMode == isSimpleMode)
+        return;
+
+    m_isSimpleMode = isSimpleMode;
+
+    const auto targetValue = m_isSimpleMode ? 0.0 : 1.0;
     if (animate)
     {
         opacityAnimator(m_extraInfoLabel)->animateTo(targetValue);
-        opacityAnimator(m_rightButtonsPanel)->animateTo(targetValue);
+        auto animator = opacityAnimator(m_rightButtonsPanel);
+        animator->animateTo(targetValue);
+        if (isSimpleMode)
+        {
+            connect(
+                animator,
+                &AbstractAnimator::finished,
+                this,
+                &QnResourceTitleItem::updateNameLabelElideConstraint);
+        }
+        else
+        {
+            updateNameLabelElideConstraint();
+        }
     }
     else
     {
         m_extraInfoLabel->setOpacity(targetValue);
         m_rightButtonsPanel->setOpacity(targetValue);
+        updateNameLabelElideConstraint();
     }
 }
 
@@ -114,4 +133,23 @@ GraphicsLabel* QnResourceTitleItem::titleLabel()
 GraphicsLabel* QnResourceTitleItem::extraInfoLabel()
 {
     return m_extraInfoLabel;
+}
+
+void QnResourceTitleItem::resizeEvent(QGraphicsSceneResizeEvent* /*event*/)
+{
+    updateNameLabelElideConstraint();
+}
+
+void QnResourceTitleItem::updateNameLabelElideConstraint()
+{
+    if (m_isSimpleMode)
+    {
+        auto availableWidth =
+            m_rightButtonsPanel->x() - m_nameLabel->x() + m_rightButtonsPanel->size().width();
+        m_nameLabel->setElideConstraint(static_cast<int>(availableWidth));
+    }
+    else
+    {
+        m_nameLabel->setElideConstraint(0);
+    }
 }

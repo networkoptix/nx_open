@@ -24,17 +24,17 @@
 ****************************************************************************/
 
 #include "graphics_label.h"
-#include "graphics_label_p.h"
 
 #include <QtGui/QFontMetricsF>
 
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/style/skin.h>
+#include <ui/common/text_pixmap_cache.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/common/text_pixmap_cache.h>
-#include <nx/vms/client/desktop/style/skin.h>
-#include <ui/workaround/sharp_pixmap_painting.h>
+#include "graphics_label_p.h"
 
 using nx::vms::client::core::Geometry;
 
@@ -108,7 +108,11 @@ QString GraphicsLabelPrivate::calculateText() const
         return text;
 
     QFontMetricsF metrics(q_func()->font());
-    return metrics.elidedText(text, elideMode, q_func()->size().width(), Qt::AlignCenter);
+    return metrics.elidedText(
+        text,
+        elideMode,
+        std::max(q_func()->size().width(), static_cast<qreal>(elideConstraint)),
+        Qt::AlignCenter);
 }
 
 // -------------------------------------------------------------------------- //
@@ -214,7 +218,29 @@ void GraphicsLabel::setElideMode(Qt::TextElideMode elideMode)
     d->elideMode = elideMode;
     d->pixmapDirty = true;
     d->staticTextDirty = true;
+    d->updateSizeHint();
     setAcceptHoverEvents(d->elideMode != Qt::ElideNone);
+    update();
+}
+
+int GraphicsLabel::elideConstraint() const
+{
+    return d_func()->elideConstraint;
+}
+
+void GraphicsLabel::setElideConstraint(int constraint)
+{
+    Q_D(GraphicsLabel);
+
+    if (d->elideConstraint == constraint)
+        return;
+
+    d->elideConstraint = constraint;
+    if (d->elideMode == Qt::ElideNone)
+        return;
+
+    d->pixmapDirty = true;
+    d->staticTextDirty = true;
     update();
 }
 
@@ -304,4 +330,3 @@ void GraphicsLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
         }
     }
 }
-
