@@ -334,6 +334,7 @@ private:
     bool m_sliderWindowInvalid = false;
     bool m_timelineWindowIsNearLive = false;
 
+    bool m_updatingCalendarFromSlider = false;
     bool m_updatingSliderFromReader = false;
     bool m_updatingSliderFromScrollBar = false;
     bool m_updatingScrollBarFromSlider = false;

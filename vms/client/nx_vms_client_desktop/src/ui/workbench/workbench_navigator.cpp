@@ -2101,6 +2101,8 @@ void QnWorkbenchNavigator::updateCalendarFromSlider()
     if (!isValid())
         return;
 
+    QScopedValueRollback<bool> guard(m_updatingCalendarFromSlider, true);
+
     m_calendar->selection = {
         QDateTime::fromMSecsSinceEpoch(
             m_timeSlider->windowStart().count() + m_calendar->displayOffset),
@@ -2110,7 +2112,7 @@ void QnWorkbenchNavigator::updateCalendarFromSlider()
 
 void QnWorkbenchNavigator::updateTimeSliderWindowFromCalendar()
 {
-    if (!isValid())
+    if (!isValid() || m_updatingCalendarFromSlider)
         return;
 
     m_timeSlider->finishAnimations();
