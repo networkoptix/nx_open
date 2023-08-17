@@ -87,6 +87,11 @@ Dialog
                     model: LdapHelper.kSchemes
 
                     readonly property bool supportsStarTls: LdapHelper.supportsStarTls(currentText)
+
+                    onCurrentIndexChanged:
+                    {
+                        testStatus.visible = false
+                    }
                 }
 
                 TextFieldWithValidator
@@ -120,6 +125,12 @@ Dialog
                             ? 1
                             : 0
                     }
+
+                    onFocusChanged:
+                    {
+                        if (activeFocus)
+                            testStatus.visible = false
+                    }
                 }
             }
         }
@@ -142,6 +153,12 @@ Dialog
                     return text
                         ? ""
                         : qsTr("Login DN cannot be empty.")
+                }
+
+                onFocusChanged:
+                {
+                    if (activeFocus)
+                        testStatus.visible = false
                 }
             }
         }
@@ -168,6 +185,12 @@ Dialog
                     return passwordTextField.text || passwordTextField.showFakePassword
                         ? ""
                         : qsTr("Password cannot be empty.")
+                }
+
+                onFocusChanged:
+                {
+                    if (activeFocus)
+                        testStatus.visible = false
                 }
             }
         }
@@ -239,6 +262,7 @@ Dialog
                     {
                         if (dialog.validate())
                         {
+                            testStatus.visible = true
                             self.testConnection(
                                 dialog.ldapScheme + dialog.hostAndPort,
                                 dialog.adminDn,
@@ -249,54 +273,59 @@ Dialog
                     }
                 }
 
-                Image
+                RowLayout
                 {
-                    visible: dialog.testState == LdapSettings.TestState.ok
-                        || dialog.testState == LdapSettings.TestState.error
+                    id: testStatus
 
-                    Layout.alignment: Qt.AlignTop
-                    Layout.topMargin: (testButton.height - height) / 2
-                    Layout.leftMargin: 8
-
-                    source: dialog.testState == LdapSettings.TestState.ok
-                        ? "image://svg/skin/user_settings/connection_ok.svg"
-                        : "image://svg/skin/user_settings/connection_error.svg"
-                    sourceSize: Qt.size(20, 20)
-                }
-
-                Spinner
-                {
-                    Layout.alignment: Qt.AlignTop
-                    Layout.topMargin: (testButton.height - height) / 2
-                    Layout.leftMargin: 8
-                    running: dialog.testState == LdapSettings.TestState.connecting
-                }
-
-                Text
-                {
-                    visible: dialog.testState != LdapSettings.TestState.initial
-
-                    Layout.alignment: Qt.AlignTop
-                    Layout.topMargin: testButton.baselineOffset - baselineOffset
-                    Layout.fillWidth: true
-
-                    text: dialog.testState == LdapSettings.TestState.connecting
-                        ? qsTr("Connecting...")
-                        : dialog.testMessage
-
-                    color:
+                    Image
                     {
-                        switch (dialog.testState)
-                        {
-                            case LdapSettings.TestState.error:
-                                return ColorTheme.colors.red_core
-                            case LdapSettings.TestState.ok:
-                                return ColorTheme.colors.green_core
-                            default:
-                                return ColorTheme.colors.light16
-                        }
+                        visible: dialog.testState == LdapSettings.TestState.ok
+                            || dialog.testState == LdapSettings.TestState.error
+
+                        Layout.alignment: Qt.AlignTop
+                        Layout.topMargin: (testButton.height - height) / 2
+                        Layout.leftMargin: 8
+
+                        source: dialog.testState == LdapSettings.TestState.ok
+                            ? "image://svg/skin/user_settings/connection_ok.svg"
+                            : "image://svg/skin/user_settings/connection_error.svg"
+                        sourceSize: Qt.size(20, 20)
                     }
-                    wrapMode: Text.WordWrap
+
+                    Spinner
+                    {
+                        Layout.alignment: Qt.AlignTop
+                        Layout.topMargin: (testButton.height - height) / 2
+                        Layout.leftMargin: 8
+                        running: dialog.testState == LdapSettings.TestState.connecting
+                    }
+
+                    Text
+                    {
+                        visible: dialog.testState != LdapSettings.TestState.initial
+
+                        Layout.alignment: Qt.AlignTop
+                        Layout.topMargin: testButton.baselineOffset - baselineOffset
+                        Layout.fillWidth: true
+
+                        text: dialog.testState == LdapSettings.TestState.connecting
+                            ? qsTr("Connecting...")
+                            : dialog.testMessage
+
+                        color:
+                        {
+                            switch (dialog.testState)
+                            {
+                                case LdapSettings.TestState.error:
+                                    return ColorTheme.colors.red_core
+                                case LdapSettings.TestState.ok:
+                                    return ColorTheme.colors.green_core
+                                default:
+                                    return ColorTheme.colors.light16
+                            }
+                        }
+                        wrapMode: Text.WordWrap
+                    }
                 }
             }
         }
