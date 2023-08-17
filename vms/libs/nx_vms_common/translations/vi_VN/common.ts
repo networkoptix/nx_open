@@ -56,15 +56,15 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Người dùng này không tồn tại hoặc không thể đăng nhập.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Nhiều người dùng có cùng thông tin đăng nhập.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>Không thể xác minh chứng chỉ SSL/TLS của máy chủ LDAP.</translation>
     </message>
   </context>
   <context>
@@ -158,51 +158,51 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Quản trị viên</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Người dùng quyền hạn lớn</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Trình xem nâng cao</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Trình xem</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Xem trực tiếp</translation>
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation type="unfinished">System Health Viewers</translation>
+      <translation>Trình xem tình trạng hệ thống</translation>
     </message>
     <message>
       <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
-      <translation type="unfinished">Has full control of System configuration, but cannot create or modify other Power Users.</translation>
+      <translation>Có toàn quyền kiểm soát cấu hình Hệ thống, nhưng không thể tạo hoặc sửa đổi Người dùng cấp cao khác.</translation>
     </message>
     <message>
       <source>Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
+      <translation>Có thể xem và thực thi các vị trí và trình tham quan PTZ, sử dụng âm thanh 2 chiều, vận hành các nút Mô-đun I/O, tạo và chỉnh sửa Dấu trang và xem Nhật ký sự kiện.</translation>
     </message>
     <message>
       <source>Can view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Can view and export archive and Bookmarks.</translation>
+      <translation>Có thể xem và xuất kho lưu trữ và Dấu trang.</translation>
     </message>
     <message>
       <source>Can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Can view live videos, I/O modules and web pages.</translation>
+      <translation>Có thể xem video trực tiếp, mô-đun I/O và trang web.</translation>
     </message>
     <message>
       <source>Can view System Health Monitoring information.</source>
-      <translation type="unfinished">Can view System Health Monitoring information.</translation>
+      <translation>Có thể xem thông tin Giám sát tình trạng hệ thống.</translation>
     </message>
     <message>
       <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
-      <translation type="unfinished">This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</translation>
+      <translation>Người dùng này có các đặc quyền Hệ thống không giới hạn và không thể bị xóa. Có thể tạo và sửa đổi Quản trị viên, đồng thời có thể hợp nhất Hệ thống và liên kết hoặc hủy liên kết với tài khoản Nx Cloud.</translation>
     </message>
   </context>
   <context>
@@ -429,15 +429,15 @@
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>Đã nhận được dữ liệu không hợp lệ từ thiết bị. Chi tiết: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Đã nhận được dữ liệu không hợp lệ từ camera. Chi tiết: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>Đã nhận được dữ liệu không hợp lệ từ mô-đun I/O. Chi tiết: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -802,20 +802,20 @@
     <message>
       <source>%1 Licenses</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Licenses</translation>
+      <translation>%1 Giấy phép</translation>
     </message>
     <message numerus="yes">
       <source>%n %1 Licenses</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">
-        <numerusform>%n %1 Licenses</numerusform>
+      <translation>
+        <numerusform>%n %1 Giấy phép</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 %2 Licenses</source>
       <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 %2 Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 %2 Giấy phép</numerusform>
       </translation>
     </message>
   </context>
@@ -1095,7 +1095,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Nhiều nhóm</translation>
     </message>
   </context>
   <context>
@@ -1435,7 +1435,7 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation>Codec video màn hình chất lượng thấp</translation>
+      <translation>Giải mã video màn hình chất lượng thấp</translation>
     </message>
     <message>
       <source>License server</source>
@@ -1567,19 +1567,19 @@
     </message>
     <message>
       <source>Cloud storage update period in seconds</source>
-      <translation type="unfinished">Cloud storage update period in seconds</translation>
+      <translation>Thời gian cập nhật bộ nhớ đám mây tính bằng giây</translation>
     </message>
     <message>
       <source>LDAP settings</source>
-      <translation type="unfinished">LDAP settings</translation>
+      <translation>Cài đặt LDAP</translation>
     </message>
     <message>
       <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
+      <translation>Cài đặt SMTP</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>Thời gian khả dụng của mã phiên xác thực (giây)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
@@ -1591,33 +1591,33 @@
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>ngay bây giờ</translation>
     </message>
     <message numerus="yes">
       <source>%n minute(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minute(s) ago</numerusform>
+      <translation>
+        <numerusform>%n phút trước</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hour(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hour(s) ago</numerusform>
+      <translation>
+        <numerusform>%n giờ trước</numerusform>
       </translation>
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>hôm qua</translation>
     </message>
     <message numerus="yes">
       <source>%n day(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n day(s) ago</numerusform>
+      <translation>
+        <numerusform>%n ngày trước</numerusform>
       </translation>
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>một tuần trước</translation>
     </message>
   </context>
   <context>
@@ -1672,7 +1672,7 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Mở khóa phần lưu trữ này để xuất nội dung.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -1719,11 +1719,11 @@
     </message>
     <message>
       <source>Device output</source>
-      <translation>Sản lượng thiết bị</translation>
+      <translation>Đầu ra thiết bị</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation>Sản lượng máy ảnh</translation>
+      <translation>Đầu ra camera</translation>
     </message>
     <message>
       <source>Device recording</source>
@@ -1769,7 +1769,7 @@
     </message>
     <message>
       <source>Any Event</source>
-      <translation>Bất kỳ tổ chức sự kiện</translation>
+      <translation>Tất cả sự kiện</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1883,7 +1883,7 @@
     </message>
     <message>
       <source>Event: %1</source>
-      <translation>Biến cố：%1</translation>
+      <translation>Sự kiện: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
@@ -2290,17 +2290,17 @@
     </message>
     <message>
       <source>Group</source>
-      <translation type="unfinished">Group</translation>
+      <translation>Nhóm</translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n nhóm</numerusform>
       </translation>
     </message>
     <message>
       <source>All Power Users</source>
-      <translation type="unfinished">All Power Users</translation>
+      <translation>Tất cả người dùng cấp cao</translation>
     </message>
   </context>
 </TS>

@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Any server issue</source>
-      <translation type="unfinished">Any server issue</translation>
+      <translation>Bất kỳ sự cố máy chủ nào</translation>
     </message>
   </context>
   <context>
@@ -36,23 +36,23 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Bắt đầu khi nào</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Xảy ra tại</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Thuộc loại</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Và chú thích</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Và mô tả</translation>
     </message>
   </context>
   <context>
@@ -72,15 +72,15 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Xảy ra lúc</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Thuộc loại</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>Và đối tượng</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Tạo dấu trang</translation>
     </message>
     <message>
       <source>At</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Thời lượng cố định</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Thêm thẻ</translation>
     </message>
   </context>
   <context>
@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Điều chỉnh hành động</translation>
     </message>
   </context>
   <context>
@@ -163,15 +163,15 @@
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>Tín hiệu đầu vào trên thiết bị</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Xảy ra lúc</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>Với ID</translation>
     </message>
   </context>
   <context>
@@ -273,7 +273,7 @@
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Đầu ra thiết bị</translation>
     </message>
     <message>
       <source>At</source>
@@ -281,7 +281,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Thời lượng cố định</translation>
     </message>
   </context>
   <context>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>Ghi hình camera</translation>
     </message>
     <message>
       <source>On</source>
@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Thời lượng cố định</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -350,7 +350,7 @@
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>Để lại toàn màn hình</translation>
+      <translation>Thoát toàn màn hình</translation>
     </message>
     <message>
       <source>To</source>
@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Đến người dùng</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -899,7 +899,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation>Tên người sử dụng</translation>
+      <translation>Tên</translation>
     </message>
     <message>
       <source>Icon</source>
@@ -1019,7 +1019,7 @@
     <name>nx::vms::rules::TextWithFields</name>
     <message>
       <source>Event: %1</source>
-      <translation>Biến cố：%1</translation>
+      <translation>Sự kiện: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
