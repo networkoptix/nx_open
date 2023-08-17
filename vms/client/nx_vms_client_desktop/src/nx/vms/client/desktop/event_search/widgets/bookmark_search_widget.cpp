@@ -116,9 +116,6 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
                 updateTimer->stop();
         });
 
-    connect(systemContext()->accessController(), &AccessController::permissionsMaybeChanged,
-        this, &BookmarkSearchWidget::updateAllowance);
-
     // Signals that can potentially be emitted during this widget destruction must be
     // disconnected in ~Private, so store the connections in d->connections.
 
