@@ -7,32 +7,10 @@ from pathlib import Path
 import zipfile
 
 
-def create_libs_debug_file(build_dir, output_filename):
+def create_libs_debug_file(targets, build_dir, output_filename):
     lib_dir = Path(build_dir) / 'lib'
 
-    dsym_paths = [
-        lib_dir / f'lib{name}.dylib.dSYM' for name in (
-            'nx_vms_common',
-            'nx_media_core',
-            'nx_media',
-            'nx_rtp',
-            'nx_codec',
-            'nx_network',
-            'nx_utils',
-            'nx_kit',
-            'nx_vms_api',
-            'nx_vms_rules',
-            'nx_vms_update',
-            'nx_vms_utils',
-            'nx_zip',
-            'nx_branding',
-            'nx_build_info',
-            'nx_monitoring',
-            'vms_gateway_core',
-            'nx_vms_applauncher_api',
-            'udt',
-        )
-    ]
+    dsym_paths = [lib_dir / f'lib{name}.dylib.dSYM' for name in targets]
 
     # Archive each .dSYM directory.
     with zipfile.ZipFile(output_filename, "w", zipfile.ZIP_DEFLATED) as zip:
@@ -43,6 +21,7 @@ def create_libs_debug_file(build_dir, output_filename):
 def main():
     args = parse_generation_scripts_arguments()
     create_libs_debug_file(
+        targets=args.targets,
         build_dir=args.config['BUILD_DIR'],
         output_filename=args.output_file)
 
