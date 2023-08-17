@@ -58,6 +58,7 @@ public:
     bool pixmapDirty;
     qreal shadowRadius = 0.0;
     Qt::TextElideMode elideMode = Qt::ElideNone;
+    int elideConstraint = 0;
 };
 
 #endif // GRAPHICSLABEL_P_H
