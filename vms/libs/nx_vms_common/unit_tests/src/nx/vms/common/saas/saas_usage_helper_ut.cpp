@@ -57,7 +57,7 @@ static const std::string kServiceDataJson = R"json(
     "createdByChannelPartner": "5f124fdd-9fc7-43c1-898a-0dabde021894",
     "parameters": {
       "days": 30,
-      "maxResolutionMP": 5,
+      "maxResolutionMp": 5,
       "totalChannelNumber": 5
     }
   },
@@ -70,7 +70,7 @@ static const std::string kServiceDataJson = R"json(
     "createdByChannelPartner": "5f124fdd-9fc7-43c1-898a-0dabde021894",
     "parameters": {
       "days": 30,
-      "maxResolutionMP": 10,
+      "maxResolutionMp": 10,
       "totalChannelNumber": 5
     }
   },

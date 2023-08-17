@@ -75,9 +75,9 @@ SaasCloudStorageParameters SaasCloudStorageParameters::fromParams(const SaasServ
     SaasCloudStorageParameters result;
     fieldFromMap(result, parameters, totalChannelNumber);
     fieldFromMap(result, parameters, days);
-    fieldFromMap(result, parameters, maxResolutionMP);
-    if (result.maxResolutionMP == 0)
-        result.maxResolutionMP = kUnlimitedResolution;
+    fieldFromMap(result, parameters, maxResolutionMp);
+    if (result.maxResolutionMp == 0)
+        result.maxResolutionMp = kUnlimitedResolution;
     return result;
 }
 

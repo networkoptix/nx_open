@@ -63,12 +63,12 @@ struct NX_VMS_API SaasCloudStorageParameters
     /**%apidoc Archive duration in days */
     int days = 0;
 
-    /**%apidoc Maxumum camera resolution in megapixels */
-    int maxResolutionMP = kUnlimitedResolution;
+    /**%apidoc Maximum camera resolution in megapixels */
+    int maxResolutionMp = kUnlimitedResolution;
 
     static SaasCloudStorageParameters fromParams(const SaasServiceParameters& parameters);
 };
-#define SaasCloudStorageParameters_fields (totalChannelNumber)(days)(maxResolutionMP)
+#define SaasCloudStorageParameters_fields (totalChannelNumber)(days)(maxResolutionMp)
 NX_REFLECTION_INSTRUMENT(SaasCloudStorageParameters, SaasCloudStorageParameters_fields)
 
 /**%apidoc Saas service parameters for 'analytics' service type */
@@ -152,7 +152,7 @@ NX_REFLECTION_ENUM_CLASS(UseStatus,
     /**%apidoc No issues */
     ok,
 
-    /**%apidoc Service type should be blocked because of overuse. 
+    /**%apidoc Service type should be blocked because of overuse.
      * The block date is in 'tmpExpirationDate' field
      */
     overUse
@@ -166,7 +166,7 @@ struct ServiceTypeStatus
     UseStatus status;
 
     /**%apidoc There is issue with service overflow detected by license server.
-     * The issue should be fixed till this date underwise VMS will start to
+     * The issue should be fixed till this date, otherwise VMS will start to
      * turn off services.
      */
     SaasDateTime issueExpirationDate;
@@ -211,7 +211,7 @@ struct NX_VMS_API SaasSecurity
      * UTC time string in format 'YYYY-MM-DD hh:mm:ss'.
      */
     SaasDateTime tmpExpirationDate;
-	
+
     std::map<QString, ServiceTypeStatus> status;
 
     bool operator==(const SaasSecurity&) const = default;
