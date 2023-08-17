@@ -5,11 +5,21 @@
 
 #include <QtWidgets/QMenu>
 
+#include <core/resource/camera_resource.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+static bool isCamera(const QnSharedResourcePointer<QnResource>& resource)
+{
+    return (bool) resource.objectCast<QnVirtualCameraResource>();
+};
+
+} // namespace
 
 AbstractSearchWidget::AbstractSearchWidget(
     QnWorkbenchContext* context,
@@ -23,7 +33,12 @@ AbstractSearchWidget::AbstractSearchWidget(
     setRelevantControls(Control::defaults);
 
     connect(systemContext()->accessController(), &core::AccessController::permissionsMaybeChanged,
-        this, &AbstractSearchWidget::updateAllowance);
+        this,
+        [this](const QnResourceList& resources)
+        {
+            if (resources.empty() || std::any_of(resources.begin(), resources.end(), isCamera))
+                updateAllowance();
+        });
 }
 
 AbstractSearchWidget::~AbstractSearchWidget()
