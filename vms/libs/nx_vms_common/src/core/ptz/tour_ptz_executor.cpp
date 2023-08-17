@@ -83,6 +83,7 @@ public:
 
     bool handleTimer(int timerId);
     void handleFinished(Command command, const QVariant &data);
+    void onSpotActivated();
 
     QnPtzTourSpot &currentSpot() { return data.tour.spots[index]; }
     QnPtzTourSpotData &currentSpotData() { return data.spots[index]; }
@@ -106,6 +107,7 @@ public:
     bool usingDefaultMoveTimer;
     bool needPositionUpdate;
     bool waitingForNewPosition;
+    bool spotJustActivated;
 
     QElapsedTimer spotTimer;
     Vector startPosition;
@@ -126,6 +128,7 @@ QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate():
     usingDefaultMoveTimer(false),
     needPositionUpdate(false),
     waitingForNewPosition(false),
+    spotJustActivated(false),
     lastPositionRequestTime(0),
     newPositionRequestTime(0),
     canReadPosition(false)
@@ -231,17 +234,10 @@ void QnTourPtzExecutorPrivate::startMoving()
     spotTimer.restart();
 
     activateCurrentSpot();
-    requestPosition();
 
-    const QnPtzTourSpotData &spotData = currentSpotData();
-    if(state == Moving && spotData.moveTime > pingTimeout) {
-        NX_VERBOSE(this, "Estimated move time: %1 ms", spotData.moveTime);
-        moveTimer.start(spotData.moveTime - pingTimeout, q);
-        usingDefaultMoveTimer = false;
-    } else {
-        moveTimer.start(pingTimeout, q);
-        usingDefaultMoveTimer = true;
-    }
+    moveTimer.start(pingTimeout, q);
+    usingDefaultMoveTimer = true;
+    spotJustActivated = true;
 }
 
 void QnTourPtzExecutorPrivate::processMoving()
@@ -254,9 +250,17 @@ void QnTourPtzExecutorPrivate::processMoving()
         usingDefaultMoveTimer = true;
     }
 
-    if(waitingForNewPosition) {
+    if (spotJustActivated)
+    {
+        spotJustActivated = false;
+        onSpotActivated();
+    }
+    else if (waitingForNewPosition)
+    {
         needPositionUpdate = true;
-    } else {
+    }
+    else
+    {
         requestPosition();
     }
 }
@@ -369,6 +373,22 @@ void QnTourPtzExecutorPrivate::handleFinished(Command command, const QVariant &d
     }
     else if(command == defaultCommand)
         processMoving(data.isValid(), data.value<Vector>());
+}
+
+void QnTourPtzExecutorPrivate::onSpotActivated()
+{
+    requestPosition();
+
+    int timeout = pingTimeout;
+    const auto& spotData = currentSpotData();
+    if(state == Moving && spotData.moveTime > pingTimeout * 2)
+    {
+        NX_VERBOSE(this, "Estimated move time: %1 ms", spotData.moveTime);
+        timeout = spotData.moveTime - pingTimeout * 2;
+    }
+
+    moveTimer.start(timeout, q);
+    usingDefaultMoveTimer = (timeout == pingTimeout);
 }
 
 // -------------------------------------------------------------------------- //
