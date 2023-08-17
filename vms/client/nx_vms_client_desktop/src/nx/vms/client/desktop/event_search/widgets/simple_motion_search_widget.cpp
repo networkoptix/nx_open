@@ -137,8 +137,6 @@ SimpleMotionSearchWidget::SimpleMotionSearchWidget(QnWorkbenchContext* context, 
 
     connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
         &SimpleMotionSearchWidget::updateAllowance);
-    connect(systemContext()->accessController(), &AccessController::permissionsMaybeChanged, this,
-        &SimpleMotionSearchWidget::updateAllowance);
 }
 
 SimpleMotionSearchWidget::~SimpleMotionSearchWidget()
