@@ -19,6 +19,8 @@ TableView
     id: control
 
     required property Analytics.StateView taxonomy
+    signal editingStarted
+    signal editingFinished
 
     function getColumnWidth(columnIndex)
     {
@@ -105,6 +107,10 @@ TableView
                 LookupListTableCellDelegate
                 {
                     id: delegateItem
+
+                    onEditingStarted: control.editingStarted()
+                    onEditingFinished: control.editingFinished()
+                    Component.onDestruction: control.editingFinished()
 
                     taxonomy: control.taxonomy
                 }

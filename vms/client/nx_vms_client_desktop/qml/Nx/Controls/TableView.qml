@@ -22,6 +22,7 @@ TableView
 
     property alias horizontalHeaderVisible: columnsHeader.visible
     property alias headerBackgroundColor: columnsHeader.color
+    signal headerCheckStateChanged()
 
     function getSelectedRowIndexes()
     {
@@ -162,8 +163,11 @@ TableView
                                 headerButton.setCheckState(Qt.Checked)
                             else if (hasUncheckedValues)
                                 headerButton.setCheckState(Qt.Unchecked)
+                            else if (control.model.rowCount() === 0)
+                                headerButton.setCheckState(Qt.Unchecked)
                             else
                                 console.warn("Unexpected model check states")
+                            control.headerCheckStateChanged()
                         }
 
                         model: control.model
@@ -182,6 +186,8 @@ TableView
                         }
 
                         onDataChanged: updateCheckState()
+                        onRowsRemoved: updateCheckState()
+                        onRowsInserted: updateCheckState()
                     }
 
                     width: calculateWidth(control.columnWidthProvider(index))

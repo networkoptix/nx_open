@@ -223,6 +223,15 @@ Dialog
                     }
                     TextButton
                     {
+                        id: deleteItemButton
+
+                        text: qsTr("Delete")
+                        visible: false
+                        icon.source: "image://svg/skin/text_buttons/delete_20.svg"
+                        onClicked: entriesModel.deleteEntries(tableView.getSelectedRowIndexes())
+                    }
+                    TextButton
+                    {
                         text: qsTr("Import")
                         icon.source: "image://svg/skin/text_buttons/import.svg"
                     }
@@ -242,6 +251,22 @@ Dialog
 
                 model: entriesModel
                 taxonomy: control.taxonomy
+
+                onHeaderCheckStateChanged:
+                {
+                    const selectedIndexes = getSelectedRowIndexes()
+                    if (selectedIndexes.length === 0 && deleteItemButton.visible)
+                    {
+                        deleteItemButton.visible = false
+                    }
+                    else if(selectedIndexes.length !== 0 && !deleteItemButton.visible)
+                    {
+                        deleteItemButton.visible = true
+                    }
+                }
+
+                onEditingStarted: deleteItemButton.enabled = false
+                onEditingFinished: deleteItemButton.enabled = true
 
                 anchors
                 {

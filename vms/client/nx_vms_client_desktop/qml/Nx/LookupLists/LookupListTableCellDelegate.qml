@@ -26,11 +26,15 @@ FocusScope
     focus: isEditing
     anchors.fill: parent
 
+    signal editingStarted
+    signal editingFinished
+
     // Never pass key presses to parents while editing.
     Keys.onPressed: (event) => event.accepted = isEditing
 
     function edit()
     {
+        control.editingStarted()
         console.log("Edit started")
         editor.value = model.display
         isEditing = true
@@ -49,6 +53,7 @@ FocusScope
         console.log("Revert")
         editor.value = model.display
         isEditing = false
+        control.editingFinished()
     }
 
     MouseArea
@@ -81,10 +86,13 @@ FocusScope
         objectType: control.objectType
         attribute: control.attribute
 
+        onEditingStarted: control.editingStarted()
+
         onEditingFinished:
         {
             console.log("Editing Finished")
             commit()
+            control.editingFinished()
         }
 
         Keys.onPressed: (event) =>
