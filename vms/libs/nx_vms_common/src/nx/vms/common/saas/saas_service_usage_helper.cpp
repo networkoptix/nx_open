@@ -258,7 +258,7 @@ void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
     auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
     for (const auto& [id, parameters]: cloudStorageData)
     {
-        auto& cacheData = cache[{parameters.maxResolutionMP, id}];
+        auto& cacheData = cache[{parameters.maxResolutionMp, id}];
         cacheData.total += parameters.totalChannelNumber;
         if (saasData.state == SaasState::active)
             cacheData.available += parameters.totalChannelNumber;
@@ -309,7 +309,7 @@ void CloudStorageServiceUsageHelper::setUsedDevices(const QSet<QnUuid>& devices)
 
 
 void CloudStorageServiceUsageHelper::proposeChange(
-    const std::set<QnUuid>& devicesToAdd, 
+    const std::set<QnUuid>& devicesToAdd,
     const std::set<QnUuid>& devicesToRemove)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -408,7 +408,7 @@ std::map<QnUuid, QnUuid> CloudStorageServiceUsageHelper::servicesByCameras() con
             if (parameters.totalChannelNumber > 0)
             {
                 availableChannels.emplace(
-                    parameters.maxResolutionMP, Data{id, parameters.totalChannelNumber});
+                    parameters.maxResolutionMp, Data{id, parameters.totalChannelNumber});
             }
         }
     }
