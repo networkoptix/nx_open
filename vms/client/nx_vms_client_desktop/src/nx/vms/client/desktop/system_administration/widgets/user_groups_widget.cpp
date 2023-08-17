@@ -397,6 +397,13 @@ void UserGroupsWidget::Private::setupPlaceholder()
     ui->nothingFoundPlaceholderLayout->addWidget(descriptionText, /*stretch*/ 0, Qt::AlignHCenter);
 }
 
+QSize UserGroupsWidget::sizeHint() const
+{
+    // We need to provide some valid size because of resizeContentsPrecision == 0. Without a valid 
+    // sizeHint parent layout may expand the viewport widget which leads to performance issues.
+    return QSize(200, 200);
+}
+
 void UserGroupsWidget::Private::handleModelChanged()
 {
     const bool empty = sortModel->rowCount() == 0;
