@@ -25,6 +25,8 @@ public:
 
     void filterDigestUsers();
 
+    virtual QSize sizeHint() const override;
+
 private:
     class Private;
     class Delegate;

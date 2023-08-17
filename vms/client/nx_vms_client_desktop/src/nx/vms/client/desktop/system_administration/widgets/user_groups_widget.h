@@ -23,6 +23,8 @@ public:
     virtual void applyChanges() override;
     virtual bool hasChanges() const override;
 
+    virtual QSize sizeHint() const override;
+
 private:
     class Private;
     class Delegate;
