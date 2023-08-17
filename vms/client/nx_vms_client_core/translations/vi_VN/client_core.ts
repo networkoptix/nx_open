@@ -140,7 +140,7 @@
     </message>
     <message>
       <source>User is disabled</source>
-      <translation>Người dùng bị tắt</translation>
+      <translation>Người dùng bị vô hiệu hóa</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>

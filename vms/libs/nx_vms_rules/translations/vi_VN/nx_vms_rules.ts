@@ -605,11 +605,11 @@
     </message>
     <message>
       <source>Users</source>
-      <translation>Người sử dụng</translation>
+      <translation>Người dùng</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Tên người sử dụng</translation>
+      <translation>Tên</translation>
     </message>
     <message>
       <source>Icon</source>
@@ -721,7 +721,7 @@
     <name>nx::vms::rules::TextWithFields</name>
     <message>
       <source>Event: %1</source>
-      <translation>Biến cố：%1</translation>
+      <translation>Sự kiện: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
