@@ -253,11 +253,11 @@
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>Đường mòn kiểm toán</translation>
+      <translation>Báo cáo hành vi người dùng</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Rõ ràng Lọc</translation>
+      <translation>Xóa bộ lọc</translation>
     </message>
     <message>
       <source>Email settings</source>
@@ -269,7 +269,7 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>Event Rules</translation>
+      <translation>Quy tắc sự kiện</translation>
     </message>
   </context>
   <context>
@@ -422,18 +422,18 @@
     </message>
     <message>
       <source>Bookmark Log</source>
-      <translation>Bookmark Đăng nhập</translation>
+      <translation>Nhật ký dấu trang</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Rõ ràng Lọc</translation>
+      <translation>Xóa bộ lọc</translation>
     </message>
   </context>
   <context>
     <name>BusinessRuleWidget</name>
     <message>
       <source>Event</source>
-      <translation>Biến cố</translation>
+      <translation>Sự kiện</translation>
     </message>
     <message>
       <source>Schedule...</source>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>Event Rules</translation>
+      <translation>Quy tắc sự kiện</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Rõ ràng Lọc</translation>
+      <translation>Xóa bộ lọc</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -1175,7 +1175,7 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
+      <translation>Quy tắc sự kiện...</translation>
     </message>
   </context>
   <context>
@@ -1813,7 +1813,7 @@
     </message>
     <message>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>Địa chỉ IP cho các camera và máy chủ, nhóm người sử dụng, vv.</translation>
+      <translation>Địa chỉ IP cho camera và máy chủ, nhóm người dùng, vv.</translation>
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
@@ -2381,7 +2381,7 @@
     </message>
     <message>
       <source>Screen</source>
-      <translation>Màn</translation>
+      <translation>Màn hình</translation>
     </message>
     <message>
       <source>Additional Options</source>
@@ -2841,11 +2841,11 @@
     <name>SystemSettingsWidget</name>
     <message>
       <source>(recommended)</source>
-      <translation>(đề nghị)</translation>
+      <translation>(khuyến nghị)</translation>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation>Gửi sử dụng và crash thống kê vô danh với các nhà phát triển phần mềm</translation>
+      <translation>Gửi ẩn danh thông tin sử dụng và thống kê sự cố cho nhà phát triển phần mềm</translation>
     </message>
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
@@ -2853,7 +2853,7 @@
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>
-      <translation>Ngôn ngữ tùy chỉnh cho thông báo trên Đám mây</translation>
+      <translation>Tùy chỉnh ngôn ngữ cho thông báo trên Đám mây</translation>
     </message>
   </context>
   <context>
@@ -3057,7 +3057,7 @@
     </message>
     <message>
       <source>New License</source>
-      <translation>Ủy quyền mới</translation>
+      <translation>Giấy phép mới</translation>
     </message>
   </context>
   <context>

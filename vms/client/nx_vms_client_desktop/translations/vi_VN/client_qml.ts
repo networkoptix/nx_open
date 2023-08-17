@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation>Người sử dụng</translation>
+      <translation>Người dùng</translation>
     </message>
     <message>
       <source>Login Attribute</source>
@@ -549,7 +549,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation>Tên người sử dụng</translation>
+      <translation>Tên</translation>
     </message>
     <message>
       <source>Column Name</source>
@@ -648,7 +648,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation>Tên người sử dụng</translation>
+      <translation>Tên</translation>
     </message>
     <message>
       <source>Base DN</source>
@@ -795,7 +795,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation>Tên người sử dụng</translation>
+      <translation>Tên</translation>
     </message>
     <message>
       <source>Description</source>
@@ -857,7 +857,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation>Người sử dụng</translation>
+      <translation>Người dùng</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -868,7 +868,7 @@
     <name>GroupMembersTab</name>
     <message>
       <source>Users</source>
-      <translation>Người sử dụng</translation>
+      <translation>Người dùng</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1106,7 +1106,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation>Người sử dụng</translation>
+      <translation>Người dùng</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1319,7 +1319,7 @@
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Bạn chưa tạo bất kỳ Danh sách nào. Bạn có thể lưu trữ nhiều giá trị trong danh sách tạo sẵn để sử dụng trong Quy tắc sự kiện. Tạo một Danh sách mới để bắt đầu thêm các quy tắc.</translation>
     </message>
     <message>
       <source>Create New...</source>
@@ -1796,7 +1796,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation>Dấu trang</translation>
     </message>
     <message>
       <source>Events</source>
@@ -2208,7 +2208,7 @@ to activate PTZ</source>
     <name>UserGeneralTab</name>
     <message>
       <source>Audit Trail</source>
-      <translation>Đường mòn kiểm toán</translation>
+      <translation>Báo cáo hành vi người dùng</translation>
     </message>
     <message>
       <source>Delete</source>
