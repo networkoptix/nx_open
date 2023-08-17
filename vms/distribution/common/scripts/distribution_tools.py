@@ -165,6 +165,7 @@ def icu_files(icu_lib_directory):
         for file in find_files_by_template(icu_lib_directory, template):
             yield file
 
+
 def shared_libraries(directory: str) -> Generator[str, None, None]:
     for file in Path(directory).glob(f"*{_dynamic_library_extension()}"):
         yield file
@@ -225,7 +226,7 @@ def shell_like_parse(infile):
 
         # Parse the value, shlex.split() should take care of comments and whitespaces.
 
-        if value.startswith('('): # Array.
+        if value.startswith('('):  # Array.
             parsed_elements = shlex.split(value[1:], comments=True)
 
             # Last parsed element should be either '<arg...>)' or just ')'.
@@ -234,7 +235,7 @@ def shell_like_parse(infile):
             elif parsed_elements[-1].endswith(')'):
                 value[-1] = parsed_elements[-1][:-1]
 
-        else: # Value.
+        else:  # Value.
             value = shlex.split(value, comments=True)
             # shlex.split() always returns a list, but we need a single value here.
             if value:
@@ -244,12 +245,14 @@ def shell_like_parse(infile):
 
     return result
 
+
 def parse_generation_scripts_arguments():
-    Arguments = namedtuple('Arguments', ['config', 'output_file'])
+    Arguments = namedtuple('Arguments', ['config', 'output_file', 'targets'])
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help="Config files via semicolon", required=True)
     parser.add_argument('--output_file', help="Output file", required=True)
+    parser.add_argument('--targets', help="Target files via semicolon")
     args = parser.parse_args()
 
     config = {}
@@ -263,4 +266,4 @@ def parse_generation_scripts_arguments():
                 config_part = yaml.load(f, Loader=yaml.SafeLoader)
             config.update(config_part)
 
-    return Arguments(config=config, output_file=args.output_file)
+    return Arguments(config=config, output_file=args.output_file, targets=args.targets.split(';'))
