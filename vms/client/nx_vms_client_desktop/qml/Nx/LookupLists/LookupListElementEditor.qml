@@ -21,10 +21,12 @@ Control
     property bool isGeneric: !objectType
     property string value
 
-    signal editingFinished()
+    signal editingStarted
+    signal editingFinished
 
     function setFocus()
     {
+        control.editingStarted()
         loader.item.forceActiveFocus()
     }
 
@@ -38,6 +40,7 @@ Control
 
         onActivated: (index) =>
         {
+            control.editingStarted()
             control.value = valueAt(index)
             control.editingFinished()
         }

@@ -2,6 +2,8 @@
 
 #include "lookup_list_entries_model.h"
 
+#include <range/v3/view/reverse.hpp>
+
 #include <nx/utils/range_adapters.h>
 
 namespace nx::vms::client::desktop {
@@ -154,6 +156,22 @@ void LookupListEntriesModel::addEntry(const QVariantMap& values)
     m_data->rawData().entries.push_back(std::move(entry));
 
     endInsertRows();
+}
+
+void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
+{
+    if (!NX_ASSERT(m_data))
+        return;
+
+    if (!NX_ASSERT(!rows.empty()))
+        return;
+
+    for (auto& index: rows | ranges::views::reverse)
+    {
+        beginRemoveRows({}, index, index);
+        m_data->rawData().entries.erase(m_data->rawData().entries.begin() + index);
+        endRemoveRows();
+    }
 }
 
 } // namespace nx::vms::client::desktop

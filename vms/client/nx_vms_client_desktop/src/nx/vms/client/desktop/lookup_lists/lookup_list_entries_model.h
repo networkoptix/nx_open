@@ -51,6 +51,7 @@ public:
     void setListModel(LookupListModel* value);
 
     Q_INVOKABLE void addEntry(const QVariantMap& values);
+    Q_INVOKABLE void deleteEntries(const QVector<int>& rows);
 
 signals:
     void listModelChanged();
