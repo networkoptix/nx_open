@@ -2533,8 +2533,13 @@ void ActionHandler::doCloseApplication(bool force, AppClosingMode mode)
     if (mode == AppClosingMode::CloseAll)
         appContext()->clientStateHandler()->sharedMemoryManager()->requestToExit();
 
-    if (context()->user() && mode != AppClosingMode::External)
-        appContext()->clientStateHandler()->storeSystemSpecificState();
+    if (mode != AppClosingMode::External)
+    {
+        if (context()->user())
+            appContext()->clientStateHandler()->storeSystemSpecificState();
+
+        appContext()->clientStateHandler()->storeSystemIndependentState();
+    }
 
     menu()->trigger(action::BeforeExitAction);
 
@@ -2544,10 +2549,6 @@ void ActionHandler::doCloseApplication(bool force, AppClosingMode mode)
     // statement (i.e. closing is confirmed).
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force) && !force)
         return;
-
-    // Store system-independent parameters
-    if (mode != AppClosingMode::External)
-        appContext()->clientStateHandler()->clientClosed();
 
     context()->setClosingDown(true);
     mainWindowWidget()->hide();
