@@ -448,7 +448,7 @@ TEST_F(ClientStateHandlerTest, loadCommonStateOnStartup)
 TEST_F(ClientStateHandlerTest, saveCommonStateOnClosing)
 {
     const auto lastSession = currentSession();
-    clientStateHandler()->clientClosed();
+    clientStateHandler()->storeSystemIndependentState();
     randomizeCurrentSession();
 
     clientStateHandler()->clientStarted(kEmptyStartupParameters);
@@ -462,7 +462,7 @@ TEST_F(ClientStateHandlerTest, commonStateIsNotSavedOnClosingInVideowallMode)
 {
     clientRuntimeSettings()->setVideoWallMode(true);
     const auto lastSession = currentSession();
-    clientStateHandler()->clientClosed();
+    clientStateHandler()->storeSystemIndependentState();
     randomizeCurrentSession();
 
     clientStateHandler()->clientStarted(kEmptyStartupParameters);
