@@ -150,7 +150,7 @@ void ClientStateHandler::clientStarted(StartupParameters parameters)
     applyState(d->sessionState, ClientStateDelegate::Substate::systemIndependentParameters);
 }
 
-void ClientStateHandler::clientClosed()
+void ClientStateHandler::storeSystemIndependentState()
 {
     if (!qnRuntime->isDesktopMode())
         return;

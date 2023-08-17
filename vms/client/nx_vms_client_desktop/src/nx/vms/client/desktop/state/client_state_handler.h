@@ -121,9 +121,9 @@ public:
     void clientStarted(StartupParameters parameters);
 
     /**
-     * Handle explicit client closing. Common system-independent state will be updated.
+     * Common system-independent state will be updated.
      */
-    void clientClosed();
+    void storeSystemIndependentState();
 
     /**
      * Handle client connection.
