@@ -190,7 +190,6 @@ public:
 public:
     explicit Private(UserListWidget* q);
     void setupUi();
-    void loadData();
     void filterDigestUsers() { ui->filterButton->setCurrentAction(filterDigestAction); }
 
 private:
@@ -228,6 +227,8 @@ UserListWidget::UserListWidget(QWidget* parent):
     d(new Private(this))
 {
     d->setupUi();
+
+    d->usersModel->resetUsers();
 }
 
 UserListWidget::~UserListWidget()
@@ -237,7 +238,7 @@ UserListWidget::~UserListWidget()
 
 void UserListWidget::loadDataToUi()
 {
-    d->loadData();
+    d->header->setCheckState(Qt::Unchecked);
 }
 
 void UserListWidget::applyChanges()
@@ -352,6 +353,13 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
 
     connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
         [this]() { sortModel->setSyncId(this->q->globalSettings()->ldap().syncId()); });
+}
+
+QSize UserListWidget::sizeHint() const
+{
+    // We need to provide some valid size because of resizeContentsPrecision == 0. Without a valid 
+    // sizeHint parent layout may expand the viewport widget which leads to performance issues.
+    return QSize(200, 200);
 }
 
 void UserListWidget::Private::setupUi()
@@ -785,11 +793,6 @@ void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
             break;
         }
     }
-}
-
-void UserListWidget::Private::loadData()
-{
-    usersModel->resetUsers();
 }
 
 } // namespace nx::vms::client::desktop
