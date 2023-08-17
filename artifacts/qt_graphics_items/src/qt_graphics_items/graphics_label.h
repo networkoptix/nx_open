@@ -66,6 +66,10 @@ public:
     Qt::TextElideMode elideMode() const;
     void setElideMode(Qt::TextElideMode elideMode);
 
+    int elideConstraint() const;
+    /* Allows to paint text outside the item boundaries, but no more than the constraint. */
+    void setElideConstraint(int constraint);
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 public slots:

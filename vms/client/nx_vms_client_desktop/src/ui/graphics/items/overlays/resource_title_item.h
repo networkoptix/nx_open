@@ -27,9 +27,15 @@ public:
     GraphicsLabel* titleLabel();
     GraphicsLabel* extraInfoLabel();
 
+protected:
+    virtual void resizeEvent(QGraphicsSceneResizeEvent* event) override;
+
 private:
     QnImageButtonBar* const m_leftButtonsPanel;
     QnImageButtonBar* const m_rightButtonsPanel;
     GraphicsLabel* const m_nameLabel;
     GraphicsLabel* const m_extraInfoLabel;
+    bool m_isSimpleMode = false;
+
+    void updateNameLabelElideConstraint();
 };
