@@ -33,8 +33,8 @@ signals:
     void propertyChanged();
 
 private:
-    void at_resourceAdded(const QnResourcePtr& resource);
-    void at_resourceRemoved(const QnResourcePtr& resource);
+    void at_resourcesAdded(const QnResourceList& resource);
+    void at_resourcesRemoved(const QnResourceList& resource);
     void at_propertyChanged(const QnResourcePtr& resource, const QString& propertyName);
 
 private:
