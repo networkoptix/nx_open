@@ -67,10 +67,10 @@ struct NX_VMS_API DeviceModelGeneral
     /**%apidoc[opt] */
     bool isManuallyAdded = false;
 
-    /**%apidoc[readonly] Device manufacturer. */
+    /**%apidoc[immutable] Device manufacturer. */
     QString vendor;
 
-    /**%apidoc[readonly] Device model. */
+    /**%apidoc[immutable] Device model. */
     QString model;
 
     std::optional<DeviceGroupSettings> group;
@@ -282,6 +282,7 @@ struct NX_VMS_API DeviceModel: DeviceModelGeneral, ResourceWithParameters
     /**%apidoc[opt] */
     DeviceMotionSettings motion;
 
+    /**%apidoc[readonly] */
     std::optional<ResourceStatus> status;
 
     /**%apidoc[opt] */
@@ -290,12 +291,12 @@ struct NX_VMS_API DeviceModel: DeviceModelGeneral, ResourceWithParameters
     /**%apidoc[opt] */
     CameraBackupQuality backupQuality = CameraBackup_Default;
 
-    /**%apidoc[readonly]
+    /**%apidoc[immutable]
      * %// Appeared starting from /rest/v2/devices.
      */
     std::optional<DeviceType> deviceType;
 
-    /**%apidoc[readonly] */
+    /**%apidoc[immutable] */
     std::optional<DeviceCapabilities> capabilities;
 
     DeviceModel() = default;
