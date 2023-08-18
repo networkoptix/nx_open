@@ -37,6 +37,7 @@
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -182,20 +183,21 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
                 m_gapBeforeNewTracks = false;
         });
 
-    auto cameraStatusListener =
+    connect(q->accessController(), &AccessController::permissionsMaybeChanged, this,
+        [this](const QnResourceList& resources)
+        {
+            const auto isCamera =
+                [](const QnResourcePtr& resource)
+                {
+                    return resource.objectCast<QnVirtualCameraResource>();
+                };
+
+            if (resources.isEmpty() || std::any_of(resources.begin(), resources.end(), isCamera))
+                updateMetadataReceivers();
+        });
+
+    const auto cameraStatusListener =
         new core::SessionResourcesSignalListener<QnVirtualCameraResource>(q);
-
-    cameraStatusListener->setOnAddedHandler(
-        [this](const QnVirtualCameraResourceList& /*cameras*/)
-        {
-            updateMetadataReceivers();
-        });
-
-    cameraStatusListener->setOnRemovedHandler(
-        [this](const QnVirtualCameraResourceList& /*cameras*/)
-        {
-            updateMetadataReceivers();
-        });
 
     cameraStatusListener->addOnSignalHandler(
         &QnResource::statusChanged,
@@ -766,9 +768,11 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
         }
 
         const auto isReceiverRequired =
-            [](const QnVirtualCameraResourcePtr& camera)
+            [this](const QnVirtualCameraResourcePtr& camera)
             {
-                return camera->isOnline() && !camera->enabledAnalyticsEngines().empty();
+                return camera->isOnline()
+                    && !camera->enabledAnalyticsEngines().empty()
+                    && q->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
             };
 
         // Preserve existing receivers that are still relevant.
