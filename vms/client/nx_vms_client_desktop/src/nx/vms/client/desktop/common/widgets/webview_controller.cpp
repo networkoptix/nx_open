@@ -842,6 +842,21 @@ void WebViewController::setMenuSave(bool enabled)
         });
 }
 
+bool WebViewController::isWebPageContextMenuEnabled() const
+{
+    const QQuickItem* root = d->rootObject();
+    return root && root->property("enableCustomMenu").toBool();
+}
+
+void WebViewController::setWebPageContextMenuEnabled(bool enabled)
+{
+    d->callWhenReady(
+        [enabled](QQuickItem* root)
+        {
+            root->setProperty("enableCustomMenu", enabled);
+        });
+}
+
 void WebViewController::addProfileScript(const QWebEngineScript& script)
 {
     d->callWhenReady(

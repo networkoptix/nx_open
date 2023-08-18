@@ -29,6 +29,8 @@ public:
     bool overlayIsVisible() const;
     void setOverlayVisibility(bool visible);
 
+    void setPreventDefaultContextMenu(bool value);
+
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;
 
