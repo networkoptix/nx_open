@@ -93,7 +93,8 @@ Dialog
 
             hint: ContextHintButton
             {
-                toolTipText: "TBD" // TODO: VMS-41034
+                toolTipText: qsTr("The Base DN sets the starting point for LDAP searches and"
+                    + " synchronization.")
             }
 
             TextFieldWithValidator
@@ -120,7 +121,8 @@ Dialog
 
             hint: ContextHintButton
             {
-                toolTipText: "TBD" // TODO: VMS-41034
+                toolTipText: qsTr("Filters help control access to the system and synchronization"
+                    + " by specifying which users and/or groups from the Base DN are allowed.")
             }
 
             TextFieldWithValidator
