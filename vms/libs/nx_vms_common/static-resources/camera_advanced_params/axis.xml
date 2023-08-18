@@ -116,6 +116,43 @@
                     readCmd="param.cgi"
                     aux="reopenStreams"/>
             </group>
+            <group name="Zipstream">
+                <param id="root.Image.I0.MPEG.ZStrength"
+                    name="Strength"
+                    dataType="Enumeration"
+                    range="Disabled,Low,Medium,High,Higher,Extreme"
+                    internalRange="off,10,20,30,40,50"
+                    readCmd="param.cgi"/>
+                <param id="root.Image.I0.MPEG.ZGopMode"
+                    name="GOP mode"
+                    dataType="Enumeration"
+                    range="Fixed,Dynamic"
+                    internalRange="fixed,dynamic"
+                    readCmd="param.cgi"/>
+                <param id="root.Image.I0.MPEG.ZFpsMode"
+                    name="FPS mode"
+                    dataType="Enumeration"
+                    range="Fixed,Dynamic"
+                    internalRange="fixed,dynamic"
+                    readCmd="param.cgi"/>
+                <param id="root.Image.I0.MPEG.ZMinFps"
+                    name="Lower FPS limit"
+                    description="0 means that the FPS is allowed to go as low as the dynamic frame rate can go. If a value is greater than 0 the dynamic frame rate is not allowed to go below the specified value."
+                    dataType="Number"
+                    range="0,10000"
+                    unit="fps"
+                    readCmd="param.cgi">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="root.Image.I0.MPEG.ZFpsMode"
+                                    condition="value=Dynamic"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+            </group>
         </group>
         <group name="Audio">
             <group name="Input Settings">
