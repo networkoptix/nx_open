@@ -20,7 +20,11 @@ class ParentGroupsModel: public QSortFilterProxyModel
     Q_PROPERTY(bool directOnly READ directOnly WRITE setDirectOnly NOTIFY directOnlyChanged)
 
 public:
+    ParentGroupsModel(QObject* parent = nullptr);
+
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
+
+    bool lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight) const override;
 
     bool directOnly() const
     {
@@ -55,15 +59,6 @@ class ParentGroupsProvider: public QAbstractListModel
         READ membersModel
         WRITE setMembersModel
         NOTIFY membersModelChanged)
-
-public:
-    enum Roles
-    {
-        isParent = Qt::UserRole + 1,
-        isLdap,
-        isPredefined,
-        canEditMembers,
-    };
 
 public:
     explicit ParentGroupsProvider(QObject* parent = nullptr);
