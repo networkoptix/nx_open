@@ -14,7 +14,7 @@
 namespace nx::vms::api {
 
 /**apidoc
- * %param[opt] id Storage unique id. Can be omitted when creating a new object.
+ * %param[immutable] id Storage unique id. Can be omitted when creating a new object.
  * %param parentId Parent Server unique id.
  * %param[opt] name Arbitrary Storage name.
  * %param url Full Storage url (path to the local folder).

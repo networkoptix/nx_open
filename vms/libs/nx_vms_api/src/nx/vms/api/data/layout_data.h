@@ -16,7 +16,7 @@ namespace nx::vms::api {
 
 /**%apidoc
  * Layout Item information object
- * %param [readonly] id Item unique id.
+ * %param [immutable] id Item unique id.
  */
 struct NX_VMS_API LayoutItemData: IdData
 {
@@ -111,7 +111,7 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(LayoutItemData)
 NX_REFLECTION_INSTRUMENT(LayoutItemData, LayoutItemData_Fields)
 
 /**%apidoc Layout information object
- * %param [readonly] id Layout unique id.
+ * %param [immutable] id Layout unique id.
  * %param [opt] parentId Unique id of the user owning the layout.
  * %param name Layout name.
  *     %example Layout
