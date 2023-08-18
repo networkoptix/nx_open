@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "ui_user_list_widget.h"
-#include "user_list_widget.h"
 
 #include <algorithm>
 
@@ -49,6 +48,7 @@
 #include <utils/math/color_transformations.h>
 
 #include "private/highlighted_text_item_delegate.h"
+#include "user_list_widget.h"
 
 namespace nx::vms::client::desktop {
 
@@ -719,7 +719,7 @@ bool UserListWidget::Private::canDelete(const QnUserResourcePtr& user) const
 
 bool UserListWidget::Private::canDelete(const QnUserResourceList& users) const
 {
-    return !users.empty() && std::all_of(users.cbegin(), users.cend(),
+    return !users.empty() && std::any_of(users.cbegin(), users.cend(),
         [this](const QnUserResourcePtr& user) { return canDelete(user); });
 }
 

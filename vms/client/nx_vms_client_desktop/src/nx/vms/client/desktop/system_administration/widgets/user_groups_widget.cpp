@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "user_groups_widget.h"
 #include "ui_user_groups_widget.h"
 
 #include <utility>
@@ -37,6 +36,7 @@
 #include <ui/help/help_topics.h>
 
 #include "private/highlighted_text_item_delegate.h"
+#include "user_groups_widget.h"
 
 using namespace nx::vms::common;
 
@@ -421,7 +421,7 @@ void UserGroupsWidget::Private::handleSelectionChanged()
         header->setCheckState(Qt::PartiallyChecked);
 
     const bool canDelete = !checkedGroupIds.empty()
-        && std::all_of(checkedGroupIds.cbegin(), checkedGroupIds.cend(),
+        && std::any_of(checkedGroupIds.cbegin(), checkedGroupIds.cend(),
             [this](const QnUuid& groupId) { return canDeleteGroup(groupId); });
 
     deleteSelectedButton->setVisible(canDelete);
