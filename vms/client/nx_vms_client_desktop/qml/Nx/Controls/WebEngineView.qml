@@ -251,6 +251,44 @@ Item
             return actions.map(a => a === WebEngineView.NoAction ? null : webView.action(a))
         }
 
+        Component
+        {
+            id: devToolsComponent
+
+            Window
+            {
+                readonly property var webView: devToolsWebView
+
+                width: 700
+                height: 500
+
+                onClosing: devToolsWebView.inspectedView = null
+
+                WebEngineView
+                {
+                    id: devToolsWebView
+                    anchors.fill: parent
+                }
+            }
+        }
+
+        function showDevTools()
+        {
+            if (devToolsView)
+            {
+                // Just raise already opened window.
+                devToolsView.Window.window.raise()
+                return
+            }
+
+            const devTools = devToolsComponent.createObject()
+            devToolsView = devTools.webView
+            parent.closeWindows.connect(devTools.close)
+
+            devTools.show()
+            devTools.raise()
+        }
+
         onContextMenuRequested: function(request)
         {
             request.accepted = true
