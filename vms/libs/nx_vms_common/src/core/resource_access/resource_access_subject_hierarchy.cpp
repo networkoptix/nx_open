@@ -8,11 +8,22 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 
 using namespace nx::vms::common;
 
 namespace nx::core::access {
+
+namespace {
+
+constexpr auto userFilter =
+    [](const QnResourcePtr& resource)
+    {
+        return resource->hasFlags(Qn::ResourceFlag::user);
+    };
+
+} // namespace;
 
 class ResourceAccessSubjectHierarchy::Private: public QObject
 {
@@ -29,33 +40,37 @@ public:
     {
     }
 
-    void handleResourceAdded(const QnResourcePtr& resource)
+    void handleResourcesAdded(const QnResourceList& resources)
     {
-        const auto user = resource.objectCast<QnUserResource>();
-        if (!user)
-            return;
-
         const auto updateUser =
             [this](const QnUserResourcePtr& user)
             {
-                const auto groupIds = user->groupIds();
-                q->addOrUpdate(user->getId(), {groupIds.cbegin(), groupIds.cend()});
+                q->addOrUpdate(user->getId(), nx::utils::toQSet(user->groupIds()));
             };
 
-        connect(
-            user.get(), &QnUserResource::userGroupsChanged, this, updateUser, Qt::DirectConnection);
+        for (const auto& resource: resources)
+        {
+            const auto user = resource.objectCast<QnUserResource>();
+            if (!user)
+                continue;
 
-        updateUser(user);
+            connect(user.get(), &QnUserResource::userGroupsChanged,
+                this, updateUser, Qt::DirectConnection);
+
+            updateUser(user);
+        }
     }
 
-    void handleResourceRemoved(const QnResourcePtr& resource)
+    void handleResourcesRemoved(const QnResourceList& resources)
     {
-        const auto user = resource.objectCast<QnUserResource>();
-        if (!user)
-            return;
+        for (const auto& resource: resources)
+        {
+            if (!resource->hasFlags(Qn::ResourceFlag::user))
+                continue;
 
-        user->disconnect(this);
-        q->remove(user->getId());
+            resource->disconnect(this);
+            q->remove(resource->getId());
+        }
     }
 
     void handleGroupAddedOrUpdated(const nx::vms::api::UserGroupData& group)
@@ -78,8 +93,7 @@ public:
             for (const auto& group: userGroupManager->groups())
                 handleGroupAddedOrUpdated(group);
 
-            for (const auto& user: resourcePool->getResources<QnUserResource>())
-                handleResourceAdded(user);
+            handleResourcesAdded(resourcePool->getResources(userFilter));
         }
 
         emit q->reset();
@@ -101,11 +115,11 @@ ResourceAccessSubjectHierarchy::ResourceAccessSubjectHierarchy(
     if (!NX_ASSERT(resourcePool && userGroupManager))
         return;
 
-    connect(resourcePool, &QnResourcePool::resourceAdded,
-        d.get(), &Private::handleResourceAdded, Qt::DirectConnection);
+    connect(resourcePool, &QnResourcePool::resourcesAdded,
+        d.get(), &Private::handleResourcesAdded, Qt::DirectConnection);
 
-    connect(resourcePool, &QnResourcePool::resourceRemoved,
-        d.get(), &Private::handleResourceRemoved, Qt::DirectConnection);
+    connect(resourcePool, &QnResourcePool::resourcesRemoved,
+        d.get(), &Private::handleResourcesRemoved, Qt::DirectConnection);
 
     connect(userGroupManager, &UserGroupManager::addedOrUpdated,
         d.get(), &Private::handleGroupAddedOrUpdated, Qt::DirectConnection);
@@ -119,8 +133,7 @@ ResourceAccessSubjectHierarchy::ResourceAccessSubjectHierarchy(
     for (const auto& group: userGroupManager->groups())
         d->handleGroupAddedOrUpdated(group);
 
-    for (const auto& user: resourcePool->getResources<QnUserResource>())
-        d->handleResourceAdded(user);
+    d->handleResourcesAdded(resourcePool->getResources(userFilter));
 }
 
 ResourceAccessSubjectHierarchy::~ResourceAccessSubjectHierarchy()

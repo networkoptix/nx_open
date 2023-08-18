@@ -27,7 +27,8 @@ class GlobalPermissionsWatcher::Private: public QObject
     const QPointer<UserGroupManager> userGroupManager;
 
 public:
-    Private(GlobalPermissionsWatcher* q,
+    Private(
+        GlobalPermissionsWatcher* q,
         QnResourcePool* resourcePool,
         UserGroupManager* userGroupManager)
         :
@@ -38,11 +39,11 @@ public:
         if (!NX_ASSERT(resourcePool && userGroupManager))
             return;
 
-        connect(resourcePool, &QnResourcePool::resourceAdded,
-            this, &Private::handleResourceAdded, Qt::DirectConnection);
+        connect(resourcePool, &QnResourcePool::resourcesAdded,
+            this, &Private::handleResourcesAdded, Qt::DirectConnection);
 
-        connect(resourcePool, &QnResourcePool::resourceRemoved,
-            this, &Private::handleResourceRemoved, Qt::DirectConnection);
+        connect(resourcePool, &QnResourcePool::resourcesRemoved,
+            this, &Private::handleResourcesRemoved, Qt::DirectConnection);
 
         connect(userGroupManager, &UserGroupManager::addedOrUpdated,
             this, &Private::handleGroupAddedOrUpdated, Qt::DirectConnection);
@@ -60,29 +61,35 @@ public:
             handleGroupAddedOrUpdated(group);
     }
 
-    void handleResourceAdded(const QnResourcePtr& resource)
+    void handleResourcesAdded(const QnResourceList& resources)
     {
-        const auto user = resource.objectCast<QnUserResource>();
-        if (!user)
-            return;
+        for (const auto& resource: resources)
+        {
 
-        handleUserChanged(user);
+            const auto user = resource.objectCast<QnUserResource>();
+            if (!user)
+                continue;
 
-        if (user->isAdministrator())
-            return;
+            handleUserChanged(user);
 
-        connect(user.get(), &QnUserResource::permissionsChanged,
-            this, &Private::handleUserChanged, Qt::DirectConnection);
+            if (user->isAdministrator())
+                continue;
+
+            connect(user.get(), &QnUserResource::permissionsChanged,
+                this, &Private::handleUserChanged, Qt::DirectConnection);
+        }
     }
 
-    void handleResourceRemoved(const QnResourcePtr& resource)
+    void handleResourcesRemoved(const QnResourceList& resources)
     {
-        const auto user = resource.objectCast<QnUserResource>();
-        if (!user)
-            return;
+        for (const auto& resource: resources)
+        {
+            if (!resource->hasFlags(Qn::ResourceFlag::user))
+                continue;
 
-        user->disconnect(this);
-        handleSubjectRemoved(user->getId());
+            resource->disconnect(this);
+            handleSubjectRemoved(resource->getId());
+        }
     }
 
     void handleUserChanged(const QnUserResourcePtr& user)
