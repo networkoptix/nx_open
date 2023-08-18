@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
@@ -806,7 +807,7 @@ struct LogsManagementWatcher::Private
                     || notificationId == serverLogLevelWarning
                     || notificationId == logsDownloadNotification)
                 {
-                    context->action(ui::action::LogsManagementAction)->trigger();
+                    context->menu()->trigger(ui::action::LogsManagementAction);
                 }
             });
     }
