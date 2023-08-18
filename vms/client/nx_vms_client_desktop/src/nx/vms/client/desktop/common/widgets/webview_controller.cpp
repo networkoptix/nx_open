@@ -31,6 +31,7 @@
 #include <nx/network/nx_network_ini.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/abstract_web_authenticator.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/c2p/jsapi/external.h>
 #include <nx/vms/client/desktop/jsapi/auth.h>
 #include <nx/vms/client/desktop/jsapi/globals.h>
@@ -407,6 +408,38 @@ struct WebViewController::Private: public QObject
         else
             rejectAuth();
     }
+
+    QList<QAction*> getAdditionalActions(QObject* parent) const
+    {
+        QQuickItem* root = rootObject();
+        if (!root)
+            return {};
+
+        const auto webView = root->findChild<QQuickWebEngineView*>(kWebViewId);
+        if (!webView)
+            return {};
+
+        QList<QAction*> result;
+
+        if (ini().developerMode)
+        {
+            QAction* devTools = new QAction(parent);
+            devTools->setText(tr("Developer Tools"));
+
+            connect(devTools, &QAction::triggered, this,
+                [webView = QPointer(webView)]()
+                {
+                    if (!NX_ASSERT(webView))
+                        return;
+
+                    QMetaObject::invokeMethod(webView, "showDevTools");
+                });
+
+            result.append(devTools);
+        }
+
+        return result;
+    }
 };
 
 WebViewController::WebViewController(QObject* parent):
@@ -734,7 +767,11 @@ QList<QAction*> WebViewController::getContextMenuActions(QObject* parent) const
     if (!ok)
         return {};
 
-    return createActions(webActions, parent);
+    auto result = createActions(webActions, parent);
+
+    result.append(d->getAdditionalActions(parent));
+
+    return result;
 }
 
 void WebViewController::showMenu(float x, float y, const QVariant& webActions)
@@ -753,6 +790,7 @@ void WebViewController::showMenu(float x, float y, const QVariant& webActions)
 
     const auto menuActions = createActions(webActions, menu);
     menu->addActions(menuActions);
+    menu->addActions(d->getAdditionalActions(menu));
 
     const QPointF globalPos = webView->mapToGlobal({x, y});
     menu->popup(globalPos.toPoint());
