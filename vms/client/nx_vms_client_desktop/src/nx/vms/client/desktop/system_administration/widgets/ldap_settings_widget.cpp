@@ -347,12 +347,7 @@ void LdapSettingsWidget::discardChanges()
 {
     d->statusUpdateTimer.stop();
 
-    if (d->currentHandle)
-    {
-        connectedServerApi()->cancelRequest(d->currentHandle);
-        d->currentHandle = 0;
-    }
-
+    cancelCurrentRequest();
     d->setState(d->initialSettings);
 }
 
@@ -423,16 +418,13 @@ void LdapSettingsWidget::resetLdap()
                 showError(tr("Connection failed"));
         });
 
-    if (d->currentHandle)
-        connectedServerApi()->cancelRequest(d->currentHandle);
+    cancelCurrentRequest();
 
     // Clear the settings immediately but rollback on error.
     globalSettings()->setLdap({});
 
-    d->currentHandle = connectedServerApi()->resetLdapAsync(
-        sessionTokenHelper,
-        resetCallback,
-        thread());
+    if (auto api = connectedServerApi())
+        d->currentHandle = api->resetLdapAsync(sessionTokenHelper, resetCallback, thread());
 }
 
 void LdapSettingsWidget::applyChanges()
@@ -517,18 +509,20 @@ void LdapSettingsWidget::applyChanges()
             }
         });
 
-    if (d->currentHandle)
-        connectedServerApi()->cancelRequest(d->currentHandle);
+    cancelCurrentRequest();
 
     // Apply the settings immediately but rollback on error.
     globalSettings()->setLdap(settingsChange);
     d->checkingOnlineStatus = true;
 
-    d->currentHandle = connectedServerApi()->modifyLdapSettingsAsync(
-        settingsChange,
-        sessionTokenHelper,
-        settingsCallback,
-        thread());
+    if (auto api = connectedServerApi())
+    {
+        d->currentHandle = api->modifyLdapSettingsAsync(
+            settingsChange,
+            sessionTokenHelper,
+            settingsCallback,
+            thread());
+    }
 }
 
 void LdapSettingsWidget::requestSync()
@@ -540,29 +534,27 @@ void LdapSettingsWidget::requestSync()
         tr("Synchronize"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
-    if (d->currentHandle)
-        connectedServerApi()->cancelRequest(d->currentHandle);
-
+    cancelCurrentRequest();
     d->syncRequested = true;
 
-    d->currentHandle = connectedServerApi()->syncLdapAsync(
-        sessionTokenHelper,
-        nx::utils::guarded(this,
-            [this](bool success, int handle, const rest::ErrorOrEmpty& result)
-            {
-                if (handle == d->currentHandle)
-                    d->currentHandle = 0;
+    auto callback = nx::utils::guarded(this,
+        [this](bool success, int handle, const rest::ErrorOrEmpty& result)
+        {
+            if (handle == d->currentHandle)
+                d->currentHandle = 0;
 
-                d->syncRequested = false;
+            d->syncRequested = false;
 
-                if (success)
-                    checkOnlineAndSyncStatus();
-                else if (auto error = std::get_if<nx::network::rest::Result>(&result))
-                    showError(error->errorString);
-                else
-                    showError(tr("Connection failed"));
-            }),
-        thread());
+            if (success)
+                checkOnlineAndSyncStatus();
+            else if (auto error = std::get_if<nx::network::rest::Result>(&result))
+                showError(error->errorString);
+            else
+                showError(tr("Connection failed"));
+        });
+
+    if (auto api = connectedServerApi())
+        d->currentHandle = api->syncLdapAsync(sessionTokenHelper, callback, thread());
 }
 
 bool LdapSettingsWidget::hasChanges() const
@@ -586,44 +578,43 @@ void LdapSettingsWidget::testConnection(
     settings.startTls = startTls;
     settings.ignoreCertificateErrors = ignoreCertErrors;
 
-    if (d->currentHandle)
-        connectedServerApi()->cancelRequest(d->currentHandle);
+    cancelCurrentRequest();
 
-    d->currentHandle = connectedServerApi()->testLdapSettingsAsync(
-        settings,
-        nx::utils::guarded(this,
-            [this](
-                bool success, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
+    auto callback = nx::utils::guarded(this,
+        [this](
+            bool success, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
+        {
+            if (handle == d->currentHandle)
             {
-                if (handle == d->currentHandle)
-                {
-                    d->currentHandle = 0;
-                }
-                else
-                {
-                    d->testMessage = "";
-                    return;
-                }
+                d->currentHandle = 0;
+            }
+            else
+            {
+                d->testMessage = "";
+                return;
+            }
 
-                if (auto firstDnPerFilter = std::get_if<std::vector<QString>>(&errorOrData))
-                {
-                    d->testMessage = tr("Connection OK");
-                    d->testState = TestState::ok;
-                }
-                else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-                {
-                    d->testMessage = error->errorString;
-                    d->testState = TestState::error;
-                }
-                else
-                {
-                    d->testMessage = tr("Connection failed");
-                    d->testState = TestState::error;
-                }
-            }),
-        thread());
+            if (auto firstDnPerFilter = std::get_if<std::vector<QString>>(&errorOrData))
+            {
+                d->testMessage = tr("Connection OK");
+                d->testState = TestState::ok;
+            }
+            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+            {
+                d->testMessage = error->errorString;
+                d->testState = TestState::error;
+            }
+            else
+            {
+                d->testMessage = tr("Connection failed");
+                d->testState = TestState::error;
+            }
+        });
 
-    if (d->currentHandle)
+    if (auto api = connectedServerApi())
+        d->currentHandle = api->testLdapSettingsAsync(settings, callback, thread());
+
+    if (d->currentHandle > 0)
         d->testState = TestState::connecting;
 }
 
@@ -643,23 +634,22 @@ void LdapSettingsWidget::testOnline(
     settings.startTls = startTls;
     settings.ignoreCertificateErrors = ignoreCertErrors;
 
-    if (d->currentHandle)
-        connectedServerApi()->cancelRequest(d->currentHandle);
+    cancelCurrentRequest();
 
-    d->currentHandle = connectedServerApi()->testLdapSettingsAsync(
-        settings,
-        nx::utils::guarded(this,
-            [this](
-                bool success, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
-            {
-                if (handle == d->currentHandle)
-                    d->currentHandle = 0;
+    auto callback = nx::utils::guarded(this,
+        [this](
+            bool success, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
+        {
+            if (handle == d->currentHandle)
+                d->currentHandle = 0;
 
-                d->checkingOnlineStatus = false;
-                d->online = success && std::get_if<std::vector<QString>>(&errorOrData);
-                d->updateUserAndGroupCount();
-            }),
-        thread());
+            d->checkingOnlineStatus = false;
+            d->online = success && std::get_if<std::vector<QString>>(&errorOrData);
+            d->updateUserAndGroupCount();
+        });
+
+    if (auto api = connectedServerApi())
+        d->currentHandle = api->testLdapSettingsAsync(settings, callback, thread());
 }
 
 void LdapSettingsWidget::showError(const QString& errorMessage)
@@ -677,17 +667,17 @@ void LdapSettingsWidget::showError(const QString& errorMessage)
         this);
 
     messageBox.setWindowTitle(tr("LDAP"));
-
     messageBox.exec();
 }
 
 void LdapSettingsWidget::cancelCurrentRequest()
 {
-    if (d->currentHandle)
+    if (d->currentHandle > 0)
     {
-        connectedServerApi()->cancelRequest(d->currentHandle);
-        d->currentHandle = 0;
+        if (auto api = connectedServerApi())
+            api->cancelRequest(d->currentHandle);
     }
+    d->currentHandle = 0;
 }
 
 void LdapSettingsWidget::showEvent(QShowEvent* event)
