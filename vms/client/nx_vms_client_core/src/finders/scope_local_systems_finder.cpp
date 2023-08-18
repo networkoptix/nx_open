@@ -47,6 +47,5 @@ void ScopeLocalSystemsFinder::updateSystems()
         newSystems.insert(system->id(), system);
     }
 
-    const auto newFinalSystems = filterOutSystems(newSystems);
-    setFinalSystems(newFinalSystems);
+    setFinalSystems(newSystems);
 }
