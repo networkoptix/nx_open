@@ -77,7 +77,7 @@ Control
                     leftMargin: 6
                     verticalCenter: parent.verticalCenter
                 }
-                text: qsTr("Select")
+                text: control.enabled ? qsTr("Select") : ("<" + qsTr("No groups") + ">")
 
                 opacity: control.enabled ? 1.0 : 0.3
                 visible: model.parentGroups.length == 0
@@ -91,7 +91,7 @@ Control
             id: boxMouseArea
             anchors.fill: parent
 
-            hoverEnabled: true
+            hoverEnabled: control.enabled
             onClicked: (mouse) =>
             {
                 const clickY = mouse.y
