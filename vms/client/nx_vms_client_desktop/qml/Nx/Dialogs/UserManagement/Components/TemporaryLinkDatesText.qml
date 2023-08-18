@@ -23,11 +23,11 @@ Text
         const dateUntil = highlight(`${displayDate(linkValidUntil)}`)
 
         if (!revokeAccessEnabled)
-            return qsTr(`Valid from %1 to %2`).arg(dateFrom).arg(dateUntil)
+            return qsTr(`Valid from %1 until %2`).arg(dateFrom).arg(dateUntil)
 
         const expires = highlight(`${UserSettingsGlobal.humanReadableSeconds(expiresAfterLoginS)}`)
 
-        return qsTr(`Valid from %1 to %2 or %3 after login`)
+        return qsTr(`Valid from %1 until %2 or %3 after login`)
             .arg(dateFrom)
             .arg(dateUntil)
             .arg(expires)

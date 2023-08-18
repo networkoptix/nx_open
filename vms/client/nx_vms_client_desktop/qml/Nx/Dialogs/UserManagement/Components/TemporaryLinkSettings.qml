@@ -29,12 +29,12 @@ Column
     {
         id: validUntilField
 
-        text: qsTr("Link Valid until")
+        text: qsTr("Link Valid Until")
 
         hint: ContextHintButton
         {
             toolTipText: qsTr("The link will remain accessible until the date specified"
-             + " (including, based on the Server time)")
+             + " (including, based on server time)")
         }
 
         DatePicker
