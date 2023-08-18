@@ -952,18 +952,6 @@ void QnCommonMessageProcessor::resetUserGroups(const UserGroupDataList& userGrou
     }
 }
 
-void QnCommonMessageProcessor::resetAccessRights(const FullInfoData& fullData)
-{
-    QHash<QnUuid, nx::core::access::ResourceAccessMap> accessMaps;
-
-    for (const auto& u: fullData.users)
-        accessMaps.insert(u.id, {u.resourceAccessRights.begin(), u.resourceAccessRights.end()});
-    for (const auto& g: fullData.userGroups)
-        accessMaps.insert(g.id, {g.resourceAccessRights.begin(), g.resourceAccessRights.end()});
-
-    m_context->accessRightsManager()->resetAccessRights(accessMaps);
-}
-
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid&, ec2::NotificationSource)
 {
     return true;
@@ -1107,7 +1095,6 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
 
     m_context->showreelManager()->resetShowreels(fullData.showreels);
 
-    resetAccessRights(fullData);
     m_context->resourceAccessManager()->endUpdate();
 }
 
