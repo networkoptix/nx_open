@@ -66,6 +66,7 @@ ComboBox
     implicitHeight: 28
 
     background: backgroundLoader.item
+    font.pixelSize: 14
 
     // TODO: Qt6 'pressed' is readonly
     //pressed: hoverArea.pressed
@@ -119,7 +120,7 @@ ComboBox
         autoScroll: activeFocus
         selectByMouse: true
         selectionColor: ColorTheme.highlight
-        font.pixelSize: 14
+        font: control.font
         color: ColorTheme.text
         verticalAlignment: Text.AlignVCenter
 
@@ -252,6 +253,7 @@ ComboBox
             elide: Text.ElideRight
             color: highlightedIndex == index ? ColorTheme.colors.brand_contrast : ColorTheme.text
             verticalAlignment: Text.AlignVCenter
+            font: control.font
 
             readonly property real tab: control.tabRole ? popupItem.itemData[control.tabRole] : 0
 

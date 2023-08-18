@@ -494,7 +494,7 @@ Item
                         }
 
                         width: parent.width
-                        spacing: 8
+                        spacing: 16
 
                         function openNewLinkDialog(showWarning)
                         {

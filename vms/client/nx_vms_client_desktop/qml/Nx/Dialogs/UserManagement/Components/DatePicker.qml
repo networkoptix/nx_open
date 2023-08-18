@@ -58,13 +58,14 @@ RowLayout
         height: 20
 
         hoverEnabled: control.enabled
+        enabled: !popup.opened
 
         icon.source: "image://svg/skin/calendar/calendar.svg"
         icon.width: width
         icon.height: height
         icon.color: hovered
             ? ColorTheme.colors.light13
-            : ColorTheme.colors.light16
+            : popup.opened ? ColorTheme.colors.light17 : ColorTheme.colors.light16
 
         background: null
 
@@ -174,7 +175,7 @@ RowLayout
 
                         font.pixelSize: 16
                         font.weight: Font.Medium
-                        font.capitalization: Font.AllUppercase
+                        font.capitalization: Font.Capitalize
                         color: ColorTheme.text
                         text: `${locale.standaloneMonthName(visibleMonth)} ${visibleYear}`
  

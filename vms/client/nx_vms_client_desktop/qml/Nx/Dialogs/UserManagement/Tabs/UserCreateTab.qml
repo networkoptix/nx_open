@@ -70,6 +70,12 @@ Item
             x: 16
             width: scroll.width - 16 * 2
 
+            component Spacer: Item
+            {
+                width: 1
+                height: 8
+            }
+
             SectionHeader
             {
                 text: qsTr("New User")
@@ -79,6 +85,7 @@ Item
             {
                 UserEnabledSwitch
                 {
+                    height: 28
                     id: enabledUserSwitch
                 }
             }
@@ -127,6 +134,8 @@ Item
                     }
                 }
             }
+
+            Spacer {}
 
             CenteredField
             {
@@ -185,6 +194,8 @@ Item
                     }
                 }
             }
+
+            Spacer {}
 
             CenteredField
             {
@@ -318,6 +329,8 @@ Item
                         + " account.")
                 }
             }
+
+            Spacer {}
 
             CenteredField
             {

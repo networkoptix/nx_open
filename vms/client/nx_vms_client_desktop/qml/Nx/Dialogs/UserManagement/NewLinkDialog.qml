@@ -82,7 +82,7 @@ Dialog
             anchors.left: parent.left
             anchors.right: parent.right
 
-            text: qsTr("The previous link will be invalidated once a new one has been issued.")
+            text: qsTr("The previous link will be invalidated once a new one has been issued")
 
             onCloseClicked: banner.visible = false
         }

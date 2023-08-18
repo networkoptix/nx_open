@@ -97,6 +97,7 @@ Row
         width: Math.max(90, requiredContentWidth)
         model: suffixModel
         textRole: "display"
+        font.capitalization: Font.Capitalize
 
         onCurrentIndexChanged: updateSeconds()
     }
