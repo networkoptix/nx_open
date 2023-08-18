@@ -135,7 +135,6 @@ protected:
     void resetResources(const nx::vms::api::FullInfoData& fullData);
     void resetLicenses(const nx::vms::api::LicenseDataList& licenses);
     void resetCamerasWithArchiveList(const nx::vms::api::ServerFootageDataList& cameraHistoryList);
-    void resetAccessRights(const nx::vms::api::FullInfoData& fullData);
 
     virtual bool canRemoveResource(const QnUuid& resourceId, ec2::NotificationSource source);
     virtual void removeResourceIgnored(const QnUuid& resourceId);

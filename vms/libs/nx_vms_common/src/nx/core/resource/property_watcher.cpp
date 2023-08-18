@@ -29,11 +29,11 @@ void PropertyWatcher::watch(
         m_propertiesToWatch = std::move(properties);
         m_resourceFilter = std::move(resourceFilter);
 
-        connect(m_resourcePool, &QnResourcePool::resourceAdded,
-            this, &PropertyWatcher::at_resourceAdded);
+        connect(m_resourcePool, &QnResourcePool::resourcesAdded,
+            this, &PropertyWatcher::at_resourcesAdded);
 
-        connect(m_resourcePool, &QnResourcePool::resourceRemoved,
-            this, &PropertyWatcher::at_resourceRemoved);
+        connect(m_resourcePool, &QnResourcePool::resourcesRemoved,
+            this, &PropertyWatcher::at_resourcesRemoved);
 
         QnResourceList resources = m_resourcePool->getResources(m_resourceFilter);
 
@@ -47,30 +47,50 @@ void PropertyWatcher::watch(
     emit propertyChanged();
 }
 
-void PropertyWatcher::at_resourceAdded(const QnResourcePtr& resource)
+void PropertyWatcher::at_resourcesAdded(const QnResourceList& resources)
 {
+    bool match = false;
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        if (m_resourceFilter && !m_resourceFilter(resource))
+        if (!m_resourceFilter)
             return;
 
-        connect(resource.data(), &QnResource::propertyChanged,
-            this, &PropertyWatcher::at_propertyChanged);
-
+        for (const auto& resource: resources)
+        {
+            if (m_resourceFilter(resource))
+            {
+                connect(resource.data(), &QnResource::propertyChanged,
+                    this, &PropertyWatcher::at_propertyChanged);
+                match = true;
+            }
+        }
     }
 
-    emit propertyChanged();
+    if (match)
+        emit propertyChanged();
 }
 
-void PropertyWatcher::at_resourceRemoved(const QnResourcePtr& resource)
+void PropertyWatcher::at_resourcesRemoved(const QnResourceList& resources)
 {
+    bool match = false;
+
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        if (m_resourceFilter && !m_resourceFilter(resource))
+        if (!m_resourceFilter)
             return;
+
+        for (const auto& resource: resources)
+        {
+            resource->disconnect(this);
+
+            if (!match && m_resourceFilter(resource))
+                match = true;
+        }
     }
 
-    emit propertyChanged();
+    if (match)
+        emit propertyChanged();
 }
 
 void PropertyWatcher::at_propertyChanged(const QnResourcePtr& resource, const QString& propertyName)
