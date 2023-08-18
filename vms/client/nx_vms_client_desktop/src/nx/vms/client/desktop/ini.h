@@ -363,6 +363,9 @@ struct Ini: nx::kit::IniConfig
         "[Support] Radass should lower item quality if CPU usage is critically high for this "
         "period of time (in milliseconds).");
 
+    NX_INI_FLAG(false, showBorderInVideoWallMode,
+        "[Support] Show window border in Video Wall mode to workaround graphics drivers issues.");
+
     // ---------------------------------------------------------------------------------------------
     // CI section.
     // Flags here are used for the client functional unit tests.

@@ -87,6 +87,8 @@
     #include <ui/workaround/mac_utils.h>
 #endif
 
+namespace nx::vms::client::desktop {
+
 namespace {
 
 const int kSuccessCode = 0;
@@ -146,13 +148,13 @@ Qt::WindowFlags calculateWindowFlags()
         ? Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
         : Qt::Window | Qt::CustomizeWindowHint;
 
-    if (qnRuntime->isVideoWallMode())
+    if (qnRuntime->isVideoWallMode() && !ini().showBorderInVideoWallMode)
         result |= Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint;
 
     return result;
 }
 
-static void initQmlGlyphCacheWorkaround()
+void initQmlGlyphCacheWorkaround()
 {
     #if defined (Q_OS_MACOS)
         #if defined(__amd64)
@@ -192,8 +194,6 @@ static void initQmlGlyphCacheWorkaround()
 }
 
 } // namespace
-
-namespace nx::vms::client::desktop {
 
 int runApplicationInternal(QApplication* application, const QnStartupParameters& startupParams)
 {
@@ -251,7 +251,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     #endif
 
     // Dealing with EULA in videowall mode can make people frown.
-    if (!qnRuntime->isVideoWallMode() && qnRuntime->isDesktopMode())
+    if (!qnRuntime->isVideoWallMode())
     {
         int accepted = qnSettings->acceptedEulaVersion();
         int current = nx::branding::eulaVersion();
@@ -298,7 +298,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         StartupParameters::fromCommandLineParams(startupParams));
 
     #if defined(Q_OS_WIN)
-        if (qnRuntime->isVideoWallMode())
+        if (qnRuntime->isVideoWallMode() && !ini().showBorderInVideoWallMode)
             QWindowsWindowFunctions::setHasBorderInFullScreen(mainWindow->windowHandle(), true);
     #endif
 
