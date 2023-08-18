@@ -63,7 +63,7 @@ void ParentGroupsProvider::setMembersModel(nx::vms::client::desktop::MembersMode
             const auto count = rowCount();
 
             if (count > 0)
-                emit dataChanged(index(0), index(count - 1), {canEditMembers});
+                emit dataChanged(index(0), index(count - 1), {MembersModel::Roles::CanEditMembers});
         };
 
     connect(m_membersModel, &QAbstractItemModel::modelReset, this, updateModel);
@@ -76,34 +76,39 @@ QVariant ParentGroupsProvider::data(const QModelIndex& index, int role) const
     if (index.row() < 0 || index.row() >= (int) m_groups.size() || !m_context)
         return {};
 
+    const auto id = m_groups.at(index.row());
+
     const auto group =
-        [this](const QModelIndex& index)
+        [this, id]()
         {
-            return m_context->systemContext()->userGroupManager()->find(
-                m_groups.at(index.row())).value_or(api::UserGroupData{});
+            return m_context->systemContext()->userGroupManager()->find(id)
+                .value_or(api::UserGroupData{});
         };
 
     switch (role)
     {
         case Qt::DisplayRole:
-            return group(index).name;
+            return group().name;
 
-        case isLdap:
-            return group(index).type == nx::vms::api::UserType::ldap;
+        case MembersModel::IsLdap:
+            return group().type == nx::vms::api::UserType::ldap;
 
-        case isParent:
+        case MembersModel::IsParentRole:
         {
             const auto directParents =
                 m_context->subjectHierarchy()->directParents(m_context->currentSubjectId());
 
-            return directParents.contains(m_groups.at(index.row()));
+            return directParents.contains(id);
         }
 
-        case isPredefined:
-            return MembersCache::isPredefined(m_groups.at(index.row()));
+        case MembersModel::IsPredefined:
+            return MembersCache::isPredefined(id);
 
-        case canEditMembers:
-            return m_membersModel->canEditMembers(m_groups.at(index.row()));
+        case MembersModel::CanEditMembers:
+            return m_membersModel->canEditMembers(id);
+
+        case MembersModel::IdRole:
+            return QVariant::fromValue(id);
 
         default:
             return {};
@@ -115,7 +120,7 @@ bool ParentGroupsProvider::setData(const QModelIndex& index, const QVariant& val
     if (index.row() < 0
         || index.row() >= (int) m_groups.size()
         || !m_context
-        || role != isParent)
+        || role != MembersModel::IsParentRole)
     {
         return false;
     }
@@ -142,10 +147,11 @@ QHash<int, QByteArray> ParentGroupsProvider::roleNames() const
 {
     auto names = base_type::roleNames();
 
-    names.insert(isParent, "isParent");
-    names.insert(isLdap, "isLdap");
-    names.insert(isPredefined, "isPredefined");
-    names.insert(canEditMembers, "canEditMembers");
+    names.insert(MembersModel::IsParentRole, "isParent");
+    names.insert(MembersModel::IsLdap, "isLdap");
+    names.insert(MembersModel::IsPredefined, "isPredefined");
+    names.insert(MembersModel::CanEditMembers, "canEditMembers");
+    names.insert(MembersModel::IdRole, "id");
     names[Qt::DisplayRole] = "text";
 
     return names;
@@ -194,6 +200,11 @@ void ParentGroupsProvider::updateInfo()
     }
 }
 
+ParentGroupsModel::ParentGroupsModel(QObject* object): base_type(object)
+{
+    sort(0); //< Enable sorting.
+}
+
 bool ParentGroupsModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     if (!sourceModel() || !m_directOnly)
@@ -213,6 +224,21 @@ void ParentGroupsModel::setDirectOnly(bool value)
     emit directOnlyChanged();
 
     invalidateRowsFilter();
+}
+
+bool ParentGroupsModel::lessThan(
+    const QModelIndex& sourceLeft,
+    const QModelIndex& sourceRight) const
+{
+    const bool leftParent = sourceLeft.data(MembersModel::IsParentRole).toBool();
+    const bool rightParent = sourceRight.data(MembersModel::IsParentRole).toBool();
+
+    // Direct parents go in front of non-direct parents.
+    if (leftParent != rightParent)
+        return leftParent;
+
+    // Otherwise maintain source model sorting.
+    return sourceLeft.row() < sourceRight.row();
 }
 
 void ParentGroupsProvider::registerQmlTypes()
