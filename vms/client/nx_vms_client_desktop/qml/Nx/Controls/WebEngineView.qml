@@ -56,6 +56,9 @@ Item
     // Add context menu entries for downloading images, pages etc.
     property bool menuSave: false
 
+    // Enable web page to have its own context menu.
+    property bool enableCustomMenu: false
+
     property alias url: webView.url
     property alias userScripts: webView.userScripts
     property alias profile: webView.profile
@@ -291,6 +294,12 @@ Item
 
         onContextMenuRequested: function(request)
         {
+            if (enableCustomMenu)
+            {
+                request.accepted = false
+                return
+            }
+
             request.accepted = true
 
             if (!controller)

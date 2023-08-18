@@ -26,6 +26,8 @@ public:
 
     Error setMinimalInterfaceMode(bool value);
 
+    Error setPreventDefaultContextMenu(bool value);
+
 private:
     Self* const q = nullptr;
     QnWorkbenchItem* const m_item = nullptr;
@@ -46,6 +48,21 @@ Error Self::Private::setMinimalInterfaceMode(bool value)
     return Error::success();
 }
 
+Error Self::Private::setPreventDefaultContextMenu(bool value)
+{
+    if (!m_item)
+        return Error::failed();
+
+    const auto resourceWidget = context()->display()->widget(m_item);
+    const auto webWidget = dynamic_cast<QnWebResourceWidget*>(resourceWidget);
+
+    if (!webWidget)
+        return Error::failed();
+
+    webWidget->setPreventDefaultContextMenu(value);
+    return Error::success();
+}
+
 Self::Self(QnWorkbenchItem* item, QObject* parent):
     QObject(parent),
     d(new Private(this, item, parent))
@@ -59,6 +76,11 @@ Self::~Self()
 QJsonObject Self::setMinimalInterfaceMode(bool value)
 {
     return detail::toJsonObject(d->setMinimalInterfaceMode(value));
+}
+
+QJsonObject Self::setPreventDefaultContextMenu(bool value)
+{
+    return detail::toJsonObject(d->setPreventDefaultContextMenu(value));
 }
 
 } // namespace nx::vms::client::desktop::jsapi
