@@ -443,8 +443,6 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
         return;
 
     auto welcomeScreen = mainWindow()->welcomeScreen();
-    const bool isCloudConnection = isConnectionToCloud(
-        d->currentConnectionProcess->context->logonData);
     const bool connectingTileExists = welcomeScreen
         && welcomeScreen->connectingTileExists();
     if (connectingTileExists)
@@ -501,7 +499,7 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
         }
         default:
         {
-            if (!connectingTileExists || error.externalDescription || isCloudConnection)
+            if (!connectingTileExists)
             {
                 QnConnectionDiagnosticsHelper::showConnectionErrorMessage(context(),
                     error,
