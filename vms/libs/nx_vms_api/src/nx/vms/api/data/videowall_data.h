@@ -108,7 +108,7 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallMatrixData)
 /**%apidoc Video wall information object.
  * %param[proprietary] typeId
  * %param[opt] parentId Id of a User who created this video wall.
- * %param[readonly] id Video wall unique id.
+ * %param[immutable] id Video wall unique id.
  * %param name Video wall name.
  *     %example Video wall
  * %param[unused] url
