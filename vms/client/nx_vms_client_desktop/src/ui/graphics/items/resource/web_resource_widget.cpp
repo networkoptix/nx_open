@@ -207,8 +207,11 @@ bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
         {
             auto mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
             mousePressEvent(mouseEvent);
-            if (mouseEvent->button() == Qt::RightButton)
-                return true;
+            if (!m_webEngineView->controller()->isWebPageContextMenuEnabled())
+            {
+                if (mouseEvent->button() == Qt::RightButton)
+                    return true;
+            }
         }
         if (m_isMinimalTitleBar && event->type() == QEvent::GraphicsSceneHoverMove)
         {
@@ -298,6 +301,11 @@ void QnWebResourceWidget::setOverlayVisibility(bool visible)
         hudOverlay(),
         hasButtons ? OverlayVisibility::Visible : OverlayVisibility::Invisible,
         true);
+}
+
+void QnWebResourceWidget::setPreventDefaultContextMenu(bool value)
+{
+    m_webEngineView->controller()->setWebPageContextMenuEnabled(value);
 }
 
 bool QnWebResourceWidget::verifyCertificate(const QString& pemString, const QUrl& url)

@@ -25,6 +25,9 @@ public:
     /** Sets the web page widget minimal interface mode. */
     Q_INVOKABLE QJsonObject setMinimalInterfaceMode(bool value);
 
+    /** Prevent showing default context menu. */
+    Q_INVOKABLE QJsonObject setPreventDefaultContextMenu(bool value);
+
 private:
     class Private;
     nx::utils::ImplPtr<Private> d;

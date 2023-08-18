@@ -98,6 +98,12 @@ public:
     /** Show save menu actions such as `Save page` or `Save image`. */
     void setMenuSave(bool enabled);
 
+    /** Enable web page to have its own context menu. */
+    void setWebPageContextMenuEnabled(bool enabled);
+
+    /** Returns true if web page is allowed to have its own context menu. */
+    bool isWebPageContextMenuEnabled() const;
+
     /**
      * Expose QObject properties and slots/signals to the page JavaScript.
      * Lifetime of the object is controlled by its creator. Sutable for separate web views
