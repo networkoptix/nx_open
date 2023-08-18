@@ -9,7 +9,7 @@ namespace nx::vms::api {
 /**%apidoc Web page information object.
  * %param[unused] typeId
  * %param[proprietary] parentId
- * %param[readonly] id Web page unique id.
+ * %param[immutable] id Web page unique id.
  * %param name Web page name.
  *     %example Web page
  * %param url Web page URL.
