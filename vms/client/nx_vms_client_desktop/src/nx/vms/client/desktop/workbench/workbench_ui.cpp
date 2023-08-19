@@ -1222,6 +1222,10 @@ void WorkbenchUi::activatePreviousSystemTab()
         m_title->activatePreviousSystemTab();
 }
 
+NotificationsWorkbenchPanel *WorkbenchUi::notificationsPanel() const {
+    return m_notifications.data();
+}
+
 void WorkbenchUi::setTitleOpened(bool opened, bool animate)
 {
     if (m_title)

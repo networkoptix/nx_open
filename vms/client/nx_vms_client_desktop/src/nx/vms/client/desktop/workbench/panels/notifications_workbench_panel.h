@@ -79,6 +79,10 @@ public:
     bool resizeable() const;
     void setResizeable(bool value);
 
+    BaseWidget *baseWidget() const {
+        return m_baseWidget;
+    }
+
 private:
     void enableShowButton(bool used);
     void updateControlsGeometry();

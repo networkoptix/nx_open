@@ -118,6 +118,8 @@ public:
     void setTitleUsed(bool titleUsed = true);
     void activatePreviousSystemTab();
 
+    NotificationsWorkbenchPanel *notificationsPanel() const;
+
 private:
     void setFpsVisible(bool fpsVisible = true);
     void setDebugInfoVisible(bool debugInfoVisible = true);
