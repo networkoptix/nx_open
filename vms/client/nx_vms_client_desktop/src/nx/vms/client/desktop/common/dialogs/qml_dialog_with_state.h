@@ -148,7 +148,7 @@ public:
                 setModified(originalState() != currentState());
             });
 
-        const auto onInitialized = 
+        const auto onInitialized =
             [this]
             {
                 auto rootObject = rootObjectHolder()->object();
