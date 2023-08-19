@@ -19,6 +19,7 @@ Dialog
     id: dialog
 
     property alias isHttpDigestEnabledOnImport: digestCheckBox.checked
+    property bool isHttpDigestEnabledOnImportInitial
 
     property alias loginAttribute: loginAttributeTextField.text
     property alias loginAttributeAuto: loginAttributeTextField.auto
@@ -35,7 +36,7 @@ Dialog
     modality: Qt.ApplicationModal
 
     minimumWidth: 540
-    minimumHeight: content.height + buttonBox.implicitHeight + 16
+    minimumHeight: content.height + buttonBox.implicitHeight + banner.height + 16
 
     width: minimumWidth
     height: minimumHeight
@@ -190,6 +191,22 @@ Dialog
                 }
             }
         }
+    }
+
+    DialogBanner
+    {
+        id: banner
+
+        width: parent.width
+        anchors.bottom: buttonBox.top
+
+        style: Banner.Style.Info
+        text: digestCheckBox.checked
+            ? qsTr("To enable digest authentication for LDAP users that are already added to the "
+                + "VMS database, you need to enable it directly in these users' settings.")
+            : qsTr("To disable digest authentication for LDAP users that are already added to the "
+                + "VMS database, you need to enable it directly in these users' settings.")
+        visible: isHttpDigestEnabledOnImport !== isHttpDigestEnabledOnImportInitial
     }
 
     function accept()

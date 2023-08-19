@@ -39,7 +39,7 @@
 
 namespace {
 
-static const QUrl kLdapSettingsQmlComponentUrl("qrc:/qml/Nx/Dialogs/Ldap/Tabs/LdapSettings.qml");
+static const QUrl kLdapSettingsQmlComponentUrl("Nx/Dialogs/Ldap/Tabs/LdapSettings.qml");
 static const auto kStatusUpdateInterval = std::chrono::seconds(10);
 
 } // namespace
@@ -216,6 +216,7 @@ struct LdapSettingsWidget::Private
 
         state.preferredSyncServer = settings.preferredMasterSyncServer;
         state.isHttpDigestEnabledOnImport = settings.isHttpDigestEnabledOnImport;
+        state.isHttpDigestEnabledOnImportInitial = settings.isHttpDigestEnabledOnImport;
 
         return state;
     }
