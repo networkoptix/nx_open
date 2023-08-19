@@ -1097,9 +1097,9 @@ enum IDType
     VxNewMonitoringLayoutAction,
 
     /**
-     * Opens a new review layout for the provided system id.
+     * Opens a new report layout for the provided system id.
      */
-    VxOpenReviewLayoutAction,
+    VxOpenReportLayoutAction,
 
     /**
      * Dismisses all alerting from a system, provided a system id.

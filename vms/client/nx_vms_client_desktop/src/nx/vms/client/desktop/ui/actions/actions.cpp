@@ -2270,7 +2270,7 @@ void initialize(Manager* manager, Action* root)
 
     vx::registerLocationPropertiesAction(factory);
     vx::registerDismissSystemAlertAction(factory);
-    vx::registerOpenReviewLayoutAction(factory);
+    vx::registerOpenReportLayoutAction(factory);
     vx::registerDebugVxAction(factory);
 
     // -- Developer mode actions end. Please do not add real actions afterwards.
