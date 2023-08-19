@@ -108,8 +108,8 @@ function(nx_add_target name type)
                 else()
                     find_file(rc_source_file project.rc
                         PATHS
-                            "${CMAKE_SOURCE_DIR}/cmake"
-                            "${CMAKE_SOURCE_DIR}/open/cmake"
+                            "${open_source_root}/cmake"
+                            "${open_source_root}/open/cmake"
                         REQUIRED)
                     set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.rc")
                 endif()
