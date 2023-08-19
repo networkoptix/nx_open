@@ -49,6 +49,7 @@ struct LdapSettings
 
     Q_PROPERTY(QnUuid preferredSyncServer MEMBER preferredSyncServer)
     Q_PROPERTY(bool isHttpDigestEnabledOnImport MEMBER isHttpDigestEnabledOnImport)
+    Q_PROPERTY(bool isHttpDigestEnabledOnImportInitial MEMBER isHttpDigestEnabledOnImportInitial)
 
 public:
     bool isValid = false;
@@ -69,6 +70,7 @@ public:
 
     QnUuid preferredSyncServer;
     bool isHttpDigestEnabledOnImport = false;
+    bool isHttpDigestEnabledOnImportInitial = false;
 };
 
 class LdapFiltersModel: public QAbstractListModel
