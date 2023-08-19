@@ -37,6 +37,7 @@ Rectangle
     property bool syncRequested
     property var preferredSyncServer
     property bool isHttpDigestEnabledOnImport
+    property bool isHttpDigestEnabledOnImportInitial
 
     property bool hideEmptyLdapWarning: false
 
@@ -504,6 +505,8 @@ Rectangle
                             advancedSettingsDialog.preferredSyncServer = control.preferredSyncServer
                             advancedSettingsDialog.isHttpDigestEnabledOnImport =
                                 control.isHttpDigestEnabledOnImport
+                            advancedSettingsDialog.isHttpDigestEnabledOnImportInitial =
+                                control.isHttpDigestEnabledOnImportInitial
 
                             advancedSettingsDialog.show()
                         }
