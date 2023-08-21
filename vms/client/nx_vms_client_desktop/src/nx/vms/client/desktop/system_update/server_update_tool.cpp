@@ -1584,8 +1584,9 @@ QString ServerUpdateTool::getInstalledUpdateInfomationUrl() const
 std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
     const common::update::UpdateInfoParams& infoParams)
 {
-    auto connection = connectedServerApi();
-    if (!connection)
+    const auto connection = this->connection();
+
+    if (!connection || !connection->serverApi())
     {
         NX_WARNING(this, "checkForUpdate() - There's no server connection.");
         std::promise<UpdateContents> promise;
@@ -1600,7 +1601,7 @@ std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
             infoParams]() -> UpdateContents
         {
             auto contents = system_update::getUpdateContents(
-                connection, updateUrl, infoParams);
+                connection->serverApi(), updateUrl, infoParams);
             if (std::holds_alternative<update::LatestVmsVersionParams>(infoParams))
                 contents.sourceType = UpdateSourceType::internet;
             else
