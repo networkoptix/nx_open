@@ -60,7 +60,7 @@ class NxOpenConan(ConanFile):
         "quick_start_guide:format": "pdf",
     }
 
-    ffmpeg_version_and_revision = "4.4#3798b16fa0e0317daf710c96f2c794c3"
+    ffmpeg_version_and_revision = "4.4#536f5ecf1fc3b97b935d1bcb30d3e795"
     requires = (
         f"ffmpeg/{ffmpeg_version_and_revision}",
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
