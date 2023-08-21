@@ -427,21 +427,20 @@ Item
         }
     }
 
-    Item
+    Row
     {
         // Covers dialog button box.
 
         anchors.top: parent.bottom
 
         height: control.buttonBox.height
-        width: parent.width
+        x: 16
+        spacing: 8
 
         Switch
         {
             id: automaticDependenciesSwitch
 
-            anchors.left: parent.left
-            anchors.leftMargin: 16
             anchors.verticalCenter: parent.verticalCenter
 
             visible: control.editingEnabled
@@ -461,6 +460,17 @@ Item
 
             onToggled:
                 GlobalTemporaries.automaticAccessDependenciesEnabledByDefault = checked
+        }
+
+        ContextHintButton
+        {
+            anchors.verticalCenter: parent.verticalCenter
+
+            toolTipText: qsTr("Resources table gives you an overview of user's or group "
+                + "permissions and allows you to assign permissions for specific resources."
+                + "Click on the cells to select and unselect them. Use drag&drop and "
+                + "Shift+drag&drop for batch edit. If you select a permission that depends on "
+                + "another permission both permissions will be granted automatically.")
         }
     }
 
