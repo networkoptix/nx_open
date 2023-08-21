@@ -8,6 +8,7 @@
 
 #include <network/system_helpers.h>
 #include <nx/branding.h>
+#include <nx/build_info.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/protocol_version.h>
@@ -35,7 +36,8 @@ std::string makeCertificateAndKey()
 static const nx::utils::SoftwareVersion kVersion42(4, 2);
 static const nx::utils::SoftwareVersion kVersion50(5, 0);
 static const nx::utils::SoftwareVersion kVersion51(5, 1);
-static const nx::utils::SoftwareVersion kVersion60(6, 0);
+static const nx::utils::SoftwareVersion kLatestVersion(nx::build_info::vmsVersion());
+
 static const QnUuid kExpectedServerId = QnUuid::createUuid();
 static const QString kCloudSystemId = QnUuid::createUuid().toSimpleString();
 static const std::string kExpectedServerPem = makeCertificateAndKey();
@@ -67,7 +69,7 @@ std::vector<UserInfo> makeDefaultUsers()
 
 struct TestSystemData
 {
-    nx::utils::SoftwareVersion version = {};
+    nx::utils::SoftwareVersion version = kLatestVersion;
     int serversCount = 1;
     std::vector<UserInfo> users = makeDefaultUsers();
 };
@@ -87,6 +89,9 @@ struct TestLogonData
 
     /** Whether connection is done with cloud credentials and address. */
     bool isCloud = false;
+
+    /** Whether connection is done with ldap credentials. */
+    bool isLdap = false;
 
     /** Whether connection is checked as for mobile client (json compatible with old systems). */
     nx::vms::api::PeerType peerType = nx::vms::api::PeerType::mobileClient;
@@ -169,7 +174,7 @@ public:
         connectionFactory->setUserInteractionDelegate(std::move(userInteractionDelegate));
     }
 
-    void givenSystem(TestSystemData data)
+    void givenSystem(TestSystemData data = {})
     {
         const QnUuid localSystemId = QnUuid::createUuid();
         testSystemData = data;
@@ -232,6 +237,16 @@ public:
             {
                 logonData.address = nx::network::SocketAddress(kCloudSystemId.toStdString());
             }
+        }
+        else if (data.isLdap)
+        {
+            logonData.credentials.username = kLocalUserName;
+            logonData.userType = nx::vms::api::UserType::ldap;
+            logonData.address = kLocalHost;
+            if (data.hasToken)
+                logonData.credentials.authToken = nx::network::http::BearerAuthToken(kLocalToken);
+            else
+                logonData.credentials.authToken = nx::network::http::PasswordAuthToken(kPassword);
         }
         else
         {
@@ -320,7 +335,7 @@ private:
 
 TEST_F(RemoteConnectionFactoryTest, localSystemMinimalTest)
 {
-    givenSystem({.version = kVersion60});
+    givenSystem();
     givenLogonData({});
     whenConnectToSystem();
     thenRequestsCountIs(3); //< serversInfo, userType, loginWithToken
@@ -330,7 +345,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystemMinimalTest)
 
 TEST_F(RemoteConnectionFactoryTest, localSystemNoTokenTest)
 {
-    givenSystem({.version = kVersion60});
+    givenSystem();
     givenLogonData({.hasToken = false});
     whenConnectToSystem();
     thenRequestsCountIs(3); //< serversInfo, userType, issueToken
@@ -340,7 +355,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystemNoTokenTest)
 
 TEST_F(RemoteConnectionFactoryTest, localSystemNoUsernameTest)
 {
-    givenSystem({.version = kVersion60});
+    givenSystem();
     givenLogonData({});
     logonData.credentials.username = {};
     whenConnectToSystem();
@@ -351,7 +366,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystemNoUsernameTest)
 
 TEST_F(RemoteConnectionFactoryTest, localSystemNoVersionTest)
 {
-    givenSystem({.version = kVersion60});
+    givenSystem();
     givenLogonData({.hasVersion = false});
     whenConnectToSystem();
     thenRequestsCountIs(4); //< moduleInformation, serversInfo, userType, loginWithToken
@@ -424,7 +439,7 @@ TEST_F(RemoteConnectionFactoryTest, localSystem42NoIdMultipleServersTest)
 
 TEST_F(RemoteConnectionFactoryTest, cloudSystemMinimalTest)
 {
-    givenSystem({.version = kVersion60});
+    givenSystem();
     givenLogonData({.isCloud = true});
     whenConnectToSystem();
     thenRequestsCountIs(2); //< serversInfo, loginWithToken
@@ -433,7 +448,7 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystemMinimalTest)
 
 TEST_F(RemoteConnectionFactoryTest, cloudSystemNoIdTest)
 {
-    givenSystem({.version = kVersion60});
+    givenSystem();
     givenLogonData({.hasId = false, .isCloud = true});
     whenConnectToSystem();
     thenRequestsCountIs(2); //< serversInfo, loginWithToken
@@ -442,7 +457,7 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystemNoIdTest)
 
 TEST_F(RemoteConnectionFactoryTest, cloudSystemNoIdMultipleServersTest)
 {
-    givenSystem({.version = kVersion60, .serversCount = 2});
+    givenSystem({.serversCount = 2});
     givenLogonData({.hasId = false, .isCloud = true});
     whenConnectToSystem();
     thenRequestsCountIs(2); //< serversInfo, loginWithToken
@@ -473,6 +488,15 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystem42Test)
     givenLogonData({.hasToken = false, .isCloud = true});
     whenConnectToSystem();
     thenRequestsCountIs(2); //< moduleInformation, loginWithDigest
+    thenConnectionSuccessful();
+}
+
+// Check scenario when we certainly sure current user is LDAP one, e.g. on reconnect.
+TEST_F(RemoteConnectionFactoryTest, ldapUserTest)
+{
+    givenSystem();
+    givenLogonData({.isLdap = true});
+    whenConnectToSystem();
     thenConnectionSuccessful();
 }
 

@@ -652,22 +652,20 @@ struct RemoteConnectionFactory::Private
     {
         if (context)
         {
-            if (!NX_ASSERT(context->userType() == nx::vms::api::UserType::local))
+            // Cloud users are not allowed to be here.
+            if (!NX_ASSERT(context->userType() != nx::vms::api::UserType::cloud))
             {
                 context->setError(RemoteConnectionErrorCode::internalError);
                 return {};
             }
 
-            // Username may be not passed if logging in as local user by token.
+            // Username may be not passed if logging in as local or ldap user by token.
             if (context->credentials().username.empty())
             {
                 if (const auto token = context->credentials().authToken; token.isBearerToken())
                 {
                     if (token.value.starts_with(nx::vms::api::LoginSession::kTokenPrefix))
-                    {
-                        context->logonData.userType = nx::vms::api::UserType::local;
                         return {.type = context->logonData.userType};
-                    }
 
                     if (token.value.starts_with(nx::vms::api::TemporaryToken::kPrefix))
                     {
@@ -1127,7 +1125,7 @@ struct RemoteConnectionFactory::Private
         // permissions.
         if (isOldPermissionsModelUsed(context()))
         {
-            //< GET /rest/v1/users/<username>
+            // GET /rest/v1/users/<username>
             requestCompatibilityUserPermissions(context());
         }
     }
