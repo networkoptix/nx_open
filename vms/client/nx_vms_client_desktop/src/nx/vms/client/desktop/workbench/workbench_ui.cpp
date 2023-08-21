@@ -938,9 +938,13 @@ void WorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
         {
             if (!alreadyZoomed)
                 m_unzoomedOpenedPanels = openedPanels();
-            const auto panels = newWidget->options().testFlag(QnResourceWidget::DisplayMotion) || m_timeline->isPinnedManually()
-                ? TimelinePanel
-                : NoPanel;
+
+            const auto panels = m_timeline->isPinnedManually()
+                || newWidget->options().testFlag(QnResourceWidget::DisplayMotion)
+                || newWidget->options().testFlag(QnResourceWidget::DisplayAnalyticsObjects)
+                    ? TimelinePanel
+                    : NoPanel;
+
             setOpenedPanels(panels, true);
         }
         else
