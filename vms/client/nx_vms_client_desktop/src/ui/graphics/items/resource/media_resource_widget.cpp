@@ -108,6 +108,7 @@
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
+#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -1078,6 +1079,7 @@ void QnMediaResourceWidget::createButtons()
             if (objectSearchButton->isClicked() && on)
                 selectThisWidget(true);
 
+            setProperty(Qn::NoHandScrollOver, on);
             action(action::ObjectSearchModeAction)->setChecked(on);
         });
 
@@ -2168,8 +2170,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
                 item()->setData(role, m_savedItemDataState.take(role));
         }
 
-        if (motionSearchEnabled || options().testFlag(FullScreenMode))
-            action(action::ToggleTimelineAction)->setChecked(motionSearchEnabled);
+        updateTimelineVisibility();
 
         setOption(WindowResizingForbidden, motionSearchEnabled);
 
@@ -2199,6 +2200,9 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 
     if (changedFlags.testFlag(DisplayRoi))
         setRoiVisible(options().testFlag(DisplayRoi), false);
+
+    if (changedFlags.testFlag(FullScreenMode))
+        updateTimelineVisibility();
 
     if (changedFlags.testFlags(DisplayHotspots))
     {
@@ -2975,6 +2979,15 @@ void QnMediaResourceWidget::updateHotspotsState()
         && d->camera->cameraHotspotsEnabled());
 }
 
+void QnMediaResourceWidget::updateTimelineVisibility()
+{
+    if (options().testFlag(FullScreenMode))
+    {
+        action(action::ToggleTimelineAction)->setChecked(
+            isAnalyticsObjectsVisibleForcefully() || isMotionSearchModeEnabled());
+    }
+}
+
 void QnMediaResourceWidget::processDiagnosticsRequest()
 {
     statisticsModule()->controls()->registerClick(
@@ -3230,7 +3243,9 @@ bool QnMediaResourceWidget::isAnalyticsObjectsVisibleForcefully() const
 void QnMediaResourceWidget::setAnalyticsObjectsVisibleForcefully(bool visible, bool animate)
 {
     d->analyticsObjectsVisibleForcefully = visible;
-    setAnalyticsModeEnabled(visible || isAnalyticsObjectsVisible(), animate);
+    setOption(DisplayAnalyticsObjects, visible);
+    setAnalyticsModeEnabled(visible, animate);
+    updateTimelineVisibility();
 }
 
 bool QnMediaResourceWidget::isAnalyticsModeEnabled() const

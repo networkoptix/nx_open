@@ -409,6 +409,7 @@ private:
     void updateAnalyticsVisibility(bool animate = false);
     void handleSyncStateChanged(bool enabled);
     void updateHotspotsState();
+    void updateTimelineVisibility();
 
     void updateCompositeOverlayMode();
 
