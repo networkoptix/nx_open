@@ -47,6 +47,7 @@
 #include "utils/license_usage_provider.h"
 #include "watchers/camera_settings_advanced_manifest_watcher.h"
 #include "watchers/camera_settings_analytics_engines_watcher.h"
+#include "watchers/camera_settings_engine_license_summary_watcher.h"
 #include "watchers/camera_settings_global_permissions_watcher.h"
 #include "watchers/camera_settings_global_settings_watcher.h"
 #include "watchers/camera_settings_license_watcher.h"
@@ -312,6 +313,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
     new CameraSettingsResourceAccessWatcher(d->store, systemContext(), this);
     new CameraSettingsSaasStateWatcher(d->store, systemContext(), this);
+    new CameraSettingsEngineLicenseWatcher(d->store, systemContext(), this);
 
     auto generalTab = new CameraSettingsGeneralTabWidget(
         d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
@@ -373,7 +375,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     addPage(
         int(CameraSettingsTab::analytics),
         new CameraAnalyticsSettingsWidget(
-            d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
+            systemContext(), d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
         ini().enableMetadataApi ? tr("Integrations") : tr("Plugins"));
 
     addPage(

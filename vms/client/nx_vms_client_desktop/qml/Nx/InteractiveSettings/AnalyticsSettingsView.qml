@@ -44,6 +44,7 @@ StackLayout
         {
             id: header
             engineInfo: viewModel.currentEngineInfo
+            licenseSummary: viewModel.currentEngineLicenseSummary
             checked:
                 checkable && viewModel.enabledEngines.indexOf(viewModel.currentEngineId) !== -1
         }

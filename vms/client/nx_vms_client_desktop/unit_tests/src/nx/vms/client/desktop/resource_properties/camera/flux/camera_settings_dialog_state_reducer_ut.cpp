@@ -80,6 +80,23 @@ void ensureScheduleFps(const CameraSettingsDialogState& state, int fps)
         ASSERT_EQ(task.fps, fps);
 }
 
+AnalyticsEngineInfo makeAnalyticsEngine(bool isLicenseRequired)
+{
+    AnalyticsEngineInfo engineInfo;
+    engineInfo.id = QnUuid::createUuid();
+    engineInfo.isLicenseRequired = isLicenseRequired;
+    return engineInfo;
+};
+
+api::LicenseSummaryDataEx makeLicenseSummary()
+{
+    api::LicenseSummaryDataEx licenseSummary;
+    licenseSummary.total = 10;
+    licenseSummary.available = 10;
+    licenseSummary.inUse = 5;
+    return licenseSummary;
+};
+
 } // namespace
 
 class CameraSettingsDialogStateReducerTest: public ContextBasedTest
@@ -548,7 +565,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, reEnableDualStreaming)
     // Turn dual streaming off.
     State disabledDualStreaming = Reducer::setDualStreamingDisabled(
         std::move(initial), true);
-    
+
     ASSERT_FALSE(disabledDualStreaming.isDualStreamingEnabled());
     ASSERT_TRUE(disabledDualStreaming.isMotionImplicitlyDisabled());
     ASSERT_TRUE(disabledDualStreaming.motion.enabled.hasValue());
@@ -567,11 +584,11 @@ TEST_F(CameraSettingsDialogStateReducerTest, reEnableDualStreaming)
     ASSERT_TRUE(reloadedDiabledDualStreaming.motion.enabled.get());
     ASSERT_EQ(reloadedDiabledDualStreaming.motion.stream.getBase(), State::StreamIndex::primary);
     ASSERT_EQ(reloadedDiabledDualStreaming.effectiveMotionStream(), State::StreamIndex::primary);
-    
+
     // Turn dual streaming on.
     State enabledDualStreaming = Reducer::setDualStreamingDisabled(
         std::move(reloadedDiabledDualStreaming), false);
-    
+
     ASSERT_TRUE(enabledDualStreaming.isDualStreamingEnabled());
     ASSERT_TRUE(enabledDualStreaming.isMotionImplicitlyDisabled());
     ASSERT_TRUE(enabledDualStreaming.motion.enabled.hasValue());
@@ -995,6 +1012,22 @@ TEST_F(CameraSettingsDialogStateReducerTest, resetDeviceAgentData)
     EXPECT_EQ(userReplaceSettings.values.base, initialSettings.values.base);
     EXPECT_EQ(userReplaceSettings.values.user, newUserValues);
     EXPECT_EQ(userReplaceSettings.model, newModel);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Analytics
+
+TEST_F(CameraSettingsDialogStateReducerTest, enginelicenseChangesHandledProperly)
+{
+    auto state = Reducer::loadCameras({}, {createCamera()});
+    bool isChanged{};
+
+    QList<AnalyticsEngineInfo> engines;
+    engines.push_back(makeAnalyticsEngine(/*isLicenseRequired*/ true));
+    std::tie(isChanged, state) = Reducer::setAnalyticsEngines(std::move(state), engines);
+
+    state = Reducer::handleOverusedEngines(std::move(state), {engines.front().id});
+    EXPECT_TRUE(state.analytics.userEnabledEngines.get().empty());
 }
 
 } // namespace test

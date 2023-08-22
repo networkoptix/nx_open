@@ -10,8 +10,8 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/common/flux/private_flux_store.h>
+#include <nx/vms/time/formatter.h>
 
 #include "camera_settings_dialog_state_reducer.h"
 
@@ -772,6 +772,14 @@ void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
         {
             return Reducer::setDeviceAgentSettingsValues(
                 std::move(state), engineId, activeElement, values, paramValues);
+        });
+}
+void CameraSettingsDialogStore::handleOverusedEngines(const QSet<QnUuid>& overusedEngines)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::handleOverusedEngines(std::move(state), overusedEngines);
         });
 }
 

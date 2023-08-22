@@ -19,6 +19,7 @@ struct AnalyticsEngineInfo
     QString description;
     QString version;
     QString vendor;
+    bool isLicenseRequired = false;
     QJsonObject settingsModel;
     bool isDeviceDependent = false;
     nx::vms::api::analytics::IntegrationType type;
@@ -34,6 +35,7 @@ struct AnalyticsEngineInfo
             {"description", description},
             {"version", version},
             {"vendor", vendor},
+            {"isLicenseRequired", isLicenseRequired},
             {"settingsModel", settingsModel},
             {"isDeviceDependent", isDeviceDependent},
             {"type", QString::fromStdString(nx::reflect::toString(type))}
@@ -43,6 +45,6 @@ struct AnalyticsEngineInfo
 
 // TODO: #sivanov Add settingsModel when QJsonObject is supported in the nx_reflect.
 NX_REFLECTION_INSTRUMENT(AnalyticsEngineInfo,
-    (id)(name)(description)(version)(vendor)(isDeviceDependent))
+    (id)(name)(description)(version)(vendor)(isLicenseRequired)(isDeviceDependent))
 
 } // namespace nx::vms::client::desktop

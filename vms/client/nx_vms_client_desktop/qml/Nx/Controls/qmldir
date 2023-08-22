@@ -77,6 +77,7 @@ Tab 1.0 Tab.qml
 TabBar 1.0 TabBar.qml
 TabControl 1.0 TabControl.qml
 TableView 1.0 TableView.qml
+Tag 1.0 Tag.qml
 TextArea 1.0 TextArea.qml
 TextAreaWithScroll 1.0 TextAreaWithScroll.qml
 TextButton 1.0 TextButton.qml
