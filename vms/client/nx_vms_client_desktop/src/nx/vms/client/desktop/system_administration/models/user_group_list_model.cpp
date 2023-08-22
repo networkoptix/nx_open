@@ -16,6 +16,7 @@
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -35,11 +36,24 @@ struct UserGroupListModel::Private
     QHash<QString, int> sameNameGroups;
     QList<QSet<QnUuid>> cycledGroupSets;
     QSet<QnUuid> cycledGroups;
+    bool ldapServerOnline = true;
 
     Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId())
     {
         connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
             [this]() { syncId = this->q->globalSettings()->ldap().syncId(); });
+
+        connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::statusChanged, q,
+            [this, q]()
+            {
+                if (const auto status = q->systemContext()->ldapStatusWatcher()->status())
+                    ldapServerOnline = (status->state == api::LdapStatus::State::online);
+
+                emit q->dataChanged(
+                    q->index(0, GroupWarningColumn),
+                    q->index(q->rowCount() - 1, GroupWarningColumn),
+                    {Qn::DecorationPathRole, Qt::ToolTipRole});
+            });
     }
 
     QStringList getParentGroupNames(const UserGroupData& group) const
@@ -300,8 +314,9 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             {
                 case GroupWarningColumn:
                 {
-                    if (d->ldapGroupNotFound(group))
+                    if (d->ldapServerOnline && d->ldapGroupNotFound(group))
                         return tr("Group is not found in the LDAP database.");
+
                     if (!d->isUnique(group))
                     {
                         return tr("There are multiple groups with this name in the system. To "
@@ -342,7 +357,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             {
                 case GroupWarningColumn:
                 {
-                    if (d->ldapGroupNotFound(group)
+                    if ((d->ldapServerOnline && d->ldapGroupNotFound(group))
                         || !d->isUnique(group)
                         || d->cycledGroups.contains(group.id))
                     {
