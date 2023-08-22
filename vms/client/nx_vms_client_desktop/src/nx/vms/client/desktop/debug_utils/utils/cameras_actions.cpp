@@ -8,6 +8,8 @@
 
 #include "debug_custom_actions.h"
 
+#undef DeviceCapabilities
+
 namespace nx::vms::client::desktop {
 
 void CamerasActions::registerAction()
