@@ -179,6 +179,15 @@ QnSecurityCamResource::QnSecurityCamResource():
         {
             return std::get<0>(nx::reflect::json::deserialize<QnIOPortDataList>(
                 nx::toBufferView(getProperty(ResourcePropertyKey::kIoSettings).toUtf8())));
+        }),
+    m_cachedHasVideo(
+        [this]()
+        {
+            auto result = getProperty(ResourcePropertyKey::kNoVideoSupport);
+            if (!result.isEmpty())
+                return result.toInt() == 0;
+
+            return !resourceData().value<bool>(ResourceDataKey::kNoVideoSupport);
         })
 {
     NX_VERBOSE(this, "Creating");
@@ -459,11 +468,7 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
 
 bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    auto result = getProperty(ResourcePropertyKey::kNoVideoSupport);
-    if (!result.isEmpty())
-        return result.toInt() == 0;
-
-    return !resourceData().value<bool>(ResourceDataKey::kNoVideoSupport);
+    return m_cachedHasVideo.get();
 }
 
 Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
@@ -1736,6 +1741,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedExplicitDeviceType.reset();
     m_cachedMotionStreamIndex.reset();
     m_cachedIoPorts.reset();
+    m_cachedHasVideo.reset();
 }
 
 bool QnSecurityCamResource::useBitratePerGop() const
