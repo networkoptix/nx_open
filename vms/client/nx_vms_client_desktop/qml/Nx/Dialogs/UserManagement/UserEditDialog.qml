@@ -57,11 +57,13 @@ DialogWithState
     property alias sharedResources: membersModel.sharedResources
     property bool permissionsEditable: true
 
+    property alias linkEditable: generalSettings.linkEditable
     property alias linkValidFrom: generalSettings.linkValidFrom
     property alias linkValidUntil: generalSettings.linkValidUntil
     property alias expiresAfterLoginS: generalSettings.expiresAfterLoginS
     property alias revokeAccessEnabled: generalSettings.revokeAccessEnabled
     property alias displayOffsetMs: generalSettings.displayOffsetMs
+    property alias firstLoginTime: generalSettings.firstLoginTime
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex

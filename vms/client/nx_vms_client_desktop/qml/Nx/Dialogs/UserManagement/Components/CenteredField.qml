@@ -11,7 +11,7 @@ Item
     id: control
 
     width: parent.width
-    height: innerItem.childrenRect.height
+    height: Math.max(innerItem.childrenRect.height, labelRow.height)
 
     default property alias data: innerItem.data
     property alias text: label.text
@@ -24,9 +24,13 @@ Item
     property alias hint: textHint.data
     readonly property real labelImplicitWidth: labelRow.width
 
+    baselineOffset: label.y + label.baselineOffset
+
     Item
     {
         id: innerItem
+
+        baselineOffset: control.baselineOffset
 
         anchors
         {
