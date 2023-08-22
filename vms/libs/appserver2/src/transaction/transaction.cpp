@@ -90,4 +90,20 @@ QnUuid QnAbstractTransaction::makeHash(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiTranLogFilter,
     (json)(ubjson)(xml)(csv_record), ApiTranLogFilter_Fields)
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TransactionModel, (json), TransactionModel_Fields)
+
+void TransactionModel::setError(
+    const QString& message, const QByteArray& binaryData, bool withData)
+{
+    _error = message;
+    QnUbjsonReader<QByteArray> stream(&binaryData);
+    if (QJsonValue value; QnUbjson::deserialize(&stream, &value))
+        data = value;
+    else
+        data = QnLexical::serialized(binaryData);
+    NX_WARNING(NX_SCOPE_TAG, "%1", QJson::serialized(*this));
+    if (!withData)
+        data.reset();
+}
+
 } // namespace ec2
