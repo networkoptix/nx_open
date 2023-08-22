@@ -45,12 +45,14 @@ Item
     property bool enabled: true
     property int userType: UserSettingsGlobal.LocalUser
 
-    property alias linkValidFrom: temporaryUserText.linkValidFrom
-    property alias linkValidUntil: temporaryUserText.linkValidUntil
-    property alias expiresAfterLoginS: temporaryUserText.expiresAfterLoginS
-    property alias revokeAccessEnabled: temporaryUserText.revokeAccessEnabled
+    property bool linkEditable: true
+    property alias linkValidFrom: linkDates.linkValidFrom
+    property alias linkValidUntil: linkDates.linkValidUntil
+    property alias expiresAfterLoginS: linkDates.expiresAfterLoginS
+    property alias revokeAccessEnabled: linkDates.revokeAccessEnabled
+    property alias firstLoginTime: linkDates.firstLoginTime
 
-    property alias displayOffsetMs: temporaryUserText.displayOffsetMs
+    property alias displayOffsetMs: linkDates.displayOffsetMs
 
     property bool ldapError: false
 
@@ -212,6 +214,8 @@ Item
 
                 Column
                 {
+                    id: contentColumn
+
                     spacing: 8
                     anchors.left: parent.left
                     anchors.leftMargin: 16
@@ -448,12 +452,48 @@ Item
                     CenteredField
                     {
                         visible: allowInsecureCheckBox.checked
-                            && control.userType != UserSettingsGlobal.CloudUser
+                            && allowInsecureCheckBox.visible
 
                         InsecureWarning
                         {
                             width: parent.width
                         }
+                    }
+
+                    Item
+                    {
+                        height: 64 - contentColumn.spacing * 2
+                        width: parent.width
+
+                        visible: control.userType == UserSettingsGlobal.TemporaryUser
+                                && !control.linkEditable
+                                && linkDates.expiresInMs > 0
+
+                        CenteredField
+                        {
+                            id: expiresTextField
+
+                            y: contentColumn.spacing
+
+                            text: qsTr("Access expires")
+
+                            Text
+                            {
+                                anchors.baseline: parent.baseline
+
+                                width: parent.width
+
+                                //: Date and time when access expires,
+                                //: for example: 14.05.2023, 10:23 (in 10 days)
+                                text: (control.self || "") && qsTr(`%1 (in %2)`)
+                                    .arg(linkDates.expirationDateText)
+                                    .arg(control.self.durationFormat(linkDates.expiresInMs))
+
+                                color: ColorTheme.colors.light4
+                                font: Qt.font({pixelSize: 14, weight: Font.Normal})
+                            }
+                        }
+
                     }
 
                     CenteredField
@@ -474,6 +514,7 @@ Item
 
                         text: qsTr("Access Link")
                         visible: control.userType == UserSettingsGlobal.TemporaryUser
+                            && control.linkEditable
                     }
 
                     ColumnLayout
@@ -481,17 +522,6 @@ Item
                         id: accessLinkLayout
 
                         visible: accessLinkSection.visible
-
-                        property date currentDate: new Date()
-                        property bool expired: currentDate > control.linkValidUntil
-
-                        Timer
-                        {
-                            interval: 1000
-                            running: accessLinkSection.visible
-                            repeat: true
-                            onTriggered: accessLinkLayout.currentDate = new Date()
-                        }
 
                         width: parent.width
                         spacing: 16
@@ -552,17 +582,41 @@ Item
                             }
                         }
 
-                        TemporaryLinkDatesText
+                        TemporaryLinkDates
                         {
-                            id: temporaryUserText
+                            id: linkDates
 
-                            visible: !accessLinkLayout.expired
+                            property date currentDate: new Date()
+                            readonly property bool expired: expiresInMs <= 0
+                            readonly property var expiresInMs:
+                                expirationDate.getTime() - currentDate.getTime()
+
+                            Timer
+                            {
+                                interval: 1000
+                                running: control.userType == UserSettingsGlobal.TemporaryUser
+                                repeat: true
+                                onTriggered: linkDates.currentDate = new Date()
+                            }
+                        }
+
+                        Text
+                        {
+                            visible: !linkDates.expired
+
+                            wrapMode: Text.WordWrap
+                            textFormat: Text.StyledText
+
+                            color: ColorTheme.colors.light16
+                            font: Qt.font({pixelSize: 14, weight: Font.Normal})
                             width: parent.width
+
+                            text: linkDates.validityDatesText
                         }
 
                         RowLayout
                         {
-                            visible: !accessLinkLayout.expired
+                            visible: !linkDates.expired
 
                             spacing: 8
 
@@ -601,7 +655,7 @@ Item
                         Text
                         {
                             Layout.alignment: Qt.AlignHCenter
-                            visible: accessLinkLayout.expired
+                            visible: linkDates.expired
 
                             text: qsTr("No valid link for this user")
                             color: ColorTheme.colors.light16
@@ -611,7 +665,7 @@ Item
                         Button
                         {
                             Layout.alignment: Qt.AlignHCenter
-                            visible: accessLinkLayout.expired
+                            visible: linkDates.expired
                             enabled: control.enabled
 
                             text: qsTr("New Link...")

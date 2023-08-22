@@ -92,6 +92,8 @@ Item
 
             CenteredField
             {
+                id: typeField
+
                 text: qsTr("Type")
 
                 visible: control.self ? control.self.isConnectedToCloud() : false
@@ -123,6 +125,7 @@ Item
                         icon.source: "image://svg/skin/user_settings/toggle_local_user.svg"
                         flatSide: -1 //< Rigth.
                         checked: control.userType == UserSettingsGlobal.LocalUser
+                            || control.userType == UserSettingsGlobal.TemporaryUser
                     }
 
                     ToggleButton
@@ -135,7 +138,10 @@ Item
                 }
             }
 
-            Spacer {}
+            Spacer
+            {
+                visible: typeField.visible
+            }
 
             CenteredField
             {
@@ -303,7 +309,7 @@ Item
             CenteredField
             {
                 visible: allowInsecureCheckBox.checked
-                    && control.userType != UserSettingsGlobal.CloudUser
+                    && allowInsecureCheckBox.visible
 
                 InsecureWarning
                 {
