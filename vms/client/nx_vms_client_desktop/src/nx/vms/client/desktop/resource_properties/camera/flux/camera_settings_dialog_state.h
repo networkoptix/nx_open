@@ -21,6 +21,8 @@
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/device_profile.h>
 #include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/core/utils/rotation.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_types.h>
