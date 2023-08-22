@@ -391,7 +391,11 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     }
 
                     if (!d->isUnique(user))
-                        return tr("There are multiple users with the same login in the system.");
+                    {
+                        return tr("There are multiple users with the same credentials in the "
+                            "system. To avoid issues with log in it is required for all users to "
+                            "have unique credentials.");
+                    }
 
                     break;
                 }
