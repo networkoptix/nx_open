@@ -13,7 +13,6 @@
 #include <nx/network/rest/result.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/time/time_protocol_client.h>
-#include <nx/network/url/url_builder.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/time.h>
 #include <nx/vms/common/application_context.h>
@@ -117,11 +116,10 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
         return Result::error;
     }
 
-    nx::utils::Url url = nx::network::url::Builder()
-        .setScheme(nx::network::http::kSecureUrlSchemeName)
-        .setHost(route.addr.address.toString())
-        .setPort(route.addr.port)
-        .setPath(kTimeSyncUrlPath);
+    nx::utils::Url url(server->getApiUrl());
+    url.setHost(route.addr.address.toString());
+    url.setPort(route.addr.port);
+    url.setPath(kTimeSyncUrlPath);
 
     auto socket = connectToRemoteHost(route, /*sslRequired*/ true);
 
