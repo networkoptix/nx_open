@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Thêm mục nhập</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Cài đặt nâng cao</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,11 +24,11 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Thuộc tính đăng nhập</translation>
     </message>
     <message>
       <source>Allow digest authentication for imported users</source>
-      <translation type="unfinished">Allow digest authentication for imported users</translation>
+      <translation>Cho phép xác thực thông báo cho người dùng đã nhập</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -36,11 +36,11 @@
     </message>
     <message>
       <source>Name Attribute</source>
-      <translation type="unfinished">Name Attribute</translation>
+      <translation>Thuộc tính tên</translation>
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Thành viên</translation>
     </message>
     <message>
       <source>Misc</source>
@@ -48,19 +48,19 @@
     </message>
     <message>
       <source>Group Attribute</source>
-      <translation type="unfinished">Group Attribute</translation>
+      <translation>Thuộc tính nhóm</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
-      <translation type="unfinished">Synchronization&lt;br&gt;Interval</translation>
+      <translation>Đồng bộ hóa&lt;br&gt;Khoảng thời gian</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Hết thời gian tìm kiếm</translation>
     </message>
     <message>
       <source>Proxy LDAP requests&lt;br&gt;via server</source>
-      <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
+      <translation>Yêu cầu LDAP proxy&lt;br&gt;qua máy chủ</translation>
     </message>
   </context>
   <context>
@@ -237,7 +237,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Tích hợp API</translation>
     </message>
   </context>
   <context>
@@ -251,23 +251,23 @@
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Tích hợp API</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>Tích hợp API tương tác với %1 Máy chủ thông qua REST API và trao đổi siêu dữ liệu</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Yêu cầu mới</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>Tích hợp API có thể được bật sau khi xác minh mã nhận được từ nhà cung cấp Tích hợp. Yêu cầu mới có thể bị vô hiệu hóa để ngăn chặn tương tác không mong muốn.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Bật %1?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -275,19 +275,19 @@
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Tích hợp này sẽ có thể:
+ • thay đổi cài đặt trên camera
+ • truy cập vào kho lưu trữ
+ • xử lý luồng video
+ • trao đổi siêu dữ liệu qua mạng</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Bật tích hợp</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Xóa %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
@@ -799,7 +799,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -845,7 +845,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1410,26 +1410,26 @@
     </message>
     <message>
       <source>Selected groups</source>
-      <translation type="unfinished">Selected groups</translation>
+      <translation>Nhóm đã chọn</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Không có nhóm</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Sử dụng các điều khiển ở bên trái để thêm vào một nhóm</translation>
     </message>
     <message>
       <source>LDAP group membership is managed in LDAP</source>
-      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
+      <translation>Thành viên nhóm LDAP được quản lý trong LDAP</translation>
     </message>
   </context>
   <context>
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Đổi mật khẩu - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1456,22 +1456,22 @@
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Không có quyền tùy chỉnh</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources</source>
-      <translation type="unfinished">No resources</translation>
+      <translation>Không có tài nguyên</translation>
     </message>
     <message>
       <source>Try changing search criteria</source>
-      <translation type="unfinished">Try changing search criteria</translation>
+      <translation>Thử thay đổi tiêu chí tìm kiếm</translation>
     </message>
     <message>
       <source>Automatically add dependent access rights</source>
-      <translation type="unfinished">Automatically add dependent access rights</translation>
+      <translation>Tự động thêm quyền truy cập phụ thuộc</translation>
     </message>
   </context>
   <context>
@@ -1482,7 +1482,7 @@
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Plugin là các chương trình chạy trên Máy chủ %1 để cho phép tích hợp phân tích video liền mạch.</translation>
     </message>
   </context>
   <context>
@@ -1601,34 +1601,34 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Target lock tracking</source>
-      <translation type="unfinished">Target lock tracking</translation>
+      <translation>Theo dõi khóa mục tiêu</translation>
     </message>
     <message>
       <source>Alt + Click to follow the object</source>
-      <translation type="unfinished">Alt + Click to follow the object</translation>
+      <translation>Alt + Nhấp để theo dõi đối tượng</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>hôm nay</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 giờ</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 giờ</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 ngày</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 ngày</translation>
     </message>
   </context>
   <context>
@@ -1687,7 +1687,7 @@ to activate PTZ</source>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Có sẵn theo quyền</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -1699,7 +1699,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Trang web &amp; Tích hợp</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1707,7 +1707,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Theo dõi tài nguyên hệ thống</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2088,7 +2088,7 @@ to activate PTZ</source>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Người dùng mới</translation>
     </message>
     <message>
       <source>General</source>
@@ -2104,7 +2104,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Quyền toàn cầu</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2115,7 +2115,7 @@ to activate PTZ</source>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Người dùng mới</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2155,15 +2155,15 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Cho phép xác thực (digest) không an toàn</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Bạn cần chỉ định địa chỉ email của người dùng.</translation>
     </message>
     <message>
       <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation type="unfinished">If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</translation>
+      <translation>Nếu người dùng đã có tài khoản, họ sẽ thấy hệ thống này và có thể đăng nhập. Nếu chưa, chúng tôi sẽ gửi lời mời đến địa chỉ này và người dùng sẽ thấy hệ thống ngay sau khi tạo tài khoản.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2174,7 +2174,7 @@ to activate PTZ</source>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Người dùng - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2190,18 +2190,18 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Quyền toàn cầu</translation>
     </message>
   </context>
   <context>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Người dùng đã kích hoạt</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Người dùng bị vô hiệu hóa</translation>
     </message>
   </context>
   <context>
@@ -2236,15 +2236,15 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Đặt mật khẩu để kích hoạt xác thực không an toàn</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Cho phép xác thực (digest) không an toàn</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Không tìm thấy người dùng này trong cơ sở dữ liệu LDAP và không thể đăng nhập.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2270,15 +2270,15 @@ to activate PTZ</source>
     <name>VmsRulesDialog</name>
     <message>
       <source>Vms Rules</source>
-      <translation type="unfinished">Vms Rules</translation>
+      <translation>Quy tắc VMS</translation>
     </message>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Thêm quy tắc</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Tạo bản sao</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2286,7 +2286,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Không có bản ghi</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2294,7 +2294,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Khôi phục mặc định...</translation>
     </message>
   </context>
   <context>

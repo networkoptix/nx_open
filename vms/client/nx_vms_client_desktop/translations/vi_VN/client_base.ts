@@ -992,7 +992,7 @@
     </message>
     <message>
       <source>Lookup Lists...</source>
-      <translation type="unfinished">Lookup Lists...</translation>
+      <translation>Danh sách tra cứu...</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1000,7 +1000,7 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation type="unfinished">Device...</translation>
+      <translation>Thiết bị...</translation>
     </message>
     <message>
       <source>Add User...</source>
@@ -1008,11 +1008,11 @@
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>Tích hợp...</translation>
     </message>
     <message>
       <source>New Integration...</source>
-      <translation type="unfinished">New Integration...</translation>
+      <translation>Tích hợp mới...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -1020,23 +1020,23 @@
     </message>
     <message>
       <source>Add Showreel...</source>
-      <translation type="unfinished">Add Showreel...</translation>
+      <translation>Thêm Showreel...</translation>
     </message>
     <message>
       <source>Add Virtual Camera...</source>
-      <translation type="unfinished">Add Virtual Camera...</translation>
+      <translation>Thêm camera ảo...</translation>
     </message>
     <message>
       <source>Integration Settings...</source>
-      <translation type="unfinished">Integration Settings...</translation>
+      <translation>Cài đặt tích hợp...</translation>
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>Tích hợp proxy...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
-      <translation type="unfinished">Proxied Web Page...</translation>
+      <translation>Trang web được ủy quyền...</translation>
     </message>
     <message>
       <source>Layout</source>
@@ -1048,15 +1048,15 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>Màn hình chào mừng mới</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>Hiển thị tài nguyên được ủy quyền</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Nhập từ thiết bị...</translation>
     </message>
   </context>
   <context>
@@ -1110,7 +1110,7 @@
     </message>
     <message>
       <source>Event Occurs</source>
-      <translation type="unfinished">Event Occurs</translation>
+      <translation>Sự kiện xảy ra</translation>
     </message>
     <message>
       <source>Event Starts</source>
@@ -2154,7 +2154,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -3320,7 +3320,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
   </context>
   <context>
@@ -3351,7 +3351,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3802,7 +3802,7 @@ to %1</source>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Điều chỉnh thị giác</translation>
+      <translation>Giao diện</translation>
     </message>
     <message>
       <source>Screen Recording</source>
@@ -3841,7 +3841,7 @@ to %1</source>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Preparing Image...</source>
-      <translation>Chuẩn bị hình ảnh...</translation>
+      <translation>Đang chuẩn bị hình ảnh...</translation>
     </message>
     <message>
       <source>Please wait while image is being prepared...</source>
@@ -4478,7 +4478,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
   </context>
   <context>
@@ -7462,7 +7462,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -7901,11 +7901,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::CustomAccessSummaryModel</name>
     <message>
       <source>View video archive</source>
-      <translation type="unfinished">View video archive</translation>
+      <translation>Xem lưu trữ video</translation>
     </message>
     <message>
       <source>Export video archive</source>
-      <translation type="unfinished">Export video archive</translation>
+      <translation>Xuất lưu trữ video</translation>
     </message>
     <message>
       <source>View bookmarks</source>
@@ -7917,7 +7917,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>User input</source>
-      <translation type="unfinished">User input</translation>
+      <translation>Đầu vào từ người dùng</translation>
     </message>
     <message>
       <source>Edit camera settings</source>
@@ -7929,7 +7929,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>View live</source>
-      <translation type="unfinished">View live</translation>
+      <translation>Xem trực tiếp</translation>
     </message>
   </context>
   <context>
@@ -8133,7 +8133,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>No events</source>
@@ -8186,7 +8186,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
   </context>
   <context>
@@ -8297,7 +8297,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Mở khóa phần lưu trữ này để xuất nội dung.</translation>
     </message>
   </context>
   <context>
@@ -8515,30 +8515,30 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Permission granted by %1 group</source>
-      <translation type="unfinished">Permission granted by %1 group</translation>
+      <translation>Quyền được cấp bởi nhóm %1</translation>
     </message>
     <message>
       <source>Generate events</source>
-      <translation type="unfinished">Generate events</translation>
+      <translation>Tạo sự kiện</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::GroupSettingsDialog</name>
     <message>
       <source>Group name cannot be empty.</source>
-      <translation type="unfinished">Group name cannot be empty.</translation>
+      <translation>Không được để trống tên nhóm.</translation>
     </message>
     <message>
       <source>Group with the same name already exists.</source>
-      <translation type="unfinished">Group with the same name already exists.</translation>
+      <translation>Nhóm có cùng tên đã tồn tại.</translation>
     </message>
     <message>
       <source>Delete failed</source>
-      <translation type="unfinished">Delete failed</translation>
+      <translation>Xóa không thành công</translation>
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Áp dụng thay đổi?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -8570,7 +8570,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Delete groups</source>
-      <translation type="unfinished">Delete groups</translation>
+      <translation>Xóa nhóm</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -8739,11 +8739,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation type="unfinished">Disconnect LDAP server?</translation>
+      <translation>Ngắt kết nối máy chủ LDAP?</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Tất cả người dùng và nhóm LDAP sẽ bị xóa khỏi hệ thống.&lt;br&gt;&lt;br&gt;Cài đặt LDAP cũng sẽ bị xóa.</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -8751,7 +8751,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Reset Settings</source>
-      <translation type="unfinished">Reset Settings</translation>
+      <translation>Phục hồi cài đặt</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -8767,11 +8767,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
-      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+      <translation>Xóa người dùng và nhóm LDAP hiện tại?</translation>
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
-      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+      <translation>Có vẻ như bạn đã thay đổi máy chủ LDAP. Bạn nên xóa tất cả người dùng và nhóm LDAP hiện có trước khi nhập người dùng và nhóm từ máy chủ LDAP mới.</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -8787,15 +8787,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
-      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+      <translation>Đồng bộ hóa người dùng và nhóm LDAP</translation>
     </message>
     <message>
       <source>Synchronize</source>
-      <translation type="unfinished">Synchronize</translation>
+      <translation>Đồng bộ hóa</translation>
     </message>
     <message>
       <source>Connection OK</source>
-      <translation type="unfinished">Connection OK</translation>
+      <translation>Kết nối OK</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -8960,15 +8960,15 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Default Logging level</source>
-      <translation type="unfinished">Default Logging level</translation>
+      <translation>Mức ghi nhật ký mặc định</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
+      <translation>Mức ghi nhật ký không mặc định. Chúng tôi khuyến nghị nên đặt thành “thông tin”</translation>
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
-      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+      <translation>Mức ghi nhật ký làm giảm hiệu suất của hệ thống</translation>
     </message>
   </context>
   <context>
@@ -9043,7 +9043,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
     <message>
       <source>Network request failed</source>
-      <translation type="unfinished">Network request failed</translation>
+      <translation>Yêu cầu mạng không thành công</translation>
     </message>
   </context>
   <context>
@@ -9767,7 +9767,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::PlaybackPositionItem</name>
     <message>
       <source>video is paused</source>
-      <translation type="unfinished">video is paused</translation>
+      <translation>video bị tạm dừng</translation>
     </message>
   </context>
   <context>
@@ -9895,23 +9895,23 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+      <translation>Một tích hợp có thể tương tác với Máy khách và yêu cầu quyền truy cập vào phiên người dùng</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation type="unfinished">Proxy this integration through the server</translation>
+      <translation>Ủy quyền việc tích hợp này thông qua máy chủ</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
-      <translation type="unfinished">Proxy this web page through the server</translation>
+      <translation>Proxy trang web này thông qua máy chủ</translation>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+      <translation>Cho phép mở tích hợp này mà không cần kiểm tra chứng chỉ SSL</translation>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+      <translation>Cho phép mở trang web này mà không cần kiểm tra chứng chỉ SSL</translation>
     </message>
     <message>
       <source>New Web Page</source>
@@ -9923,7 +9923,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>Trang web được ủy quyền mới</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -9931,19 +9931,19 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Tích hợp mới</translation>
     </message>
     <message>
       <source>Edit Integration</source>
-      <translation type="unfinished">Edit Integration</translation>
+      <translation>Chỉnh sửa tích hợp</translation>
     </message>
     <message>
       <source>New Proxied Integration</source>
-      <translation type="unfinished">New Proxied Integration</translation>
+      <translation>Tích hợp proxy mới</translation>
     </message>
     <message>
       <source>Edit Proxied Integration</source>
-      <translation type="unfinished">Edit Proxied Integration</translation>
+      <translation>Chỉnh sửa tích hợp proxy</translation>
     </message>
   </context>
   <context>
@@ -10083,32 +10083,32 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
       <source>Access granted by %1 group</source>
-      <translation type="unfinished">Access granted by %1 group</translation>
+      <translation>Quyền truy cập được cấp bởi nhóm %1</translation>
     </message>
     <message numerus="yes">
       <source>Access granted by %n groups: %1</source>
-      <translation type="unfinished">
-        <numerusform>Access granted by %n groups: %1</numerusform>
+      <translation>
+        <numerusform>Quyền truy cập được cấp bởi %n nhóm: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Access granted by %1 layout</source>
-      <translation type="unfinished">Access granted by %1 layout</translation>
+      <translation>Quyền truy cập được cấp bởi bố cục %1</translation>
     </message>
     <message numerus="yes">
       <source>Access granted by %n layouts: %1</source>
-      <translation type="unfinished">
-        <numerusform>Access granted by %n layouts: %1</numerusform>
+      <translation>
+        <numerusform>Quyền truy cập được cấp bởi %n bố cục: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Access granted by %1 video wall</source>
-      <translation type="unfinished">Access granted by %1 video wall</translation>
+      <translation>Truy cập được cấp bởi %1 tường video</translation>
     </message>
     <message numerus="yes">
       <source>Access granted by %n video walls: %1</source>
-      <translation type="unfinished">
-        <numerusform>Access granted by %n video walls: %1</numerusform>
+      <translation>
+        <numerusform>Truy cập được cấp bởi %n tường video: %1</numerusform>
       </translation>
     </message>
     <message>
@@ -10117,11 +10117,11 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Trang web &amp; Tích hợp</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Theo dõi tài nguyên hệ thống</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -10129,16 +10129,16 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>User&apos;s custom permissions</source>
-      <translation type="unfinished">User&apos;s custom permissions</translation>
+      <translation>Quyền tùy chỉnh của người dùng</translation>
     </message>
     <message>
       <source>Group&apos;s custom permissions</source>
-      <translation type="unfinished">Group&apos;s custom permissions</translation>
+      <translation>Quyền tùy chỉnh của nhóm</translation>
     </message>
     <message>
       <source>Access granted by %1</source>
       <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
-      <translation type="unfinished">Access granted by %1</translation>
+      <translation>Quyền truy cập được cấp bởi %1</translation>
     </message>
   </context>
   <context>
@@ -10164,7 +10164,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::ResourcesChangesManager</name>
     <message>
       <source>Resource list is empty</source>
-      <translation type="unfinished">Resource list is empty</translation>
+      <translation>Danh sách tài nguyên trống</translation>
     </message>
     <message>
       <source>No connection</source>
@@ -10175,7 +10175,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
       <source>Password confirmation is required to apply changes</source>
-      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+      <translation>Cần xác nhận mật khẩu để áp dụng các thay đổi</translation>
     </message>
     <message>
       <source>Confirm</source>
@@ -10480,7 +10480,7 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+      <translation>Hình mờ sẽ được hiển thị trên các video trực tiếp, lưu trữ và xuất chỉ dành cho người dùng có quyền thấp. Bạn và những người dùng cấp cao khác sẽ không nhìn thấy chúng.</translation>
     </message>
   </context>
   <context>
@@ -10932,7 +10932,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Open</source>
@@ -11067,7 +11067,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Member of</source>

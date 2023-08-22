@@ -399,7 +399,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Timeout</source>
@@ -1993,7 +1993,7 @@
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>Đăng nhập vào trang web</translation>
     </message>
   </context>
   <context>
@@ -2571,7 +2571,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation type="unfinished">Display servers in tree for non-power users</translation>
+      <translation>Hiển thị máy chủ trong sơ đồ cây cho người dùng có quyền thấp</translation>
     </message>
   </context>
   <context>
