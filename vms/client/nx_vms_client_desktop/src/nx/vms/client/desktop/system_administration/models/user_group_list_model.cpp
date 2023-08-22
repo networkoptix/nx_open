@@ -304,8 +304,9 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                         return tr("Group is not found in the LDAP database.");
                     if (!d->isUnique(group))
                     {
-                        return tr("There are multiple groups with the same name in the system. "
-                            "Rename or delete non-unique groups.");
+                        return tr("There are multiple groups with this name in the system. To "
+                            "maintain a clear and organized structure, we suggest providing "
+                            "unique names for each group.");
                     }
                     if (d->cycledGroups.contains(group.id))
                     {
