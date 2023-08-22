@@ -12,6 +12,7 @@ PanelBase
     id: panel
 
     required property var engineInfo
+    required property var licenseSummary
 
     property bool checkable: true
     property bool checked: false
@@ -30,7 +31,8 @@ PanelBase
 
     headerItem: IntegrationHeader
     {
-        name: engineInfo ? engineInfo.name : ""
+        engineInfo: panel.engineInfo
+        licenseSummary: panel.licenseSummary
         checkable: panel.checkable
         checked: panel.checked
         refreshing: panel.refreshing
@@ -76,6 +78,23 @@ PanelBase
             text: engineInfo ? engineInfo.vendor : ""
             color: ColorTheme.light
             visible: !!text
+        }
+
+        Text
+        {
+            text: qsTr("Usage")
+            color: ColorTheme.windowText
+            visible: usage.visible
+        }
+
+        Text
+        {
+            id: usage
+            text: licenseSummary ? licenseSummary.inUse + "/" + licenseSummary.available : ""
+            color: !!licenseSummary && licenseSummary.inUse > licenseSummary.available
+                ? ColorTheme.colors.red_core
+                : ColorTheme.light
+            visible: !panel.checkable && !!text
         }
     }
 

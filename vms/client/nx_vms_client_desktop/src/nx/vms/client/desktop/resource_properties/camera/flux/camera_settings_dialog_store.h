@@ -13,6 +13,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/utils/std/optional.h>
+#include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/desktop/common/flux/flux_types.h>
@@ -199,6 +200,7 @@ public:
         const QString& activeElement,
         const QJsonObject& paramsModel,
         const QJsonObject& values);
+    void handleOverusedEngines(const QSet<QnUuid>& overusedEngines);
 
     Q_INVOKABLE void refreshDeviceAgentSettings(const QnUuid& engineId);
     void resetDeviceAgentData(

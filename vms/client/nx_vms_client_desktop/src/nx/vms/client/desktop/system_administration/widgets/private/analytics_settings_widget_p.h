@@ -31,7 +31,7 @@ class AnalyticsSettingsWidget::Private:
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
 
 public:
-    Private(AnalyticsSettingsWidget* q);
+    explicit Private(AnalyticsSettingsWidget* q);
 
     Q_INVOKABLE QnUuid getCurrentEngineId() const { return currentEngineId; }
     Q_INVOKABLE void setCurrentEngineId(const QnUuid& engineId);
@@ -48,6 +48,7 @@ public:
 
     Q_INVOKABLE QJsonObject settingsModel(const QnUuid& engineId);
     Q_INVOKABLE QJsonObject errors(const QnUuid& engineId) { return m_errors[engineId]; }
+
     QVariant analyticsEngines() const { return engines; }
 
     void updateEngines();
@@ -96,6 +97,7 @@ signals:
     void currentSettingsStateChanged();
     void currentErrorsChanged();
     void loadingChanged();
+    void licenseSummariesChanged();
 
 private:
     void addEngine(const QnUuid& engineId, const AnalyticsEngineInfo& engineInfo);

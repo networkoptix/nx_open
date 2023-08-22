@@ -3,42 +3,16 @@
 #include "analytics_engines_watcher.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/analytics_integration_model.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/fusion/model_functions.h>
+
+#include "analytics_data_helper.h"
 
 using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
-
-namespace {
-
-AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& engine)
-{
-    const auto plugin = engine->getParentResource().dynamicCast<AnalyticsPluginResource>();
-    if (!plugin)
-        return {};
-
-    const auto pluginManifest = plugin->manifest();
-
-    QJsonObject settingsModel = QJson::deserialized<QJsonObject>(
-        engine->getProperty(AnalyticsEngineResource::kSettingsModelProperty).toUtf8());
-
-    return AnalyticsEngineInfo {
-        engine->getId(),
-        engine->getName(),
-        pluginManifest.description,
-        pluginManifest.version,
-        pluginManifest.vendor,
-        std::move(settingsModel),
-        engine->isDeviceDependent(),
-        plugin->integrationType()
-    };
-}
-
-} // namespace
 
 class AnalyticsEnginesWatcher::Private:
     public QObject,
@@ -73,7 +47,8 @@ void AnalyticsEnginesWatcher::Private::at_resourceAdded(const QnResourcePtr& res
 {
     if (const auto& engine = resource.dynamicCast<AnalyticsEngineResource>())
     {
-        const auto& info = engineInfoFromResource(engine);
+        const auto& info =
+            engineInfoFromResource(engine, SettingsModelSource::resourceProperty);
         if (info.id.isNull())
             return;
 

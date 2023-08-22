@@ -8,9 +8,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/client/desktop/analytics/analytics_data_helper.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
-#include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"
@@ -18,29 +18,6 @@
 using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
-
-namespace {
-
-AnalyticsEngineInfo engineInfoFromResource(const AnalyticsEngineResourcePtr& engine)
-{
-    const auto plugin = engine->getParentResource().dynamicCast<AnalyticsPluginResource>();
-    const auto pluginManifest = NX_ASSERT(plugin)
-        ? plugin->manifest()
-        : api::analytics::PluginManifest{};
-
-    return AnalyticsEngineInfo {
-        engine->getId(),
-        engine->getName(),
-        pluginManifest.description,
-        pluginManifest.version,
-        pluginManifest.vendor,
-        engine->manifest().deviceAgentSettingsModel,
-        engine->isDeviceDependent(),
-        engine->integrationType()
-    };
-}
-
-} // namespace
 
 class CameraSettingsAnalyticsEnginesWatcher::Private:
     public QObject,
@@ -207,7 +184,7 @@ void CameraSettingsAnalyticsEnginesWatcher::Private::at_resourceAdded(
 
     if (const auto& engine = resource.objectCast<AnalyticsEngineResource>())
     {
-        const auto info = engineInfoFromResource(engine);
+        const auto info = engineInfoFromResource(engine, SettingsModelSource::manifest);
         if (info.id.isNull())
             return;
 

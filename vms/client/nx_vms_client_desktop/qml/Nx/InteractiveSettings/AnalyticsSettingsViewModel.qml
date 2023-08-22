@@ -23,6 +23,7 @@ NxObject
     readonly property alias engines: impl.engines
     readonly property alias currentEngineSettingsModel: impl.currentEngineSettingsModel
     readonly property alias currentSettingsErrors: impl.currentSettingsErrors
+    readonly property alias currentEngineLicenseSummary: impl.currentEngineLicenseSummary
     property var enabledEngines: engines.map(engine => engine.id) //< Enabled by default.
     property var requestsModel
 
@@ -54,6 +55,7 @@ NxObject
         property var engines: []
         property var currentEngineSettingsModel
         property var currentSettingsErrors
+        property var currentEngineLicenseSummary
 
         // Menu related properties.
         property var currentEngineId
@@ -69,10 +71,12 @@ NxObject
         updateModel(/*model*/ null, /*initialValues*/ null)
     }
 
-    function updateState(engines, engineId, model, values, errors, isInitial)
+    function updateState(engines, licenseSummary, engineId, model, values, errors, isInitial)
     {
         if (JSON.stringify(impl.engines) !== JSON.stringify(engines))
             impl.engines = engines
+
+        impl.currentEngineLicenseSummary = licenseSummary
 
         if (!engineId)
             return

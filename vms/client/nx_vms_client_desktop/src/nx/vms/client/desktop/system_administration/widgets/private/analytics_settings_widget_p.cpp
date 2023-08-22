@@ -14,9 +14,14 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
+#include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+// #include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <utils/common/event_processors.h>
 
 using namespace nx::vms::common;
@@ -54,6 +59,11 @@ AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
 
     view->rootObject()->setProperty("store", QVariant::fromValue(this));
 
+    const auto engineLicenseSummaryProvider =
+        new EngineLicenseSummaryProvider{q->systemContext(), this};
+    view->rootObject()->setProperty(
+        "engineLicenseSummaryProvider", QVariant::fromValue(engineLicenseSummaryProvider));
+
     connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineAdded,
         this, &Private::addEngine);
 
@@ -69,6 +79,10 @@ AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
             if (engineId == currentEngineId)
                 emit currentSettingsStateChanged();
         });
+
+    const auto serviceManager = systemContext()->saasServiceManager();
+    connect(serviceManager, &common::saas::ServiceManager::dataChanged,
+        this, &Private::licenseSummariesChanged);
 }
 
 void AnalyticsSettingsWidget::Private::updateEngines()

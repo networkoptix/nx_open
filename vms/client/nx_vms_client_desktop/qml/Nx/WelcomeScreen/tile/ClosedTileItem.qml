@@ -142,7 +142,7 @@ Item
             visible: tile.cloud
         }
 
-        Tag
+        Nx.Tag
         {
             color: ColorTheme.colors.dark12
 
@@ -151,7 +151,7 @@ Item
             visible: !tile.online
         }
 
-        Tag
+        Nx.Tag
         {
             color: ColorTheme.colors.dark12
 
@@ -160,7 +160,7 @@ Item
             visible: tile.unreachable && tile.online
         }
 
-        Tag
+        Nx.Tag
         {
             color: ColorTheme.colors.red_core
 
@@ -169,7 +169,7 @@ Item
             visible: tile.incompatible && tile.online
         }
 
-        Tag
+        Nx.Tag
         {
             id: versionTag
 
@@ -178,7 +178,7 @@ Item
             visible: text && !tile.incompatible && tile.online
         }
 
-        Tag
+        Nx.Tag
         {
             id: anchorTag
 

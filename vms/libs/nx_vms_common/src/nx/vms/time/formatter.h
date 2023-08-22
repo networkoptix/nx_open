@@ -32,6 +32,7 @@ enum Format
     dd_MM_yy,
     d_MMMM_yyyy,
     dd_MMMM_yyyy,
+    MMMM_d_yyyy,
     dd_MM_yyyy_hh_mm_ss, // ~=QLocale::DateTime::ShortFormat
     dd_MM_yy_hh_mm_ss,
     dddd_d_MMMM_yyyy_hh_mm_ss, // ~=QLocale::DateTime::LongFormat
