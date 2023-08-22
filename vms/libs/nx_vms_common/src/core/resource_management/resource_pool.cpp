@@ -196,7 +196,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     QnResourceList removedResources;
     for (const QnResourcePtr& resource: std::as_const(resources))
     {
-        if (!resource || resource->resourcePool() != this)
+        if (!resource || resource->hasFlags(Qn::removed) || resource->resourcePool() != this)
         {
             NX_VERBOSE(this, "Skip different pool resource %1, id: %2, name: %3",
                 resource, resource->getId(), resource->getName());
