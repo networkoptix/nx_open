@@ -663,6 +663,7 @@ private:
     nx::utils::CachedValue<nx::vms::api::DeviceType> m_cachedExplicitDeviceType;
     nx::utils::CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
     nx::utils::CachedValue<QnIOPortDataList> m_cachedIoPorts;
+    nx::utils::CachedValue<bool> m_cachedHasVideo;
 
 protected slots:
     virtual void resetCachedValues();
