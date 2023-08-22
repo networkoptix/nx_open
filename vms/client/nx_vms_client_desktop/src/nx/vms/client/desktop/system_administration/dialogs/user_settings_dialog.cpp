@@ -49,6 +49,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/vms/utils/system_uri.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
@@ -99,6 +100,7 @@ struct UserSettingsDialog::Private
     QmlProperty<QDateTime> linkValidUntil;
     QmlProperty<int> expiresAfterLoginS;
     QmlProperty<bool> revokeAccessEnabled;
+    QmlProperty<QDateTime> firstLoginTime;
 
     QnUserResourcePtr user;
     rest::Handle m_currentRequest = -1;
@@ -116,7 +118,8 @@ struct UserSettingsDialog::Private
         linkValidFrom(q->rootObjectHolder(), "linkValidFrom"),
         linkValidUntil(q->rootObjectHolder(), "linkValidUntil"),
         expiresAfterLoginS(q->rootObjectHolder(), "expiresAfterLoginS"),
-        revokeAccessEnabled(q->rootObjectHolder(), "revokeAccessEnabled")
+        revokeAccessEnabled(q->rootObjectHolder(), "revokeAccessEnabled"),
+        firstLoginTime(q->rootObjectHolder(), "firstLoginTime")
     {
         connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
             [this]() { syncId = q->globalSettings()->ldap().syncId(); });
@@ -700,6 +703,35 @@ QDateTime UserSettingsDialog::newValidUntilDate() const
     return validUntil;
 }
 
+QString UserSettingsDialog::durationFormat(qint64 ms) const
+{
+    using namespace std::chrono;
+    using namespace nx::vms::text;
+
+    if (ms < 0) //< Prevent asserts in HumanReadable::timeSpan().
+        return {};
+
+    constexpr auto kOneMonth = months(1);
+    static const QString separator =
+        QString(" %1 ").arg(tr("and", /*comment*/ "Example: 1 month and 2 days"));
+
+    int suppressSecondUnitLimit = text::HumanReadable::kAlwaysSuppressSecondUnit;
+
+    auto duration = std::chrono::milliseconds(ms);
+
+    if (const auto months = duration_cast<std::chrono::months>(duration); months >= kOneMonth)
+        suppressSecondUnitLimit = HumanReadable::kNoSuppressSecondUnit;
+    else if (const auto minutes = duration_cast<std::chrono::minutes>(duration); minutes < 1min)
+        duration = 1min;
+
+    return HumanReadable::timeSpan(
+        duration_cast<std::chrono::milliseconds>(duration),
+        HumanReadable::Months | HumanReadable::Days | HumanReadable::Hours | HumanReadable::Minutes,
+        text::HumanReadable::SuffixFormat::Full,
+        separator,
+        suppressSecondUnitLimit);
+}
+
 UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr& user)
 {
     UserSettingsDialogState state;
@@ -719,13 +751,15 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         return state;
     }
 
-    const auto currentUser = systemContext()->userWatcher()->user();
-    const Qn::Permissions permissions = accessController()->permissions(user);
+    const bool isSelf = systemContext()->userWatcher()->user()->getId() == user->getId();
+    Qn::Permissions permissions = accessController()->permissions(user);
+    // Temporary user cannot edit itself.
+    if (user->userType() == nx::vms::api::UserType::temporaryLocal && isSelf)
+        permissions &= ~(Qn::FullUserPermissions | Qn::SavePermission);
 
     state.userType = (UserSettingsGlobal::UserType) user->userType();
-    state.isSelf = currentUser->getId() == user->getId();
+    state.isSelf = isSelf;
     state.userId = user->getId();
-
     state.login = user->getName();
     state.loginEditable = permissions.testFlag(Qn::WriteNamePermission);
     state.fullName = user->fullName();
@@ -758,14 +792,29 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     {
         const QnUserHash hash = user->getHash();
 
-        NX_ASSERT(hash.type == QnUserHash::Type::temporary);
-        NX_ASSERT(hash.temporaryToken);
+        if (hash.type == QnUserHash::Type::temporary && hash.temporaryToken)
+        {
+            d->updateUiFromTemporaryToken(*hash.temporaryToken);
 
-        d->updateUiFromTemporaryToken(*hash.temporaryToken);
+            const auto firstLoginTimeStr =
+                user->getProperty(ResourcePropertyKey::kTemporaryUserFirstLoginTime);
+
+            d->firstLoginTime = firstLoginTimeStr.isEmpty()
+                ? QDateTime{}
+                : d->serverDate(duration_cast<milliseconds>(
+                    seconds(firstLoginTimeStr.toLongLong())));
+        }
+        else
+        {
+            d->updateUiFromTemporaryToken({});
+        }
     }
 
     d->ldapError =
         user->isLdap() && !user->externalId().dn.isEmpty() && user->externalId().syncId != d->syncId;
+
+    state.linkEditable = accessController()->hasPowerUserPermissions()
+        && permissions.testFlag(Qn::SavePermission);
 
     return state;
 }

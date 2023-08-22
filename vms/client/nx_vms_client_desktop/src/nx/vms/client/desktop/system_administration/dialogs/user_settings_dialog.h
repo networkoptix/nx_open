@@ -45,6 +45,7 @@ struct UserSettingsDialogState
     Q_PROPERTY(nx::core::access::ResourceAccessMap sharedResources MEMBER sharedResources)
     Q_PROPERTY(nx::vms::api::GlobalPermissions globalPermissions MEMBER globalPermissions)
     Q_PROPERTY(bool permissionsEditable MEMBER permissionsEditable)
+    Q_PROPERTY(bool linkEditable MEMBER linkEditable)
 
 public:
     bool operator==(const UserSettingsDialogState& other) const = default;
@@ -87,6 +88,7 @@ public:
     nx::core::access::ResourceAccessMap sharedResources;
     nx::vms::api::GlobalPermissions globalPermissions;
     bool permissionsEditable = true;
+    bool linkEditable = true;
 };
 
 class NX_VMS_CLIENT_DESKTOP_API UserSettingsDialog:
@@ -133,6 +135,7 @@ public:
     Q_INVOKABLE bool isOkClicked() const { return acceptOnSuccess(); }
 
     Q_INVOKABLE QDateTime newValidUntilDate() const;
+    Q_INVOKABLE QString durationFormat(qint64 ms) const;
 
     Q_INVOKABLE void cancelRequest();
 

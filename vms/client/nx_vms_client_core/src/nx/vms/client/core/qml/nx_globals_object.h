@@ -83,6 +83,8 @@ public:
     Q_INVOKABLE QString modifierName(const Qt::KeyboardModifier modifier) const;
 
     Q_INVOKABLE QString dateInShortFormat(const QDateTime& date);
+
+    Q_INVOKABLE QString dateTimeInShortFormat(const QDateTime& dateTime);
 };
 
 } // namespace nx::vms::client::core
