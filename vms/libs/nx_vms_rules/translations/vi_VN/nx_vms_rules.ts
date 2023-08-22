@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation>Xảy ra lúc</translation>
+      <translation>Xảy ra tại</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -167,7 +167,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation>Xảy ra lúc</translation>
+      <translation>Xảy ra tại</translation>
     </message>
     <message>
       <source>With ID</source>
@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Trên Bố cục</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
@@ -335,18 +335,18 @@
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Đặt cho</translation>
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Tua lại</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ExitFullscreenAction</name>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Trên Bố cục</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Lỗi quạt</translation>
     </message>
     <message>
       <source>At</source>
@@ -388,19 +388,19 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Bỏ qua ghi nhật ký</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>Và Nguồn</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Và chú thích</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Và mô tả</translation>
     </message>
   </context>
   <context>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>Yêu cầu HTTP(S)</translation>
     </message>
     <message>
       <source>URL</source>
@@ -431,7 +431,7 @@
     </message>
     <message>
       <source>Method</source>
-      <translation type="unfinished">Method</translation>
+      <translation>Phương thức</translation>
     </message>
     <message>
       <source>Authentication Type</source>
@@ -477,11 +477,11 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Bắt đầu khi</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Xảy ra tại</translation>
     </message>
   </context>
   <context>
@@ -571,7 +571,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Tooltip</source>
@@ -579,7 +579,7 @@
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Hiển thị thông báo trên màn hình</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -598,7 +598,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Tua lại</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -613,7 +613,7 @@
     </message>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Ghi khẩn cấp</translation>
     </message>
   </context>
   <context>
@@ -624,7 +624,7 @@
     </message>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>Phát âm thanh</translation>
     </message>
     <message>
       <source>At</source>
@@ -647,23 +647,23 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Xảy ra tại</translation>
     </message>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>Dành cho plugin</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Và chú thích</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Và mô tả</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>Và cấp độ là</translation>
     </message>
   </context>
   <context>
@@ -687,18 +687,18 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>Quá tải PoE</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Bắt đầu khi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>Thực thi PTZ cài sẵn</translation>
     </message>
     <message>
       <source>At</source>
@@ -706,7 +706,7 @@
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>PTZ cài sẵn</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -714,7 +714,7 @@
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Thực thi cho người dùng</translation>
     </message>
   </context>
   <context>
@@ -733,11 +733,11 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Gửi thông báo di động</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>Thêm tên thiết bị nguồn trong phần nội dung</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -756,7 +756,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Lặp lại âm thanh</translation>
     </message>
     <message>
       <source>At</source>
@@ -775,7 +775,7 @@
     </message>
     <message>
       <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
+      <translation>Gửi Email</translation>
     </message>
     <message>
       <source>To</source>
@@ -783,7 +783,7 @@
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation type="unfinished">Additional Recipients</translation>
+      <translation>Người nhận bổ sung</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -872,11 +872,11 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Tua lại</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Buộc mở bố cục cảnh báo</translation>
     </message>
   </context>
   <context>
@@ -907,11 +907,11 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Xảy ra tại</translation>
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>Bởi</translation>
     </message>
   </context>
   <context>
@@ -930,11 +930,11 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>Tại thiết bị</translation>
     </message>
     <message>
       <source>To users</source>
-      <translation type="unfinished">To users</translation>
+      <translation>Đến người dùng</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -996,7 +996,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>Hiển thị lớp phủ văn bản</translation>
     </message>
     <message>
       <source>At</source>
@@ -1004,11 +1004,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Thời lượng cố định</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>Tuỳ chỉnh văn bản</translation>
     </message>
     <message>
       <source>Show to</source>
@@ -1042,7 +1042,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>Ghi vào nhật ký</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1086,7 +1086,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Hành động không xác định</translation>
     </message>
   </context>
 </TS>
