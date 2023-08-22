@@ -347,7 +347,9 @@ void ConnectionBase::onHttpClientDone()
         pingSupported,
         useWebsocketMode,
         pingSupportedHeaderIt != headers.cend(),
-        pingSupportedHeaderIt->second == "true");
+        pingSupportedHeaderIt != headers.cend()
+            ? pingSupportedHeaderIt->second
+            : "");
 
     if (useWebsocketMode)
     {

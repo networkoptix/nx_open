@@ -26,9 +26,11 @@
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/layout/layout_settings_dialog.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/license/usage_helper.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_roles_dialog.h>
@@ -251,15 +253,22 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
     if (!dialog->exec())
         return;
 
+    const bool proposeToEnableRecording = NX_ASSERT(settings.recording.enabled.hasValue())
+        ? settings.recording.enabled()
+        : false;
+
+    nx::vms::license::CamLicenseUsageHelper licenseUsageHelper(systemContext());
+
     const bool copyArchiveLength = dialog->copyArchiveLength();
     const auto applyChanges =
-        [this, &settings, copyArchiveLength](
+        [this, &settings, &licenseUsageHelper, proposeToEnableRecording, copyArchiveLength](
             const QnVirtualCameraResourcePtr& camera)
         {
             using CameraBitrateCalculator = nx::vms::common::CameraBitrateCalculator;
 
-            if (NX_ASSERT(settings.recording.enabled.hasValue()))
-                camera->setScheduleEnabled(settings.recording.enabled());
+            licenseUsageHelper.propose(camera, proposeToEnableRecording);
+            camera->setScheduleEnabled(proposeToEnableRecording
+                && !licenseUsageHelper.isOverflowForCamera(camera));
 
             const int maxFps = camera->getMaxFps();
             const int reservedSecondStreamFps =

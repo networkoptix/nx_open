@@ -402,7 +402,7 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
 
     m_masterCloudSyncAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "masterCloudSyncList", QString(), this,
-        [] { return tr("Semicolon-separated list of Servers designated to connect to the Cloud."
+        [] { return tr("Semicolon-separated list of Servers designated to connect to the Cloud. "
             "Servers at the top of the list have higher priority. If the list is empty a Server "
             "for the Cloud connection is selected automatically."); });
 

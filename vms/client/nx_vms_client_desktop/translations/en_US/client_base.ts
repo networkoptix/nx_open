@@ -1031,6 +1031,10 @@
         <source>Save Cloud Layout As...</source>
         <translation></translation>
     </message>
+    <message>
+        <source>User Manual...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -1152,6 +1156,21 @@
             <numerusform>%n layout</numerusform>
             <numerusform>%n layouts</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>FileExtensions</name>
+    <message>
+        <source>Pictures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Files</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3137,21 +3156,6 @@ to %1</source>
     <message>
         <source>To generate Generic Event, please refer to %1.</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnCustomFileDialog</name>
-    <message>
-        <source>Pictures</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Files</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8258,6 +8262,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Recording will not be enabled on some cameras.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
