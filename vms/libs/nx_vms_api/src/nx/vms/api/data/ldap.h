@@ -18,6 +18,12 @@ namespace nx::vms::api {
 
 using namespace std::chrono_literals;
 
+const std::string kLdapScheme{"ldap"};
+constexpr const int kLdapDefaultPort{389};
+
+const std::string kLdapsScheme{"ldaps"};
+constexpr const int kLdapsDefaultPort{636};
+
 struct NX_VMS_API LdapSettingSearchFilter
 {
     /**%apidoc[opt]
@@ -83,7 +89,7 @@ struct NX_VMS_API LdapSettings
     std::chrono::milliseconds passwordExpirationPeriodMs = 5min;
 
     /**%apidoc[opt] */
-    std::chrono::seconds searchTimeoutS = 30s;
+    std::chrono::seconds searchTimeoutS = 1min;
 
     /**%apidoc[opt] */
     int searchPageSize = 1000;
@@ -102,7 +108,7 @@ struct NX_VMS_API LdapSettings
         usersAndGroups);
 
     /**%apidoc[opt] Automatic synchronization policy. */
-    Sync continuousSync = Sync::disabled;
+    Sync continuousSync = Sync::groupsOnly;
 
     /**%apidoc[opt] Delay between automatic synchronization cycles.
      * %example 0
@@ -136,7 +142,7 @@ struct NX_VMS_API LdapSettings
     bool ignoreCertificateErrors = false;
 
     bool operator==(const LdapSettings&) const = default;
-    Void getId() const { return Void(); }
+    Void getId() const { return {}; }
 
     bool isValid(bool checkPassword = true) const;
     QString syncId() const;
