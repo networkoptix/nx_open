@@ -15,6 +15,32 @@
 
 namespace nx::vms::common::test {
 
+namespace {
+
+class SignalListener: public QObject
+{
+public:
+    SignalListener(const QnResourcePool* pool)
+    {
+        connect(pool, &QnResourcePool::resourceRemoved, this,
+            [this](const auto& resource)
+            {
+                removedBySingleSignal.append(resource->getId());
+            });
+
+        connect(pool, &QnResourcePool::resourcesRemoved, this,
+            [this](const auto& resources)
+            {
+                removedByGroupSignal.append(resources.ids());
+            });
+    }
+
+    QnUuidList removedBySingleSignal;
+    QnUuidList removedByGroupSignal;
+};
+
+} // namespace
+
 class QnResourcePoolTest: public ContextBasedTest
 {
 };
@@ -180,6 +206,18 @@ TEST_F(QnResourcePoolTest, userByName)
 
     cloudUser->setEnabled(true);
     ASSERT_EQ(resourcePool()->userByName(kName).first, cloudUser);
+}
+
+TEST_F(QnResourcePoolTest, removeSignal)
+{
+    auto listener = SignalListener(resourcePool());
+    auto camera = addCamera();
+
+    resourcePool()->removeResources({camera});
+    resourcePool()->removeResources({camera});
+
+    EXPECT_EQ(listener.removedByGroupSignal.size(), 1);
+    EXPECT_EQ(listener.removedBySingleSignal.size(), 1);
 }
 
 } // namespace nx::vms::common::test
