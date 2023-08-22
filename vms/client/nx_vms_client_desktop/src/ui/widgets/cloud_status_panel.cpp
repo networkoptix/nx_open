@@ -66,7 +66,6 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     Q_D(QnCloudStatusPanel);
 
     setProperty(nx::style::Properties::kDontPolishFontProperty, true);
-    setPopupMode(QToolButton::MenuButtonPopup);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
     setPaletteColor(this, QPalette::Window, nx::vms::client::core::colorTheme()->color("dark7"));
     setContentsMargins(10, 0, 0, 0);
@@ -155,7 +154,6 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
     Q_Q(QnCloudStatusPanel);
     loggedInMenu->setWindowFlags(loggedInMenu->windowFlags());
     loggedInMenu->addAction(q->action(action::OpenCloudMainUrl));
-    loggedInMenu->addSeparator();
     loggedInMenu->addAction(q->action(action::OpenCloudManagementUrl));
     loggedInMenu->addAction(q->action(action::LogoutFromCloud));
 
@@ -195,16 +193,19 @@ void QnCloudStatusPanelPrivate::updateUi()
             q->setText(QString());
             q->setIcon(loggedOutIcon);
             q->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            q->setPopupMode(QToolButton::DelayedPopup);
             break;
         case CloudStatusWatcher::Online:
             q->setText(effectiveUserName);
             q->setIcon(loggedInIcon);
             q->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            q->setPopupMode(QToolButton::MenuButtonPopup);
             break;
         case CloudStatusWatcher::Offline:
             q->setText(effectiveUserName);
             q->setIcon(offlineIcon);
             q->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            q->setPopupMode(QToolButton::MenuButtonPopup);
             break;
         default:
             NX_ASSERT(false, "Should never get here.");
