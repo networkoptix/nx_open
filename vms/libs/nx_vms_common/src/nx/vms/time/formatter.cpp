@@ -146,6 +146,7 @@ const FormatsHash& DateTimeFormats::defaultFormats()
         {Format::dd_MM_yyyy, "dd-MM-yy"},
         {Format::d_MMMM_yyyy, "d MMMM yyyy"},
         {Format::dd_MMMM_yyyy, "dd MMMM yyyy"},
+        {Format::MMMM_d_yyyy, "MMMM d, yyyy"},
         {Format::dd_MM_yyyy_hh_mm_ss, "dd-MM-yyyy hh:mm:ss"},
         {Format::dd_MM_yy_hh_mm_ss, "dd-MM-yy hh:mm:ss"},
         {Format::dddd_d_MMMM_yyyy_hh_mm_ss, "dddd, d MMMM yyyy hh:mm:ss"},

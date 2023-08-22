@@ -5,6 +5,7 @@
 #include <QtQuick/QQuickItem>
 
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
+#include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <utils/common/event_processors.h>
@@ -20,11 +21,13 @@ static constexpr QSize kMinimumSize(800, 400);
 } // namespace
 
 CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
+    SystemContext* context,
     CameraSettingsDialogStore* store,
     QQmlEngine* engine,
     QWidget* parent)
     :
-    base_type(engine, parent)
+    base_type(engine, parent),
+    SystemContextAware(context)
 {
     setClearColor(palette().window().color());
     setResizeMode(QQuickWidget::SizeRootObjectToView);
@@ -41,6 +44,12 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
 
     rootObject()->setProperty("store", QVariant::fromValue(store));
     rootObject()->setProperty("backend", QVariant::fromValue(this));
+
+    const auto engineLicenseSummaryProvider =
+        new EngineLicenseSummaryProvider{systemContext(), this};
+    rootObject()->setProperty(
+        "engineLicenseSummaryProvider", QVariant::fromValue(engineLicenseSummaryProvider));
+
     setHelpTopic(this, Qn::PluginsAndAnalytics_Help);
 }
 

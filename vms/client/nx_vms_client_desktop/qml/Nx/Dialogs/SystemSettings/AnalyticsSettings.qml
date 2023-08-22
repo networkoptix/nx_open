@@ -16,6 +16,7 @@ Item
     id: analyticsSettings
 
     property var store: null
+    property var engineLicenseSummaryProvider: null
 
     function activateEngine(engineId) { viewModel.setCurrentEngine(engineId) }
 
@@ -36,6 +37,7 @@ Item
             const engineId = store.getCurrentEngineId()
             viewModel.updateState(
                 store.analyticsEngines,
+                engineLicenseSummaryProvider.licenseSummary(engineId),
                 engineId,
                 store.settingsModel(engineId),
                 store.settingsValues(engineId),
@@ -49,6 +51,7 @@ Item
             function onAnalyticsEnginesChanged() { viewModel.storeUpdated() }
             function onCurrentSettingsStateChanged() { viewModel.storeUpdated() }
             function onCurrentErrorsChanged() { viewModel.storeUpdated() }
+            function onLicenseSummariesChanged() { viewModel.storeUpdated() }
         }
     }
 

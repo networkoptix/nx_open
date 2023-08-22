@@ -2645,6 +2645,31 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setAnalyticsEngines(
     return {true, std::move(state)};
 }
 
+State CameraSettingsDialogStateReducer::handleOverusedEngines(
+    State state, const QSet<QnUuid>& overusedEngines)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for %2", __func__, overusedEngines);
+
+    NX_ASSERT(state.isSingleCamera());
+
+    if (!state.isSingleCamera())
+        return state;
+
+    const auto userEnabledEngineBase = state.analytics.userEnabledEngines.getBase();
+    auto userEnabledEngineUser = state.analytics.userEnabledEngines.getBase();
+    for (auto engineIt = userEnabledEngineUser.begin(); engineIt != userEnabledEngineUser.end();)
+    {
+        if (!userEnabledEngineBase.contains(*engineIt) && overusedEngines.contains(*engineIt))
+            engineIt = userEnabledEngineUser.erase(engineIt);
+        else
+            ++engineIt;
+    }
+
+    state = setUserEnabledAnalyticsEngines(std::move(state), userEnabledEngineUser);
+
+    return state;
+}
+
 std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
     State state, const QnUuid& value)
 {

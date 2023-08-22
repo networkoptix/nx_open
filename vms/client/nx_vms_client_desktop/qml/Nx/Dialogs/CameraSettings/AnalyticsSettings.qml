@@ -20,6 +20,8 @@ Item
 
     property var store: null
     property var backend: null
+    property var engineLicenseSummaryProvider: null
+
     property bool loading: false
     property bool supportsDualStreaming: false
     readonly property bool isDeviceDependent: viewModel.currentEngineInfo !== undefined
@@ -47,9 +49,12 @@ Item
             analyticsSettings.resourceId = resourceId
 
             const currentEngineId = store.currentAnalyticsEngineId()
-            viewModel.enabledEngines = store.userEnabledAnalyticsEngines()
+            const userEnabledAnalyticsEngines = store.userEnabledAnalyticsEngines()
+            viewModel.enabledEngines = userEnabledAnalyticsEngines
             viewModel.updateState(
                 store.analyticsEngines(),
+                engineLicenseSummaryProvider.licenseSummary(
+                    currentEngineId, resourceId, userEnabledAnalyticsEngines),
                 currentEngineId,
                 store.deviceAgentSettingsModel(currentEngineId),
                 store.deviceAgentSettingsValues(currentEngineId),

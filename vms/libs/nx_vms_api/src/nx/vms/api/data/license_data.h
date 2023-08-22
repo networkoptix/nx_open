@@ -3,13 +3,14 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtCore/QVariantMap>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/latin1_array.h>
+#include <nx/utils/uuid.h>
 
 #include "data_macros.h"
 #include "map.h"
-#include <nx/reflect/instrument.h>
-#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace vms {
@@ -134,6 +135,16 @@ struct NX_VMS_API LicenseSummaryData
     int inUse = 0;
 
     bool operator==(const LicenseSummaryData& other) const = default;
+
+    QVariantMap toVariantMap() const
+    {
+        return
+        {
+            {"total", total},
+            {"available", available},
+            {"inUse", inUse}
+        };
+    }
 };
 
 struct NX_VMS_API LicenseSummaryDataEx: public LicenseSummaryData
@@ -159,4 +170,3 @@ using LicenseSummaryValues = Map<QString /*type*/, LicenseSummaryData /*summary*
 } // namespace api
 } // namespace vms
 } // namespace nx
-
