@@ -28,6 +28,10 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData&, QnResourceAccessManager*
 
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
+    nx::vms::api::UserData* userData);
+
+bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
     nx::vms::api::ResourceParamData* paramData);
 
 bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
