@@ -86,8 +86,6 @@ private:
     void decrementDeviceCount(const PresentedStateWithCheckState& deviceState);
 
 private:
-    using DeviceCheckedStateHash = QHash<QString, bool>;
-    using PresentedStateHash = QHash<QString, PresentedState>;
     using DeviceRowStateHash = QHash<QString, PresentedStateWithCheckState>;
     using DeviceCountHash = QHash<PresentedStateWithCheckState, int>;
 

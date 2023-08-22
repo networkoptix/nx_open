@@ -5,7 +5,6 @@
 #include <QtGui/QFont>
 #include <QtGui/QPalette>
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -155,15 +154,15 @@ QVariant FoundDevicesModel::getDisplayData(const QModelIndex& index) const
     if (!isCorrectRow(index))
         return QVariant();
 
-    const auto& currentDeivce = device(index);
+    const auto currentDevice = device(index);
     switch (index.column())
     {
         case Columns::modelColumn:
-            return currentDeivce.name;
+            return currentDevice.name;
         case Columns::addressColumn:
-            return currentDeivce.url;
+            return currentDevice.url;
         case Columns::brandColumn:
-            return currentDeivce.vendor;
+            return currentDevice.vendor;
         default:
             return QVariant();
     }
