@@ -218,6 +218,7 @@ struct UserGroupListModel::Private
             while (!groups.empty())
             {
                 const QnUuid group = *groups.begin();
+                groups.erase(groups.begin());
                 for (auto it = cycledGroupSets.begin(); it != cycledGroupSets.end();
                     /*no increment*/)
                 {
