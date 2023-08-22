@@ -25,5 +25,6 @@ RewindTriangle::RewindTriangle(bool fastForward, QGraphicsWidget* parent):
 void RewindTriangle::paint(
     QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
+    painter->setOpacity(opacity());
     painter->drawPixmap(0, 0, m_pixmap);
 }
