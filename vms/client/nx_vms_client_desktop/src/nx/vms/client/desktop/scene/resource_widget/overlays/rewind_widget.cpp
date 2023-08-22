@@ -146,8 +146,11 @@ void RewindWidget::tick(int deltaMs)
     auto animator = opacityAnimator(m_background);
     animator->setEasingCurve(QEasingCurve::OutCirc);
     auto animator1 = opacityAnimator(m_triangle1);
+    animator1->setEasingCurve(QEasingCurve::OutCirc);
     auto animator2 = opacityAnimator(m_triangle2);
+    animator2->setEasingCurve(QEasingCurve::OutCirc);
     auto animator3 = opacityAnimator(m_triangle3);
+    animator3->setEasingCurve(QEasingCurve::OutCirc);
 
     if (!animator || !animator1 || !animator2 || !animator3 || animator1->isRunning()
         || animator2->isRunning() || animator3->isRunning())
@@ -203,9 +206,9 @@ void RewindWidget::tick(int deltaMs)
     if (m_totalMs < 500)
     {
         animator2->setTimeLimit(100);
-        animator2->animateTo(0.5);
+        animator2->animateTo(0.0);
         animator3->setTimeLimit(100);
-        animator3->animateTo(1.0);
+        animator3->animateTo(0.5);
         return;
     }
 
@@ -213,19 +216,9 @@ void RewindWidget::tick(int deltaMs)
     {
         if (!animator->isRunning())
         {
-            animator->setEasingCurve(QEasingCurve::OutCirc);
             animator->setTimeLimit(200);
             animator->animateTo(0.0);
         }
-        animator2->setTimeLimit(100);
-        animator2->animateTo(0.0);
-        animator3->setTimeLimit(100);
-        animator3->animateTo(0.5);
-        return;
-    }
-
-    if (m_totalMs < 700)
-    {
         animator3->setTimeLimit(100);
         animator3->animateTo(0.0);
         return;
