@@ -6,11 +6,10 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <api/server_rest_connection.h>
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -29,10 +28,10 @@
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 
+#include "private/found_devices_delegate.h"
 #include "private/found_devices_model.h"
 #include "private/manual_device_searcher.h"
 #include "private/presented_state_delegate.h"
-#include "private/found_devices_delegate.h"
 
 namespace nx::vms::client::desktop {
 
@@ -579,10 +578,14 @@ void DeviceAdditionDialog::handleDeviceRemoved(const QString& physicalId)
         return;
 
     const auto state = index.data(FoundDevicesModel::presentedStateRole);
-    if (state == FoundDevicesModel::alreadyAddedState)
-        m_model->setData(index, FoundDevicesModel::notPresentedState, FoundDevicesModel::presentedStateRole);
-    else
-        NX_ASSERT(false, "Wrong presented state");
+    if (NX_ASSERT(state == FoundDevicesModel::alreadyAddedState,
+        "Wrong presented state: %1", state))
+    {
+        m_model->setData(
+            index,
+            FoundDevicesModel::notPresentedState,
+            FoundDevicesModel::presentedStateRole);
+    };
 }
 
 void DeviceAdditionDialog::handleAddDevicesClicked()
