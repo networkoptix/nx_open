@@ -511,9 +511,18 @@ QnWorkbenchController::QnWorkbenchController(QObject* parent):
         [this]()
         {
             if (m_rewindDirection == ShiftDirection::fastForward)
+            {
+                if (navigator()->isLive())
+                {
+                    m_rewindTimer->stop();
+                    return;
+                }
                 menu()->trigger(ui::action::FastForwardAction);
+            }
             else if (m_rewindDirection == ShiftDirection::rewind)
+            {
                 menu()->trigger(ui::action::RewindAction);
+            }
         });
 
     updateCurrentLayoutInstruments();
@@ -735,8 +744,12 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
     const auto shift =
         [this](ShiftDirection direction) -> bool
         {
-            if (!navigator()->canJump())
+            if (!navigator()->canJump() ||
+                (navigator()->isLive() && direction == ShiftDirection::fastForward))
+            {
                 return false;
+            }
+
             // If two arrow keys are pressed simultaneously, change direction to the next one.
             if (m_rewindTimer->isActive() && m_rewindDirection == direction)
                 return true;
