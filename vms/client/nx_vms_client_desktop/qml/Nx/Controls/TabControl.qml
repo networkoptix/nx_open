@@ -15,7 +15,7 @@ Control
 
     spacing: 0 //< Spacing between tabbar and content.
 
-    readonly property alias tabs: d.tabs
+    default property list<Tab> tabs
 
     readonly property var visibleTabs:
     {
@@ -87,13 +87,12 @@ Control
                 {
                     var previousTab = currentItem
 
-                    /* QML's TabBar has an internal bug. If some buttons were removed,
-                     * then added again, and we clicked to not selected tab button, previous
-                     * selected button disappears. It's properties "visible/opacity/geometry" not
-                     * changes. It looks like it was removed from the scene graph.
-                     */
-                    contentChildren = buttons //< This duplication is a workaround
-                    contentChildren = buttons //< for tab button disappearing.
+                    var itemsCount = count
+                    for (let i = 0; i < itemsCount; ++i)
+                        takeItem(0)
+
+                    for (let i = 0; i < buttons.length; ++i)
+                        addItem(buttons[i])
 
                     currentIndex = Math.max(buttons.indexOf(previousTab), 0)
                 }
