@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
   </context>
   <context>
@@ -251,7 +251,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
   </context>
   <context>
@@ -426,7 +426,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Tooltip</source>
@@ -453,7 +453,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Level</source>

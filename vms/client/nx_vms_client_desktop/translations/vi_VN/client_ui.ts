@@ -406,7 +406,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Timeout</source>

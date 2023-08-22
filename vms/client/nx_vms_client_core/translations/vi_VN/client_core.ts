@@ -82,7 +82,7 @@
     </message>
     <message>
       <source>Server has a different version:</source>
-      <translation>Máy chủ có một phiên bản khác nhau:</translation>
+      <translation>Máy chủ có một phiên bản khác:</translation>
     </message>
     <message>
       <source>You will be asked to restart the client in compatibility mode.</source>
