@@ -51,6 +51,8 @@ CameraSelectionDialog::AlertTextProvider initAlertTextProvider(
                 {
                     alertRows.append(helper.getProposedUsageMsg());
                     alertRows.append(helper.getRequiredMsg());
+                    alertRows.append(CopyScheduleCameraSelectionDialog::tr(
+                        "Recording will not be enabled on some cameras."));
                 }
             }
 
@@ -151,9 +153,9 @@ CopyScheduleCameraSelectionDialog::CopyScheduleCameraSelectionDialog(
     QWidget* parent)
     :
     base_type(
-        supportsSchedule(settings),
-        canApplySchedule(settings),
-        initAlertTextProvider(settings),
+        /*resourceFilter*/ supportsSchedule(settings),
+        /*resourceValidator*/ canApplySchedule(settings),
+        /*alertTextProvider*/ initAlertTextProvider(settings),
         parent)
 {
     resourceSelectionWidget()->setShowRecordingIndicator(true);
