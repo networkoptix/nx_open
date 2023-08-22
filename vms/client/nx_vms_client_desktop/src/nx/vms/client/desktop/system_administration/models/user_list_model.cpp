@@ -68,7 +68,6 @@ public:
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
 
-    rest::Handle ldapStatusRequestHandle = 0;
     bool ldapServerOnline = true;
 
     Private(UserListModel* q):
@@ -113,10 +112,15 @@ public:
             [this]() { syncId = globalSettings()->ldap().syncId(); });
 
         connect(systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::statusChanged, this,
-            [this]()
+            [this, q]()
             {
                 if (const auto status = systemContext()->ldapStatusWatcher()->status())
                     ldapServerOnline = (status->state == api::LdapStatus::State::online);
+
+                emit q->dataChanged(
+                    q->index(0, UserWarningColumn),
+                    q->index(q->rowCount() - 1, UserWarningColumn),
+                    {Qt::DecorationRole, Qt::ToolTipRole});
             });
     }
 
