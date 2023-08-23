@@ -319,7 +319,7 @@ QModelIndex ImportFromDeviceDialogModel::mapToSource(const QModelIndex& proxyInd
         return QModelIndex();
 
     const int column = proxyIndex.column();
-    if (!NX_ASSERT(column == 0))
+    if (column != 0)
         return QModelIndex();
 
     return sourceModel()->index(row, 0);
