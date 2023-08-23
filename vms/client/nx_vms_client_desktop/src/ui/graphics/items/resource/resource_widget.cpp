@@ -374,8 +374,10 @@ void QnResourceWidget::createButtons()
     iconButton->setPreferredSize(kTitleButtonSize);
     iconButton->setVisible(false);
     iconButton->setAcceptedMouseButtons(Qt::NoButton);
-    iconButton->setObjectName("IconButton");
-    leftButtonsBar->addButton(Qn::RecordingStatusIconButton, iconButton);
+    iconButton->setObjectName("ZoomStatusIconButton");
+    iconButton->setIcon(loadSvgIcon("item/zoom_window.svg"));
+    iconButton->setToolTip(tr("Zoom Window"));
+    leftButtonsBar->addButton(Qn::ZoomStatusIconButton, iconButton);
 
     auto closeButton = createStatisticAwareButton("res_widget_close");
     closeButton->setIcon(loadSvgIcon("item/close.svg"));

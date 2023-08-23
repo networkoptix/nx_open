@@ -43,8 +43,8 @@ enum WidgetButtons
     //---------------------------------------------------------------------------------------------
     // Buttons for the left panel, sorting left-to-right.
 
-    // Status of the recording, actual for cameras.
-    RecordingStatusIconButton = 1 << 15,
+    // Indicates if is zoomed item, actual for cameras.
+    ZoomStatusIconButton = 1 << 15,
 
     // Reload web page, web pages only.
     ReloadPageButton = 1 << 16,
@@ -54,6 +54,12 @@ enum WidgetButtons
 
     // Indicate if video stream is paused
     PauseButton = 1 << 18,
+
+    //---------------------------------------------------------------------------------------------
+    // Buttons on the playback panel.
+
+    // Status of the recording, actual for cameras.
+    RecordingStatusIconButton = 1 << 19,
 };
 
 } // namespace Qn
