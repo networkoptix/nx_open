@@ -1508,15 +1508,6 @@ void QnMediaResourceWidget::at_videoLayoutChanged()
 
 void QnMediaResourceWidget::updateIconButton()
 {
-    if (isZoomWindow())
-    {
-        const auto zoomIconButton =
-            m_hudOverlay->title()->leftButtonsBar()->button(Qn::RecordingStatusIconButton);
-        zoomIconButton->setIcon(qnSkin->icon("item/zoom_window.svg"));
-        zoomIconButton->setToolTip(tr("Zoom Window"));
-        return;
-    }
-
     if (!d->camera || d->camera->hasFlags(Qn::virtual_camera))
         return;
 
@@ -2282,7 +2273,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     if (isZoomWindow())
     {
-        result |= Qn::RecordingStatusIconButton;
+        result |= Qn::ZoomStatusIconButton;
         return result;
     }
 
