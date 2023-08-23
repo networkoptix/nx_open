@@ -343,6 +343,10 @@ public:
     static bool isKnown(const std::string_view& str);
 
     static bool isMessageBodyAllowed(const Method& method);
+    bool isMessageBodyAllowed() const
+    {
+        return isMessageBodyAllowed(*this);
+    }
 
     static bool isMessageBodyAllowedInResponse(
         const Method& method,
