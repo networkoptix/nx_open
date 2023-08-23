@@ -63,7 +63,12 @@ public:
     /** Returns subject global permissions. */
     nx::vms::api::GlobalPermissions globalPermissions(const QnUuid& subjectId) const;
 
-    /** A combination of all access rights of the specified subject. */
+    /**
+     * A combination of all access rights of the specified subject.
+     * Currently this method is not usable because due to the server implementation when a resource
+     * is deleted its id stays in all subject access right lists it was in, so this method will
+     * return a combination of access rights towards both actual and no longer actual resources.
+     */
     nx::vms::api::AccessRights availableAccessRights(const QnUuid& subjectId) const;
 
     /** Returns whether the subject has admin access rights. */

@@ -5,7 +5,9 @@
 
 #include <QtWidgets/QMenu>
 
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,6 +21,9 @@ AbstractSearchWidget::AbstractSearchWidget(
     d(new Private(this, model))
 {
     setRelevantControls(Control::defaults);
+
+    connect(systemContext()->accessController(), &core::AccessController::permissionsMaybeChanged,
+        this, &AbstractSearchWidget::updateAllowance);
 }
 
 AbstractSearchWidget::~AbstractSearchWidget()

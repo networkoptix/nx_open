@@ -168,15 +168,22 @@ GlobalPermissions AccessController::calculateGlobalPermissions() const
         : GlobalPermissions{};
 }
 
-bool AccessController::hasDevicePermissions(Qn::Permissions requiredPermissions) const
+bool AccessController::isDeviceAccessRelevant(AccessRights requiredAccessRights) const
 {
+    if (!d->user)
+        return false;
+
+    const auto accessManager = systemContext()->resourceAccessManager();
+    if (accessManager->hasAccessRights(d->user, kAllDevicesGroupId, requiredAccessRights))
+        return true;
+
     const auto devices = systemContext()->resourcePool()->getAllCameras(
         /*parentId*/ QnUuid{}, /*ignoreDesktopCameras*/ true);
 
     return std::any_of(devices.begin(), devices.end(),
-        [this, requiredPermissions](const QnVirtualCameraResourcePtr& device)
+        [this, accessManager, requiredAccessRights](const QnVirtualCameraResourcePtr& device)
         {
-            return hasPermissions(device, requiredPermissions);
+            return accessManager->hasAccessRights(d->user, device, requiredAccessRights);
         });
 }
 

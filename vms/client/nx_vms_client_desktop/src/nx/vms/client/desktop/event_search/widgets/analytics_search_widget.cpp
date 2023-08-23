@@ -153,9 +153,6 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
     connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
         &AnalyticsSearchWidget::updateAllowance);
 
-    connect(systemContext()->accessController(), &AccessController::permissionsMaybeChanged, this,
-        &AnalyticsSearchWidget::updateAllowance);
-
     connect(action(action::ObjectSearchModeAction), &QAction::toggled, this,
         [this](bool on)
         {
@@ -199,8 +196,9 @@ bool AnalyticsSearchWidget::calculateAllowance() const
     if (!d->taxonomyManager)
         return false;
 
-    const bool hasPermissions = model()->isOnline() && systemContext()->accessController()->
-        hasDevicePermissions(Qn::Permission::ViewFootagePermission);
+    const bool hasPermissions = model()->isOnline()
+        && systemContext()->accessController()->isDeviceAccessRelevant(
+            nx::vms::api::AccessRight::viewArchive);
 
     return hasPermissions && !d->engines().empty();
 }
