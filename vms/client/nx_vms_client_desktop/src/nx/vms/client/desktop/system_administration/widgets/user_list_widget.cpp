@@ -383,7 +383,10 @@ void UserListWidget::Private::setupUi()
     ui->usersTable->setModel(sortModel);
     ui->usersTable->setHeader(header);
     ui->usersTable->setIconSize(QSize(24, 24));
-    ui->usersTable->setItemDelegate(new UserListWidget::Delegate(q));
+
+    auto delegate = new UserListWidget::Delegate(q);
+    ui->usersTable->setItemDelegate(delegate);
+    delegate->setView(ui->usersTable);
 
     header->setVisible(true);
     header->setHighlightCheckedIndicator(true);
