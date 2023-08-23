@@ -575,10 +575,9 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             {
                 case UserWarningColumn:
                 {
-                    if (user->userType() == nx::vms::api::UserType::ldap
-                        && (!d->ldapServerOnline
-                            || d->notFoundUsers.contains(user->getId())
-                            || !d->nonUniqueNameTracker.isUnique(user->getId())))
+                    if (!d->nonUniqueNameTracker.isUnique(user->getId())
+                        || (user->userType() == nx::vms::api::UserType::ldap
+                            && (!d->ldapServerOnline || d->notFoundUsers.contains(user->getId()))))
                     {
                         return QString("user_settings/user_alert.svg");
                     }
