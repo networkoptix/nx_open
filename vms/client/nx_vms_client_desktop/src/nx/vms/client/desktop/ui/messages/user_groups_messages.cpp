@@ -20,10 +20,12 @@ static constexpr int kRecommendedWidth = 284;
 
 class GroupListWidget: public QListWidget
 {
-    using base_type = QListWidget;
-
 public:
-    using base_type::base_type;
+    GroupListWidget(QWidget* parent = nullptr):
+        QListWidget(parent)
+    {
+        setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    }
 
     QSize sizeHint() const
     {
