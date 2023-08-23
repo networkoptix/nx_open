@@ -184,7 +184,9 @@ bool WebDownloader::download(QObject* item, QnWorkbenchContext* context)
     if (path.isEmpty())
         return false;
 
-    item->setProperty("path", path);
+    QFileInfo file(path);
+    item->setProperty("downloadDirectory", file.absolutePath());
+    item->setProperty("downloadFileName", file.fileName());
 
     new WebDownloader(context->instance<workbench::LocalNotificationsManager>(), path, item);
 
