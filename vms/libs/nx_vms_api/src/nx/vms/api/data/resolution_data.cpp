@@ -56,7 +56,10 @@ void serialize(QnJsonContext* ctx, const ResolutionData& value, QJsonValue* targ
 
 int ResolutionData::megaPixels() const
 {
-    return (size.width() * size.height() + 500'000) / 1'000'000;
+    if (size.isEmpty())
+        return 0;
+
+    return std::max(1, (size.width() * size.height() + 500'000) / 1'000'000);
 }
 
 } // namespace nx::vms::api
