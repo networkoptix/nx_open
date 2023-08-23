@@ -2514,19 +2514,21 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (d->camera)
     {
-        const auto requiredPermissions =
+        const auto calculateRequiredPermissions =
             [this]() -> Qn::Permissions
             {
-                if (d->isPlayingLive())
-                    return Qn::ViewLivePermission;
+                Qn::Permissions requiredPermissions = d->isPlayingLive()
+                    ? Qn::ViewLivePermission
+                    : Qn::ViewFootagePermission;
 
                 const auto screenRecordingAction = action(ui::action::ToggleScreenRecordingAction);
-                return screenRecordingAction && screenRecordingAction->isChecked()
-                    ? (Qn::ViewFootagePermission | Qn::ExportPermission)
-                    : Qn::ViewFootagePermission;
-            }();
+                if (screenRecordingAction && screenRecordingAction->isChecked())
+                    requiredPermissions |= Qn::ExportPermission;
 
-        if (!d->accessController()->hasPermissions(d->camera, requiredPermissions))
+                return requiredPermissions;
+            };
+
+        if (!d->accessController()->hasPermissions(d->camera, calculateRequiredPermissions()))
             return Qn::AccessDeniedOverlay;
     }
 
