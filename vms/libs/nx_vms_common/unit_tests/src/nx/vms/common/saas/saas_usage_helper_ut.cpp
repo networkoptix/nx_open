@@ -336,6 +336,136 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
     ASSERT_EQ(150, serviceUsages[QnUuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
 }
 
+TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasProposeChanges)
+{
+    using namespace nx::vms::api;
+
+    // Available services:
+    // 1. "60a18a70-452b-46a1-9bfd-e66af6fbd0de": 50 channels, 5 megapixels
+    // 2. "60a18a70-452b-46a1-9bfd-e66af6fbd0dd": 100 channels, 10 megapixels
+    // 3. "60a18a70-452b-46a1-9bfd-e66af6fbd0dc": 150 channels, unlimited megapixels
+
+    auto enabledBackupCameras = addCameras(/*size*/ 50, /* megapixels*/ 5, /*useBackup*/ true);
+    auto disabledBackupCameras = addCameras(/*size*/ 50, /* megapixels*/ 5, /*useBackup*/ false);
+
+    const auto getCamerasIds =
+        [](QnVirtualCameraResourceList::iterator begin, QnVirtualCameraResourceList::iterator end)
+        {
+            std::set<QnUuid> idSet;
+            std::transform(begin, end, std::inserter(idSet, idSet.end()),
+                [](const QnVirtualCameraResourcePtr& camera){ return camera->getId(); });
+            return idSet;
+        };
+
+    auto someEnabledBackupCamerasIds =
+        getCamerasIds(enabledBackupCameras.begin(), std::next(enabledBackupCameras.begin(), 25));
+
+    auto allEnabledBackupCamerasIds =
+        getCamerasIds(enabledBackupCameras.begin(), enabledBackupCameras.end());
+
+    auto someDisabledBackupCamerasIds =
+        getCamerasIds(disabledBackupCameras.begin(), std::next(disabledBackupCameras.begin(), 25));
+
+    auto allDisabledBackupCamerasIds =
+        getCamerasIds(disabledBackupCameras.begin(), disabledBackupCameras.end());
+
+    std::set<QnUuid> allCamerasIds;
+    allCamerasIds.merge(allEnabledBackupCamerasIds);
+    allCamerasIds.merge(allDisabledBackupCamerasIds);
+
+    // Propose enabling already enabled does nothing.
+    m_cloudeStorageHelper->proposeChange(someEnabledBackupCamerasIds, {});
+    auto info = m_cloudeStorageHelper->allInfoByMegapixels();
+    ASSERT_EQ(50, info[5].inUse);
+    ASSERT_EQ(0, info[10].inUse);
+    ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+
+    // Propose disable already disabled does nothing.
+    m_cloudeStorageHelper->proposeChange({}, someDisabledBackupCamerasIds);
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
+    ASSERT_EQ(50, info[5].inUse);
+    ASSERT_EQ(0, info[10].inUse);
+    ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+
+    // Propose enabling cameras with disabled backup changes usage.
+    m_cloudeStorageHelper->proposeChange(someDisabledBackupCamerasIds, {});
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
+    ASSERT_EQ(50, info[5].inUse);
+    ASSERT_EQ(25, info[10].inUse);
+    ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+
+    // Propose disabling cameras with enabled backup (not disabled earlier) changes usage.
+    m_cloudeStorageHelper->proposeChange({}, someEnabledBackupCamerasIds);
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
+    ASSERT_EQ(25, info[5].inUse);
+    ASSERT_EQ(0, info[10].inUse);
+    ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+
+    // Propose disabling cameras with backup proposed to enable earlier shows that state of
+    // previous propose is not stored.
+    m_cloudeStorageHelper->proposeChange({}, someDisabledBackupCamerasIds);
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
+    ASSERT_EQ(50, info[5].inUse);
+    ASSERT_EQ(0, info[10].inUse);
+    ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+
+    // Propose enabling some disabled cameras and disabling the same amount of enabled cameras
+    // doesn't change usage.
+    m_cloudeStorageHelper->proposeChange(someDisabledBackupCamerasIds, someEnabledBackupCamerasIds);
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
+    ASSERT_EQ(50, info[5].inUse);
+    ASSERT_EQ(0, info[10].inUse);
+    ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+
+    // Propose enabling all known cameras and disabling all known cameras at the same time is no-op.
+    m_cloudeStorageHelper->proposeChange(allCamerasIds, allCamerasIds);
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
+    ASSERT_EQ(50, info[5].inUse);
+    ASSERT_EQ(0, info[10].inUse);
+    ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+
+    // Invalidating cache returns usage information to the initial state.
+    m_cloudeStorageHelper->invalidateCache();
+    info = m_cloudeStorageHelper->allInfoByMegapixels();
+    ASSERT_EQ(50, info[5].inUse);
+    ASSERT_EQ(0, info[10].inUse);
+    ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
+}
+
+TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasAccumulateLicenseUsage)
+{
+    using namespace nx::vms::api;
+
+    // Available services:
+    // 1. "60a18a70-452b-46a1-9bfd-e66af6fbd0de": 50 channels, 5 megapixels
+    // 2. "60a18a70-452b-46a1-9bfd-e66af6fbd0dd": 100 channels, 10 megapixels
+    // 3. "60a18a70-452b-46a1-9bfd-e66af6fbd0dc": 150 channels, unlimited megapixels
+
+    auto enabledBackupCameras5MP = addCameras(/*size*/ 15, /* megapixels*/ 5, /*useBackup*/ true);
+    auto enabledBackupCameras15MP = addCameras(/*size*/ 25, /* megapixels*/ 15, /*useBackup*/ true);
+    auto disabledBackupCameras15MP = addCameras(/*size*/ 50, /* megapixels*/ 15, /*useBackup*/ false);
+
+    auto summary = m_cloudeStorageHelper->allInfoForResolution(5);
+    ASSERT_EQ(300, summary.available);
+    ASSERT_EQ(40, summary.inUse);
+    ASSERT_EQ(300, summary.total);
+
+    summary = m_cloudeStorageHelper->allInfoForResolution(10);
+    ASSERT_EQ(250, summary.available);
+    ASSERT_EQ(25, summary.inUse);
+    ASSERT_EQ(250, summary.total);
+
+    summary = m_cloudeStorageHelper->allInfoForResolution(15);
+    ASSERT_EQ(150, summary.available);
+    ASSERT_EQ(25, summary.inUse);
+    ASSERT_EQ(150, summary.total);
+
+    summary = m_cloudeStorageHelper->allInfoForResolution(100);
+    ASSERT_EQ(150, summary.available);
+    ASSERT_EQ(25, summary.inUse);
+    ASSERT_EQ(150, summary.total);
+}
+
 TEST_F(SaasServiceUsageHelperTest, LocalRecordingServiceLoaded)
 {
     using namespace nx::vms::api;
