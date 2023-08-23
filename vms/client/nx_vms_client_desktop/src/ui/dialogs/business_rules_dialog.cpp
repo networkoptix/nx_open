@@ -59,11 +59,8 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-static const QColor kBasicColor = "#A5B7C0";
-static const QColor kLight1Color = "#FFFFFF";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kButtonsIconSubstitutions = {
-    {QnIcon::Normal, {{kBasicColor, "light10"}, {kLight1Color, "light1"}}},
-};
+static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
+    kButtonsIconSubstitutions = {{QnIcon::Normal, {.primary = "light1"}}};
 
     class SortRulesProxyModel:
         public QSortFilterProxyModel,
