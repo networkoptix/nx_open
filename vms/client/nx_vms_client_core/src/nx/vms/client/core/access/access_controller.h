@@ -20,7 +20,7 @@ namespace nx::vms::client::core {
 //-------------------------------------------------------------------------------------------------
 // AccessController
 
-class NX_VMS_CLIENT_CORE_API AccessController: 
+class NX_VMS_CLIENT_CORE_API AccessController:
     public QObject,
     private nx::vms::common::SystemContextAware
 {
@@ -49,16 +49,16 @@ public:
     bool hasPermissions(const UserGroupData& targetUserGroup, Qn::Permissions desired) const;
     bool hasPermissions(const QnUuid& subjectId, Qn::Permissions desired) const;
 
-    /**
-     * Check whether the client has specified permisions to at least one device in the pool.
-     */
-    // TODO: Refactor this method. Probably should check for low-level AccessRights.
-    virtual bool hasDevicePermissions(Qn::Permissions requiredPermissions) const;
-
     /** Get current user's global permissions. */
     GlobalPermissions globalPermissions() const;
     bool hasGlobalPermissions(GlobalPermissions desired) const;
     bool hasPowerUserPermissions() const;
+
+    /**
+     * Checks whether specifed access rights are currently relevant for any device to determine
+     * what global operations are available (e.g. show Bookmarks panel or not, etc.)
+     */
+    virtual bool isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAccessRights) const;
 
     /**
      * Create or return existing shared notifier of permission changes for specified resource.

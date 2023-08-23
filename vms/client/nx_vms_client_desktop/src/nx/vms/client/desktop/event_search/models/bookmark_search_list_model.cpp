@@ -26,7 +26,8 @@ bool BookmarkSearchListModel::isConstrained() const
 
 bool BookmarkSearchListModel::hasAccessRights() const
 {
-    return systemContext()->accessController()->hasDevicePermissions(Qn::ViewBookmarksPermission);
+    return systemContext()->accessController()->isDeviceAccessRelevant(
+        nx::vms::api::AccessRight::viewBookmarks);
 }
 
 void BookmarkSearchListModel::dynamicUpdate(const QnTimePeriod& period)

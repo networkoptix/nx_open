@@ -659,7 +659,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Bookmark Log..."))
         .shortcut("Ctrl+B")
         .condition(
-            condition::hasPermissionsForResources(Qn::ViewBookmarksPermission)
+            condition::isDeviceAccessRelevant(nx::vms::api::AccessRight::viewBookmarks)
             && !condition::showreelIsRunning());
 
     factory(LoginToCloud)
@@ -2079,7 +2079,7 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .text(ContextMenu::tr("Show Bookmarks")) //< To be displayed on the button
         .toggledText(ContextMenu::tr("Hide Bookmarks"))
-        .condition(condition::hasPermissionsForResources(Qn::ViewBookmarksPermission));
+        .condition(condition::isDeviceAccessRelevant(nx::vms::api::AccessRight::viewBookmarks));
 
     factory(ToggleCalendarAction)
         .flags(NoTarget)

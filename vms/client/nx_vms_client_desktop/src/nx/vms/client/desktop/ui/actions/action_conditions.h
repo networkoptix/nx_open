@@ -680,6 +680,8 @@ ConditionWrapper canExportLayout();
 ConditionWrapper canExportBookmark();
 ConditionWrapper canExportBookmarks();
 
+ConditionWrapper isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAccessRights);
+
 /** Whether virtual camera upload is enabled. */
 ConditionWrapper virtualCameraUploadEnabled();
 
@@ -733,8 +735,8 @@ ConditionWrapper canSaveLayoutAs();
 ConditionWrapper userHasCamerasWithEditableSettings();
 
 /**
- * Checks if all resources have the permissions. If no resources are provided then if any
- * resource in resource pool has the permissions.
+ * Checks if all resources have the permissions.
+ * If no resources are provided, the check fails.
  */
 ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions);
 
