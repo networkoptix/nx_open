@@ -2,8 +2,10 @@
 
 #include "highlighted_text_item_delegate.h"
 
+#include <QtCore/QCache>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QAbstractTextDocumentLayout>
+#include <QtGui/QGuiApplication>
 #include <QtGui/QPainter>
 #include <QtWidgets/QAbstractItemView>
 
@@ -11,16 +13,33 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 
-namespace nx::vms::client::desktop {
-
 namespace {
 
-QString highlightMatch(const QString& text, const QRegularExpression& rx, const QColor& color)
+struct CacheKey
+{
+    QString text;
+    int width = 0;
+    QColor color;
+    QFont font;
+
+    bool operator==(const CacheKey&) const = default;
+};
+
+static size_t qHash(const CacheKey& key, size_t seed = 0)
+{
+    return qHashMulti(seed, key.text, key.width, key.color.rgba(), key.font);
+}
+
+QString highlightMatch(const QString& text, const QRegularExpression& rx)
 {
     QString result;
+
     if (!text.isEmpty())
     {
-        const QString fontBegin = QString("<font color=\"%1\">").arg(color.name());
+        static const QString kColorName =
+            nx::vms::client::core::colorTheme()->color("yellow_d1").name();
+
+        const QString fontBegin = QString("<font color=\"%1\">").arg(kColorName);
         static const QString fontEnd = "</font>";
         int pos = 0;
         auto matchIterator = rx.globalMatch(text);
@@ -44,12 +63,108 @@ QString highlightMatch(const QString& text, const QRegularExpression& rx, const 
 
 } // namespace
 
+namespace nx::vms::client::desktop {
+
+class HighlightedTextItemDelegate::Private
+{
+public:
+    QSet<int> columns;
+
+    QPointer<QAbstractItemView> view;
+    mutable QCache<CacheKey, QPixmap> cache;
+
+    Private(const QSet<int>& colums):
+        columns(colums)
+    {
+    }
+
+    QPixmap* getPixmap(const QString& text, const QStyleOptionViewItem& option) const
+    {
+        CacheKey key
+        {
+            .text = text,
+            .width = option.rect.width(),
+            .color = option.palette.color(QPalette::Text),
+            .font = option.font
+        };
+
+        auto result = cache.object(key);
+
+        if (!result && !text.isEmpty())
+        {
+            QTextDocument doc;
+
+            doc.setDefaultFont(key.font);
+            doc.setDocumentMargin(0);
+            doc.setHtml(text);
+
+            WidgetUtils::elideTextRight(&doc, key.width);
+
+            const auto pixelRatio = qApp->devicePixelRatio();
+            const auto pixmapSize = doc.size().toSize() * pixelRatio;
+
+            QImage image(pixmapSize, QImage::Format_ARGB32_Premultiplied);
+
+            if (image.isNull())
+                return nullptr;
+
+            image.setDevicePixelRatio(pixelRatio);
+            image.fill(Qt::transparent);
+
+            QPainter painter(&image);
+
+            // Set default document color.
+            QAbstractTextDocumentLayout::PaintContext ctx;
+            ctx.palette.setColor(QPalette::Text, key.color);
+
+            doc.documentLayout()->draw(&painter, ctx);
+
+            result = new QPixmap(QPixmap::fromImage(image));
+
+            if (!cache.insert(key, result))
+                result = nullptr;
+        }
+
+        return result;
+    }
+
+    static QRegularExpression getSearchRx(const QStyleOptionViewItem& option)
+    {
+        if (const auto itemView = qobject_cast<const QAbstractItemView*>(option.widget))
+        {
+            if (const auto m = qobject_cast<const QSortFilterProxyModel*>(itemView->model()))
+                return m->filterRegularExpression();
+        }
+
+        return {};
+    }
+
+    void updateCacheSize()
+    {
+        if (!view || !view->model())
+            return;
+
+        const int visibleRowCount = std::min(
+            view->model()->rowCount(),
+            view->size().height() / style::Metrics::kViewRowHeight);
+
+        // Adjust cache to be twice the number of visible items.
+        cache.setMaxCost(columns.count() * visibleRowCount * 2);
+    }
+};
+
 HighlightedTextItemDelegate::HighlightedTextItemDelegate(
     QObject* parent,
-    const QSet<int>& colums)
+    const QSet<int>& columns)
     :
     base_type(parent),
-    m_columns(colums)
+    d(new Private(columns))
+{
+    static const int kDefaultCachedRows = 20;
+    d->cache.setMaxCost(columns.count() * kDefaultCachedRows);
+}
+
+HighlightedTextItemDelegate::~HighlightedTextItemDelegate()
 {
 }
 
@@ -57,14 +172,20 @@ QSize HighlightedTextItemDelegate::sizeHint(
     const QStyleOptionViewItem& option,
     const QModelIndex& index) const
 {
-    if (!m_columns.empty() && !m_columns.contains(index.column()))
+    if (!d->columns.empty() && !d->columns.contains(index.column()))
         return base_type::sizeHint(option, index);
 
     auto opt = option;
     initStyleOption(&opt, index);
 
     QTextDocument doc;
-    initTextDocument(doc, opt);
+    const auto text = highlightMatch(
+        opt.text,
+        Private::getSearchRx(opt));
+
+    doc.setDefaultFont(option.font);
+    doc.setDocumentMargin(0);
+    doc.setHtml(text);
 
     return QSize(
         qCeil(doc.idealWidth()) + 2 * style::Metrics::kStandardPadding,
@@ -76,7 +197,7 @@ void HighlightedTextItemDelegate::paint(
     const QStyleOptionViewItem& option,
     const QModelIndex& index) const
 {
-    if (!m_columns.empty() && !m_columns.contains(index.column()))
+    if (!d->columns.empty() && !d->columns.contains(index.column()))
     {
         base_type::paint(painter, option, index);
         return;
@@ -85,53 +206,53 @@ void HighlightedTextItemDelegate::paint(
     auto opt = option;
     initStyleOption(&opt, index);
 
-    QTextDocument doc;
-    initTextDocument(doc, opt);
-
-    painter->save();
-
     opt.rect = opt.rect.adjusted(
         style::Metrics::kStandardPadding, 0, -style::Metrics::kStandardPadding, 0);
 
-    WidgetUtils::elideTextRight(&doc, opt.rect.width());
+    const auto text = highlightMatch(
+        opt.text,
+        Private::getSearchRx(opt));
 
-    const auto rect = QStyle::alignedRect(
-        Qt::LeftToRight,
-        Qt::AlignLeft | Qt::AlignVCenter,
-        doc.size().toSize(),
-        opt.rect);
+    if (QPixmap* pixmap = d->getPixmap(text, opt))
+    {
+        painter->save();
 
-    painter->translate(rect.left(), rect.top());
-    const QRect clip(0, 0, rect.width(), rect.height());
+        const auto rect = QStyle::alignedRect(
+            Qt::LeftToRight,
+            Qt::AlignLeft | Qt::AlignVCenter,
+            pixmap->deviceIndependentSize().toSize(),
+            opt.rect);
 
-    QAbstractTextDocumentLayout::PaintContext ctx;
-    ctx.palette = opt.palette;
+        painter->drawPixmap(rect, *pixmap);
 
-    painter->setClipRect(clip);
-    ctx.clip = clip;
-
-    doc.documentLayout()->draw(painter, ctx);
-
-    painter->restore();
+        painter->restore();
+    }
 }
 
-void HighlightedTextItemDelegate::initTextDocument(
-    QTextDocument& doc,
-    const QStyleOptionViewItem& option) const
+bool HighlightedTextItemDelegate::eventFilter(QObject* object, QEvent* event)
 {
-    auto opt = option;
+    if (object == d->view && event->type() == QEvent::Resize)
+        d->updateCacheSize();
 
-    QRegularExpression rx;
-    if (const auto itemView = qobject_cast<const QAbstractItemView*>(opt.widget))
-    {
-        if (const auto m = qobject_cast<const QSortFilterProxyModel*>(itemView->model()))
-            rx = m->filterRegularExpression();
-    }
+    return false;
+}
 
-    doc.setDefaultFont(opt.font);
-    doc.setDocumentMargin(0);
+void HighlightedTextItemDelegate::setView(QAbstractItemView* view)
+{
+    if (!view->model())
+        return;
 
-    doc.setHtml(highlightMatch(opt.text, rx, core::colorTheme()->color("yellow_d1")));
+    d->view = view;
+
+    const auto updateCache = [this]() { d->updateCacheSize(); };
+
+    connect(view->model(), &QAbstractItemModel::rowsInserted, this, updateCache);
+    connect(view->model(), &QAbstractItemModel::rowsRemoved, this, updateCache);
+    connect(view->model(), &QAbstractItemModel::modelReset, this, updateCache);
+
+    view->installEventFilter(this);
+
+    updateCache();
 }
 
 } // namespace nx::vms::client::desktop

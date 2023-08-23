@@ -299,7 +299,10 @@ void UserGroupsWidget::Private::setupUi()
 
     ui->groupsTable->setModel(sortModel);
     ui->groupsTable->setHeader(header);
-    ui->groupsTable->setItemDelegate(new UserGroupsWidget::Delegate(q));
+
+    auto delegate = new UserGroupsWidget::Delegate(q);
+    ui->groupsTable->setItemDelegate(delegate);
+    delegate->setView(ui->groupsTable);
 
     header->setVisible(true);
     header->setHighlightCheckedIndicator(true);
