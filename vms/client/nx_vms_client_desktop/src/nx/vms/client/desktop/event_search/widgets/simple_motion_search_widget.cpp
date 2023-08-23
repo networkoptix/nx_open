@@ -165,8 +165,8 @@ QString SimpleMotionSearchWidget::itemCounterText(int count) const
 bool SimpleMotionSearchWidget::calculateAllowance() const
 {
     // Panel is hidden for live viewers but should be visible when browsing local files offline.
-    return !model()->isOnline() || systemContext()->accessController()->hasDevicePermissions(
-        Qn::Permission::ViewFootagePermission);
+    return !model()->isOnline() || systemContext()->accessController()->isDeviceAccessRelevant(
+        nx::vms::api::AccessRight::viewArchive);
 }
 
 } // namespace nx::vms::client::desktop

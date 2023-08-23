@@ -23,6 +23,8 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace nx::vms::api;
+
 class AccessController::Private: public QObject
 {
     AccessController* const q;
@@ -63,7 +65,7 @@ bool AccessController::canCreateStorage(const QnUuid& serverId) const
 
 bool AccessController::canCreateLayout(const nx::vms::api::LayoutData& layoutData) const
 {
-    return user() 
+    return user()
         && systemContext()->resourceAccessManager()->canCreateLayout(user(), layoutData);
 }
 
@@ -126,6 +128,34 @@ Qn::Permissions AccessController::calculatePermissions(const QnResourcePtr& targ
         return d->permissionsForCamera(camera);
 
     return base_type::calculatePermissions(targetResource);
+}
+
+bool AccessController::isDeviceAccessRelevant(AccessRights requiredAccessRights) const
+{
+    if (qnRuntime->isVideoWallMode())
+    {
+        const auto kVideoWallModeAccessRights =
+            AccessRight::view
+            | AccessRight::viewArchive
+            | AccessRight::viewBookmarks
+            | AccessRight::userInput;
+
+        return kVideoWallModeAccessRights.testFlags(requiredAccessRights);
+    }
+
+    if (qnRuntime->isAcsMode())
+    {
+        const auto kAcsModeAccessRights =
+            AccessRight::view
+            | AccessRight::viewArchive
+            | AccessRight::exportArchive
+            | AccessRight::viewBookmarks
+            | AccessRight::userInput;
+
+        return kAcsModeAccessRights.testFlags(requiredAccessRights);
+    }
+
+    return base_type::isDeviceAccessRelevant(requiredAccessRights);
 }
 
 GlobalPermissions AccessController::calculateGlobalPermissions() const
