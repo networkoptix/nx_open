@@ -3,8 +3,8 @@
 #include "desktop_data_provider.h"
 
 #include <intrin.h>
-#include <mmsystem.h>
 #include <windows.h>
+#include <mmsystem.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
