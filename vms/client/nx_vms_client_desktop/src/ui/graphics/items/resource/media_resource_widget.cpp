@@ -95,6 +95,8 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/intercom/utils.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/crypt/crypt.h>
@@ -2332,8 +2334,23 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 {
     m_encryptedArchiveData.clear();
 
-    if (qnRuntime->isVideoWallMode() && !isVideoWallLicenseValid())
-        return Qn::VideowallWithoutLicenseOverlay;
+    if (qnRuntime->isVideoWallMode())
+    {
+        if (nx::vms::common::saas::saasIsInitialized(systemContext()))
+        {
+            if (!nx::vms::common::saas::saasIsActive(systemContext()))
+            {
+                const auto saasState = systemContext()->saasServiceManager()->saasState();
+                return saasState == nx::vms::api::SaasState::suspend
+                    ? Qn::SaasSuspended
+                    : Qn::SaasShutDown;
+            }
+        }
+        else if (!isVideoWallLicenseValid())
+        {
+            return Qn::VideowallWithoutLicenseOverlay;
+        }
+    }
 
     if (!d->hasAccess())
         return Qn::AccessDeniedOverlay;

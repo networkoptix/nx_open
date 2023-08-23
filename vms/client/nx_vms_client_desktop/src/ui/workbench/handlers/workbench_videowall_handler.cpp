@@ -66,6 +66,8 @@
 #include <nx/vms/client/desktop/videowall/workbench_videowall_shortcut_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -1526,7 +1528,22 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 {
-    if (m_licensesHelper->totalLicenses(Qn::LC_VideoWall) == 0)
+    if (nx::vms::common::saas::saasIsInitialized(context()->systemContext()))
+    {
+        if (!nx::vms::common::saas::saasIsActive(context()->systemContext()))
+        {
+            const auto saasState = context()->systemContext()->saasServiceManager()->saasState();
+            const auto caption = saasState == nx::vms::api::SaasState::suspend
+                ? tr("SaaS suspended")
+                : tr("SaaS shut down");
+            QnMessageBox::critical(mainWindowWidget(),
+                caption,
+                tr("To add Video Wall, SaaS should be in active state. "
+                    "Contact your channel partner for details."));
+            return;
+        }
+    }
+    else if (m_licensesHelper->totalLicenses(Qn::LC_VideoWall) == 0)
     {
         showLicensesErrorDialog(
             tr("To enable this feature, please activate a Video Wall license."));

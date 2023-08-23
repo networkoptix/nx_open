@@ -12,6 +12,9 @@
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -61,6 +64,27 @@ void QnAttachToVideowallDialog::submitToResource(const QnVideoWallResourcePtr& v
 
 void QnAttachToVideowallDialog::updateLicencesUsage()
 {
+    const auto systemContext = m_videowall->systemContext();
+
+    if (nx::vms::common::saas::saasIsInitialized(systemContext))
+    {
+        const auto saasIsActive = nx::vms::common::saas::saasIsActive(systemContext);
+        if (!saasIsActive)
+        {
+            const auto saasState = systemContext->saasServiceManager()->saasState();
+            ui->licensesLabel->setText(saasState == nx::vms::api::SaasState::suspend
+                ? tr("SaaS suspended. To attach to Video Wall, SaaS must be in active state. "
+                    "Contact your channel partner for details.")
+                : tr("SaaS shut down. To attach to Video Wall, SaaS must be in active state. "
+                    "Contact your channel partner for details."));
+            setWarningStyle(ui->licensesLabel);
+        }
+
+        ui->licensesLabel->setHidden(saasIsActive);
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(saasIsActive);
+        return;
+    }
+
     /* Calculate how many screens are proposed to be added or removed on local PC. */
     QnUuid pcUuid = appContext()->localSettings()->pcUuid();
     int used = pcUuid.isNull() || m_videowall.isNull()
@@ -71,8 +95,8 @@ void QnAttachToVideowallDialog::updateLicencesUsage()
     int localScreensChange = ui->manageWidget->proposedItemsCount() - used;
 
     using namespace nx::vms::license;
-    VideoWallLicenseUsageHelper helper(m_videowall->systemContext());
-    VideoWallLicenseUsageProposer proposer(m_videowall->systemContext(), &helper, localScreensChange);
+    VideoWallLicenseUsageHelper helper(systemContext);
+    VideoWallLicenseUsageProposer proposer(systemContext, &helper, localScreensChange);
 
     QPalette palette = this->palette();
     bool licensesOk = helper.isValid();

@@ -398,6 +398,8 @@ namespace Qn
         CannotDecryptMediaOverlay,
         MismatchedCertificateOverlay,
         InformationRequiredOverlay,
+        SaasSuspended,
+        SaasShutDown,
 
         OverlayCount
     };
