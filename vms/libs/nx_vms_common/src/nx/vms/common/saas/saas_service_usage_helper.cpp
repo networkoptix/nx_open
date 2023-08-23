@@ -272,21 +272,26 @@ void CloudStorageServiceUsageHelper::updateCacheUnsafe() const
     processUsedDevicesUnsafe(getAllCameras());
 }
 
-void CloudStorageServiceUsageHelper::processUsedDevicesUnsafe(const QnVirtualCameraResourceList& cameras) const
+void CloudStorageServiceUsageHelper::processUsedDevicesUnsafe(
+    const QnVirtualCameraResourceList& cameras) const
 {
     for (const auto& camera: cameras)
     {
         if (camera->isBackupEnabled())
-        {
-            const int megapixels = getMegapixels(camera);
-            ServiceInfo key{megapixels, QnUuid()};
-            auto it = m_cache->lower_bound(key);
-            if (it == m_cache->end())
-                it = m_cache->emplace(key, LicenseSummaryData()).first;
-            ++it->second.inUse;
-        }
+            countCameraAsUsedUnsafe(camera);
     }
     borrowUsages();
+}
+
+void CloudStorageServiceUsageHelper::countCameraAsUsedUnsafe(
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    const int megapixels = getMegapixels(camera);
+    ServiceInfo key{megapixels, QnUuid()};
+    auto it = m_cache->lower_bound(key);
+    if (it == m_cache->end())
+        it = m_cache->emplace(key, LicenseSummaryData()).first;
+    ++it->second.inUse;
 }
 
 void CloudStorageServiceUsageHelper::setUsedDevices(const QSet<QnUuid>& devices)
@@ -307,7 +312,6 @@ void CloudStorageServiceUsageHelper::setUsedDevices(const QSet<QnUuid>& devices)
     processUsedDevicesUnsafe(cameras);
 }
 
-
 void CloudStorageServiceUsageHelper::proposeChange(
     const std::set<QnUuid>& devicesToAdd,
     const std::set<QnUuid>& devicesToRemove)
@@ -318,23 +322,40 @@ void CloudStorageServiceUsageHelper::proposeChange(
     calculateAvailableUnsafe();
 
     auto cameras = systemContext()->resourcePool()->getAllCameras(
-        QnResourcePtr(), /*ignoreDesktopCameras*/ true);
-    std::set<QnUuid> devices;
+        /*server*/ QnResourcePtr(),
+        /*ignoreDesktopCameras*/ true);
+
+    std::map<QnUuid, QnVirtualCameraResourcePtr> backupEnabledCamerasById;
     for (const auto& camera: cameras)
-        devices.insert(camera->getId());
+    {
+        if (camera->isBackupEnabled())
+            backupEnabledCamerasById.insert({camera->getId(), camera});
+    }
+
     for (const auto& id: devicesToAdd)
-        devices.insert(id);
+    {
+        if (devicesToRemove.contains(id))
+            continue;
+        if (const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
+            backupEnabledCamerasById.insert({camera->getId(), camera});
+    };
+
     for (const auto& id: devicesToRemove)
-        devices.erase(id);
+    {
+        if (devicesToAdd.contains(id))
+            continue;
+        backupEnabledCamerasById.erase(id);
+    };
 
     cameras.clear();
-    for (const auto& id: devices)
-    {
-        if (const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
-            cameras.push_back(camera);
-    }
+    for (const auto& [_, camera]: backupEnabledCamerasById)
+        cameras.push_back(camera);
+
     sortCameras(&cameras);
-    processUsedDevicesUnsafe(cameras);
+    for (const auto& camera: cameras)
+        countCameraAsUsedUnsafe(camera);
+
+    borrowUsages();
 }
 
 void CloudStorageServiceUsageHelper::borrowUsages() const
@@ -369,7 +390,6 @@ bool CloudStorageServiceUsageHelper::isOverflow() const
         });
 }
 
-
 std::map<int, LicenseSummaryData> CloudStorageServiceUsageHelper::allInfoByMegapixels() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -378,6 +398,24 @@ std::map<int, LicenseSummaryData> CloudStorageServiceUsageHelper::allInfoByMegap
     std::map<int, LicenseSummaryData> result;
     for (const auto& [key, value]: *m_cache)
         result.emplace(key.megapixels, value);
+    return result;
+}
+
+LicenseSummaryData CloudStorageServiceUsageHelper::allInfoForResolution(int megapixels) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!m_cache)
+        updateCacheUnsafe();
+
+    LicenseSummaryData result;
+    for (const auto& [key, value]: *m_cache)
+    {
+        if (key.megapixels < megapixels)
+            continue;
+        result.available += value.available;
+        result.inUse += value.inUse;
+        result.total += value.total;
+    }
     return result;
 }
 
