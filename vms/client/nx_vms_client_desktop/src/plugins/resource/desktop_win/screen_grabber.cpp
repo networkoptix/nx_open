@@ -14,6 +14,7 @@
 #include <QtGui/QScreen>
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QWidget>
 
 #include <nx/utils/log/log.h>
 #include "utils/media/sse_helper.h"
