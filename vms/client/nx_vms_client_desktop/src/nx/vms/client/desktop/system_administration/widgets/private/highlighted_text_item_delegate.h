@@ -4,6 +4,8 @@
 
 #include <QtWidgets/QStyledItemDelegate>
 
+#include <nx/utils/impl_ptr.h>
+
 class QTextDocument;
 
 namespace nx::vms::client::desktop {
@@ -16,7 +18,8 @@ class HighlightedTextItemDelegate: public QStyledItemDelegate
     using base_type = QStyledItemDelegate;
 
 public:
-    HighlightedTextItemDelegate(QObject* parent = nullptr, const QSet<int>& colums = {});
+    HighlightedTextItemDelegate(QObject* parent = nullptr, const QSet<int>& columns = {});
+    virtual ~HighlightedTextItemDelegate() override;
 
     virtual QSize sizeHint(
         const QStyleOptionViewItem& option, const QModelIndex& index) const override;
@@ -24,11 +27,15 @@ public:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option,
         const QModelIndex& index) const override;
 
-protected:
-    void initTextDocument(QTextDocument& doc, const QStyleOptionViewItem& option) const;
+    // Enable monitoring of view size for cache adjustment.
+    void setView(QAbstractItemView* view);
 
 protected:
-    QSet<int> m_columns;
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
+
+private:
+    class Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // nx::vms::client::desktop
