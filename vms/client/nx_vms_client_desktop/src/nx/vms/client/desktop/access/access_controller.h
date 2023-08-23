@@ -28,6 +28,8 @@ public:
     bool canCreateVideoWall() const;
     bool canCreateWebPage() const;
 
+    virtual bool isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAccessRights) const;
+
 protected:
     virtual GlobalPermissions calculateGlobalPermissions() const override;
 

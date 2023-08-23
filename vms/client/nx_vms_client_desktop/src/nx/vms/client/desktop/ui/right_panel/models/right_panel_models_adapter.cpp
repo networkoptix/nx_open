@@ -866,10 +866,15 @@ void RightPanelModelsAdapter::Private::setContext(QnWorkbenchContext* value)
     if (m_context)
     {
         TileInteractionHandler::install(q);
+
+        m_contextConnections << connect(
+            m_context->accessController(), &core::AccessController::permissionsMaybeChanged,
+                q, &RightPanelModelsAdapter::allowanceChanged);
     }
 
     recreateSourceModel();
     emit q->contextChanged();
+    emit q->allowanceChanged();
 }
 
 void RightPanelModelsAdapter::Private::setType(Type value)
@@ -896,14 +901,14 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
         case Type::motion:
         {
             // Prohibited for live viewers but should be allowed when browsing local files offline.
-            return !q->isOnline()
-                || accessController->hasDevicePermissions(Qn::Permission::ViewFootagePermission);
+            return !q->isOnline() || accessController->isDeviceAccessRelevant(
+                nx::vms::api::AccessRight::viewArchive);
         }
 
         case Type::bookmarks:
         {
-            return q->isOnline()
-                && accessController->hasDevicePermissions(Qn::Permission::ViewBookmarksPermission);
+            return q->isOnline() && accessController->isDeviceAccessRelevant(
+                nx::vms::api::AccessRight::viewBookmarks);
         }
 
         case Type::events:
@@ -914,8 +919,8 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
 
         case Type::analytics:
         {
-            const bool hasPermissions = q->isOnline()
-                && accessController->hasDevicePermissions(Qn::Permission::ViewFootagePermission);
+            const bool hasPermissions = q->isOnline() && accessController->isDeviceAccessRelevant(
+                nx::vms::api::AccessRight::viewArchive);
 
             if (!hasPermissions)
                 return false;

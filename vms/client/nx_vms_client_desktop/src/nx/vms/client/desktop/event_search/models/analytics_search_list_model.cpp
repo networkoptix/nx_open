@@ -118,7 +118,8 @@ void AnalyticsSearchListModel::setLiveTimestampGetter(LiveTimestampGetter value)
 
 bool AnalyticsSearchListModel::hasAccessRights() const
 {
-    return systemContext()->accessController()->hasDevicePermissions(Qn::ViewFootagePermission);
+    return systemContext()->accessController()->isDeviceAccessRelevant(
+        nx::vms::api::AccessRight::viewArchive);
 }
 
 } // namespace nx::vms::client::desktop

@@ -2222,6 +2222,15 @@ ConditionWrapper canExportBookmarks()
         });
 }
 
+ConditionWrapper isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAccessRights)
+{
+    return new CustomBoolCondition(
+        [requiredAccessRights](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return context->accessController()->isDeviceAccessRelevant(requiredAccessRights);
+        });
+}
+
 ConditionWrapper virtualCameraUploadEnabled()
 {
     return new VirtualCameraCondition(
@@ -2432,9 +2441,6 @@ ConditionWrapper hasPermissionsForResources(Qn::Permissions permissions)
     return new ResourcesCondition(
         [permissions](const QnResourceList& resources, QnWorkbenchContext* context)
         {
-            if (resources.empty())
-                return context->accessController()->hasDevicePermissions(permissions);
-
             return std::all_of(resources.begin(), resources.end(),
                 [permissions](auto resource)
                 {
