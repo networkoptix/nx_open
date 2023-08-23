@@ -109,6 +109,12 @@ public:
     std::map<int, nx::vms::api::LicenseSummaryData> allInfoByMegapixels() const;
 
     /*
+     * @return Services usage summary accumulated for cloud storage services with resolution
+     *     greater than or euqal to the given value.
+     */
+    nx::vms::api::LicenseSummaryData allInfoForResolution(int megapixels) const;
+
+    /*
      * @return Information about available license usages per service.
      *     key - serviceId, value - service usage info.
      */
@@ -142,6 +148,7 @@ private:
     void borrowUsages() const;
     void calculateAvailableUnsafe() const;
     void processUsedDevicesUnsafe(const QnVirtualCameraResourceList& cameras) const;
+    void countCameraAsUsedUnsafe(const QnVirtualCameraResourcePtr& camera) const;
 private:
 
     struct ServiceInfo
