@@ -26,10 +26,8 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
     QnResourceList inaccessible = removedResources.filtered(
         [this, videowall](const QnResourcePtr& resource) -> bool
         {
-            // TODO: #vkutin Fix this when videowall sharing behavior is finalized.
-
             const auto details = resourceAccessManager()->accessDetails(
-                accessController()->user()->getId(),resource, nx::vms::api::AccessRight::view);
+                accessController()->user()->getId(), resource, nx::vms::api::AccessRight::view);
 
             for (const auto& providers: details)
             {
