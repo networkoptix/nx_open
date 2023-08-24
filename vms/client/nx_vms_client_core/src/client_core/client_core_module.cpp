@@ -20,7 +20,7 @@
 #include <nx/vms/client/core/network/session_token_terminator.h>
 #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
-#include <nx/vms/client/core/skin/svg_icon_provider.h>
+#include <nx/vms/client/core/skin/svg_image_provider.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/operation_manager.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
@@ -66,7 +66,8 @@ QnClientCoreModule::QnClientCoreModule(
 
     d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
 
-    appContext()->qmlEngine()->addImageProvider("svg", new nx::vms::client::core::SvgIconProvider());
+    appContext()->qmlEngine()->addImageProvider("svg",
+        new nx::vms::client::core::SvgImageProvider());
 }
 
 QnClientCoreModule::~QnClientCoreModule()
