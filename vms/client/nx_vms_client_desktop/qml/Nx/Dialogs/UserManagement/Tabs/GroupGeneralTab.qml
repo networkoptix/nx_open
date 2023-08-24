@@ -153,6 +153,8 @@ Item
                 {
                     text: qsTr("Permission Groups")
 
+                    visible: !control.isPredefined
+
                     GroupsComboBox
                     {
                         id: groupsComboBox
