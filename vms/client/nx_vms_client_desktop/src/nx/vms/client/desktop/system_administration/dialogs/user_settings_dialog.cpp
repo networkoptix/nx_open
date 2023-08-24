@@ -35,6 +35,7 @@
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
@@ -48,6 +49,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/utils/system_uri.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
 #include <ui/workbench/workbench_context.h>
@@ -152,7 +154,16 @@ struct UserSettingsDialog::Private
     QString linkFromToken(const std::string& token) const
     {
         const auto server = q->systemContext()->currentServer();
-        return nx::format("%1/#/?token=%2", server->getUrl(), token);
+        if (!ini().nativeLinkForTemporaryUsers)
+            return nx::format("%1/#/?token=%2", server->getUrl(), token);
+
+        using namespace nx::vms::utils;
+        SystemUri uri;
+        uri.scope = SystemUri::Scope::direct;
+        uri.protocol = SystemUri::Protocol::Native;
+        uri.systemAddress = server->getRemoteUrl().displayAddress();
+        uri.credentials.authToken.setBearerToken(token);
+        return uri.toString();
     }
 
     nx::vms::api::TemporaryToken generateTemporaryToken(
