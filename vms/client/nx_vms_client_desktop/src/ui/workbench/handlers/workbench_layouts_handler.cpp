@@ -390,42 +390,39 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
     if (layout->isFile())
     {
         menu()->trigger(action::SaveLocalLayoutAction, layout);
+        return;
     }
-    else if (layout->isCrossSystem())
+
+    if (layout->isCrossSystem())
     {
         snapshotManager->save(layout);
         return;
     }
-    else if (layout->isVideoWallReviewLayout())
+
+    const auto change = calculateLayoutChange(layout);
+    const auto layoutOwner = layout->getParentResource();
+
+    if (confirmLayoutChange(change, layoutOwner))
     {
-        // TODO: #sivanov Refactor common code to common place.
-        NX_ASSERT(ResourceAccessManager::hasPermissions(layout, Qn::SavePermission),
-            "Saving unsaveable resource");
-        if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
+        if (layout->isVideoWallReviewLayout())
+        {
+            if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
                 nx::utils::guarded(this,
                     [layout, snapshotManager](int /*reqId*/, ec2::ErrorCode errorCode)
-                {
-                    snapshotManager->markBeingSaved(layout->getId(), false);
-                    if (errorCode != ec2::ErrorCode::ok)
-                        return;
-                    snapshotManager->markChanged(layout->getId(), false);
-                })))
-        {
-            snapshotManager->markBeingSaved(layout->getId(), true);
+                    {
+                        snapshotManager->markBeingSaved(layout->getId(), false);
+
+                        if (errorCode == ec2::ErrorCode::ok)
+                            snapshotManager->markChanged(layout->getId(), false);
+                    })))
+            {
+                snapshotManager->markBeingSaved(layout->getId(), true);
+            }
         }
-    }
-    else
-    {
-        // TODO: #sivanov Check existing layouts. All remotes layout checking and saving should be
-        // done in one place.
-
-        const auto change = calculateLayoutChange(layout);
-        const auto layoutOwner = layout->getParentResource();
-
-        if (confirmLayoutChange(change, layoutOwner))
-            snapshotManager->save(layout);
         else
-            snapshotManager->restore(layout);
+        {
+            snapshotManager->save(layout);
+        }
     }
 }
 
