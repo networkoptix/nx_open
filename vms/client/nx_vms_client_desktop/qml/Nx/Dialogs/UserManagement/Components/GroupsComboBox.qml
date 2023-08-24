@@ -24,6 +24,8 @@ Control
 
     height: groupFlow.maxHeight
 
+    onEnabledChanged: popupObject.close()
+
     function highlightMatchingText(text)
     {
         if (!currentSearchRegExp)
