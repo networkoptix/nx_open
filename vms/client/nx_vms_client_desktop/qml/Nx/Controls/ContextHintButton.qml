@@ -18,17 +18,15 @@ Control
 
     baselineOffset: image.baselineOffset + topPadding
 
-    contentItem: IconImage
+    contentItem: SvgImage
     {
         id: image
-        width: 16
-        height: 16
 
-        color: hasHelpTopic && hovered && !mouseArea.containsPress
-            ? ColorTheme.colors.dark14
-            : ColorTheme.colors.dark15
+        primaryColor: hasHelpTopic && hovered && !mouseArea.containsPress
+            ? "dark15"
+            : "dark14"
 
-        source: "image://svg/skin/buttons/context_hint_16.svg"
+        sourcePath: "skin/buttons/context_hint_16.svg"
         sourceSize: Qt.size(16, 16)
 
         baselineOffset: 12.5
