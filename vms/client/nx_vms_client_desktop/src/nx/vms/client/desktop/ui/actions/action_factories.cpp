@@ -344,6 +344,9 @@ Factory::ActionList ShowOnItemsFactory::newActions(const Parameters& parameters,
     if (const auto action = initHotspotsAction(parameters, parent))
         result.append(action);
 
+    if (const auto action = initToolbarAction(parameters, parent))
+        result.append(action);
+
     return result;
 }
 
@@ -353,8 +356,9 @@ QAction* ShowOnItemsFactory::initInfoAction(const Parameters& parameters, QObjec
     QList<QnResourceWidget*> actualWidgets;
     for (const auto widget: widgets)
     {
-        if (!(widget->visibleButtons() & Qn::InfoButton))
+        if (!(widget->visibleButtons() & Qn::InfoButton) && !widget->isInfoVisible())
             return nullptr;
+
         actualWidgets.append(widget);
     }
 
@@ -482,6 +486,43 @@ QAction* ShowOnItemsFactory::initHotspotsAction(const Parameters& parameters, QO
         {
             for (QnMediaResourceWidget* widget: widgetsWithHotspots)
                 widget->setHotspotsVisible(checked);
+        });
+
+    return action;
+}
+
+QAction* ShowOnItemsFactory::initToolbarAction(const Parameters& parameters, QObject* parent)
+{
+    const QnResourceWidgetList widgets = parameters.widgets();
+
+    QList<QnWebResourceWidget*> webResourceWidgets;
+    for (const auto& widget: widgets)
+    {
+        const auto webResourceWidget = dynamic_cast<QnWebResourceWidget*>(widget);
+        if (!webResourceWidget)
+            continue;
+
+        webResourceWidgets.append(webResourceWidget);
+    }
+
+    if (webResourceWidgets.empty())
+        return nullptr;
+
+    const auto action = new QAction(tr("Toolbar"), parent);
+    action->setCheckable(true);
+
+    const bool allToolbarsAreVisible = std::all_of(
+        webResourceWidgets.begin(), webResourceWidgets.end(),
+        [](QnWebResourceWidget* widget) { return widget->overlayIsVisible(); });
+    action->setChecked(allToolbarsAreVisible);
+
+    connect(action, &QAction::triggered, this,
+        [webResourceWidgets, allToolbarsAreVisible](bool checked)
+        {
+            for (QnWebResourceWidget* widget: webResourceWidgets)
+            {
+                widget->setOverlayVisibility(!allToolbarsAreVisible);
+            }
         });
 
     return action;
