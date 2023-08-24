@@ -96,6 +96,7 @@
 #include "context_current_user_watcher.h"
 #include "local_session_token_expiration_watcher.h"
 #include "remote_session.h"
+#include "temporary_user_expiration_watcher.h"
 #include "user_auth_debug_info_watcher.h"
 
 using namespace std::chrono;
@@ -359,6 +360,11 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
 
     // The only instance of UserAuthDebugInfoWatcher is created to be owned by the context.
     context()->instance<UserAuthDebugInfoWatcher>();
+
+    auto temporeryUserExpirationWatcher =
+        new TemporaryUserExpirationWatcher(
+            context()->instance<workbench::LocalNotificationsManager>(),
+            this);
 }
 
 ConnectActionsHandler::~ConnectActionsHandler()
