@@ -53,9 +53,16 @@ public:
     QSet<QnUuid> checkedGroupIds() const;
     void setCheckedGroupIds(const QSet<QnUuid>& value);
 
+    QSet<QnUuid> notFoundGroups() const;
+    QSet<QnUuid> nonUniqueGroups() const;
+
     void reset(const UserGroupDataList& groups);
     bool addOrUpdateGroup(const UserGroupData& group);
     bool removeGroup(const QnUuid& groupId);
+
+signals:
+    void notFoundGroupsChanged();
+    void nonUniqueGroupsChanged();
 
 private:
     struct Private;

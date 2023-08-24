@@ -22,6 +22,7 @@ public:
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
     virtual bool hasChanges() const override;
+    virtual void resetWarnings() override;
 
     void filterDigestUsers();
 
