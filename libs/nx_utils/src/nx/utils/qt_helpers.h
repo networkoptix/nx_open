@@ -2,8 +2,12 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <QtCore/QSet>
+#include <QtCore/QString>
 #include <QtCore/QVariantList>
+#include <QtCore/QVariantMap>
 
 namespace nx::utils {
 
@@ -36,6 +40,21 @@ QVariantList toQVariantList(const Container& source)
     result.reserve(source.size());
     for (const auto& item: source)
         result.push_back(QVariant::fromValue(item));
+    return result;
+}
+
+template<typename KeyValueRange /*must map strings to values*/>
+QVariantMap toQVariantMap(const KeyValueRange& source)
+{
+    QVariantMap result;
+    for (const auto& [name, value]: source)
+    {
+        if constexpr (std::is_convertible_v<decltype(name), QString>)
+            result.insert(name, QVariant::fromValue(value));
+        else
+            result.insert(QAnyStringView(name).toString(), QVariant::fromValue(value));
+    }
+
     return result;
 }
 

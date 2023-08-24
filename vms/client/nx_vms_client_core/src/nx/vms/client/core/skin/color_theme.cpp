@@ -14,17 +14,27 @@
 #include <utils/math/color_transformations.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/qt_helpers.h>
+#include <utils/common/hash.h>
+#include <utils/math/color_transformations.h>
 
 #include "color_theme_reader.h"
+#include "icon.h"
 
 namespace nx::vms::client::core {
 
 static ColorTheme* s_instance = nullptr;
 
+// ------------------------------------------------------------------------------------------------
+// ColorTheme::Private
+
 struct ColorTheme::Private
 {
+    ColorTheme* const q;
+
     ColorTree::ColorMap colorsByPath;
     QVariantMap colorTree;
+    mutable QJSValue jsColorTree;
 
     ColorTree::ColorGroups groups;
 
@@ -32,8 +42,12 @@ struct ColorTheme::Private
 
     QHash<QColor, ColorInfo> colorInfoByColor;
 
+    QHash<QString, IconCustomization> iconCustomizationByCategory;
+
     /** Initialize color values, color groups and color substitutions. */
     void loadColors(const QString& mainColorsFile, const QString& skinColorsFile);
+
+    void initIconCustomizations();
 
 private:
     QJsonObject readColorDataFromFile(const QString& fileName) const;
@@ -86,6 +100,22 @@ QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& fileName) 
     return QJsonObject();
 }
 
+void ColorTheme::Private::initIconCustomizations()
+{
+    // TODO: VMS-41294 #pprivalov Fix this record by specification, and implement other categories.
+
+    iconCustomizationByCategory.insert("text_buttons", {
+        {{QIcon::Off, QIcon::Normal}, {{"primary", "light14"}}},
+        {{QIcon::Off, QIcon::Active}, {{"primary", "red"}}},
+        {{QIcon::Off, QnIcon::Pressed}, {{"primary", "light14"}}},
+        {{QIcon::On, QIcon::Normal}, {{"primary", "light4"}}},
+        {{QIcon::On, QIcon::Active}, {{"primary", "light3"}}},
+        {{QIcon::On, QnIcon::Pressed}, {{"primary", "light4"}}}});
+}
+
+// ------------------------------------------------------------------------------------------------
+// ColorTheme
+
 ColorTheme::ColorTheme(QObject* parent):
     ColorTheme(":/skin/basic_colors.json", ":/skin/skin_colors.json")
 {
@@ -96,7 +126,7 @@ ColorTheme::ColorTheme(const QString& basicColorsFileName,
     QObject* parent)
     :
     QObject(parent),
-    d(new Private())
+    d(new Private{.q = this})
 {
     if (s_instance)
         NX_ERROR(this, "Singleton is created more than once.");
@@ -104,6 +134,7 @@ ColorTheme::ColorTheme(const QString& basicColorsFileName,
         s_instance = this;
 
     d->loadColors(basicColorsFileName, skinColorsFileName);
+    d->initIconCustomizations();
 }
 
 ColorTheme::~ColorTheme()
@@ -120,6 +151,19 @@ ColorTheme* ColorTheme::instance()
 QVariantMap ColorTheme::colors() const
 {
     return d->colorTree;
+}
+
+QJSValue ColorTheme::jsColors() const
+{
+    if (!d->jsColorTree.isUndefined())
+        return d->jsColorTree;
+
+    const auto engine = qmlEngine(this);
+    if (!NX_ASSERT(engine, "This property should only be accessed from QML code"))
+        return {};
+
+    d->jsColorTree = engine->toScriptValue(d->colorTree);
+    return d->jsColorTree;
 }
 
 ColorSubstitutions ColorTheme::getColorSubstitutions() const
@@ -195,6 +239,66 @@ Q_INVOKABLE bool ColorTheme::isDark(const QColor& color)
 Q_INVOKABLE bool ColorTheme::isLight(const QColor& color)
 {
     return !isDark(color);
+}
+
+bool ColorTheme::hasIconCustomization(const QString& category) const
+{
+    return !iconCustomization(category).empty();
+}
+
+ColorTheme::IconCustomization ColorTheme::iconCustomization(const QString& category) const
+{
+    return d->iconCustomizationByCategory.value(category);
+}
+
+QMap<QString, QString> ColorTheme::iconImageCustomization(
+    const QString& category,
+    const QIcon::Mode mode,
+    const QIcon::State state) const
+{
+    const auto customization = iconCustomization(category);
+    if (!NX_ASSERT(!customization.empty(),
+        "Icon customization category \"%1\" is not defined", category))
+    {
+        return {};
+    }
+
+    const auto result = customization.value({state, mode});
+    NX_ASSERT(!result.empty(),
+        "Customization of icon category \"%1\" for mode %2 and state %3 is not defined",
+        category, mode, state);
+
+    return result;
+}
+
+QJSValue ColorTheme::iconImageCustomization(const QString& category,
+    bool hovered, bool pressed, bool selected, bool disabled, bool checked) const
+{
+    const auto engine = qmlEngine(this);
+    if (!NX_ASSERT(engine, "This method should only be called from QML code"))
+        return {};
+
+    const QIcon::Mode mode =
+        [=]()
+        {
+            if (disabled)
+                return QIcon::Disabled;
+            if (selected)
+                return QIcon::Selected;
+            if (pressed)
+                return QnIcon::Pressed;
+            if (hovered)
+                return QIcon::Active;
+            return QIcon::Normal;
+        }();
+
+    const QIcon::State state = checked ? QIcon::On : QIcon::Off;
+    const auto customization = iconImageCustomization(category, mode, state);
+
+    QJSValue result = engine->newObject();
+    for (const auto& [name, value]: customization.asKeyValueRange())
+        result.setProperty(name, value);
+    return result;
 }
 
 void ColorTheme::registerQmlType()

@@ -2,6 +2,7 @@
 
 #include "schedule_cell_painter.h"
 
+#include <QtCore/QVariant>
 #include <QtGui/QPainter>
 
 #include <utils/math/color_transformations.h>
@@ -32,8 +33,8 @@ ScheduleCellPainter::~ScheduleCellPainter()
 void ScheduleCellPainter::paintCellBackground(
     QPainter* painter,
     const QRectF& rect,
-    bool hovered, const
-    QVariant& cellData) const
+    bool hovered,
+    const QVariant& cellData) const
 {
     if (cellData.toBool())
         painter->fillRect(rect, hovered ? d->nonEmptyCellHoveredColor : d->nonEmptyCellColor);

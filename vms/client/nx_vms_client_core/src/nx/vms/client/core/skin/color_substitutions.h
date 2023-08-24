@@ -13,5 +13,5 @@ using ColorSubstitutions = QMap<QColor, QColor>;
 
 inline bool operator<(const QColor& color1, const QColor& color2)
 {
-    return color1.rgb() < color2.rgb();
+    return (quint64) color1.rgba64() < (quint64) color2.rgba64();
 }
