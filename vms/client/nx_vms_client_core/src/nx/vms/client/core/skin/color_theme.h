@@ -3,8 +3,9 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QVariantMap>
 #include <QtGui/QColor>
+#include <QtGui/QIcon>
+#include <QtQml/QJSValue>
 
 #include "color_substitutions.h"
 
@@ -18,7 +19,7 @@ class NX_VMS_CLIENT_CORE_API ColorTheme: public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QVariantMap colors READ colors CONSTANT)
+    Q_PROPERTY(QJSValue colors READ jsColors CONSTANT)
 
 public:
     explicit ColorTheme(QObject* parent = nullptr);
@@ -30,8 +31,6 @@ public:
 
     static ColorTheme* instance();
 
-    QVariantMap colors() const;
-
     /**
      * @return Pairs of basic and current skin color values.
      */
@@ -42,6 +41,22 @@ public:
 
     QList<QColor> colors(const QString& name) const;
 
+    QVariantMap colors() const;
+
+    using ImageCustomization = QMap<QString /*source class name*/, QString /*target color name*/>;
+    using IconCustomization = QHash<QPair<QIcon::State, QIcon::Mode>, ImageCustomization>;
+
+    bool hasIconCustomization(const QString& category) const;
+    IconCustomization iconCustomization(const QString& category) const;
+
+    ImageCustomization iconImageCustomization(
+        const QString& category,
+        const QIcon::Mode mode,
+        const QIcon::State state) const;
+
+    Q_INVOKABLE QJSValue /*ImageCustomization*/ iconImageCustomization(const QString& category,
+        bool hovered, bool pressed, bool selected, bool disabled, bool checked) const;
+
     static Q_INVOKABLE QColor transparent(const QColor& color, qreal alpha);
     Q_INVOKABLE QColor darker(const QColor& color, int offset) const;
     Q_INVOKABLE QColor lighter(const QColor& color, int offset) const;
@@ -50,6 +65,9 @@ public:
     Q_INVOKABLE static bool isLight(const QColor& color);
 
     static void registerQmlType();
+
+private:
+    QJSValue jsColors() const;
 
 private:
     struct Private;
