@@ -287,6 +287,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, enableRemoteArchiveSynchronization,
         "[Feature] Enable ONVIF Profile G");
 
+    // VMS-41144
+    NX_INI_FLAG(true, nativeLinkForTemporaryUsers,
+        "[Feature] Use native link type for temporary user");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move
