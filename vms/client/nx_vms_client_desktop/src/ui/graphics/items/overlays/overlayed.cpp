@@ -20,13 +20,15 @@ detail::OverlayedBase::OverlayWidget::OverlayWidget()
     , rotationTransform(nullptr)
 {}
 
-void detail::OverlayedBase::initOverlayed(QGraphicsWidget *widget) {
+void detail::OverlayedBase::initOverlayed(QGraphicsWidget *widget)
+{
     m_widget = widget;
     m_overlayVisible = false;
     m_overlayRotation = Rotation(0);
 }
 
-void detail::OverlayedBase::updateOverlaysRotation() {
+void detail::OverlayedBase::updateOverlaysRotation()
+{
     const auto overlayRotation = Rotation::closestStandardRotation(m_widget->rotation());
     if (overlayRotation != m_overlayRotation)
     {
@@ -35,7 +37,7 @@ void detail::OverlayedBase::updateOverlaysRotation() {
     }
 }
 
-int detail::OverlayedBase::overlayWidgetIndex(QGraphicsWidget* widget) const 
+int detail::OverlayedBase::overlayWidgetIndex(QGraphicsWidget* widget) const
 {
     for (int i = 0; i < m_overlayWidgets.size(); i++)
     {
@@ -45,8 +47,7 @@ int detail::OverlayedBase::overlayWidgetIndex(QGraphicsWidget* widget) const
     return -1;
 }
 
-void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget
-    , const OverlayParams &params)
+void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget* widget, const OverlayParams& params)
 {
     if (!NX_ASSERT(widget))
         return;
@@ -88,7 +89,8 @@ void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget
     updateOverlayWidgetsVisibility(false);
 }
 
-void detail::OverlayedBase::removeOverlayWidget(QGraphicsWidget *widget) {
+void detail::OverlayedBase::removeOverlayWidget(QGraphicsWidget* widget)
+{
     int index = overlayWidgetIndex(widget);
     if(index == -1)
         return;
@@ -101,12 +103,16 @@ void detail::OverlayedBase::removeOverlayWidget(QGraphicsWidget *widget) {
     m_overlayWidgets.removeAt(index);
 }
 
-detail::OverlayedBase::OverlayVisibility detail::OverlayedBase::overlayWidgetVisibility(QGraphicsWidget *widget) const {
+detail::OverlayedBase::OverlayVisibility detail::OverlayedBase::overlayWidgetVisibility(
+    QGraphicsWidget* widget) const
+{
     int index = overlayWidgetIndex(widget);
     return index == -1 ? Invisible : m_overlayWidgets[index].visibility;
 }
 
-void detail::OverlayedBase::setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility, bool animate)
+void detail::OverlayedBase::setOverlayWidgetVisibility(
+    QGraphicsWidget* widget,
+    OverlayVisibility visibility, bool animate)
 {
     int index = overlayWidgetIndex(widget);
     if(index == -1)
@@ -119,7 +125,8 @@ void detail::OverlayedBase::setOverlayWidgetVisibility(QGraphicsWidget *widget, 
     updateOverlayWidgetsVisibility(animate);
 }
 
-bool detail::OverlayedBase::isOverlayVisible() const {
+bool detail::OverlayedBase::isOverlayVisible() const
+{
     return m_overlayVisible;
 }
 
@@ -174,7 +181,10 @@ void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate)
     }
 }
 
-void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible /*= true*/, bool animate /*= true*/)
+void detail::OverlayedBase::setOverlayWidgetVisible(
+    QGraphicsWidget* widget,
+    bool visible /*= true*/,
+    bool animate /*= true*/)
 {
     if (!widget)
         return;
@@ -227,7 +237,8 @@ bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
     return !qFuzzyIsNull(widget->opacity());
 }
 
-detail::OverlayParams::OverlayParams(OverlayedBase::OverlayVisibility visibility,
+detail::OverlayParams::OverlayParams(
+    OverlayedBase::OverlayVisibility visibility,
     OverlayedBase::OverlayFlags flags,
     qreal z,
     const QMarginsF& margins)

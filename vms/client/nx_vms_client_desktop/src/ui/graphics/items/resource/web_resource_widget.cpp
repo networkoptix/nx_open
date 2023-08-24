@@ -225,6 +225,9 @@ bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
 
 int QnWebResourceWidget::calculateButtonsVisibility() const
 {
+    if (!m_overlayIsVisible)
+        return false;
+
     const int defaultButtonsVisibility = base_type::calculateButtonsVisibility();
     return m_isMinimalTitleBar
         ? defaultButtonsVisibility & Qn::CloseButton
@@ -269,6 +272,19 @@ nx::vms::client::desktop::GraphicsWebEngineView* QnWebResourceWidget::webView() 
 void QnWebResourceWidget::setMinimalTitleBarMode(bool value)
 {
     m_isMinimalTitleBar = value;
+    setupWidget();
+    updateButtonsVisibility();
+    updateTitleText();
+}
+
+bool QnWebResourceWidget::overlayIsVisible() const
+{
+    return m_overlayIsVisible;
+}
+
+void QnWebResourceWidget::setOverlayVisibility(bool visible)
+{
+    m_overlayIsVisible = visible;
     setupWidget();
     updateButtonsVisibility();
     updateTitleText();
