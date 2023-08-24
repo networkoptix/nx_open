@@ -17,6 +17,7 @@ public:
     virtual ~LdapStatusWatcher() override;
 
     std::optional<api::LdapStatus> status() const;
+    bool isOnline() const;
 
     void refresh();
 

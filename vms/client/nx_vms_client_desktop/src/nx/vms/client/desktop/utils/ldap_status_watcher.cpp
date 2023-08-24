@@ -25,6 +25,11 @@ std::optional<api::LdapStatus> LdapStatusWatcher::status() const
     return m_status;
 }
 
+bool LdapStatusWatcher::isOnline() const
+{
+    return m_status && m_status->state == api::LdapStatus::State::online;
+}
+
 void LdapStatusWatcher::refresh()
 {
     NX_DEBUG(this, "Status refresh was requested.");

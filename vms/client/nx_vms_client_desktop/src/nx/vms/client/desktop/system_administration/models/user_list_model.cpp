@@ -24,6 +24,8 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
+#include "private/non_unique_name_tracker.h"
+
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -63,11 +65,11 @@ class UserListModel::Private:
 public:
     QString syncId;
     boost::container::flat_set<QnUserResourcePtr> users;
-    QHash<QString, QSet<QnUuid>> sameNameUsers; //< Used for detection of non-unique user names.
-    QHash<QnUuid, QString> prevName; //< Cache for user names before change.
+    QSet<QnUuid> notFoundUsers;
     QSet<QnUserResourcePtr> checkedUsers;
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
+    NonUniqueNameTracker nonUniqueNameTracker;
 
     bool ldapServerOnline = true;
 
@@ -121,7 +123,7 @@ public:
                 emit q->dataChanged(
                     q->index(0, UserWarningColumn),
                     q->index(q->rowCount() - 1, UserWarningColumn),
-                    {Qt::DecorationRole, Qt::ToolTipRole});
+                    {Qn::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
             });
     }
 
@@ -130,7 +132,6 @@ public:
     void handleUserChanged(const QnUserResourcePtr& user);
 
     QnUserResourcePtr user(const QModelIndex& index) const;
-    bool isUnique(const QnUserResourcePtr& user) const;
     bool ldapUserNotFound(const QnUserResourcePtr& user) const;
 
     Qt::CheckState checkState() const;
@@ -143,6 +144,8 @@ public:
 private:
     void addUserInternal(const QnUserResourcePtr& user);
     void removeUserInternal(const QnUserResourcePtr& user);
+
+    void markUserNotFound(const QnUserResourcePtr& user, bool notFound = true);
 };
 
 void UserListModel::Private::at_resourcePool_resourceChanged(const QnResourcePtr& resource)
@@ -159,19 +162,10 @@ void UserListModel::Private::handleUserChanged(const QnUserResourcePtr& user)
     if (it == users.end())
         return;
 
-    // Update map for non-unique name detection.
+    if (nonUniqueNameTracker.update(user->getId(), user->getName().toLower()))
+        emit model->nonUniqueUsersChanged();
 
-    // Remove old name.
-    const auto prevLowercaseName = prevName.value(user->getId());
-    auto& usersWithName = sameNameUsers[prevLowercaseName];
-    usersWithName.remove(user->getId());
-    if (usersWithName.isEmpty())
-        sameNameUsers.remove(prevLowercaseName);
-
-    // Insert new name.
-    const auto lowercaseName = user->getName().toLower();
-    sameNameUsers[lowercaseName].insert(user->getId());
-    prevName[user->getId()] = lowercaseName;
+    markUserNotFound(user, ldapUserNotFound(user));
 
     const auto row = users.index_of(it);
     QModelIndex index = model->index(row);
@@ -184,11 +178,6 @@ QnUserResourcePtr UserListModel::Private::user(const QModelIndex& index) const
         return QnUserResourcePtr();
 
     return *users.nth(index.row());
-}
-
-bool UserListModel::Private::isUnique(const QnUserResourcePtr& user) const
-{
-    return sameNameUsers[user->getName().toLower()].size() <= 1;
 }
 
 bool UserListModel::Private::ldapUserNotFound(const QnUserResourcePtr& user) const
@@ -273,9 +262,9 @@ void UserListModel::Private::removeUser(const QnUserResourcePtr& user)
 
 void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 {
-    const auto lowercaseName = user->getName().toLower();
-    sameNameUsers[lowercaseName].insert(user->getId());
-    prevName[user->getId()] = lowercaseName;
+    markUserNotFound(user, ldapUserNotFound(user));
+    if (nonUniqueNameTracker.update(user->getId(), user->getName().toLower()))
+        emit model->nonUniqueUsersChanged();
 
     connect(user.get(), &QnUserResource::nameChanged, this,
         &UserListModel::Private::at_resourcePool_resourceChanged);
@@ -302,13 +291,10 @@ void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 
 void UserListModel::Private::removeUserInternal(const QnUserResourcePtr& user)
 {
-    const auto lowercaseName = user->getName().toLower();
-    auto& usersWithName = sameNameUsers[lowercaseName];
-    usersWithName.remove(user->getId());
-    if (usersWithName.isEmpty())
-        sameNameUsers.remove(lowercaseName);
+    if (nonUniqueNameTracker.remove(user->getId()))
+        emit model->nonUniqueUsersChanged();
 
-    prevName.remove(user->getId());
+    markUserNotFound(user, false);
 
     disconnect(user.get(), &QnUserResource::nameChanged, this,
         &UserListModel::Private::at_resourcePool_resourceChanged);
@@ -324,6 +310,22 @@ void UserListModel::Private::removeUserInternal(const QnUserResourcePtr& user)
     checkedUsers.remove(user);
     enableChangedUsers.remove(user);
     digestChangedUsers.remove(user);
+}
+
+void UserListModel::Private::markUserNotFound(const QnUserResourcePtr& user, bool notFound)
+{
+    if (notFound)
+    {
+        const auto count = notFoundUsers.size();
+        notFoundUsers.insert(user->getId());
+        if (count < notFoundUsers.count())
+            emit model->notFoundUsersChanged();
+    }
+    else
+    {
+        if (notFoundUsers.remove(user->getId()))
+            emit model->notFoundUsersChanged();
+    }
 }
 
 UserListModel::UserListModel(QObject* parent):
@@ -393,11 +395,11 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     {
                         if (!d->ldapServerOnline)
                             return tr("LDAP server is offline. Users are not able to log in.");
-                        if (d->ldapUserNotFound(user))
+                        if (d->notFoundUsers.contains(user->getId()))
                             return tr("User is not found in the LDAP database.");
                     }
 
-                    if (!d->isUnique(user))
+                    if (!d->nonUniqueNameTracker.isUnique(user->getId()))
                     {
                         return tr("There are multiple users with the same credentials in the "
                             "system. To avoid issues with log in it is required for all users to "
@@ -456,8 +458,8 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 {
                     if (user->userType() == nx::vms::api::UserType::ldap
                         && (!d->ldapServerOnline
-                            || d->ldapUserNotFound(user)
-                            || !d->isUnique(user)))
+                            || d->notFoundUsers.contains(user->getId())
+                            || !d->nonUniqueNameTracker.isUnique(user->getId())))
                     {
                         return QString("user_settings/user_alert.svg");
                     }
@@ -506,19 +508,6 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
         {
             if (const auto path = data(index, Qn::DecorationPathRole).toString(); !path.isEmpty())
                 return qnSkin->icon(path, core::SvgIconColorer::kTreeIconSubstitutions);
-            break;
-        }
-
-        case Qt::ForegroundRole:
-        {
-            // Always use default color for checkboxes.
-            if (index.column() == CheckBoxColumn)
-                return QVariant();
-
-            // Highlight conflicting users.
-            if (user->isLdap() && !d->isUnique(user))
-                return core::colorTheme()->color("red_l2");
-
             break;
         }
 
@@ -698,6 +687,16 @@ bool UserListModel::contains(const QnUserResourcePtr& user) const
 bool UserListModel::isInteractiveColumn(int column)
 {
     return column == CheckBoxColumn;
+}
+
+QSet<QnUuid> UserListModel::notFoundUsers() const
+{
+    return d->notFoundUsers;
+}
+
+QSet<QnUuid> UserListModel::nonUniqueUsers() const
+{
+    return d->nonUniqueNameTracker.nonUniqueNameIds();
 }
 
 SortedUserListModel::SortedUserListModel(QObject* parent): base_type(parent)

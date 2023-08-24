@@ -61,6 +61,13 @@ public:
 
     static bool isInteractiveColumn(int column);
 
+    QSet<QnUuid> notFoundUsers() const;
+    QSet<QnUuid> nonUniqueUsers() const;
+
+signals:
+    void notFoundUsersChanged();
+    void nonUniqueUsersChanged();
+
 private:
     class Private;
     nx::utils::ImplPtr<Private> d;
