@@ -120,15 +120,18 @@ AnalyticsFilterModel::AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QOb
 {
     if (taxonomyManager)
     {
-        connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
-            this,
+        auto onTaxonomyChanged =
             [this]
             {
                 if (m_isActive)
                     rebuild();
 
                 const auto taxonomy = m_taxonomyManager->currentTaxonomy();
-                connect(
+
+                if (!taxonomy->resourceSupportProxy())
+                    return;
+
+                m_manifestsUpdatedConnection.reset(connect(
                     taxonomy->resourceSupportProxy(),
                     &nx::analytics::taxonomy::AbstractResourceSupportProxy::manifestsMaybeUpdated,
                     this,
@@ -136,10 +139,13 @@ AnalyticsFilterModel::AnalyticsFilterModel(TaxonomyManager* taxonomyManager, QOb
                     {
                         if (m_isActive)
                             rebuild();
-                    });
-            });
+                    }));
+            };
 
-        rebuild();
+        connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
+            this, onTaxonomyChanged);
+
+        onTaxonomyChanged();
     }
 }
 
@@ -247,11 +253,7 @@ ObjectType* AnalyticsFilterModel::findFilterObjectType(const QStringList& analyt
 
 QStringList AnalyticsFilterModel::getAnalyticsObjectTypeIds(ObjectType* filterObjectType)
 {
-    if (!filterObjectType)
-        return {};
-
-    const auto ids = filterObjectType->fullSubtreeTypeIds();
-    return QStringList{ids.begin(), ids.end()};
+    return filterObjectType ? QStringList{filterObjectType->id()} : QStringList{};
 }
 
 bool AnalyticsFilterModel::isActive() const
