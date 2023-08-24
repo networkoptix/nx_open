@@ -161,7 +161,7 @@ Dialog
 
             focus: !dialog.askCurrentPassword
 
-            validateFunc: UserSettingsGlobal.validatePassword
+            validateFunc: (text) => UserSettingsGlobal.validatePassword(text)
             onTextChanged: confirmPasswordTextField.warningState = false
         }
 

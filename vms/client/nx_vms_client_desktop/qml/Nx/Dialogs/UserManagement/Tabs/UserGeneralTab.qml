@@ -341,7 +341,7 @@ Item
                                     login: control.login
                                     askCurrentPassword: control.isSelf
                                     currentPasswordValidator: control.isSelf
-                                        ? control.self.validateCurrentPassword
+                                        ? (text) => control.self.validateCurrentPassword(text)
                                         : null
 
                                     onAccepted:
@@ -396,7 +396,7 @@ Item
                                 showLogin: true
 
                                 currentPasswordValidator: control.isSelf
-                                    ? control.self.validateCurrentPassword
+                                    ? (text) => control.self.validateCurrentPassword(text)
                                     : null
 
                                 onAccepted:
