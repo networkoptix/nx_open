@@ -40,6 +40,7 @@ Rectangle
     property bool isHttpDigestEnabledOnImportInitial
 
     property bool hideEmptyLdapWarning: false
+    property bool hideEditingWarning: false
 
     property bool modified
 
@@ -48,6 +49,7 @@ Rectangle
 
     readonly property bool showSpinners: (syncIsRunning || syncRequested) && !modified
     readonly property bool showEmptyLdapWarning: userCount <= 0 && groupCount <= 0 && lastSync
+    readonly property bool showEditingWarning: modified && !showEmptyLdapWarning && lastSync
     readonly property int kDefaultSyncIntervalS: 3600 //< 1 hour.
     readonly property int kDefaultSearchTimeoutS: 60 //< 1 minute.
     readonly property int kShortSyncIntervalS: 60 //< 1 minute.
@@ -800,8 +802,9 @@ Rectangle
 
             style: DialogBanner.Style.Info
 
-            text: qsTr("Continuous import from LDAP is disabled for this system."
-                + " Some settings may be not available.")
+            text: qsTr("Continuous import from LDAP is disabled for this system. Updates to "
+                + "groups and user's and groups' membership will occur solely through manual "
+                + "synchronization.")
 
             Layout.fillWidth: true
         }
@@ -813,13 +816,28 @@ Rectangle
 
             style: DialogBanner.Style.Warning
 
-            text: qsTr("No users or groups match synchronization settings and are added to the"
-                + " system’s DB. Make sure LDAP server parameters and filters are configured "
-                + "correctly. ")
+            text: qsTr("No users or groups match synchronization settings and are added to the "
+                + "system DB. Make sure LDAP server parameters and filters are configured "
+                + "correctly.")
 
             Layout.fillWidth: true
 
             onCloseClicked: control.hideEmptyLdapWarning = true
+        }
+
+        DialogBanner
+        {
+            style: DialogBanner.Style.Warning
+
+            text: qsTr("Please use care when altering LDAP settings. Incorrect configuration "
+                + "could disrupt system availability for a large number of users simultaneously.")
+
+            visible: control.showEditingWarning && !control.hideEditingWarning
+            closeVisible: true
+
+            Layout.fillWidth: true
+
+            onCloseClicked: control.hideEditingWarning = true
         }
     }
 }
