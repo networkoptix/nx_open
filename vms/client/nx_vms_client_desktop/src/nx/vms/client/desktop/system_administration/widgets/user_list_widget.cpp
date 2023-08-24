@@ -38,6 +38,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
@@ -173,6 +174,19 @@ public:
     CheckableHeaderView* const header{new CheckableHeaderView(UserListModel::CheckBoxColumn, q)};
     QAction* filterDigestAction = nullptr;
 
+    AlertBar* const notFoundUsersWarning{new AlertBar(q)};
+    QPushButton* const deleteNotFoundUsersButton{new QPushButton(
+        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+        QString(),
+        notFoundUsersWarning)};
+
+    AlertBar* const ldapServerOfflineWarning{new AlertBar(q)};
+    AlertBar* const nonUniqueUsersWarning{new AlertBar(q)};
+
+    bool hideNotFoundUsersWarning = false;
+    bool hideLdapServerOfflineWarning = false;
+    bool hideNonUniqueUsersWarning = false;
+
     ControlBar* const selectionControls{new ControlBar(q)};
 
     QPushButton* const deleteButton{new QPushButton(
@@ -192,12 +206,15 @@ public:
     explicit Private(UserListWidget* q);
     void setupUi();
     void filterDigestUsers() { ui->filterButton->setCurrentAction(filterDigestAction); }
+    void updateBanners();
 
 private:
     void createUser();
     void editUser(const QnUserResourcePtr& user);
+    void deleteUsers(const QnUserResourceList& usersToDelete);
     void deleteSelected();
     void editSelected();
+    void deleteNotFoundLdapUsers();
 
     void modelUpdated();
     void updateSelection();
@@ -216,6 +233,8 @@ private:
 
     QnUserResourceList visibleUsers() const;
     QnUserResourceList visibleSelectedUsers() const;
+
+    int getLdapUserCount() const;
 
     void visibleAdded(int first, int last);
     void visibleAboutToBeRemoved(int first, int last);
@@ -301,6 +320,14 @@ bool UserListWidget::hasChanges() const
     return d->m_hasChanges;
 }
 
+void UserListWidget::resetWarnings()
+{
+    d->hideLdapServerOfflineWarning = false;
+    d->hideNotFoundUsersWarning = false;
+    d->hideNonUniqueUsersWarning = false;
+    d->updateBanners();
+}
+
 void UserListWidget::filterDigestUsers()
 {
     d->filterDigestUsers();
@@ -366,7 +393,14 @@ QSize UserListWidget::sizeHint() const
 void UserListWidget::Private::setupUi()
 {
     ui->setupUi(q);
-    q->layout()->addWidget(selectionControls);
+
+    auto alertsLayout = new QVBoxLayout();
+    alertsLayout->setSpacing(0);
+    alertsLayout->addWidget(notFoundUsersWarning);
+    alertsLayout->addWidget(ldapServerOfflineWarning);
+    alertsLayout->addWidget(nonUniqueUsersWarning);
+    alertsLayout->addWidget(selectionControls);
+    q->layout()->addItem(alertsLayout);
 
     ui->filterButton->menu()->addAction(
         tr("All Users"),
@@ -414,6 +448,28 @@ void UserListWidget::Private::setupUi()
 
     connect(ui->usersTable, &QAbstractItemView::clicked, this, &Private::handleUsersTableClicked);
     connect(ui->createUserButton, &QPushButton::clicked, this, &Private::createUser);
+
+    setPaletteColor(notFoundUsersWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
+    setPaletteColor(ldapServerOfflineWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
+    setPaletteColor(nonUniqueUsersWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
+    notFoundUsersWarning->setCloseButtonVisible(true);
+    ldapServerOfflineWarning->setCloseButtonVisible(true);
+    nonUniqueUsersWarning->setCloseButtonVisible(true);
+    nonUniqueUsersWarning->setText(tr(
+        "Multiple users share the same login, causing login failures. To resolve this issue, "
+            "either update the affected user logins or disable/delete duplicates."));
+
+    deleteNotFoundUsersButton->setFlat(true);
+    notFoundUsersWarning->verticalLayout()->addWidget(deleteNotFoundUsersButton, 0, Qt::AlignLeft);
+    connect(deleteNotFoundUsersButton, &QPushButton::clicked, this,
+        &Private::deleteNotFoundLdapUsers);
+
+    connect(notFoundUsersWarning, &MessageBar::closeClicked, this,
+        [this]() { hideNotFoundUsersWarning = true; });
+    connect(ldapServerOfflineWarning, &MessageBar::closeClicked, this,
+        [this]() { hideLdapServerOfflineWarning = true; });
+    connect(nonUniqueUsersWarning, &MessageBar::closeClicked, this,
+        [this]() { hideNonUniqueUsersWarning = true; });
 
     deleteButton->setFlat(true);
     editButton->setFlat(true);
@@ -463,8 +519,13 @@ void UserListWidget::Private::setupUi()
     connect(hoverTracker, &ItemViewHoverTracker::itemLeave, this,
         [this]() { ui->usersTable->unsetCursor(); });
 
-    updateSelection();
+    connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::statusChanged, this,
+        &Private::updateBanners);
+    connect(usersModel, &UserListModel::notFoundUsersChanged, this, &Private::updateBanners);
+    connect(usersModel, &UserListModel::nonUniqueUsersChanged, this, &Private::updateBanners);
 
+    updateSelection();
+    updateBanners();
     setupPlaceholder();
 }
 
@@ -487,6 +548,26 @@ void UserListWidget::Private::setupPlaceholder()
     ui->nothingFoundPlaceholderLayout->addWidget(placeholderText, /*stretch*/ 0, Qt::AlignHCenter);
     ui->nothingFoundPlaceholderLayout->addSpacing(8);
     ui->nothingFoundPlaceholderLayout->addWidget(descriptionText, /*stretch*/ 0, Qt::AlignHCenter);
+}
+
+void UserListWidget::Private::updateBanners()
+{
+    notFoundUsersWarning->setText(tr("%n existing LDAP users are not found in the LDAP database.",
+        "", usersModel->notFoundUsers().size()));
+    deleteNotFoundUsersButton->setText(
+        tr("Delete %n users", "", usersModel->notFoundUsers().size()));
+    ldapServerOfflineWarning->setText(
+        tr("LDAP server is offline. %n users are not able to log in.", "", getLdapUserCount()));
+
+    ldapServerOfflineWarning->setVisible(!hideLdapServerOfflineWarning
+        && (q->systemContext()->ldapStatusWatcher()->status()->state
+            != api::LdapStatus::State::online));
+
+    notFoundUsersWarning->setVisible(!hideNotFoundUsersWarning
+        && !ldapServerOfflineWarning->isVisible()
+        && !usersModel->notFoundUsers().isEmpty());
+    nonUniqueUsersWarning->setVisible(!hideNonUniqueUsersWarning
+        && !usersModel->nonUniqueUsers().isEmpty());
 }
 
 void UserListWidget::Private::modelUpdated()
@@ -530,11 +611,8 @@ void UserListWidget::Private::createUser()
         action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 
-void UserListWidget::Private::deleteSelected()
+void UserListWidget::Private::deleteUsers(const QnUserResourceList& usersToDelete)
 {
-    const auto usersToDelete = visibleSelectedUsers().filtered(
-        [this](const QnUserResourcePtr& user) { return canDelete(user); });
-
     if (usersToDelete.isEmpty())
         return;
 
@@ -562,6 +640,18 @@ void UserListWidget::Private::deleteSelected()
         qnResourcesChangesManager->deleteResource(resource, callback);
 
     q->setEnabled(false);
+}
+
+void UserListWidget::Private::deleteSelected()
+{
+    const auto usersToDelete = visibleSelectedUsers().filtered(
+        [this](const QnUserResourcePtr& user) { return canDelete(user); });
+    deleteUsers(usersToDelete);
+}
+
+void UserListWidget::Private::deleteNotFoundLdapUsers()
+{
+    deleteUsers(q->resourcePool()->getResourcesByIds<QnUserResource>(usersModel->notFoundUsers()));
 }
 
 void UserListWidget::Private::editSelected()
@@ -722,6 +812,14 @@ QnUserResourceList UserListWidget::Private::visibleSelectedUsers() const
     }
 
     return result;
+}
+
+int UserListWidget::Private::getLdapUserCount() const
+{
+    const auto ldapUsers = q->systemContext()->resourcePool()->getResources<QnUserResource>(
+        [](const auto& user) { return user->isLdap(); });
+
+    return ldapUsers.size();
 }
 
 bool UserListWidget::Private::canDelete(const QnUserResourcePtr& user) const

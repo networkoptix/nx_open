@@ -30,6 +30,7 @@
 #include <nx/vms/client/desktop/system_administration/models/user_group_list_model.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
+#include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/common/palette.h>
@@ -173,6 +174,17 @@ public:
     CheckableHeaderView* const header{new CheckableHeaderView(
         UserGroupListModel::CheckBoxColumn, q)};
 
+    AlertBar* const notFoundGroupsWarning{new AlertBar(q)};
+    QPushButton* const deleteNotFoundGroupsButton{new QPushButton(
+        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+        QString(),
+        notFoundGroupsWarning)};
+
+    AlertBar* const nonUniqueGroupsWarning{new AlertBar(q)};
+
+    bool hideNotFoundGroupsWarning = false;
+    bool hideNonUniqueGroupsWarning = false;
+
     ControlBar* const selectionControls{new ControlBar(q)};
 
     QPushButton* const deleteSelectedButton{new QPushButton(
@@ -192,9 +204,13 @@ public:
 
     bool canDeleteGroup(const QnUuid& group);
 
+    void updateBanners();
+
 private:
     void createGroup();
+    void deleteGroups(const QSet<QnUuid>& groupsToDelete);
     void deleteSelected();
+    void deleteNotFoundLdapGroups();
 
     void setupPlaceholder();
 
@@ -260,6 +276,13 @@ bool UserGroupsWidget::hasChanges() const
     return false;
 }
 
+void UserGroupsWidget::resetWarnings()
+{
+    d->hideNotFoundGroupsWarning = false;
+    d->hideNonUniqueGroupsWarning = false;
+    d->updateBanners();
+}
+
 // -----------------------------------------------------------------------------------------------
 // UserGroupsWidget::Private
 
@@ -294,6 +317,8 @@ UserGroupsWidget::Private::Private(UserGroupsWidget* q, UserGroupManager* manage
 void UserGroupsWidget::Private::setupUi()
 {
     ui->setupUi(q);
+    q->layout()->addWidget(notFoundGroupsWarning);
+    q->layout()->addWidget(nonUniqueGroupsWarning);
     q->layout()->addWidget(selectionControls);
 
     const auto hoverTracker = new ItemViewHoverTracker(ui->groupsTable);
@@ -338,6 +363,25 @@ void UserGroupsWidget::Private::setupUi()
     connect(ui->groupsTable, &QAbstractItemView::clicked, this, &Private::handleCellClicked);
     connect(ui->createGroupButton, &QPushButton::clicked, this, &Private::createGroup);
 
+    setPaletteColor(notFoundGroupsWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
+    setPaletteColor(nonUniqueGroupsWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
+    notFoundGroupsWarning->setCloseButtonVisible(true);
+    nonUniqueGroupsWarning->setCloseButtonVisible(true);
+    nonUniqueGroupsWarning->setText(tr(
+        "Multiple groups share the same name, which can lead to confusion. To maintain a clear "
+            "and organized structure, we suggest providing unique names for each group."));
+
+    deleteNotFoundGroupsButton->setFlat(true);
+    notFoundGroupsWarning->verticalLayout()->addWidget(
+        deleteNotFoundGroupsButton, 0, Qt::AlignLeft);
+    connect(deleteNotFoundGroupsButton, &QPushButton::clicked, this,
+        &Private::deleteNotFoundLdapGroups);
+
+    connect(notFoundGroupsWarning, &MessageBar::closeClicked, this,
+        [this]() { hideNotFoundGroupsWarning = true; });
+    connect(nonUniqueGroupsWarning, &MessageBar::closeClicked, this,
+        [this]() { hideNonUniqueGroupsWarning = true; });
+
     deleteSelectedButton->setFlat(true);
     connect(deleteSelectedButton, &QPushButton::clicked, this, &Private::deleteSelected);
 
@@ -375,8 +419,15 @@ void UserGroupsWidget::Private::setupUi()
     connect(hoverTracker, &ItemViewHoverTracker::itemLeave, this,
         [this]() { ui->groupsTable->unsetCursor(); });
 
-    handleSelectionChanged();
+    connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::statusChanged, this,
+        &Private::updateBanners);
+    connect(groupsModel, &UserGroupListModel::notFoundGroupsChanged, this,
+        &Private::updateBanners);
+    connect(groupsModel, &UserGroupListModel::nonUniqueGroupsChanged, this,
+        &Private::updateBanners);
 
+    handleSelectionChanged();
+    updateBanners();
     setupPlaceholder();
 }
 
@@ -421,6 +472,21 @@ bool UserGroupsWidget::Private::canDeleteGroup(const QnUuid& groupId)
         groupId, Qn::RemovePermission);
 }
 
+void UserGroupsWidget::Private::updateBanners()
+{
+    notFoundGroupsWarning->setText(
+        tr("%n existing LDAP groups are not found in the LDAP database.", "",
+            groupsModel->notFoundGroups().size()));
+    deleteNotFoundGroupsButton->setText(
+        tr("Delete %n groups", "", groupsModel->notFoundGroups().size()));
+
+    notFoundGroupsWarning->setVisible(!hideNotFoundGroupsWarning
+        && q->systemContext()->ldapStatusWatcher()->isOnline()
+        && !groupsModel->notFoundGroups().isEmpty());
+    nonUniqueGroupsWarning->setVisible(!hideNonUniqueGroupsWarning
+        && !groupsModel->nonUniqueGroups().isEmpty());
+}
+
 void UserGroupsWidget::Private::handleSelectionChanged()
 {
     const auto checkedGroupIds = groupsModel->checkedGroupIds() & visibleGroupIds();
@@ -455,27 +521,16 @@ void UserGroupsWidget::Private::createGroup()
         .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
 }
 
-void UserGroupsWidget::Private::deleteSelected()
+void UserGroupsWidget::Private::deleteGroups(const QSet<QnUuid>& groupsToDelete)
 {
-    QSet<QnUuid> toDelete;
-
-    const auto selectedGroups = visibleSelectedGroupIds();
-    for (const auto& groupId: selectedGroups)
-    {
-        if (!canDeleteGroup(groupId))
-            continue;
-
-        toDelete << groupId;
-    }
-
-    if (toDelete.isEmpty())
+    if (groupsToDelete.isEmpty())
         return;
 
-    if (!ui::messages::UserGroups::removeGroups(q, toDelete, /*allowSilent*/ false))
+    if (!ui::messages::UserGroups::removeGroups(q, groupsToDelete, /*allowSilent*/ false))
         return;
 
-    GroupSettingsDialog::removeGroups(q->systemContext(), toDelete, nx::utils::guarded(q,
-        [this, toDelete](bool success, const QString& errorString)
+    GroupSettingsDialog::removeGroups(q->systemContext(), groupsToDelete, nx::utils::guarded(q,
+        [this, groupsToDelete](bool success, const QString& errorString)
         {
             q->setEnabled(true);
 
@@ -483,9 +538,9 @@ void UserGroupsWidget::Private::deleteSelected()
                 return;
 
             QString text;
-            if (const auto count = toDelete.count(); count == 1)
+            if (const auto count = groupsToDelete.count(); count == 1)
             {
-                if (const auto group = groupsModel->findGroup(toDelete.values()[0]))
+                if (const auto group = groupsModel->findGroup(groupsToDelete.values()[0]))
                     text = tr("Failed to delete group \"%1\".").arg(group->name.toHtmlEscaped());
                 else
                     text = tr("Failed to delete group.");
@@ -506,6 +561,20 @@ void UserGroupsWidget::Private::deleteSelected()
         }));
 
     q->setEnabled(false);
+}
+
+void UserGroupsWidget::Private::deleteSelected()
+{
+    QSet<QnUuid> toDelete = visibleSelectedGroupIds();
+    toDelete.removeIf([this](const QnUuid& id) { return !canDeleteGroup(id); });
+    deleteGroups(toDelete);
+}
+
+void UserGroupsWidget::Private::deleteNotFoundLdapGroups()
+{
+    QSet<QnUuid> toDelete = groupsModel->notFoundGroups();
+    toDelete.removeIf([this](const QnUuid& id) { return !canDeleteGroup(id); });
+    deleteGroups(toDelete);
 }
 
 nx::vms::api::UserGroupDataList UserGroupsWidget::Private::userGroups() const

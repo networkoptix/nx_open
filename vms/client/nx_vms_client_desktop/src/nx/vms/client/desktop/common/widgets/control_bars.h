@@ -84,12 +84,17 @@ public:
      */
     QHBoxLayout* overlayLayout() const;
 
+    bool closeButtonVisible() const;
+    void setCloseButtonVisible(bool visible);
+
 private:
     using base_type::setDisplayed;
 
 signals:
     /** Emitted only when `setOpenExternalLinks` is disabled. */
     void linkActivated(const QString& link);
+
+    void closeClicked();
 
 private:
     struct Private;

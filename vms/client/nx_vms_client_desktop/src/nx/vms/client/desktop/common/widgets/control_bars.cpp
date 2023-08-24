@@ -2,11 +2,12 @@
 
 #include "control_bars.h"
 
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QPushButton>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
@@ -135,20 +136,31 @@ struct MessageBar::Private
     MessageBar* const q;
     QnWordWrappedLabel* const label{new QnWordWrappedLabel(q)};
     QHBoxLayout* const overlayLayout{new QHBoxLayout(label)};
+    QPushButton* const closeButton{new QPushButton(
+        qnSkin->icon("banners/close.svg"), QString(), q)};
 };
 
 MessageBar::MessageBar(QWidget* parent):
     base_type(parent),
     d(new Private{.q = this})
 {
-    horizontalLayout()->addWidget(d->label);
+    horizontalLayout()->addWidget(d->label, 1);
     d->label->setForegroundRole(QPalette::Text);
     d->label->label()->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     d->label->setText(QString());
     setOpenExternalLinks(true);
 
-    connect(d->label, &QnWordWrappedLabel::linkActivated,
-        this, &MessageBar::linkActivated);
+    connect(d->label, &QnWordWrappedLabel::linkActivated, this, &MessageBar::linkActivated);
+
+    horizontalLayout()->addWidget(d->closeButton, 0, Qt::AlignTop);
+    d->closeButton->setFlat(true);
+    d->closeButton->setFixedSize(20, 20);
+    d->closeButton->setToolTip(tr("Close"));
+    d->closeButton->setFocusPolicy(Qt::NoFocus);
+    d->closeButton->hide();
+
+    connect(d->closeButton, &QPushButton::clicked, this, &MessageBar::closeClicked);
+    connect(d->closeButton, &QPushButton::clicked, this, &MessageBar::hide);
 }
 
 MessageBar::~MessageBar()
@@ -178,6 +190,16 @@ void MessageBar::setOpenExternalLinks(bool open)
 QHBoxLayout* MessageBar::overlayLayout() const
 {
     return d->overlayLayout;
+}
+
+bool MessageBar::closeButtonVisible() const
+{
+    return d->closeButton->isVisible();
+}
+
+void MessageBar::setCloseButtonVisible(bool visible)
+{
+    d->closeButton->setVisible(visible);
 }
 
 QnWordWrappedLabel* MessageBar::label() const

@@ -22,6 +22,8 @@
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 
+#include "private/non_unique_name_tracker.h"
+
 namespace nx::vms::client::desktop {
 
 // -----------------------------------------------------------------------------------------------
@@ -34,10 +36,11 @@ struct UserGroupListModel::Private
 
     UserGroupDataList orderedGroups;
     QSet<QnUuid> checkedGroupIds;
-    QHash<QString, int> sameNameGroups;
     QList<QSet<QnUuid>> cycledGroupSets;
     QSet<QnUuid> cycledGroups;
     bool ldapServerOnline = true;
+    QSet<QnUuid> notFoundGroups;
+    NonUniqueNameTracker nonUniqueNameTracker;
 
     Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId())
     {
@@ -53,7 +56,7 @@ struct UserGroupListModel::Private
                 emit q->dataChanged(
                     q->index(0, GroupWarningColumn),
                     q->index(q->rowCount() - 1, GroupWarningColumn),
-                    {Qn::DecorationPathRole, Qt::ToolTipRole});
+                    {Qn::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
             });
     }
 
@@ -92,11 +95,6 @@ struct UserGroupListModel::Private
     bool ldapGroupNotFound(const UserGroupData& group) const
     {
         return !group.externalId.dn.isEmpty() && group.externalId.syncId != syncId;
-    }
-
-    bool isUnique(const UserGroupData& group) const
-    {
-        return sameNameGroups.value(group.name.toLower()) == 1;
     }
 
     bool isChecked(const UserGroupData& group) const
@@ -256,6 +254,22 @@ struct UserGroupListModel::Private
         for (const QSet<QnUuid>& cycledGroupSet: cycledGroupSets)
             cycledGroups.unite(cycledGroupSet);
     }
+
+    void markGroupNotFound(const QnUuid& groupId, bool notFound = true)
+    {
+        if (notFound)
+        {
+            const auto count = notFoundGroups.size();
+            notFoundGroups.insert(groupId);
+            if (count < notFoundGroups.count())
+                emit q->notFoundGroupsChanged();
+        }
+        else
+        {
+            if (notFoundGroups.remove(groupId))
+                emit q->notFoundGroupsChanged();
+        }
+    }
 };
 
 // -----------------------------------------------------------------------------------------------
@@ -317,10 +331,10 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             {
                 case GroupWarningColumn:
                 {
-                    if (d->ldapServerOnline && d->ldapGroupNotFound(group))
+                    if (d->ldapServerOnline && d->notFoundGroups.contains(group.id))
                         return tr("Group is not found in the LDAP database.");
 
-                    if (!d->isUnique(group))
+                    if (!d->nonUniqueNameTracker.isUnique(group.id))
                     {
                         return tr("There are multiple groups with this name in the system. To "
                             "maintain a clear and organized structure, we suggest providing "
@@ -363,8 +377,8 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             {
                 case GroupWarningColumn:
                 {
-                    if ((d->ldapServerOnline && d->ldapGroupNotFound(group))
-                        || !d->isUnique(group)
+                    if ((d->ldapServerOnline && d->notFoundGroups.contains(group.id))
+                        || !d->nonUniqueNameTracker.isUnique(group.id)
                         || d->cycledGroups.contains(group.id))
                     {
                         return QString("user_settings/user_alert.svg");
@@ -530,10 +544,22 @@ void UserGroupListModel::setCheckedGroupIds(const QSet<QnUuid>& value)
         {Qt::CheckStateRole});
 }
 
+QSet<QnUuid> UserGroupListModel::notFoundGroups() const
+{
+    return d->notFoundGroups;
+}
+
+QSet<QnUuid> UserGroupListModel::nonUniqueGroups() const
+{
+    return d->nonUniqueNameTracker.nonUniqueNameIds();
+}
+
 void UserGroupListModel::reset(const UserGroupDataList& groups)
 {
     const ScopedReset reset(this);
     d->checkedGroupIds.clear();
+    d->notFoundGroups.clear();
+    d->nonUniqueNameTracker = {};
     d->orderedGroups = groups;
 
     std::sort(d->orderedGroups.begin(), d->orderedGroups.end(),
@@ -545,15 +571,22 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
     if (!NX_ASSERT(newEnd == d->orderedGroups.end()))
         d->orderedGroups.erase(newEnd, d->orderedGroups.end());
 
-    d->sameNameGroups.clear();
     for (const auto& group: d->orderedGroups)
-        ++d->sameNameGroups[group.name.toLower()];
+    {
+        if (d->ldapGroupNotFound(group))
+            d->notFoundGroups.insert(group.id);
+
+        d->nonUniqueNameTracker.update(group.id, group.name.toLower());
+    }
     d->refreshCycledGroupSets();
+    emit notFoundGroupsChanged();
+    emit nonUniqueGroupsChanged();
 }
 
 bool UserGroupListModel::addOrUpdateGroup(const UserGroupData& group)
 {
-    const auto lowerCaseName = group.name.toLower();
+    if (d->nonUniqueNameTracker.update(group.id, group.name.toLower()))
+        emit nonUniqueGroupsChanged();
 
     const auto position = d->findPosition(group.id);
     if (position == d->orderedGroups.end() || position->id != group.id)
@@ -562,14 +595,14 @@ bool UserGroupListModel::addOrUpdateGroup(const UserGroupData& group)
         const int row = position - d->orderedGroups.begin();
         const ScopedInsertRows insertRows(this, row, row);
         d->orderedGroups.insert(position, group);
-        ++d->sameNameGroups[lowerCaseName];
+        d->markGroupNotFound(group.id, d->ldapGroupNotFound(group));
         d->refreshCycledGroupSets(utils::toQSet(group.parentGroupIds) + QSet{group.id});
         return true;
     }
 
     // Update.
-    --d->sameNameGroups[position->name.toLower()];
-    ++d->sameNameGroups[lowerCaseName];
+    d->markGroupNotFound(group.id, d->ldapGroupNotFound(group));
+
     const auto oldParentGroupIds = position->parentGroupIds;
 
     *position = group;
@@ -598,13 +631,15 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
         return false;
     }
 
-    --d->sameNameGroups[it->name.toLower()];
+    if (d->nonUniqueNameTracker.remove(groupId))
+        emit nonUniqueGroupsChanged();
 
     const int row = it - d->orderedGroups.begin();
 
     const ScopedRemoveRows removeRows(this, row, row);
     d->orderedGroups.erase(it);
     d->checkedGroupIds.remove(groupId);
+    d->markGroupNotFound(groupId, false);
 
     // Remove group from other groups.
     for (auto& group: d->orderedGroups)
