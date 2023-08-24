@@ -117,7 +117,8 @@ MembershipSettings
         }
     }
 
-    summaryText: qsTr("Selected groups")
+    //: 'Member of' as in sentence: 'Current user/group is a member of: group1, group2, group3'.
+    summaryText: qsTr("Member of")
     summaryModel: ParentGroupsModel
     {
         sourceModel: ParentGroupsProvider
