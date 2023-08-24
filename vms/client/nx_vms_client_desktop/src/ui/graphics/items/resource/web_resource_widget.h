@@ -26,6 +26,9 @@ public:
 
     void setMinimalTitleBarMode(bool value);
 
+    bool overlayIsVisible() const;
+    void setOverlayVisibility(bool visible);
+
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;
 
@@ -51,4 +54,5 @@ private:
     bool m_validCertificate = true;
     bool m_pageLoaded = false;
     bool m_isMinimalTitleBar = false;
+    bool m_overlayIsVisible = true;
 };
