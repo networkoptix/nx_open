@@ -187,10 +187,12 @@ Dialog
 
     function accept()
     {
-        if (newPasswordTextField.validate()
-            && newPasswordTextField.strengthAccepted
-            && confirmPasswordTextField.validate()
-            && (!askCurrentPassword || currentPasswordTextField.validate()))
+        const isTrue = v => !!v
+
+        if ([newPasswordTextField.validate(),
+            newPasswordTextField.strengthAccepted,
+            confirmPasswordTextField.validate(),
+            (!askCurrentPassword || currentPasswordTextField.validate())].every(isTrue))
         {
             dialog.accepted()
             dialog.close()
