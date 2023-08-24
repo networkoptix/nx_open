@@ -67,6 +67,7 @@ struct LdapSettingsWidget::Private
     QmlProperty<bool> syncIsRunning;
     QmlProperty<bool> syncRequested;
     QmlProperty<bool> hideEmptyLdapWarning;
+    QmlProperty<bool> hideEditingWarning;
 
     QmlProperty<bool> modified;
 
@@ -92,6 +93,7 @@ struct LdapSettingsWidget::Private
         syncIsRunning(quickWidget, "syncIsRunning"),
         syncRequested(quickWidget, "syncRequested"),
         hideEmptyLdapWarning(quickWidget, "hideEmptyLdapWarning"),
+        hideEditingWarning(quickWidget, "hideEditingWarning"),
         modified(quickWidget, "modified"),
         hasConfig(quickWidget, "hasConfig")
     {
@@ -583,7 +585,7 @@ void LdapSettingsWidget::testConnection(
 
     auto callback = nx::utils::guarded(this,
         [this](
-            bool success, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
+            bool /*success*/, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
         {
             if (handle == d->currentHandle)
             {
@@ -681,12 +683,12 @@ void LdapSettingsWidget::cancelCurrentRequest()
     d->currentHandle = 0;
 }
 
-void LdapSettingsWidget::showEvent(QShowEvent* event)
+void LdapSettingsWidget::showEvent(QShowEvent*)
 {
     d->statusUpdateTimer.start();
 }
 
-void LdapSettingsWidget::hideEvent(QHideEvent* event)
+void LdapSettingsWidget::hideEvent(QHideEvent*)
 {
     d->statusUpdateTimer.stop();
 }
@@ -694,6 +696,7 @@ void LdapSettingsWidget::hideEvent(QHideEvent* event)
 void LdapSettingsWidget::resetWarnings()
 {
     d->hideEmptyLdapWarning = false;
+    d->hideEditingWarning = false;
 }
 
 } // namespace nx::vms::client::desktop
