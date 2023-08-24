@@ -4,7 +4,10 @@
 
 #include <QtCore/QTimer>
 
+#include <core/resource/user_resource.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/synctime.h>
 
@@ -150,10 +153,16 @@ void RemoteSessionTimeoutWatcher::tick()
     const bool isTimeToNotify = timeLeft && *timeLeft <= kFirstNotificationTime;
     const bool isTimeToLastNotify = timeLeft && *timeLeft <= kLastNotificationTime;
     const bool notificationWasCancelled = d->timeLeftWhenCancelled.has_value();
-
-    const bool notificationShouldBeVisible =
+    bool notificationShouldBeVisible =
         ((isTimeToNotify && !notificationWasCancelled)
             || (isTimeToLastNotify && (*d->timeLeftWhenCancelled > kLastNotificationTime)));
+
+    const auto currentUser = session->systemContext()->userWatcher()->user();
+    if (currentUser && currentUser->isTemporary())
+    {
+        const auto deltaTime = currentUser->temporarySessionExpiresIn().value() - timeLeft.value();
+        notificationShouldBeVisible &= deltaTime > kForceDisconnectTime;
+    }
 
     if (notificationShouldBeVisible)
     {
@@ -189,6 +198,12 @@ void RemoteSessionTimeoutWatcher::sessionStarted(std::shared_ptr<RemoteSession> 
                 d->passwordEnteredAt = qnSyncTime->currentTimePoint();
                 tick();
             });
+
+        connect(session->systemContext()->userWatcher(),
+            &nx::vms::client::core::UserWatcher::userChanged,
+            this,
+            &RemoteSessionTimeoutWatcher::tick);
+
         tick();
     }
 }
