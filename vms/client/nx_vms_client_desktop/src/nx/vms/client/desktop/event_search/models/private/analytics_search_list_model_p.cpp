@@ -12,6 +12,7 @@
 #include <QtWidgets/QMenu>
 
 #include <analytics/common/object_metadata.h>
+#include <analytics/db/analytics_db_types.h>
 #include <api/server_rest_connection.h>
 #include <client/client_module.h>
 #include <common/common_module.h>
@@ -424,8 +425,8 @@ void AnalyticsSearchListModel::Private::setAttributeFilters(const QStringList& v
 
 void AnalyticsSearchListModel::Private::updateRelevantObjectTypes()
 {
-    std::set<QString> relevantObjectTypes(
-        m_selectedObjectTypes.begin(), m_selectedObjectTypes.end());
+    const auto relevantObjectTypes = nx::analytics::db::addDerivedTypeIds(
+        q->systemContext()->analyticsTaxonomyStateWatcher(), m_selectedObjectTypes);
 
     if (relevantObjectTypes == m_relevantObjectTypes)
         return;

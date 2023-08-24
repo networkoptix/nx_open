@@ -102,6 +102,12 @@ Window
         {
             model: d.filterModel.engines
 
+            onModelChanged:
+            {
+                if (d.filterModel.engines.length > 0 && eventModel.analyticsSetup)
+                    tabBar.selectEngine(eventModel.analyticsSetup.engine)
+            }
+
             EngineButton
             {
                 engine: modelData
