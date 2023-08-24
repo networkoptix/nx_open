@@ -230,12 +230,21 @@ ConnectionInfo LoginDialog::connectionInfo() const
         if (!url.isValid())
             return {};
 
-        const QString fragment = url.fragment();
-        const QUrlQuery query{fragment.mid(fragment.indexOf("?") + 1)};
-        const auto authToken = query.queryItemValue("token").toStdString();
+        QString authToken;
+        if (url.hasFragment())
+        {
+            const QString fragment = url.fragment();
+            const QUrlQuery query{fragment.mid(fragment.indexOf("?") + 1)};
+            authToken = query.queryItemValue("token");
+        }
+        else
+        {
+            const QUrlQuery query{url.toQUrl()};
+            authToken = query.queryItemValue("auth");
+        }
 
         nx::network::SocketAddress address(url.host(), url.port());
-        return {address, nx::network::http::BearerAuthToken{authToken}};
+        return {address, nx::network::http::BearerAuthToken{authToken.toStdString()}};
     }
 }
 
