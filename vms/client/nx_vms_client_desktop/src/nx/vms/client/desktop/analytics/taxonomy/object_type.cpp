@@ -30,7 +30,6 @@ struct ObjectType::Private
     std::map<QString, const nx::analytics::taxonomy::AbstractObjectType*> additionalObjectTypes;
     mutable std::optional<std::vector<QString>> cachedTypeIds;
     mutable std::optional<std::vector<QString>> cachedFullSubtreeTypeIds;
-    mutable std::optional<QString> cachedId;
     QPointer<ObjectType> baseObjectType;
     std::vector<ObjectType*> derivedObjectTypes;
     std::vector<Attribute*> attributes;
@@ -118,12 +117,7 @@ std::vector<QString> ObjectType::fullSubtreeTypeIds() const
 
 QString ObjectType::id() const
 {
-    if (d->cachedId)
-        return *d->cachedId;
-
-    const std::vector<QString> ids = fullSubtreeTypeIds();
-    d->cachedId = makeId(QStringList{ids.begin(), ids.end()});
-    return *d->cachedId;
+    return d->mainObjectType->id();
 }
 
 QString ObjectType::name() const

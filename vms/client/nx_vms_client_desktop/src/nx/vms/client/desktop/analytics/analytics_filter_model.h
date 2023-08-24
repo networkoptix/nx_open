@@ -6,10 +6,12 @@
 #include <set>
 #include <vector>
 
+#include <QtCore/QMetaObject>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
 #include <nx/analytics/taxonomy/abstract_engine.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/state_view_builder.h>
 
 Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/taxonomy/object_type.h")
@@ -128,6 +130,7 @@ private:
 
 private:
     QPointer<TaxonomyManager> m_taxonomyManager;
+    nx::utils::ScopedConnection m_manifestsUpdatedConnection;
     std::unique_ptr<StateViewBuilder> m_stateViewBuilder;
     std::vector<nx::analytics::taxonomy::AbstractEngine*> m_engines;
 
