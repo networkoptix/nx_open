@@ -152,21 +152,12 @@ std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloud
     return purchasedServices<SaasCloudStorageParameters>(SaasService::kCloudRecordingType);
 }
 
-std::pair<bool, QString> ServiceManager::isBlocked() const
+bool ServiceManager::isBlocked() const
 {
     using namespace nx::vms::api;
 
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    const auto state = m_data.state;
-    if (state == SaasState::suspend || state == SaasState::shutdown)
-    {
-        const QString message = NX_FMT(
-            "Access for cloud users is forbiden because of System "
-            "is in '%1' state", toString(state));
-        return {true, message};
-    }
-
-    return {false, QString()};
+    return m_data.state == SaasState::suspend || m_data.state == SaasState::shutdown;
 }
 
 void ServiceManager::updateLocalRecordingLicenseV1()

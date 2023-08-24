@@ -73,9 +73,9 @@ public:
     std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> cloudStorageData() const;
 
     /**
-     * @return Whether access to the system is blocked to cloud users with the reason description.
+     * @return Whether Saas is in blocked state.
      */
-    std::pair<bool, QString> isBlocked() const;
+    bool isBlocked() const;
 
     /**
      * Depending on the SaaS licensing state, adds or removes License object converted from
