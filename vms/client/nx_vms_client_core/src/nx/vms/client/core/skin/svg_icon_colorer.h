@@ -59,6 +59,8 @@ public:
          * into constructor.
          */
         IconSubstitutions operator+(const IconSubstitutions& other) const;
+
+        QString hash() const;
     };
 
     static QByteArray colorized(const QByteArray& source);
