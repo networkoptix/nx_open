@@ -113,7 +113,7 @@ struct NX_VMS_API LdapSettings
     /**%apidoc[opt] Delay between automatic synchronization cycles.
      * %example 0
      */
-    std::chrono::seconds continuousSyncIntervalS = 0s;
+    std::chrono::seconds continuousSyncIntervalS = 1h;
 
     /**%apidoc[opt]
      * Preferred Server in the System that will be used to execute synchronization with the LDAP
