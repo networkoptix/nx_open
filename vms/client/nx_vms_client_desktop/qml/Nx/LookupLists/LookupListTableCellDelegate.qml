@@ -28,6 +28,7 @@ FocusScope
 
     signal editingStarted
     signal editingFinished
+    signal valueChanged
 
     // Never pass key presses to parents while editing.
     Keys.onPressed: (event) => event.accepted = isEditing
@@ -44,8 +45,11 @@ FocusScope
     function commit()
     {
         console.log("Commit " + editor.value)
+        const valueChanged = editor.value !== model.display
         model.edit = editor.value
         isEditing = false
+        if (valueChanged)
+            control.valueChanged()
     }
 
     function revert()
