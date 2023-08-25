@@ -6,7 +6,7 @@ import Nx
 import Nx.Core
 
 import nx.client.core
-import nx.client.desktop
+import nx.vms.client.desktop
 
 Instrument
 {
