@@ -300,6 +300,11 @@ distrib_copyServerSystemLibs() # destination_path
         )
         distrib_copySystemLibs "${destination_path}" "${libs_to_copy[@]}"
     fi
+
+    echo "Copying ALSA library (used only if libasound2 deb is not installed)"
+
+    mkdir -p "${destination_path}/libasound2"
+    distrib_copySystemLibs "${destination_path}/libasound2" libasound.so.2
 }
 
 # Copy libraries from the specified directory using copy_system_library.py.
