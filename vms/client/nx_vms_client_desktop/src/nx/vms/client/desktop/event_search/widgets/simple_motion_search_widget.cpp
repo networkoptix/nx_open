@@ -56,7 +56,7 @@ public:
         m_areaButton->setAccented(true);
         m_areaButton->setDeactivatedText(tr("Select area on the video to filter results"));
         m_areaButton->setText(tr("In selected area"));
-        m_areaButton->setIcon(qnSkin->icon("text_buttons/frame_20x20.svg", kIconSubstitutions));
+        m_areaButton->setIcon(qnSkin->icon("text_buttons/frame_20x20_deprecated.svg", kIconSubstitutions));
 
         connect(m_areaButton, &SelectableTextButton::stateChanged, this,
             [this](SelectableTextButton::State state)
