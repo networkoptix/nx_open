@@ -17,8 +17,8 @@
 template<class T>
 class QnGlBufferStream {
 public:
-    QnGlBufferStream(QByteArray *target): 
-        m_target(target) 
+    QnGlBufferStream(QByteArray *target):
+        m_target(target)
     {
         NX_ASSERT(target);
 

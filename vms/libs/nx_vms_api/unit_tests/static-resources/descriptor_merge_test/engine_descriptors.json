@@ -5,7 +5,7 @@
                 "id": "{a83ad533-e397-4bce-be9b-72ffab905d66}",
                 "name": "Test Engine 1",
                 "pluginId": "test.plugin1",
-                "capabilities": "" 
+                "capabilities": ""
             },
             "{768e0413-e829-4380-8ce7-64dcbc5f1f3f}": {
                 "id": "{768e0413-e829-4380-8ce7-64dcbc5f1f3f}",

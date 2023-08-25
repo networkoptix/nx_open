@@ -26,11 +26,11 @@ protected:
         const QJsonObject object = testData.fullData["result"].toObject();
         const QByteArray objectAsBytes = QJsonDocument(object).toJson();
 
-        auto [deserializationResult, result] = 
+        auto [deserializationResult, result] =
             nx::reflect::json::deserialize<std::map<QString, GroupDescriptor>>(objectAsBytes.toStdString());
-        
+
         m_expectedData = deserializationResult;
-        
+
         ASSERT_TRUE(result.success);
 
         ASSERT_FALSE(m_expectedData.empty());

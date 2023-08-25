@@ -417,7 +417,7 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
                     m_changedEnabledState.remove(camera);
                 else
                     m_changedEnabledState.insert(camera, enabled);
-                
+
                 dataChangedScopedAccumulator.rowDataChanged(index);
             }
         }

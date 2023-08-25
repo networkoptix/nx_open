@@ -66,7 +66,7 @@ struct SystemSettingsManager::Private
 
                 if (callback)
                     callback();
-                    
+
                 if (hasChange)
                     emit q->systemSettingsChanged();
             }

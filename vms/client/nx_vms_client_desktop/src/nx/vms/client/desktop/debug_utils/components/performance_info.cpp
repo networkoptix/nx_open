@@ -43,7 +43,7 @@ public:
     QElapsedTimer fpsTimer;
     std::list<qint64> requestCountLastMinute = std::list<qint64>(60, 0);
     QTimer requestsCountUpdateTimer;
-    
+
     Private()
     {
         requestsCountUpdateTimer.setInterval(kRequestCountUpdateInterval);
@@ -144,7 +144,7 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
     auto requestsPerMin = requestsCount - d->requestCountLastMinute.front();
     QString requestInfo = nx::format("Requests per min: %1 (total: %2)")
         .args(requestsPerMin, requestsCount);
-    
+
     if (requestsPerMin > ini().maxSeverRequestCountPerMinunte)
         requestInfo = setWarningStyleHtml(requestInfo);
 

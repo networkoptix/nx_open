@@ -45,7 +45,7 @@ LocalNetworkInterfacesManager::LocalNetworkInterfacesManager(QObject* parent):
     d->start();
 }
 
-LocalNetworkInterfacesManager::~LocalNetworkInterfacesManager() 
+LocalNetworkInterfacesManager::~LocalNetworkInterfacesManager()
 {
 }
 

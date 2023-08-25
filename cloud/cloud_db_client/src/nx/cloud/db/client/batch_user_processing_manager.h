@@ -22,13 +22,13 @@ public:
     virtual void getBatchState(
         const std::string & batchId,
         std::function<void(api::ResultCode, api::BatchState)> completionHandler) override;
-    
+
      virtual void getBatchErrorInfo(
         const std::string& batchId,
         std::function<void(api::ResultCode, api::BatchErrorInfo)> completionHandler) override;
 
 private:
-    
+
     AsyncRequestsExecutor* m_requestsExecutor = nullptr;
 };
 

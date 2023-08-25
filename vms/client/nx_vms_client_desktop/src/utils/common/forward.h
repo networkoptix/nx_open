@@ -6,7 +6,7 @@
 /**
  * A simple constructor forwarding macro that saves a lot of typing for
  * non-C++11 compilers.
- * 
+ *
  * \param CLASS                         Name of the enclosing class.
  * \param BASE                          Name of the base class to forward
  *                                      constructor arguments to.

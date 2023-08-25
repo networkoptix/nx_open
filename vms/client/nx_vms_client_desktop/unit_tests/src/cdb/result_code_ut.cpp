@@ -50,7 +50,7 @@ TEST(CdbResultCodeTest, ToString)
 {
     ResultCode resultCode(ResultCode::ok);
 
-    /* This dummy switch should produce compiler warning (error in case of -Werror=switch) if 
+    /* This dummy switch should produce compiler warning (error in case of -Werror=switch) if
        new enum value is added and not propagated to this test. */
     switch(resultCode)
     {

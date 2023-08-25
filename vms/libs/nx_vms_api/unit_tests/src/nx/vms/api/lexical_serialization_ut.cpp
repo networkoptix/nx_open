@@ -71,16 +71,16 @@ TEST(Lexical, enumSerialization)
 }
 
 TEST(Lexical, deprecatedServerFlags)
-{    
+{
     // The following Server Flags have been declared obsolete, but must be properly deserialized
     // from their original names for compatibility.
-    
+
     EXPECT_EQ(ServerFlag::SF_deprecated_AutoSystemName,
         nx::reflect::fromString<ServerFlag>("SF_AutoSystemName"));
 
     EXPECT_EQ(ServerFlag::SF_deprecated_RequiresEdgeLicense,
         nx::reflect::fromString<ServerFlag>("SF_RequiresEdgeLicense"));
-        
+
     EXPECT_EQ(ServerFlag::SF_deprecated_HasHDD,
         nx::reflect::fromString<ServerFlag>("SF_Has_HDD"));
 }

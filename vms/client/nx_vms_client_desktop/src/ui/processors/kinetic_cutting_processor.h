@@ -9,7 +9,7 @@
 #include "kinetic_processor.h"
 
 /**
- * Kinetic processor that introduces speed cutting threshold 
+ * Kinetic processor that introduces speed cutting threshold
  * after which speed is cut much more aggressively.
  */
 class KineticCuttingProcessor: public KineticProcessor {

@@ -153,7 +153,7 @@ TEST(SharedMemoryManager, currentInstanceIsUnregisteredOnClose)
     auto sharedMemory = makeMockSharedMemory();
     auto processesMap = makeMockProcessesMap();
     auto manager = makeMockSharedMemoryManager(sharedMemory, processesMap);
-    
+
     ASSERT_EQ(MockSharedMemoryInterface::sharedMemoryBlock(sharedMemory, currentPid).pid, currentPid);
 
     // Manager must cleanup his own session on closing.

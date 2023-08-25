@@ -43,7 +43,7 @@ struct coord_type<QPointF> {
     typedef qreal type;
 };
 
-template<class T> 
+template<class T>
 inline T polarToCartesian(typename coord_type<T>::type r, typename coord_type<T>::type alpha);
 
 template<>

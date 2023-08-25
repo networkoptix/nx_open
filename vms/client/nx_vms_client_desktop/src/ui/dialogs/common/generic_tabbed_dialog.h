@@ -80,7 +80,7 @@ protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
 
     /**
-     * @brief shows Dialog window with confirmation of result. 
+     * @brief shows Dialog window with confirmation of result.
      */
     virtual QDialogButtonBox::StandardButton getConfirmationResult();
 

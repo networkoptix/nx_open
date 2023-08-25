@@ -462,13 +462,13 @@ struct SystemOfferPatch
 };
 
 /**
- * System attribute 
+ * System attribute
  */
 struct Attribute
 {
     /**%apidoc Unique attribute name. */
     std::string name;
-    
+
     /**%apidoc Attribute value. */
     std::string value;
 
@@ -488,28 +488,28 @@ struct SystemUsersBatchItem
 {
     /**%apidoc Users emails */
     std::vector<std::string> users;
-    
+
     /**%apidoc System ids */
     std::vector<std::string> systems;
-    
+
     /**%apidoc Access role to be assigned. */
     SystemAccessRole accessRole = SystemAccessRole::none;
-    
+
     /**%apidoc Custom attributes to assign */
-    std::map<std::string, std::string> attributes; 
+    std::map<std::string, std::string> attributes;
 };
 
 /**
 * Create async processing batch request.
 */
-struct CreateBatchRequest 
+struct CreateBatchRequest
 {
     /**%apidoc Batch items to process */
     std::vector<SystemUsersBatchItem> items;
 };
 
 /**
- * Create batch response with request traking id assigned. 
+ * Create batch response with request traking id assigned.
 */
 struct CreateBatchResponse
 {
@@ -536,7 +536,7 @@ enum class BatchStatus
 *  Batch has been processed completely if pending operations is zero
 *  Batch hase been processed without errors if failed operations is zero
 */
-struct BatchState 
+struct BatchState
 {
     /**%apidoc Current batch status. */
     BatchStatus status = BatchStatus::inProgress;

@@ -253,7 +253,7 @@ public:
             QJson::serialize(context, value(), &result);
         else
             QJson::serialize(value(), &result);
-        
+
         return result;
     }
 

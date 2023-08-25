@@ -224,7 +224,7 @@ void ManualDeviceSearcher::searchForDevices(
     nx::vms::api::DeviceSearch deviceSearchData;
     deviceSearchData.credentials = {login, password};
     deviceSearchData.port = port;
-    if (endAddress.isEmpty()) 
+    if (endAddress.isEmpty())
         deviceSearchData.target = nx::vms::api::DeviceSearchIp{urlOrStartAddress};
     else
         deviceSearchData.target = nx::vms::api::DeviceSearchIpRange{urlOrStartAddress, endAddress};

@@ -285,7 +285,7 @@
         "_": "All PTZ-related colors",
         "main": "brand_core",
         "fill": "brand_l1",
- 
+
         "manage": {
             "_": "Manage PTZ dialog",
             "title": "#404040",

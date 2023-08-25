@@ -36,6 +36,6 @@ std::string DeserializationResult::toString() const
     if (firstNonDeserializedField != std::nullopt)
         errorString << ", First non-deserialized field: \"" << *firstNonDeserializedField << "\"";
     return errorString.str();
-} 
+}
 
 } // namespace nx::reflect

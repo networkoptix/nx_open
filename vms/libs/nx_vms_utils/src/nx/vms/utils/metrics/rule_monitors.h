@@ -7,17 +7,17 @@
 namespace nx::vms::utils::metrics {
 
 // General rules file parsing error.
-class NX_VMS_UTILS_API RuleSyntaxError: 
+class NX_VMS_UTILS_API RuleSyntaxError:
     public BaseError { using BaseError::BaseError; };
 
-class NX_VMS_UTILS_API UnknownValueId: 
+class NX_VMS_UTILS_API UnknownValueId:
     public RuleSyntaxError { using RuleSyntaxError::RuleSyntaxError; };
 
 // General formula calculation error in ExtraValueMonitor.
-class NX_VMS_UTILS_API FormulaCalculationError: 
+class NX_VMS_UTILS_API FormulaCalculationError:
     public BaseError { using BaseError::BaseError; };
 
-class NX_VMS_UTILS_API NullValueError: 
+class NX_VMS_UTILS_API NullValueError:
     public FormulaCalculationError { using FormulaCalculationError::FormulaCalculationError; };
 
 // NOTE: Generators are allowed to throw exceptions!

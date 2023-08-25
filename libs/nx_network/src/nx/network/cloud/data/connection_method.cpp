@@ -21,7 +21,7 @@ std::string toString(int value)
         strs[count++] = "proxy";
     if (value & reverseConnect)
         strs[count++] = "reverseConnect";
-    
+
     return nx::utils::join(strs.begin(), strs.begin() + count, ',');
 }
 

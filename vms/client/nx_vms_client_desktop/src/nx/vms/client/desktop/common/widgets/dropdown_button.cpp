@@ -135,7 +135,7 @@ void DropdownButton::setCurrentIndex(int index, bool trigger)
 
     if (trigger && action)
         action->trigger();
-    
+
     if (m_adjustSize)
         setText(action->text()); //< Auto-adjust size.
 

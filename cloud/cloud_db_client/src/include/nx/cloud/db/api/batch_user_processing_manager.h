@@ -20,7 +20,7 @@ public:
     virtual void createUpdateBatch(
         const api::CreateBatchRequest& request,
         std::function<void(api::ResultCode, api::CreateBatchResponse)> completionHandler) = 0;
-    
+
     virtual void getBatchState(
         const std::string & batchId,
         std::function<void(api::ResultCode, api::BatchState)> completionHandler) = 0;

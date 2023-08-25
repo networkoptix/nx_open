@@ -9,7 +9,7 @@
 
 /**
  * Weak pointer class that also supports <tt>QGraphicsItem</tt>s.
- */ 
+ */
 template<class T>
 class WeakPointer: public QPointer<T> {
     typedef QPointer<T> base_type;

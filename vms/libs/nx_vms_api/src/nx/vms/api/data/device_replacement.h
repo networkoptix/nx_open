@@ -76,7 +76,7 @@ struct NX_VMS_API DeviceReplacementResponse
 private:
     /**
      * Add new message to the section.
-     * Due to section contains messages with same severity level only the new message 
+     * Due to section contains messages with same severity level only the new message
      * with higher severity level will clear previous messages from the section.
      * And vice versa: in case of new message has lower severity level than current level
      * of the section then such message will be not added.

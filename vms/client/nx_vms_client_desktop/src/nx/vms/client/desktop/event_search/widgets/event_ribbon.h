@@ -99,9 +99,9 @@ signals:
     void dragStarted(const QModelIndex& index, const QPoint& pos, const QSize& size);
     void linkActivated(const QModelIndex& index, const QString& link);
     void contextMenuRequested(
-        const QModelIndex& index, 
+        const QModelIndex& index,
         const QPoint& globalPos,
-        bool withStandardInteraction, 
+        bool withStandardInteraction,
         QWidget* parent);
     void pluginActionRequested(const QnUuid& engineId, const QString& actionTypeId,
         const nx::analytics::db::ObjectTrack& track, const QnVirtualCameraResourcePtr& camera);

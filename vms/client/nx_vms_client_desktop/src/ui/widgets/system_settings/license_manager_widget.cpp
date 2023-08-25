@@ -684,7 +684,7 @@ void LicenseManagerWidget::handleWidgetStateChange()
                         LicenseActivationDialogs::failure(this);
                     }
                 }
-                else 
+                else
                 {
                     NX_VERBOSE(this, "License activated successfully.");
                     LicenseActivationDialogs::success(this);
@@ -692,7 +692,7 @@ void LicenseManagerWidget::handleWidgetStateChange()
 
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);
             };
-        
+
         NX_VERBOSE(this,
             "Activating license using VMS Server. License key: %1",
             body.key);

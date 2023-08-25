@@ -56,7 +56,7 @@ TEST(Kmp, search)
     ASSERT_EQ(0, kmpFindNext("ffa3dc", "ffa"));
     ASSERT_EQ(6, kmpFindNext("1fa3dcffa", "ffa"));
     ASSERT_EQ(6, kmpFindNext("ffa3dcffa", "ffa", 1));
-    
+
     ASSERT_EQ(std::string::npos, kmpFindNext("c43ebddnladfbfdlflcndnn4e", "4f"));
     ASSERT_EQ(std::string::npos, kmpFindNext("", "4f"));
     ASSERT_EQ(std::string::npos, kmpFindNext("4", "4f"));

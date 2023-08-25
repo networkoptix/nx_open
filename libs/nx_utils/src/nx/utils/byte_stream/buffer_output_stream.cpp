@@ -10,7 +10,7 @@ BufferOutputStream::BufferOutputStream():
     AbstractByteStreamFilter(std::shared_ptr<AbstractByteStreamFilter>())
 {
 }
-        
+
 bool BufferOutputStream::processData(const ConstBufferRefType& data)
 {
     m_buffer += data;

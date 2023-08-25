@@ -27,7 +27,7 @@ having a certain special behavior, thus, must not be used when such special beha
 intended.
 
 Identifiers starting with `nx.` must not be used for the entities introduced by parties other than
-Nx. 
+Nx.
 
 Some Attributes with pre-defined names starting with `nx.sys.` are used for the VMS internal
 purposes and to access certain, sometimes experimental, features. Some of such Attributes are

@@ -24,7 +24,7 @@ void WaitingForQThreadToEmptyEventQueue::join()
         while (m_waitsDone < m_howManyTimesToWait)
             qApp->processEvents();
     }
-    else 
+    else
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         NX_VERBOSE(this, "Start waiting for counter value %1", m_howManyTimesToWait);

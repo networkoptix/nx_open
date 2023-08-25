@@ -17,7 +17,7 @@ namespace QnFlatMapDetail {
 
     /* FactoryData implements empty base optimization. */
 
-    template<class Factory, bool isEmpty = std::is_empty<Factory>::value> 
+    template<class Factory, bool isEmpty = std::is_empty<Factory>::value>
     class FactoryData {
     public:
         FactoryData(const Factory &factory): m_factory(factory) {}

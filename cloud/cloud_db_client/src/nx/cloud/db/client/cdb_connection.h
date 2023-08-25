@@ -27,7 +27,7 @@ public:
     virtual api::MaintenanceManager* maintenanceManager() override;
     virtual api::OauthManager* oauthManager() override;
     virtual api::TwoFactorAuthManager* twoFactorAuthManager() override;
-    
+
     virtual api::BatchUserProcessingManager* batchUserProcessingManager() override;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;

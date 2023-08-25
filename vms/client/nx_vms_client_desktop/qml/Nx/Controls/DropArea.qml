@@ -10,9 +10,9 @@ DropArea
 
     property var currentMimeData: watcher.mimeData
 
-    DragMimeDataWatcher 
-    { 
-        id: watcher 
+    DragMimeDataWatcher
+    {
+        id: watcher
         watched: dropArea
     }
 }

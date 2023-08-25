@@ -5,12 +5,12 @@
 namespace ec2
 {
 
-QnStoredFileNotificationManager::QnStoredFileNotificationManager() 
+QnStoredFileNotificationManager::QnStoredFileNotificationManager()
 {
 }
 
 void QnStoredFileNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::StoredFileData>& tran, 
+    const QnTransaction<nx::vms::api::StoredFileData>& tran,
     NotificationSource /*source*/)
 {
     if (tran.command == ApiCommand::addStoredFile)
@@ -28,7 +28,7 @@ void QnStoredFileNotificationManager::triggerNotification(
 }
 
 void QnStoredFileNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::StoredFilePath>& tran, 
+    const QnTransaction<nx::vms::api::StoredFilePath>& tran,
     NotificationSource /*source*/)
 {
     NX_ASSERT(tran.command == ApiCommand::removeStoredFile);

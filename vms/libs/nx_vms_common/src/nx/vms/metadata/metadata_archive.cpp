@@ -243,7 +243,7 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
     int64_t availableMediaRecords = m_detailedMetadataFile.size() / m_index.header.recordSize;
     if (m_noGeometryMetadataFile)
     {
-        availableMediaRecords = std::min(availableMediaRecords, 
+        availableMediaRecords = std::min(availableMediaRecords,
             (int64_t) m_noGeometryMetadataFile->size() / m_index.header.noGeometryRecordSize());
     }
     int64_t mediaRecords = m_index.truncateTo(availableMediaRecords);

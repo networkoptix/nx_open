@@ -39,7 +39,7 @@ PlaybackPositionItem::PlaybackPositionItem(WindowContext* windowContext, QGraphi
     static const QColor kArchiveBackgroundColor = core::colorTheme()->color("timeline.playback.archive");
 
     setAcceptedMouseButtons(Qt::NoButton);
-    
+
     PlaybackPositionIconTextWidgetOptions pauseOptions;
     pauseOptions.backgroundColor = kPauseBackgroundColor;
     pauseOptions.borderRadius = 2;
@@ -79,8 +79,8 @@ PlaybackPositionItem::PlaybackPositionItem(WindowContext* windowContext, QGraphi
     mainLayout->setItemSpacing(0, 4);
 
     setLayout(mainLayout);
-    
-    connect(display()->playbackPositionBlinkTimer(), &QTimer::timeout, this, 
+
+    connect(display()->playbackPositionBlinkTimer(), &QTimer::timeout, this,
         [this]()
         {
             if (qFuzzyIsNull(opacity()) && !m_isLive)
@@ -106,7 +106,7 @@ void PlaybackPositionItem::cancelAnimation()
     // Animation is not running
     if (m_totalMs == kStopped)
         return;
-    
+
     m_totalMs = kStopped;
     auto animator = opacityAnimator(this);
     if (animator && animator->isRunning())

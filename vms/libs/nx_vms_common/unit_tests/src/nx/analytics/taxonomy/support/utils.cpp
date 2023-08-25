@@ -15,7 +15,7 @@ bool loadDescriptorsTestData(const QString& filePath, TestData* outTestData)
 
     const QByteArray data = file.readAll();
 
-    auto [fullData, jsonResult] = 
+    auto [fullData, jsonResult] =
         nx::reflect::json::deserialize<QJsonObject>(data.toStdString());
 
     outTestData->fullData = fullData;
@@ -26,10 +26,10 @@ bool loadDescriptorsTestData(const QString& filePath, TestData* outTestData)
     const QJsonObject maybeDescriptors = outTestData->fullData.contains("descriptors")
             ? outTestData->fullData["descriptors"].toObject()
             : outTestData->fullData;
-    
+
     const QByteArray maybeDescriptorsAsBytes = QJsonDocument(maybeDescriptors).toJson();
 
-    auto [deserializedDescriptors, result] = 
+    auto [deserializedDescriptors, result] =
         nx::reflect::json::deserialize<nx::vms::api::analytics::Descriptors>(maybeDescriptorsAsBytes.toStdString());
 
     outTestData->descriptors = deserializedDescriptors;

@@ -38,7 +38,7 @@ public:
      * @return Detailed structure describing whole aspects of SaaS licensing state of the system.
      */
     nx::vms::api::SaasData data() const;
-    
+
     /**
      * @return SaaS services available to the system from Channel Partners, indexed by
      *     the service ID.
@@ -92,7 +92,7 @@ public:
     // have any sense on the client side.
     void setEnabled(bool value);
     bool isEnabled() const;
-    
+
 signals:
     void dataChanged();
 

@@ -55,7 +55,7 @@ void QnLayoutNameDialog::setText(const QString &text) {
 void QnLayoutNameDialog::at_nameLineEdit_textChanged(const QString &text) {
     foreach(QAbstractButton *button, ui->buttonBox->buttons()) {
         QDialogButtonBox::ButtonRole role = ui->buttonBox->buttonRole(button);
-        
+
         if(role == QDialogButtonBox::AcceptRole || role == QDialogButtonBox::YesRole || role == QDialogButtonBox::ApplyRole)
             button->setEnabled(!text.isEmpty());
     }

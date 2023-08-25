@@ -8,7 +8,7 @@
 namespace nx::utils {
 
 /**
- * Helps to parse and navigate strings that represent a full or a partial path to a property in a 
+ * Helps to parse and navigate strings that represent a full or a partial path to a property in a
  * structure/object in the "dot notation", e.g. `server.cpu.vendor` or `response.error.message`.
  * It supports `*` in path strings to help with wildcard matching.
  */

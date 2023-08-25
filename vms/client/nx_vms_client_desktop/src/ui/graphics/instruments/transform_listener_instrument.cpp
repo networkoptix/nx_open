@@ -2,7 +2,7 @@
 
 #include "transform_listener_instrument.h"
 
-TransformListenerInstrument::TransformListenerInstrument(QObject *parent): 
+TransformListenerInstrument::TransformListenerInstrument(QObject *parent):
     Instrument(Viewport, makeSet(QEvent::Paint, QEvent::Resize), parent)
 {}
 

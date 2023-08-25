@@ -159,7 +159,7 @@ TEST(Ptr, shareToPtr)
             ASSERT_EQ(p, data.get());
             ASSERT_EQ(2, data->refCount());
             ASSERT_FALSE(Data::s_destructorCalled);
-            
+
             // Test shareToPtr(const Ptr<RefCountable>&).
             {
                 const Ptr<Data> data2 = shareToPtr(data);
@@ -172,7 +172,7 @@ TEST(Ptr, shareToPtr)
         } //< data.~Ptr() called.
         ASSERT_EQ(1, p->refCount());
         ASSERT_FALSE(Data::s_destructorCalled);
-        
+
         delete p;
     }
     ASSERT_TRUE(Data::s_destructorCalled);
