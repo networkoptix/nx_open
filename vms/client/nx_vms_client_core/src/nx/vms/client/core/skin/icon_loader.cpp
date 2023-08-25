@@ -144,7 +144,7 @@ void loadCustomIcons(
         }
         else
         {
-            path = prefix + lit("_") + suffix.value() + extension;
+            path = prefix + "_" + suffix.value() + extension;
             auto image = getImageFromSkin(skin, path);
             if (!image.isNull())
                 builder->add(image, suffix.key(), QnIcon::On);
@@ -187,7 +187,7 @@ QIcon IconLoader::polish(const QIcon& icon)
         return icon;
 
     QString pixmapName = accessor.name(0);
-    if (!pixmapName.startsWith(lit(":/skin")))
+    if (!pixmapName.startsWith(":/skin"))
         return icon;
 
     /* Ok, that's an icon from :/skin or :/skin_dark */
@@ -205,12 +205,14 @@ QIcon IconLoader::load(const QString& name,
     const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
     const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
 {
-    static const QString kSeparator = lit("=^_^=");
+    static const QString kSeparator = "=^_^=";
+    static const QString kHashSeparator = ">_<";
 
-    QString key = name + kSeparator + checkedName;
+    QString key = name + kHashSeparator + svgColorSubstitutions.hash()
+        + kSeparator + checkedName + kHashSeparator + svgCheckedColorSubstitutions.hash();
     if (!suffixes)
     {
-        key += kSeparator + lit("_default");
+        key += kSeparator + "_default";
         suffixes = &kDefaultSuffixes;
     }
     else
