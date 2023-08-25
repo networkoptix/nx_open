@@ -228,7 +228,11 @@ Dialog
                         text: qsTr("Delete")
                         visible: false
                         icon.source: "image://svg/skin/text_buttons/delete_20_deprecated.svg"
-                        onClicked: entriesModel.deleteEntries(tableView.getSelectedRowIndexes())
+                        onClicked:
+                        {
+                            entriesModel.deleteEntries(tableView.getSelectedRowIndexes())
+                            hasChanges = true
+                        }
                     }
                     TextButton
                     {
@@ -267,7 +271,7 @@ Dialog
                     {
                         deleteItemButton.visible = false
                     }
-                    else if(selectedIndexes.length !== 0 && !deleteItemButton.visible)
+                    else if (selectedIndexes.length !== 0 && !deleteItemButton.visible)
                     {
                         deleteItemButton.visible = true
                     }
@@ -283,6 +287,7 @@ Dialog
                     deleteItemButton.enabled = true
                     exportListButton.enabled = true
                 }
+                onValueChanged: hasChanges = true
 
                 anchors
                 {

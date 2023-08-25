@@ -21,6 +21,7 @@ TableView
     required property Analytics.StateView taxonomy
     signal editingStarted
     signal editingFinished
+    signal valueChanged
 
     function getColumnWidth(columnIndex)
     {
@@ -110,6 +111,7 @@ TableView
 
                     onEditingStarted: control.editingStarted()
                     onEditingFinished: control.editingFinished()
+                    onValueChanged: control.valueChanged()
                     Component.onDestruction: control.editingFinished()
 
                     taxonomy: control.taxonomy
