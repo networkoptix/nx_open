@@ -205,7 +205,7 @@ Dialog
             ? qsTr("To enable digest authentication for LDAP users that are already added to the "
                 + "VMS database, you need to enable it directly in these users' settings.")
             : qsTr("To disable digest authentication for LDAP users that are already added to the "
-                + "VMS database, you need to enable it directly in these users' settings.")
+                + "VMS database, you need to disable it directly in these users' settings.")
         visible: isHttpDigestEnabledOnImport !== isHttpDigestEnabledOnImportInitial
     }
 
