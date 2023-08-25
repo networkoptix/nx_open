@@ -368,7 +368,8 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(
     if (!process.isRunning())
         paintPixmap(painter,
             bodyRect(),
-            qnSkin->icon("buttons/add_20x20.svg", kIconSubstitutions).pixmap(QSize(20, 20)));
+            qnSkin->icon("buttons/add_20x20_deprecated.svg", kIconSubstitutions)
+                .pixmap(QSize(20, 20)));
 }
 
 QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const

@@ -89,7 +89,7 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
     ui->enableHotspotsCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->enableHotspotsCheckBox->setForegroundRole(QPalette::ButtonText);
 
-    ui->addHotspotButton->setIcon(qnSkin->icon("buttons/add_20x20.svg", kIconSubstitutions));
+    ui->addHotspotButton->setIcon(qnSkin->icon("buttons/add_20x20_deprecated.svg", kIconSubstitutions));
 
     ui->hotspotsEditorWidget->setMaximumHeight(kMaximumHotspotEditorHeight);
 
