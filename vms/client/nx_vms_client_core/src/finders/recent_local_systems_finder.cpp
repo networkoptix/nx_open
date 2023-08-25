@@ -67,5 +67,6 @@ void QnRecentLocalSystemsFinder::updateSystems()
         newSystems.insert(system->id(), system);
     }
 
-    setFinalSystems(newSystems);
+    const auto newFinalSystems = filterOutSystems(newSystems);
+    setFinalSystems(newFinalSystems);
 }
