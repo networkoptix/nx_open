@@ -13,6 +13,13 @@
 
 namespace nx::vms::api {
 
+NX_REFLECTION_ENUM_CLASS(LogName,
+    main = static_cast<int>(nx::log::LogName::main),
+    http = static_cast<int>(nx::log::LogName::http),
+    system = static_cast<int>(nx::log::LogName::system),
+    update
+);
+
 struct NX_VMS_API LogArchiveFilter
 {
     QnUuid id;
@@ -20,8 +27,15 @@ struct NX_VMS_API LogArchiveFilter
     /**%apidoc Indicates if the archive includes (and how many) rotated files. */
     std::optional<int> rotated;
 
-    /**%apidoc:stringArray Logs included in the archive. */
-    std::optional<json::ValueOrArray<nx::log::LogName>> names;
+    /**%apidoc:stringArray
+     * Logs included in the archive.
+     *     %value main
+     *     %value http
+     *     %value system
+     *     %value update
+     * %// NOTE: need to specify values explicitly since apidoc doesn't parse ValueOrArray
+     */
+    std::optional<json::ValueOrArray<LogName>> names;
 };
 #define LogArchiveFilter_Fields (id)(rotated)(names)
 QN_FUSION_DECLARE_FUNCTIONS(LogArchiveFilter, (json), NX_VMS_API)
