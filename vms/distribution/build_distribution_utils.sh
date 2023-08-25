@@ -269,6 +269,11 @@ distrib_copyServerSystemLibs() # destination_path
 
     echo "Copying libicu"
     distrib_copySystemLibs "${destination_path}" "${ICU_RUNTIME_LIBS[@]}"
+
+    echo "Copying ALSA library (used only if libasound2 deb is not installed)"
+
+    mkdir -p "${destination_path}/libasound2"
+    distrib_copySystemLibs "${destination_path}/libasound2" libasound.so.2
 }
 
 # Copy libraries from the specified directory using copy_system_library.py.
