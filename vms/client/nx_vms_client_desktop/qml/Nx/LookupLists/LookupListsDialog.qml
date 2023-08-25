@@ -218,7 +218,7 @@ Dialog
                     Button
                     {
                         text: qsTr("Add")
-                        iconUrl: "image://svg/skin/buttons/add_20x20.svg"
+                        iconUrl: "image://svg/skin/buttons/add_20x20_deprecated.svg"
                         onClicked: addEntryDialog.createObject(control).openNewIn(control)
                     }
                     TextButton
@@ -307,7 +307,7 @@ Dialog
             Button
             {
                 text: qsTr("Create New...")
-                iconUrl: "image://svg/skin/buttons/add_20x20.svg"
+                iconUrl: "image://svg/skin/buttons/add_20x20_deprecated.svg"
                 onClicked: createNewList()
             }
             TextButton
