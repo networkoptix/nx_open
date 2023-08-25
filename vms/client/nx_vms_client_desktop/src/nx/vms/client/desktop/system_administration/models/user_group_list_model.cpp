@@ -392,8 +392,9 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
 
         case Qt::DecorationRole:
         {
-            const auto path = data(index, Qn::DecorationPathRole).toString();
-            return path.isEmpty() ? QVariant() : QVariant::fromValue(qnSkin->icon(path));
+            if (const auto path = data(index, Qn::DecorationPathRole).toString(); !path.isEmpty())
+                return qnSkin->icon(path, core::SvgIconColorer::kTreeIconSubstitutions);
+            break;
         }
 
         case Qt::CheckStateRole:

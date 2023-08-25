@@ -127,7 +127,8 @@ public:
                 core::Skin::maximumSize(icon),
                 opt.rect.adjusted(padding, 0, -padding, 0));
 
-            icon.paint(painter, rect);
+            icon.paint(painter, rect, Qt::AlignCenter,
+                opt.checkState == Qt::Checked ? QIcon::Selected : QIcon::Normal);
             return;
         }
 
@@ -357,7 +358,7 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
 
 QSize UserListWidget::sizeHint() const
 {
-    // We need to provide some valid size because of resizeContentsPrecision == 0. Without a valid 
+    // We need to provide some valid size because of resizeContentsPrecision == 0. Without a valid
     // sizeHint parent layout may expand the viewport widget which leads to performance issues.
     return QSize(200, 200);
 }

@@ -4,6 +4,7 @@
 
 #include <functional>
 
+#include <QtCore/QCryptographicHash>
 #include <QtCore/QFileInfo>
 #include <QtCore/QMap>
 #include <QtCore/QString>
@@ -243,6 +244,16 @@ SvgIconColorer::IconSubstitutions SvgIconColorer::IconSubstitutions::operator+(
             dst[color.key()] = color.value();
     }
     return result;
+}
+
+QString SvgIconColorer::IconSubstitutions::hash() const
+{
+    QByteArray data;
+    QDataStream stream(&data, QDataStream::WriteOnly);
+    stream << *this;
+    QCryptographicHash hash(QCryptographicHash::Sha1);
+    hash.addData(data);
+    return QString::fromLatin1(hash.resultView());
 }
 
 } // namespace nx::vms::client::core
