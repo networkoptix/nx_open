@@ -193,12 +193,12 @@ bool Instrument::eventFilter(QObject* object, QEvent* event)
 
 void Instrument::registerQmlType()
 {
-    qmlRegisterType<Instrument>("nx.client.desktop", 1, 0, "Instrument");
-    qmlRegisterUncreatableType<MouseEvent>("nx.client.desktop", 1, 0, "MouseEvent",
+    qmlRegisterType<Instrument>("nx.vms.client.desktop", 1, 0, "Instrument");
+    qmlRegisterUncreatableType<MouseEvent>("nx.vms.client.desktop", 1, 0, "MouseEvent",
         "Cannot create instance of MouseEvent");
-    qmlRegisterUncreatableType<HoverEvent>("nx.client.desktop", 1, 0, "HoverEvent",
+    qmlRegisterUncreatableType<HoverEvent>("nx.vms.client.desktop", 1, 0, "HoverEvent",
         "Cannot create instance of HoverEvent");
-    qmlRegisterUncreatableType<KeyEvent>("nx.client.desktop", 1, 0, "KeyEvent",
+    qmlRegisterUncreatableType<KeyEvent>("nx.vms.client.desktop", 1, 0, "KeyEvent",
         "Cannot create instance of KeyEvent");
 }
 
