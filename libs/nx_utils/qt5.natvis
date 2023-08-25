@@ -237,7 +237,7 @@
 -->
 
 
-<!-- 
+<!--
     <Type Name="QHostAddress">
         <DisplayString>{*(reinterpret_cast&lt;QString*&gt;(d.d))}</DisplayString>
         <StringView>*(reinterpret_cast&lt;QString*&gt;(d.d))</StringView>

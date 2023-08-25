@@ -15,7 +15,7 @@ public:
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
     void setPlaybackRange(const QnTimePeriod& playbackRange);
     QnTimePeriod getPlaybackRange() const;
-    
+
     qint64 endTimeMs() const;
 
 private:

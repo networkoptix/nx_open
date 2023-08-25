@@ -11,7 +11,7 @@ namespace nx::network::http::server {
 /**
  * Provides htdigest authentication by loading htdigest user/password combinations from a file or
  * input stream.
- * ABNF syntax for the file is following:  
+ * ABNF syntax for the file is following:
  * <pre><code>
  * HTDIGEST_FILE_CONTENTS = 1 *( USER_RECORD LF )
  * USER_RECORD = USERNAME ":" REALM ":" HA1

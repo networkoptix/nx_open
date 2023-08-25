@@ -181,7 +181,7 @@ bool parseBoundingBox(
     if (!boundingBox.is_object())
         return addError(issues, Issue::boundingBoxIsNotAJsonObject, dumpJson(boundingBox));
 
-    const auto& parseParam = 
+    const auto& parseParam =
         [&boundingBox, &issues](float* outValue, const std::string& fieldName, Issue issue) -> bool
         {
             const Json& value = boundingBox[fieldName];

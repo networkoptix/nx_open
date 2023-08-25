@@ -21,7 +21,7 @@ NX_REFLECTION_ENUM_CLASS(PtzPositionType,
 
     /**%apidoc Absolute position in the range defined by the Device. */
     absolute,
-    
+
     /**%apidoc Logical position in the range -180 to 180. */
     logical
 );
@@ -144,7 +144,7 @@ struct NX_VMS_API PtzTourSpot
 
     /**%apidoc
      * Movement speed of the Device during the Tour.
-     * %example 0.1 
+     * %example 0.1
      */
     float speed = 0;
 };

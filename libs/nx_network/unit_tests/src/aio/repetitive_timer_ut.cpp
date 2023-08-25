@@ -53,7 +53,7 @@ protected:
     {
         m_timerEvents.pop();
     }
-    
+
     void waitForMultipleEvents()
     {
         for (int i = 0; i < 3; ++i)

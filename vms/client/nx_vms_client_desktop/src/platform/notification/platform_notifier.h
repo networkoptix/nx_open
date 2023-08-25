@@ -24,7 +24,7 @@ signals:
     void changed(int value);
 
     /**
-     * This signal is emitted whenever system time changes. 
+     * This signal is emitted whenever system time changes.
      */
     void timeChanged();
 

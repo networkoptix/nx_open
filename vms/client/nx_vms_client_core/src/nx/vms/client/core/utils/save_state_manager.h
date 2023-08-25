@@ -11,7 +11,7 @@ namespace nx::vms::client::core {
 
 /**
  * Utility logic layer for objects, which can be modified locally and remotely simultaneously.
- * It's main purpose is to avoid overriding unsaved local changes when remote data is received. 
+ * It's main purpose is to avoid overriding unsaved local changes when remote data is received.
  */
 class NX_VMS_CLIENT_CORE_API SaveStateManager: public QObject
 {

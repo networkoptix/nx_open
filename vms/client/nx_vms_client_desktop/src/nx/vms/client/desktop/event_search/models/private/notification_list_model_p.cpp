@@ -786,7 +786,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     static const QColor kBasicColor = "#A5B7C0";
     static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
         {QnIcon::Normal, {{kBasicColor, "light10"}}},
-    }; 
+    };
     eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge_24.svg", kIconSubstitutions));
     eventData.extraAction->setText(tr("Acknowledge"));
 

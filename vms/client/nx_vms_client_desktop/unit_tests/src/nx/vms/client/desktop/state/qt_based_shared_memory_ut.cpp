@@ -41,7 +41,7 @@ SharedMemoryData generateRandomData()
             data.commandData = QnUuid::createUuid().toString().toLatin1();
     }
 
-    std::transform(sessionsToAdd.begin(), sessionsToAdd.end(), result.sessions.begin(), 
+    std::transform(sessionsToAdd.begin(), sessionsToAdd.end(), result.sessions.begin(),
         [](SessionId sessionId)
         {
             return SharedMemoryData::Session{sessionId, randomString().toStdString()};

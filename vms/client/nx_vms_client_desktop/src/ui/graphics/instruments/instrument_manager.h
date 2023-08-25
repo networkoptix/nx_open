@@ -18,7 +18,7 @@ class InstrumentManagerPrivate;
 
 /**
  * Instrument manager ties graphics scene, views and items and instruments together.
- * 
+ *
  * It supports multiple graphics views per instrument manager.
  */
 class InstrumentManager: public QObject, public InstallationMode {
@@ -26,8 +26,8 @@ class InstrumentManager: public QObject, public InstallationMode {
 public:
     /**
      * Constructor.
-     * 
-     * \param scene                    Graphics scene that this instrument manager 
+     *
+     * \param scene                    Graphics scene that this instrument manager
      *                                 will work with.
      * \param parent                   Parent object for this instrument manager.
      */
@@ -40,7 +40,7 @@ public:
 
     /**
      * Installs the given instrument to the associated graphics view.
-     * 
+     *
      * \param instrument               Instrument to install.
      * \param mode                     Where to install the given instrument.
      * \param reference                Reference instrument for the given installation mode.
@@ -50,7 +50,7 @@ public:
 
     /**
      * Uninstalls the given instrument from the associated graphics view.
-     * 
+     *
      * \param instrument               Instrument to uninstall.
      * \returns                        Whether the instrument was successfully uninstalled.
      */
@@ -58,7 +58,7 @@ public:
 
     /**
      * Registers the given graphics scene with this instrument manager.
-     * 
+     *
      * If the given scene is destroyed, it will be unregistered automatically.
      *
      * \param scene                    Graphics scene to register.
@@ -67,9 +67,9 @@ public:
 
     /**
      * Unregisters the given graphics scene from this instrument manager.
-     * 
+     *
      * Unregistering a scene automatically unregisters all its views and items.
-     * 
+     *
      * \param scene                    Graphics scene to unregister.
      */
     void unregisterScene(QGraphicsScene *scene);
@@ -85,7 +85,7 @@ public:
 
     /**
      * Unregisters the given graphics view from this instrument manager.
-     * 
+     *
      * \param view                     Graphics view to unregister.
      */
     void unregisterView(QGraphicsView *view);
@@ -105,19 +105,19 @@ public:
 
     /**
      * Unregisters the given graphics item from this instrument manager.
-     * 
+     *
      * \param item                     Graphics item to unregister.
      */
     void unregisterItem(QGraphicsItem *item);
 
     /**
-     * \returns                        Graphics scene that is registered with 
+     * \returns                        Graphics scene that is registered with
      *                                 this instrument manager.
      */
     QGraphicsScene *scene() const;
 
     /**
-     * \returns                        Graphics views that are registered with 
+     * \returns                        Graphics views that are registered with
      *                                 this instrument manager.
      */
     const QSet<QGraphicsView *> &views() const;
@@ -129,7 +129,7 @@ public:
     const QSet<QGraphicsItem *> &items() const;
 
     /**
-     * \returns                        All instruments installed into this 
+     * \returns                        All instruments installed into this
      *                                 instrument manager.
      */
     const QList<Instrument *> &instruments() const;

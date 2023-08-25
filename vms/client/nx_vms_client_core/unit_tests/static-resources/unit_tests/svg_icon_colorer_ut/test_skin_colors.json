@@ -1,6 +1,6 @@
 {
     "_": "Test skin. It's required because we use default skin in tests. But for icon colorization check we needs to have both base and target skins.",
-    
+
     "dark1":        "#000000",
     "dark2":        "#080808",
     "dark3":        "#101010",

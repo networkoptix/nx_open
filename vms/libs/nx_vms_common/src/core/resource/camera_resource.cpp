@@ -470,7 +470,7 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::calculateSupportedObjectTypes
 QnVirtualCameraResource::DeviceAgentManifestMap
     QnVirtualCameraResource::fetchDeviceAgentManifests() const
 {
-    auto [deserializedManifestMap, result] = 
+    auto [deserializedManifestMap, result] =
         nx::reflect::json::deserialize<DeviceAgentManifestMap>(getProperty(kDeviceAgentManifestsProperty).toUtf8().toStdString());
 
     if (!result.success)

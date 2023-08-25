@@ -110,7 +110,7 @@ following fields:
 - `"items"`: List<Name (String) or Object>
 
     List of the enumeration values. Each item is either a Name as defined in the "General information"
-    section, or an object with an id and a list of dependent attributes. 
+    section, or an object with an id and a list of dependent attributes.
     May look like `[ "Sedan", "Truck or SUV" ]`.
 
 - `"baseItems"`: Array<String>

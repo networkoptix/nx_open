@@ -290,7 +290,7 @@ bool deserialize(const QString& value, QRect* target)
     target->setWidth(dimensions[0].toInt(&success));
     if (!success)
         return false;
-    
+
     target->setHeight(dimensions[1].toInt(&success));
     return success;
 }

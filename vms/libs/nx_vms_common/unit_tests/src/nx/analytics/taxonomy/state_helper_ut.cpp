@@ -167,7 +167,7 @@ protected:
 
         const QByteArray data = file.readAll();
 
-        auto [fullData, jsonResult] = 
+        auto [fullData, jsonResult] =
             nx::reflect::json::deserialize<QJsonObject>(data.toStdString());
 
         if (!jsonResult.success)
@@ -183,9 +183,9 @@ protected:
         const QJsonObject taxonomyObject = inputData[kTaxonomyKey].toObject();
         const QByteArray taxonomyObectAsBytes = QJsonDocument(taxonomyObject).toJson();
 
-        auto [descriptors, result] = 
+        auto [descriptors, result] =
             nx::reflect::json::deserialize<TestDescriptors>(taxonomyObectAsBytes.toStdString());
-   
+
         if (!result.success)
             FAIL();
 
@@ -281,7 +281,7 @@ protected:
         const QJsonArray enabledAnalyticsenginesArray = deviceParameters[kEnabledAnalyticsEnginesKey].toArray();
         const QByteArray enabledAnalyticsenginesArrayAsBytes = QJsonDocument(enabledAnalyticsenginesArray).toJson();
 
-        auto [enabledAnalyticsEngineStringIds, enabledAnalyticsenginesResult] = 
+        auto [enabledAnalyticsEngineStringIds, enabledAnalyticsenginesResult] =
             nx::reflect::json::deserialize<std::set<QString>>(enabledAnalyticsenginesArrayAsBytes.toStdString());
 
         ASSERT_TRUE(enabledAnalyticsenginesResult.success);
@@ -295,7 +295,7 @@ protected:
         const QJsonArray compatibleAnalyticsEnginesArray = deviceParameters[kCompatibleAnalyticsEnginesKey].toArray();
         const QByteArray compatibleAnalyticsEnginesArrayAsBytes = QJsonDocument(compatibleAnalyticsEnginesArray).toJson();
 
-        auto [compatibleAnalyticsEngineIds, compatibleAnalyticsEnginesResult] = 
+        auto [compatibleAnalyticsEngineIds, compatibleAnalyticsEnginesResult] =
             nx::reflect::json::deserialize<std::set<QString>>(compatibleAnalyticsEnginesArrayAsBytes.toStdString());
 
         ASSERT_TRUE(compatibleAnalyticsEnginesResult.success);
@@ -312,7 +312,7 @@ protected:
         const QJsonObject supportedEventTypesObject = deviceParameters[kSupportedEventTypesKey].toObject();
         const QByteArray supportedEventTypesArrayAsBytes = QJsonDocument(supportedEventTypesObject).toJson();
 
-        auto [eventTypesByEngineStringId, eventTypesByEngineStringIdResult] = 
+        auto [eventTypesByEngineStringId, eventTypesByEngineStringIdResult] =
             nx::reflect::json::deserialize<std::map<QString, std::set<QString>>>(supportedEventTypesArrayAsBytes.toStdString());
 
         ASSERT_TRUE(eventTypesByEngineStringIdResult.success);
@@ -326,7 +326,7 @@ protected:
         const QJsonObject supportedObjectTypesObject = deviceParameters[kSupportedObjectTypesKey].toObject();
         const QByteArray supportedObjectTypesArrayAsBytes = QJsonDocument(supportedObjectTypesObject).toJson();
 
-        auto [objectTypesByEngineStringId, objectTypesByEngineStringIdResult] = 
+        auto [objectTypesByEngineStringId, objectTypesByEngineStringIdResult] =
             nx::reflect::json::deserialize<std::map<QString, std::set<QString>>>(supportedObjectTypesArrayAsBytes.toStdString());
 
         ASSERT_TRUE(objectTypesByEngineStringIdResult.success);
@@ -376,7 +376,7 @@ protected:
             const QJsonArray array = testParameters[kAdditionalEntitiesKey].toArray();
             const QByteArray arrayAsBytes = QJsonDocument(array).toJson();
 
-            auto [deserializationResult, result] = 
+            auto [deserializationResult, result] =
                 nx::reflect::json::deserialize<std::vector<TestScopedEntity>>(arrayAsBytes.toStdString());
 
             ASSERT_TRUE(result.success);
@@ -387,15 +387,15 @@ protected:
         const QJsonArray array = s_expectedData[testName].toArray();
         const QByteArray arrayAsBytes = QJsonDocument(array).toJson();
 
-        auto [asVector, asVectorResult] = 
+        auto [asVector, asVectorResult] =
             nx::reflect::json::deserialize<std::vector<TestEngineScope>>(arrayAsBytes.toStdString());
 
         m_expectedEntityTree = asVector;
 
-        auto [asSet, asSetResult] = 
+        auto [asSet, asSetResult] =
             nx::reflect::json::deserialize<std::set<QString>>(arrayAsBytes.toStdString());
 
-        m_expectedEntities = asSet; 
+        m_expectedEntities = asSet;
 
         ASSERT_TRUE(asVectorResult.success || asSetResult.success);
     }

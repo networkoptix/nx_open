@@ -64,7 +64,7 @@ namespace QnCsvDetail {
     {
         using type = T;
     };
-    
+
     template<typename T>
     struct UnwrapOptional<std::optional<T>>
     {

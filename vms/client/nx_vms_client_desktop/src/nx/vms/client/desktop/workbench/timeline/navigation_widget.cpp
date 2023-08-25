@@ -123,13 +123,13 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
 
     connect(m_speedSlider, &SpeedSlider::sliderRestricted, this,
         [this]
-        { 
+        {
             showMessage(m_rewindDisabledText);
         });
 
     connect(action(ui::action::ToggleSyncAction), &QAction::toggled, this,
         [this]
-        { 
+        {
             updateBackwardButtonEnabled();
         },
         Qt::QueuedConnection);
@@ -157,8 +157,8 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
         this, &NavigationWidget::updatePlayButtonChecked, Qt::QueuedConnection);
 
-    connect(navigator(), &QnWorkbenchNavigator::currentLayoutItemRemoved, 
-        this, &NavigationWidget::updateBackwardButtonEnabled);   
+    connect(navigator(), &QnWorkbenchNavigator::currentLayoutItemRemoved,
+        this, &NavigationWidget::updateBackwardButtonEnabled);
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged,
         m_speedSlider, &SpeedSlider::finishAnimations);

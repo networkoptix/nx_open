@@ -321,16 +321,16 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                             "Enum Type item 1",
                             {
                                 "value": "Enum Type item 2",
-                                "dependentAttributes": 
+                                "dependentAttributes":
                                 [
                                     {
                                         "type": "Enum",
                                         "name": "(Base) Enum attribute 2",
-                                        "items": 
-                                        [ 
-                                            "Enum Type item 1", 
-                                            "Enum Type item 2", 
-                                            "Enum Type item 3" 
+                                        "items":
+                                        [
+                                            "Enum Type item 1",
+                                            "Enum Type item 2",
+                                            "Enum Type item 3"
                                         ]
                                     }
                                 ]

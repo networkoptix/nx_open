@@ -29,7 +29,7 @@ public slots:
             emit deactivated();
         }
     }
-    
+
     void setInactive(bool inactive) { setActive(!inactive); }
     void activate() { setActive(true); }
     void deactivate() { setActive(false); }

@@ -22,7 +22,7 @@ struct NX_VMS_API ResolutionData
 
     operator QSize() const { return size; }
     operator QSize&() { return size; }
-    
+
     int megaPixels() const;
 
     /**%apidoc[unused] */

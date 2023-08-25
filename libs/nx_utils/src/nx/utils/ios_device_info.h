@@ -17,7 +17,7 @@ struct NX_UTILS_API IosDeviceInformation
 
     enum Version
     {
-        iPhone6 = 7,        
+        iPhone6 = 7,
         iPadAir2 = 5
     };
 

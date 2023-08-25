@@ -5,7 +5,7 @@
 
 #include <QtCore/QVariant>
 
-template<class T> 
+template<class T>
 inline T qvariant_cast(const QVariant &value, const T &defaultValue) {
     const int typeId = qMetaTypeId<T>();
     if (typeId == value.userType())

@@ -100,7 +100,7 @@ bool AnalyticsEngineResource::isEnabledForDevice(const QnVirtualCameraResourcePt
 
 EngineManifest AnalyticsEngineResource::fetchManifest() const
 {
-    auto [deserializedManifest, result] = 
+    auto [deserializedManifest, result] =
         nx::reflect::json::deserialize<EngineManifest>(getProperty(kEngineManifestProperty).toUtf8().toStdString());
 
     if (!result.success)

@@ -39,7 +39,7 @@ struct NX_VMS_API MediaSettings
     /**%apidoc[opt]:string
      * The option will be applied only when the stream transcoding is turned on by some of other
      * transcoding options, or because the original stream codec doesn't fit within the Client
-     * request. The resolution format is `{width}x{height}`. The string may contain either a width 
+     * request. The resolution format is `{width}x{height}`. The string may contain either a width
      * and height (for instance, 320x240) or a height only (for instance, 240p). By default, the
      * default secondary stream resolution is used.
      */
@@ -90,7 +90,7 @@ struct NX_VMS_API MediaSettings
     int dewarpingPanofactor = 1;
 
     /**%apidoc[opt]:string
-     * A transcoding option. Zooms the selected image region. The format is 
+     * A transcoding option. Zooms the selected image region. The format is
      * `{x},{y},{width}x{height}` with values in range [0..1].
      */
     std::optional<RectAsString> zoom;

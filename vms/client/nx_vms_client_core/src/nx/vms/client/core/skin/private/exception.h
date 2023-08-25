@@ -28,7 +28,7 @@ public:
 
 private:
     QString m_message;
-    mutable QByteArray m_cachedWhat; 
+    mutable QByteArray m_cachedWhat;
 };
 
 #endif // QN_EXCEPTION_H

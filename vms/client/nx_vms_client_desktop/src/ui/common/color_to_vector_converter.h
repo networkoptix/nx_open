@@ -12,7 +12,7 @@ void convert(const QVector4D &source, QColor *target);
 void convert(const QColor &source, QVector4D *target);
 
 /**
- * QVector4D -> QColor converter. 
+ * QVector4D -> QColor converter.
  */
 class QnColorToVectorConverter: public AbstractConverter {
 public:

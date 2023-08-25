@@ -18,7 +18,7 @@ namespace {
 
 } // anonymous namespace
 
-QnGenericNotifier::QnGenericNotifier(QObject *parent): 
+QnGenericNotifier::QnGenericNotifier(QObject *parent):
     base_type(parent),
     m_lastUtcTime( 0 ),
     m_lastLocalTime( 0 ),
@@ -38,7 +38,7 @@ QnGenericNotifier::~QnGenericNotifier() {
 
 void QnGenericNotifier::updateTimes(bool notify) {
     qint64 elapsedTime = m_elapsedTimer.elapsed();
-    
+
     QDateTime localDateTime = QDateTime::currentDateTime();
     QDateTime utcDateTime = localDateTime.toUTC();
     localDateTime.setTimeSpec(Qt::UTC);

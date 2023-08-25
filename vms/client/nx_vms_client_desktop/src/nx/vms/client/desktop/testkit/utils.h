@@ -117,7 +117,7 @@ Qt::KeyboardModifiers sendKeys(
 
 /**
  * Sends mouse event(s) to the specified window.
- * @param button Button that caused the event. If the event type is MouseMove, the appropriate button for this event is Qt::NoButton. 
+ * @param button Button that caused the event. If the event type is MouseMove, the appropriate button for this event is Qt::NoButton.
  * @param buttons State of all buttons at the time of the event.
  * @param modifiers State of all keyboard modifiers.
  */

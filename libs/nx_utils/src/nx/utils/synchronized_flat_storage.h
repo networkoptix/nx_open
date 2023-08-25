@@ -53,7 +53,7 @@ private:
     Q_DISABLE_COPY(QnSynchronizedFlatStorage);
 
 private:
-    /** Mutex that protects all operations. Note that we're not using a 
+    /** Mutex that protects all operations. Note that we're not using a
      * shared/read-write mutex as it is more heavyweight than a regular mutex,
      * and the read operations are extremely fast anyway. */
     mutable std::mutex m_mutex;

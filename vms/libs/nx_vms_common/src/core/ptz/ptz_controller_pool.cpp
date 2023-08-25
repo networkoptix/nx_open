@@ -131,7 +131,7 @@ void QnPtzControllerPool::stop()
         auto resourcePtr = d->controllerByResource.begin().key();
         unregisterResource(resourcePtr);
     }
-    
+
     // Have to wait until all posted events are processed, deleteLater() can be called
     // within the event slot, that's why we specify the second parameter.
     if (d->executorThread->isRunning())

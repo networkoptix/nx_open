@@ -121,7 +121,7 @@ struct ResourceSupportProxy::Private:
 
         using DeviceAgentManifests = std::map<QnUuid, DeviceAgentManifest>;
 
-        auto [manifests, result] = 
+        auto [manifests, result] =
             nx::reflect::json::deserialize<DeviceAgentManifests>(serializedManifests.toUtf8().toStdString());
 
         if (!result.success)

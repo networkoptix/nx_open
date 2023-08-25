@@ -25,7 +25,7 @@ public:
      * \param rotationPropertyName      Property name for changing widget's rotation.
      * \param parent                    Parent object.
      */
-    WidgetAnimator(QGraphicsWidget* widget, const QByteArray& geometryPropertyName, 
+    WidgetAnimator(QGraphicsWidget* widget, const QByteArray& geometryPropertyName,
         const QByteArray& rotationPropertyName, QObject* parent = nullptr);
 
     /**

@@ -175,7 +175,7 @@ void LinkHoverProcessor::updateColors(UpdateTime when)
     }
 
     /* Apply altered label text: */
-    auto changer = 
+    auto changer =
         [this, alteredText, hovered]() { changeLabelState(alteredText, hovered); };
     if (when == UpdateTime::Now)
         changer();

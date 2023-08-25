@@ -47,7 +47,7 @@ private:
     // Extracts selected parameters from the dialog and prepares appropriate export tool.
     ExportToolInstance prepareExportTool(const ExportSettingsDialog& dialog);
     ExportToolInstance prepareExportTool(
-        Settings settings, 
+        Settings settings,
         const QnResourcePtr& resource,
         bool saveExistingLayout, bool forceTranscoding);
 

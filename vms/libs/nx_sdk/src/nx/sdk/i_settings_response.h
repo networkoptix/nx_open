@@ -33,7 +33,7 @@ public:
 
 /**
  * The data to be returned from the plugin describing the desired settings.
- * 
+ *
  * A combination of optional individual setting errors, optional new setting values in case they
  * were adjusted, and an optional new Settings Model.
  */

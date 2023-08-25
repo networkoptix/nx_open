@@ -267,7 +267,7 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
     ASSERT_EQ(cameras1.size(), info[5].inUse); //< 5 Megapixels licenses.
     ASSERT_EQ(0, info[10].inUse); //< 10 Megapixels licenses.
     ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
-    
+
     auto serviceIdInfo = m_cloudeStorageHelper->allInfoByService();
     ASSERT_EQ(3, serviceIdInfo.size());
 

@@ -60,10 +60,10 @@ struct RewindOverlay::Private: public QObject
     {
         if (content->scale() == scale && size == q->size())
             return;
-        
+
         scale = content->sceneScale();
         size = q->size();
-        
+
         auto scaledSize = size / scale;
         content->setGeometry({0, 0, scaledSize.width(), scaledSize.height()});
         fastForward->updateSize(scaledSize);

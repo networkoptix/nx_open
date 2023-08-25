@@ -122,11 +122,11 @@ protected:
         const QJsonArray array = m_testData.fullData["nonReachableTypes"].toArray();
         const QByteArray arrayAsBytes = QJsonDocument(array).toJson();
 
-        auto [deserializationResult, result] = 
+        auto [deserializationResult, result] =
             nx::reflect::json::deserialize<std::set<QString>>(arrayAsBytes.toStdString());
-        
+
         expectedResult = deserializationResult;
-        
+
         ASSERT_TRUE(result.success);
 
         ASSERT_EQ(nonReachableTypeIds(m_result.state), expectedResult);
@@ -139,11 +139,11 @@ protected:
         const QJsonObject object = m_testData.fullData["result"].toObject();
         const QByteArray obectAsBytes = QJsonDocument(object).toJson();
 
-        auto [deserializationResult, result] = 
+        auto [deserializationResult, result] =
             nx::reflect::json::deserialize<std::map<QString, InheritanceTestExpectedData>>(obectAsBytes.toStdString());
-        
+
         expectedData = deserializationResult;
-        
+
         ASSERT_TRUE(result.success);
 
         ASSERT_FALSE(expectedData.empty());
@@ -184,11 +184,11 @@ protected:
         const QJsonObject object = m_testData.fullData["result"].toObject();
         const QByteArray obectAsBytes = QJsonDocument(object).toJson();
 
-        auto [deserializationResult, result] = 
+        auto [deserializationResult, result] =
             nx::reflect::json::deserialize<std::map<QString, ScopeTestExpectedData>>(obectAsBytes.toStdString());
-        
+
         expectedData = deserializationResult;
-        
+
         ASSERT_TRUE(result.success);
 
         ASSERT_FALSE(expectedData.empty());
@@ -253,11 +253,11 @@ protected:
         const QJsonObject object = m_testData.fullData["result"].toObject();
         const QByteArray obectAsBytes = QJsonDocument(object).toJson();
 
-        auto [deserializationResult, result] = 
+        auto [deserializationResult, result] =
             nx::reflect::json::deserialize<std::map<QString, FlagTestExpectedData>>(obectAsBytes.toStdString());
-        
+
         expectedData = deserializationResult;
-        
+
         ASSERT_TRUE(result.success);
 
         ASSERT_FALSE(expectedData.empty());

@@ -17,7 +17,7 @@ public:
 protected:
     virtual bool mousePressEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) override {
         fixButtonDownPositions(event);
-            
+
         return false;
     }
 
@@ -29,7 +29,7 @@ protected:
 
     virtual bool mouseReleaseEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) override {
         fixButtonDownPositions(event);
-            
+
         return false;
     }
 
@@ -40,7 +40,7 @@ private:
                 continue;
 
             /* Qt is totally inconsistent in setting the button down positions for
-             * mouse events. So we invalidate positions for buttons that are not pressed. 
+             * mouse events. So we invalidate positions for buttons that are not pressed.
              * This fixes some really surprising quirks in how selection is handled in
              * graphics items. */
             Qt::MouseButton button = static_cast<Qt::MouseButton>(i);
@@ -82,7 +82,7 @@ bool SelectionFixupInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSce
 
     if(event->modifiers() & Qt::ControlModifier)
         return false; /* Ctrl-selection is processed when mouse button is released. */
-   
+
     if(!item->isSelected()) {
         item->scene()->clearSelection();
         item->setSelected(true);
@@ -102,11 +102,11 @@ bool SelectionFixupInstrument::mouseMoveEvent(QGraphicsItem *item, QGraphicsScen
 
 bool SelectionFixupInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     if(!m_isClick)
-        return false; 
+        return false;
 
     if(!(item->flags() & QGraphicsItem::ItemIsSelectable))
         return false;
-    
+
     event->accept();
 
     if(event->button() != Qt::LeftButton)
@@ -115,7 +115,7 @@ bool SelectionFixupInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsS
     if(!(event->modifiers() & Qt::ControlModifier)) {
         /* User may let go of the Ctrl button while mouse button is still pressed. */
         bool signalsBlocked = item->scene()->blockSignals(true); /* Don't emit multiple notifications. */
-        item->scene()->clearSelection(); 
+        item->scene()->clearSelection();
         item->scene()->blockSignals(signalsBlocked);
         item->setSelected(true);
     } else {

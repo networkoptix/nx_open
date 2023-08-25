@@ -23,7 +23,7 @@ public:
 
     virtual void setForwardOnly(bool val) = 0;
     virtual void prepare(const std::string_view& query) = 0;
-    
+
     template<typename... Params>
     void prepareWithValues(const std::string_view& query, Params&&... params);
 
@@ -43,7 +43,7 @@ public:
 
     template<typename T> T value(int index) const;
     template<typename T> T value(const char* name) const;
-    
+
     virtual QSqlRecord record() = 0;
     virtual QVariant lastInsertId() const = 0;
     virtual int numRowsAffected() const = 0;

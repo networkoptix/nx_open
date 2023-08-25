@@ -10,7 +10,7 @@
 #include "instrument.h"
 
 /**
- * This instrument listens to view transformation and size changes and notifies 
+ * This instrument listens to view transformation and size changes and notifies
  * about them via <tt>transformChanged</tt> and <tt>sizeChanged</tt> signals.
  */
 class TransformListenerInstrument: public Instrument {

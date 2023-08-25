@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API AnalyticsSdkObjectDetected: public InstantEvent
 public:
     AnalyticsSdkObjectDetected(
         const QnResourcePtr& resource,
-        const nx::common::metadata::ObjectMetadataPacketPtr& packet, 
+        const nx::common::metadata::ObjectMetadataPacketPtr& packet,
         const nx::common::metadata::ObjectMetadata& metadata);
 
     QnUuid engineId() const;

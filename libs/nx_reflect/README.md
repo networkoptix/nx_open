@@ -194,9 +194,9 @@ Instrumenting type that uses get/set methods to promote its attributes:
     // nx::reflect::json::serialize(FooWithGetSetProperty()) returns {"strAttribute":"Hello"}
 
     Note that `nx::reflect::none` can be used in `NX_REFLECTION_INSTRUMENT_GSN` macro instead of a
-    getter or setter to declare write-only or read-only property respectively.  
+    getter or setter to declare write-only or read-only property respectively.
     In this case, only deserialization is available for a type with write-only property
-    and only serialization for a type with read-only property.  
+    and only serialization for a type with read-only property.
     An attempt to deserialize to a value of type with a read-only property causes compile error.
 
 NOTE: Class hierarchy may contain types instrumented in different ways.

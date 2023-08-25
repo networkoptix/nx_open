@@ -35,7 +35,7 @@ QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(QWidget* parent, const QnMedi
     auto selectedServerIndex = servers.indexOf(selectedServer);
     if (selectedServerIndex == -1)
         selectedServerIndex = servers.indexOf(currentServer());
-    
+
     m_model = new QnResourceListModel(this);
     m_model->setHasCheckboxes(false);
     m_model->setReadOnly(true);

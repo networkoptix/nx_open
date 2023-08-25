@@ -44,7 +44,7 @@ QnMediaResourceWidget* findParent(QGraphicsItem* item, int depth = 0)
         return nullptr;
     if (auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
         return widget;
-    
+
     return findParent(item->parentWidget(), depth + 1);
 }
 
