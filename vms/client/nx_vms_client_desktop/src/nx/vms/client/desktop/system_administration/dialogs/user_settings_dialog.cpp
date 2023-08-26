@@ -730,6 +730,40 @@ void UserSettingsDialog::onCopyLink()
     QGuiApplication::clipboard()->setText(d->linkFromToken(hash.temporaryToken->token));
 }
 
+QString UserSettingsDialog::warningForGroups(
+    const QList<nx::vms::client::desktop::MembersModelGroup>& parentGroups) const
+{
+    const auto hasGroups =
+        [this, &parentGroups](const QSet<QnUuid>& permissionGroups)
+        {
+            const auto hierarchy = systemContext()->accessSubjectHierarchy();
+
+            for (const auto& group: parentGroups)
+            {
+                if (permissionGroups.contains(group.id)
+                    || hierarchy->isRecursiveMember(group.id, permissionGroups))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+    if (hasGroups({api::kAdministratorsGroupId, api::kPowerUsersGroupId}))
+    {
+        return tr("Granting broad permissions to the temporary user is not recommended."
+            " Some actions may not work.");
+    }
+    else if (hasGroups({api::kAdvancedViewersGroupId, api::kViewersGroupId}))
+    {
+        return tr("Granting broad permissions to the temporary user is not recommended.");
+    }
+
+    return {};
+}
+
+
 QDateTime UserSettingsDialog::newValidUntilDate() const
 {
     auto validUntil = d->serverDate(duration_cast<milliseconds>(qnSyncTime->currentTimePoint()))
