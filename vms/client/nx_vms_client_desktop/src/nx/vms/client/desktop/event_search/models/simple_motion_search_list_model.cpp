@@ -15,6 +15,7 @@
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -24,7 +25,6 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
-#include <ui/help/business_help.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -126,7 +126,7 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
             return QVariant::fromValue(qnSkin->pixmap("tree/camera.svg"));
 
         case Qn::HelpTopicIdRole:
-            return QnBusiness::eventHelpId(vms::api::EventType::cameraMotionEvent);
+            return rules::eventHelpId(vms::api::EventType::cameraMotionEvent);
 
         case Qn::TimestampRole:
             return QVariant::fromValue(chunk.startTime());

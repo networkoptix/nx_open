@@ -11,12 +11,11 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QVBoxLayout>
 
-#include <core/resource/media_resource.h>
 #include <client_core/client_core_module.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
+#include <core/resource/media_resource.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/helper.h>
-
 #include <nx/vms/client/desktop/thumbnails/local_media_thumbnail.h>
 
 #include "../fisheye/fisheye_preview_controller.h"
@@ -52,7 +51,7 @@ MediaFileSettingsDialog::MediaFileSettingsDialog(QWidget* parent):
     d(new Private{this})
 {
     resize(kDefaultSize);
-    setHelpTopic(this, Qn::MainWindow_MediaItem_Dewarping_Help);
+    setHelpTopic(this, HelpTopic::Id::MainWindow_MediaItem_Dewarping);
 
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins({});
@@ -84,7 +83,7 @@ MediaFileSettingsDialog::MediaFileSettingsDialog(QWidget* parent):
         QQmlEngine::CppOwnership);
 
     d->rootObject->setProperty("previewSource", QVariant::fromValue(d->mediaPreview));
-    d->rootObject->setProperty("helpTopic", Qn::MainWindow_MediaItem_Dewarping_Help);
+    d->rootObject->setProperty("helpTopic", HelpTopic::Id::MainWindow_MediaItem_Dewarping);
 
     connect(d->rootObject, SIGNAL(dataChanged()), this, SLOT(handleDataChanged()));
 }

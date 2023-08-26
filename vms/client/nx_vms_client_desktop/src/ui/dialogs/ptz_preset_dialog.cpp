@@ -8,13 +8,12 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_preset.h>
-
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <utils/common/variant.h>
 
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-
 using namespace nx::vms::client::core::ptz;
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::common::ptz;
 
 QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlags):
@@ -23,7 +22,7 @@ QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlag
 {
     ui->setupUi(this);
 
-    setHelpTopic(this, Qn::PtzPresets_Help);
+    setHelpTopic(this, HelpTopic::Id::PtzPresets);
 
     connect(ui->nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateOkButtonEnabled()));
 

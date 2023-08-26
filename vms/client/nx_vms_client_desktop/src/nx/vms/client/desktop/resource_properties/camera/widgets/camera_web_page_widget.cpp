@@ -16,9 +16,9 @@
 #include <nx/vms/client/desktop/common/utils/camera_web_authenticator.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <utils/common/event_processors.h>
 
 #include "../flux/camera_settings_dialog_state.h"
@@ -92,7 +92,7 @@ CameraWebPageWidget::CameraWebPageWidget(
     NX_ASSERT(store);
     connect(store, &CameraSettingsDialogStore::stateChanged, this, &CameraWebPageWidget::loadState);
 
-    setHelpTopic(this, Qn::CameraSettingsWebPage_Help);
+    setHelpTopic(this, HelpTopic::Id::CameraSettingsWebPage);
 
     connect(d->webWidget->controller(), &WebViewController::profileChanged, this,
         [this](QQuickWebEngineProfile* profile)

@@ -24,6 +24,8 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -42,8 +44,6 @@
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
@@ -229,7 +229,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         qnSkin->icon("text_buttons/ok_20.svg", kIconSubstitutions).pixmap(QSize(20, 20)));
     ui->linkCopiedWidget->hide();
 
-    setHelpTopic(this, Qn::Administration_Update_Help);
+    setHelpTopic(this, HelpTopic::Id::Administration_Update);
 
     m_sortedModel.reset(new SortedPeerUpdatesModel(this));
     m_sortedModel->setSourceModel(m_updatesModel.get());

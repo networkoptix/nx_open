@@ -2,8 +2,8 @@
 
 #include "tree_view.h"
 
-#include <QtCore/QTimerEvent>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QTimerEvent>
 #include <QtGui/QDragMoveEvent>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QApplication>
@@ -11,8 +11,7 @@
 
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
-
-#include <ui/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <utils/common/variant.h>
 
 namespace nx::vms::client::desktop {

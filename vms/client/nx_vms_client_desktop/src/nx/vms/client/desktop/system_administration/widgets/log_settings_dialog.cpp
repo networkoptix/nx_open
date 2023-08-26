@@ -10,12 +10,12 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/text/time_strings.h>
-#include <ui/help/help_handler.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {
@@ -200,7 +200,7 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
 
     init({});
 
-    setHelpTopic(this, Qn::HelpTopic::CollectingLogs_Help);
+    setHelpTopic(this, HelpTopic::Id::CollectingLogs);
 }
 
 LogSettingsDialog::~LogSettingsDialog()

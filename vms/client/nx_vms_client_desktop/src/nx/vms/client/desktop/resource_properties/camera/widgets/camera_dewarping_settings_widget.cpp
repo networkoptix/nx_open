@@ -5,9 +5,9 @@
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
 
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 
@@ -39,11 +39,10 @@ CameraDewarpingSettingsWidget::CameraDewarpingSettingsWidget(
     if (NX_ASSERT(thumbnail))
         engine->setObjectOwnership(thumbnail.get(), QQmlEngine::CppOwnership);
 
-    setHelpTopic(this, Qn::MainWindow_MediaItem_Dewarping_Help);
+    setHelpTopic(this, HelpTopic::Id::MainWindow_MediaItem_Dewarping);
 
     rootObject()->setProperty("store", QVariant::fromValue(store));
     rootObject()->setProperty("previewSource", QVariant::fromValue(thumbnail.get()));
-    rootObject()->setProperty("helpTopic", Qn::MainWindow_MediaItem_Dewarping_Help);
 }
 
 } // namespace nx::vms::client::desktop

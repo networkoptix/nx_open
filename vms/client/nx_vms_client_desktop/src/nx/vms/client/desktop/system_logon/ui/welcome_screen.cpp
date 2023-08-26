@@ -26,15 +26,17 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
@@ -47,8 +49,6 @@
 #include <nx/vms/discovery/manager.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_handler.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/models/systems_controller.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
@@ -119,7 +119,7 @@ WelcomeScreen::WelcomeScreen(QWidget* parent):
     connect(qnCloudStatusWatcher, &CloudStatusWatcher::is2FaEnabledForUserChanged,
         this, &WelcomeScreen::is2FaEnabledForUserChanged);
 
-    setHelpTopic(this, Qn::Login_Help);
+    setHelpTopic(this, HelpTopic::Id::Login);
 
     connect(&appContext()->localSettings()->autoLogin,
         &nx::utils::property_storage::BaseProperty::changed,
@@ -340,7 +340,7 @@ bool WelcomeScreen::confirmCloudTileHiding() const
 
 void WelcomeScreen::openHelp() const
 {
-    QnHelpHandler::openHelpTopic(Qn::MainWindow_TitleBar_MainMenu_Help);
+    HelpHandler::openHelpTopic(HelpTopic::Id::MainWindow_TitleBar_MainMenu);
 }
 
 QString WelcomeScreen::minSupportedVersion() const

@@ -5,18 +5,20 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-#include <nx/vms/event/actions/abstract_action.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/event/actions/abstract_action.h>
+
+using namespace nx::vms::client::desktop;
 
 QnCameraBookmarkDialog::QnCameraBookmarkDialog(bool mandatoryDescription, QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnCameraBookmarkDialog)
 {
     ui->setupUi(this);
-    setHelpTopic(this, Qn::Bookmarks_Editing_Help);
+    setHelpTopic(this, HelpTopic::Id::Bookmarks_Editing);
 
     connect(ui->bookmarkWidget, &QnBookmarkWidget::validChanged,
         this, &QnCameraBookmarkDialog::updateOkButtonAvailability);

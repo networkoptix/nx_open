@@ -5,9 +5,9 @@
 #include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 

@@ -5,10 +5,10 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/utils/bit_stream.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/schedule_cell_painter.h>
 #include <nx/vms/common/utils/schedule.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 
 #include "week_time_schedule_dialog.h"
 
@@ -29,7 +29,7 @@ WeekTimeScheduleDialog::WeekTimeScheduleDialog(QWidget* parent, bool isEmptyAllo
     ui->valueOffButton->setButtonBrush({});
     ui->gridWidget->setBrush(ui->valueOnButton->buttonBrush());
 
-    setHelpTopic(this, Qn::EventsActions_Schedule_Help);
+    setHelpTopic(this, HelpTopic::Id::EventsActions_Schedule);
 
     connect(ui->valueOnButton,  &QToolButton::clicked, this,
         [this]() { ui->gridWidget->setBrush(ui->valueOnButton->buttonBrush()); });

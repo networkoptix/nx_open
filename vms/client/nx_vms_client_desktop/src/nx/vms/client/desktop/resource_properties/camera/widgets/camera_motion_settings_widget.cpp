@@ -17,12 +17,12 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_button.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -129,7 +129,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     connect(forceDetectionButton, &QPushButton::clicked, store,
         [store]() { store->forceMotionDetection(); });
 
-    setHelpTopic(this, Qn::CameraSettings_Motion_Help);
+    setHelpTopic(this, HelpTopic::Id::CameraSettings_Motion);
 
     connect(m_motionWidget, &QQuickWidget::statusChanged, this,
         [this, sensitivityColors](QQuickWidget::Status status)

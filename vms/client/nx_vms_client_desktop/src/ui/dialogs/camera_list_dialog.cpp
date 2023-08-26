@@ -20,10 +20,10 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/camera_list_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/utils/table_export_helper.h>
@@ -122,7 +122,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget* parent):
     ui->camerasView->horizontalHeader()->setSectionResizeMode(QnCameraListModel::NameColumn,
         QHeaderView::Interactive); //< Name may be of any length
 
-    setHelpTopic(this, Qn::CameraList_Help);
+    setHelpTopic(this, HelpTopic::Id::CameraList);
 
     ItemViewAutoHider::create(ui->camerasView, tr("No cameras"));
 }

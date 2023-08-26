@@ -10,6 +10,8 @@
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -24,8 +26,6 @@
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/system_settings/cloud_management_widget.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
 #include <ui/widgets/system_settings/general_system_administration_widget.h>
@@ -41,7 +41,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     ui(new ::Ui::QnSystemAdministrationDialog)
 {
     ui->setupUi(this);
-    setHelpTopic(this, Qn::Administration_Help);
+    setHelpTopic(this, HelpTopic::Id::Administration);
 
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
     addPage(GeneralPage, generalWidget, tr("General"));

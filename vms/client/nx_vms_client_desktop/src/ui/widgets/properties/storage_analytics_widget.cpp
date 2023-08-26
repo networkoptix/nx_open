@@ -21,6 +21,8 @@
 #include <nx/vms/client/desktop/common/widgets/dropdown_button.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
@@ -29,8 +31,6 @@
 #include <server/server_storage_manager.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/recording_stats_adapter.h>
 #include <ui/models/recording_stats_model.h>
 #include <ui/utils/table_export_helper.h>
@@ -150,7 +150,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     connect(storageManager, &QnServerStorageManager::storageSpaceRecieved,
         this, &QnStorageAnalyticsWidget::atReceivedSpaceInfo);
 
-    setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
+    setHelpTopic(this, HelpTopic::Id::ServerSettings_StorageAnalitycs);
 
     // TODO: #sivanov Use HumanReadable texts instead.
     ui->extraSizeSpinBox->setSuffix(' ' + tr("TB", "TB - terabytes"));

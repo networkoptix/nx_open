@@ -6,8 +6,8 @@
 
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <utils/common/event_processors.h>
 
 #include "../flux/camera_settings_dialog_store.h"
@@ -50,7 +50,7 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
     rootObject()->setProperty(
         "engineLicenseSummaryProvider", QVariant::fromValue(engineLicenseSummaryProvider));
 
-    setHelpTopic(this, Qn::PluginsAndAnalytics_Help);
+    setHelpTopic(this, HelpTopic::Id::PluginsAndAnalytics);
 }
 
 QVariant CameraAnalyticsSettingsWidget::requestParameters(const QJsonObject& model)

@@ -28,6 +28,8 @@
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -42,8 +44,6 @@
 #include <nx/vms/rules/utils/string_helper.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/utils/table_export_helper.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -153,7 +153,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
 
     setWarningStyle(ui->warningLabel);
 
-    setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
+    setHelpTopic(this, HelpTopic::Id::MainWindow_Notifications_EventLog);
 
     QList<EventLogModel::Column> columns;
     columns << EventLogModel::DateTimeColumn << EventLogModel::EventColumn << EventLogModel::EventCameraColumn <<

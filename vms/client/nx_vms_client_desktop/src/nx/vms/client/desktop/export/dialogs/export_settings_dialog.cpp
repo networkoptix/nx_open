@@ -23,6 +23,8 @@
 #include <nx/vms/client/desktop/common/widgets/control_bars.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button_group.h>
 #include <nx/vms/client/desktop/export/widgets/export_password_widget.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -31,8 +33,6 @@
 #include <nx/vms/time/formatter.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -107,7 +107,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     m_passwordWidget(new ExportPasswordWidget(this))
 {
     ui->setupUi(this);
-    setHelpTopic(this, Qn::Exporting_Help);
+    setHelpTopic(this, HelpTopic::Id::Exporting);
 
     // Save titles for restoring tabs when they are removed
     for (int i = 0; i < ui->tabWidget->count(); i++)

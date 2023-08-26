@@ -29,6 +29,8 @@
 #include <nx/vms/client/desktop/export/tools/export_manager.h>
 #include <nx/vms/client/desktop/export/tools/export_media_tool.h>
 #include <nx/vms/client/desktop/export/tools/export_media_validator.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -48,15 +50,13 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
 #ifdef Q_OS_WIN
-#include <launcher/nov_launcher_win.h>
+    #include <launcher/nov_launcher_win.h>
 #endif
 
 namespace nx::vms::client::desktop {

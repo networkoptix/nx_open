@@ -13,10 +13,10 @@
 #include <core/resource/resource.h>
 #include <core/resource/webpage_resource.h>
 #include <nx/branding.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 
 namespace {

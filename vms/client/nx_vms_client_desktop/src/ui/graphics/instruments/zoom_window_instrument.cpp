@@ -7,12 +7,14 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/media_resource.h>
 #include <nx/utils/random.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/opacity_animator.h>
@@ -20,8 +22,6 @@
 #include <ui/common/constrained_resizable.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -92,7 +92,7 @@ public:
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
 
-        setHelpTopic(this, Qn::MainWindow_MediaItem_ZoomWindows_Help);
+        setHelpTopic(this, HelpTopic::Id::MainWindow_MediaItem_ZoomWindows);
 
         updateInteractivity();
     }

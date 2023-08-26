@@ -1,14 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_tree_model_test_fixture.h"
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/user_resource.h>
+#include <client/client_globals.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <ui/help/help_topics.h>
-#include <client/client_globals.h>
+
+#include "resource_tree_model_test_fixture.h"
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -263,7 +263,7 @@ TEST_F(ResourceTreeModelTest, imageMediaResourceHelpTopic)
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(imageResource->getName()),
-            dataMatch(Qn::HelpTopicIdRole, Qn::MainWindow_Tree_Exported_Help))));
+            dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::MainWindow_Tree_Exported))));
 }
 
 TEST_F(ResourceTreeModelTest, videoMediaResourceHelpTopic)
@@ -276,7 +276,7 @@ TEST_F(ResourceTreeModelTest, videoMediaResourceHelpTopic)
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(videoResource->getName()),
-            dataMatch(Qn::HelpTopicIdRole, Qn::MainWindow_Tree_Exported_Help))));
+            dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::MainWindow_Tree_Exported))));
 }
 
 TEST_F(ResourceTreeModelTest, fileLayoutResourceHelpTopic)
@@ -289,7 +289,7 @@ TEST_F(ResourceTreeModelTest, fileLayoutResourceHelpTopic)
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(fileLayoutResource->getName()),
-            dataMatch(Qn::HelpTopicIdRole, Qn::MainWindow_Tree_MultiVideo_Help))));
+            dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::MainWindow_Tree_MultiVideo))));
 }
 
 TEST_F(ResourceTreeModelTest, mediaResourceTooltip)

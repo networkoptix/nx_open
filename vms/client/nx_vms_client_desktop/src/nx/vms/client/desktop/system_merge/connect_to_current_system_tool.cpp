@@ -15,14 +15,14 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <utils/common/delayed.h>
 
 #include "merge_systems_tool.h"
@@ -367,7 +367,7 @@ QString ConnectToCurrentSystemTool::requestPassword() const
     dialog.setWindowTitle(tr("Enter password..."));
     dialog.setCaption(tr("Administrator password"));
     dialog.useForPassword();
-    setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
+    setHelpTopic(&dialog, HelpTopic::Id::Systems_ConnectToCurrentSystem);
 
     return dialog.exec() == QDialog::Accepted ? dialog.value() : QString();
 }

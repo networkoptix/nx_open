@@ -3,8 +3,8 @@
 #include "general_system_administration_widget.h"
 #include "ui_general_system_administration_widget.h"
 
-#include <QtGui/QResizeEvent>
 #include <QtGui/QAction>
+#include <QtGui/QResizeEvent>
 #include <QtWidgets/QPushButton>
 
 #include <api/runtime_info_manager.h>
@@ -18,6 +18,8 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -26,8 +28,6 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
@@ -131,11 +131,12 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
 
     retranslateUi();
 
-    setHelpTopic(m_buttons[kBusinessRulesButton], Qn::EventsActions_Help);
-    setHelpTopic(m_buttons[kEventLogButton     ], Qn::EventLog_Help);
-    setHelpTopic(m_buttons[kCameraListButton   ], Qn::Administration_General_CamerasList_Help);
-    setHelpTopic(m_buttons[kAuditLogButton     ], Qn::AuditTrail_Help);
-    setHelpTopic(m_buttons[kBookmarksButton], Qn::Bookmarks_Search_Help);
+    setHelpTopic(m_buttons[kBusinessRulesButton], HelpTopic::Id::EventsActions);
+    setHelpTopic(m_buttons[kEventLogButton], HelpTopic::Id::EventLog);
+    setHelpTopic(m_buttons[kCameraListButton],
+        HelpTopic::Id::Administration_General_CamerasList);
+    setHelpTopic(m_buttons[kAuditLogButton], HelpTopic::Id::AuditTrail);
+    setHelpTopic(m_buttons[kBookmarksButton], HelpTopic::Id::Bookmarks_Search);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBusinessRulesAction); });

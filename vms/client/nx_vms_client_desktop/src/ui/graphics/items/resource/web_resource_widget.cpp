@@ -12,6 +12,7 @@
 #include <nx/utils/url.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -25,7 +26,6 @@
 #include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
@@ -126,7 +126,7 @@ QnWebResourceWidget::~QnWebResourceWidget()
 
 int QnWebResourceWidget::helpTopicAt(const QPointF& /*pos*/) const
 {
-    return Qn::MainWindow_WebPageItem_Help;
+    return HelpTopic::Id::MainWindow_WebPageItem;
 }
 
 void QnWebResourceWidget::setupOverlays()

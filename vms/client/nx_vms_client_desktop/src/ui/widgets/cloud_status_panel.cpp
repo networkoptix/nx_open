@@ -11,12 +11,12 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -75,7 +75,7 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     font.setWeight(QFont::Bold);
     setFont(font);
 
-    setHelpTopic(this, Qn::MainWindow_TitleBar_Cloud_Help);
+    setHelpTopic(this, HelpTopic::Id::MainWindow_TitleBar_Cloud);
 
     connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher,
         &CloudStatusWatcher::updateSystems);

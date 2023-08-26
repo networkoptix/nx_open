@@ -8,6 +8,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -16,7 +17,6 @@
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/strings_helper.h>
-#include <ui/help/business_help.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -64,7 +64,7 @@ void CallNotificationsListModel::Private::addNotification(
 
     EventData eventData;
     eventData.toolTip = tooltip(action);
-    eventData.helpId = QnBusiness::eventHelpId(params.eventType);
+    eventData.helpId = rules::eventHelpId(params.eventType);
     eventData.level = QnNotificationLevel::valueOf(action);
     eventData.timestamp = (std::chrono::microseconds) params.eventTimestampUsec;
     eventData.ruleId = action->getRuleId();

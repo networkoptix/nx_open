@@ -7,11 +7,9 @@
 #include <QtWidgets/QApplication>
 
 #include <core/resource/camera_bookmark.h>
-
-#include <ui/processors/hover_processor.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/workbench/timeline/bookmark_tooltip.h>
-#include <ui/help/help_topics.h>
-
+#include <ui/processors/hover_processor.h>
 #include <utils/common/delayed.h>
 
 namespace
@@ -465,7 +463,7 @@ void QnBookmarksViewer::setAllowExport(bool allowExport)
 
 int QnBookmarksViewer::helpTopicAt(const QPointF& /*pos*/) const
 {
-    return Qn::Bookmarks_Usage_Help;
+    return HelpTopic::Id::Bookmarks_Usage;
 }
 
 QnCameraBookmarkList QnBookmarksViewer::getDisplayedBookmarks() const

@@ -26,6 +26,8 @@
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/cross_system/dialogs/cloud_layouts_intro_dialog.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
@@ -57,8 +59,6 @@
 #include <nx_ec/managers/abstract_resource_manager.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
@@ -458,7 +458,7 @@ void LayoutsHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
         hasSavePermission ? layout->getName() : generateUniqueLayoutName(context()->user());
 
     dialog->setName(proposedName);
-    setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
+    setHelpTopic(dialog.data(), HelpTopic::Id::SaveLayout);
 
     QString name;
     do

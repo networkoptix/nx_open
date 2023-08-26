@@ -8,11 +8,10 @@
 #include <QtWidgets/QGraphicsSceneResizeEvent>
 #include <QtWidgets/QSizePolicy>
 
-#include <ui/graphics/items/controls/time_slider.h>
-#include <ui/help/help_topics.h>
-#include <utils/math/functors.h>
-
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <ui/graphics/items/controls/time_slider.h>
+#include <utils/math/functors.h>
 
 using std::chrono::milliseconds;
 
@@ -54,7 +53,7 @@ void ThumbnailPanel::paint(
 
 int ThumbnailPanel::helpTopicAt(const QPointF&) const
 {
-    return Qn::MainWindow_Thumbnails_Help;
+    return HelpTopic::Id::MainWindow_Thumbnails;
 }
 
 QnTimePeriod ThumbnailPanel::fullTimePeriod() const

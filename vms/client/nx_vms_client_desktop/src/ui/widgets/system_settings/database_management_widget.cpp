@@ -11,6 +11,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
@@ -18,8 +20,6 @@
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
@@ -43,7 +43,7 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     ui->openFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
     ui->openFolderButton->setFlat(true);
 
-    setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
+    setHelpTopic(this, HelpTopic::Id::SystemSettings_Server_Backup);
 
     connect(ui->backupButton, &QPushButton::clicked, this, &QnDatabaseManagementWidget::backupDb);
     connect(ui->restoreButton, &QPushButton::clicked, this, &QnDatabaseManagementWidget::restoreDb);

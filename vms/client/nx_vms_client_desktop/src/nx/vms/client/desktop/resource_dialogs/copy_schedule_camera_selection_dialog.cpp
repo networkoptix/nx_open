@@ -8,12 +8,12 @@
 #include <common/common_module.h>
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/license/usage_helper.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 
 namespace nx::vms::client::desktop {
 
@@ -159,7 +159,7 @@ CopyScheduleCameraSelectionDialog::CopyScheduleCameraSelectionDialog(
         parent)
 {
     resourceSelectionWidget()->setShowRecordingIndicator(true);
-    setHelpTopic(this, Qn::CameraSettings_Recording_Export_Help);
+    setHelpTopic(this, HelpTopic::Id::CameraSettings_Recording_Export);
 
     resourceSelectionWidget()->resourceViewWidget()->setFooterWidget(createCheckBoxFooterWidget());
     copyArchiveLengthCheckBox()->setText(tr("Copy archive length settings"));

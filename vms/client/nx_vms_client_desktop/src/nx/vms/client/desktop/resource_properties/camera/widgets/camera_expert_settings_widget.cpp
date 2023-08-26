@@ -9,6 +9,7 @@
 
 #include <core/ptz/ptz_constants.h>
 #include <nx/network/http/http_types.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -18,16 +19,15 @@
 #include <nx/vms/client/desktop/common/utils/spin_box_utils.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/utils/log/log.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include "private/motion_stream_alerts.h"
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"
+#include "private/motion_stream_alerts.h"
 
 namespace nx::vms::client::desktop {
 
@@ -359,14 +359,21 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->remoteArchiveMotionDetectionCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setRemoteArchiveMotionDetectionEnabled);
 
-    setHelpTopic(this, Qn::CameraSettingsExpertPage_Help);
-    setHelpTopic(ui->secondStreamDisableCheckBox, Qn::CameraSettings_SecondStream_Help);
-    setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
-    setHelpTopic(ui->keepCameraTimeSettingsCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
-    setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
-    setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
-    setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
-    setHelpTopic(ui->useMedia2ToFetchProfilesGroupBox, Qn::CameraSettings_Onvif_Help);
+    setHelpTopic(this, HelpTopic::Id::CameraSettingsExpertPage);
+    setHelpTopic(ui->secondStreamDisableCheckBox,
+        HelpTopic::Id::CameraSettings_SecondStream);
+    setHelpTopic(ui->settingsDisableControlCheckBox,
+        HelpTopic::Id::CameraSettings_Expert_SettingsControl);
+    setHelpTopic(ui->keepCameraTimeSettingsCheckBox,
+        HelpTopic::Id::CameraSettings_Expert_SettingsControl);
+    setHelpTopic(ui->checkBoxPrimaryRecorder,
+        HelpTopic::Id::CameraSettings_Expert_DisableArchivePrimary);
+    setHelpTopic(ui->checkBoxSecondaryRecorder,
+        HelpTopic::Id::CameraSettings_Expert_DisableArchivePrimary);
+    setHelpTopic(ui->groupBoxRTP,
+        HelpTopic::Id::CameraSettings_Expert_Rtp);
+    setHelpTopic(ui->useMedia2ToFetchProfilesGroupBox,
+        HelpTopic::Id::CameraSettings_Onvif);
 
     ui->settingsDisableControlCheckBox->setHint(tr("Server will not change any cameras settings, "
         "it will receive and use camera stream as-is."));
@@ -374,7 +381,8 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     ui->keepCameraTimeSettingsCheckBox->setHint(
         tr("Server will not push time settings to the camera."));
 
-    setHelpTopic(ui->bitratePerGopCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
+    setHelpTopic(ui->bitratePerGopCheckBox,
+        HelpTopic::Id::CameraSettings_Expert_SettingsControl);
     ui->bitratePerGopCheckBox->setHint(tr("Helps fix image quality issues on some cameras; "
         "for others will cause significant bitrate increase."));
 

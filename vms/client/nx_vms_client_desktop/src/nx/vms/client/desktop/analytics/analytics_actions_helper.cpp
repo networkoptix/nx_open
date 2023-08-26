@@ -5,10 +5,10 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ui/dialogs/analytics_action_settings_dialog.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
@@ -30,7 +30,7 @@ void AnalyticsActionsHelper::processResult(
             QDialogButtonBox::NoButton,
             parent);
 
-        setHelpTopic(&message, Qn::Forced_Empty_Help);
+        setHelpTopic(&message, HelpTopic::Id::Forced_Empty);
         message.exec();
     }
 

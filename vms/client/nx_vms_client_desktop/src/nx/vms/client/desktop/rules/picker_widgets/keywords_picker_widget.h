@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/rules/event_filter_fields/keywords_field.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/common/elided_label.h>
 
 #include "oneline_text_picker_widget.h"
@@ -26,7 +26,7 @@ protected:
         m_label->addHintLine(tr(
             "Event will trigger only if there are matches in the source with any of the entered keywords."));
         m_label->addHintLine(tr("If the field is empty, event will always trigger."));
-        setHelpTopic(m_label, Qn::EventsActions_Generic_Help);
+        setHelpTopic(m_label, HelpTopic::Id::EventsActions_Generic);
 
         m_lineEdit->setPlaceholderText(m_fieldDescriptor->description);
     }

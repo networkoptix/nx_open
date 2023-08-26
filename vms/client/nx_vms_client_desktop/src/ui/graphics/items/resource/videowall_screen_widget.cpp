@@ -17,14 +17,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/resource/videowall_item_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
@@ -259,7 +259,7 @@ void QnVideowallScreenWidget::atItemDataChanged(Qn::ItemDataRole role)
 
 int QnVideowallScreenWidget::helpTopicAt(const QPointF& /*pos*/) const
 {
-    return Qn::Videowall_Display_Help;
+    return HelpTopic::Id::Videowall_Display;
 }
 
 void QnVideowallScreenWidget::updateItems()

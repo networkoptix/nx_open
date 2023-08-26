@@ -7,11 +7,11 @@
 #include <QtWidgets/QApplication>
 
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/dwm.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -31,7 +31,7 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent):
     initResolutionCombobox();
 
     setWarningStyle(ui->recordingWarningLabel);
-    setHelpTopic(this, Qn::SystemSettings_ScreenRecording_Help);
+    setHelpTopic(this, HelpTopic::Id::SystemSettings_ScreenRecording);
 
     connect(ui->captureCursorCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);

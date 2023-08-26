@@ -20,6 +20,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/progress_state.h>
+#include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -34,7 +35,6 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/common/notification_levels.h>
-#include <ui/help/business_help.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -341,7 +341,7 @@ QVariant SystemHealthListModel::Private::timestamp(int index) const
 
 int SystemHealthListModel::Private::helpId(int index) const
 {
-    return QnBusiness::healthHelpId(m_items[index].message);
+    return rules::healthHelpId(m_items[index].message);
 }
 
 int SystemHealthListModel::Private::priority(int index) const
