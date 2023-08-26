@@ -5,11 +5,14 @@
 #include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/event_fwd.h>
 
-// TODO: #vkutin Think of a proper namespace
-namespace QnBusiness {
+namespace nx::vms::client::desktop {
+
+namespace rules {
 
 int eventHelpId(nx::vms::api::EventType type);
 int actionHelpId(nx::vms::api::ActionType type);
 int healthHelpId(nx::vms::common::system_health::MessageType type);
 
-} // namespace QnBusiness
+} // namespace rules
+
+} // namespace nx::vms::client::desktop

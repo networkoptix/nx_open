@@ -4,14 +4,14 @@
 #include "ui_layout_general_settings_widget.h"
 
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include "../flux/layout_settings_dialog_store.h"
 #include "../flux/layout_settings_dialog_state.h"
+#include "../flux/layout_settings_dialog_store.h"
 
 namespace nx::vms::client::desktop {
 
@@ -51,7 +51,7 @@ void LayoutGeneralSettingsWidget::setupUi()
     ui->setupUi(this);
     ui->lockedCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->lockedCheckBox->setForegroundRole(QPalette::ButtonText);
-    setHelpTopic(ui->lockedCheckBox, Qn::LayoutSettings_Locking_Help);
+    setHelpTopic(ui->lockedCheckBox, HelpTopic::Id::LayoutSettings_Locking);
 
     const QString fixedSizeSuffix = " " + tr("cells");
     ui->fixedWidthSpinBox->setSuffix(fixedSizeSuffix);

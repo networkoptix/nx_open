@@ -26,6 +26,8 @@
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -34,8 +36,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_context.h>
@@ -50,7 +50,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
-    setHelpTopic(this, Qn::About_Help);
+    setHelpTopic(this, HelpTopic::Id::About);
 
     m_copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);

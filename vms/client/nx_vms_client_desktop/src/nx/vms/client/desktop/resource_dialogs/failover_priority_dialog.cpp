@@ -6,10 +6,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_view_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 
 namespace nx::vms::client::desktop {
 
@@ -22,7 +22,7 @@ FailoverPriorityDialog::FailoverPriorityDialog(QWidget* parent):
     const auto failoverPriorityViewWidget = new FailoverPriorityViewWidget(this);
     ui->widgetLayout->insertWidget(0, failoverPriorityViewWidget);
 
-    setHelpTopic(this, Qn::ServerSettings_Failover_Help);
+    setHelpTopic(this, HelpTopic::Id::ServerSettings_Failover);
 
     m_applyFailoverPriority =
         [this, failoverPriorityViewWidget]

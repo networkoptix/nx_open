@@ -6,10 +6,10 @@
 #include <QtWidgets/QHeaderView>
 
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/delegates/ioport_item_delegate.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/ioports_view_model.h>
 
 #include "../flux/camera_settings_dialog_state.h"
@@ -40,7 +40,7 @@ IoModuleSettingsWidget::IoModuleSettingsWidget(CameraSettingsDialogStore* store,
     ui->table->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
-    setHelpTopic(this, Qn::IOModules_Help);
+    setHelpTopic(this, HelpTopic::Id::IOModules);
 
     connect(store, &CameraSettingsDialogStore::stateChanged, this,
         &IoModuleSettingsWidget::loadState);

@@ -23,6 +23,8 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/rules/event_action_subtype.h>
 #include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
 #include <nx/vms/client/desktop/rules/helpers/fullscreen_action_helper.h>
@@ -40,8 +42,6 @@
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/text/human_readable.h>
-#include <ui/help/business_help.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx;
@@ -1100,9 +1100,12 @@ int QnBusinessRuleViewModel::getHelpTopic(Column column) const
 {
     switch (column)
     {
-        case Column::event:  return QnBusiness::eventHelpId(m_eventType);
-        case Column::action: return QnBusiness::actionHelpId(m_actionType);
-        default:             return Qn::EventsActions_Help;
+        case Column::event:
+            return nx::vms::client::desktop::rules::eventHelpId(m_eventType);
+        case Column::action:
+            return nx::vms::client::desktop::rules::actionHelpId(m_actionType);
+        default:
+            return HelpTopic::Id::EventsActions;
     }
 }
 

@@ -8,12 +8,12 @@
 #include <core/resource/device_dependent_strings.h>
 #include <nx/branding.h>
 #include <nx/vms/api/data/system_settings.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/translation_list_model.h>
 
 using namespace nx::vms::client::desktop;
@@ -26,17 +26,17 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    setHelpTopic(ui->autoDiscoveryCheckBox, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
+    setHelpTopic(ui->autoDiscoveryCheckBox, HelpTopic::Id::SystemSettings_Server_CameraAutoDiscovery);
     ui->autodiscoveryHint->addHintLine(tr("When enabled, the system continuously discovers new cameras and servers, "
         "and sends discovery requests to cameras for status update."));
     ui->autodiscoveryHint->addHintLine(
         tr("If Failover is enabled, server may still request camera status updates regardless of this setting."));
-    setHelpTopic(ui->autodiscoveryHint, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
+    setHelpTopic(ui->autodiscoveryHint, HelpTopic::Id::SystemSettings_Server_CameraAutoDiscovery);
 
-    setHelpTopic(ui->statisticsReportCheckBox, Qn::SystemSettings_General_AnonymousUsage_Help);
+    setHelpTopic(ui->statisticsReportCheckBox, HelpTopic::Id::SystemSettings_General_AnonymousUsage);
     ui->statisticsReportHint->addHintLine(tr("Includes information about system, such as cameras models and firmware versions, number of servers, etc."));
     ui->statisticsReportHint->addHintLine(tr("Does not include any personal information and is completely anonymous."));
-    setHelpTopic(ui->statisticsReportHint, Qn::SystemSettings_General_AnonymousUsage_Help);
+    setHelpTopic(ui->statisticsReportHint, HelpTopic::Id::SystemSettings_General_AnonymousUsage);
 
     setWarningStyle(ui->settingsWarningLabel);
 

@@ -8,9 +8,9 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/analytics_sdk_event_model.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {
@@ -38,19 +38,19 @@ AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(SystemContext* systemContext, Q
     ui->sdkEventTypeLabel->addHintLine(tr("Analytics events can be set up on a certain cameras."));
     ui->sdkEventTypeLabel->addHintLine(tr("Choose cameras using the button above to see the list "
         "of supported events."));
-    setHelpTopic(ui->sdkEventTypeLabel, Qn::EventsActions_VideoAnalytics_Help);
+    setHelpTopic(ui->sdkEventTypeLabel, HelpTopic::Id::EventsActions_VideoAnalytics);
 
     ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in the caption "
         "with any of the entered keywords."));
     ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
     ui->captionLabel->addHintLine(tr("This field is case sensitive."));
-    setHelpTopic(ui->captionLabel, Qn::EventsActions_VideoAnalytics_Help);
+    setHelpTopic(ui->captionLabel, HelpTopic::Id::EventsActions_VideoAnalytics);
 
     ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the "
         "description field with any of the entered keywords."));
     ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
     ui->descriptionLabel->addHintLine(tr("This field is case sensitive."));
-    setHelpTopic(ui->descriptionLabel, Qn::EventsActions_VideoAnalytics_Help);
+    setHelpTopic(ui->descriptionLabel, HelpTopic::Id::EventsActions_VideoAnalytics);
 }
 
 AnalyticsSdkEventWidget::~AnalyticsSdkEventWidget()

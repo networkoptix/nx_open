@@ -9,11 +9,11 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/text/human_readable.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include "private/rapid_review_settings_widget_p.h"
@@ -123,7 +123,7 @@ RapidReviewSettingsWidget::RapidReviewSettingsWidget(QWidget* parent):
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &RapidReviewSettingsWidget::deleteClicked);
 
-    setHelpTopic(this, Qn::Rapid_Review_Help);
+    setHelpTopic(this, HelpTopic::Id::Rapid_Review);
 }
 
 RapidReviewSettingsWidget::~RapidReviewSettingsWidget()

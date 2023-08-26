@@ -32,6 +32,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/license/license_helpers.h>
 #include <nx/vms/client/desktop/licensing/license_management_dialogs.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
@@ -48,8 +50,6 @@
 #include <ui/delegates/license_list_item_delegate.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/license_details_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/license_list_model.h>
 #include <ui/utils/table_export_helper.h>
 #include <ui/workbench/workbench_context.h>
@@ -202,7 +202,7 @@ LicenseManagerWidget::LicenseManagerWidget(QWidget* parent):
             }
         });
 
-    setHelpTopic(this, Qn::Licenses_Help);
+    setHelpTopic(this, HelpTopic::Id::Licenses);
 
     connect(ui->detailsButton,  &QPushButton::clicked, this,
         [this]()

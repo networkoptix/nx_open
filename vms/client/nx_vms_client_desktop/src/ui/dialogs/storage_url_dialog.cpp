@@ -15,10 +15,10 @@
 #include <nx/vms/api/data/storage_init_result.h>
 #include <nx/vms/client/desktop/common/utils/scoped_cursor_rollback.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <server/server_storage_manager.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/common/scoped_value_rollback.h>
 
@@ -38,7 +38,7 @@ QnStorageUrlDialog::QnStorageUrlDialog(
 {
     NX_ASSERT(m_storageManager);
     ui->setupUi(this);
-    setHelpTopic(this, Qn::ServerSettings_Storages_Help);
+    setHelpTopic(this, HelpTopic::Id::ServerSettings_Storages);
     ui->urlEdit->setFocus();
     connect(ui->protocolComboBox, QnComboboxCurrentIndexChanged, this,
         &QnStorageUrlDialog::at_protocolComboBox_currentIndexChanged);

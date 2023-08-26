@@ -11,13 +11,13 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource_display_info.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/common/html/html.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <utils/common/delete_later.h>
 
 using namespace nx::vms::client::desktop;
@@ -38,7 +38,7 @@ QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::Window
     connect(copyButton, &QPushButton::clicked,
         this, &QnCameraDiagnosticsDialog::at_copyButton_clicked);
 
-    setHelpTopic(this, Qn::CameraDiagnostics_Help);
+    setHelpTopic(this, HelpTopic::Id::CameraDiagnostics);
 }
 
 QnCameraDiagnosticsDialog::~QnCameraDiagnosticsDialog() {

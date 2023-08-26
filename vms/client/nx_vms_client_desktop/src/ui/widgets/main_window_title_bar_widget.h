@@ -4,7 +4,7 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/help/help_topics.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnLayoutTabBar;
@@ -67,11 +67,11 @@ private:
     nx::vms::client::desktop::ToolButton* newActionButton(
         nx::vms::client::desktop::ui::action::IDType actionId,
         const QIcon& icon,
-        int helpTopicId = Qn::Empty_Help);
+        int helpTopicId = nx::vms::client::desktop::HelpTopic::Id::Empty);
 
     nx::vms::client::desktop::ToolButton* newActionButton(
         nx::vms::client::desktop::ui::action::IDType actionId,
-        int helpTopicId = Qn::Empty_Help,
+        int helpTopicId = nx::vms::client::desktop::HelpTopic::Id::Empty,
         const QSize& fixedSize = QSize());
 
     nx::vms::client::desktop::ToolButton* newActionButton(

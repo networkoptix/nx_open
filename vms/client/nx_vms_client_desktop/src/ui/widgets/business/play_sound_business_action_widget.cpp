@@ -9,12 +9,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/audio/audiodevice.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/action_parameters.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
@@ -70,7 +70,7 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(
     ui->selectUsersButton->setVisible(ui->playToClient->isChecked());
     setSubjectsButton(ui->selectUsersButton);
 
-    setHelpTopic(this, Qn::EventsActions_PlaySound_Help);
+    setHelpTopic(this, HelpTopic::Id::EventsActions_PlaySound);
 }
 
 QnPlaySoundBusinessActionWidget::~QnPlaySoundBusinessActionWidget()

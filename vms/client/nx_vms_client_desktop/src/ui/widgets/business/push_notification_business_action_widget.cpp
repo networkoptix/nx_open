@@ -12,6 +12,8 @@
 #include <nx/network/app_info.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
@@ -19,8 +21,6 @@
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
@@ -85,7 +85,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(
         tr("%1 Settings", "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
             .arg(nx::branding::cloudName()));
 
-    setHelpTopic(this, Qn::EventsActions_SendMobileNotification_Help);
+    setHelpTopic(this, HelpTopic::Id::EventsActions_SendMobileNotification);
 
     ui->languageButton->setIcon(qnSkin->icon("events/push_language.svg"));
     connect(ui->languageButton, &QPushButton::clicked, this,

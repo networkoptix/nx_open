@@ -1,29 +1,29 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "left_panel_widget.h"
-#include "private/resource_browser_wrapper_p.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QItemSelectionModel>
 #include <QtCore/QScopedValueRollback>
-#include <QtQuick/QQuickItem>
+#include <QtGui/QAction>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
-#include <QtGui/QAction>
+#include <QtQuick/QQuickItem>
 #include <QtWidgets/QToolTip>
 
 #include <client/client_globals.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/resource.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
-#include <nx/utils/log/assert.h>
-#include <nx/vms/client/core/utils/qml_helpers.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include "private/resource_browser_wrapper_p.h"
 
 namespace nx::vms::client::desktop {
 
@@ -177,7 +177,7 @@ QQuickItem* LeftPanelWidget::openCloseButton() const
 
 int LeftPanelWidget::helpTopicAt(const QPointF& pos) const
 {
-    return QnHelpTopicAccessor::helpTopicAt(rootObject(), pos);
+    return HelpTopicAccessor::helpTopicAt(rootObject(), pos);
 }
 
 // ------------------------------------------------------------------------------------------------

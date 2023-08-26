@@ -1,14 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_tree_model_test_fixture.h"
-
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <ui/help/help_topics.h>
 #include <client/client_globals.h>
+#include <common/common_module.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+
+#include "resource_tree_model_test_fixture.h"
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -786,7 +786,7 @@ TEST_F(ResourceTreeModelTest, serverHelpTopic)
     const auto serverIndex = uniqueMatchingIndex(kUniqueServerNameCondition);
 
     // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, Qn::MainWindow_Tree_Servers_Help)(serverIndex));
+    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::MainWindow_Tree_Servers)(serverIndex));
 }
 
 TEST_F(ResourceTreeModelTest, serverDisplayNameMapping)

@@ -41,6 +41,7 @@
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -48,7 +49,6 @@
 #include <nx/vms/text/human_readable.h>
 #include <server/server_storage_manager.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/delayed.h>
@@ -320,7 +320,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return QVariant::fromValue(objectDuration(track));
 
         case Qn::HelpTopicIdRole:
-            return Qn::Empty_Help;
+            return HelpTopic::Id::Empty;
 
         case Qn::ResourceListRole:
         case Qn::DisplayedResourceListRole:

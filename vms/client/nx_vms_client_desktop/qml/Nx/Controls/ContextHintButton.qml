@@ -61,9 +61,5 @@ Control
     }
 
     readonly property bool hasHelpTopic:
-    {
-        const kEmptyHelp = 0
-        const kForcedEmptyHelp = 1
-        return helpTopic != kEmptyHelp && helpTopic != kForcedEmptyHelp
-    }
+        helpTopic != HelpTopic.Empty && helpTopic != HelpTopic.ForcedEmpty
 }

@@ -22,6 +22,8 @@
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/control_bars.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_administration/dialogs/group_settings_dialog.h>
@@ -32,8 +34,6 @@
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 
 #include "private/highlighted_text_item_delegate.h"
 #include "user_groups_widget.h"
@@ -360,7 +360,7 @@ void UserGroupsWidget::Private::setupUi()
             q->update();
         });
 
-    setHelpTopic(q, Qn::SystemSettings_UserManagement_Help);
+    setHelpTopic(q, HelpTopic::Id::SystemSettings_UserManagement);
 
     // Cursor changes with hover.
     connect(hoverTracker, &ItemViewHoverTracker::itemEnter, this,

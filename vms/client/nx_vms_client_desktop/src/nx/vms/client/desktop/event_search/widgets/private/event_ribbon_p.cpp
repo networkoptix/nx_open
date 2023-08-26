@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/common/utils/progress_state.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/private/style_private.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
@@ -41,7 +42,6 @@
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>

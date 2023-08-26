@@ -4,9 +4,9 @@
 
 #include <QtGui/QAction>
 
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_pane_settings.h>
 
@@ -25,7 +25,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
 {
     m_widget->setVisible(false);
 
-    setHelpTopic(m_widget, Qn::MainWindow_Calendar_Help);
+    setHelpTopic(m_widget, HelpTopic::Id::MainWindow_Calendar);
 
     navigator()->setCalendar(m_widget);
 

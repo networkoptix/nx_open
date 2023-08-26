@@ -21,6 +21,8 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/server_selection_dialog.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -30,8 +32,6 @@
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
@@ -97,7 +97,7 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget* parent):
     ui->setupUi(this);
 
     ui->scheduleButton->setIcon(qnSkin->icon(lit("buttons/schedule_20.svg"), kIconSubstitutions));
-    setHelpTopic(ui->scheduleButton, Qn::EventsActions_Schedule_Help);
+    setHelpTopic(ui->scheduleButton, HelpTopic::Id::EventsActions_Schedule);
 
     ui->eventDefinitionGroupBox->installEventFilter(this);
     ui->actionDefinitionGroupBox->installEventFilter(this);

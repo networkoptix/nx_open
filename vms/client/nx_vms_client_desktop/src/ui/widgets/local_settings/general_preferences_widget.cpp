@@ -10,13 +10,13 @@
 #include <common/common_module.h>
 #include <nx/build_info.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 using namespace nx::vms::client;
@@ -35,10 +35,11 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget* parent):
     if (!nx::vms::utils::isAutoRunSupported())
         ui->autoStartCheckBox->hide();
 
-    setHelpTopic(ui->mediaFoldersGroupBox, Qn::MediaFolders_Help);
-    setHelpTopic(ui->pauseOnInactivityCheckBox, Qn::SystemSettings_General_AutoPause_Help);
+    setHelpTopic(ui->mediaFoldersGroupBox, HelpTopic::Id::MediaFolders);
+    setHelpTopic(ui->pauseOnInactivityCheckBox,
+        HelpTopic::Id::SystemSettings_General_AutoPause);
     setHelpTopic(ui->idleTimeoutSpinBox, ui->idleTimeoutWidget,
-        Qn::SystemSettings_General_AutoPause_Help);
+        HelpTopic::Id::SystemSettings_General_AutoPause);
 
     ui->idleTimeoutWidget->setEnabled(false);
 

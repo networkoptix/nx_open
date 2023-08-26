@@ -8,12 +8,12 @@
 #include <business/business_resource_validation.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -32,7 +32,7 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(
     ui->customTextCheckBox->hide();
     ui->customTextEdit->hide();
 
-    setHelpTopic(this, Qn::EventsActions_ShowDesktopNotification_Help);
+    setHelpTopic(this, HelpTopic::Id::EventsActions_ShowDesktopNotification);
 
     ui->hintLabel->setHintText(tr("Notification will be shown until one of the users who see it "
         "creates bookmark with event description"));

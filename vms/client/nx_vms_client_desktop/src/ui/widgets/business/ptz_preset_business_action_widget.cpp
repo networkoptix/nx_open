@@ -12,11 +12,11 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include "core/ptz/ptz_preset.h"
@@ -32,7 +32,7 @@ QnExecPtzPresetBusinessActionWidget::QnExecPtzPresetBusinessActionWidget(
 {
     ui->setupUi(this);
     connect(ui->presetComboBox,  QnComboboxCurrentIndexChanged, this, &QnExecPtzPresetBusinessActionWidget::paramsChanged);
-    //setHelpTopic(this, Qn::EventsActions_CameraOutput_Help);
+    //setHelpTopic(this, HelpTopic::Id::EventsActions_CameraOutput);
 }
 
 QnExecPtzPresetBusinessActionWidget::~QnExecPtzPresetBusinessActionWidget()

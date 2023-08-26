@@ -19,6 +19,8 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/ptz/remote_ptz_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -30,8 +32,6 @@
 #include <nx/vms/license/usage_helper.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
@@ -452,7 +452,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     connect(ui->tabWidget, &QTabWidget::currentChanged,
         d.get(), [this] { d->updatePreviewIfNeeded(); });
 
-    setHelpTopic(this, Qn::CameraSettings_Help);
+    setHelpTopic(this, HelpTopic::Id::CameraSettings);
 }
 
 CameraSettingsDialog::~CameraSettingsDialog()

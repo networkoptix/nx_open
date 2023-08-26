@@ -4,10 +4,10 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/showreel_data.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
-#include <ui/help/help_topics.h>
 
 #include "resource_tree_model_test_fixture.h"
 

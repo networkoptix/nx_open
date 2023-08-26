@@ -32,6 +32,8 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -45,8 +47,6 @@
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <ui/delegates/business_rule_item_delegate.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/business/business_rule_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
@@ -325,8 +325,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->buttonBox->addButton(m_resetDefaultsButton, QDialogButtonBox::ResetRole);
     connect(m_resetDefaultsButton, &QPushButton::clicked, this, &QnBusinessRulesDialog::at_resetDefaultsButton_clicked);
 
-    setHelpTopic(this, Qn::EventsActions_Help);
-    setHelpTopic(ui->eventLogButton, Qn::EventLog_Help);
+    setHelpTopic(this, HelpTopic::Id::EventsActions);
+    setHelpTopic(ui->eventLogButton, HelpTopic::Id::EventLog);
 
     m_currentDetailsWidget = ui->detailsWidget;
 

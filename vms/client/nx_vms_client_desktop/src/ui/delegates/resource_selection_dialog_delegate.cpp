@@ -3,8 +3,7 @@
 #include "resource_selection_dialog_delegate.h"
 
 #include <core/resource_management/resource_pool.h>
-
-#include <ui/help/help_topics.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 
 // -------------------------------------------------------------------------- //
 // QnResourceSelectionDialogDelegate

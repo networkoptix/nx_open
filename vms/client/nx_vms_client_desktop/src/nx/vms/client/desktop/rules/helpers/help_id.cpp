@@ -2,10 +2,10 @@
 
 #include "help_id.h"
 
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/utils/type.h>
-#include <ui/help/help_topics.h>
 
 namespace nx::vms::client::desktop {
 
@@ -27,21 +27,22 @@ HelpIdMap eventHelpMap()
 {
     HelpIdMap result;
 
-    addHelpId<AnalyticsEvent>(result, Qn::EventsActions_VideoAnalytics_Help);
-    addHelpId<AnalyticsObjectEvent>(result, Qn::EventsActions_VideoAnalytics_Help);
-    addHelpId<BackupFinishedEvent>(result, Qn::EventsActions_BackupFinished_Help);
-    addHelpId<CameraInputEvent>(result, Qn::EventsActions_CameraInput_Help);
-    addHelpId<DeviceDisconnectedEvent>(result, Qn::EventsActions_CameraDisconnected_Help);
-    addHelpId<DeviceIpConflictEvent>(result, Qn::EventsActions_CameraIpConflict_Help);
-    addHelpId<GenericEvent>(result, Qn::EventsActions_Generic_Help);
-    addHelpId<LicenseIssueEvent>(result, Qn::EventsActions_LicenseIssue_Help);
-    addHelpId<MotionEvent>(result, Qn::EventsActions_CameraMotion_Help);
-    addHelpId<NetworkIssueEvent>(result, Qn::EventsActions_NetworkIssue_Help);
-    addHelpId<ServerConflictEvent>(result, Qn::EventsActions_MediaServerConflict_Help);
-    addHelpId<ServerFailureEvent>(result, Qn::EventsActions_MediaServerFailure_Help);
-    addHelpId<ServerStartedEvent>(result, Qn::EventsActions_MediaServerStarted_Help);
-    addHelpId<SoftTriggerEvent>(result, Qn::EventsActions_SoftTrigger_Help);
-    addHelpId<StorageIssueEvent>(result, Qn::EventsActions_StorageFailure_Help);
+    addHelpId<AnalyticsEvent>(result, HelpTopic::Id::EventsActions_VideoAnalytics);
+    addHelpId<AnalyticsObjectEvent>(result, HelpTopic::Id::EventsActions_VideoAnalytics);
+    addHelpId<BackupFinishedEvent>(result, HelpTopic::Id::EventsActions_BackupFinished);
+    addHelpId<CameraInputEvent>(result, HelpTopic::Id::EventsActions_CameraInput);
+    addHelpId<DeviceDisconnectedEvent>(result,
+        HelpTopic::Id::EventsActions_CameraDisconnected);
+    addHelpId<DeviceIpConflictEvent>(result, HelpTopic::Id::EventsActions_CameraIpConflict);
+    addHelpId<GenericEvent>(result, HelpTopic::Id::EventsActions_Generic);
+    addHelpId<LicenseIssueEvent>(result, HelpTopic::Id::EventsActions_LicenseIssue);
+    addHelpId<MotionEvent>(result, HelpTopic::Id::EventsActions_CameraMotion);
+    addHelpId<NetworkIssueEvent>(result, HelpTopic::Id::EventsActions_NetworkIssue);
+    addHelpId<ServerConflictEvent>(result, HelpTopic::Id::EventsActions_MediaServerConflict);
+    addHelpId<ServerFailureEvent>(result, HelpTopic::Id::EventsActions_MediaServerFailure);
+    addHelpId<ServerStartedEvent>(result, HelpTopic::Id::EventsActions_MediaServerStarted);
+    addHelpId<SoftTriggerEvent>(result, HelpTopic::Id::EventsActions_SoftTrigger);
+    addHelpId<StorageIssueEvent>(result, HelpTopic::Id::EventsActions_StorageFailure);
 
     return result;
 }
@@ -50,22 +51,25 @@ HelpIdMap actionHelpMap()
 {
     HelpIdMap result;
 
-    // addHelpId<Action>(result, Qn::EventsActions_ShowIntercomInformer_Help);
-    addHelpId<BookmarkAction>(result, Qn::EventsActions_Bookmark_Help);
-    addHelpId<DeviceOutputAction>(result, Qn::EventsActions_CameraOutput_Help);
-    addHelpId<DeviceRecordingAction>(result, Qn::EventsActions_StartRecording_Help);
-    addHelpId<HttpAction>(result, Qn::EventsActions_ExecHttpRequest_Help);
-    addHelpId<NotificationAction>(result, Qn::EventsActions_ShowDesktopNotification_Help);
-    addHelpId<PanicRecordingAction>(result, Qn::EventsActions_StartPanicRecording_Help);
-    addHelpId<PlaySoundAction>(result, Qn::EventsActions_PlaySound_Help);
-    addHelpId<PtzPresetAction>(result, Qn::EventsActions_ExecutePtzPreset_Help);
-    addHelpId<PushNotificationAction>(result, Qn::EventsActions_SendMobileNotification_Help);
-    addHelpId<RepeatSoundAction>(result, Qn::EventsActions_PlaySoundRepeated_Help);
-    addHelpId<SendEmailAction>(result, Qn::EventsActions_SendMail_Help);
-    addHelpId<ShowOnAlarmLayoutAction>(result, Qn::EventsActions_ShowOnAlarmLayout_Help);
-    addHelpId<SpeakAction>(result, Qn::EventsActions_Speech_Help);
-    addHelpId<TextOverlayAction>(result, Qn::EventsActions_ShowTextOverlay_Help);
-    addHelpId<WriteToLogAction>(result, Qn::EventsActions_Diagnostics_Help);
+    // addHelpId<Action>(result, HelpTopic::Id::EventsActions_ShowIntercomInformer);
+    addHelpId<BookmarkAction>(result, HelpTopic::Id::EventsActions_Bookmark);
+    addHelpId<DeviceOutputAction>(result, HelpTopic::Id::EventsActions_CameraOutput);
+    addHelpId<DeviceRecordingAction>(result, HelpTopic::Id::EventsActions_StartRecording);
+    addHelpId<HttpAction>(result, HelpTopic::Id::EventsActions_ExecHttpRequest);
+    addHelpId<NotificationAction>(result,
+        HelpTopic::Id::EventsActions_ShowDesktopNotification);
+    addHelpId<PanicRecordingAction>(result, HelpTopic::Id::EventsActions_StartPanicRecording);
+    addHelpId<PlaySoundAction>(result, HelpTopic::Id::EventsActions_PlaySound);
+    addHelpId<PtzPresetAction>(result, HelpTopic::Id::EventsActions_ExecutePtzPreset);
+    addHelpId<PushNotificationAction>(result,
+        HelpTopic::Id::EventsActions_SendMobileNotification);
+    addHelpId<RepeatSoundAction>(result, HelpTopic::Id::EventsActions_PlaySoundRepeated);
+    addHelpId<SendEmailAction>(result, HelpTopic::Id::EventsActions_SendMail);
+    addHelpId<ShowOnAlarmLayoutAction>(result,
+        HelpTopic::Id::EventsActions_ShowOnAlarmLayout);
+    addHelpId<SpeakAction>(result, HelpTopic::Id::EventsActions_Speech);
+    addHelpId<TextOverlayAction>(result, HelpTopic::Id::EventsActions_ShowTextOverlay);
+    addHelpId<WriteToLogAction>(result, HelpTopic::Id::EventsActions_Diagnostics);
 
     return result;
 }

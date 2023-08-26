@@ -16,6 +16,8 @@
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_selection_widget.h>
@@ -27,8 +29,6 @@
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_handler.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/camera/camera_replacement.h>
 
@@ -288,7 +288,7 @@ CameraReplacementDialog::CameraReplacementDialog(
             d->resourceSelectionWidget->resourceViewWidget()->makeRequiredItemsVisible();
         });
 
-    setHelpTopic(this, Qn::CameraReplacementDialog_Help);
+    setHelpTopic(this, HelpTopic::Id::CameraReplacementDialog);
 }
 
 CameraReplacementDialog::~CameraReplacementDialog()

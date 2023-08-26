@@ -4,7 +4,7 @@
 
 #include <QtQml/QtQml>
 
-#include <ui/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 
 namespace nx::vms::client::desktop {
 
@@ -14,7 +14,7 @@ ContextHelpAttached::ContextHelpAttached(QObject* parent): QObject(parent)
 
 int ContextHelpAttached::topicId() const
 {
-    return QnHelpTopicAccessor::helpTopic(parent());
+    return HelpTopicAccessor::helpTopic(parent());
 }
 
 void ContextHelpAttached::setTopicId(int value)
@@ -22,7 +22,7 @@ void ContextHelpAttached::setTopicId(int value)
     if (topicId() == value)
         return;
 
-    QnHelpTopicAccessor::setHelpTopic(parent(), value);
+    HelpTopicAccessor::setHelpTopic(parent(), value);
     emit topicIdChanged();
 }
 

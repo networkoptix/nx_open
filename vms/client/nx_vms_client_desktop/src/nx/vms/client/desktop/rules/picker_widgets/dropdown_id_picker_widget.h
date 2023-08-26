@@ -8,6 +8,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/event_rules/widgets/detectable_object_type_combo_box.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/analytics_sdk_event_model.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/plugin_diagnostic_event_model.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -16,8 +18,6 @@
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/utils/field.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/common/elided_label.h>
 #include <ui/widgets/common/tree_combo_box.h>
 
@@ -159,7 +159,7 @@ protected:
         m_label->addHintLine(tr("Analytics events can be set up on a certain cameras."));
         m_label->addHintLine(
             tr("Choose cameras using the button above to see the list of supported events."));
-        setHelpTopic(m_label, Qn::EventsActions_VideoAnalytics_Help);
+        setHelpTopic(m_label, HelpTopic::Id::EventsActions_VideoAnalytics);
     }
 
     void onCurrentIndexChanged() override
@@ -245,7 +245,7 @@ protected:
         m_label->addHintLine(tr("Analytics object detection can be set up on a certain cameras."));
         m_label->addHintLine(
             tr("Choose cameras using the button above to see the list of supported events."));
-        setHelpTopic(m_label, Qn::EventsActions_VideoAnalytics_Help);
+        setHelpTopic(m_label, HelpTopic::Id::EventsActions_VideoAnalytics);
     }
 
     void onCurrentIndexChanged() override

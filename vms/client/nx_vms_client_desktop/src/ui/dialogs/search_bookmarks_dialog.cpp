@@ -2,10 +2,11 @@
 
 #include "search_bookmarks_dialog.h"
 
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <ui/dialogs/private/search_bookmarks_dialog_p.h>
 
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
+using namespace nx::vms::client::desktop;
 
 QnSearchBookmarksDialog::QnSearchBookmarksDialog(
     const QString& filterText,
@@ -16,7 +17,7 @@ QnSearchBookmarksDialog::QnSearchBookmarksDialog(
     base_type(parent),
     d_ptr(new QnSearchBookmarksDialogPrivate(filterText, utcStartTimeMs, utcFinishTimeMs, this))
 {
-    setHelpTopic(this, Qn::Bookmarks_Search_Help);
+    setHelpTopic(this, HelpTopic::Id::Bookmarks_Search);
 
     setWindowFlags(windowFlags()
         | Qt::WindowMaximizeButtonHint

@@ -16,14 +16,14 @@
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/provided_text_display.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_painter.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 #include <utils/common/event_processors.h>
@@ -152,10 +152,10 @@ void CameraScheduleWidget::setupUi()
                 ui->scrollAreaWidgetContents->minimumSizeHint().width());
         });
 
-    setHelpTopic(this, Qn::CameraSettingsRecordingPage_Help);
-    setHelpTopic(ui->licensesButton, Qn::Licenses_Help);
-    setHelpTopic(ui->licenseUsageLabel, Qn::Licenses_Help);
-    setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
+    setHelpTopic(this, HelpTopic::Id::CameraSettingsRecordingPage);
+    setHelpTopic(ui->licensesButton, HelpTopic::Id::Licenses);
+    setHelpTopic(ui->licenseUsageLabel, HelpTopic::Id::Licenses);
+    setHelpTopic(ui->exportScheduleButton, HelpTopic::Id::CameraSettings_Recording_Export);
 }
 
 void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
