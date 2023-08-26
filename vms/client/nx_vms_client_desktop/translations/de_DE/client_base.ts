@@ -6354,7 +6354,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Auch auf der Quellkamera eingestellt</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
