@@ -94,7 +94,7 @@ DialogWithState
         id: tabControl
 
         anchors.fill: parent
-        anchors.bottomMargin: buttonBox.height
+        anchors.bottomMargin: buttonBox.height + (banner.visible ? banner.height : 0)
 
         dialogLeftPadding: dialog.leftPadding
         dialogRightPadding: dialog.rightPadding
@@ -174,6 +174,28 @@ DialogWithState
                 }
             }
         }
+    }
+
+    DialogBanner
+    {
+        id: banner
+
+        style: DialogBanner.Style.Info
+
+        closeVisible: true
+
+        visible: !!text && [0, 1].includes(tabControl.currentTabIndex)
+
+        text: dialog.userType == UserSettingsGlobal.TemporaryUser
+            ? dialog.self.warningForGroups(membersModel.parentGroups)
+            : ""
+
+        onCloseClicked: visible = false
+
+        anchors.bottom: buttonBox.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        z: -1
     }
 
     buttonBox: DialogButtonBox

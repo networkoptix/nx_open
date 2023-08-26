@@ -137,6 +137,9 @@ public:
     Q_INVOKABLE QDateTime newValidUntilDate() const;
     Q_INVOKABLE QString durationFormat(qint64 ms) const;
 
+    Q_INVOKABLE QString warningForGroups(
+        const QList<nx::vms::client::desktop::MembersModelGroup>& parentGroups) const;
+
     Q_INVOKABLE void cancelRequest();
 
 public slots:
