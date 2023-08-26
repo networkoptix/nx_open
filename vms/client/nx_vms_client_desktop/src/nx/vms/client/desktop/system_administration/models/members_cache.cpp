@@ -64,6 +64,8 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
     m_info.clear();
     m_sortedCache.clear();
     m_stats = {};
+    m_tmpUsersInGroup.clear();
+    m_tmpUsers.clear();
     emit reset();
 
     Members members;
@@ -82,6 +84,14 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
         const auto id = user->getId();
         m_info.insert(id, infoFromContext(systemContext, id));
         members.users << id;
+
+        if (m_info[id].isTemporary)
+        {
+            for (const auto& groupId: m_subjectContext->subjectHierarchy()->directParents(id))
+                addTmpUser(groupId, id);
+
+            addTmpUser({}, id);
+        }
     }
 
     sortSubjects(members.users);
@@ -188,9 +198,10 @@ void MembersCache::modify(
     const QSet<QnUuid>& groupsWithChangedMembers,
     const QSet<QnUuid>& subjectsWithChangedParents)
 {
-    const auto removeIn = [this](const QnUuid& groupId, const QnUuid& id, bool isGroup)
+    const auto removeFrom =
+        [this](const QnUuid& groupId, const QnUuid& id, const Info& idInfo)
         {
-            QList<QnUuid>& idList = isGroup
+            QList<QnUuid>& idList = idInfo.isGroup
                 ? m_sortedCache[groupId].groups
                 : m_sortedCache[groupId].users;
 
@@ -200,12 +211,16 @@ void MembersCache::modify(
                 emit beginRemove(i, id, groupId);
                 idList.removeAt(i);
                 emit endRemove(i, id, groupId);
+
+                if (!idInfo.isGroup && idInfo.isTemporary)
+                    addTmpUser(groupId, id);
             }
         };
 
-    const auto addTo = [this](const QnUuid& groupId, const QnUuid& id, bool isGroup)
+    const auto addTo =
+        [this](const QnUuid& groupId, const QnUuid& id, const Info& idInfo)
         {
-            QList<QnUuid>& idList = isGroup
+            QList<QnUuid>& idList = idInfo.isGroup
                 ? m_sortedCache[groupId].groups
                 : m_sortedCache[groupId].users;
 
@@ -215,6 +230,9 @@ void MembersCache::modify(
                 emit beginInsert(i, id, groupId);
                 idList.insert(i, id);
                 emit endInsert(i, id, groupId);
+
+                if (!idInfo.isGroup && idInfo.isTemporary)
+                    removeTmpUser(groupId, id);
             }
         };
 
@@ -225,36 +243,36 @@ void MembersCache::modify(
         for (const auto& groupId: m_sortedCache.keys())
         {
             if (!groupId.isNull()) //< Delay removal from top level.
-                removeIn(groupId, id, idInfo.isGroup);
+                removeFrom(groupId, id, idInfo);
         }
 
         // Remove from top level.
-        removeIn({}, id, idInfo.isGroup);
+        removeFrom({}, id, idInfo);
     }
 
     for (const auto& id: added)
     {
         const auto idInfo = (m_info[id] = infoFromContext(m_systemContext, id));
 
-        addTo({}, id, idInfo.isGroup);
+        addTo({}, id, idInfo);
         const auto parents = m_subjectContext->subjectHierarchy()->directParents(id);
         for (const auto& groupId: parents)
-            addTo(groupId, id, idInfo.isGroup);
+            addTo(groupId, id, idInfo);
     }
 
     for (const auto& id: subjectsWithChangedParents)
     {
-        const bool isGroup = info(id).isGroup;
+        const auto idInfo = info(id);
         const auto parents = m_subjectContext->subjectHierarchy()->directParents(id);
         const auto removedFrom = groupsWithChangedMembers - parents;
         auto addedTo = groupsWithChangedMembers;
         addedTo.intersect(parents);
 
         for (const auto& groupId: removedFrom)
-            removeIn(groupId, id, isGroup);
+            removeFrom(groupId, id, idInfo);
 
         for (const auto& groupId: addedTo)
-            addTo(groupId, id, isGroup);
+            addTo(groupId, id, idInfo);
     }
 
     for (const auto& id: (removed - added))
@@ -264,6 +282,50 @@ void MembersCache::modify(
     }
 
     updateStats(added, removed);
+}
+
+void MembersCache::addTmpUser(const QnUuid& groupId, const QnUuid& userId)
+{
+    if (groupId.isNull())
+    {
+        m_tmpUsers.insert(userId);
+        return;
+    }
+
+    const int count = m_tmpUsersInGroup.value(groupId, 0) + 1;
+    m_tmpUsersInGroup[groupId] = count;
+}
+
+void MembersCache::removeTmpUser(const QnUuid& groupId, const QnUuid& userId)
+{
+    if (groupId.isNull())
+    {
+        m_tmpUsers.remove(userId);
+        return;
+    }
+
+    const int count = m_tmpUsersInGroup.value(groupId, 0) - 1;
+    if (count <= 0)
+        m_tmpUsersInGroup.remove(groupId);
+    else
+        m_tmpUsersInGroup[groupId] = count;
+}
+
+QList<int> MembersCache::temporaryUserIndexes() const
+{
+    const auto users = sorted().users;
+
+    QList<int> result;
+    result.reserve(m_tmpUsers.size());
+
+    for (const auto& id: m_tmpUsers)
+    {
+        const int i = indexIn(users, id);
+        if (i != users.size() && users.at(i) == id)
+            result.push_back(i);
+    }
+
+    return result;
 }
 
 void MembersCache::updateStats(const QSet<QnUuid>& added, const QSet<QnUuid>& removed)
