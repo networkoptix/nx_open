@@ -24,6 +24,15 @@ using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+static const QSet<QnUuid> kRestrictedForTemp = {
+    nx::vms::api::kAdministratorsGroupId,
+    nx::vms::api::kPowerUsersGroupId
+};
+
+} // namespace
+
 MembersModelGroup MembersModelGroup::fromId(SystemContext* systemContext, const QnUuid& id)
 {
     const auto group = systemContext->userGroupManager()->find(id).value_or(api::UserGroupData{});
@@ -368,6 +377,14 @@ void MembersModel::readUsersAndGroups()
                 if (!m_cache)
                     return;
 
+                m_cache->modify(
+                    added,
+                    removed,
+                    groupsWithChangedMembers,
+                    subjectsWithChangedParents);
+
+                checkCycles();
+
                 if (subjectsWithChangedParents.contains(m_subjectId))
                 {
                     if (!m_cache->sorted().groups.empty())
@@ -378,15 +395,11 @@ void MembersModel::readUsersAndGroups()
                             this->index(groupsStart + m_cache->sorted().groups.size() - 1));
                     }
                     emit parentGroupsChanged();
+
+                    // Users may not be allowed due to group change.
+                    for (int row: m_cache->temporaryUserIndexes())
+                        emit dataChanged(this->index(row), this->index(row), {IsAllowedMember});
                 }
-
-                m_cache->modify(
-                    added,
-                    removed,
-                    groupsWithChangedMembers,
-                    subjectsWithChangedParents);
-
-                checkCycles();
             });
 
         m_connections << connect(
@@ -565,29 +578,116 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     return roles;
 }
 
-bool MembersModel::isAllowedMember(const QnUuid& groupId) const
+bool MembersModel::isAllowed(const QnUuid& parentId, const QnUuid& childId) const
 {
-    if (groupId == m_subjectId)
+    // Unable to include into itself.
+    if (parentId == childId)
         return false;
 
-    if (MembersCache::isPredefined(groupId))
+    // Predefined group cannot be put into another group.
+    if (MembersCache::isPredefined(childId))
         return false;
 
-    return systemContext()->accessController()->hasPermissions(
-            groupId,
-            Qn::WriteAccessRightsPermission)
-        && !m_subjectContext->subjectHierarchy()->isRecursiveMember(m_subjectId, {groupId});
+    auto parentInfo = m_cache->info(parentId);
+
+    // If we are in a user creation dialog, there is no user info available. But we can still
+    // gather some essential data from other properties.
+    if (parentInfo.name.isEmpty() && parentId == m_subjectId)
+    {
+        parentInfo.isGroup = !m_subjectIsUser;
+        parentInfo.isTemporary = m_temporary;
+    }
+
+    // Unable to add users to users.
+    if (!parentInfo.isGroup)
+        return false;
+
+    // LDAP group membership should be managed via LDAP.
+    if (parentInfo.isLdap)
+        return false;
+
+    auto childInfo = m_cache->info(childId);
+
+    // If we are in a user creation dialog, gather info for childId also.
+    const bool childInfoFromProperties = childInfo.name.isEmpty() && childId == m_subjectId;
+    if (childInfoFromProperties)
+    {
+        childInfo.isGroup = !m_subjectIsUser;
+        childInfo.isTemporary = m_temporary;
+    }
+
+    // Temporary users can not get PowerUsers (or higher) permissions.
+    if (kRestrictedForTemp.contains(parentId)
+        || m_subjectContext->subjectHierarchy()->isRecursiveMember(parentId, kRestrictedForTemp))
+    {
+        // Deny if child is a temporary user.
+        if (childInfo.isTemporary)
+            return false;
+
+        // Deny if any child subgroup contains a temporary user.
+        for (const auto& groupId: m_cache->groupsWithTemporary())
+        {
+            if (groupId == childId
+                || m_subjectContext->subjectHierarchy()->isRecursiveMember(groupId, {childId}))
+            {
+                return false;
+            }
+        }
+    }
+
+    if (!childInfoFromProperties
+        && !systemContext()->accessController()->hasPermissions(
+            childId,
+            Qn::WriteAccessRightsPermission))
+    {
+        return false;
+    }
+
+    return !m_subjectContext->subjectHierarchy()->isRecursiveMember(parentId, {childId});
 }
 
-bool MembersModel::isAllowedParent(const QnUuid& groupId) const
+void MembersModel::setTemporary(bool value)
 {
-    if (groupId == m_subjectId)
-        return false;
+    if (value == m_temporary)
+        return;
 
-    if (MembersCache::isPredefined(m_subjectId))
-        return false;
+    m_temporary = value;
+    emit temporaryChanged();
 
-    return !m_subjectContext->subjectHierarchy()->recursiveParents({groupId}).contains(m_subjectId);
+    if (!m_subjectContext)
+        return;
+
+    if (m_temporary)
+    {
+        const auto hierarchy = m_subjectContext->subjectHierarchy();
+
+        // Cleanup parent groups that are not allowed for a temporary user.
+
+        auto parents = hierarchy->directParents(m_subjectId);
+        auto members = hierarchy->directMembers(m_subjectId);
+
+        QSet<QnUuid> parentsToRemove;
+        for (const auto& groupId: parents)
+        {
+            if (kRestrictedForTemp.contains(groupId)
+                || hierarchy->isRecursiveMember(groupId, {kRestrictedForTemp}))
+            {
+                parentsToRemove << groupId;
+            }
+        }
+
+        m_subjectContext->setRelations(parents - parentsToRemove, members);
+    }
+
+    if (!m_cache)
+        return;
+
+    const int groupsBegin = m_cache->sorted().users.size();
+    const int groupsEnd = groupsBegin + m_cache->sorted().groups.size() - 1;
+    if (groupsEnd < groupsBegin)
+        return;
+
+    emit dataChanged(index(groupsBegin), index(groupsEnd), {IsAllowedMember, IsAllowedParent});
 }
 
 QVariant MembersModel::data(const QModelIndex& index, int role) const
@@ -612,14 +712,10 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
                 && m_subjectContext->subjectHierarchy()->directMembers(id).contains(m_subjectId);
 
         case IsAllowedMember:
-            return !m_subjectIsUser
-                && !MembersCache::isPredefined(id)
-                && isAllowedMember(id);
+            return isAllowed(m_subjectId, id);
 
         case IsAllowedParent:
-            return m_cache->info(id).isGroup
-                && isAllowedParent(id)
-                && !m_cache->info(id).isLdap;
+            return isAllowed(id, m_subjectId);
 
         case Qt::DisplayRole:
             return m_cache->info(id).name;
@@ -770,7 +866,7 @@ void MembersModel::setParentGroups(const QList<MembersModelGroup>& groups)
 void MembersModel::setGroupId(const QnUuid& groupId)
 {
     // Setting a group or a user forces reload of model data.
-    const bool groupChanged = groupId == m_subjectId;
+    const bool groupChanged = groupId != m_subjectId;
 
     m_subjectId = groupId;
 
@@ -787,7 +883,7 @@ void MembersModel::setGroupId(const QnUuid& groupId)
 
 void MembersModel::setUserId(const QnUuid& userId)
 {
-    const bool userChanged = userId == m_subjectId;
+    const bool userChanged = userId != m_subjectId;
 
     m_subjectId = userId;
 
