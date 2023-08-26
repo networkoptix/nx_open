@@ -60,6 +60,11 @@ public:
 
     Stats stats() const { return m_stats; }
 
+    // Returns indexes of all temporary users.
+    QList<int> temporaryUserIndexes() const;
+
+    QList<QnUuid> groupsWithTemporary() const { return m_tmpUsersInGroup.keys(); }
+
 public slots:
     void modify(
         const QSet<QnUuid>& added,
@@ -90,10 +95,15 @@ private:
 
     void updateStats(const QSet<QnUuid>& added, const QSet<QnUuid>& removed);
 
+    void addTmpUser(const QnUuid& groupId, const QnUuid& userId);
+    void removeTmpUser(const QnUuid& groupId, const QnUuid& userId);
+
 private:
     mutable QHash<QnUuid, Members> m_sortedCache;
     QHash<QnUuid, Info> m_info;
     Stats m_stats;
+    QHash<QnUuid, int> m_tmpUsersInGroup; //< Number of temporary user in each group that has them.
+    QSet<QnUuid> m_tmpUsers; //< All temporary users.
     AccessSubjectEditingContext* m_subjectContext = nullptr;
     nx::vms::common::SystemContext* m_systemContext = nullptr;
 };

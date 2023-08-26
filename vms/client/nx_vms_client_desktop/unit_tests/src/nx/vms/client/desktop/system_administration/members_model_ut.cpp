@@ -96,7 +96,7 @@ public:
         m_user2 = addUser("user2", {m_group2, m_group3});
         m_user3 = addUser("user3", {m_group2, m_group3});
         addUser("user4", {});
-        m_user5 = addUser("user5", {m_group4});
+        m_user5 = addUser("user5", {m_group4}, api::UserType::temporaryLocal);
     }
 
     void verifyRow(int row, const QString& name, int offset)
@@ -105,10 +105,13 @@ public:
         ASSERT_EQ(offset, m_model->data(m_model->index(row), MembersModel::OffsetRole).toInt());
     }
 
-    QnUuid addUser(const QString& name, const std::vector<QnUuid>& parents)
+    QnUuid addUser(
+        const QString& name,
+        const std::vector<QnUuid>& parents,
+        const api::UserType& userType = api::UserType::local)
     {
         QnUserResourcePtr user(
-            new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
+            new QnUserResource(userType, /*externalId*/ {}));
         user->setIdUnsafe(QnUuid::createUuid());
         user->setName(name);
         user->addFlags(Qn::remote);
@@ -409,17 +412,20 @@ TEST_F(MembersModelTest, allowedMembers)
 
 TEST_F(MembersModelTest, allowedParents)
 {
-    // Check that group2 cannot have parents that are already its members (direct or inderect).
+    // Check that group2 cannot have parents that are already its members (direct or inderect)
+    // and cannot be a part of Administrators or Power Users because of temporary user member.
     m_model->setGroupId(m_group2);
 
+    addGroup("group6", {api::kPowerUsersGroupId});
+    addGroup("group7", {});
+
     static const QStringList kAllowedParents = {
-        "Administrators",
-        "Power Users",
         "Advanced Viewers",
         "Viewers",
         "Live Viewers",
         "System Health Viewers",
-        "group1"
+        "group1",
+        "group7"
     };
 
     const QStringList allowedParents = filterTopLevelByRole(MembersModel::IsAllowedParent);

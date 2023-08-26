@@ -72,6 +72,7 @@ class NX_VMS_CLIENT_DESKTOP_API MembersModel: public QAbstractListModel, public 
 
     Q_PROPERTY(QnUuid groupId READ groupId WRITE setGroupId NOTIFY groupIdChanged)
     Q_PROPERTY(QnUuid userId READ userId WRITE setUserId NOTIFY userIdChanged)
+    Q_PROPERTY(bool temporary READ temporary WRITE setTemporary NOTIFY temporaryChanged)
     Q_PROPERTY(QList<nx::vms::client::desktop::MembersModelGroup> parentGroups
         READ parentGroups
         WRITE setParentGroups
@@ -135,6 +136,9 @@ public:
     QnUuid userId() const { return m_subjectIsUser ? m_subjectId : QnUuid{}; }
     void setUserId(const QnUuid& userId);
 
+    bool temporary() const { return m_temporary; }
+    void setTemporary(bool value);
+
     void setOwnSharedResources(const nx::core::access::ResourceAccessMap& resources);
     nx::core::access::ResourceAccessMap ownSharedResources() const;
 
@@ -168,12 +172,12 @@ signals:
     void editingContextChanged();
     void customGroupCountChanged();
     void membersCacheChanged();
+    void temporaryChanged();
 
 private:
     void loadModelData();
 
-    bool isAllowedMember(const QnUuid& groupId) const;
-    bool isAllowedParent(const QnUuid& groupId) const;
+    bool isAllowed(const QnUuid& parentId, const QnUuid& childId) const;
 
     void addParent(const QnUuid& groupId);
     void addMember(const QnUuid& memberId);
@@ -192,7 +196,7 @@ private:
 
     QnUuid m_subjectId;
     bool m_subjectIsUser = false;
-
+    bool m_temporary = false; //< m_subjectId is a temporary user, implies m_subjectIsUser == true.
     int m_customGroupCount = 0;
 
     MembersCache::Members m_subjectMembers; //< Sorted by id so states can be matched.
