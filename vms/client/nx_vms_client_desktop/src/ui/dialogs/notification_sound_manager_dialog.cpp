@@ -6,13 +6,13 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/media/audio_player.h>
@@ -26,7 +26,7 @@ QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *pare
 {
     ui->setupUi(this);
 
-    setHelpTopic(this, Qn::EventsActions_PlaySound_Help);
+    setHelpTopic(this, HelpTopic::Id::EventsActions_PlaySound);
 
     ui->listView->setModel(m_model);
 

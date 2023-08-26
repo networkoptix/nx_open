@@ -1,19 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "archive_length_widget.h"
+#include "ui_archive_length_widget.h"
 
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/spin_box_utils.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include "ui_archive_length_widget.h"
 #include "../data/recording_period.h"
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"
@@ -83,7 +83,7 @@ struct ArchiveLengthWidget::Private
 void ArchiveLengthWidget::Private::setupUi()
 {
     ui->setupUi(q);
-    setHelpTopic(q, Qn::CameraSettings_Recording_ArchiveLength_Help);
+    setHelpTopic(q, HelpTopic::Id::CameraSettings_Recording_ArchiveLength);
 
     check_box_utils::autoClearTristate(ui->checkBoxMinArchive);
     check_box_utils::autoClearTristate(ui->checkBoxMaxArchive);

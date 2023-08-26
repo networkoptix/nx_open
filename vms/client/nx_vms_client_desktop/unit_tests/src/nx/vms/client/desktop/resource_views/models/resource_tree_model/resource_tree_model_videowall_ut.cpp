@@ -6,9 +6,9 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <ui/help/help_topics.h>
 
 #include "resource_tree_model_test_fixture.h"
 
@@ -377,7 +377,7 @@ TEST_F(ResourceTreeModelTest, videoWallHelpTopic)
     const auto videoWallIndex = uniqueMatchingIndex(kUniqueVideoWallNameCondition);
 
     // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, Qn::Videowall_Help)(videoWallIndex));
+    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::Videowall)(videoWallIndex));
 }
 
 TEST_F(ResourceTreeModelTest, videoWallScreenHelpTopic)
@@ -395,7 +395,8 @@ TEST_F(ResourceTreeModelTest, videoWallScreenHelpTopic)
     const auto videoWallScreenIndex = uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition);
 
     // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, Qn::Videowall_Display_Help)(videoWallScreenIndex));
+    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::Videowall_Display)(
+        videoWallScreenIndex));
 }
 
 TEST_F(ResourceTreeModelTest, videoWallMatrixHelpTopic)
@@ -413,7 +414,8 @@ TEST_F(ResourceTreeModelTest, videoWallMatrixHelpTopic)
     const auto videoWallMatrixIndex = uniqueMatchingIndex(kUniqueVideoWallMatrixNameCondition);
 
     // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, Qn::Videowall_Management_Help)(videoWallMatrixIndex));
+    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::Videowall_Management)(
+        videoWallMatrixIndex));
 }
 
 TEST_F(ResourceTreeModelTest, videoWallTooltip)

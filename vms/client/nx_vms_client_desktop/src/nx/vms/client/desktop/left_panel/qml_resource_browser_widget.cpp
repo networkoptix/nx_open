@@ -16,11 +16,11 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
@@ -97,7 +97,7 @@ ui::action::Parameters QmlResourceBrowserWidget::currentParameters(ui::action::A
 
 int QmlResourceBrowserWidget::helpTopicAt(const QPointF& pos) const
 {
-    return QnHelpTopicAccessor::helpTopicAt(rootObject(), pos);
+    return HelpTopicAccessor::helpTopicAt(rootObject(), pos);
 }
 
 } // namespace nx::vms::client::desktop

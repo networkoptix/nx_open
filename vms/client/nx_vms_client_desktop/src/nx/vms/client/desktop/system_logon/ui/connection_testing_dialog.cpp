@@ -18,10 +18,10 @@
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/html/html.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <utils/connection_diagnostics_helper.h>
 
 #include "../logic/connection_delegate_helper.h"
@@ -61,18 +61,18 @@ struct DiagnosticResult
     QnUuid newServerId;
 };
 
-Qn::HelpTopic helpTopicId(RemoteConnectionErrorCode errorCode)
+HelpTopic::Id helpTopicId(RemoteConnectionErrorCode errorCode)
 {
     switch (errorCode)
     {
         case RemoteConnectionErrorCode::cloudHostDiffers:
         case RemoteConnectionErrorCode::versionIsTooLow:
         case RemoteConnectionErrorCode::binaryProtocolVersionDiffers:
-            return Qn::VersionMismatch_Help;
+            return HelpTopic::Id::VersionMismatch;
         case RemoteConnectionErrorCode::factoryServer:
-            return Qn::Setup_Wizard_Help;
+            return HelpTopic::Id::Setup_Wizard;
         default:
-            return Qn::Login_Help;
+            return HelpTopic::Id::Login;
     }
 }
 
@@ -186,7 +186,7 @@ ConnectionTestingDialog::ConnectionTestingDialog(QWidget* parent):
     d(new Private{})
 {
     d->ui->setupUi(this);
-    setHelpTopic(this, Qn::Login_Help);
+    setHelpTopic(this, HelpTopic::Id::Login);
 
     d->ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(false);
 
@@ -352,7 +352,7 @@ void ConnectionTestingDialog::updateUi()
             d->ui->statusLabel->setText(tr("New System"));
             d->setupNewServerButton->setVisible(true);
             d->ui->descriptionLabel->setVisible(false);
-            setHelpTopic(this, Qn::Setup_Wizard_Help);
+            setHelpTopic(this, HelpTopic::Id::Setup_Wizard);
             break;
         }
     }

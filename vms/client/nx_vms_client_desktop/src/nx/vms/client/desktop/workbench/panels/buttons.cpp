@@ -5,6 +5,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -12,8 +14,6 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -67,7 +67,7 @@ QnImageButtonWidget* newActionButton(
     button->setDefaultAction(action);
     button->setFixedSize(core::Skin::maximumSize(action->icon()));
 
-    if (helpTopicId != Qn::Empty_Help)
+    if (helpTopicId != HelpTopic::Id::Empty)
         setHelpTopic(button, helpTopicId);
 
     return button;
@@ -99,7 +99,7 @@ T* newCustomShowHideButton(
     button->setProperty(Qn::NoHandScrollOver, true);
     button->setProperty(Qn::BlockMotionSelection, true);
 
-    setHelpTopic(button, Qn::MainWindow_Pin_Help);
+    setHelpTopic(button, HelpTopic::Id::MainWindow_Pin);
     return button;
 }
 
@@ -141,7 +141,7 @@ QnImageButtonWidget* newPinTimelineButton(
     button->setProperty(Qn::NoHandScrollOver, true);
     button->setProperty(Qn::BlockMotionSelection, true);
 
-    setHelpTopic(button, Qn::MainWindow_Pin_Help);
+    setHelpTopic(button, HelpTopic::Id::MainWindow_Pin);
     return button;
 }
 

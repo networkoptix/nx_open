@@ -10,13 +10,13 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
-#include <ui/help/help_handler.h>
-#include <ui/help/help_topic_accessor.h>
 
 namespace nx::vms::client::desktop {
 
@@ -46,8 +46,8 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
     ui->helpLabel->setText(
         tr("Read more on the %1").arg(common::html::localLink(tr("help page"))));
     connect(ui->helpLabel, &QLabel::linkActivated,
-        [](){ QnHelpHandler::openHelpTopic(Qn::HelpTopic::CloudLayoutsIntroduction_help); });
-    setHelpTopic(this, Qn::HelpTopic::CloudLayoutsIntroductionAssign_Help);
+        [](){ HelpHandler::openHelpTopic(HelpTopic::Id::CloudLayoutsIntroduction); });
+    setHelpTopic(this, HelpTopic::Id::CloudLayoutsIntroductionAssign);
 
     QColor captionTextColor = core::colorTheme()->color("light1");
     setPaletteColor(ui->captionLabel, QPalette::WindowText, captionTextColor);

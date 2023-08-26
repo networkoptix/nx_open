@@ -19,13 +19,13 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/common/html/html.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
@@ -143,7 +143,7 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
             return QVariant::fromValue<QnResourcePtr>(camera(bookmark));
 
         case Qn::HelpTopicIdRole:
-            return Qn::Bookmarks_Usage_Help;
+            return HelpTopic::Id::Bookmarks_Usage;
 
         case Qn::CameraBookmarkRole:
             return QVariant::fromValue(bookmark);

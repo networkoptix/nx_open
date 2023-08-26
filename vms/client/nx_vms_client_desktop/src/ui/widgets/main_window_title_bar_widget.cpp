@@ -24,6 +24,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/screen_recording_indicator.h>
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
@@ -34,7 +35,6 @@
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/common/palette.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window_title_bar_state.h>
@@ -193,7 +193,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     d->mainMenuButton = newActionButton(
         action::MainMenuAction,
         qnSkin->icon("titlebar/main_menu.svg", "", nullptr, Style::kTitleBarSubstitutions),
-        Qn::MainWindow_TitleBar_MainMenu_Help);
+        HelpTopic::Id::MainWindow_TitleBar_MainMenu);
     connect(d->mainMenuButton, &ToolButton::justPressed, this,
         [this]()
         {
@@ -238,7 +238,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
         .arg(core::colorTheme()->color("dark8").name());
     d->newTabButton = newActionButton(
         action::OpenNewTabAction,
-        Qn::MainWindow_TitleBar_NewLayout_Help,
+        HelpTopic::Id::MainWindow_TitleBar_NewLayout,
         kTabBarButtonSize);
     d->newTabButton->setStyleSheet(styleSheet);
 
@@ -451,7 +451,7 @@ ToolButton *QnMainWindowTitleBarWidget::newActionButton(
     button->setFixedSize(qnSkin->maximumSize(icon));
     button->setAutoRaise(true);
 
-    if (helpTopicId != Qn::Empty_Help)
+    if (helpTopicId != HelpTopic::Id::Empty)
         setHelpTopic(button, helpTopicId);
 
     return button;
@@ -470,7 +470,7 @@ ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     button->setFixedSize(fixedSize.isEmpty() ? button->iconSize() : fixedSize);
     button->setAutoRaise(true);
 
-    if (helpTopicId != Qn::Empty_Help)
+    if (helpTopicId != HelpTopic::Id::Empty)
         setHelpTopic(button, helpTopicId);
 
     return button;
@@ -480,7 +480,7 @@ ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     action::IDType actionId,
     const QSize& fixedSize)
 {
-    return newActionButton(actionId, Qn::Empty_Help, fixedSize);
+    return newActionButton(actionId, HelpTopic::Id::Empty, fixedSize);
 }
 
 QWidget* QnMainWindowTitleBarWidget::newRecordingIndicator(const QSize& fixedSize)
@@ -546,7 +546,7 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     }
     d->systemLayout->addWidget(newActionButton(
         action::WhatsThisAction,
-        Qn::MainWindow_ContextHelp_Help,
+        HelpTopic::Id::MainWindow_ContextHelp,
         kControlButtonSize));
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     d->systemLayout->addWidget(newActionButton(
@@ -555,7 +555,7 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     d->systemLayout->addWidget(newActionButton(
         action::EffectiveMaximizeAction,
-        Qn::MainWindow_Fullscreen_Help,
+        HelpTopic::Id::MainWindow_Fullscreen,
         kControlButtonSize));
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     {
@@ -625,14 +625,14 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
 #ifdef ENABLE_LOGIN_TO_ANOTHER_SYSTEM_BUTTON
     layout->addWidget(newActionButton(
         action::OpenLoginDialogAction,
-        Qn::Login_Help,
+        HelpTopic::Id::Login,
         kControlButtonSize));
 #else
     layout->addSpacing(8);
 #endif
     layout->addWidget(newActionButton(
         action::WhatsThisAction,
-        Qn::MainWindow_ContextHelp_Help,
+        HelpTopic::Id::MainWindow_ContextHelp,
         kControlButtonSize));
     layout->addWidget(newVLine("dark8", "dark6"));
     layout->addWidget(newActionButton(
@@ -641,7 +641,7 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
     layout->addWidget(newVLine("dark8", "dark6"));
     layout->addWidget(newActionButton(
         action::EffectiveMaximizeAction,
-        Qn::MainWindow_Fullscreen_Help,
+        HelpTopic::Id::MainWindow_Fullscreen,
         kControlButtonSize));
     layout->addWidget(newVLine("dark8", "dark6"));
     {

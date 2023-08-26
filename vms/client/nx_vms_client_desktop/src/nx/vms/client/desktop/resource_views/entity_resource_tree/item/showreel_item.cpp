@@ -5,9 +5,9 @@
 #include <QtCore/QVariant>
 
 #include <client/client_globals.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
-#include <ui/help/help_topics.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -42,7 +42,7 @@ QVariant ShowreelItem::data(int role) const
             return QVariant::fromValue(m_showreel.id);
 
         case Qn::HelpTopicIdRole:
-            return QVariant::fromValue<int>(Qn::Showreel_Help);
+            return QVariant::fromValue<int>(HelpTopic::Id::Showreel);
     }
     return QVariant();
 }

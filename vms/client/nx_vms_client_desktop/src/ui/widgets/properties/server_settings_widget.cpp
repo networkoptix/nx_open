@@ -31,6 +31,8 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -40,8 +42,6 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
@@ -207,13 +207,14 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     setWarningStyle(ui->failoverWarningLabel);
 
     /* Set up context help. */
-    setHelpTopic(ui->nameLabel, ui->nameLineEdit, Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->nameLabel, ui->maxCamerasSpinBox, Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->nameLabel, ui->locationIdSpinBox, Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->ipAddressLabel, ui->ipAddressLineEdit, Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->portLabel, ui->portLineEdit, Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->webCamerasDiscoveryCheckBox, Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->failoverGroupBox, Qn::ServerSettings_Failover_Help);
+    setHelpTopic(ui->nameLabel, ui->nameLineEdit, HelpTopic::Id::ServerSettings_General);
+    setHelpTopic(ui->nameLabel, ui->maxCamerasSpinBox, HelpTopic::Id::ServerSettings_General);
+    setHelpTopic(ui->nameLabel, ui->locationIdSpinBox, HelpTopic::Id::ServerSettings_General);
+    setHelpTopic(ui->ipAddressLabel, ui->ipAddressLineEdit,
+        HelpTopic::Id::ServerSettings_General);
+    setHelpTopic(ui->portLabel, ui->portLineEdit, HelpTopic::Id::ServerSettings_General);
+    setHelpTopic(ui->webCamerasDiscoveryCheckBox, HelpTopic::Id::ServerSettings_General);
+    setHelpTopic(ui->failoverGroupBox, HelpTopic::Id::ServerSettings_Failover);
 
     const auto failoverHint = HintButton::createGroupBoxHint(ui->failoverGroupBox);
     // Notice: this hint button uses help topic from the parent class.

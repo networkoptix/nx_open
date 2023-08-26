@@ -26,6 +26,8 @@
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
@@ -41,8 +43,6 @@
 #include <ui/common/palette.h>
 #include <ui/delegates/audit_item_delegate.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/audit/audit_log_detail_model.h>
 #include <ui/models/audit/audit_log_session_model.h>
 #include <ui/utils/table_export_helper.h>
@@ -98,7 +98,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     setWarningStyle(ui->warningLabel);
 
-    setHelpTopic(this, Qn::AuditTrail_Help);
+    setHelpTopic(this, HelpTopic::Id::AuditTrail);
 
     setTabShape(ui->mainTabWidget->tabBar(), nx::style::TabShape::Compact);
     setTabShape(ui->detailsTabWidget->tabBar(), nx::style::TabShape::Compact);

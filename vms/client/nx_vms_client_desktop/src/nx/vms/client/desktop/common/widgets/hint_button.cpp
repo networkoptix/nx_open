@@ -12,10 +12,10 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
-#include <ui/help/help_handler.h>
-#include <ui/help/help_topic_accessor.h>
 
 namespace {
 
@@ -135,7 +135,7 @@ int HintButton::getHelpTopicId() const
 
 bool HintButton::hasHelpTopic() const
 {
-    return getHelpTopicId() != Qn::Empty_Help;
+    return getHelpTopicId() != HelpTopic::Id::Empty;
 }
 
 void HintButton::showTooltip(bool show)
@@ -170,7 +170,7 @@ bool HintButton::event(QEvent* event)
     // clicked() signal will not be emitted and mouseReleaseEvent() will not be called if
     // hint button is disabled due to not checked parent QGroupBox, so we catch click this way.
     if (event->type() == QEvent::MouseButtonRelease && hasHelpTopic())
-        QnHelpHandler::openHelpTopic(getHelpTopicId());
+        HelpHandler::openHelpTopic(getHelpTopicId());
 
     return base_type::event(event);
 }

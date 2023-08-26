@@ -25,6 +25,8 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -37,8 +39,6 @@
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
@@ -528,7 +528,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     dialog->addWidget(tr("Timestamp:"), timestampComboBox);
     dialog->addWidget(tr("Camera name:"), cameraNameComboBox);
     setAccentStyle(dialog.data(), QDialogButtonBox::Save);
-    setHelpTopic(dialog.data(), Qn::MainWindow_MediaItem_Screenshot_Help);
+    setHelpTopic(dialog.data(), HelpTopic::Id::MainWindow_MediaItem_Screenshot);
 
     QString fileName;
 

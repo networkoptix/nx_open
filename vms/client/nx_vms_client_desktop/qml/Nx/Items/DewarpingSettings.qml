@@ -18,9 +18,6 @@ Item
     /** Preview image source. */
     property AbstractResourceThumbnail previewSource: null
 
-    /** Integer index of help topic in the documentation (used in context hints). */
-    property alias helpTopic: fisheyeSettings.helpTopic
-
     /** Enable/disable dewarping. */
     property alias dewarpingEnabled: enableSwitch.checked
 

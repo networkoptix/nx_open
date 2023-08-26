@@ -3,12 +3,11 @@
 #include "setup_wizard_dialog.h"
 
 #include <QtCore/QUrlQuery>
-
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLineEdit>
 
-#include <client_core/client_core_module.h>
 #include <client/client_runtime_settings.h>
+#include <client_core/client_core_module.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/network/url/url_builder.h>
@@ -16,9 +15,9 @@
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 
 #include "private/setup_wizard_dialog_p.h"
 
@@ -80,7 +79,7 @@ SetupWizardDialog::SetupWizardDialog(
 
     layout->addWidget(d->webViewWidget);
     setFixedSize(kSetupWizardSize);
-    setHelpTopic(this, Qn::Setup_Wizard_Help);
+    setHelpTopic(this, HelpTopic::Id::Setup_Wizard);
 }
 
 SetupWizardDialog::~SetupWizardDialog()

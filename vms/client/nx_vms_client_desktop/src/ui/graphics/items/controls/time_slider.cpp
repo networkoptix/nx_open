@@ -29,6 +29,7 @@
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/graphics_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -46,7 +47,6 @@
 #include <ui/common/palette.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider_pixmap_cache.h>
-#include <ui/help/help_topics.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
@@ -1799,13 +1799,13 @@ int QnTimeSlider::helpTopicAt(const QPointF& pos) const
     }
 
     if (hasMotion)
-        return Qn::MainWindow_MediaItem_SmartSearch_Help;
+        return HelpTopic::Id::MainWindow_MediaItem_SmartSearch;
 
     if (!m_bookmarksHelper->bookmarksAtPosition(timeFromPosition(pos),
         milliseconds(qint64(m_msecsPerPixel))).isEmpty())
-            return Qn::Bookmarks_Usage_Help;
+            return HelpTopic::Id::Bookmarks_Usage;
 
-    return Qn::MainWindow_Slider_Timeline_Help;
+    return HelpTopic::Id::MainWindow_Slider_Timeline;
 }
 
 

@@ -1,35 +1,35 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "notifications_workbench_panel.h"
-#include "buttons.h"
 
 #include <QtCore/QTimer>
 #include <QtGui/QAction>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
+#include <nx/vms/client/desktop/event_search/widgets/event_panel.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/widget_opacity_animator.h>
 #include <ui/common/notification_levels.h>
-#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/generic/blinking_image_widget.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
+#include <ui/graphics/items/generic/blinking_image_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/processors/hover_processor.h>
-#include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>
-
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/event_search/widgets/event_panel.h>
-#include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
-#include <nx/vms/client/desktop/workbench/workbench_animations.h>
+#include <ui/workbench/workbench_ui_globals.h>
 #include <utils/common/event_processors.h>
+
+#include "buttons.h"
 
 namespace nx::vms::client::desktop {
 
@@ -167,7 +167,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
     initEventPanel();
 
-    setHelpTopic(m_widget, Qn::NotificationsPanel_Help);
+    setHelpTopic(m_widget, HelpTopic::Id::NotificationsPanel);
 
     action(action::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setTransform(QTransform::fromScale(-1, 1)); // Achtung! Flips button horizontally.

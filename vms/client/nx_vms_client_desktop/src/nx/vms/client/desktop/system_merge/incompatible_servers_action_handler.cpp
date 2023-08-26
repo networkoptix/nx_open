@@ -14,6 +14,8 @@
 #include <nx/build_info.h>
 #include <nx/vms/client/core/system_logon/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/system_merge/connect_to_current_system_tool.h>
@@ -21,8 +23,6 @@
 #include <nx/vms/client/desktop/ui/dialogs/merge_systems_dialog.h>
 #include <nx/vms/license/remote_licenses.h>
 #include <ui/dialogs/common/input_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/merge_systems_common.h>

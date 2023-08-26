@@ -12,12 +12,12 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/translation_list_model.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
@@ -51,16 +51,16 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
 
     ui->imageNameLineEdit->setPlaceholderText('<' + tr("No image") + '>');
 
-    setHelpTopic(this,                                                        Qn::SystemSettings_General_Customizing_Help);
-    setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
-    setHelpTopic(ui->showIpInTreeCheckBox,                                    Qn::SystemSettings_General_ShowIpInTree_Help);
+    setHelpTopic(this,                                                        HelpTopic::Id::SystemSettings_General_Customizing);
+    setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       HelpTopic::Id::SystemSettings_General_TourCycleTime);
+    setHelpTopic(ui->showIpInTreeCheckBox,                                    HelpTopic::Id::SystemSettings_General_ShowIpInTree);
 
     ui->showIpInTreeCheckBoxHint->setHintText(
         tr("Displays IP addresses for cameras and servers and roles for users."));
 
     ui->timeModeLabel->setHint(tr("Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones."));
     ui->tourCycleTimeLabel->setHint(tr("Length of time each camera on layout will be displayed if you start a Tour."));
-    setHelpTopic(ui->tourCycleTimeLabel, Qn::SystemSettings_General_TourCycleTime_Help);
+    setHelpTopic(ui->tourCycleTimeLabel, HelpTopic::Id::SystemSettings_General_TourCycleTime);
 
     auto aligner = new Aligner(this);
     aligner->addWidgets({

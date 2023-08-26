@@ -7,12 +7,15 @@
 
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/desktop/common/dialogs/repeated_password_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -22,9 +25,6 @@
 #include <nx/vms/text/human_readable.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_handler.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 using namespace nx::vms::common;
@@ -56,31 +56,32 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         "The encryption password will be required to restore the archive on another system."
         "\nCaution: This password cannot be reset. If you lose it, the archive will be unrecoverable."));
 
-    setHelpTopic(ui->useHttpsOnlyCamerasCheckBox, Qn::ConnectToCamerasOverOnlyHttps_Help);
+    setHelpTopic(ui->useHttpsOnlyCamerasCheckBox, HelpTopic::Id::ConnectToCamerasOverOnlyHttps);
     ui->useHttpsOnlyCamerasCheckBox->setHint(ui->useHttpsOnlyCamerasCheckBox->text());
 
-    setHelpTopic(ui->displayWatermarkCheckBox, Qn::UserWatermark_Help);
+    setHelpTopic(ui->displayWatermarkCheckBox, HelpTopic::Id::UserWatermark);
     ui->displayWatermarkCheckBox->setHint(tr(
         "Watermarks will be displayed over live, archive and exported videos for non-power users"
         " only. You and other power users will not see them."));
 
-    setHelpTopic(ui->auditTrailCheckBox, Qn::AuditTrail_Help);
+    setHelpTopic(ui->auditTrailCheckBox, HelpTopic::Id::AuditTrail);
     ui->auditTrailCheckBox->setHint(tr("Tracks and logs all user actions."));
 
-    setHelpTopic(ui->limitSessionLengthCheckBox, Qn::LaunchingAndClosing_Help);
+    setHelpTopic(ui->limitSessionLengthCheckBox, HelpTopic::Id::LaunchingAndClosing);
     ui->limitSessionLengthCheckBox->setHint(tr(
         "Local and LDAP users will be automatically logged out if their session exceeds the"
         " specified duration."));
 
     ui->forceTrafficEncryptionCheckBox->setHint(
         tr("Does not affect the connections established by server."));
-    setHelpTopic(ui->forceTrafficEncryptionCheckBox, Qn::ForceSecureConnections_Help);
+    setHelpTopic(ui->forceTrafficEncryptionCheckBox, HelpTopic::Id::ForceSecureConnections);
 
-    setHelpTopic(ui->forceVideoTrafficEncryptionCheckBox, Qn::EnableEncryptedVideoTraffic_Help);
+    setHelpTopic(ui->forceVideoTrafficEncryptionCheckBox,
+        HelpTopic::Id::EnableEncryptedVideoTraffic);
     ui->forceVideoTrafficEncryptionCheckBox->setHint(tr(
         "Enables RTSP traffic encryption."));
 
-    setHelpTopic(ui->archiveEncryptionGroupBox, Qn::EnableArchiveEncryption_Help);
+    setHelpTopic(ui->archiveEncryptionGroupBox, HelpTopic::Id::EnableArchiveEncryption);
     const auto archiveEncryptionHint = HintButton::createGroupBoxHint(ui->archiveEncryptionGroupBox);
     archiveEncryptionHint->setHintText(tr(
         "Encrypts archive data to prevent it from being viewed outside of the system. "
@@ -167,7 +168,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         });
 
     connect(ui->digestAlertLabel, &AlertLabel::linkActivated, this,
-        [] { QnHelpHandler::openHelpTopic(Qn::HelpTopic::SessionAndDigestAuth_Help); });
+        [] { HelpHandler::openHelpTopic(HelpTopic::Id::SessionAndDigestAuth); });
     connect(ui->manageUsersButton, &QPushButton::clicked,
         this, &SecuritySettingsWidget::manageUsers);
 

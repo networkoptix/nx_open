@@ -28,6 +28,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -38,8 +40,6 @@
 #include <nx/vms/time/formatter.h>
 #include <server/server_storage_manager.h>
 #include <ui/dialogs/storage_url_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/storage_list_model.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
@@ -468,11 +468,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     m_storagePoolMenu->addAction(tr("Main"))->setData(false);
     m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
 
-    setHelpTopic(this, Qn::ServerSettings_Storages_Help);
+    setHelpTopic(this, HelpTopic::Id::ServerSettings_Storages);
 
     ui->rebuildBackupButtonHint->addHintLine(tr("Reindexing can fix problems with archive or "
         "backup if they have been lost or damaged, or if some hardware has been replaced."));
-    setHelpTopic(ui->rebuildBackupButtonHint, Qn::ServerSettings_ArchiveRestoring_Help);
+    setHelpTopic(ui->rebuildBackupButtonHint, HelpTopic::Id::ServerSettings_ArchiveRestoring);
 
     auto hoverTracker = new ItemViewHoverTracker(ui->storageView);
     hoverTracker->setMouseCursorRole(Qn::ItemMouseCursorRole);

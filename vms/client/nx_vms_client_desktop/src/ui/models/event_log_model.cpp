@@ -25,6 +25,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -34,7 +35,6 @@
 #include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/time/formatter.h>
-#include <ui/help/business_help.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
@@ -615,9 +615,9 @@ int QnEventLogModel::helpTopicIdData(Column column, const vms::event::ActionData
     switch (column)
     {
         case EventColumn:
-            return QnBusiness::eventHelpId(action.eventParams.eventType);
+            return rules::eventHelpId(action.eventParams.eventType);
         case ActionColumn:
-            return QnBusiness::actionHelpId(action.actionType);
+            return rules::actionHelpId(action.actionType);
         default:
             return -1;
     }

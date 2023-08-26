@@ -10,12 +10,12 @@
 #include <client/client_runtime_settings.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
-#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <utils/common/delayed.h>
 
 #include "private/oauth_login_dialog_p.h"
@@ -49,7 +49,7 @@ OauthLoginDialog::OauthLoginDialog(
 
     layout->addWidget(d->m_stackedWidget);
     setFixedSize(fixedSize);
-    setHelpTopic(this, Qn::Login_Help);
+    setHelpTopic(this, HelpTopic::Id::Login);
 
     executeLater([this]() { loadPage(); }, this);
 

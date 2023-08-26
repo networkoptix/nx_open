@@ -20,6 +20,8 @@
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -30,8 +32,6 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/util.h>
 
@@ -55,7 +55,7 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
-    setHelpTopic(this, Qn::Systems_MergeSystems_Help);
+    setHelpTopic(this, HelpTopic::Id::Systems_MergeSystems);
 
     setWarningStyle(ui->errorLabel);
 

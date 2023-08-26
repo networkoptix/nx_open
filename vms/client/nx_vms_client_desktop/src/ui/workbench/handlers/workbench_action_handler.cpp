@@ -82,6 +82,9 @@
 #include <nx/vms/client/desktop/cross_system/dialogs/cloud_layouts_intro_dialog.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/profile_g/import_from_device_dialog.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
@@ -155,9 +158,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
-#include <ui/help/help_handler.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
@@ -228,7 +228,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
 
     connect(action(action::UserManualAction), &QAction::triggered, this,
-        [] { QnHelpHandler::openHelpTopic(Qn::MainWindow_Scene_Help); },
+        [] { HelpHandler::openHelpTopic(HelpTopic::Id::MainWindow_Scene); },
         Qt::QueuedConnection);
 
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));

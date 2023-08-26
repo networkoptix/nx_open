@@ -9,11 +9,12 @@
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 
 using namespace nx::vms::client::core;
 using namespace nx::vms::client::core::ptz;
+using namespace nx::vms::client::desktop;
 
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :
     base_type(parent),
@@ -254,7 +255,7 @@ bool QnPtzManageModel::removeRows(int row, int count, const QModelIndex &parent)
 QVariant QnPtzManageModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent())) {
         if (role == Qn::HelpTopicIdRole)
-            return Qn::PtzPresets_Help;
+            return HelpTopic::Id::PtzPresets;
         return QVariant();
     }
 
@@ -525,7 +526,9 @@ QVariant QnPtzManageModel::titleData(RowType rowType,  int column, int role) con
             return f;
         }
     case Qn::HelpTopicIdRole:
-        return rowType == PresetTitleRow ? Qn::PtzPresets_Help : Qn::PtzManagement_Tour_Help;
+        return rowType == PresetTitleRow
+            ? HelpTopic::Id::PtzPresets
+            : HelpTopic::Id::PtzManagement_Tour;
 
     default:
         break;
@@ -572,7 +575,7 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
     case Qn::ValidRole:
         return true;
     case Qn::HelpTopicIdRole:
-        return Qn::PtzPresets_Help;
+        return HelpTopic::Id::PtzPresets;
     default:
         break;
     }
@@ -630,7 +633,7 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
         // TODO: some gradations required: fully invalid, only warning (eg. hotkey duplicates)
         return tourIsValid(tourModel);
     case Qn::HelpTopicIdRole:
-        return Qn::PtzManagement_Tour_Help;
+        return HelpTopic::Id::PtzManagement_Tour;
     default:
         break;
     }

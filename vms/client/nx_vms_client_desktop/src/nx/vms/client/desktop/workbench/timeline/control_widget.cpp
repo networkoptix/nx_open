@@ -14,6 +14,8 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -21,8 +23,6 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
@@ -224,14 +224,13 @@ ControlWidget::ControlWidget(QnWorkbenchContext* context, QWidget* parent):
     connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,
         this, &ControlWidget::updateVolumeButtonsEnabled);
 
-
-    setHelpTopic(this,               Qn::MainWindow_Playback_Help);
-    setHelpTopic(m_volumeSlider,     Qn::MainWindow_Slider_Volume_Help);
-    setHelpTopic(m_muteButton,       Qn::MainWindow_Slider_Volume_Help);
-    setHelpTopic(m_liveButton,       Qn::MainWindow_Navigation_Help);
-    setHelpTopic(m_syncButton,       Qn::MainWindow_Sync_Help);
-    setHelpTopic(m_calendarButton,   Qn::MainWindow_Calendar_Help);
-    setHelpTopic(m_thumbnailsButton, Qn::MainWindow_Thumbnails_Help);
+    setHelpTopic(this, HelpTopic::Id::MainWindow_Playback);
+    setHelpTopic(m_volumeSlider, HelpTopic::Id::MainWindow_Slider_Volume);
+    setHelpTopic(m_muteButton, HelpTopic::Id::MainWindow_Slider_Volume);
+    setHelpTopic(m_liveButton, HelpTopic::Id::MainWindow_Navigation);
+    setHelpTopic(m_syncButton, HelpTopic::Id::MainWindow_Sync);
+    setHelpTopic(m_calendarButton, HelpTopic::Id::MainWindow_Calendar);
+    setHelpTopic(m_thumbnailsButton, HelpTopic::Id::MainWindow_Thumbnails);
 
     /* Run handlers */
     updateMuteButtonChecked();

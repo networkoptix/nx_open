@@ -38,8 +38,6 @@ Item
     /** Fisheye lens projection type. */
     property int lensProjection: { return Dewarping.CameraProjection.equidistant }
 
-    property int helpTopic: 0
-
     implicitHeight: content.implicitHeight
     implicitWidth: content.implicitWidth
     opacity: enabled ? 1.0 : 0.3
@@ -284,7 +282,7 @@ Item
                     {
                         text: qsTr("Angle")
                         contextHintText: qsTr("Camera roll correction")
-                        contextHelpTopic: fisheyeSettings.helpTopic
+                        contextHelpTopic: HelpTopic.MainWindow_MediaItem_Dewarping
                     }
 
                     DoubleSpinBox

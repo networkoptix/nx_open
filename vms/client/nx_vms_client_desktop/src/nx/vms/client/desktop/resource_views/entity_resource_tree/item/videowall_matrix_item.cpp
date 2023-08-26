@@ -4,10 +4,10 @@
 
 #include <QtCore/QVariant>
 
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <core/resource/videowall_resource.h>
 #include <client/client_globals.h>
-#include <ui/help/help_topics.h>
+#include <core/resource/videowall_resource.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -46,7 +46,7 @@ QVariant VideoWallMatrixItem::data(int role) const
             return QVariant::fromValue(m_matrix.uuid);
 
         case Qn::HelpTopicIdRole:
-            return QVariant::fromValue<int>(Qn::Videowall_Management_Help);
+            return QVariant::fromValue<int>(HelpTopic::Id::Videowall_Management);
     }
 
     return QVariant();
