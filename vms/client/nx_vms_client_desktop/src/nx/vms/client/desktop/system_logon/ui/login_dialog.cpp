@@ -22,6 +22,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -29,8 +31,6 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/utils/system_uri.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
@@ -108,7 +108,7 @@ LoginDialog::LoginDialog(QWidget *parent):
     setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     setWindowTitle(tr("Connect to Server..."));
-    setHelpTopic(this, Qn::Login_Help);
+    setHelpTopic(this, HelpTopic::Id::Login);
 
     auto buttonBoxLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
     if (NX_ASSERT(buttonBoxLayout))

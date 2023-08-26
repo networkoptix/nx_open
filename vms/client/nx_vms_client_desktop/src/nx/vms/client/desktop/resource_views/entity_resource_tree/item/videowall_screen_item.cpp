@@ -6,9 +6,9 @@
 
 #include <client/client_globals.h>
 #include <core/resource/videowall_resource.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/system_context.h>
-#include <ui/help/help_topics.h>
 
 namespace {
 
@@ -72,7 +72,7 @@ QVariant VideoWallScreenItem::data(int role) const
             return QVariant::fromValue(m_screen.uuid);
 
         case Qn::HelpTopicIdRole:
-            return QVariant::fromValue<int>(Qn::Videowall_Display_Help);
+            return QVariant::fromValue<int>(HelpTopic::Id::Videowall_Display);
     }
 
     return QVariant();

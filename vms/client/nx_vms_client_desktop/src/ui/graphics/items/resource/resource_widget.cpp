@@ -26,6 +26,8 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
@@ -58,8 +60,6 @@
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_display.h>
@@ -393,7 +393,7 @@ void QnResourceWidget::createButtons()
     rotateButton->setIcon(loadSvgIcon("item/rotate.svg"));
     rotateButton->setToolTip(tooltipText(tr("Rotate"), "Alt+drag"));
     rotateButton->setObjectName("RotateButton");
-    setHelpTopic(rotateButton, Qn::MainWindow_MediaItem_Rotate_Help);
+    setHelpTopic(rotateButton, HelpTopic::Id::MainWindow_MediaItem_Rotate);
     connect(rotateButton, &QnImageButtonWidget::pressed, this, &QnResourceWidget::rotationStartRequested);
     connect(rotateButton, &QnImageButtonWidget::released, this, &QnResourceWidget::rotationStopRequested);
 

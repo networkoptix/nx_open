@@ -28,6 +28,8 @@
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/control_bars.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
@@ -39,8 +41,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
@@ -448,7 +448,7 @@ void UserListWidget::Private::setupUi()
             handleUsersTableClicked(index.sibling(index.row(), UserListModel::CheckBoxColumn));
         });
 
-    setHelpTopic(q, Qn::SystemSettings_UserManagement_Help);
+    setHelpTopic(q, HelpTopic::Id::SystemSettings_UserManagement);
 
     // Cursor changes with hover:
     connect(hoverTracker, &ItemViewHoverTracker::itemEnter, this,

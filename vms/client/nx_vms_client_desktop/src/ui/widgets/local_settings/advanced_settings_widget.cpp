@@ -25,6 +25,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
@@ -41,8 +43,6 @@
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -94,7 +94,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
 
     ui->maximumLiveBufferLengthSpinBox->setSuffix(' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds));
 
-    setHelpTopic(ui->doubleBufferCheckbox, Qn::SystemSettings_General_DoubleBuffering_Help);
+    setHelpTopic(ui->doubleBufferCheckbox, HelpTopic::Id::SystemSettings_General_DoubleBuffering);
 
     ui->doubleBufferCheckboxHint->setHintText(
         tr("Helps avoid problems with OpenGL drawing which result in 100% CPU load."));

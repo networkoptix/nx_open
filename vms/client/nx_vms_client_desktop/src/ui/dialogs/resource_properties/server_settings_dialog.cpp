@@ -14,6 +14,8 @@
 #include <nx/network/http/http_types.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_state.h>
@@ -25,8 +27,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/properties/server_settings_widget.h>
 #include <ui/widgets/properties/storage_analytics_widget.h>
 #include <ui/widgets/properties/storage_config_widget.h>
@@ -152,7 +152,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
-    setHelpTopic(this, Qn::ServerSettings_General_Help);
+    setHelpTopic(this, HelpTopic::Id::ServerSettings_General);
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog()
@@ -169,7 +169,7 @@ void QnServerSettingsDialog::setupShowWebServerLink()
     }
 
     buttonsLayout->insertWidget(0, d->webPageLink);
-    setHelpTopic(d->webPageLink, Qn::ServerSettings_WebClient_Help);
+    setHelpTopic(d->webPageLink, HelpTopic::Id::ServerSettings_WebClient);
     connect(d->webPageLink, &QLabel::linkActivated, this,
         [this] { menu()->trigger(action::WebAdminAction, d->server); });
 }

@@ -13,14 +13,14 @@
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/image_preview_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/common/framed_label.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
@@ -182,7 +182,7 @@ void LayoutBackgroundSettingsWidget::setupUi()
     ui->widthSpinBox->setSuffix(' ' + tr("cells"));
     ui->heightSpinBox->setSuffix(' ' + tr("cells"));
 
-    setHelpTopic(this, Qn::LayoutSettings_EMapping_Help);
+    setHelpTopic(this, HelpTopic::Id::LayoutSettings_EMapping);
 
     installEventFilter(this);
     ui->imageLabel->installEventFilter(this);

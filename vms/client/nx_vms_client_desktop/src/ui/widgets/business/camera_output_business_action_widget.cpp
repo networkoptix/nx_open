@@ -7,12 +7,12 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 using namespace nx::vms::client::desktop;
@@ -49,7 +49,7 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(
 
     connect(ui->timeDuration, SIGNAL(valueChanged()), this, SLOT(paramsChanged()));
 
-    setHelpTopic(this, Qn::EventsActions_CameraOutput_Help);
+    setHelpTopic(this, HelpTopic::Id::EventsActions_CameraOutput);
 }
 
 QnCameraOutputBusinessActionWidget::~QnCameraOutputBusinessActionWidget()

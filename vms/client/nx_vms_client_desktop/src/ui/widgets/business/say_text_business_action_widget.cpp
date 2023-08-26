@@ -8,10 +8,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/audio/audiodevice.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/event/action_parameters.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <utils/media/audio_player.h>
 
 using namespace nx::vms::client::desktop;
@@ -54,7 +54,7 @@ QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(
     ui->selectUsersButton->setVisible(ui->playToClient->isChecked());
     setSubjectsButton(ui->selectUsersButton);
 
-    setHelpTopic(this, Qn::EventsActions_Speech_Help);
+    setHelpTopic(this, HelpTopic::Id::EventsActions_Speech);
 }
 
 QnSayTextBusinessActionWidget::~QnSayTextBusinessActionWidget()

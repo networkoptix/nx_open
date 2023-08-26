@@ -10,13 +10,13 @@
 #include <health/system_health_strings_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
@@ -38,7 +38,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     SnappedScrollBar* scrollBar = new SnappedScrollBar(this);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    setHelpTopic(this, Qn::SystemSettings_Notifications_Help);
+    setHelpTopic(this, HelpTopic::Id::SystemSettings_Notifications);
 
     ui->deprecationMessageBar->setText(tr("These settings apply only to the System you are logged"
         " in to and will be removed in future versions."));

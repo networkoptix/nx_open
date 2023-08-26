@@ -34,6 +34,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -86,7 +87,6 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/help/help_handler.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context_aware.h>

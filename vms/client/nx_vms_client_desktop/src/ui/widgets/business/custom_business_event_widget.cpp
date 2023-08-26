@@ -13,9 +13,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/common/html/html.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -44,15 +44,15 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(
 
     ui->sourceLabel->addHintLine(tr("Event will trigger only if there are matches in the source with any of the entered keywords."));
     ui->sourceLabel->addHintLine(tr("If the field is empty, event will always trigger."));
-    setHelpTopic(ui->sourceLabel, Qn::EventsActions_Generic_Help);
+    setHelpTopic(ui->sourceLabel, HelpTopic::Id::EventsActions_Generic);
 
     ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in the caption with any of the entered keywords."));
     ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
-    setHelpTopic(ui->captionLabel, Qn::EventsActions_Generic_Help);
+    setHelpTopic(ui->captionLabel, HelpTopic::Id::EventsActions_Generic);
 
     ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the description with any of the entered keywords."));
     ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
-    setHelpTopic(ui->descriptionLabel, Qn::EventsActions_Generic_Help);
+    setHelpTopic(ui->descriptionLabel, HelpTopic::Id::EventsActions_Generic);
 
     if (auto server = currentServer())
     {

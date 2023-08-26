@@ -4,12 +4,12 @@
 #include "ui_adjust_video_dialog.h"
 
 #include <core/resource/media_resource.h>
-
-#include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
 
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
+using namespace nx::vms::client::desktop;
 
 QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent) :
     base_type(parent),
@@ -32,7 +32,7 @@ QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent) :
     
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonClicked(QAbstractButton*)));
 
-    setHelpTopic(this, Qn::ImageEnhancement_Help);
+    setHelpTopic(this, HelpTopic::Id::ImageEnhancement);
 }
 
 QnAdjustVideoDialog::~QnAdjustVideoDialog() {

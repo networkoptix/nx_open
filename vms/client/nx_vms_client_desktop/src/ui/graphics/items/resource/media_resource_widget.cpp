@@ -65,6 +65,8 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
@@ -122,8 +124,6 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/gl_native_painting.h>
@@ -932,7 +932,7 @@ void QnMediaResourceWidget::createButtons()
             /* checked*/ false,
             /* shortcut*/ {},
             /* tooltip */ tr("Area Zoom"),
-            /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
+            /* help id */ HelpTopic::Id::MainWindow_MediaItem_Ptz,
             /* internal id */ Qn::PtzButton,
             /* statistics key */ "media_widget_area_zoom",
             /* handler */ &QnMediaResourceWidget::setPtzMode);
@@ -944,7 +944,7 @@ void QnMediaResourceWidget::createButtons()
             /* checked*/ false,
             /* shortcut*/ QKeySequence::fromString("P"),
             /* tooltip */ tr("PTZ"),
-            /* help id */ Qn::MainWindow_MediaItem_Ptz_Help,
+            /* help id */ HelpTopic::Id::MainWindow_MediaItem_Ptz,
             /* internal id */ Qn::PtzButton,
             /* statistics key */ "media_widget_ptz",
             /* handler */ &QnMediaResourceWidget::setPtzMode);
@@ -955,7 +955,7 @@ void QnMediaResourceWidget::createButtons()
         item()->dewarpingParams().enabled,
         QKeySequence::fromString("D"),
         tr("Dewarping"),
-        Qn::MainWindow_MediaItem_Dewarping_Help,
+        HelpTopic::Id::MainWindow_MediaItem_Dewarping,
         Qn::FishEyeButton, "media_widget_fisheye",
         &QnMediaResourceWidget::at_fishEyeButton_toggled);
 
@@ -964,7 +964,7 @@ void QnMediaResourceWidget::createButtons()
         false,
         QKeySequence::fromString("W"),
         tr("Create Zoom Window"),
-        Qn::MainWindow_MediaItem_ZoomWindows_Help,
+        HelpTopic::Id::MainWindow_MediaItem_ZoomWindows,
         Qn::ZoomWindowButton, "media_widget_zoom",
         &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
 
@@ -975,7 +975,7 @@ void QnMediaResourceWidget::createButtons()
             item()->displayHotspots() && d->camera->cameraHotspotsEnabled(),
             QKeySequence::fromString("H"),
             tr("Hotspots"),
-            Qn::Empty_Help,
+            HelpTopic::Id::Empty,
             Qn::HotspotsButton, "media_widget_hotspots",
             &QnMediaResourceWidget::setHotspotsVisible);
     }
@@ -1004,7 +1004,7 @@ void QnMediaResourceWidget::createButtons()
     screenshotButton->setIcon(loadSvgIcon("item/screenshot.svg"));
     screenshotButton->setCheckable(false);
     screenshotButton->setToolTip(tooltipText(tr("Screenshot"), QKeySequence{"Alt+S"}));
-    setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
+    setHelpTopic(screenshotButton, HelpTopic::Id::MainWindow_MediaItem_Screenshot);
     connect(screenshotButton, &QnImageButtonWidget::clicked, this,
         &QnMediaResourceWidget::at_screenshotButton_clicked);
 
@@ -1031,7 +1031,7 @@ void QnMediaResourceWidget::createButtons()
         isMotionSearchModeEnabled(),
         {},
         tooltipText(tr("Motion Search"), "Alt+M"),
-        Qn::MainWindow_MediaItem_SmartSearch_Help,
+        HelpTopic::Id::MainWindow_MediaItem_SmartSearch,
         Qn::MotionSearchButton,
         "media_widget_msearch",
         /*executor*/ {});
@@ -2060,49 +2060,49 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
         };
 
     if (action(action::ToggleShowreelModeAction)->isChecked())
-        return Qn::MainWindow_Scene_TourInProgress_Help;
+        return HelpTopic::Id::MainWindow_Scene_TourInProgress;
 
     const Qn::ResourceStatusOverlay statusOverlay = statusOverlayController()->statusOverlay();
 
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay)
-        return Qn::Licenses_Help;
+        return HelpTopic::Id::Licenses;
 
     if (statusOverlay == Qn::OfflineOverlay || statusOverlay == Qn::OldFirmwareOverlay)
-        return Qn::MainWindow_MediaItem_Diagnostics_Help;
+        return HelpTopic::Id::MainWindow_MediaItem_Diagnostics;
 
     if (statusOverlay == Qn::UnauthorizedOverlay)
-        return Qn::MainWindow_MediaItem_Unauthorized_Help;
+        return HelpTopic::Id::MainWindow_MediaItem_Unauthorized;
 
     if (statusOverlay == Qn::AccessDeniedOverlay)
-        return Qn::MainWindow_MediaItem_AccessDenied_Help;
+        return HelpTopic::Id::MainWindow_MediaItem_AccessDenied;
 
     if (statusOverlay == Qn::IoModuleDisabledOverlay)
-        return Qn::IOModules_Help;
+        return HelpTopic::Id::IOModules;
 
     if (options().testFlag(ControlPtz))
     {
         if (m_dewarpingParams.enabled)
-            return Qn::MainWindow_MediaItem_Dewarping_Help;
+            return HelpTopic::Id::MainWindow_MediaItem_Dewarping;
 
-        return Qn::MainWindow_MediaItem_Ptz_Help;
+        return HelpTopic::Id::MainWindow_MediaItem_Ptz;
     }
 
     if (isZoomWindow())
-        return Qn::MainWindow_MediaItem_ZoomWindows_Help;
+        return HelpTopic::Id::MainWindow_MediaItem_ZoomWindows;
 
     if (options().testFlag(DisplayMotion))
-        return Qn::MainWindow_MediaItem_SmartSearch_Help;
+        return HelpTopic::Id::MainWindow_MediaItem_SmartSearch;
 
     if (isIoModule())
-        return Qn::IOModules_Help;
+        return HelpTopic::Id::IOModules;
 
     if (d->resource->hasFlags(Qn::local))
-        return Qn::MainWindow_MediaItem_Local_Help;
+        return HelpTopic::Id::MainWindow_MediaItem_Local;
 
     if (d->camera && d->camera->isDtsBased())
-        return Qn::MainWindow_MediaItem_AnalogCamera_Help;
+        return HelpTopic::Id::MainWindow_MediaItem_AnalogCamera;
 
-    return Qn::MainWindow_MediaItem_Help;
+    return HelpTopic::Id::MainWindow_MediaItem;
 }
 
 void QnMediaResourceWidget::channelLayoutChangedNotify()
@@ -3385,7 +3385,7 @@ QAction* QnMediaResourceWidget::createActionAndButton(const QString& iconName,
     bool checked,
     const QKeySequence& shortcut,
     const QString& toolTip,
-    Qn::HelpTopic helpTopic,
+    HelpTopic::Id helpTopic,
     Qn::WidgetButtons buttonId,
     const QString& buttonName,
     ButtonHandler executor)

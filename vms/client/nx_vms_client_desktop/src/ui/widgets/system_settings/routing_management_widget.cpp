@@ -9,28 +9,25 @@
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <network/system_helpers.h>
+#include <nx/network/address_resolver.h>
+#include <nx/network/socket_common.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/utils/qt_helpers.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_discovery_manager.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/input_dialog.h>
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/server_addresses_model.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <utils/common/event_processors.h>
-#include <nx/utils/qt_helpers.h>
-
-#include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
-
-#include <network/system_helpers.h>
-
-#include <nx/network/address_resolver.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/socket_common.h>
-#include <nx/network/url/url_builder.h>
-#include <nx/utils/string.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -201,7 +198,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
     setWarningStyle(ui->warningLabel);
 
-    setHelpTopic(this, Qn::Administration_RoutingManagement_Help);
+    setHelpTopic(this, HelpTopic::Id::Administration_RoutingManagement);
 
     m_serverListModel = new QnResourceListModel(this);
     m_serverListModel->setReadOnly(true);

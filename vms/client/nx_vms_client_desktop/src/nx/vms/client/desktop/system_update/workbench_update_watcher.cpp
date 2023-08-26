@@ -16,6 +16,8 @@
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/style/webview_style.h>
@@ -29,8 +31,6 @@
 #include <nx/vms/update/update_check.h>
 #include <ui/common/notification_levels.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/util.h>
 

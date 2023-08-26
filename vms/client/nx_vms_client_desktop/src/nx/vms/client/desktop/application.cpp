@@ -3,15 +3,15 @@
 #include "application.h"
 
 #ifdef Q_OS_LINUX
-#include <unistd.h>
+    #include <unistd.h>
 #endif
 
 #ifdef Q_WS_X11
-#include <X11/Xlib.h>
+    #include <X11/Xlib.h>
 #endif
 
 #if defined(Q_OS_MACOS)
-#include <sys/sysctl.h>
+    #include <sys/sysctl.h>
 #endif
 
 #include <iostream>
@@ -56,6 +56,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/joystick_settings_action_handler.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -68,7 +69,6 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <statistics/statistics_manager.h>
 #include <ui/graphics/instruments/gl_checker_instrument.h>
-#include <ui/help/help_handler.h>
 #include <ui/statistics/modules/session_restore_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/combobox_wheel_filter.h>
@@ -77,11 +77,11 @@
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 #if defined(Q_OS_MACOS)
-#include <ui/workaround/mac_utils.h>
+    #include <ui/workaround/mac_utils.h>
 #endif
 
 #if defined(Q_OS_WIN)
-#include <QtGui/qpa/qplatformwindow_p.h>
+    #include <QtGui/qpa/qplatformwindow_p.h>
 #endif
 
 namespace nx::vms::client::desktop {
@@ -224,7 +224,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     /* Initialize sound. */
     nx::audio::AudioDevice::instance()->setVolume(appContext()->localSettings()->audioVolume());
 
-    qApp->installEventFilter(&QnHelpHandler::instance());
+    qApp->installEventFilter(&HelpHandler::instance());
 
     // Hovered QComboBox changes its value when user scrolls a mouse wheel, even if the ComboBox
     // is not focused. It leads to weird and undesirable UI behaviour in some parts of the client.

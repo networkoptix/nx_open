@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
+#include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -43,7 +44,6 @@
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
-#include <ui/help/business_help.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
@@ -336,11 +336,11 @@ void NotificationListModel::Private::onNotificationActionBase(
     NX_VERBOSE(this, "Received action: %1, state: %2, id: %3",
         actionType, action->state(), action->id());
 
-    if (actionType == rules::utils::type<NotificationAction>())
+    if (actionType == vms::rules::utils::type<NotificationAction>())
         onNotificationAction(action.dynamicCast<NotificationAction>(), cloudSystemId);
-    else if (actionType == rules::utils::type<RepeatSoundAction>())
+    else if (actionType == vms::rules::utils::type<RepeatSoundAction>())
         onRepeatSoundAction(action.dynamicCast<RepeatSoundAction>());
-    else if (actionType == rules::utils::type<ShowOnAlarmLayoutAction>())
+    else if (actionType == vms::rules::utils::type<ShowOnAlarmLayoutAction>())
         onAlarmLayoutAction(action.dynamicCast<ShowOnAlarmLayoutAction>());
     else
         NX_ASSERT(false, "Unexpected action type: %1", actionType);
@@ -501,7 +501,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.title = title;
     eventData.description = description(params);
     eventData.toolTip = tooltip(action);
-    eventData.helpId = QnBusiness::eventHelpId(params.eventType);
+    eventData.helpId = rules::eventHelpId(params.eventType);
     eventData.level = QnNotificationLevel::valueOf(action);
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
     eventData.icon = pixmapForAction(action, eventData.titleColor);

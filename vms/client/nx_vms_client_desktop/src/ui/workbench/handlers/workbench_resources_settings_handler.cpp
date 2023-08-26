@@ -19,6 +19,8 @@
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
@@ -37,8 +39,6 @@
 #include <nx/vms/license/usage_helper.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>

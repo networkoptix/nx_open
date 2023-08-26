@@ -18,6 +18,8 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/ui/actions/action_conditions.h>
@@ -26,8 +28,6 @@
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -175,7 +175,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
         &QnAbstractPtzDialog::saveChanges);
 
-    setHelpTopic(ui->tourGroupBox, Qn::PtzManagement_Tour_Help);
+    setHelpTopic(ui->tourGroupBox, HelpTopic::Id::PtzManagement_Tour);
 
     // TODO: implement preview receiving and displaying
 

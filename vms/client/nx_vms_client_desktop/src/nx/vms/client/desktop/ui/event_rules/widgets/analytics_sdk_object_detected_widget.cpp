@@ -8,8 +8,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {
@@ -32,10 +32,10 @@ AnalyticsSdkObjectDetectedWidget::AnalyticsSdkObjectDetectedWidget(
     ui->sdkObjectTypeLabel->addHintLine(tr("Analytics object detection can be set up on a certain cameras."));
     ui->sdkObjectTypeLabel->addHintLine(tr("Choose cameras using the button above to see the list "
         "of supported events."));
-    setHelpTopic(ui->sdkObjectTypeLabel, Qn::EventsActions_VideoAnalytics_Help);
+    setHelpTopic(ui->sdkObjectTypeLabel, HelpTopic::Id::EventsActions_VideoAnalytics);
 
     ui->attributesLabel->addHintLine(tr("Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab."));
-    setHelpTopic(ui->attributesEdit, Qn::EventsActions_VideoAnalytics_Help);
+    setHelpTopic(ui->attributesEdit, HelpTopic::Id::EventsActions_VideoAnalytics);
 }
 
 AnalyticsSdkObjectDetectedWidget::~AnalyticsSdkObjectDetectedWidget()

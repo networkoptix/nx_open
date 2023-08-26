@@ -28,12 +28,12 @@
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
 #include <nx/vms/client/core/software_trigger/software_triggers_watcher.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/types.h>
 #include <nx/vms/common/ptz/datafield.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/common/speed_range.h>
 #include <ui/graphics/items/resource/button_ids.h>
-#include <ui/help/help_topics.h>
 
 #include "resource_widget.h"
 
@@ -482,7 +482,7 @@ private:
         bool checked,
         const QKeySequence& shortcut,
         const QString& toolTip,
-        Qn::HelpTopic helpTopic,
+        nx::vms::client::desktop::HelpTopic::Id helpTopic,
         Qn::WidgetButtons buttonId,
         const QString& buttonName,
         ButtonHandler executor);

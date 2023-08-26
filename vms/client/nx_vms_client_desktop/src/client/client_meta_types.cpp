@@ -32,6 +32,7 @@
 #include <nx/vms/client/desktop/debug_utils/dialogs/joystick_investigation_wizard/joystick_manager.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_action_choice_model.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_settings_model.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_lists_dialog.h>
@@ -103,7 +104,6 @@
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/weak_graphics_item_pointer.h>
-#include <ui/help/help_handler.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <utils/color_space/image_correction.h>
@@ -304,13 +304,14 @@ void QnClientMetaTypes::registerQmlTypes()
         "FilteredResourceProxyModel",
         "FilteredResourceProxyModel can be created from C++ code only.");
 
-    qmlRegisterSingletonType<QnHelpHandler>("nx.vms.client.desktop", 1, 0, "HelpHandler",
+    qmlRegisterSingletonType<HelpHandler>("nx.vms.client.desktop", 1, 0, "HelpHandler",
         [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
         {
-            auto helpHandler = &QnHelpHandler::instance();
+            auto helpHandler = &HelpHandler::instance();
             qmlEngine->setObjectOwnership(helpHandler, QQmlEngine::CppOwnership);
             return helpHandler;
         });
+    HelpTopic::registerQmlType();
 
     qmlRegisterSingletonType<LocalSettings>("nx.vms.client.desktop", 1, 0, "LocalSettings",
         [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*

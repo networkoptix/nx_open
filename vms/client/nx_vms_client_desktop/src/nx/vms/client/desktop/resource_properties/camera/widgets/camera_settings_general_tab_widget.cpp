@@ -6,10 +6,10 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 
 #include "../dialogs/camera_credentials_dialog.h"
 #include "../flux/camera_settings_dialog_state.h"
@@ -35,10 +35,10 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->virtualCameraTimeZoneWidget->setStore(store);
     ui->virtualCameraMotionWidget->setStore(store);
     ui->virtualCameraUploadWidget->setStore(store);
-    setHelpTopic(ui->virtualCameraArchiveLengthWidget, Qn::VirtualCamera_Help);
-    setHelpTopic(ui->virtualCameraTimeZoneWidget, Qn::VirtualCamera_Help);
-    setHelpTopic(ui->virtualCameraMotionWidget, Qn::VirtualCamera_Help);
-    setHelpTopic(ui->virtualCameraUploadWidget, Qn::VirtualCamera_Help);
+    setHelpTopic(ui->virtualCameraArchiveLengthWidget, HelpTopic::Id::VirtualCamera);
+    setHelpTopic(ui->virtualCameraTimeZoneWidget, HelpTopic::Id::VirtualCamera);
+    setHelpTopic(ui->virtualCameraMotionWidget, HelpTopic::Id::VirtualCamera);
+    setHelpTopic(ui->virtualCameraUploadWidget, HelpTopic::Id::VirtualCamera);
 
     ui->editStreamsPanel->hide();
     ui->overEditStreamsLine->hide();

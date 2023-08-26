@@ -14,11 +14,13 @@
 #include <core/resource/avi/avi_resource.h>
 #include <export/sign_helper.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <utils/common/event_processors.h>
+
+using namespace nx::vms::client::desktop;
 
 // TODO: #sivanov Rewrite to QML.
 class QnSignDialogGlWidget: public QOpenGLWidget
@@ -81,7 +83,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
 {
     ui->setupUi(this);
 
-    setHelpTopic(this, Qn::Watermark_Help);
+    setHelpTopic(this, HelpTopic::Id::Watermark);
 
     m_layout = new QVBoxLayout(ui->videoSpacer);
     m_layout->setSpacing(0);

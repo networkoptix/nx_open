@@ -7,9 +7,8 @@
 #include <QtCore/QTimer>
 
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_display_info.h>
-#include <nx_ec/abstract_ec_connection.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -17,14 +16,15 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
-#include <nx/vms/time_sync/time_sync_manager.h>
 #include <nx/vms/time/formatter.h>
+#include <nx/vms/time_sync/time_sync_manager.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <utils/common/synctime.h>
 
 #include "../delegates/time_synchronization_servers_delegate.h"
@@ -240,7 +240,7 @@ void TimeSynchronizationWidget::hideEvent(QHideEvent* event)
 void TimeSynchronizationWidget::setupUi()
 {
     ui->setupUi(this);
-    setHelpTopic(this, Qn::Administration_TimeSynchronization_Help);
+    setHelpTopic(this, HelpTopic::Id::Administration_TimeSynchronization);
 
     ui->vmsTimeCaptionLabel->setHint(tr("Time, common and synchronized between all servers. "
         "Can be different with OS time on any particular server."));

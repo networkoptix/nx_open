@@ -1,14 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_tree_model_test_fixture.h"
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/camera_resource.h>
-#include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <ui/help/help_topics.h>
-#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <client/client_globals.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
+
+#include "resource_tree_model_test_fixture.h"
 
 using namespace nx::vms::api;
 
@@ -867,7 +867,7 @@ TEST_F(ResourceTreeModelTest, cameraHelpTopic)
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, Qn::MainWindow_Tree_Camera_Help)(cameraIndex));
+    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::MainWindow_Tree_Camera)(cameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, ioModuleHelpTopic)
@@ -885,7 +885,7 @@ TEST_F(ResourceTreeModelTest, ioModuleHelpTopic)
     const auto ioModuleIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
     // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, Qn::IOModules_Help)(ioModuleIndex));
+    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::IOModules)(ioModuleIndex));
 }
 
 TEST_F(ResourceTreeModelTest, recorderHelpTopic)
@@ -903,7 +903,7 @@ TEST_F(ResourceTreeModelTest, recorderHelpTopic)
     const auto recorderIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
 
     // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, Qn::MainWindow_Tree_Recorder_Help)(recorderIndex));
+    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::MainWindow_Tree_Recorder)(recorderIndex));
 }
 
 TEST_F(ResourceTreeModelTest, cameraNodeProvidesResource)

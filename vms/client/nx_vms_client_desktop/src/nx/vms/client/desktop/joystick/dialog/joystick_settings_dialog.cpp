@@ -5,16 +5,18 @@
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QWidget>
 
-#include <client_core/client_core_module.h>
 #include <client/client_module.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/utils/qml_property.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -24,16 +26,14 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/common/system_settings.h>
-#include <ui/help/help_handler.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_context.h>
 
-#include "joystick_button_settings_model.h"
-#include "joystick_button_action_choice_model.h"
-#include "layout_intermediate_model.h"
-#include "../settings/manager.h"
-#include "../settings/device.h"
 #include "../settings/descriptors.h"
+#include "../settings/device.h"
+#include "../settings/manager.h"
+#include "joystick_button_action_choice_model.h"
+#include "joystick_button_settings_model.h"
+#include "layout_intermediate_model.h"
 
 namespace nx::vms::client::desktop::joystick {
 
@@ -310,7 +310,7 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
         this, SIGNAL(resetToDefault()));
     connect(this, &JoystickSettingsDialog::resetToDefault, handleReset);
 
-    setHelpTopic(this, Qn::HelpTopic::UsingJoystick_Help);
+    setHelpTopic(this, HelpTopic::Id::UsingJoystick);
 }
 
 JoystickSettingsDialog::~JoystickSettingsDialog()

@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
@@ -32,7 +33,6 @@
 #include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/notification_levels.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
@@ -235,7 +235,7 @@ QVariant VmsEventSearchListModel::Private::data(
         }
 
         case Qn::HelpTopicIdRole:
-            return Qn::Empty_Help;
+            return HelpTopic::Id::Empty;
 
         default:
             handled = false;

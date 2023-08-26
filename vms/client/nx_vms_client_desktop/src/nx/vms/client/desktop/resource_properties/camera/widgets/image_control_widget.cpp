@@ -5,9 +5,9 @@
 
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <ui/common/read_only.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include "../flux/camera_settings_dialog_state.h"
@@ -27,11 +27,11 @@ ImageControlWidget::ImageControlWidget(QWidget* parent):
     setHelpTopic(
         ui->aspectRatioComboBox,
         ui->aspectRatioLabel,
-        Qn::CameraSettings_AspectRatio_Help);
+        HelpTopic::Id::CameraSettings_AspectRatio);
     setHelpTopic(
         ui->rotationComboBox,
         ui->rotationLabel,
-        Qn::CameraSettings_Rotation_Help);
+        HelpTopic::Id::CameraSettings_Rotation);
 
     m_aligner = new Aligner(this);
     m_aligner->addWidgets({ui->rotationLabel, ui->aspectRatioLabel});

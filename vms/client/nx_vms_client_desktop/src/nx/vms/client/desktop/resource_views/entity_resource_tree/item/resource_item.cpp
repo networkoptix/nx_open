@@ -14,12 +14,14 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/system_context.h>
-#include <ui/help/help_topics.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -29,36 +31,36 @@ QVariant resourceHelpTopic(const QnResourcePtr& resource)
         return QVariant();
 
     if (resource->hasFlags(Qn::fake_server))
-        return Qn::OtherSystems_Help;
+        return HelpTopic::Id::OtherSystems;
 
     if (resource->hasFlags(Qn::server))
-        return Qn::MainWindow_Tree_Servers_Help;
+        return HelpTopic::Id::MainWindow_Tree_Servers;
 
     if (resource->hasFlags(Qn::io_module))
-        return Qn::IOModules_Help;
+        return HelpTopic::Id::IOModules;
 
     if (resource->hasFlags(Qn::live_cam))
-        return Qn::MainWindow_Tree_Camera_Help;
+        return HelpTopic::Id::MainWindow_Tree_Camera;
 
     if (resource->hasFlags(Qn::layout))
     {
         auto layout = resource.staticCast<QnLayoutResource>();
         if (layout->isFile())
-            return Qn::MainWindow_Tree_MultiVideo_Help;
-        return Qn::MainWindow_Tree_Layouts_Help;
+            return HelpTopic::Id::MainWindow_Tree_MultiVideo;
+        return HelpTopic::Id::MainWindow_Tree_Layouts;
     }
 
     if (resource->hasFlags(Qn::user))
-        return Qn::MainWindow_Tree_Users_Help;
+        return HelpTopic::Id::MainWindow_Tree_Users;
 
     if (resource->hasFlags(Qn::web_page))
-        return Qn::MainWindow_Tree_WebPage_Help;
+        return HelpTopic::Id::MainWindow_Tree_WebPage;
 
     if (resource->hasFlags(Qn::videowall))
-        return Qn::Videowall_Help;
+        return HelpTopic::Id::Videowall;
 
     if (resource->hasFlags(Qn::local))
-        return Qn::MainWindow_Tree_Exported_Help;
+        return HelpTopic::Id::MainWindow_Tree_Exported;
 
     return QVariant();
 }

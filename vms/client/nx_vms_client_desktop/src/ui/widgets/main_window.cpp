@@ -31,6 +31,8 @@
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
 #include <nx/vms/client/desktop/debug_utils/menu/debug_actions_handler.h>
 #include <nx/vms/client/desktop/export/workbench/workbench_export_handler.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_action_handler.h>
 #include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
@@ -61,8 +63,6 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/view/graphics_scene.h>
 #include <ui/graphics/view/graphics_view.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -674,29 +674,29 @@ void MainWindow::updateScreenInfo()
 std::pair<int, bool> MainWindow::calculateHelpTopic() const
 {
     if (action(action::ToggleShowreelModeAction)->isChecked())
-        return {Qn::MainWindow_Scene_TourInProgress_Help, true};
+        return {HelpTopic::Id::MainWindow_Scene_TourInProgress, true};
 
     if (auto layout = workbench()->currentLayout())
     {
         if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
-            return {Qn::Videowall_Display_Help, false};
+            return {HelpTopic::Id::Videowall_Display, false};
 
         if (layout->isPreviewSearchLayout())
-            return {Qn::MainWindow_Scene_PreviewSearch_Help, true};
+            return {HelpTopic::Id::MainWindow_Scene_PreviewSearch, true};
 
         if (layout->isShowreelReviewLayout())
-            return {Qn::Showreel_Help, true};
+            return {HelpTopic::Id::Showreel, true};
 
         if (QnLayoutResourcePtr resource = layout->resource())
         {
             if (resource->isFile())
-                return{Qn::MainWindow_Tree_MultiVideo_Help, true};
+                return{HelpTopic::Id::MainWindow_Tree_MultiVideo, true};
 
             if (!resource->backgroundImageFilename().isEmpty())
-                return {Qn::MainWindow_Scene_EMapping_Help, false};
+                return {HelpTopic::Id::MainWindow_Scene_EMapping, false};
         }
     }
-    return {Qn::MainWindow_Scene_Help, false};
+    return {HelpTopic::Id::MainWindow_Scene, false};
 }
 
 void MainWindow::updateHelpTopic()

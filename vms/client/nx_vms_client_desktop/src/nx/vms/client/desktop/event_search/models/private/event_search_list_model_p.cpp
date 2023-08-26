@@ -21,13 +21,13 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/common/notification_levels.h>
-#include <ui/help/help_topics.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::client::desktop {
@@ -226,7 +226,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         }
 
         case Qn::HelpTopicIdRole:
-            return Qn::Empty_Help;
+            return HelpTopic::Id::Empty;
 
         default:
             handled = false;

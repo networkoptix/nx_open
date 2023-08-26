@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/cloud_system_status_item.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/resource_item.h>
@@ -25,7 +26,6 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
-#include <ui/help/help_topics.h>
 
 namespace {
 
@@ -359,7 +359,7 @@ AbstractItemPtr ResourceTreeItemFactory::createServersItem() const
         .withRole(Qt::DisplayRole, tr("Servers"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Servers))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::servers))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_Servers_Help));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Servers));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createHealthMonitorsItem() const
@@ -395,7 +395,7 @@ AbstractItemPtr ResourceTreeItemFactory::createLayoutsItem() const
         .withRole(Qt::DisplayRole, tr("Layouts"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Layouts))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::layouts))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_Layouts_Help));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Layouts));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createShowreelsItem() const
@@ -404,7 +404,7 @@ AbstractItemPtr ResourceTreeItemFactory::createShowreelsItem() const
         .withRole(Qt::DisplayRole, tr("Showreels"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Showreels))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::showreels))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::Showreel_Help));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::Showreel));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createIntegrationsItem(Qt::ItemFlags flags) const
@@ -413,7 +413,7 @@ AbstractItemPtr ResourceTreeItemFactory::createIntegrationsItem(Qt::ItemFlags fl
         .withRole(Qt::DisplayRole, tr("Integrations"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Integrations))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::integrations))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_WebPage_Help))
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_WebPage))
         .withFlags(flags);
 }
 
@@ -423,7 +423,7 @@ AbstractItemPtr ResourceTreeItemFactory::createWebPagesItem(Qt::ItemFlags flags)
         .withRole(Qt::DisplayRole, tr("Web Pages"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::WebPages))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::webPages))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_WebPage_Help))
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_WebPage))
         .withFlags(flags);
 }
 
@@ -434,7 +434,7 @@ AbstractItemPtr ResourceTreeItemFactory::createWebPagesAndIntegrationsItem(
         .withRole(Qt::DisplayRole, tr("Web Pages & Integrations"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::WebPages))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::webPages))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_WebPage_Help))
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_WebPage))
         .withFlags(flags);
 }
 
@@ -444,7 +444,7 @@ AbstractItemPtr ResourceTreeItemFactory::createUsersItem() const
         .withRole(Qt::DisplayRole, tr("Users"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Users))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::users))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_Users_Help));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Users));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createOtherSystemsItem() const
@@ -453,7 +453,7 @@ AbstractItemPtr ResourceTreeItemFactory::createOtherSystemsItem() const
         .withRole(Qt::DisplayRole, tr("Other Systems"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::OtherSystems))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::otherSystems))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::OtherSystems_Help));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::OtherSystems));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createLocalFilesItem() const
@@ -462,7 +462,7 @@ AbstractItemPtr ResourceTreeItemFactory::createLocalFilesItem() const
         .withRole(Qt::DisplayRole, tr("Local Files"))
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::LocalResources))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::localResources))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MediaFolders_Help));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MediaFolders));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createAllCamerasAndResourcesItem() const
@@ -505,7 +505,7 @@ AbstractItemPtr ResourceTreeItemFactory::createSharedLayoutsItem(bool useRegular
         .withRole(Qt::DisplayRole, displayText)
         .withRole(Qn::ResourceIconKeyRole, iconKey)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::sharedLayouts))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_Layouts_Help));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Layouts));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createResourceItem(const QnResourcePtr& resource)
@@ -560,7 +560,7 @@ AbstractItemPtr ResourceTreeItemFactory::createRecorderItem(
         .withRole(Qt::EditRole, nameProvider, nameInvalidator)
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(iconKey))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::recorder))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::MainWindow_Tree_Recorder_Help))
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Recorder))
         .withRole(Qn::CameraGroupIdRole, cameraGroupId)
         .withFlags(itemFlags);
 }
@@ -571,7 +571,7 @@ AbstractItemPtr ResourceTreeItemFactory::createOtherSystemItem(const QString& sy
         .withRole(Qt::DisplayRole, systemId)
         .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::OtherSystem))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::localSystem))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::OtherSystems_Help));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::OtherSystems));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& systemId)
@@ -588,7 +588,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
         .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(Qn::CloudSystemIdRole, systemId)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::cloudSystem))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::OtherSystems_Help))
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::OtherSystems))
         .withRole(Qn::ExtraInfoRole, extraInfoProvider, extraInfoInvalidator)
         .withFlags(cloudSystemFlagsProvider(systemId));
 }

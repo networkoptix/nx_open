@@ -16,6 +16,8 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -34,8 +36,6 @@
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -517,7 +517,7 @@ QColor QnServerResourceWidget::getColor(Qn::StatisticsDeviceType deviceType, int
 }
 
 int QnServerResourceWidget::helpTopicAt(const QPointF &) const {
-    return Qn::MainWindow_MonitoringItem_Help;
+    return HelpTopic::Id::MainWindow_MonitoringItem;
 }
 
 Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter* painter, int channel,
@@ -686,7 +686,7 @@ void QnServerResourceWidget::createButtons()
     showLogButton->setIcon(loadSvgIcon("item/log.svg"));
     showLogButton->setCheckable(false);
     showLogButton->setToolTip(tr("Show Log"));
-    setHelpTopic(showLogButton, Qn::MainWindow_MonitoringItem_Log_Help);
+    setHelpTopic(showLogButton, HelpTopic::Id::MainWindow_MonitoringItem_Log);
     connect(showLogButton, &QnImageButtonWidget::clicked, this,
         [this] {menu()->trigger(action::ServerLogsAction, m_resource);});
     titleBar()->rightButtonsBar()->addButton(Qn::ShowLogButton, showLogButton);

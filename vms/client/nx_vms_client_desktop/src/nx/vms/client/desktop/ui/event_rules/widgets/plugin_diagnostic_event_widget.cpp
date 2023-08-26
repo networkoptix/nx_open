@@ -9,10 +9,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ui/event_rules/models/plugin_diagnostic_event_model.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx::vms::client::desktop {
@@ -47,19 +47,19 @@ PluginDiagnosticEventWidget::PluginDiagnosticEventWidget(
         &PluginDiagnosticEventWidget::paramsChanged);
 
     //ui->pirLabel->addHintLine(tr("Choose plugin instance from the list"));
-    //setHelpTopic(ui->pluginDiagnosticEventTypeLabel, Qn::EventsActions_VideoAnalytics_Help);
+    //setHelpTopic(ui->pluginDiagnosticEventTypeLabel, HelpTopic::Id::EventsActions_VideoAnalytics);
 
     ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in the caption "
         "with any of the entered keywords."));
     ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
     ui->captionLabel->addHintLine(tr("This field is case sensitive."));
-    //setHelpTopic(ui->captionLabel, Qn::EventsActions_VideoAnalytics_Help);
+    //setHelpTopic(ui->captionLabel, HelpTopic::Id::EventsActions_VideoAnalytics);
 
     ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the "
         "description field with any of the entered keywords."));
     ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
     ui->descriptionLabel->addHintLine(tr("This field is case sensitive."));
-    //setHelpTopic(ui->descriptionLabel, Qn::EventsActions_VideoAnalytics_Help);
+    //setHelpTopic(ui->descriptionLabel, HelpTopic::Id::EventsActions_VideoAnalytics);
 }
 
 PluginDiagnosticEventWidget::~PluginDiagnosticEventWidget() {
