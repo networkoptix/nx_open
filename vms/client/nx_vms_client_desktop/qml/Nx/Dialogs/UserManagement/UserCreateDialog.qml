@@ -87,6 +87,7 @@ DialogWithState
     MembersModel
     {
         id: membersModel
+        temporary: userType == UserSettingsGlobal.TemporaryUser
     }
 
     DialogTabControl
