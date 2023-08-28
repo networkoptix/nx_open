@@ -195,7 +195,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->gridEvents->addAction(m_filterAction);
     ui->gridEvents->addAction(m_resetFilterAction);
 
-    ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutionsLight10));
+    ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/close_medium_20x20.svg", kIconSubstitutionsLight10));
     connect(ui->clearFilterButton, &QPushButton::clicked, this,
         &QnEventLogDialog::reset);
 
