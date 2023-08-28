@@ -356,7 +356,7 @@ void WelcomeScreen::showSystemWentToOfflineNotification() const
         {
             QnMessageBox::critical(parentWidget(),
                 tr("Unable to connect to the system because it has become offline"));
-            dropConnectingState();
+            emit dropConnectingState();
         });
 }
 
@@ -535,9 +535,6 @@ void WelcomeScreen::connectToSystemInternal(
         return; //< Connection process is in progress
 
     NX_DEBUG(this, "Delayed connect to the system %1 after click on tile", address);
-    if (context()->user())
-        workbench()->saveStateInCache();
-
     LogonData logonData(core::LogonData{
         .address = address,
         .credentials = credentials,

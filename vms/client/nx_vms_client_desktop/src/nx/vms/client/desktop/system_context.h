@@ -72,6 +72,7 @@ public:
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;
     SystemSpecificLocalSettings* localSettings() const;
     RestApiHelper* restApiHelper() const;
+    QnUuid localSystemId() const;
     Q_INVOKABLE nx::vms::client::desktop::analytics::TaxonomyManager* taxonomyManager() const;
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;
 

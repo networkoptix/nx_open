@@ -32,6 +32,7 @@ public:
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+    QModelIndex findSystem(const QnUuid& systemId) const;
     QModelIndex findSystem(const QString& systemId) const;
     void addSystem(const QnSystemDescriptionPtr& systemDescription, const LogonData& logonData);
     void removeSystem(const QnSystemDescriptionPtr& systemDescription);

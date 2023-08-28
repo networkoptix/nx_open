@@ -38,6 +38,9 @@ QVariant SystemTabBarModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return QVariant::fromValue(item.systemDescription->name());
 
+        case Qn::LocalSystemIdRole:
+            return QVariant::fromValue(item.systemDescription->id());
+
         case Qn::LogonDataRole:
             return QVariant::fromValue(item.logonData);
 
@@ -48,6 +51,7 @@ QVariant SystemTabBarModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(item.workbenchState);
 
         default:
+            NX_ASSERT(false, "We should not be here.");
             return {};
     }
 }
@@ -70,6 +74,11 @@ bool SystemTabBarModel::setData(const QModelIndex& index, const QVariant& value,
 QVariant SystemTabBarModel::headerData(int, Qt::Orientation, int) const
 {
     return {};
+}
+
+QModelIndex SystemTabBarModel::findSystem(const QnUuid& systemId) const
+{
+    return findSystem(systemId.toSimpleString());
 }
 
 QModelIndex SystemTabBarModel::findSystem(const QString& systemId) const

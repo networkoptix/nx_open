@@ -1092,6 +1092,7 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
         flags |= DisconnectFlag::Force;
 
     NX_DEBUG(this, "Disconnecting from the server");
+    auto systemId = systemContext()->localSystemId();
     const bool wasLoggedIn = (bool) context()->user();
     if (!disconnectFromServer(flags))
         return;
@@ -1099,7 +1100,9 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
     if (wasLoggedIn)
         appContext()->clientStateHandler()->clientDisconnected();
 
-    menu()->trigger(ui::action::RemoveSystemFromTabBarAction);
+    menu()->trigger(
+        ui::action::RemoveSystemFromTabBarAction,
+        ui::action::Parameters(Qn::LocalSystemIdRole, systemId));
     emit mainWindow()->welcomeScreen()->dropConnectingState();
 }
 
@@ -1252,10 +1255,10 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
     {
         setState(LogicalState::disconnected);
         if (auto welcomeScreen = mainWindow()->welcomeScreen())
-            welcomeScreen->dropConnectingState();
+            emit welcomeScreen->dropConnectingState();
     }
     if (force)
-        menu()->trigger(ui::action::RemoveSystemFromTabBarAction);
+        workbench()->removeSystem(systemContext()->localSystemId());
 
     clearConnection();
     return true;

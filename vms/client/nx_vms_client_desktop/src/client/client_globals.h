@@ -184,6 +184,11 @@ namespace Qn
          */
         CloudSystemIdRole,
 
+        /**
+         * Role for local system id (QString). Used in system tabbar.
+         */
+        LocalSystemIdRole,
+
         /** CloudSystemConnectData structure. Used in the ConnectToCloudSystemAction. */
         CloudSystemConnectDataRole,
 

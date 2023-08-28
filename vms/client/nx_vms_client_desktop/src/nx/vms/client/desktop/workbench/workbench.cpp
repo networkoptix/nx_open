@@ -514,9 +514,10 @@ void Workbench::removeSystem(const QnSystemDescriptionPtr& systemDescription)
     windowContext()->systemTabBarModel()->removeSystem(systemDescription);
 }
 
-void Workbench::removeSystem(const QString& systemId)
+void Workbench::removeSystem(const QnUuid& systemId)
 {
-    windowContext()->systemTabBarModel()->removeSystem(systemId);
+    if (!systemId.isNull())
+        windowContext()->systemTabBarModel()->removeSystem(systemId.toSimpleString());
 }
 
 void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
@@ -927,12 +928,10 @@ void Workbench::submit(WorkbenchState& state, bool forceIncludeEmptyLayouts)
 void Workbench::applyLoadedState()
 {
     auto model = windowContext()->systemTabBarModel();
-    auto modelIndex = model->findSystem(
-        systemContext()->globalSettings()->localSystemId().toSimpleString());
+    auto modelIndex = model->findSystem(systemContext()->localSystemId());
     if (modelIndex.isValid())
     {
-        const auto workbenchState =
-            model->data(modelIndex, Qn::WorkbenchStateRole).value<WorkbenchState>();
+        const auto workbenchState = modelIndex.data(Qn::WorkbenchStateRole).value<WorkbenchState>();
         if (!workbenchState.layoutUuids.empty() || !workbenchState.unsavedLayouts.empty())
         {
             update(workbenchState);
@@ -940,15 +939,6 @@ void Workbench::applyLoadedState()
         }
     }
     d->stateDelegate->updateWorkbench();
-}
-
-void Workbench::saveStateInCache()
-{
-    WorkbenchState workbenchState;
-    submit(workbenchState, /*forceIncludeEmptyLayouts*/ true);
-    windowContext()->systemTabBarModel()->setSystemState(
-        systemContext()->globalSettings()->localSystemId().toSimpleString(),
-        std::move(workbenchState));
 }
 
 // -------------------------------------------------------------------------- //

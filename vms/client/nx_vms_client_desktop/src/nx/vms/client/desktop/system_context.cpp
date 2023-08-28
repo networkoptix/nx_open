@@ -12,6 +12,7 @@
 #include <core/resource/resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
 #include <nx/branding.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
@@ -224,6 +225,12 @@ SystemSpecificLocalSettings* SystemContext::localSettings() const
 RestApiHelper* SystemContext::restApiHelper() const
 {
     return d->restApiHelper.get();
+}
+
+QnUuid SystemContext::localSystemId() const
+{
+    const auto& currentConnection = connection();
+    return currentConnection ? currentConnection->moduleInformation().localSystemId : QnUuid();
 }
 
 analytics::TaxonomyManager* SystemContext::taxonomyManager() const

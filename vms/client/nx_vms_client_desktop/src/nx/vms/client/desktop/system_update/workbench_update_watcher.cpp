@@ -35,7 +35,6 @@
 #include <utils/common/util.h>
 
 #include "server_update_tool.h"
-#include "update_verification.h"
 
 using namespace std::chrono;
 
@@ -108,6 +107,8 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
                 if (m_userLoggedIn)
                 {
                     auto systemId = systemSettings()->localSystemId();
+                    if (systemId.isNull())
+                        systemId = systemContext()->localSystemId();
                     m_private->serverUpdateTool->onConnectToSystem(systemId);
                 }
                 else
