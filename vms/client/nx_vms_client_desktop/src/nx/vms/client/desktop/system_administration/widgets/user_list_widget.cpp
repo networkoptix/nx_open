@@ -176,7 +176,7 @@ public:
     ControlBar* const selectionControls{new ControlBar(q)};
 
     QPushButton* const deleteButton{new QPushButton(
-        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+        qnSkin->icon("text_buttons/delete_20_deprecated.svg", kTextButtonColors),
         tr("Delete"),
         selectionControls)};
 
