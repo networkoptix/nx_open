@@ -552,6 +552,11 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
                     return ExportSettingsDialog::tr("Export is not available: This camera does not have "
                         "a video archive for the selected time period.");
 
+                case ExportMediaValidator::Result::exportNotAllowed:
+                    return ExportSettingsDialog::tr("You do not have a permission to export "
+                        "archive for some of the selected cameras. Video from those cameras will "
+                        "not be exported to the resulting file.");
+
                 default:
                     NX_ASSERT(false);
                     return QString();

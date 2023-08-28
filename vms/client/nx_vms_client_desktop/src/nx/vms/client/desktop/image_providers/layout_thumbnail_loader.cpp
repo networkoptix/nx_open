@@ -15,6 +15,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -26,6 +27,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
@@ -42,6 +44,12 @@ static const QSize kBackgroundPreviewSize(200, 200);
 static inline bool isOdd(int value)
 {
     return (value & 1) != 0;
+}
+
+bool hasExportPermission(const QnResourcePtr& resource)
+{
+    const auto accessController = SystemContext::fromResource(resource)->accessController();
+    return accessController->hasPermissions(resource, Qn::ExportPermission);
 }
 
 } // namespace
@@ -96,6 +104,7 @@ struct LayoutThumbnailLoader::Private
         msecSinceEpoch(msecSinceEpoch),
         noDataWidget(new AutoscaledPlainText()),
         offlineWidget(new QWidget()),
+        noExportPermissionWidget(new QWidget()),
         nonCameraWidget(new AutoscaledPlainText())
     {
         QFont font;
@@ -120,6 +129,22 @@ struct LayoutThumbnailLoader::Private
         noSignalText->setFont(font);
         setPaletteColor(noSignalText, QPalette::WindowText, core::colorTheme()->color("red_core"));
         offlineWidgetLayout->addWidget(noSignalText, 1, Qt::AlignHCenter);
+
+        auto noExportPermissionLayout = new QVBoxLayout(noExportPermissionWidget.get());
+        noExportPermissionLayout->setSpacing(0);
+        noExportPermissionLayout->setContentsMargins(6, 2, 6, 6);
+        noExportPermissionLayout->addWidget(new ScalableImageWidget(
+            ":/skin/item_placeholders/no_access.svg"), 3, Qt::AlignHCenter);
+
+        auto noExportPermissionText = new AutoscaledPlainText();
+        noExportPermissionText->setText(tr("NO EXPORT PERMISSION"));
+        noExportPermissionText->setProperty(style::Properties::kDontPolishFontProperty, true);
+        noExportPermissionText->setContentsMargins(kMinIndicationMargins);
+        noExportPermissionText->setFont(font);
+        setPaletteColor(noExportPermissionText,
+            QPalette::WindowText,
+            core::colorTheme()->color("red_core"));
+        noExportPermissionLayout->addWidget(noExportPermissionText, 1, Qt::AlignHCenter);
 
         nonCameraWidget->setText(tr("NOT A CAMERA"));
         nonCameraWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
@@ -160,6 +185,8 @@ struct LayoutThumbnailLoader::Private
         qreal rotation = qMod(item->rotation, 180.0);
         QRectF cellRect = item->outCellRect;
 
+        const bool exportAllowed = hasExportPermission(item->resource);
+
         // Aspect ratio is invalid when there is no image. No need to rotate in this case.
         if (qFuzzyIsNull(rotation) || !aspectRatio.isValid())
         {
@@ -171,7 +198,8 @@ struct LayoutThumbnailLoader::Private
 
             QPainter painter(&outputImage);
             paintPixmapSharp(&painter,
-                specialPixmap(item->resource->isOnline(), status, item->outRect.size()),
+                specialPixmap(
+                    item->resource->isOnline(), exportAllowed, status, item->outRect.size()),
                 item->outRect.topLeft());
         }
         else
@@ -196,7 +224,8 @@ struct LayoutThumbnailLoader::Private
             painter.rotate(rotation);
             painter.translate(-cellRect.center());
             paintPixmapSharp(&painter,
-                specialPixmap(item->resource->isOnline(), status, item->outRect.size()),
+                specialPixmap(
+                    item->resource->isOnline(), exportAllowed, status, item->outRect.size()),
                 item->outRect.topLeft());
         }
 
@@ -332,15 +361,18 @@ struct LayoutThumbnailLoader::Private
     }
 
     // Generates a pixmap for 'NoData' or 'Invalid' state.
-    QPixmap specialPixmap(bool isOnline, Qn::ThumbnailStatus status, const QSize& size) const
+    QPixmap specialPixmap(
+        bool isOnline, bool exportAllowed, Qn::ThumbnailStatus status, const QSize& size) const
     {
         QPixmap pixmap(size * outputImage.devicePixelRatio());
         pixmap.setDevicePixelRatio(outputImage.devicePixelRatio());
         pixmap.fill(Qt::transparent);
 
-        auto noDataStatusWidget = isOnline || msecSinceEpoch != DATETIME_NOW
-            ? noDataWidget.get()
-            : offlineWidget.get();
+        auto noDataStatusWidget = exportAllowed
+            ? (isOnline || msecSinceEpoch != DATETIME_NOW)
+                ? noDataWidget.get()
+                : offlineWidget.get()
+            : noExportPermissionWidget.get();
 
         switch (status)
         {
@@ -411,6 +443,7 @@ struct LayoutThumbnailLoader::Private
     // We need this widgets to draw special states, like 'NoData'.
     QScopedPointer<AutoscaledPlainText> noDataWidget;
     QScopedPointer<QWidget> offlineWidget;
+    QScopedPointer<QWidget> noExportPermissionWidget;
     QScopedPointer<AutoscaledPlainText> nonCameraWidget;
 };
 
@@ -672,10 +705,7 @@ void LayoutThumbnailLoader::doLoadAsync()
 
         thumbnailItem->provider.reset(provider);
 
-        // We connect only to statusChanged event.
-        // We expect that provider sends signals in a proper order
-        // and it already has generated image.
-        connect(thumbnailItem->provider.data(), &ImageProvider::statusChanged, this,
+        const auto handleStatusChange =
             [this, thumbnailItem, zoomRect](Qn::ThumbnailStatus status)
             {
                 QnAspectRatio sourceAr(thumbnailItem->provider->sizeHint());
@@ -691,9 +721,27 @@ void LayoutThumbnailLoader::doLoadAsync()
                 // TODO: Why do we use different types for aspect ratio
                 // in drawTile and updateTileStatus ?
                 d->updateTileStatus(status, sourceAr, thumbnailItem);
-            });
+            };
 
-        thumbnailItem->provider->loadAsync();
+        if (hasExportPermission(resource))
+        {
+            // We connect only to statusChanged event.
+            // We expect that provider sends signals in a proper order
+            // and it already has generated image.
+            connect(thumbnailItem->provider.data(), &ImageProvider::statusChanged, this,
+                handleStatusChange);
+
+            thumbnailItem->provider->loadAsync();
+        }
+        else
+        {
+            QMetaObject::invokeMethod(this,
+                [handleStatusChange]()
+                {
+                    handleStatusChange(Qn::ThumbnailStatus::NoData);
+                },
+                Qt::QueuedConnection);
+        }
     }
 
     if (d->numLoading == 0)

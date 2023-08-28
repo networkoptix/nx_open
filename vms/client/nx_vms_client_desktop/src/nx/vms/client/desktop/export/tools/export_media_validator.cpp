@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/data/export_layout_settings.h>
@@ -111,6 +112,9 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 
     Results results;
 
+    if (!systemContext->accessController()->hasPermissions(resource, Qn::ExportPermission))
+        results.set((int) Result::exportNotAllowed);
+
     // The local video file may not have timestamps.
     // This does not mean that there is no data in it. We can export it.
 
@@ -165,6 +169,10 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     const ExportLayoutSettings& settings, QnLayoutResourcePtr layout)
 {
+    auto systemContext = SystemContext::fromResource(layout);
+    if (!NX_ASSERT(systemContext))
+        return {};
+
     Results results;
 
     const auto isExecutable = FileExtensionUtils::isExecutable(settings.fileName.extension);
@@ -176,6 +184,12 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
         const auto resource = getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
+
+        if (!systemContext->accessController()->hasPermissions(resource, Qn::ExportPermission))
+        {
+            results.set((int) Result::exportNotAllowed);
+            continue;
+        }
 
         if (resource->hasFlags(Qn::still_image))
         {
