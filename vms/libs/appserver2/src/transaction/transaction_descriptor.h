@@ -120,12 +120,6 @@ using FilterByReadPermissionFuncType = std::function<void(
     ParamType&)>;
 
 template<typename ParamType>
-using FilterBySavePermissionFuncType = std::function<void(
-    nx::vms::common::SystemContext* systemContext,
-    const Qn::UserAccessData& accessData,
-    ParamType&)>;
-
-template<typename ParamType>
 using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(
     nx::vms::common::SystemContext* systemContext,
     const Qn::UserAccessData& accessData,
@@ -206,7 +200,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
     TriggerNotificationFuncType<ParamType> triggerNotificationFunc;
     CheckSavePermissionFuncType<ParamType> checkSavePermissionFunc;
     CheckReadPermissionFuncType<ParamType> checkReadPermissionFunc;
-    FilterBySavePermissionFuncType<ParamType> filterBySavePermissionFunc;
     FilterByReadPermissionFuncType<ParamType> filterByReadPermissionFunc;
     CheckRemotePeerAccessFuncType<ParamType> checkRemotePeerAccessFunc;
     GetTransactionTypeFuncType<ParamType> getTransactionTypeFunc;
@@ -216,7 +209,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
         typename TriggerNotificationF,
         typename CheckSavePermissionFunc,
         typename CheckReadPermissionFunc,
-        typename FilterBySavePermissionFunc,
         typename FilterByReadPermissionFunc,
         typename CheckRemoteAccessFunc,
         typename GetTransactionTypeFunc
@@ -230,7 +222,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
         TriggerNotificationF&& triggerNotificationFunc,
         CheckSavePermissionFunc&& checkSavePermissionFunc,
         CheckReadPermissionFunc&& checkReadPermissionFunc,
-        FilterBySavePermissionFunc&& filterBySavePermissionFunc,
         FilterByReadPermissionFunc&& filterByReadPermissionFunc,
         CheckRemoteAccessFunc&& checkRemotePeerAccessFunc,
         GetTransactionTypeFunc&& getTransactionTypeFunc)
@@ -240,7 +231,6 @@ struct TransactionDescriptor : TransactionDescriptorBase
         triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc)),
         checkSavePermissionFunc(std::forward<CheckSavePermissionFunc>(checkSavePermissionFunc)),
         checkReadPermissionFunc(std::forward<CheckReadPermissionFunc>(checkReadPermissionFunc)),
-        filterBySavePermissionFunc(std::forward<FilterBySavePermissionFunc>(filterBySavePermissionFunc)),
         filterByReadPermissionFunc(std::forward<FilterByReadPermissionFunc>(filterByReadPermissionFunc)),
         checkRemotePeerAccessFunc(std::forward<CheckRemoteAccessFunc>(checkRemotePeerAccessFunc)),
         getTransactionTypeFunc(std::forward<GetTransactionTypeFunc>(getTransactionTypeFunc))
