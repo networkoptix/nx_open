@@ -21,6 +21,7 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/overlays/hud_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
@@ -285,9 +286,14 @@ bool QnWebResourceWidget::overlayIsVisible() const
 void QnWebResourceWidget::setOverlayVisibility(bool visible)
 {
     m_overlayIsVisible = visible;
-    setupWidget();
-    updateButtonsVisibility();
-    updateTitleText();
+
+    const bool hasButtons = calculateButtonsVisibility() != 0;
+    const auto contentMargins = hasButtons ? kDefaultWidgetMargins : QMargins{};
+    updateOverlayWidgetMargins(m_webEngineView.get(), contentMargins);
+    setOverlayWidgetVisibility(
+        hudOverlay(),
+        hasButtons ? OverlayVisibility::Visible : OverlayVisibility::Invisible,
+        true);
 }
 
 bool QnWebResourceWidget::verifyCertificate(const QString& pemString, const QUrl& url)

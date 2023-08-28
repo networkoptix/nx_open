@@ -967,6 +967,11 @@ QnResourceTitleItem* QnResourceWidget::titleBar() const
     return m_hudOverlay->title();
 }
 
+QnHudOverlayWidget* QnResourceWidget::hudOverlay() const
+{
+    return m_hudOverlay;
+}
+
 void QnResourceWidget::setCheckedButtons(int buttons)
 {
     titleBar()->rightButtonsBar()->setCheckedButtons(buttons);
