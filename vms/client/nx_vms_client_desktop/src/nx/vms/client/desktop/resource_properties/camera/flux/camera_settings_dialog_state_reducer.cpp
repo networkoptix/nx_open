@@ -5,8 +5,8 @@
 #include <chrono>
 #include <limits>
 
-#include <QtNetwork/QAuthenticator>
 #include <QtCore/QUrlQuery>
+#include <QtNetwork/QAuthenticator>
 
 #include <camera/fps_calculator.h>
 #include <client/client_module.h>
@@ -15,9 +15,9 @@
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource/resource_media_layout.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/resource_media_layout.h>
 #include <nx/analytics/utils.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/json/serializer.h>
@@ -1002,6 +1002,15 @@ State CameraSettingsDialogStateReducer::setHasEditAccessRightsForAllCameras(
         state.singleCameraSettings.cameraHotspotsEnabled.resetUser();
         state.singleCameraSettings.cameraHotspots.resetUser();
     }
+
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setHasViewLivePermission(State state, bool value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    state.singleCameraProperties.hasViewLivePermission = value;
 
     return state;
 }

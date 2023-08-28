@@ -2,7 +2,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QObject>
+
+#include <core/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,6 +23,13 @@ public:
         CameraSettingsDialogStore* store,
         SystemContext* systemContext,
         QObject* parent);
+    virtual ~CameraSettingsResourceAccessWatcher() override;
+
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
+
+private:
+    class Private;
+    std::unique_ptr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop
