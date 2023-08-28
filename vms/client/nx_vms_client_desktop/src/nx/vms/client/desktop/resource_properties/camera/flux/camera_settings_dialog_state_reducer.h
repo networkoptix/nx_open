@@ -79,6 +79,7 @@ public:
     static State setHasPowerUserPermissions(State state, bool value);
     static State setHasEventLogPermission(State state, bool value);
     static State setHasEditAccessRightsForAllCameras(State state, bool value);
+    static State setHasViewLivePermission(State state, bool value);
     static State setSaasInitialized(State state, bool value);
     static State setSingleVirtualCameraState(State state, const VirtualCameraState& value);
 
