@@ -22,6 +22,7 @@
 
 class QnAspectRatio;
 struct QnCameraAdvancedParams;
+
 namespace nx::vms::api::dewarping { struct MediaData; }
 namespace nx::vms::client::core { enum class StandardRotation; }
 
@@ -91,6 +92,7 @@ public:
     void setHasPowerUserPermissions(bool value);
     void setHasEventLogPermission(bool value);
     void setHasEditAccessRightsForAllCameras(bool value);
+    void setHasViewLivePermission(bool value);
     void setSaasInitialized(bool value);
     void setSingleVirtualCameraState(const VirtualCameraState& value);
     void setSingleCameraUserName(const QString& text);
