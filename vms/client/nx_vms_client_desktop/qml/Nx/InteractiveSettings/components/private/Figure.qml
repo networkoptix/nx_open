@@ -72,7 +72,7 @@ LabeledItem
 
             TextButton
             {
-                icon.source: "image://svg/skin/text_buttons/delete_20.svg"
+                icon.source: "image://svg/skin/text_buttons/delete_20_deprecated.svg"
                 visible: figureView.hasFigure
 
                 onClicked:

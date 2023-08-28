@@ -83,7 +83,7 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
                     return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
             case DeleteButtonColumn:
-                return qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions);
+                return qnSkin->icon("text_buttons/delete_20_deprecated.svg", kIconSubstitutions);
         }
     }
 

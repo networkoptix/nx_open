@@ -87,7 +87,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         m_deleteButton = new QPushButton;
         m_deleteButton->setText(tr("Delete"));
-        m_deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions));
+        m_deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20_deprecated.svg", kIconSubstitutions));
         m_deleteButton->setFlat(true);
         connect(
             m_deleteButton,
