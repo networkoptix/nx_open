@@ -227,7 +227,7 @@ Dialog
 
                         text: qsTr("Delete")
                         visible: false
-                        icon.source: "image://svg/skin/text_buttons/delete_20.svg"
+                        icon.source: "image://svg/skin/text_buttons/delete_20_deprecated.svg"
                         onClicked: entriesModel.deleteEntries(tableView.getSelectedRowIndexes())
                     }
                     TextButton

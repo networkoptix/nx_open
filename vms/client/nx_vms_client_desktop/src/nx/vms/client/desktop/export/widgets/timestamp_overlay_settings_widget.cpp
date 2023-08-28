@@ -62,7 +62,7 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
             emit formatChanged(format);
         });
 
-    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions));
+    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20_deprecated.svg", kIconSubstitutions));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &TimestampOverlaySettingsWidget::deleteClicked);
