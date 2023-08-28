@@ -2056,6 +2056,18 @@ Handle ServerConnection::loginAsync(
         targetThread);
 }
 
+Handle ServerConnection::loginAsync(
+    const nx::vms::api::TemporaryLoginSessionRequest& data,
+    Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
+    QThread* targetThread)
+{
+    return executePost(
+        "/rest/v3/login/temporaryToken",
+        nx::reflect::json::serialize(data),
+        std::move(callback),
+        targetThread);
+}
+
 Handle ServerConnection::replaceDevice(
     const QnUuid& deviceToBeReplacedId,
     const QString& replacementDevicePhysicalId,
