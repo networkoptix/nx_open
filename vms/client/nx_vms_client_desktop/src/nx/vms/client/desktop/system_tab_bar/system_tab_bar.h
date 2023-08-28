@@ -21,7 +21,6 @@ class SystemTabBar:
 
 public:
     SystemTabBar(QWidget* parent = nullptr);
-    void setModel(SystemTabBarModel* model);
     void rebuildTabs();
     void activateHomeTab();
     void activatePreviousTab();
@@ -36,6 +35,7 @@ private:
     bool isHomeTab(int index) const;
     int homeTabIndex() const;
     void updateHomeTab();
+    SystemTabBarModel* model() const;
 
     void at_currentTabChanged(int index);
     void at_currentSystemChanged(QnSystemDescriptionPtr systemDescription);
@@ -43,7 +43,7 @@ private:
 
 private:
     bool m_updating = false;
-    int m_lastTabIndex = 0;
+    int m_lastTabIndex = -1;
 };
 
 } // namespace nx::vms::client::desktop

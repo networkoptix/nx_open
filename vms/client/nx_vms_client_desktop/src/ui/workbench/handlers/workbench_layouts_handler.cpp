@@ -1036,10 +1036,16 @@ void LayoutsHandler::at_openNewTabAction_triggered()
     if (context()->user())
         resource->setParentId(context()->user()->getId());
 
-    resourcePool()->addResource(resource);
+    {
+        // Do not add resource on workbench layout if something was added there via resource pool.
+        const auto count = workbench()->layouts().size();
+        resourcePool()->addResource(resource);
+        if (workbench()->layouts().size() > count)
+            return;
+    }
+    QnWorkbenchLayout* layout = workbench()->addLayout(resource);
 
     const auto parameters = menu()->currentParameters(sender());
-    QnWorkbenchLayout* layout = workbench()->addLayout(resource);
     if (parameters.hasArgument(Qn::LayoutSyncStateRole))
     {
         const auto syncState = parameters.argument(Qn::LayoutSyncStateRole);
