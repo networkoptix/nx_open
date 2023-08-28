@@ -61,7 +61,7 @@ by a plugin:
     - `ref_countable.h` - `class nx::sdk::RefCountable`: base class for objects implementing
         `IRefCountable` interface.
     - `ptr.h` - `class nx::sdk::Ptr`: Smart Pointer to reference-countable objects.
-    - `to_string.h` and `src/nx/sdk/helpers/uuid_helper.h`: Conversion functions.
+    - `to_string.h` and `uuid_helper.h`: Conversion functions.
 
 - `src/nx/sdk/analytics/helpers/` - Analytics-related utilities and typical/base classes
     implementing interfaces, including:

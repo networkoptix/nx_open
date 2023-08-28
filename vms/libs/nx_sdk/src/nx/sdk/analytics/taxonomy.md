@@ -14,7 +14,7 @@ SDK.
 
 The example of defining a Type Library, as well as using the Base Library, can be found in Stub
 Analytics Plugin, "Taxonomy features" sub-plugin, located in this SDK:
-samples/stub_analytics_plugin/src/nx/vms_server_plugins/analytics/stub/taxonomy_features/device_agent_manifest.h
+`samples/stub_analytics_plugin/src/nx/vms_server_plugins/analytics/stub/taxonomy_features/device_agent_manifest.h`
 
 ---------------------------------------------------------------------------------------------------
 ## General information
