@@ -790,6 +790,11 @@ public:
         Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
         QThread* targetThread);
 
+    Handle loginAsync(
+        const nx::vms::api::TemporaryLoginSessionRequest& data,
+        Result<ErrorOrData<nx::vms::api::LoginSession>>::type callback,
+        QThread* targetThread);
+
     Handle replaceDevice(
         const QnUuid& deviceToBeReplacedId,
         const QString& replacementDevicePhysicalId,

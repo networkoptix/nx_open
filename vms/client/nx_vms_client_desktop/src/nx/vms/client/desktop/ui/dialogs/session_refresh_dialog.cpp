@@ -8,6 +8,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/url.h>
 #include <nx/vms/auth/auth_result.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/password_input_field.h>
@@ -61,31 +62,55 @@ SessionRefreshDialog::SessionRefreshDialog(
     setInformativeText(infoText);
     setWindowFlags(windowFlags() | flags);
 
-    // Login input(disabled) and label;
-    auto loginLabel = new QLabel(tr("Login"), this);
-    addCustomWidget(loginLabel);
+    if (context()->user()->isTemporary())
+    {
+        auto loginLabel = new QLabel(tr("Access Link"), this);
+        addCustomWidget(loginLabel);
 
-    auto loginField = new InputField(this);
-    loginField->setEnabled(false);
-    loginField->setText(QString::fromStdString(systemContext()->connectionCredentials().username));
-    addCustomWidget(loginField);
+        m_linkField = new InputField(this);
 
-    // Password input and label.
-    auto passwordLabel = new QLabel(tr("Password"), this);
-    addCustomWidget(passwordLabel);
+        m_linkField->setValidator([](const QString& link)
+            {
+                return ValidationResult{nx::utils::Url::fromUserInput(link).isValid()
+                        ? QValidator::Acceptable
+                        : QValidator::Invalid};
+            });
 
-    m_passwordField = new PasswordInputField(this);
-    m_passwordField->setValidator(
-        [this](const QString& /*password*/)
-        {
-            return m_validationResult;
-        });
-    addCustomWidget(
-        m_passwordField,
-        QnMessageBox::Layout::Content,
-        /*stretch*/ 0,
-        Qt::Alignment(),
-        /*focusThisWidget*/ true);
+        addCustomWidget(
+            m_linkField,
+            QnMessageBox::Layout::Content,
+            /*stretch*/ 0,
+            Qt::Alignment(),
+            /*focusThisWidget*/ true);
+    }
+    else
+    {
+        // Login input(disabled) and label;
+        auto loginLabel = new QLabel(tr("Login"), this);
+        addCustomWidget(loginLabel);
+
+        auto loginField = new InputField(this);
+        loginField->setEnabled(false);
+        loginField->setText(QString::fromStdString(systemContext()->connectionCredentials().username));
+        addCustomWidget(loginField);
+
+        // Password input and label.
+        auto passwordLabel = new QLabel(tr("Password"), this);
+        addCustomWidget(passwordLabel);
+
+        m_passwordField = new PasswordInputField(this);
+        m_passwordField->setValidator(
+            [this](const QString& /*password*/)
+            {
+                return m_validationResult;
+            });
+        addCustomWidget(
+            m_passwordField,
+            QnMessageBox::Layout::Content,
+            /*stretch*/ 0,
+            Qt::Alignment(),
+            /*focusThisWidget*/ true);
+    }
 
     // Action button.
     m_actionButton = new BusyIndicatorButton(this);
@@ -106,20 +131,10 @@ void SessionRefreshDialog::accept()
         return;
     }
 
-    nx::vms::api::LoginSessionRequest loginRequest;
-    loginRequest.username = QString::fromStdString(
-        systemContext()->connectionCredentials().username);
-    loginRequest.password = m_passwordField->text();
-
-    lockUi(true);
-
-    if (m_passwordValidationMode)
-        validatePassword(loginRequest);
-    else
-        refreshSession(loginRequest);
+    refreshSession();
 }
 
-void SessionRefreshDialog::refreshSession(const nx::vms::api::LoginSessionRequest& loginRequest)
+void SessionRefreshDialog::refreshSession()
 {
     auto callback = nx::utils::guarded(
         this,
@@ -138,7 +153,9 @@ void SessionRefreshDialog::refreshSession(const nx::vms::api::LoginSessionReques
                     m_refreshResult.token = nx::network::http::BearerAuthToken(session->token);
                     m_refreshResult.tokenExpirationTime =
                         qnSyncTime->currentTimePoint() + session->expiresInS;
-                    m_refreshResult.password = m_passwordField->text();
+
+                    if (m_passwordField)
+                        m_refreshResult.password = m_passwordField->text();
                 }
                 else
                 {
@@ -155,10 +172,51 @@ void SessionRefreshDialog::refreshSession(const nx::vms::api::LoginSessionReques
             validationResultReady();
         });
 
-    if (auto api = connectedServerApi(); NX_ASSERT(api, "No Server connection"))
-        api->loginAsync(loginRequest, std::move(callback), thread());
+    if (context()->user()->isTemporary())
+    {
+        const auto url = nx::utils::Url::fromUserInput(m_linkField->text());
+
+        if (!url.isValid())
+        {
+            m_validationResult = ValidationResult(QValidator::Invalid, tr("Invalid Link"));
+            return;
+        }
+
+        nx::vms::api::TemporaryLoginSessionRequest loginRequest;
+        if (url.hasFragment())
+        {
+            const QString fragment = url.fragment();
+            const QUrlQuery query{fragment.mid(fragment.indexOf("?") + 1)};
+            loginRequest.token  = query.queryItemValue("token");
+        }
+        else
+        {
+            const QUrlQuery query{url.toQUrl()};
+            loginRequest.token  = query.queryItemValue("auth");
+        }
+
+        lockUi(true);
+        if (auto api = connectedServerApi(); NX_ASSERT(api, "No Server connection"))
+            api->loginAsync(loginRequest, std::move(callback), thread());
+        else
+            base_type::reject();
+    }
     else
-        base_type::reject();
+    {
+        nx::vms::api::LoginSessionRequest loginRequest;
+        loginRequest.username = QString::fromStdString(
+            systemContext()->connectionCredentials().username);
+        loginRequest.password = m_passwordField->text();
+
+        lockUi(true);
+
+        if (m_passwordValidationMode)
+            validatePassword(loginRequest);
+        else if (auto api = connectedServerApi(); NX_ASSERT(api, "No Server connection"))
+            api->loginAsync(loginRequest, std::move(callback), thread());
+        else
+            base_type::reject();
+    }
 }
 
 void SessionRefreshDialog::validatePassword(const nx::vms::api::LoginSessionRequest& loginRequest)
@@ -187,7 +245,8 @@ void SessionRefreshDialog::lockUi(bool lock)
 {
     const bool enabled = !lock;
 
-    m_passwordField->setEnabled(enabled);
+    if (m_passwordField)
+        m_passwordField->setEnabled(enabled);
 
     m_actionButton->setEnabled(enabled);
     m_actionButton->showIndicator(lock);
@@ -203,8 +262,12 @@ void SessionRefreshDialog::validationResultReady()
     {
         if (m_validationResult.errorMessage.isEmpty())
             m_validationResult.errorMessage = tr("Unknown error");
-        m_passwordField->clear();
-        m_passwordField->validate();
+
+        if (m_passwordField)
+        {
+            m_passwordField->clear();
+            m_passwordField->validate();
+        }
         // Reset validation result after displaying error message.
         m_validationResult = ValidationResult(QValidator::Intermediate);
 
