@@ -23,6 +23,8 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_administration/globals/results_reporter.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -339,6 +341,8 @@ LdapSettingsWidget::LdapSettingsWidget(QWidget* parent):
     auto boxLayout = new QVBoxLayout(this);
     boxLayout->setContentsMargins(0, 0, 0, 0);
     boxLayout->addWidget(d->quickWidget);
+
+    setHelpTopic(this, HelpTopic::Ldap);
 }
 
 LdapSettingsWidget::~LdapSettingsWidget()
