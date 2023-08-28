@@ -204,7 +204,7 @@ NOTE: Class hierarchy may contain types instrumented in different ways.
 ## Instrumenting enums
 Enum can be instrumented using the following macro:
 
-    #include <nx/reflect/enum.h>
+    #include <nx/reflect/enum_instrument.h>
 
     enum class Permission { read, write, execute };
     NX_REFLECTION_INSTRUMENT_ENUM(Permission, read, write, execute)
@@ -234,7 +234,7 @@ toString/fromString.
 
 Also nx_reflect provides macros which declare and instrument enum in one turn.
 
-    #include <nx/reflect/enum.h>
+    #include <nx/reflect/enum_instrument.h>
 
     // enum Permission { read, write, execute };
     NX_REFLECTION_ENUM(Permission, read, write, execute)
@@ -245,7 +245,7 @@ Also nx_reflect provides macros which declare and instrument enum in one turn.
 Due to technical limitations, enums declared **inside a class or struct** have to be declared with
 another macros (suffixed with `_IN_CLASS`).
 
-    #include <nx/reflect/enum.h>
+    #include <nx/reflect/enum_instrument.h>
 
     struct Foo
     {
@@ -258,7 +258,7 @@ another macros (suffixed with `_IN_CLASS`).
 
 All declaration macros support enums with explicit constant values.
 
-    #include <nx/reflect/enum.h>
+    #include <nx/reflect/enum_instrument.h>
 
     // enum class Permission { read, write, execute };
     NX_REFLECTION_ENUM_CLASS(Permission, read = 0x1, write = 0x2, execute = 0x4)
