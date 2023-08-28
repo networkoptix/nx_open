@@ -442,6 +442,11 @@ void StartupActionsHandler::handleAcsModeResources(
     LayoutResourcePtr layout(new LayoutResource());
     layout->setIdUnsafe(QnUuid::createUuid());
     layout->setCellSpacing(0);
+    layout->addFlags(Qn::local);
+    if (const auto user = context()->user())
+        layout->setParentId(user->getId());
+
+    resourcePool()->addResource(layout);
 
     const auto wlayout = workbench()->addLayout(layout);
     workbench()->setCurrentLayout(wlayout);
