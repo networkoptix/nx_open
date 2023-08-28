@@ -118,7 +118,7 @@ RapidReviewSettingsWidget::RapidReviewSettingsWidget(QWidget* parent):
 
     setSourcePeriodLengthMs(minimalSourcePeriodLengthMs());
 
-    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20.svg", kIconSubstitutions));
+    ui->deleteButton->setIcon(qnSkin->icon("text_buttons/delete_20_deprecated.svg", kIconSubstitutions));
 
     connect(ui->deleteButton, &QPushButton::clicked,
         this, &RapidReviewSettingsWidget::deleteClicked);
