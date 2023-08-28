@@ -25,6 +25,7 @@ public:
         transcodingInLayoutIsNotSupported,
         nonCameraResources,
         noCameraData,
+        exportNotAllowed,
 
         count
     };
