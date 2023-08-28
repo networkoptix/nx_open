@@ -11,6 +11,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/os_info.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/api/types/resource_types.h>
 
 #include "data_macros.h"
@@ -61,6 +62,7 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
 
     /**%apidoc Presented if the System is bound to the Cloud. */
     std::optional<QnUuid> cloudOwnerId;
+    nx::vms::api::SaasState saasState = nx::vms::api::SaasState::uninitialized;
 
     void fixRuntimeId();
     QString cloudId() const;
@@ -92,7 +94,8 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     (localSystemId) \
     (hwPlatform) \
     (synchronizedTimeMs) \
-    (cloudOwnerId)
+    (cloudOwnerId) \
+    (saasState)
 NX_VMS_API_DECLARE_STRUCT_EX(ModuleInformation, (ubjson)(json)(xml)(csv_record))
 NX_REFLECTION_INSTRUMENT(ModuleInformation, ModuleInformation_Fields);
 
