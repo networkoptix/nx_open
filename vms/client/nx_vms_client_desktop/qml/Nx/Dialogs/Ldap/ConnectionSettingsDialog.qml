@@ -1,15 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Window 2.15
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Dialogs 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+import Nx.Dialogs
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 import "../UserManagement/Components"
 import "ldap_helper.mjs" as LdapHelper
@@ -376,5 +377,21 @@ Dialog
         buttonLayout: DialogButtonBox.KdeLayout
 
         standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
+
+        leftPadding: 24 + hintButton.width
+
+        ContextHintButton
+        {
+            id: hintButton
+
+            parent: buttonBox
+            anchors.verticalCenter: parent.verticalCenter
+            x: 16
+
+            toolTipText: qsTr("To allow LDAP users to log in to %1, it is necessary"
+                + "to establish a connection between %1 and a corporate LDAP server.").arg(
+                    Branding.vmsName())
+            helpTopic: HelpTopic.Ldap
+        }
     }
 }
