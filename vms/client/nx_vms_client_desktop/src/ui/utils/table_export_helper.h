@@ -11,7 +11,9 @@ class QnTableExportHelper
 {
     Q_DECLARE_TR_FUNCTIONS(QnTableExportHelper)
 public:
+    using FilterFunction = std::function<bool(const QModelIndex&)>;
     static QModelIndexList getAllIndexes(QAbstractItemModel* model);
+    static QModelIndexList getFilteredIndexes(QAbstractItemModel* model, FilterFunction filter);
 
     static void exportToFile(
         const QAbstractItemModel* tableModel,
@@ -24,13 +26,28 @@ public:
         const QModelIndexList& indexes,
         const Qt::ItemDataRole dataRole = Qt::DisplayRole);
 
+    static QString getExportFilePathFromDialog(
+        const QString& fileFilters, QWidget* parent = nullptr, const QString& caption = QString());
+
+    static void exportToStreamCsv(const QAbstractItemModel* tableModel,
+        const QModelIndexList& indexes,
+        QTextStream& outputCsv,
+        const Qt::ItemDataRole dataRole = Qt::DisplayRole);
+
 private:
-    static void getGridData(
-        const QAbstractItemModel* tableModel,
+    static void getGridHtmlCsvData(const QAbstractItemModel* tableModel,
         const QModelIndexList& indexes,
         const QChar& textDelimiter,
         QString& textData,
         QString& htmlData,
+        const Qt::ItemDataRole dataRole = Qt::DisplayRole);
+
+    static QString getGridCsvData(const QAbstractItemModel* tableModel,
+        const QModelIndexList& indexes,
+        const QChar& textDelimiter,
+        const Qt::ItemDataRole dataRole = Qt::DisplayRole);
+    static QString getGridHtmlData(const QAbstractItemModel* tableModel,
+        const QModelIndexList& indexes,
         const Qt::ItemDataRole dataRole = Qt::DisplayRole);
 };
 

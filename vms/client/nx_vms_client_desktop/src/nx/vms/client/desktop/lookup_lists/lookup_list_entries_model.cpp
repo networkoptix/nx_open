@@ -5,6 +5,7 @@
 #include <range/v3/view/reverse.hpp>
 
 #include <nx/utils/range_adapters.h>
+#include <ui/utils/table_export_helper.h>
 
 namespace nx::vms::client::desktop {
 
@@ -172,6 +173,25 @@ void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
         m_data->rawData().entries.erase(m_data->rawData().entries.begin() + index);
         endRemoveRows();
     }
+}
+
+void LookupListEntriesModel::exportEntries(const QSet<int>& selectedRows, QTextStream& outputCsv)
+{
+    if (!NX_ASSERT(m_data))
+        return;
+
+    QModelIndexList indexes;
+    if (selectedRows.isEmpty() || selectedRows.size() == rowCount())
+    {
+        indexes = QnTableExportHelper::getAllIndexes(this);
+    }
+    else
+    {
+        indexes = QnTableExportHelper::getFilteredIndexes(
+            this, [&](const QModelIndex& index) { return selectedRows.contains(index.row()); });
+    }
+
+    QnTableExportHelper::exportToStreamCsv(this, indexes, outputCsv);
 }
 
 } // namespace nx::vms::client::desktop
