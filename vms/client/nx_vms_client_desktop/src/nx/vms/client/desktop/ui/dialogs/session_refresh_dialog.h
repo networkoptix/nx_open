@@ -60,11 +60,12 @@ private:
     void lockUi(bool lock);
     void validationResultReady();
 
-    void refreshSession(const nx::vms::api::LoginSessionRequest& loginRequest);
+    void refreshSession();
     void validatePassword(const nx::vms::api::LoginSessionRequest& loginRequest);
 
 private:
     InputField* m_passwordField;
+    InputField* m_linkField;
     BusyIndicatorButton* m_actionButton;
 
     bool m_passwordValidationMode = false;
