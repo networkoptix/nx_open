@@ -41,7 +41,7 @@ CloudLayoutsIntroDialog::CloudLayoutsIntroDialog(
         "we will continue to expand the capabilities of %1 Layouts in future versions")
         .arg(nx::branding::shortCloudName()));
     ui->helpIconLabel->setPixmap(
-        qnSkin->icon("buttons/context_info_16.svg", HintButton::kIconSubstitutions)
+        qnSkin->icon("buttons/context_hint_16.svg", HintButton::kIconSubstitutions)
             .pixmap(QSize(16, 16)));
     ui->helpLabel->setText(
         tr("Read more on the %1").arg(common::html::localLink(tr("help page"))));
