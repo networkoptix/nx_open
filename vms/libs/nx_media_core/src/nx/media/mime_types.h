@@ -7,6 +7,7 @@
 namespace nx::media {
 
 extern const QString kH264MimeType;
+extern const QString kH263MimeType;
 extern const QString kHevcMimeType;
 extern const QString kMpeg4MimeType;
 extern const QString kMjpegMimeType;

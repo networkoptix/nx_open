@@ -5,6 +5,7 @@
 namespace nx::media {
 
 const QString kH264MimeType = "video/h264";
+const QString kH263MimeType = "video/h263";
 const QString kHevcMimeType = "video/hevc";
 const QString kMpeg4MimeType = "video/mpeg4";
 const QString kMjpegMimeType = "video/mjpeg";
