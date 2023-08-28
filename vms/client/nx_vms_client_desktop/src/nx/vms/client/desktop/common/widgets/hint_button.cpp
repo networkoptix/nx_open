@@ -43,8 +43,8 @@ const nx::vms::client::core::SvgIconColorer::IconSubstitutions HintButton::kIcon
 
 HintButton::HintButton(QWidget* parent):
     base_type(parent),
-    m_regularPixmap(qnSkin->icon("buttons/context_info_16.svg", kIconSubstitutions).pixmap(QSize(16,16))),
-    m_highlightedPixmap(qnSkin->icon("buttons/context_info_16.svg", kIconSubstitutions).pixmap(QSize(16,16), QIcon::Mode::Active))
+    m_regularPixmap(qnSkin->icon("buttons/context_hint_16.svg", kIconSubstitutions).pixmap(QSize(16,16))),
+    m_highlightedPixmap(qnSkin->icon("buttons/context_hint_16.svg", kIconSubstitutions).pixmap(QSize(16,16), QIcon::Mode::Active))
 {
     const auto pixmapSizeScaled = m_regularPixmap.size() / m_regularPixmap.devicePixelRatioF();
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
