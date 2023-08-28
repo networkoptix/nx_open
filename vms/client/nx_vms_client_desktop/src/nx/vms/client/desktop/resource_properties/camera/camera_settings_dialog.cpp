@@ -87,6 +87,7 @@ struct CameraSettingsDialog::Private: public QObject
     QPointer<VirtualCameraSettingsStateWatcher> virtualCameraStateWatcher;
     QPointer<CameraSettingsRemoteChangesWatcher> cameraPropertyWatcher;
     QPointer<CameraSettingsPtzCapabilitiesWatcher> cameraPtzCapabilitiesWatcher;
+    QPointer<CameraSettingsResourceAccessWatcher> cameraResourceAccessWatcher;
     QnVirtualCameraResourceList cameras;
     QPointer<nx::vms::license::CamLicenseUsageHelper> licenseUsageHelper;
     QPointer<CameraAdvancedParamsWidget> advancedSettingsWidget;
@@ -195,6 +196,8 @@ struct CameraSettingsDialog::Private: public QObject
             deviceAgentSettingsAdapter,
             analyticsEnginesWatcher,
             advancedParametersManifestManager.get());
+
+        cameraResourceAccessWatcher->setCamera(singleCamera);
     }
 
     void handleAction(ui::action::IDType action)
@@ -299,6 +302,8 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->virtualCameraStateWatcher = new VirtualCameraSettingsStateWatcher(d->store, this);
     d->cameraPropertyWatcher = new CameraSettingsRemoteChangesWatcher(d->store, this);
     d->cameraPtzCapabilitiesWatcher = new CameraSettingsPtzCapabilitiesWatcher(d->store, this);
+    d->cameraResourceAccessWatcher = new CameraSettingsResourceAccessWatcher(
+        d->store, systemContext(), this);
 
     d->licenseUsageHelper = new nx::vms::license::CamLicenseUsageHelper(
         systemContext(),
@@ -311,7 +316,6 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
-    new CameraSettingsResourceAccessWatcher(d->store, systemContext(), this);
     new CameraSettingsSaasStateWatcher(d->store, systemContext(), this);
     new CameraSettingsEngineLicenseWatcher(d->store, systemContext(), this);
 

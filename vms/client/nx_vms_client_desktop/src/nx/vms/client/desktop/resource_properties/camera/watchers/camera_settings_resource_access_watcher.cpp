@@ -2,9 +2,11 @@
 
 #include "camera_settings_resource_access_watcher.h"
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -13,33 +15,52 @@
 
 namespace nx::vms::client::desktop {
 
+class CameraSettingsResourceAccessWatcher::Private
+{
+public:
+    CameraSettingsDialogStore* store = nullptr;
+    QnVirtualCameraResourcePtr camera;
+    core::AccessController::NotifierPtr cameraAccessNotifier;
+
+public:
+    void updateCameraPermissions()
+    {
+        if (const auto systemContext = SystemContext::fromResource(camera))
+        {
+            store->setHasViewLivePermission(systemContext->accessController()->hasPermissions(
+                camera, Qn::ViewLivePermission));
+        }
+    };
+};
+
 CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
     CameraSettingsDialogStore* store,
     SystemContext* systemContext,
     QObject* parent)
     :
-    base_type(parent)
+    base_type(parent),
+    d(new Private{.store = store})
 {
     if (!NX_ASSERT(store))
         return;
 
     const auto updateUserAccessRightsInfo =
-        [systemContext, store]()
+        [this, systemContext]()
         {
             const auto user = systemContext->accessController()->user();
             if (!user)
             {
-                store->setHasEditAccessRightsForAllCameras(false);
+                d->store->setHasEditAccessRightsForAllCameras(false);
                 return;
             }
 
             if (user->isAdministrator())
             {
-                store->setHasEditAccessRightsForAllCameras(true);
+                d->store->setHasEditAccessRightsForAllCameras(true);
                 return;
             }
 
-            store->setHasEditAccessRightsForAllCameras(
+            d->store->setHasEditAccessRightsForAllCameras(
                 systemContext->resourceAccessManager()->hasAccessToAllCameras(
                     user->getId(),
                     nx::vms::api::AccessRight::edit));
@@ -49,6 +70,35 @@ CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
         this, updateUserAccessRightsInfo);
 
     updateUserAccessRightsInfo();
+}
+
+CameraSettingsResourceAccessWatcher::~CameraSettingsResourceAccessWatcher()
+{
+}
+
+void CameraSettingsResourceAccessWatcher::setCamera(
+    const QnVirtualCameraResourcePtr& camera)
+{
+    if (d->camera == camera)
+    {
+        // We need to update the store even if the camera was not changed.
+        d->updateCameraPermissions();
+        return;
+    }
+
+    d->cameraAccessNotifier = {};
+    d->camera = camera;
+
+    if (!camera)
+        return;
+
+    d->cameraAccessNotifier =
+        SystemContext::fromResource(camera)->accessController()->createNotifier(camera);
+
+    connect(d->cameraAccessNotifier.get(), &core::AccessController::Notifier::permissionsChanged,
+        this, [this]() { d->updateCameraPermissions(); });
+
+    d->updateCameraPermissions();
 }
 
 } // namespace nx::vms::client::desktop
