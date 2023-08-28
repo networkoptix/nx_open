@@ -58,6 +58,7 @@ namespace {
             insert(new StandardLinearCombinator<QVector3D>());
             insert(new StandardLinearCombinator<QVector4D>());
             insert(new StandardLinearCombinator<QColor>());
+            insert(new StandardLinearCombinator<QMargins>());
         }
 
         using base_type::insert;
@@ -72,7 +73,7 @@ namespace {
 } // anonymous namespace
 
 
-LinearCombinator::LinearCombinator(QMetaType type): 
+LinearCombinator::LinearCombinator(QMetaType type):
     m_type(type)
 {}
 
@@ -158,6 +159,15 @@ QColor linearCombine(qreal a, const QColor &x, qreal b, const QColor &y) {
         qBound(0, linearCombine(a, x.green(), b, y.green()), 255),
         qBound(0, linearCombine(a, x.blue(),  b, y.blue()),  255),
         qBound(0, linearCombine(a, x.alpha(), b, y.alpha()), 255)
+    );
+}
+
+QMargins linearCombine(qreal a, const QMargins &x, qreal b, const QMargins &y) {
+    return QMargins(
+        linearCombine(a, x.left(),   b, y.left()),
+        linearCombine(a, x.top(),    b, y.top()),
+        linearCombine(a, x.right(),  b, y.right()),
+        linearCombine(a, x.bottom(), b, y.bottom())
     );
 }
 

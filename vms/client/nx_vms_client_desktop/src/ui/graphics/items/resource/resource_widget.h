@@ -280,6 +280,8 @@ public:
 
     QnResourceTitleItem* titleBar() const;
 
+    QnHudOverlayWidget* hudOverlay() const;
+
     void setCheckedButtons(int buttons);
 
     int checkedButtons() const;

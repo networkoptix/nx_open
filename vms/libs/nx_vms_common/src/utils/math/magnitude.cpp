@@ -57,6 +57,7 @@ namespace {
             insert(new StandardMagnitudeCalculator<QVector3D>());
             insert(new StandardMagnitudeCalculator<QVector4D>());
             insert(new StandardMagnitudeCalculator<QColor>());
+            insert(new StandardMagnitudeCalculator<QMargins>());
         }
 
         using base_type::insert;
@@ -146,6 +147,10 @@ qreal calculateMagnitude(const QVector4D &value) {
 
 qreal calculateMagnitude(const QColor &value) {
     return calculateMagnitude(QVector4D(value.redF(), value.greenF(), value.blueF(), value.alphaF()));
+}
+
+qreal calculateMagnitude(const QMargins &value) {
+    return calculateMagnitude(QVector4D(value.left(), value.top(), value.right(), value.bottom()));
 }
 
 qreal calculateMagnitude(const QRectF &value) {

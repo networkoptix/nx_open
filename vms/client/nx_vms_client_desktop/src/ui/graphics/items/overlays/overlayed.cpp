@@ -10,7 +10,11 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 
+#include "private/margins_animator.h"
+
 using nx::vms::client::core::Rotation;
+
+using namespace nx::vms::client::desktop::ui::workbench;
 
 detail::OverlayedBase::OverlayWidget::OverlayWidget()
     : visibility(OverlayVisibility::Invisible)
@@ -141,7 +145,7 @@ void detail::OverlayedBase::setOverlayVisible(bool visible, bool animate)
 
 void detail::OverlayedBase::updateOverlayWidgetsGeometry()
 {
-    for(const OverlayWidget &overlay: m_overlayWidgets)
+    for (const OverlayWidget& overlay: m_overlayWidgets)
     {
         QSizeF size = m_widget->size();
 
@@ -179,6 +183,27 @@ void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate)
 
         setOverlayWidgetVisible(overlay.childWidget, visible, animate);
     }
+}
+
+void detail::OverlayedBase::updateOverlayWidgetMargins(
+    const QGraphicsWidget* widget,
+    const QMargins& margins)
+{
+    if (!NX_ASSERT(widget))
+        return;
+
+    auto iter = std::find_if(m_overlayWidgets.begin(), m_overlayWidgets.end(),
+        [widget](const OverlayWidget& overlayWidget)
+        {
+            return widget == overlayWidget.widget;
+        });
+
+    if (!NX_ASSERT(iter != m_overlayWidgets.end()))
+        return;
+
+    auto animator = marginsAnimator(iter->boundWidget);
+    qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::WebResourceToolbarHideAndShow);
+    animator->animateTo(QVariant::fromValue(margins));
 }
 
 void detail::OverlayedBase::setOverlayWidgetVisible(

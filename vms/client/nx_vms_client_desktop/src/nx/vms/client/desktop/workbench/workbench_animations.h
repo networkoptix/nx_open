@@ -83,6 +83,8 @@ public:
         ItemOverlayShow,
         ItemOverlayHide,
 
+        WebResourceToolbarHideAndShow,
+
         IdCount
     );
 
