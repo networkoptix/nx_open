@@ -196,6 +196,8 @@ const QString kSpace("space");
 
 const QString kNoVideoSupport("noVideoSupport");
 
+const QString kAudioDeviceTypes("audioDeviceTypes");
+
 const QString kBitratePerGOP("bitratePerGOP");
 const QString kUseMedia2ToFetchProfiles("useMedia2ToFetchProfiles");
 const QString kIoSettings("ioSettings");
