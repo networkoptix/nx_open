@@ -229,6 +229,7 @@ NX_VMS_COMMON_API extern const QString kConfigurationalPtzCapabilities;
 // TODO: Rename to kForceOnvif and kIgnoreOnvif.
 NX_VMS_COMMON_API extern const QString kForceONVIF;
 NX_VMS_COMMON_API extern const QString kIgnoreONVIF;
+NX_VMS_COMMON_API extern const QString kAudioDeviceTypes;
 
 NX_VMS_COMMON_API extern const QString kOnvifVendorSubtype;
 
