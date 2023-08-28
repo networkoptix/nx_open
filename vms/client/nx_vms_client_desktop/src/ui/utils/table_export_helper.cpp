@@ -15,9 +15,8 @@
 
 using namespace nx::vms::client::desktop;
 
-void QnTableExportHelper::exportToFile(
-    const QAbstractItemModel* tableModel,
-    const QModelIndexList& indexes,
+QString QnTableExportHelper::getExportFilePathFromDialog(
+    const QString& fileFilters,
     QWidget* parent,
     const QString& caption)
 {
@@ -27,24 +26,18 @@ void QnTableExportHelper::exportToFile(
     QString fileName;
     while (true)
     {
-        const QString filters = QnCustomFileDialog::createFilter(
-            {
-                {tr("HTML file"), {"html"}},
-                {tr("Spread Sheet (CSV) File"), {"csv"}}
-            });
-
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             parent,
             caption,
             previousDir,
-            filters));
+            fileFilters));
         dialog->setAcceptMode(QFileDialog::AcceptSave);
         if (dialog->exec() != QDialog::Accepted)
-            return;
+            return {};
 
         fileName = dialog->selectedFile();
         if (fileName.isEmpty())
-            return;
+            return {};
 
         QString selectedExtension = dialog->selectedExtension();
         if (!fileName.toLower().endsWith(selectedExtension))
@@ -55,7 +48,7 @@ void QnTableExportHelper::exportToFile(
                 && !QnFileMessages::confirmOverwrite(
                     parent, QFileInfo(fileName).completeBaseName()))
             {
-                return;
+                return {};
             }
         }
 
@@ -72,19 +65,39 @@ void QnTableExportHelper::exportToFile(
     }
 
     appContext()->localSettings()->lastExportDir = QFileInfo(fileName).absolutePath();
+    return fileName;
+}
 
-    QString textData;
-    QString htmlData;
-    getGridData(tableModel, indexes, ';', textData, htmlData);
+void QnTableExportHelper::exportToFile(
+    const QAbstractItemModel* tableModel,
+    const QModelIndexList& indexes,
+    QWidget* parent,
+    const QString& caption)
+{
+    const QString filters = QnCustomFileDialog::createFilter(
+        {{tr("HTML file"), {"html"}}, {tr("Spread Sheet (CSV) File"), {"csv"}}});
+
+    const QString fileName =
+        QnTableExportHelper::getExportFilePathFromDialog(filters, parent, caption);
+    if (fileName.isEmpty())
+        return;
 
     QFile file(fileName);
     if (file.open(QFile::WriteOnly | QFile::Truncate))
     {
         if (fileName.endsWith(".html") || fileName.endsWith(".htm"))
-            file.write(htmlData.toUtf8());
+            file.write(getGridHtmlData(tableModel, indexes).toUtf8());
         else
-            file.write(textData.toUtf8());
+            file.write(getGridCsvData(tableModel, indexes, ';').toUtf8());
     }
+}
+
+void QnTableExportHelper::exportToStreamCsv(const QAbstractItemModel* tableModel,
+    const QModelIndexList& indexes,
+    QTextStream& outputCsv,
+    const Qt::ItemDataRole dataRole)
+{
+    outputCsv << getGridCsvData(tableModel, indexes, ',', dataRole);
 }
 
 void QnTableExportHelper::copyToClipboard(
@@ -94,7 +107,7 @@ void QnTableExportHelper::copyToClipboard(
 {
     QString textData;
     QString htmlData;
-    getGridData(tableModel, indexes, '\t', textData, htmlData, dataRole);
+    getGridHtmlCsvData(tableModel, indexes, '\t', textData, htmlData, dataRole);
 
     QMimeData* mimeData = new QMimeData();
     mimeData->setText(textData);
@@ -102,7 +115,115 @@ void QnTableExportHelper::copyToClipboard(
     QApplication::clipboard()->setMimeData(mimeData);
 }
 
-void QnTableExportHelper::getGridData(const QAbstractItemModel* tableModel,
+QString QnTableExportHelper::getGridCsvData(const QAbstractItemModel* tableModel,
+    const QModelIndexList& indexes,
+    const QChar& textDelimiter,
+    const Qt::ItemDataRole dataRole)
+{
+    QString textResult;
+
+    using namespace nx::vms::common;
+
+    QModelIndexList sortedIndexes = indexes;
+    std::sort(sortedIndexes.begin(), sortedIndexes.end());
+
+    /* Creating header. */
+    for (int i = 0; i < sortedIndexes.size() && sortedIndexes[i].row() == sortedIndexes[0].row();
+         ++i)
+    {
+        int column = sortedIndexes[i].column();
+
+        QString header = tableModel->headerData(column, Qt::Horizontal).toString();
+
+        if (i > 0)
+            textResult.append(textDelimiter);
+
+        textResult.append(header);
+    }
+
+    /* Fill table with data */
+
+    int prevRow = -1;
+    for (int i = 0; i < sortedIndexes.size(); ++i)
+    {
+        if (sortedIndexes[i].row() != prevRow)
+        {
+            prevRow = sortedIndexes[i].row();
+            textResult.append("\n");
+        }
+        else
+        {
+            textResult.append(textDelimiter);
+        }
+
+        QString textData = tableModel->data(sortedIndexes[i], dataRole).toString();
+        textResult.append(textData);
+    }
+
+    textResult.append("\n");
+
+    return textResult;
+}
+
+QString QnTableExportHelper::getGridHtmlData(const QAbstractItemModel* tableModel,
+    const QModelIndexList& indexes,
+    const Qt::ItemDataRole dataRole)
+{
+    using namespace nx::vms::common;
+
+    QModelIndexList sortedIndexes = indexes;
+    std::sort(sortedIndexes.begin(), sortedIndexes.end());
+
+    QString htmlResult;
+    {
+        html::Tag htmlTag("html", htmlResult, html::Tag::BothBreaks);
+        html::Tag bodyTag("body", htmlResult, html::Tag::BothBreaks);
+        html::Tag tableTag("table", htmlResult, html::Tag::BothBreaks);
+
+        { /* Creating header. */
+            html::Tag rowGuard("tr", htmlResult);
+            for (int i = 0;
+                 i < sortedIndexes.size() && sortedIndexes[i].row() == sortedIndexes[0].row();
+                 ++i)
+            {
+                int column = sortedIndexes[i].column();
+
+                QString header = tableModel->headerData(column, Qt::Horizontal).toString();
+                html::Tag thTag("th", htmlResult, html::Tag::NoBreaks);
+                htmlResult.append(header);
+            }
+        }
+
+        { /* Fill table with data */
+
+            QScopedPointer<html::Tag> rowTag;
+
+            int prevRow = -1;
+            for (int i = 0; i < sortedIndexes.size(); ++i)
+            {
+                if (sortedIndexes[i].row() != prevRow)
+                {
+                    prevRow = sortedIndexes[i].row();
+                    rowTag.reset(); /*< close tag before opening new. */
+                    rowTag.reset(new html::Tag("tr", htmlResult));
+                }
+
+                QString textData = tableModel->data(sortedIndexes[i], dataRole).toString();
+
+                QString dataString =
+                    tableModel->data(sortedIndexes[i], Qn::DisplayHtmlRole).toString();
+                if (dataString.isEmpty())
+                    dataString = textData.toHtmlEscaped();
+
+                html::Tag cellTag("td", htmlResult, html::Tag::NoBreaks);
+                htmlResult.append(dataString);
+            }
+        }
+    }
+    return htmlResult;
+}
+
+void QnTableExportHelper::getGridHtmlCsvData(const QAbstractItemModel* tableModel,
     const QModelIndexList& indexes,
     const QChar& textDelimiter,
     QString& textData,
@@ -177,18 +298,25 @@ void QnTableExportHelper::getGridData(const QAbstractItemModel* tableModel,
     htmlData = htmlResult;
 }
 
-QModelIndexList QnTableExportHelper::getAllIndexes(QAbstractItemModel* model)
+QModelIndexList QnTableExportHelper::getFilteredIndexes(
+    QAbstractItemModel* model, FilterFunction filter)
 {
     QModelIndexList result;
     for (int row = 0; row < model->rowCount(); ++row)
     {
         for (int col = 0; col < model->columnCount(); ++col)
         {
-            if (model->hasIndex(row, col))
+            if (model->hasIndex(row, col) && filter(model->index(row, col)))
                 result << model->index(row, col);
         }
     }
     return result;
+}
+
+QModelIndexList QnTableExportHelper::getAllIndexes(QAbstractItemModel* model)
+{
+    return QnTableExportHelper::getFilteredIndexes(
+        model, [&](const QModelIndex&) { return true; });
 }
 
 QnTableExportCompositeModel::QnTableExportCompositeModel(

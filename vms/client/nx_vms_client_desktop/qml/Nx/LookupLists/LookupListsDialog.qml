@@ -237,8 +237,16 @@ Dialog
                     }
                     TextButton
                     {
+                        id: exportListButton
+
                         text: qsTr("Export")
                         icon.source: "image://svg/skin/text_buttons/export.svg"
+                        onClicked:
+                        {
+                            exportProcessor.exportListEntries(
+                                tableView.getSelectedRowIndexes(),
+                                entriesModel)
+                        }
                     }
                     Item { Layout.fillWidth: true }
                     SearchField { }
@@ -265,8 +273,16 @@ Dialog
                     }
                 }
 
-                onEditingStarted: deleteItemButton.enabled = false
-                onEditingFinished: deleteItemButton.enabled = true
+                onEditingStarted:
+                {
+                    deleteItemButton.enabled = false
+                    exportListButton.enabled = false
+                }
+                onEditingFinished:
+                {
+                    deleteItemButton.enabled = true
+                    exportListButton.enabled = true
+                }
 
                 anchors
                 {
@@ -337,6 +353,41 @@ Dialog
         {
             let applyButton = buttonBox.standardButton(DialogButtonBox.Apply)
             applyButton.enabled = Qt.binding(function() { return hasChanges })
+        }
+    }
+
+    ExportEntriesProgressDialog
+    {
+        id: exportProgressBar
+
+        visible: false
+        onRejected: exportProcessor.cancelExport()
+        onOpenFolderRequested: Qt.openUrlExternally(exportProcessor.exportFolder())
+    }
+
+    LookupListExportProcessor
+    {
+        id: exportProcessor
+
+        onExportStarted: exportProgressBar.progressStarted()
+        onExportFinished: (exitCode) =>
+        {
+            switch (exitCode)
+            {
+                case LookupListExportProcessor.Success:
+                    exportProgressBar.progressFinished()
+                    break;
+                case LookupListExportProcessor.ErrorFileNotOpened:
+                    exportProgressBar.visible = false
+                    MessageBox.exec(MessageBox.Icon.Critical,
+                        qsTr("Could not save file"),
+                        qsTr("Please ensure that you have access to selected folder and enough disk space"),
+                        MessageBox.Ok);
+                    break;
+                default:
+                    exportProgressBar.visible = false
+            }
+
         }
     }
 }

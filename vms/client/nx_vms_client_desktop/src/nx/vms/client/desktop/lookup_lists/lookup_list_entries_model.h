@@ -52,6 +52,7 @@ public:
 
     Q_INVOKABLE void addEntry(const QVariantMap& values);
     Q_INVOKABLE void deleteEntries(const QVector<int>& rows);
+    void exportEntries(const QSet<int>& selectedRows, QTextStream& outputCsv);
 
 signals:
     void listModelChanged();
