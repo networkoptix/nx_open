@@ -1318,20 +1318,20 @@ private:
 
 struct ModifyCameraAttributesListAccess
 {
-    void operator()(
+    Result operator()(
         SystemContext* systemContext,
         const Qn::UserAccessData& accessData,
-        nx::vms::api::CameraAttributesDataList& param)
+        const nx::vms::api::CameraAttributesDataList& param)
     {
         if (hasSystemAccess(accessData))
-            return;
+            return Result();
 
         for (const auto& p: param)
         {
             if (!checkSaveResourceAccess(systemContext, accessData, p.cameraId))
             {
-                param = {};
-                return;
+                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                    "There is not enough save permissions"));
             }
         }
 
@@ -1342,12 +1342,12 @@ struct ModifyCameraAttributesListAccess
         const auto& resPool = systemContext->resourcePool();
         for (const auto& p: param)
         {
-            auto camera = resPool->getResourceById(p.cameraId).dynamicCast<QnVirtualCameraResource
-            >();
+            auto camera = resPool->getResourceById(
+                p.cameraId).dynamicCast<QnVirtualCameraResource>();
             if (!camera)
             {
-                param = {};
-                return;
+                return Result(ErrorCode::forbidden,
+                    nx::format(ServerApiErrors::tr("Device %1 not found"), p.cameraId));
             }
             cameras.push_back(camera);
             const bool prevScheduleEnabled = camera->isScheduleEnabled();
@@ -1355,12 +1355,13 @@ struct ModifyCameraAttributesListAccess
                 licenseUsageHelper.propose(camera, p.scheduleEnabled);
         }
 
-        for (const auto& camera: cameras)
+        for (const auto& camera : cameras)
             if (licenseUsageHelper.isOverflowForCamera(camera))
             {
-                param = {};
-                return;
+                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                    "There is not enough license for camera %1"), camera->getId()));
             }
+        return Result();
     }
 };
 
@@ -1842,7 +1843,6 @@ struct SetStatusTransactionType
     triggerNotificationFunc, \
     checkSavePermissionFunc, \
     checkReadPermissionFunc, \
-    filterBySavePermissionFunc, \
     filterByReadPermissionFunc, \
     checkRemotePeerAccessFunc, \
     getTransactionTypeFunc \
@@ -1857,7 +1857,6 @@ struct SetStatusTransactionType
         triggerNotificationFunc, \
         checkSavePermissionFunc, \
         checkReadPermissionFunc, \
-        filterBySavePermissionFunc, \
         filterByReadPermissionFunc, \
         checkRemotePeerAccessFunc, \
         getTransactionTypeFunc),

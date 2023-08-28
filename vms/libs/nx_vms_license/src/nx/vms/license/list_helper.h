@@ -27,6 +27,6 @@ private:
 };
 
 // Should only be used for UTs.
-void fakeLicenseCount(int value = 0);
+void setFakeLicenseCount(int value, Qn::LicenseType licenseType);
 
 } // namespace nx::vms::license

@@ -100,8 +100,10 @@ public:
                     assertModelToDbTypesProducedValidResult<IgnoredDbType, DbType>(x, id);
                     if constexpr (IsVector<DbType>::value)
                     {
-                        result = copy.processMultiUpdateSync(
-                            CrudHandler::template getUpdateCommand<std::decay_t<decltype(x[0])>>(),
+                        const auto command = CrudHandler::template getUpdateCommand<std::decay_t<decltype(x[0])>>();
+                        result = copy.template processMultiUpdateSync<DbType>(
+                            parentUpdateCommand(command),
+                            command,
                             TransactionType::Regular,
                             std::move(x),
                             list);
@@ -316,6 +318,27 @@ private:
             return ApiCommand::Value::getVmsRules;
         else
             return ApiCommand::NotDefined;
+    }
+
+    static constexpr ApiCommand::Value parentUpdateCommand(const ApiCommand::Value command)
+    {
+        switch (command)
+        {
+            case ApiCommand::Value::saveCamera:
+                return ApiCommand::Value::saveCameras;
+            case ApiCommand::Value::saveCameraUserAttributes:
+                return ApiCommand::Value::saveCameraUserAttributesList;
+            case ApiCommand::Value::saveMediaServerUserAttributes:
+                return ApiCommand::Value::saveMediaServerUserAttributesList;
+            case ApiCommand::Value::setResourceParam:
+                return ApiCommand::Value::setResourceParams;
+            case ApiCommand::Value::saveLayout:
+                return ApiCommand::Value::saveLayouts;
+            case ApiCommand::Value::addLicense:
+                return ApiCommand::Value::addLicenses;
+            default:
+                return ApiCommand::NotDefined;
+        }
     }
 
     template<typename T>
