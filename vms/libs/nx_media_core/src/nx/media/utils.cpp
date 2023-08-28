@@ -164,6 +164,9 @@ QString fromVideoCodectoMimeType(AVCodecID codecId)
     {
         case AV_CODEC_ID_H264:
             return kH264MimeType;
+        case AV_CODEC_ID_H263:
+        case AV_CODEC_ID_H263P:
+            return kH263MimeType;
         case AV_CODEC_ID_HEVC:
             return kHevcMimeType;
         case AV_CODEC_ID_MPEG4:
