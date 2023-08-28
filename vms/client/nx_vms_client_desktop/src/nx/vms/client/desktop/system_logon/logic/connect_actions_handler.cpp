@@ -216,12 +216,21 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
         [this]()
         {
             auto existingCredentials = systemContext()->connectionCredentials();
+
+            QString mainText = systemContext()->userWatcher()->user()->isTemporary()
+                ? tr("Enter access link to continue your session")
+                : tr("Enter password to continue your session");
+
+            QString infoText = systemContext()->userWatcher()->user()->isTemporary()
+                ? tr("Your session has expired. Please sign in again with your link to continue.")
+                : tr("Your session has expired. Please sign in again to continue.");
+
             const bool passwordValidationMode = existingCredentials.authToken.isPassword();
             const auto refreshSessionResult = SessionRefreshDialog::refreshSession(
                 mainWindowWidget(),
                 tr("Re-authentication required"),
-                tr("Enter password to continue your session"),
-                tr("Your session has expired. Please sign in again to continue."),
+                mainText,
+                infoText,
                 tr("OK", "Dialog button text."),
                 /*warningStyledAction*/ false,
                 passwordValidationMode);
