@@ -74,7 +74,7 @@ DialogWithState
 
     signal deleteRequested()
     signal auditTrailRequested()
-    signal groupClicked(var id)
+    signal addGroupRequested()
 
     title: qsTr("User - %1").arg(login)
 
@@ -114,7 +114,6 @@ DialogWithState
 
                 onDeleteRequested: dialog.deleteRequested()
                 onAuditTrailRequested: dialog.auditTrailRequested()
-                onGroupClicked: (id) => { dialog.groupClicked(id) }
                 onMoreGroupsClicked: dialog.tabIndex = 1
                 editingContext: membersModel.editingContext
             }
@@ -136,7 +135,7 @@ DialogWithState
                 enabled: !dialog.isSaving
                 editable: dialog.parentGroupsEditable
 
-                onAddGroupClicked: dialog.groupClicked(null)
+                onAddGroupRequested: dialog.addGroupRequested(null)
             }
         }
 

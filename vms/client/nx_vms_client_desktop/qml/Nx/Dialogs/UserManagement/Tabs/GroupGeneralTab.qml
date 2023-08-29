@@ -43,7 +43,6 @@ Item
     }
 
     signal deleteRequested()
-    signal groupClicked(var id)
     signal moreGroupsClicked()
 
     ColumnLayout

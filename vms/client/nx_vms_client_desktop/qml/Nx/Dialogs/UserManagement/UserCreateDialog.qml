@@ -71,7 +71,7 @@ DialogWithState
     property alias displayOffsetMs: generalSettings.displayOffsetMs
     property date firstLoginTime //< Not used by current dialog type.
 
-    signal groupClicked(var id)
+    signal addGroupRequested()
 
     title: qsTr("New User")
 
@@ -131,7 +131,7 @@ DialogWithState
 
                 enabled: !dialog.isSaving
 
-                onAddGroupClicked: dialog.groupClicked(null)
+                onAddGroupRequested: dialog.addGroupRequested(null)
             }
         }
         Tab

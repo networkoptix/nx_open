@@ -54,8 +54,6 @@ DialogWithState
     property alias editingContext: membersModel.editingContext
     property var self
 
-    signal groupClicked(var id)
-
     title: qsTr("New Group")
 
     validateFunc: () =>
@@ -115,8 +113,6 @@ DialogWithState
                 allowAddGroup: false
 
                 enabled: !dialog.isSaving
-
-                onAddGroupClicked: dialog.groupClicked(null)
             }
         }
 
