@@ -847,7 +847,7 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
+         <item alignment="Qt::AlignLeft">
           <widget class="QPushButton" name="toggleInfoButton">
            <property name="text">
             <string notr="true">&lt;More info&gt;</string>
