@@ -256,23 +256,17 @@ void QnTcpListener::removeAllConnections()
 {
     Q_D(QnTcpListener);
 
-    QList<QnLongRunnable*> oldConnections = d->connections;
+    QList<QnLongRunnable*> oldConnections;
     {
         NX_MUTEX_LOCKER lock(&d->connectionMtx);
-
-        for (QList<QnLongRunnable*>::iterator itr = d->connections.begin();
-            itr != d->connections.end(); ++itr)
-        {
-            QnLongRunnable* processor = *itr;
-            processor->pleaseStop();
-        }
-        d->connections.clear();
+        std::swap(d->connections, oldConnections);
     }
 
-    for (QList<QnLongRunnable*>::iterator itr = oldConnections.begin();
-        itr != oldConnections.end(); ++itr)
+    for (const auto& processor: oldConnections)
+        processor->pleaseStop();
+
+    for (const auto& processor: oldConnections)
     {
-        QnLongRunnable* processor = *itr;
         NX_DEBUG(this, "Stopping processor (sysThreadID %1)", processor->systemThreadId());
         delete processor;
     }
