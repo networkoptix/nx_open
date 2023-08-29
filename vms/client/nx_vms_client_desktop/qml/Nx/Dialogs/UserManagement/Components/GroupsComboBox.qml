@@ -105,7 +105,7 @@ Control
 
                         const popupBottom = popupObject.parent.mapToGlobal(
                             0,
-                            popupY + popupObject.height)
+                            popupY + popupObject.maxHeight)
 
                         // Place popup above mouse click if the popup does not fit within window.
                         const w = control.Window.window
@@ -276,6 +276,8 @@ Control
     Popup
     {
         id: popupObject
+
+        readonly property real maxHeight: popupContent.computeHeight(1000)
 
         width: control.width
         height: popupContent.implicitHeight
