@@ -28,7 +28,7 @@ DialogWithState
     height: minimumHeight
 
     minimumWidth: 768
-    minimumHeight: 672
+    minimumHeight: 700
 
     color: ColorTheme.colors.dark7
 
