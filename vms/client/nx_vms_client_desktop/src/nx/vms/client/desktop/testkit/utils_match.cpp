@@ -117,6 +117,16 @@ bool objectMatches(const QObject* object, QJSValue properties)
         }
     }
 
+    if (properties.hasOwnProperty("labelText"))
+    {
+        const auto labelText = object->property("labelText").toString();
+        if (!labelText.isEmpty())
+        {
+            if (!textMatches(labelText, properties.property("labelText").toString()))
+                return false;
+        }
+    }
+
     if (properties.hasOwnProperty("type"))
     {
         const auto className = QString(object->metaObject()->className());
