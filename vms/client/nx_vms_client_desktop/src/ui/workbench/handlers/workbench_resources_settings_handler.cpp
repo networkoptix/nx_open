@@ -231,19 +231,6 @@ void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
         return;
     }
 
-    if (const auto window = parameters.argument<QPointer<QQuickWindow>>(Qn::ParentWidgetRole))
-    {
-        const QScopedPointer<GroupSettingsDialog> dialog(new GroupSettingsDialog(
-            GroupSettingsDialog::editGroup,
-            dynamic_cast<nx::vms::client::desktop::SystemContext*>(systemContext()),
-            parent));
-
-        dialog->setTransientParent(window);
-        dialog->setGroup(userRoleId);
-        dialog->exec(Qt::ApplicationModal);
-        return;
-    }
-
     if (!m_groupSettingsDialog)
     {
         m_groupSettingsDialog = new GroupSettingsDialog(

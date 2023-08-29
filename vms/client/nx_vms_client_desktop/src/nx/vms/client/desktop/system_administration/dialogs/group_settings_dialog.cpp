@@ -134,8 +134,8 @@ GroupSettingsDialog::GroupSettingsDialog(
             });
     }
 
-    connect(rootObjectHolder()->object(), SIGNAL(groupClicked(QVariant)),
-        this, SLOT(onGroupClicked(QVariant)));
+    connect(rootObjectHolder()->object(), SIGNAL(addGroupRequested()),
+        this, SLOT(onAddGroupRequested()));
 
     if (dialogType == editGroup)
     {
@@ -205,13 +205,10 @@ QString GroupSettingsDialog::validateName(const QString& text)
     return {};
 }
 
-void GroupSettingsDialog::onGroupClicked(const QVariant& idVariant)
+void GroupSettingsDialog::onAddGroupRequested()
 {
-    d->sessionNotifier->actionManager()->trigger(
-        ui::action::UserGroupsAction,
-        ui::action::Parameters()
-            .withArgument(Qn::UuidRole, idVariant.value<QnUuid>())
-            .withArgument(Qn::ParentWidgetRole, QPointer(window())));
+    d->sessionNotifier->actionManager()->trigger(ui::action::UserGroupsAction,
+        ui::action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }
 
 void GroupSettingsDialog::onDeleteRequested()

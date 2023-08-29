@@ -109,7 +109,7 @@ public:
 
 public slots:
     void onDeleteRequested();
-    void onGroupClicked(const QVariant& idVariant);
+    void onAddGroupRequested();
 
 protected:
     virtual GroupSettingsDialogState createState(const QnUuid& groupId) override;

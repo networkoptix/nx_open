@@ -357,8 +357,8 @@ UserSettingsDialog::UserSettingsDialog(
             this, SLOT(onAuditTrailRequested()), Qt::QueuedConnection);
     }
 
-    connect(rootObjectHolder()->object(), SIGNAL(groupClicked(QVariant)),
-        this, SLOT(onGroupClicked(QVariant)), Qt::QueuedConnection);
+    connect(rootObjectHolder()->object(), SIGNAL(addGroupRequested()),
+        this, SLOT(onAddGroupRequested()), Qt::QueuedConnection);
 
     connect(systemContext->resourcePool(),
         &QnResourcePool::resourcesRemoved,
@@ -496,12 +496,10 @@ QString UserSettingsDialog::validateLogin(const QString& login)
     return result.state != QValidator::Acceptable ? result.errorMessage : "";
 }
 
-void UserSettingsDialog::onGroupClicked(const QVariant& idVariant)
+void UserSettingsDialog::onAddGroupRequested()
 {
-    d->sessionNotifier->actionManager()->trigger(
-        ui::action::UserGroupsAction, ui::action::Parameters()
-            .withArgument(Qn::UuidRole, idVariant.value<QnUuid>())
-            .withArgument(Qn::ParentWidgetRole, QPointer(window())));
+    d->sessionNotifier->actionManager()->trigger(ui::action::UserGroupsAction,
+        ui::action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }
 
 void UserSettingsDialog::onDeleteRequested()

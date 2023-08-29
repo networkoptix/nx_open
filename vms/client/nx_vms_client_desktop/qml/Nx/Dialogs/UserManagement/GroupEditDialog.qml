@@ -55,7 +55,7 @@ DialogWithState
     property var self
 
     signal deleteRequested()
-    signal groupClicked(var id)
+    signal addGroupRequested()
 
     title: qsTr("Group - %1").arg(name)
 
@@ -112,7 +112,6 @@ DialogWithState
                 parentGroupsEditable: dialog.parentGroupsEditable
 
                 onDeleteRequested: dialog.deleteRequested()
-                onGroupClicked: (id) => { dialog.groupClicked(id) }
                 onMoreGroupsClicked: dialog.tabIndex = 1
             }
         }
@@ -134,7 +133,7 @@ DialogWithState
                 editable: dialog.parentGroupsEditable
                 enabled: !dialog.isSaving
 
-                onAddGroupClicked: dialog.groupClicked(null)
+                onAddGroupRequested: dialog.addGroupRequested()
             }
         }
 
