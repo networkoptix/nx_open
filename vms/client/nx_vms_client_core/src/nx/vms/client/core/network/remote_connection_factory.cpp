@@ -630,7 +630,7 @@ struct RemoteConnectionFactory::Private
     {
         return context
             && context->credentials().authToken.isBearerToken()
-            && context->logonData.userType != nx::vms::api::UserType::temporaryLocal;
+            && !context->credentials().authToken.value.starts_with(api::TemporaryToken::kPrefix);
     }
 
     void loginWithToken(ContextPtr context)
