@@ -38,6 +38,11 @@ EngineHolder::EngineHolder(
 
 EngineHolder::~EngineHolder()
 {
+    stop();
+}
+
+void EngineHolder::stop()
+{
     if (!m_thread)
         return;
 
@@ -49,6 +54,7 @@ EngineHolder::~EngineHolder()
         });
 
     m_thread->wait();
+    m_thread.reset();
 }
 
 Engine* EngineHolder::engine() const

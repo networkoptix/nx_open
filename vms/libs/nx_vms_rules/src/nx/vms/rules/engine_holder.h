@@ -30,6 +30,8 @@ public:
         const QnCommonMessageProcessor* processor,
         Qt::ConnectionType connectionType);
 
+    void stop();
+
 private:
     std::unique_ptr<Plugin> m_builtinPlugin;
     std::unique_ptr<Engine> m_engine;
