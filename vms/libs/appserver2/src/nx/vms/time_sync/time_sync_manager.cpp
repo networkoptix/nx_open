@@ -39,11 +39,8 @@ TimeSyncManager::TimeSyncManager(
     connect(m_thread.get(), &QThread::started,
         [this]()
         {
-            if (!m_timer)
-            {
-                m_timer.reset(new QTimer());
-                connect(m_timer.get(), &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
-            }
+            m_timer.reset(new QTimer());
+            connect(m_timer.get(), &QTimer::timeout, this, &TimeSyncManager::doPeriodicTasks);
             updateTime();
             auto systemSettings = this->systemSettings();
             m_timer->start(
