@@ -30,6 +30,7 @@
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
+#include <nx/vms/client/desktop/workbench/managers/settings_dialog_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <statistics/statistics_manager.h>
@@ -46,7 +47,7 @@
 #include <ui/workbench/workbench_navigator.h>
 
 #if defined(Q_OS_LINUX)
-#include <ui/workaround/x11_launcher_workaround.h>
+    #include <ui/workaround/x11_launcher_workaround.h>
 #endif
 
 using namespace nx::vms::client::desktop;
@@ -79,6 +80,7 @@ QnWorkbenchContext::QnWorkbenchContext(SystemContext* systemContext, QObject* pa
     /* Create dependent objects. */
     m_menu.reset(new ui::action::Manager(this));
     m_joystickManager.reset(joystick::Manager::create(this));
+    m_settingsDialogManager = std::make_unique<SettingsDialogManager>(this);
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
     m_intercomManager = std::make_unique<IntercomManager>(systemContext);
@@ -156,6 +158,11 @@ QnWorkbenchNavigator* QnWorkbenchContext::navigator() const
 joystick::Manager* QnWorkbenchContext::joystickManager() const
 {
     return m_joystickManager.get();
+}
+
+SettingsDialogManager* QnWorkbenchContext::settingsDialogManager() const
+{
+    return m_settingsDialogManager.get();
 }
 
 MainWindow* QnWorkbenchContext::mainWindow() const

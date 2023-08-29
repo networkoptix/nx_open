@@ -177,6 +177,9 @@ void HighlightedTextItemDelegate::paint(
     auto opt = option;
     initStyleOption(&opt, index);
 
+    if (opt.state.testFlag(QStyle::StateFlag::State_Selected))
+        painter->fillRect(opt.rect, opt.palette.highlight());
+
     opt.rect = opt.rect.adjusted(
         style::Metrics::kStandardPadding, 0, -style::Metrics::kStandardPadding, 0);
 

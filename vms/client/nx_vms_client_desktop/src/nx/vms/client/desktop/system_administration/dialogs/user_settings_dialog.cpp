@@ -86,7 +86,7 @@ enum LinkHostPriority
     other
 };
 
-const auto customPriority = 
+const auto customPriority =
     [](const nx::utils::Url& url) -> int
     {
         using namespace nx::vms::common;
@@ -1085,10 +1085,10 @@ void UserSettingsDialog::refreshToken(const QString& password)
         d->m_currentRequest = api->loginAsync(loginRequest, std::move(callback), thread());
 }
 
-void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
+bool UserSettingsDialog::setUser(const QnUserResourcePtr& user)
 {
     if (d->dialogType == EditUser && d->user == user)
-        return; //< Do not reset state upon setting the same user.
+        return true; //< Do not reset state upon setting the same user.
 
     if (d->dialogType == EditUser && d->user && user && isModified())
     {
@@ -1112,11 +1112,11 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
             case QDialogButtonBox::Apply:
                 QMetaObject::invokeMethod(window(), "apply", Qt::DirectConnection);
                 // Calling apply is async, so we can not continue here.
-                return;
+                return false;
             case QDialogButtonBox::Discard:
                 break;
             case QDialogButtonBox::Cancel:
-                return;
+                return false;
         }
     }
 
@@ -1156,6 +1156,8 @@ void UserSettingsDialog::setUser(const QnUserResourcePtr& user)
 
     d->isSaving = false;
     createStateFrom(user);
+
+    return true;
 }
 
 void UserSettingsDialog::selectTab(Tab tab)

@@ -123,7 +123,7 @@ public:
 
     virtual ~UserSettingsDialog() override;
 
-    void setUser(const QnUserResourcePtr& user);
+    bool setUser(const QnUserResourcePtr& user);
     void selectTab(Tab tab);
 
     Q_INVOKABLE QString validateLogin(const QString& login);
