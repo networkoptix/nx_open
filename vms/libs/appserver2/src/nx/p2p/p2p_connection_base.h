@@ -196,7 +196,7 @@ private:
     void onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent);
     void onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead);
 
-    bool handleMessage(const nx::Buffer& message);
+    void handleMessage(const nx::Buffer& message);
     int messageHeaderSize(bool isClient) const;
     MessageType getMessageType(const nx::Buffer& buffer, bool isClient) const;
 
