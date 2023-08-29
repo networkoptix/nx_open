@@ -18,7 +18,7 @@ MembershipSettings
     property var model
     property bool allowAddGroup: true
 
-    signal addGroupClicked()
+    signal addGroupRequested()
 
     component AddGroupButton: TextButton
     {
@@ -32,7 +32,7 @@ MembershipSettings
         font: Qt.font({pixelSize: 14, weight: Font.Normal})
         color: ColorTheme.colors.light16
 
-        onClicked: control.addGroupClicked()
+        onClicked: control.addGroupRequested()
     }
 
     editableProperty: "isParent"
@@ -112,7 +112,7 @@ MembershipSettings
                 rightPadding: 16
                 iconSpacing: 2
 
-                onClicked: control.addGroupClicked()
+                onClicked: control.addGroupRequested()
             }
         }
     }

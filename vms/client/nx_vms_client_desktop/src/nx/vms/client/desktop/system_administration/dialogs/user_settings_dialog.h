@@ -145,7 +145,7 @@ public:
 public slots:
     void onDeleteRequested();
     void onAuditTrailRequested();
-    void onGroupClicked(const QVariant& idVariant);
+    void onAddGroupRequested();
     void onTerminateLink();
     void onResetLink(const QDateTime& validUntil, int revokeAccessAfterS, const QJSValue& callback);
     void onCopyLink();

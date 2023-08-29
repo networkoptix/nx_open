@@ -63,7 +63,6 @@ Item
     signal deleteRequested()
     signal auditTrailRequested()
 
-    signal groupClicked(var id)
     signal moreGroupsClicked()
 
     function validate()
