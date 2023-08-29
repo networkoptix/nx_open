@@ -17,6 +17,8 @@ namespace nx::network { class SocketAddress; }
 
 namespace nx::vms::client::desktop {
 
+class SystemContext;
+
 class ServerCertificateViewer: public QnButtonBoxDialog
 {
     Q_OBJECT
@@ -43,6 +45,7 @@ public:
         const QnMediaServerResourcePtr& server,
         const std::vector<nx::network::ssl::Certificate>& certificates,
         Mode mode,
+        nx::vms::client::desktop::SystemContext* systemContext = nullptr,
         QWidget* parent = nullptr);
 
     virtual ~ServerCertificateViewer();
@@ -56,12 +59,15 @@ private:
         const nx::vms::api::ModuleInformation& target,
         const nx::network::SocketAddress& primaryAddress,
         const std::vector<nx::network::ssl::Certificate>& certificates,
-        Mode mode);
+        Mode mode,
+        const QnUserResourcePtr& user = {});
 
     void showSelectedCertificate();
 
     void pinCertificate();
     void showPinnedCertificate();
+
+    void updateWarningLabel(bool isAdministrator, const QString& name);
 
     static QString calculateDialogTitle(Mode mode);
     static QString calculateServerInfo(
