@@ -44,8 +44,7 @@ UserDataEx UserModelBase::toUserData() &&
         user.password = std::move(*password);
     if (externalId)
         user.externalId = std::move(*externalId);
-    if (attributes)
-        user.attributes = std::move(*attributes);
+    user.attributes = attributes;
     if (!isHttpDigestEnabled)
         user.digest = UserData::kHttpIsDisabledStub;
     if (isHttpDigestEnabled && user.digest == UserData::kHttpIsDisabledStub)

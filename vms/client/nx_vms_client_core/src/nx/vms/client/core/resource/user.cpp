@@ -16,7 +16,7 @@ UserResource::UserResource(UserModelV1 data):
     setEnabled(data.isEnabled);
     setEmail(data.email);
     setFullName(data.fullName);
-    setAttributes(data.attributes.value_or(UserAttributes()));
+    setAttributes(data.attributes);
 
     GlobalPermissions permissions;
     std::vector<QnUuid> groupIds;
@@ -42,7 +42,7 @@ UserResource::UserResource(UserModelV3 data):
     setEnabled(data.isEnabled);
     setEmail(data.email);
     setFullName(data.fullName);
-    setAttributes(data.attributes.value_or(UserAttributes()));
+    setAttributes(data.attributes);
     setRawPermissions(data.permissions);
     setGroupIds(data.groupIds);
     setResourceAccessRights(data.resourceAccessRights);
