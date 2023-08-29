@@ -84,7 +84,12 @@ Dialog
 
                     model: ListModel
                     {
-                        ListElement { text: qsTr("Do not change"); value: Qt.PartiallyChecked }
+                        ListElement
+                        {
+                            text: `<${qsTr("keep current value")}>`
+                            value: Qt.PartiallyChecked
+                        }
+
                         ListElement { text: qsTr("Enabled"); value: Qt.Checked }
                         ListElement { text: qsTr("Disabled"); value: Qt.Unchecked }
                     }
