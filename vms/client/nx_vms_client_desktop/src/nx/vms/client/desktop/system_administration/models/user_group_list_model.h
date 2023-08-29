@@ -49,6 +49,7 @@ public:
     const UserGroupDataList& groups() const;
     QSet<QnUuid> groupIds() const;
     std::optional<UserGroupData> findGroup(const QnUuid& groupId) const;
+    int groupRow(const QnUuid& groupId) const;
 
     QSet<QnUuid> checkedGroupIds() const;
     void setCheckedGroupIds(const QSet<QnUuid>& value);
