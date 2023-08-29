@@ -5,6 +5,7 @@
 
 #include <typeinfo>
 
+#include <QtCore/QMargins>
 #include <QtCore/QVariant>
 
 #include <nx/utils/log/assert.h>
@@ -29,6 +30,7 @@ NX_VMS_COMMON_API QVector2D linearCombine(qreal a, const QVector2D &x, qreal b, 
 NX_VMS_COMMON_API QVector3D linearCombine(qreal a, const QVector3D &x, qreal b, const QVector3D &y);
 NX_VMS_COMMON_API QVector4D linearCombine(qreal a, const QVector4D &x, qreal b, const QVector4D &y);
 NX_VMS_COMMON_API QColor linearCombine(qreal a, const QColor &x, qreal b, const QColor &y);
+NX_VMS_COMMON_API QMargins linearCombine(qreal a, const QMargins &x, qreal b, const QMargins &y);
 
 template<class T>
 T linearCombine(qreal , const T& , qreal , const T& ) {

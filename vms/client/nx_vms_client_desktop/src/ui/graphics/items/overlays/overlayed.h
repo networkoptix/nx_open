@@ -51,7 +51,7 @@ public:
     bool isOverlayVisible() const;
     void setOverlayVisible(bool visible, bool animate);
 
-    void addOverlayWidget(QGraphicsWidget* widget, const OverlayParams &params);
+    void addOverlayWidget(QGraphicsWidget* widget, const OverlayParams& params);
 
     void removeOverlayWidget(QGraphicsWidget* widget);
 
@@ -61,6 +61,8 @@ public:
         OverlayVisibility visibility,
         bool animate);
     void updateOverlayWidgetsVisibility(bool animate);
+
+    void updateOverlayWidgetMargins(const QGraphicsWidget* widget, const QMargins& margins);
 
     static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible, bool animate);
     static bool isOverlayWidgetVisible(QGraphicsWidget* widget);

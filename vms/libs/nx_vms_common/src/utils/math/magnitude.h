@@ -5,6 +5,8 @@
 
 #include <typeinfo>
 
+#include <QtCore/QMargins>
+
 #include <nx/utils/log/assert.h>
 
 class QPoint;
@@ -31,6 +33,7 @@ qreal calculateMagnitude(const QVector2D &value);
 qreal calculateMagnitude(const QVector3D &value);
 qreal calculateMagnitude(const QVector4D &value);
 qreal calculateMagnitude(const QColor &value);
+qreal calculateMagnitude(const QMargins &value);
 qreal calculateMagnitude(const QRectF &value); /* QRectF is treated as a 4D vector here. */
 
 template<class T>
