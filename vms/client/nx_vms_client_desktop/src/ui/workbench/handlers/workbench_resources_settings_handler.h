@@ -12,8 +12,6 @@
 namespace nx::vms::client::desktop {
 
 class CameraSettingsDialog;
-class UserSettingsDialog;
-class GroupSettingsDialog;
 
 } // namespace nx::vms::client::desktop
 
@@ -45,6 +43,4 @@ private:
 private:
     QPointer<nx::vms::client::desktop::CameraSettingsDialog> m_cameraSettingsDialog;
     QPointer<QnServerSettingsDialog> m_serverSettingsDialog;
-    QPointer<nx::vms::client::desktop::UserSettingsDialog> m_userSettingsDialog;
-    QPointer<nx::vms::client::desktop::GroupSettingsDialog> m_groupSettingsDialog;
 };

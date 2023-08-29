@@ -27,6 +27,7 @@ namespace nx::vms::client::desktop {
 
 class MainWindow;
 class ResourceTreeSettings;
+class SettingsDialogManager;
 class IntercomManager;
 class Workbench;
 
@@ -61,6 +62,7 @@ public:
     QnWorkbenchDisplay* display() const;
     QnWorkbenchNavigator* navigator() const;
     nx::vms::client::desktop::joystick::Manager* joystickManager() const;
+    nx::vms::client::desktop::SettingsDialogManager* settingsDialogManager() const;
 
     nx::vms::client::desktop::MainWindow* mainWindow() const;
     QWidget* mainWindowWidget() const;
@@ -111,6 +113,7 @@ private:
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
     QScopedPointer<nx::vms::client::desktop::ResourceTreeSettings> m_resourceTreeSettings;
     std::unique_ptr<nx::vms::client::desktop::joystick::Manager> m_joystickManager;
+    std::unique_ptr<nx::vms::client::desktop::SettingsDialogManager> m_settingsDialogManager;
 
     // Have to be moved in nx::vms::client::desktop::SystemContext when it will be possible.
     std::unique_ptr<nx::vms::client::desktop::IntercomManager> m_intercomManager;

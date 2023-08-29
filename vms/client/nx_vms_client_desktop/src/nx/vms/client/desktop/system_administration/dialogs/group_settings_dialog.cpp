@@ -246,10 +246,10 @@ void GroupSettingsDialog::onDeleteRequested()
     removeGroups(systemContext(), {d->groupId}, std::move(handleRemove));
 }
 
-void GroupSettingsDialog::setGroup(const QnUuid& groupId)
+bool GroupSettingsDialog::setGroup(const QnUuid& groupId)
 {
     if (!d->groupId.isNull() && d->groupId == groupId)
-        return; //< Do not reset state upon setting the same group.
+        return true; //< Do not reset state upon setting the same group.
 
     if (!d->groupId.isNull() && !groupId.isNull() && isModified())
     {
@@ -273,11 +273,11 @@ void GroupSettingsDialog::setGroup(const QnUuid& groupId)
             case QDialogButtonBox::Apply:
                 QMetaObject::invokeMethod(window(), "apply", Qt::DirectConnection);
                 // Calling apply is async, so we can not continue here.
-                return;
+                return false;
             case QDialogButtonBox::Discard:
                 break;
             case QDialogButtonBox::Cancel:
-                return;
+                return false;
         }
     }
 
@@ -288,6 +288,8 @@ void GroupSettingsDialog::setGroup(const QnUuid& groupId)
 
     d->isSaving = false;
     createStateFrom(groupId);
+
+    return true;
 }
 
 GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)

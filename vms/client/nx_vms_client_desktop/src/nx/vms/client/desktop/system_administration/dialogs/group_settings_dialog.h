@@ -96,7 +96,7 @@ public:
 
     ~GroupSettingsDialog();
 
-    void setGroup(const QnUuid& groupId);
+    bool setGroup(const QnUuid& groupId);
 
     Q_INVOKABLE QString validateName(const QString& text);
 

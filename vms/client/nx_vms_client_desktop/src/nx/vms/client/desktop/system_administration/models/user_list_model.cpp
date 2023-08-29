@@ -51,6 +51,19 @@ nx::vms::api::UserType userTypeForSort(nx::vms::api::UserType userType)
     }
 }
 
+static const QColor kLight10Color = "#A5B7C0";
+static const core::SvgIconColorer::IconSubstitutions kEnabledUncheckedIconSubstitutions = {
+    {QIcon::Selected, {{kLight10Color, "light4"}}}};
+static const core::SvgIconColorer::IconSubstitutions kEnabledCheckedIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light2"}}},
+    {QIcon::Selected, {{kLight10Color, "light4"}}}};
+static const core::SvgIconColorer::IconSubstitutions kDisabledUncheckedIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "dark16"}}},
+    {QIcon::Selected, {{kLight10Color, "light13"}}}};
+static const core::SvgIconColorer::IconSubstitutions kDisabledCheckedIconSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light13"}}},
+    {QIcon::Selected, {{kLight10Color, "light10"}}}};
+
 } // namespace
 
 class UserListModel::Private:
@@ -507,7 +520,23 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
         case Qt::DecorationRole:
         {
             if (const auto path = data(index, Qn::DecorationPathRole).toString(); !path.isEmpty())
-                return qnSkin->icon(path, core::SvgIconColorer::kTreeIconSubstitutions);
+            {
+                core::SvgIconColorer::IconSubstitutions colorSubstitutions;
+
+                const bool checked =
+                    data(index.siblingAtColumn(CheckBoxColumn), Qt::CheckStateRole).toBool();
+                if (data(index, Qn::DisabledRole).toBool())
+                {
+                    colorSubstitutions = checked
+                        ? kDisabledCheckedIconSubstitutions : kDisabledUncheckedIconSubstitutions;
+                }
+                else
+                {
+                    colorSubstitutions = checked
+                        ? kEnabledCheckedIconSubstitutions : kEnabledUncheckedIconSubstitutions;
+                }
+                return qnSkin->icon(path, colorSubstitutions);
+            }
             break;
         }
 
