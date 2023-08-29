@@ -14,11 +14,13 @@
 #include <nx/vms/client/core/network/helpers.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 
@@ -59,16 +61,36 @@ ServerCertificateViewer::ServerCertificateViewer(
     const QnMediaServerResourcePtr& server,
     const std::vector<nx::network::ssl::Certificate>& certificates,
     Mode mode,
+    SystemContext* systemContext,
     QWidget *parent)
     :
     ServerCertificateViewer(parent)
 {
     m_server = server;
+    const auto user = systemContext
+        ? systemContext->userWatcher()->user()
+        : QnUserResourcePtr{};
+
     setCertificateData(
         server->getModuleInformation(),
         server->getPrimaryAddress(),
         certificates,
-        mode);
+        mode,
+        user);
+
+    if (mode == Mode::mismatch)
+        NX_ASSERT(systemContext);
+
+    if (systemContext)
+    {
+        connect(systemContext->userWatcher(), &core::UserWatcher::userChanged, this, 
+            [this, server](const QnUserResourcePtr& user)
+            {
+                updateWarningLabel(
+                    user && user->isAdministrator(),
+                    server->getModuleInformation().name);
+            });
+    }
 }
 
 ServerCertificateViewer::ServerCertificateViewer(
@@ -164,11 +186,24 @@ void ServerCertificateViewer::showEvent(QShowEvent *event)
     base_type::showEvent(event);
 }
 
+void ServerCertificateViewer::updateWarningLabel(bool isAdministrator, const QString& name)
+{
+    QString text =
+        tr("This certificate does not match the certificate %1 is pinned to.").arg(name);
+
+    if (!isAdministrator)
+        text += " " + tr("Contact a user with Administrators permissions to resolve this issue.");
+
+    ui->pinCertificateButton->setVisible(isAdministrator);
+    ui->warningLabel->setText(text);
+}
+
 void ServerCertificateViewer::setCertificateData(
     const nx::vms::api::ModuleInformation& target,
     const nx::network::SocketAddress& primaryAddress,
     const std::vector<nx::network::ssl::Certificate>& certificates,
-    Mode mode)
+    Mode mode,
+    const QnUserResourcePtr& user)
 {
     NX_ASSERT(!certificates.empty());
     m_certificates = nx::network::ssl::completeCertificateChain(certificates);
@@ -181,8 +216,7 @@ void ServerCertificateViewer::setCertificateData(
         tr("Server ID: %1").arg(highlightedText(target.id.toSimpleString())));
 
     // Update warning message (even if it would not be shown).
-    ui->warningLabel->setText(
-        tr("This certificate does not match the certificate %1 is pinned to.").arg(target.name));
+    updateWarningLabel(user && user->isAdministrator(), target.name);
 
     // Update tree widget.
     ui->treeWidget->clear();
@@ -299,6 +333,7 @@ void ServerCertificateViewer::showPinnedCertificate()
         m_server,
         nx::network::ssl::Certificate::parse(m_server->certificate()),
         Mode::pinned,
+        /*systemContex*/ nullptr,
         this);
 
     // We want to make both dialogs simultaneously available. To achieve this we show the child
