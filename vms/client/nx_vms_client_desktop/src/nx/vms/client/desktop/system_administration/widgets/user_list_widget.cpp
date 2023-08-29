@@ -7,6 +7,8 @@
 #include <QtCore/QMap>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPalette>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QStyledItemDelegate>
@@ -39,13 +41,13 @@
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
+#include <nx/vms/client/desktop/workbench/managers/settings_dialog_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
 #include "private/highlighted_text_item_delegate.h"
@@ -106,16 +108,14 @@ public:
         auto opt = option;
         initStyleOption(&opt, index);
 
-        // Determine item opacity based on user enabled state:
-        QnScopedPainterOpacityRollback opacityRollback(painter);
-        if (index.data(Qn::DisabledRole).toBool())
-            painter->setOpacity(painter->opacity() * nx::style::Hints::kDisabledItemOpacity);
-
         // Paint right-aligned user type icon or left-aligned custom permissions icon:
         const bool isUserIconColumn = index.column() == UserListModel::UserTypeColumn
             || index.column() == UserListModel::UserWarningColumn;
         if (isUserIconColumn || index.column() == UserListModel::IsCustomColumn)
         {
+            if (opt.state.testFlag(QStyle::StateFlag::State_Selected))
+                painter->fillRect(opt.rect, opt.palette.highlight());
+
             const auto icon = index.data(Qt::DecorationRole).value<QIcon>();
             if (icon.isNull())
                 return;
@@ -129,7 +129,8 @@ public:
                 opt.rect.adjusted(padding, 0, -padding, 0));
 
             icon.paint(painter, rect, Qt::AlignCenter,
-                opt.checkState == Qt::Checked ? QIcon::Selected : QIcon::Normal);
+                opt.state.testFlag(QStyle::StateFlag::State_Selected)
+                    ? QIcon::Selected : QIcon::Normal);
             return;
         }
 
@@ -144,17 +145,39 @@ protected:
         option->checkState = index.siblingAtColumn(UserListModel::CheckBoxColumn).data(
             Qt::CheckStateRole).value<Qt::CheckState>();
 
-        if (const bool disabledUser = index.data(Qn::DisabledRole).toBool())
+        if (index.data(Qn::DisabledRole).toBool())
         {
-            option->palette.setColor(QPalette::Text, option->checkState == Qt::Unchecked
-                ? core::colorTheme()->color("dark16")
-                : core::colorTheme()->color("light14"));
+            if (option->checkState == Qt::Unchecked)
+            {
+                option->palette.setColor(QPalette::Text,
+                    option->state.testFlag(QStyle::State_Selected)
+                        ? core::colorTheme()->color("light13")
+                        : core::colorTheme()->color("dark16"));
+            }
+            else
+            {
+                option->palette.setColor(QPalette::Text,
+                    option->state.testFlag(QStyle::State_Selected)
+                        ? core::colorTheme()->color("light10")
+                        : core::colorTheme()->color("light13"));
+            }
         }
         else
         {
-            option->palette.setColor(QPalette::Text, option->checkState == Qt::Unchecked
-                ? core::colorTheme()->color("light10")
-                : core::colorTheme()->color("light4"));
+            if (option->checkState == Qt::Unchecked)
+            {
+                option->palette.setColor(QPalette::Text,
+                    option->state.testFlag(QStyle::State_Selected)
+                        ? core::colorTheme()->color("light4")
+                        : core::colorTheme()->color("light10"));
+            }
+            else
+            {
+                option->palette.setColor(QPalette::Text,
+                    option->state.testFlag(QStyle::State_Selected)
+                        ? core::colorTheme()->color("light2")
+                        : core::colorTheme()->color("light4"));
+            }
         }
     }
 };
@@ -518,6 +541,29 @@ void UserListWidget::Private::setupUi()
 
     connect(hoverTracker, &ItemViewHoverTracker::itemLeave, this,
         [this]() { ui->usersTable->unsetCursor(); });
+
+    const auto updateCurrentUserId =
+        [this]()
+        {
+            const QnUuid userId = q->context()->settingsDialogManager()->currentEditedUserId();
+            if (userId.isNull())
+            {
+                ui->usersTable->clearSelection();
+                return;
+            }
+
+            if (const auto user = q->resourcePool()->getResourceById<QnUserResource>(userId))
+            {
+                const auto row = usersModel->userRow(user);
+                const auto index = usersModel->index(row);
+                const auto mappedIndex = sortModel->mapFromSource(index);
+                ui->usersTable->setCurrentIndex(mappedIndex);
+            }
+        };
+    connect(q->context()->settingsDialogManager(),
+        &SettingsDialogManager::currentEditedUserIdChanged, this, updateCurrentUserId);
+    connect(q->context()->settingsDialogManager(),
+        &SettingsDialogManager::currentEditedUserIdChangeFailed, this, updateCurrentUserId);
 
     connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::statusChanged, this,
         &Private::updateBanners);

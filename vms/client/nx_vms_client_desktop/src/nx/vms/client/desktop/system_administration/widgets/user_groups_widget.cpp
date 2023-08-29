@@ -7,6 +7,7 @@
 #include <QtCore/QCollator>
 #include <QtCore/QPointer>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <client/client_globals.h>
@@ -31,10 +32,12 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
+#include <nx/vms/client/desktop/workbench/managers/settings_dialog_manager.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "private/highlighted_text_item_delegate.h"
 #include "user_groups_widget.h"
@@ -104,6 +107,9 @@ public:
         const bool isUserTypeColumn = index.column() == UserGroupListModel::GroupTypeColumn;
         if (isUserTypeColumn || index.column() == UserGroupListModel::PermissionsColumn)
         {
+            if (opt.state.testFlag(QStyle::StateFlag::State_Selected))
+                painter->fillRect(opt.rect, opt.palette.highlight());
+
             const auto icon = index.data(Qt::DecorationRole).value<QIcon>();
             if (icon.isNull())
                 return;
@@ -117,7 +123,8 @@ public:
                 opt.rect.adjusted(padding, 0, -padding, 0));
 
             icon.paint(painter, rect, Qt::AlignCenter,
-                opt.checkState == Qt::Checked ? QIcon::Selected : QIcon::Normal);
+                opt.state.testFlag(QStyle::StateFlag::State_Selected)
+                    ? QIcon::Selected : QIcon::Normal);
             return;
         }
 
@@ -132,9 +139,40 @@ protected:
         option->checkState = index.siblingAtColumn(UserGroupListModel::CheckBoxColumn).data(
             Qt::CheckStateRole).value<Qt::CheckState>();
 
-        option->palette.setColor(QPalette::Text, option->checkState == Qt::Unchecked
-            ? core::colorTheme()->color("light10")
-            : core::colorTheme()->color("light4"));
+        if (index.data(Qn::DisabledRole).toBool())
+        {
+            if (option->checkState == Qt::Unchecked)
+            {
+                option->palette.setColor(QPalette::Text,
+                    option->state.testFlag(QStyle::State_Selected)
+                        ? core::colorTheme()->color("light13")
+                        : core::colorTheme()->color("dark16"));
+            }
+            else
+            {
+                option->palette.setColor(QPalette::Text,
+                    option->state.testFlag(QStyle::State_Selected)
+                        ? core::colorTheme()->color("light10")
+                        : core::colorTheme()->color("light13"));
+            }
+        }
+        else
+        {
+            if (option->checkState == Qt::Unchecked)
+            {
+                option->palette.setColor(QPalette::Text,
+                    option->state.testFlag(QStyle::State_Selected)
+                        ? core::colorTheme()->color("light4")
+                        : core::colorTheme()->color("light10"));
+            }
+            else
+            {
+                option->palette.setColor(QPalette::Text,
+                    option->state.testFlag(QStyle::State_Selected)
+                        ? core::colorTheme()->color("light2")
+                        : core::colorTheme()->color("light4"));
+            }
+        }
     }
 
     virtual bool editorEvent(QEvent* event, QAbstractItemModel* model,
@@ -312,6 +350,26 @@ UserGroupsWidget::Private::Private(UserGroupsWidget* q, UserGroupManager* manage
     connect(sortModel, &QAbstractItemModel::rowsRemoved, this, &Private::handleModelChanged);
     connect(sortModel, &QAbstractItemModel::dataChanged, this, &Private::handleSelectionChanged);
     connect(sortModel, &QAbstractItemModel::modelReset, this, &Private::handleModelChanged);
+
+    const auto updateCurrentGroupId =
+        [this, q]()
+        {
+            const QnUuid groupId = q->context()->settingsDialogManager()->currentEditedGroupId();
+            if (groupId.isNull())
+            {
+                ui->groupsTable->clearSelection();
+                return;
+            }
+
+            const auto row = groupsModel->groupRow(groupId);
+            const auto index = groupsModel->index(row);
+            const auto mappedIndex = sortModel->mapFromSource(index);
+            ui->groupsTable->setCurrentIndex(mappedIndex);
+        };
+    connect(q->context()->settingsDialogManager(),
+        &SettingsDialogManager::currentEditedGroupIdChanged, this, updateCurrentGroupId);
+    connect(q->context()->settingsDialogManager(),
+        &SettingsDialogManager::currentEditedGroupIdChangeFailed, this, updateCurrentGroupId);
 }
 
 void UserGroupsWidget::Private::setupUi()
