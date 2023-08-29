@@ -54,7 +54,7 @@ struct NX_VMS_API UserModelBase
     std::optional<UserExternalIdModel> externalId;
 
     /**%apidoc[readonly] */
-    std::optional<UserAttributes> attributes{};
+    UserAttributes attributes{};
 
     // The next fields are used by PATCH functionality to preserve the existing DB data.
     std::optional<QnLatin1Array> digest; /**<%apidoc[unused] */
@@ -90,7 +90,6 @@ NX_REFLECTION_INSTRUMENT(UserModelBase, UserModelBase_Fields)
 
 /**%apidoc User information object for REST v1 and v2
  * %param [unused] externalId
- * %param [unused] attributes
  */
 struct NX_VMS_API UserModelV1: public UserModelBase
 {
