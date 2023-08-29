@@ -71,6 +71,8 @@ Animations::Animations(QObject* parent):
 
     setup(Id::ItemOverlayShow, QEasingCurve::InOutQuad, 100);
     setup(Id::ItemOverlayHide, QEasingCurve::InOutQuad, 200);
+
+    setup(Id::WebResourceToolbarHideAndShow, QEasingCurve::OutCirc, 300);
 }
 
 Animations::~Animations()
