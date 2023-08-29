@@ -7,6 +7,8 @@
 
 #include <QtCore/QCollator>
 #include <QtCore/QPointer>
+#include <QtCore/QVector>
+#include <QtCore/QMap>
 #include <QtQml/QtQml>
 
 #include <core/resource/camera_resource.h>
@@ -58,6 +60,28 @@ AccessRights relevantAccessRights(const QnUuid& resourceGroupId)
         return AccessSubjectEditingContext::relevantAccessRights(*group);
 
     return kFullAccessRights;
+}
+
+int providerPriority(ResourceAccessInfo::ProvidedVia providerType)
+{
+    static const QVector<ResourceAccessInfo::ProvidedVia> kProvidersSortedByAscendingPriority = {
+        ResourceAccessInfo::ProvidedVia::parentUserGroup,
+        ResourceAccessInfo::ProvidedVia::videowall,
+        ResourceAccessInfo::ProvidedVia::layout,
+        ResourceAccessInfo::ProvidedVia::own,
+        ResourceAccessInfo::ProvidedVia::ownResourceGroup};
+
+    static const QMap<ResourceAccessInfo::ProvidedVia, int> kPriorityByProvider =
+        [&]()
+        {
+            QMap<ResourceAccessInfo::ProvidedVia, int> result;
+            for (int i = 0; i < kProvidersSortedByAscendingPriority.size(); ++i)
+                result[kProvidersSortedByAscendingPriority[i]] = i;
+            return result;
+        }();
+
+    static const int kLowestPriority = -1;
+    return kPriorityByProvider.value(providerType, /*defaultValue*/ kLowestPriority);
 }
 
 } // namespace
@@ -490,22 +514,8 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
                 }
                 else
                 {
-                    static const auto priorityKey =
-                        [](ResourceAccessInfo::ProvidedVia providerType)
-                        {
-                            switch (providerType)
-                            {
-                                case ResourceAccessInfo::ProvidedVia::videowall:
-                                    return 1;
-                                case ResourceAccessInfo::ProvidedVia::layout:
-                                    return 2;
-                                default:
-                                    return 0;
-                            }
-                        };
-
                     const auto providedVia = providerType(provider.get());
-                    if (priorityKey(providedVia) > priorityKey(newInfo.providedVia))
+                    if (providerPriority(providedVia) > providerPriority(newInfo.providedVia))
                         newInfo.providedVia = providedVia;
 
                     // Keep arrays sorted for easy comparison.
