@@ -615,12 +615,14 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
         return; //< connection closed
     }
 
-    if (errorCode != SystemError::noError || !handleMessage(m_readBuffer))
+    if (errorCode != SystemError::noError)
     {
         NX_DEBUG( this, "onNewMessageRead: Connection closed with error: %1", errorCode);
         setState(State::Error);
         return;
     }
+
+    handleMessage(m_readBuffer);
 
     using namespace std::placeholders;
     m_readBuffer.resize(0);
@@ -635,7 +637,7 @@ int ConnectionBase::messageHeaderSize(bool isClient) const
     return isClient ? 0 : kMessageOffset + 1;
 }
 
-bool ConnectionBase::handleMessage(const nx::Buffer& message)
+void ConnectionBase::handleMessage(const nx::Buffer& message)
 {
     NX_ASSERT(!message.empty());
 #ifdef CHECK_SEQUENCE
@@ -651,8 +653,6 @@ bool ConnectionBase::handleMessage(const nx::Buffer& message)
     const bool isClient = localPeer().isClient();
     MessageType messageType = getMessageType(message, isClient);
     emit gotMessage(weakPointer(), messageType, message.substr(messageHeaderSize(isClient)));
-
-    return true;
 }
 
 std::multimap<QString, QString> ConnectionBase::httpQueryParams() const
