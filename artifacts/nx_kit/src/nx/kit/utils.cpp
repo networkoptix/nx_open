@@ -15,8 +15,8 @@
 #if defined(_WIN32)
     #define NOMINMAX //< Needed to prevent windows.h define macros min() and max().
     #include <windows.h>
+    #include <Windows.h>
     #include <shellapi.h>
-    #include <codecvt>
 #elif defined(__APPLE__)
     #include <nx/kit/apple_utils.h>
 #else
@@ -133,14 +133,24 @@ const std::vector<std::string>& getProcessCmdLineArgs()
         LPWSTR* const argv = CommandLineToArgvW(GetCommandLineW(), &argc);
         if (!argv || argc == 0)
         {
+            LocalFree(argv);
             args = std::vector<std::string>{""};
             return args;
         }
 
         for (int i = 0; i < argc; ++i)
         {
-            args.push_back(
-                std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(argv[i]));
+            int utf8Length = WideCharToMultiByte(
+                CP_UTF8, 0, argv[i], -1, nullptr, 0, nullptr, nullptr);
+            if (utf8Length > 0)
+            {
+                std::string utf8Arg;
+                // Exclued null-terminator
+                utf8Arg.resize(utf8Length - 1);
+                WideCharToMultiByte(
+                    CP_UTF8, 0, argv[i], -1, &utf8Arg[0], utf8Length, nullptr, nullptr);
+                args.push_back(utf8Arg);
+            }
         }
         LocalFree(argv);
     #elif defined(__APPLE__)
