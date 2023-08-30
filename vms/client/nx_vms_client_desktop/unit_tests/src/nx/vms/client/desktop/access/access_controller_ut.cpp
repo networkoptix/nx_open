@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -261,6 +262,51 @@ TEST_F(AccessControllerTest, checkPermissionForNewCloudUser)
     resourcePool()->addResource(newCloudUser);
 
     checkForbiddenPermissions(newCloudUser, Qn::WriteDigestPermission);
+}
+
+TEST_F(AccessControllerTest, userGroupChangesUpdatePermissionsForTheirMembers)
+{
+    loginAs(api::GlobalPermissionDeprecated::admin); //< Power user.
+
+    const QnUserResourcePtr newLocalUser(
+        new QnUserResource(nx::vms::api::UserType::local, /*externalId*/{}));
+    newLocalUser->setName(userName2);
+    newLocalUser->setIdUnsafe(QnUuid::createUuid());
+    newLocalUser->setGroupIds({api::kPowerUsersGroupId});
+    resourcePool()->addResource(newLocalUser);
+
+    // Target is a member of Power Users.
+    // Current user cannot modify target power user.
+    ASSERT_FALSE(
+        systemContext()->accessController()->hasPermissions(newLocalUser, Qn::SavePermission));
+
+    newLocalUser->setGroupIds({});
+
+    // Target is not a member of any group.
+    // Current user can modify target non-power user.
+    ASSERT_TRUE(
+        systemContext()->accessController()->hasPermissions(newLocalUser, Qn::SavePermission));
+
+    api::UserGroupData newGroup;
+    newGroup.id = QnUuid::createUuid();
+    newGroup.name = "test_group";
+    newGroup.parentGroupIds = {api::kPowerUsersGroupId};
+    systemContext()->userGroupManager()->addOrUpdate(newGroup);
+
+    newLocalUser->setGroupIds({newGroup.id});
+
+    // Target is member of `test_group` that is a member of Power Users.
+    // Current user cannot modify target power user.
+    ASSERT_FALSE(
+        systemContext()->accessController()->hasPermissions(newLocalUser, Qn::SavePermission));
+
+    newGroup.parentGroupIds = {};
+    systemContext()->userGroupManager()->addOrUpdate(newGroup);
+
+    // Target is member of `test_group` that is no longer a member of any parent group.
+    // Current user can modify target non-power user.
+    ASSERT_TRUE(
+        systemContext()->accessController()->hasPermissions(newLocalUser, Qn::SavePermission));
 }
 
 } // namespace nx::vms::client::desktop::test
