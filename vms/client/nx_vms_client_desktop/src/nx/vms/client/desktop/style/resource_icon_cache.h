@@ -52,6 +52,10 @@ public:
         Image,
         Media,
         User,
+        LocalUser,
+        CloudUser,
+        LdapUser,
+        TemporaryUser,
         Users,
         VideoWall,
         VideoWallItem,
@@ -103,6 +107,8 @@ public:
      * @return
      */
     QIcon icon(Key key);
+
+    static Key userKey(const QnUserResourcePtr& user);
 
     static Key key(const QnResourcePtr& resource);
 
