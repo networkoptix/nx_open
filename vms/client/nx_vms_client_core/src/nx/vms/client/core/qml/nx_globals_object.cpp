@@ -317,4 +317,15 @@ QString NxGlobalsObject::dateTimeInShortFormat(const QDateTime& dateTime)
     return nx::vms::time::toString(dateTime, nx::vms::time::Format::dd_MM_yyyy_hh_mm_ss);
 }
 
+QString NxGlobalsObject::highlightMatch(
+    const QString& text, const QRegularExpression& rx, const QColor& color) const
+{
+    return common::html::highlightMatch(text, rx, color);
+}
+
+QString NxGlobalsObject::toHtmlEscaped(const QString& text) const
+{
+    return common::html::toHtmlEscaped(text);
+}
+
 } // namespace nx::vms::client::core

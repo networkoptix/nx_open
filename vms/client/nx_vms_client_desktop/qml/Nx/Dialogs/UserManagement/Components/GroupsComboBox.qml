@@ -28,10 +28,10 @@ Control
 
     function highlightMatchingText(text)
     {
-        if (!currentSearchRegExp)
-            return text
+        if (currentSearchRegExp)
+            return NxGlobals.highlightMatch(text, currentSearchRegExp, highlightColor)
 
-        return text.replace(currentSearchRegExp, `<font color="${highlightColor}">$1</font>`)
+        return NxGlobals.toHtmlEscaped(text)
     }
 
     AllowedParentsModel

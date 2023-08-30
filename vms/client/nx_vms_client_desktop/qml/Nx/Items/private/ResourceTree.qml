@@ -401,7 +401,7 @@ TreeView
             enclosingRect = hoverData.item.mapFromItem(resourceTree,
                 resourceTree.toolTipEnclosingRect)
 
-            var text = modelDataAccessor.getData(hoverData.modelIndex, "display")
+            var text = modelDataAccessor.getHtmlEscapedData(hoverData.modelIndex, "display")
             var extra = modelDataAccessor.getData(hoverData.modelIndex, "extraInfo")
 
             if (text && extra)

@@ -43,10 +43,10 @@ Item
 
     function highlightMatchingText(text)
     {
-        if (!currentSearchRegExp)
-            return text
+        if (currentSearchRegExp)
+            return NxGlobals.highlightMatch(text, currentSearchRegExp, highlightColor)
 
-        return text.replace(currentSearchRegExp, `<font color="${highlightColor}">$1</font>`)
+        return NxGlobals.toHtmlEscaped(text)
     }
 
     component SelectableGroupItem: Rectangle
@@ -154,14 +154,17 @@ Item
                 textFormat: Text.StyledText
                 text:
                 {
-                    if (control.currentSearchRegExp)
-                        return highlightMatchingText(checkableItem.text)
+                    const result = highlightMatchingText(checkableItem.text)
+                    if (control.currentSearchRegExp
+                        || !control.showDescription
+                        || !checkableItem.description)
+                    {
+                        return result
+                    }
 
-                    if (!control.showDescription || !checkableItem.description)
-                        return checkableItem.text
-
-                    return `${checkableItem.text}<font color="${checkableItem.descriptionColor}">`
-                        + ` - ${checkableItem.description}</font>`
+                    const description = NxGlobals.toHtmlEscaped(checkableItem.description)
+                    return `${result}<font color="${checkableItem.descriptionColor}">`
+                        + ` - ${description}</font>`
                 }
             }
         }

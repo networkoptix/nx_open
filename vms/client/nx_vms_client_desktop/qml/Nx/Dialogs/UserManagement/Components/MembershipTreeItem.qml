@@ -97,8 +97,11 @@ Item
             {
                 id: itemText
 
+                textFormat: Text.RichText
                 Layout.alignment: Qt.AlignVCenter
-                text: treeItem.isTopLevel ? highlightMatchingText(model.text) : model.text
+                text: treeItem.isTopLevel
+                    ? highlightMatchingText(model.text)
+                    : model.text
 
                 font: Qt.font({pixelSize: 14, weight: Font.Medium})
                 color: treeItem.textColor
