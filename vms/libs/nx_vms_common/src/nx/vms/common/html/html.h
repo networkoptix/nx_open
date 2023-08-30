@@ -40,7 +40,12 @@ private:
 };
 
 /** Enclose given text in a given tag. */
-NX_VMS_COMMON_API QString tagged(const QString& text, const QString& tag);
+NX_VMS_COMMON_API QString tagged(
+    const QString& text, const QString& tag, const QString& attributes = "");
+
+/** Enclose given text in a given tag if text is not empty. */
+NX_VMS_COMMON_API QString taggedIfNotEmpty(
+    const QString& text, const QString& tag, const QString& attributes = "");
 
 /** <html>text</html> */
 NX_VMS_COMMON_API QString document(const QString& text);
@@ -116,6 +121,17 @@ NX_VMS_COMMON_API QString link(const QString& text, const QUrl& url);
  * Create html link with the given text and url.
  */
 NX_VMS_COMMON_API QString link(const QString& text, const nx::utils::Url& url);
+
+/**
+ * Extended analog of QString::toHtmlEscaped() which also affect spaces.
+ */
+NX_VMS_COMMON_API QString toHtmlEscaped(const QString& text);
+
+/**
+ * Marks all matches substrings from regular expression \a rx in \a text with \a color
+ */
+NX_VMS_COMMON_API QString highlightMatch(
+    const QString& text, const QRegularExpression& rx, const QColor& color);
 
 } // namespace html
 } // namespace nx::vms::common

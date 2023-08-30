@@ -3,6 +3,7 @@
 #include "model_data_accessor.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/common/html/html.h>
 
 namespace nx {
 namespace client {
@@ -104,6 +105,12 @@ QVariant ModelDataAccessor::getData(const QModelIndex& index, const QString& rol
         return QVariant();
 
     return m_model->data(index, role);
+}
+
+QString ModelDataAccessor::getHtmlEscapedData(
+    const QModelIndex& index, const QString& roleName) const
+{
+    return vms::common::html::toHtmlEscaped(getData(index, roleName).toString());
 }
 
 bool ModelDataAccessor::setData(
