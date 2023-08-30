@@ -27,6 +27,7 @@ public:
 
     Q_INVOKABLE QVariant getData(int row, const QString& roleName) const;
     Q_INVOKABLE QVariant getData(const QModelIndex& index, const QString& roleName) const;
+    Q_INVOKABLE QString getHtmlEscapedData(const QModelIndex& index, const QString& roleName) const;
 
     Q_INVOKABLE bool setData(
         int row,

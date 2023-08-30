@@ -85,6 +85,11 @@ public:
     Q_INVOKABLE QString dateInShortFormat(const QDateTime& date);
 
     Q_INVOKABLE QString dateTimeInShortFormat(const QDateTime& dateTime);
+
+    Q_INVOKABLE QString highlightMatch(
+        const QString& text, const QRegularExpression& rx, const QColor& color) const;
+
+    Q_INVOKABLE QString toHtmlEscaped(const QString& text) const;
 };
 
 } // namespace nx::vms::client::core

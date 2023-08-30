@@ -2,6 +2,7 @@
 
 #include "html.h"
 
+#include <QtCore/QRegularExpression>
 #include <QtCore/QUrl>
 #include <QtGui/QColor>
 #include <QtGui/QTextDocument>
@@ -128,9 +129,16 @@ Tag::~Tag()
         m_result.append('\n');
 }
 
-QString tagged(const QString& text, const QString& tag)
+QString tagged(const QString& text, const QString& tag, const QString& attributes)
 {
-    return nx::format("<%1>%2</%1>", tag, text).toQString();
+    return attributes.isEmpty()
+        ? nx::format("<%1>%2</%1>", tag, text).toQString()
+        : nx::format("<%1 %2>%3</%1>", tag, attributes, text).toQString();
+}
+
+QString taggedIfNotEmpty(const QString& text, const QString& tag, const QString& attributes)
+{
+    return text.isEmpty() ? QString() : tagged(text, tag, attributes);
 }
 
 QString document(const QString& text)
@@ -196,7 +204,8 @@ QString elide(const QString& html, int maxLength, const QString& tail)
 bool mightBeHtml(const QString& text)
 {
     if (!text.contains('\n'))
-        return Qt::mightBeRichText(text);
+        return Qt::mightBeRichText(text)
+            || text.contains(QRegularExpression("&amp;|&lt;|&gt;|&quot;|&nbsp;"));
 
     return mightBeHtml(text.split('\n'));
 }
@@ -256,6 +265,57 @@ QString link(const QString& text, const QUrl& url)
 QString link(const QString& text, const nx::utils::Url& url)
 {
     return makeLink(text, url.toString());
+}
+
+QString toHtmlEscaped(const QString& text)
+{
+    QString result;
+    const int len = text.length();
+    result.reserve(int(len * 1.1));
+    for (int i = 0; i < len; ++i)
+    {
+        if (text.at(i) == QLatin1Char('<'))
+            result.append(QLatin1String("&lt;"));
+        else if (text.at(i) == QLatin1Char('>'))
+            result.append(QLatin1String("&gt;"));
+        else if (text.at(i) == QLatin1Char('&'))
+            result.append(QLatin1String("&amp;"));
+        else if (text.at(i) == QLatin1Char('"'))
+            result.append(QLatin1String("&quot;"));
+        else if (text.at(i) == QLatin1Char(' '))
+            result.append(QLatin1String("&nbsp;"));
+        else
+            result.append(text.at(i));
+    }
+    result.squeeze();
+    return result;
+}
+
+QString highlightMatch(const QString& text, const QRegularExpression& rx, const QColor& color)
+{
+    QString result;
+    if (!text.isEmpty())
+    {
+        const QString fontBegin = QString("<font color=\"%1\">").arg(color.name());
+        static const QString fontEnd = "</font>";
+        int pos = 0;
+        auto matchIterator = rx.globalMatch(text);
+        while (matchIterator.hasNext())
+        {
+            auto match = matchIterator.next();
+            if (match.capturedLength() == 0)
+                break;
+
+            result.append(toHtmlEscaped(text.mid(pos, match.capturedStart() - pos)));
+            result.append(fontBegin);
+            result.append(toHtmlEscaped(match.captured()));
+            result.append(fontEnd);
+            pos = match.capturedEnd();
+        }
+        result.append(toHtmlEscaped(text.mid(pos)));
+    }
+
+    return result;
 }
 
 } // namespace html

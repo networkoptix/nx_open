@@ -38,6 +38,7 @@ Item
     {
         id: label
 
+        textFormat: Text.PlainText
         font: control.font
         color: control.hovered ? ColorTheme.colors.light1 : ColorTheme.colors.light4
         text: labelTextField.text

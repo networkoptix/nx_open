@@ -36,6 +36,7 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace nx::vms::common::html;
 using namespace std::chrono;
 
 namespace {
@@ -190,7 +191,7 @@ struct EventTile::Private
         else
         {
             QTextDocument doc;
-            doc.setHtml(nx::vms::common::html::toHtml(title));
+            doc.setHtml(toHtml(title));
             doc.setTextWidth(width);
             WidgetUtils::elideDocumentLines(&doc, kTileTitleLineLimit, true);
             text = doc.toHtml();
@@ -242,7 +243,7 @@ struct EventTile::Private
         }
         else
         {
-            QString text = list.join(nx::vms::common::html::kLineBreak);
+            QString text = list.join(kLineBreak);
             if (andMore > 0)
             {
                 text += nx::format("<p style='color: %1; font-size: %2px; font-weight: %3; margin-top: %4'>%5</p>")
@@ -559,12 +560,13 @@ void EventTile::setResourceList(const QnResourceList& list, const QString& cloud
     for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
     {
         NX_ASSERT(list[i]); //< Null resource pointer is an abnormal situation.
-        items.push_back(
-            list[i] ? common::html::bold(systemName + list[i]->getName()) : systemName + "?");
+        items.push_back(list[i]
+            ? bold(toHtmlEscaped(systemName + list[i]->getName()))
+            : toHtmlEscaped(systemName) + "?");
     }
 
     if (items.isEmpty() && !cloudSystemId.isEmpty())
-        items.push_back(common::html::bold(getSystemName(cloudSystemId)));
+        items.push_back(bold(getSystemName(cloudSystemId)));
 
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
@@ -574,10 +576,10 @@ void EventTile::setResourceList(const QStringList& list, const QString& cloudSys
     auto systemName = getFormattedSystemNameIfNeeded(cloudSystemId);
     QStringList items = list.mid(0, kMaximumResourceListSize);
     for (auto& item: items)
-        item = common::html::toHtml(systemName + item);
+        item = toHtml(systemName + item);
 
     if (items.isEmpty() && !cloudSystemId.isEmpty())
-        items.push_back(common::html::bold(getSystemName(cloudSystemId)));
+        items.push_back(bold(getSystemName(cloudSystemId)));
 
     d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
