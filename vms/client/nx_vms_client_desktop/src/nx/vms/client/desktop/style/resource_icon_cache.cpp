@@ -12,6 +12,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <network/base_system_description.h>
@@ -196,6 +197,10 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     // Users.
     m_cache.insert(Users, loadIcon("tree/users.svg"));
     m_cache.insert(User, loadIcon("tree/user.svg"));
+    m_cache.insert(CloudUser, loadIcon("user_settings/user_cloud.svg"));
+    m_cache.insert(LdapUser, loadIcon("user_settings/user_ldap.svg"));
+    m_cache.insert(LocalUser, loadIcon("user_settings/user_local.svg"));
+    m_cache.insert(TemporaryUser, loadIcon("user_settings/user_local_temp.svg"));
 
     // Videowalls.
     m_cache.insert(VideoWall, loadIcon("tree/videowall.svg"));
@@ -284,6 +289,25 @@ QIcon QnResourceIconCache::icon(const QnResourcePtr& resource)
         return QIcon();
     return icon(key(resource));
 }
+QnResourceIconCache::Key QnResourceIconCache::userKey(const QnUserResourcePtr& user)
+{
+    if (!NX_ASSERT(user))
+        return User;
+
+    if (user->isCloud())
+        return CloudUser;
+
+    if (user->isLdap())
+        return LdapUser;
+
+    if (user->isTemporary())
+        return TemporaryUser;
+
+    if (user->isLocal())
+        return LocalUser;
+
+    return User;
+}
 
 QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 {
@@ -325,7 +349,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (flags.testFlag(Qn::user))
     {
-        key = User;
+        key = userKey(resource.dynamicCast<QnUserResource>());
     }
     else if (flags.testFlag(Qn::videowall))
     {
