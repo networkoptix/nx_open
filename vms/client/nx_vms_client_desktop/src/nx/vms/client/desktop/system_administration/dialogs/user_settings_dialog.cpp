@@ -48,6 +48,7 @@
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/resource/server_host_priority.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/utils/system_uri.h>
@@ -77,6 +78,30 @@ bool isAcceptedLoginCharacter(QChar character)
         || character == ' '
         || kAllowedLoginSymbols.contains(character);
 }
+
+enum LinkHostPriority
+{
+    cloud,
+    dns,
+    other
+};
+
+const auto customPriority = 
+    [](const nx::utils::Url& url) -> int
+    {
+        using namespace nx::vms::common;
+        switch (serverHostPriority(url.host()))
+        {
+            case ServerHostPriority::cloud:
+                return LinkHostPriority::cloud;
+            case ServerHostPriority::dns:
+                return LinkHostPriority::dns;
+            default:
+                return LinkHostPriority::other;
+        }
+
+        return LinkHostPriority::other;
+    };
 
 } // namespace
 
@@ -157,14 +182,28 @@ struct UserSettingsDialog::Private
     QString linkFromToken(const std::string& token) const
     {
         const auto server = q->systemContext()->currentServer();
+        const auto info = server->getModuleInformationWithAddresses();
+        auto serverUrl = nx::vms::common::mainServerUrl(info.remoteAddresses, customPriority);
+
+        if (customPriority(serverUrl) == LinkHostPriority::other)
+        {
+            if (auto url = server->getApiUrl(); url.host() != "localhost")
+                serverUrl = server->getApiUrl();
+        }
+
+        if (customPriority(serverUrl) == LinkHostPriority::cloud)
+            serverUrl.setHost(serverUrl.host().split('.').back());
+        else if (serverUrl.port(-1) == -1)
+            serverUrl.setPort(info.port);
+
         if (!ini().nativeLinkForTemporaryUsers)
-            return nx::format("%1/#/?token=%2", server->getUrl(), token);
+            return nx::format("%1/#/?token=%2", serverUrl.displayAddress(), token);
 
         using namespace nx::vms::utils;
         SystemUri uri;
         uri.scope = SystemUri::Scope::direct;
         uri.protocol = SystemUri::Protocol::Native;
-        uri.systemAddress = server->getRemoteUrl().displayAddress();
+        uri.systemAddress = serverUrl.displayAddress();
         uri.credentials.authToken.setBearerToken(token);
         return uri.toString();
     }
