@@ -154,7 +154,13 @@ public:
     ObjectDisplaySettings* objectDisplaySettings() const;
 
     ClientStateHandler* clientStateHandler() const;
+
+    /** Interface for IPC between client instances. */
     SharedMemoryManager* sharedMemoryManager() const;
+
+    /** Set custom Shared Memory Manager implementation. */
+    void setSharedMemoryManager(std::unique_ptr<SharedMemoryManager> value);
+
     RunningInstancesManager* runningInstancesManager() const;
     session::SessionManager* sessionManager() const;
 
