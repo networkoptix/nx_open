@@ -62,4 +62,6 @@ private:
     std::function<void()> m_streamCallback;
 };
 
+using TestCamDisplayPtr = QSharedPointer<TestCamDisplay>;
+
 } // namespace nx::vms::client::desktop::test

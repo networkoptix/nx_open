@@ -12,7 +12,7 @@ class QnResourcePool;
 
 class QnClientCoreModule;
 class QnForgottenSystemsManager;
-
+class QnClientRuntimeSettings;
 struct QnStartupParameters;
 
 namespace nx::vms::utils { class TranslationManager; }
@@ -162,6 +162,9 @@ public:
      */
     LocalSettings* localSettings() const;
 
+    /** Runtime Client instance settings. */
+    QnClientRuntimeSettings* runtimeSettings() const;
+
     ScreenRecordingSettings* screenRecordingSettings() const;
 
     ShowOnceSettings* showOnceSettings() const;
@@ -172,7 +175,13 @@ public:
     ObjectDisplaySettings* objectDisplaySettings() const;
 
     ClientStateHandler* clientStateHandler() const;
+
+    /** Interface for IPC between client instances. */
     SharedMemoryManager* sharedMemoryManager() const;
+
+    /** Set custom Shared Memory Manager implementation. */
+    void setSharedMemoryManager(std::unique_ptr<SharedMemoryManager> value);
+
     RunningInstancesManager* runningInstancesManager() const;
     session::SessionManager* sessionManager() const;
 
