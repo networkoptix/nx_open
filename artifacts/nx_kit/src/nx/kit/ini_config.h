@@ -147,16 +147,16 @@ public:
 
 protected:
     #define NX_INI_FLAG(DEFAULT, PARAM, DESCRIPTION) \
-        const bool PARAM = regBoolParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
+        const bool PARAM = regBoolParam(&(PARAM), DEFAULT, #PARAM, DESCRIPTION)
 
     #define NX_INI_INT(DEFAULT, PARAM, DESCRIPTION) \
-        const int PARAM = regIntParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
+        const int PARAM = regIntParam(&(PARAM), DEFAULT, #PARAM, DESCRIPTION)
 
     #define NX_INI_STRING(DEFAULT, PARAM, DESCRIPTION) \
-        const char* const PARAM = regStringParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
+        const char* const PARAM = regStringParam(&(PARAM), DEFAULT, #PARAM, DESCRIPTION)
 
     #define NX_INI_FLOAT(DEFAULT, PARAM, DESCRIPTION) \
-        const float PARAM = regFloatParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
+        const float PARAM = regFloatParam(&(PARAM), DEFAULT, #PARAM, DESCRIPTION)
 
 protected: // Used by the above macros.
     bool regBoolParam(const bool* pValue, bool defaultValue,
