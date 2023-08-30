@@ -50,7 +50,9 @@ void TreeView::keyPressEvent(QKeyEvent* event)
     {
         case Qt::Key_Enter:
         case Qt::Key_Return:
-            event->ignore();
+            if (m_enterKeyEventIgnored)
+                event->ignore();
+
             if (hasFocus())
                 emit activated(currentIndex());
             emit enterPressed(currentIndex());
@@ -111,6 +113,18 @@ void TreeView::dropEvent(QDropEvent* event)
 {
     QScopedValueRollback<bool> guard(m_inDragDropEvent, true);
     base_type::dropEvent(event);
+}
+
+void TreeView::focusInEvent(QFocusEvent* event)
+{
+    base_type::focusInEvent(event);
+    emit gotFocus(event->reason());
+}
+
+void TreeView::focusOutEvent(QFocusEvent* event)
+{
+    base_type::focusOutEvent(event);
+    emit lostFocus(event->reason());
 }
 
 void TreeView::timerEvent(QTimerEvent* event)
@@ -175,6 +189,11 @@ bool TreeView::isDefaultSpacePressIgnored() const
 void TreeView::setDefaultSpacePressIgnored(bool isIgnored)
 {
     m_isDefauldSpacePressIgnored = isIgnored;
+}
+
+void TreeView::setEnterKeyEventIgnored(bool ignored)
+{
+    m_enterKeyEventIgnored = ignored;
 }
 
 void TreeView::setMultiSelectionEditAllowed(bool value)

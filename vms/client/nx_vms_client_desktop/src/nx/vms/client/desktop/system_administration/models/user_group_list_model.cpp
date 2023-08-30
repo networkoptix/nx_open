@@ -507,30 +507,6 @@ QVariant UserGroupListModel::headerData(int section, Qt::Orientation orientation
     }
 }
 
-bool UserGroupListModel::setData(const QModelIndex& index, const QVariant& value, int role)
-{
-    if (!NX_ASSERT(checkIndex(index))
-        || role != Qt::CheckStateRole
-        || index.column() != CheckBoxColumn)
-    {
-        return base_type::setData(index, value, role);
-    }
-
-    const auto& group = d->orderedGroups[index.row()];
-    const bool checked = value.toBool();
-
-    if (d->isChecked(group) == checked)
-        return false;
-
-    if (checked)
-        d->checkedGroupIds.insert(group.id);
-    else
-        d->checkedGroupIds.remove(group.id);
-
-    emit dataChanged(index, index, {Qt::CheckStateRole});
-    return true;
-}
-
 Qt::ItemFlags UserGroupListModel::flags(const QModelIndex& index) const
 {
     if (!NX_ASSERT(checkIndex(index)))
@@ -592,6 +568,21 @@ QSet<QnUuid> UserGroupListModel::notFoundGroups() const
 QSet<QnUuid> UserGroupListModel::nonUniqueGroups() const
 {
     return d->nonUniqueNameTracker.nonUniqueNameIds();
+}
+
+void UserGroupListModel::setChecked(const QnUuid& groupId, bool checked)
+{
+    const int row = groupRow(groupId);
+    if (row < 0)
+        return;
+
+    if (checked)
+        d->checkedGroupIds.insert(groupId);
+    else
+        d->checkedGroupIds.remove(groupId);
+
+    const auto index = this->index(row, CheckBoxColumn);
+    emit dataChanged(index, index, {Qt::CheckStateRole});
 }
 
 void UserGroupListModel::reset(const UserGroupDataList& groups)
