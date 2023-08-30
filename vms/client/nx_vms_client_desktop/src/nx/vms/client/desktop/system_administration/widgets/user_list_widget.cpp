@@ -233,7 +233,7 @@ public:
 
 private:
     void createUser();
-    void editUser(const QnUserResourcePtr& user);
+    void editUser(const QnUserResourcePtr& user, bool raiseDialog = true);
     void deleteUsers(const QnUserResourceList& usersToDelete);
     void deleteSelected();
     void editSelected();
@@ -416,6 +416,8 @@ QSize UserListWidget::sizeHint() const
 void UserListWidget::Private::setupUi()
 {
     ui->setupUi(q);
+    q->addAction(ui->searchAction);
+    ui->usersTable->addAction(ui->deleteUserAction);
 
     auto alertsLayout = new QVBoxLayout();
     alertsLayout->setSpacing(0);
@@ -424,6 +426,7 @@ void UserListWidget::Private::setupUi()
     alertsLayout->addWidget(nonUniqueUsersWarning);
     alertsLayout->addWidget(selectionControls);
     q->layout()->addItem(alertsLayout);
+    q->layout()->addWidget(selectionControls);
 
     ui->filterButton->menu()->addAction(
         tr("All Users"),
@@ -499,6 +502,7 @@ void UserListWidget::Private::setupUi()
 
     constexpr int kButtonBarHeight = 32;
     selectionControls->setFixedHeight(kButtonBarHeight);
+    selectionControls->setFocusPolicy(Qt::StrongFocus);
 
     setPaletteColor(selectionControls, QPalette::Window, core::colorTheme()->color("dark11"));
     setPaletteColor(selectionControls, QPalette::WindowText, core::colorTheme()->color("light4"));
@@ -510,6 +514,9 @@ void UserListWidget::Private::setupUi()
     buttonsLayout->addWidget(editButton);
     buttonsLayout->addStretch();
 
+    QWidget::setTabOrder(ui->usersTable, deleteButton);
+    QWidget::setTabOrder(deleteButton, editButton);
+
     connect(deleteButton, &QPushButton::clicked, this, &Private::deleteSelected);
     connect(editButton, &QPushButton::clicked, this, &Private::editSelected);
 
@@ -520,11 +527,80 @@ void UserListWidget::Private::setupUi()
             q->update();
         });
 
-    // By [Space] toggle checkbox:
     connect(ui->usersTable, &TreeView::spacePressed, this,
         [this](const QModelIndex& index)
         {
+            // Toggle checkbox when Space is pressed.
             handleUsersTableClicked(index.sibling(index.row(), UserListModel::CheckBoxColumn));
+        });
+    ui->usersTable->setEnterKeyEventIgnored(false);
+    connect(ui->usersTable, &TreeView::enterPressed, this,
+        [this](const QModelIndex& index)
+        {
+            const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+            if (!user)
+                return;
+            editUser(user);
+        });
+
+    connect(ui->usersTable, &TreeView::selectionChanging, this,
+        [this](QItemSelectionModel::SelectionFlags selectionFlags,
+            const QModelIndex& index,
+            const QEvent* event)
+        {
+            if (!event || event->type() != QEvent::KeyPress)
+                return;
+
+            if (!selectionFlags.testFlag(QItemSelectionModel::Select))
+                return;
+
+            const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+            if (!user)
+                return;
+
+            QMetaObject::invokeMethod(this,
+                [this, user]() { editUser(user, /*openDialog*/ false); },
+                Qt::QueuedConnection);
+        });
+
+    connect(ui->usersTable, &TreeView::gotFocus, this,
+        [this](Qt::FocusReason reason)
+        {
+            if (reason != Qt::TabFocusReason && reason != Qt::BacktabFocusReason)
+                return;
+
+            if (ui->usersTable->currentIndex().isValid())
+                ui->usersTable->setCurrentIndex(ui->usersTable->currentIndex());
+            else
+                ui->usersTable->setCurrentIndex(sortModel->index(0, 0));
+        });
+    connect(ui->usersTable, &TreeView::lostFocus, this,
+        [this](Qt::FocusReason reason)
+        {
+            if (reason != Qt::TabFocusReason && reason != Qt::BacktabFocusReason)
+                return;
+
+            if (q->context()->settingsDialogManager()->currentEditedUserId().isNull())
+                ui->usersTable->clearSelection();
+        });
+
+    connect(ui->deleteUserAction, &QAction::triggered, this,
+        [this]()
+        {
+            const auto selected = visibleSelectedUsers();
+            if (!selected.isEmpty())
+            {
+                deleteSelected();
+                return;
+            }
+
+            const auto index = ui->usersTable->currentIndex();
+            if (!index.isValid())
+                return;
+
+            const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+            if (canDelete(user))
+                deleteUsers({user});
         });
 
     setHelpTopic(q, HelpTopic::Id::SystemSettings_UserManagement);
@@ -653,8 +729,7 @@ void UserListWidget::Private::updateSelection()
 
 void UserListWidget::Private::createUser()
 {
-    q->menu()->triggerIfPossible(action::NewUserAction,
-        action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
+    q->context()->settingsDialogManager()->createUser(q);
 }
 
 void UserListWidget::Private::deleteUsers(const QnUserResourceList& usersToDelete)
@@ -776,14 +851,15 @@ void UserListWidget::Private::editSelected()
         });
 }
 
-void UserListWidget::Private::editUser(const QnUserResourcePtr& user)
+void UserListWidget::Private::editUser(const QnUserResourcePtr& user, bool raiseDialog)
 {
     if (!NX_ASSERT(user))
         return;
 
-    q->menu()->trigger(action::UserSettingsAction, action::Parameters(user)
-        .withArgument(Qn::ForceRole, true)
-        .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
+    if (raiseDialog)
+        q->context()->settingsDialogManager()->editUser(user->getId(), /*tab*/ -1, q);
+    else
+        q->context()->settingsDialogManager()->setCurrentEditedUserId(user->getId());
 }
 
 QnUserResourceList UserListWidget::Private::visibleUsers() const

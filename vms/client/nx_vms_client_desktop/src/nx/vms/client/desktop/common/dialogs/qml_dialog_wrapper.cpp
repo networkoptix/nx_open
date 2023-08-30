@@ -259,7 +259,10 @@ void QmlDialogWrapper::open()
 void QmlDialogWrapper::raise()
 {
     if (d->window && d->window->isVisible())
+    {
         d->window->raise();
+        d->window->requestActivate();
+    }
 }
 
 void QmlDialogWrapper::accept()

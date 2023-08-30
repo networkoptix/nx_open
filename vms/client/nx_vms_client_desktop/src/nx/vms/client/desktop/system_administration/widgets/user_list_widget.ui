@@ -44,6 +44,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="placeholderText" stdset="0">
           <string>Search users</string>
          </property>
@@ -51,6 +54,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="createUserButton">
+         <property name="focusPolicy">
+          <enum>Qt::TabFocus</enum>
+         </property>
          <property name="text">
           <string>+ Add User</string>
          </property>
@@ -63,6 +69,9 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
          </property>
          <property name="text">
           <string notr="true">&lt;User Filter&gt;</string>
@@ -100,9 +109,6 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -222,6 +228,28 @@
     </layout>
    </item>
   </layout>
+  <action name="searchAction">
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="deleteUserAction">
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -243,9 +271,26 @@
  </customwidgets>
  <tabstops>
   <tabstop>filterLineEdit</tabstop>
-  <tabstop>filterButton</tabstop>
+  <tabstop>createUserButton</tabstop>
   <tabstop>usersTable</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>searchAction</sender>
+   <signal>triggered()</signal>
+   <receiver>filterLineEdit</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>316</x>
+     <y>26</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

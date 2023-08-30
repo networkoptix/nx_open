@@ -28,6 +28,8 @@ public:
     bool isDefaultSpacePressIgnored() const;
     void setDefaultSpacePressIgnored(bool isIgnored);
 
+    void setEnterKeyEventIgnored(bool ignored);
+
     /**
      * Allow editing with multiple selection. By default, editing with multiple
      * selection is not allowed.
@@ -97,6 +99,12 @@ signals:
     void selectionChanging(QItemSelectionModel::SelectionFlags selectionFlags,
         const QModelIndex& index, const QEvent* event) const;
 
+    /** Emitted when the widget gets focus. */
+    void gotFocus(Qt::FocusReason reason);
+
+    /** Emitted when the widget losts focus. */
+    void lostFocus(Qt::FocusReason reason);
+
 protected:
     virtual bool edit(
         const QModelIndex& index, QAbstractItemView::EditTrigger trigger, QEvent* event) override;
@@ -104,6 +112,8 @@ protected:
     virtual void dragMoveEvent(QDragMoveEvent* event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent* event) override;
     virtual void dropEvent(QDropEvent* event) override;
+    virtual void focusInEvent(QFocusEvent* event) override;
+    virtual void focusOutEvent(QFocusEvent* event) override;
     virtual void timerEvent(QTimerEvent* event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
     virtual void wheelEvent(QWheelEvent* event) override;
@@ -118,6 +128,7 @@ private:
     QBasicTimer m_openTimer;
     QPoint m_dragMovePos;
     bool m_isDefauldSpacePressIgnored = false;
+    bool m_enterKeyEventIgnored = true;
     bool m_dropOnBranchesAllowed = true;
     bool m_inDragDropEvent = false;
     bool m_ignoreWheelEvents = false;

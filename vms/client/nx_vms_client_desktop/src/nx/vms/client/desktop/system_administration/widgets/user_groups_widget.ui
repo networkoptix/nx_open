@@ -44,6 +44,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="placeholderText" stdset="0">
           <string>Search users</string>
          </property>
@@ -51,6 +54,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="createGroupButton">
+         <property name="focusPolicy">
+          <enum>Qt::TabFocus</enum>
+         </property>
          <property name="text">
           <string>+ Add Group</string>
          </property>
@@ -86,7 +92,7 @@
             </sizepolicy>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
+            <enum>Qt::StrongFocus</enum>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -206,6 +212,34 @@
     </layout>
    </item>
   </layout>
+  <action name="searchShortcut">
+   <property name="text">
+    <string/>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="deleteGroupAction">
+   <property name="text">
+    <string/>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -222,8 +256,26 @@
  </customwidgets>
  <tabstops>
   <tabstop>filterLineEdit</tabstop>
+  <tabstop>createGroupButton</tabstop>
   <tabstop>groupsTable</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>searchShortcut</sender>
+   <signal>triggered()</signal>
+   <receiver>filterLineEdit</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>26</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
