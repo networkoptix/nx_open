@@ -2,6 +2,11 @@
 
 #pragma once
 
+#include <QtCore/QSet>
+#include <QtCore/QString>
+
+#include <nx/utils/url.h>
+
 namespace nx::network { class HostAddress; }
 
 namespace nx::vms::common {
@@ -20,5 +25,9 @@ enum class ServerHostPriority
 };
 
 NX_VMS_COMMON_API ServerHostPriority serverHostPriority(const nx::network::HostAddress& host);
+
+NX_VMS_COMMON_API nx::utils::Url mainServerUrl(
+    const QSet<QString>& remoteAddresses,
+    std::function<int(const nx::utils::Url&)> priority = nullptr);
 
 } // namespace nx::vms::common
