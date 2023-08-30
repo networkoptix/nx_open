@@ -333,7 +333,7 @@ AbstractItemPtr ResourceTreeItemFactory::createCurrentUserItem(const QnUserResou
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
         .withRole(Qn::ResourceRole, QVariant::fromValue(user.staticCast<QnResource>()))
-        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::User))
+        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::userKey(user)))
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::currentUser))
         .withRole(Qn::ExtraInfoRole, QnResourceDisplayInfo(user).extraInfo())
         .withFlags({Qt::ItemIsEnabled, Qt::ItemIsSelectable, Qt::ItemNeverHasChildren});

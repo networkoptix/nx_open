@@ -40,7 +40,7 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             displayFullMatch(kUserName),
-            iconFullMatch(QnResourceIconCache::User),
+            iconFullMatch(QnResourceIconCache::LocalUser),
             topLevelNode(),
             atRow(1))));
 
