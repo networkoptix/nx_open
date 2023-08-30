@@ -42,7 +42,7 @@ static const QHash<AccessRight, AccessRights> kRequiredAccessRights{
     {AccessRight::manageBookmarks,
         AccessRight::view | AccessRight::viewArchive | AccessRight::viewBookmarks},
     {AccessRight::userInput, AccessRight::view},
-    {AccessRight::edit, AccessRight::view}};
+    {AccessRight::edit, AccessRight::view | AccessRight::userInput}};
 
 static const QHash<AccessRight, AccessRights> kDependentAccessRights =
     []()
