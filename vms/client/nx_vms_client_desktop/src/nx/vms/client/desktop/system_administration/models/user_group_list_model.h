@@ -43,7 +43,6 @@ public:
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     const UserGroupDataList& groups() const;
@@ -53,6 +52,7 @@ public:
 
     QSet<QnUuid> checkedGroupIds() const;
     void setCheckedGroupIds(const QSet<QnUuid>& value);
+    void setChecked(const QnUuid& groupId, bool checked);
 
     QSet<QnUuid> notFoundGroups() const;
     QSet<QnUuid> nonUniqueGroups() const;

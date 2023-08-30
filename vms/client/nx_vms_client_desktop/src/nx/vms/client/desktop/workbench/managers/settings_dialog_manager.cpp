@@ -69,7 +69,7 @@ void SettingsDialogManager::editUser(const QnUuid& userId, int tab, QWidget* par
     if (!d->userSettingsDialog)
     {
         d->userSettingsDialog = std::make_unique<UserSettingsDialog>(
-            UserSettingsDialog::DialogType::EditUser, systemContext(), parent);
+            UserSettingsDialog::DialogType::EditUser, systemContext());
         connect(d->userSettingsDialog.get(), &UserSettingsDialog::done, this,
             [this]() { setCurrentEditedUserId({}); });
         d->userSettingsDialog->setUser(resourcePool()->getResourceById<QnUserResource>(userId));
@@ -127,7 +127,7 @@ void SettingsDialogManager::editGroup(const QnUuid& groupId, QWidget* parent)
     if (!d->groupSettingsDialog)
     {
         d->groupSettingsDialog = std::make_unique<GroupSettingsDialog>(
-            GroupSettingsDialog::editGroup, systemContext(), parent);
+            GroupSettingsDialog::editGroup, systemContext());
         connect(d->groupSettingsDialog.get(), &GroupSettingsDialog::done, this,
             [this]() { setCurrentEditedGroupId({}); });
         d->groupSettingsDialog->setGroup(groupId);
