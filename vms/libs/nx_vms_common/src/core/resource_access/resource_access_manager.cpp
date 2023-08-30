@@ -117,6 +117,22 @@ QnResourceAccessManager::QnResourceAccessManager(
 
     connect(resourcePool(), &QnResourcePool::resourcesRemoved,
         this, &QnResourceAccessManager::handleResourcesRemoved);
+
+    connect(systemContext()->accessSubjectHierarchy(), &SubjectHierarchy::changed, this,
+        [this](
+            const QSet<QnUuid>& /*added*/,
+            const QSet<QnUuid>& /*removed*/,
+            const QSet<QnUuid>& /*groupsWithChangedMembers*/,
+            const QSet<QnUuid>& subjectsWithChangedParents)
+        {
+            const auto affectedUsers = resourcePool()->getResourcesByIds<QnUserResource>(
+                subjectsWithChangedParents + systemContext()->accessSubjectHierarchy()->
+                    recursiveMembers(subjectsWithChangedParents));
+
+            if (!affectedUsers.empty())
+                emit permissionsDependencyChanged(affectedUsers);
+
+        }, Qt::DirectConnection);
 }
 
 bool QnResourceAccessManager::hasPowerUserPermissions(const Qn::UserAccessData& accessData) const
