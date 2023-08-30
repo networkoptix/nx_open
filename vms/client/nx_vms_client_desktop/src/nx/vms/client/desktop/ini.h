@@ -340,8 +340,10 @@ struct Ini: nx::kit::IniConfig
         "[Support] Enable tracking of QtQuick OpenGL context creation and destruction");
 
     // VMS-37975.
-    NX_INI_FLAG(false, considerOverallCpuUsageInRadass,
-        "[Support] Consider overall CPU usage in the Radass quality control mechanism.");
+    NX_INI_STRING("auto", considerOverallCpuUsageInRadass,
+        "[Support] Consider overall CPU usage in the Radass quality control mechanism. Value "
+        "\"true\" enables this mode by default. In \"auto\" mode mechanism will work only in "
+        "multi-window environment and also in VideoWall mode.");
 
     NX_INI_FLOAT(0.7f, highSystemCpuUsageInRadass,
         "[Support] Radass should not raise item quality if system CPU usage is higher than this "

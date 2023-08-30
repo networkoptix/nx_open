@@ -778,6 +778,11 @@ SharedMemoryManager* ApplicationContext::sharedMemoryManager() const
     return d->sharedMemoryManager.get();
 }
 
+void ApplicationContext::setSharedMemoryManager(std::unique_ptr<SharedMemoryManager> value)
+{
+    d->sharedMemoryManager = std::move(value);
+}
+
 RunningInstancesManager* ApplicationContext::runningInstancesManager() const
 {
     return d->runningInstancesManager.get();
