@@ -451,9 +451,9 @@ QVariant UserGroupListModel::headerData(int section, Qt::Orientation orientation
         case DescriptionColumn:
             return tr("Description");
         case ParentGroupsColumn:
-            return tr("Member of");
+            return tr("Groups");
         case PermissionsColumn:
-            return tr("Permissions");
+            return tr("Custom");
         default:
             return QString();
     }
