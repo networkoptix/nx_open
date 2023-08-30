@@ -236,7 +236,7 @@ public:
 
     void handleModelChanged();
     void handleSelectionChanged();
-    void handleCellClicked(const QModelIndex& index);
+    void handleCellTriggered(const QModelIndex& index);
 
     nx::vms::api::UserGroupDataList userGroups() const;
 
@@ -247,6 +247,7 @@ public:
 private:
     void createGroup();
     void deleteGroups(const QSet<QnUuid>& groupsToDelete);
+    void editGroup(const QnUuid& groupId, bool raiseDialog = true);
     void deleteSelected();
     void deleteNotFoundLdapGroups();
 
@@ -375,6 +376,8 @@ UserGroupsWidget::Private::Private(UserGroupsWidget* q, UserGroupManager* manage
 void UserGroupsWidget::Private::setupUi()
 {
     ui->setupUi(q);
+    q->addAction(ui->searchShortcut);
+    ui->groupsTable->addAction(ui->deleteGroupAction);
     q->layout()->addWidget(notFoundGroupsWarning);
     q->layout()->addWidget(nonUniqueGroupsWarning);
     q->layout()->addWidget(selectionControls);
@@ -418,7 +421,60 @@ void UserGroupsWidget::Private::setupUi()
     const auto scrollBar = new SnappedScrollBar(q->window());
     ui->groupsTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    connect(ui->groupsTable, &QAbstractItemView::clicked, this, &Private::handleCellClicked);
+    connect(ui->groupsTable, &QAbstractItemView::clicked, this, &Private::handleCellTriggered);
+    connect(ui->groupsTable, &TreeView::spacePressed, this,
+        [this](const QModelIndex& index)
+        {
+            handleCellTriggered(index.siblingAtColumn(UserGroupListModel::CheckBoxColumn));
+        });
+    ui->groupsTable->setEnterKeyEventIgnored(false);
+    connect(ui->groupsTable, &TreeView::enterPressed, this,
+        [this](const QModelIndex& index)
+        {
+            handleCellTriggered(index.siblingAtColumn(UserGroupListModel::NameColumn));
+        });
+
+    connect(ui->groupsTable, &TreeView::selectionChanging, this,
+        [this](QItemSelectionModel::SelectionFlags selectionFlags,
+            const QModelIndex& index,
+            const QEvent* event)
+        {
+            if (!event || event->type() != QEvent::KeyPress)
+                return;
+
+            if (!selectionFlags.testFlag(QItemSelectionModel::Select))
+                return;
+
+            const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+            if (groupId.isNull())
+                return;
+
+            QMetaObject::invokeMethod(this,
+                [this, groupId]() { editGroup(groupId, /*openDialog*/ false); },
+                Qt::QueuedConnection);
+        });
+
+    connect(ui->groupsTable, &TreeView::gotFocus, this,
+        [this](Qt::FocusReason reason)
+        {
+            if (reason != Qt::TabFocusReason && reason != Qt::BacktabFocusReason)
+                return;
+
+            if (ui->groupsTable->currentIndex().isValid())
+                ui->groupsTable->setCurrentIndex(ui->groupsTable->currentIndex());
+            else
+                ui->groupsTable->setCurrentIndex(sortModel->index(0, 0));
+        });
+    connect(ui->groupsTable, &TreeView::lostFocus, this,
+        [this](Qt::FocusReason reason)
+        {
+            if (reason != Qt::TabFocusReason && reason != Qt::BacktabFocusReason)
+                return;
+
+            if (q->context()->settingsDialogManager()->currentEditedUserId().isNull())
+                ui->groupsTable->clearSelection();
+        });
+
     connect(ui->createGroupButton, &QPushButton::clicked, this, &Private::createGroup);
 
     setPaletteColor(notFoundGroupsWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
@@ -455,11 +511,32 @@ void UserGroupsWidget::Private::setupUi()
     buttonsLayout->addWidget(deleteSelectedButton);
     buttonsLayout->addStretch();
 
+    QWidget::setTabOrder(ui->groupsTable, deleteSelectedButton);
+
     connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
         [this](const QString& text)
         {
             sortModel->setFilterWildcard(text);
             q->update();
+        });
+
+    connect(ui->deleteGroupAction, &QAction::triggered, this,
+        [this]()
+        {
+            const auto selected = visibleSelectedGroupIds();
+            if (!selected.isEmpty())
+            {
+                deleteSelected();
+                return;
+            }
+
+            const auto index = ui->groupsTable->currentIndex();
+            if (!index.isValid())
+                return;
+
+            const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
+            if (canDeleteGroup(groupId))
+                deleteGroups({groupId});
         });
 
     setHelpTopic(q, HelpTopic::Id::SystemSettings_UserManagement);
@@ -563,20 +640,31 @@ void UserGroupsWidget::Private::handleSelectionChanged()
     selectionControls->setDisplayed(canDelete);
 }
 
-void UserGroupsWidget::Private::handleCellClicked(const QModelIndex& index)
+void UserGroupsWidget::Private::handleCellTriggered(const QModelIndex& index)
 {
-    if (index.column() == UserGroupListModel::CheckBoxColumn)
-        return;
+    const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
 
-    q->menu()->trigger(ui::action::UserGroupsAction, ui::action::Parameters()
-        .withArgument(Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>())
-        .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
+    if (index.column() == UserGroupListModel::CheckBoxColumn)
+    {
+        const bool checked = (index.data(Qt::CheckStateRole).toInt() == Qt::Checked);
+        groupsModel->setChecked(groupId, !checked);
+        return;
+    }
+
+    editGroup(groupId);
 }
 
 void UserGroupsWidget::Private::createGroup()
 {
-    q->menu()->triggerIfPossible(ui::action::UserGroupsAction, ui::action::Parameters()
-        .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(q)));
+    q->context()->settingsDialogManager()->createGroup(q);
+}
+
+void UserGroupsWidget::Private::editGroup(const QnUuid& groupId, bool raiseDialog)
+{
+    if (raiseDialog)
+        q->context()->settingsDialogManager()->editGroup(groupId, q);
+    else
+        q->context()->settingsDialogManager()->setCurrentEditedGroupId(groupId);
 }
 
 void UserGroupsWidget::Private::deleteGroups(const QSet<QnUuid>& groupsToDelete)
