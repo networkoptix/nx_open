@@ -796,6 +796,11 @@ LocalSettings* ApplicationContext::localSettings() const
     return d->localSettings.get();
 }
 
+QnClientRuntimeSettings* ApplicationContext::runtimeSettings() const
+{
+    return d->runtimeSettings.get();
+}
+
 ScreenRecordingSettings* ApplicationContext::screenRecordingSettings() const
 {
     return d->screenRecordingSettings.get();
@@ -819,6 +824,11 @@ ClientStateHandler* ApplicationContext::clientStateHandler() const
 SharedMemoryManager* ApplicationContext::sharedMemoryManager() const
 {
     return d->sharedMemoryManager.get();
+}
+
+void ApplicationContext::setSharedMemoryManager(std::unique_ptr<SharedMemoryManager> value)
+{
+    d->sharedMemoryManager = std::move(value);
 }
 
 RunningInstancesManager* ApplicationContext::runningInstancesManager() const
