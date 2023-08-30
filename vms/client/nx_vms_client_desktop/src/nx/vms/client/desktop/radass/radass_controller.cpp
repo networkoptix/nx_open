@@ -2,6 +2,8 @@
 
 #include "radass_controller.h"
 
+#include <client/client_runtime_settings.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
@@ -10,6 +12,7 @@
 #include <nx/vms/client/desktop/camera/abstract_video_display.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <utils/common/counter_hash.h>
 
 #include "radass_controller_params.h"
@@ -63,6 +66,35 @@ bool itemQualityCanBeRaised(AbstractVideoDisplay* display)
 bool itemQualityCanBeLowered(AbstractVideoDisplay* display)
 {
     return !isForcedHqDisplay(display);
+}
+
+bool calculateConsiderOverallCpuUsage()
+{
+    enum class Mode { disable, automatic, enable };
+    static const QString kAutoValue = "auto";
+    Mode iniValue =
+        []() -> Mode
+        {
+            if (kAutoValue == ini().considerOverallCpuUsageInRadass)
+                return Mode::automatic;
+
+            return QnLexical::deserialized<bool>(ini().considerOverallCpuUsageInRadass)
+                ? Mode::enable
+                : Mode::disable;
+        }();
+
+    switch (iniValue)
+    {
+        case Mode::disable:
+            return false;
+        case Mode::enable:
+            return true;
+        default: //< Automatic mode.
+            break;
+    }
+
+    return appContext()->runtimeSettings()->isVideoWallMode()
+        || !appContext()->sharedMemoryManager()->isSingleInstance();
 }
 
 enum class LqReason
@@ -129,6 +161,8 @@ namespace nx::vms::client::desktop {
 
 struct RadassController::Private
 {
+    RadassController* const q;
+
     mutable nx::Mutex mutex;
 
     // Time factory should be declared before ALL timers to prevent crash
@@ -157,17 +191,30 @@ struct RadassController::Private
 
     QnCounterHash<AbstractVideoDisplay::CameraID> cameras;
 
-    Private(const TimerFactoryPtr& timerFactory):
+    bool considerOverallCpuUsage = false;
+    TimerPtr overallCpuUsageModeTimer;
+
+    Private(RadassController* owner, const TimerFactoryPtr& timerFactory):
+        q(owner),
         mutex(nx::Mutex::Recursive),
         mainTimer(timerFactory->createTimer()),
-        lastAutoSwitchTimer((NX_ASSERT(timerFactory), timerFactory->createElapsedTimer())),
+        lastAutoSwitchTimer(timerFactory->createElapsedTimer()),
         lastSystemRtspDrop(timerFactory->createElapsedTimer()),
         lastModeChangeTimer(timerFactory->createElapsedTimer()),
-        cpuIssueTimer(timerFactory->createElapsedTimer())
+        cpuIssueTimer(timerFactory->createElapsedTimer()),
+        overallCpuUsageModeTimer(timerFactory->createTimer())
     {
         this->timerFactory = timerFactory;
         lastAutoSwitchTimer->start();
         lastModeChangeTimer->start();
+
+        QObject::connect(mainTimer.get(), &AbstractTimer::timeout, q, &RadassController::onTimer);
+        mainTimer->start(kTimerInterval);
+
+        QObject::connect(overallCpuUsageModeTimer.get(), &AbstractTimer::timeout, q,
+            [this]() { updateOverallCpuUsageMode(); });
+        overallCpuUsageModeTimer->start(kUpdateCpuUsageModeInterval);
+        updateOverallCpuUsageMode();
     }
 
     Consumer findByDisplay(AbstractVideoDisplay* display)
@@ -184,10 +231,45 @@ struct RadassController::Private
         return consumer != consumers.end();
     }
 
+    void updateOverallCpuUsageMode()
+    {
+        bool value = calculateConsiderOverallCpuUsage();
+        if (value == considerOverallCpuUsage)
+            return;
+
+        considerOverallCpuUsage = value;
+        if (value)
+        {
+            NX_VERBOSE(this, "Enable overall performance monitor. Parameters:");
+            NX_VERBOSE(this, "High System CPU: %1", ini().highSystemCpuUsageInRadass);
+            NX_VERBOSE(this, "Critical System CPU: %1", ini().criticalSystemCpuUsageInRadass);
+            NX_VERBOSE(this, "High Process CPU: %1", ini().highProcessCpuUsageInRadass);
+            NX_VERBOSE(this, "Critical Process CPU: %1", ini().criticalProcessCpuUsageInRadass);
+            QObject::connect(appContext()->performanceMonitor(),
+                &PerformanceMonitor::valuesChanged,
+                q,
+                [this](const QVariantMap& values)
+                {
+                    const QVariant totalCpuValue = values.value(PerformanceMonitor::kTotalCpu);
+                    lastSystemCpuLoadValue = totalCpuValue.toFloat();
+                    const QVariant processCpuValue = values.value(PerformanceMonitor::kProcessCpu);
+                    lastProcessCpuLoadValue = processCpuValue.toFloat();
+                    NX_VERBOSE(this, "Overall performance: total CPU %1, process CPU %2",
+                        lastSystemCpuLoadValue, lastProcessCpuLoadValue);
+                });
+        }
+        else
+        {
+            NX_VERBOSE(this, "Disable overall performance monitor.");
+            appContext()->performanceMonitor()->disconnect(q);
+        }
+        appContext()->performanceMonitor()->setEnabled(value);
+    }
+
     /** Quality cannot be raised as CPU usage will probably overflow the system limit. */
     bool cpuUsageIsTooHighToRaiseQuality() const
     {
-        if (!ini().considerOverallCpuUsageInRadass)
+        if (!considerOverallCpuUsage)
             return false;
 
         const bool result = lastSystemCpuLoadValue > ini().highSystemCpuUsageInRadass
@@ -201,7 +283,7 @@ struct RadassController::Private
     /** Overall CPU usage is too high, quality should be lowered. */
     bool cpuUsageIsCritical() const
     {
-        if (!ini().considerOverallCpuUsageInRadass)
+        if (!considerOverallCpuUsage)
             return false;
 
         const bool result = lastSystemCpuLoadValue > ini().criticalSystemCpuUsageInRadass
@@ -679,7 +761,7 @@ struct RadassController::Private
      */
     void optimizeItemsQualityByCpuUsage()
     {
-        if (!ini().considerOverallCpuUsageInRadass)
+        if (!considerOverallCpuUsage)
             return;
 
         // If everything is OK, turn off the timer.
@@ -756,30 +838,9 @@ RadassController::RadassController(QObject* parent):
 
 RadassController::RadassController(TimerFactoryPtr timerFactory, QObject* parent):
     base_type(parent),
-    d(new Private(timerFactory))
+    d(new Private(this, timerFactory))
 {
-    connect(d->mainTimer.get(), &AbstractTimer::timeout, this, &RadassController::onTimer);
-    d->mainTimer->start(kTimerInterval);
 
-    if (ini().considerOverallCpuUsageInRadass)
-    {
-        NX_VERBOSE(this, "Enable overall performance monitor. Parameters:");
-        NX_VERBOSE(this, "High System CPU: %1", ini().highSystemCpuUsageInRadass);
-        NX_VERBOSE(this, "Critical System CPU: %1", ini().criticalSystemCpuUsageInRadass);
-        NX_VERBOSE(this, "High Process CPU: %1", ini().highProcessCpuUsageInRadass);
-        NX_VERBOSE(this, "Critical Process CPU: %1", ini().criticalProcessCpuUsageInRadass);
-        appContext()->performanceMonitor()->setEnabled(true);
-        connect(appContext()->performanceMonitor(), &PerformanceMonitor::valuesChanged, this,
-            [this](const QVariantMap& values)
-            {
-                const QVariant totalCpuValue = values.value(PerformanceMonitor::kTotalCpu);
-                d->lastSystemCpuLoadValue = totalCpuValue.toFloat();
-                const QVariant processCpuValue = values.value(PerformanceMonitor::kProcessCpu);
-                d->lastProcessCpuLoadValue = processCpuValue.toFloat();
-                NX_VERBOSE(this, "Overall performance: total CPU %1, process CPU %2",
-                    d->lastSystemCpuLoadValue, d->lastProcessCpuLoadValue);
-            });
-    }
 }
 
 RadassController::~RadassController()

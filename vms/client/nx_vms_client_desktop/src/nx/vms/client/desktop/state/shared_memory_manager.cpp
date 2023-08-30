@@ -308,6 +308,13 @@ int SharedMemoryManager::currentInstanceIndex() const
     return -1;
 }
 
+bool SharedMemoryManager::isSingleInstance() const
+{
+    const SharedMemoryData data = d->readData();
+    return std::none_of(data.processes.cbegin(), data.processes.cend(),
+        [this](const auto& block) { return block.pid != 0 && block.pid != d->currentProcessPid; });
+}
+
 QList<int> SharedMemoryManager::runningInstancesIndices() const
 {
     const SharedMemoryData data = d->readData();

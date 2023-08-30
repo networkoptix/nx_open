@@ -56,6 +56,9 @@ public:
      */
     int currentInstanceIndex() const;
 
+    /** Whether current client instance is the only one running. */
+    bool isSingleInstance() const;
+
     /**
      * List of all currently running client instances' indices.
      */
