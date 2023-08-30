@@ -182,7 +182,9 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
         return false;
     }
 
-    userData->digest.clear();
+    // QnUserResource::digestAuthorizationEnabled() uses this value.
+    if (userData->digest != nx::vms::api::UserData::kHttpIsDisabledStub)
+        userData->digest.clear();
     userData->hash.clear();
     userData->cryptSha512Hash.clear();
     return true;
