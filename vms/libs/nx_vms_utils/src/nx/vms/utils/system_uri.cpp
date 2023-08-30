@@ -22,8 +22,6 @@ const QString kReferralContextKey = "context";
 const QString kResourceIdsKey = "resources";
 const QString kTimestampKey = "timestamp";
 
-const int kDefaultPort = 80;
-
 const int kUuidLength = 36;
 
 const QMap<SystemUri::Scope, QString> scopeToString
@@ -232,15 +230,12 @@ void parse(const nx::utils::Url& url, SystemUri* uri)
     if (uri->protocol != SystemUri::Protocol::Native)
         isDirectLink = false;
 
-    // Parse host.
-    auto host = url.host();
-    int port = url.port(kDefaultPort);
-    if (port != kDefaultPort)
-        host += ':' + QString::number(port);
+    // Parse address.
+    auto address = url.displayAddress();
 
     // Parse parameters and check if the link has a valid authorization data.
     parseParameters(url, uri);
-    if (isCloudHostname(host))
+    if (isCloudHostname(address))
     {
         if (uri->authCode.isEmpty())
             isDirectLink = false;
@@ -254,13 +249,13 @@ void parse(const nx::utils::Url& url, SystemUri* uri)
     if (isDirectLink)
     {
         uri->scope = SystemUri::Scope::direct;
-        uri->systemAddress = host;
+        uri->systemAddress = address;
         uri->clientCommand = SystemUri::ClientCommand::Client;
     }
     else
     {
         uri->scope = SystemUri::Scope::generic;
-        uri->cloudHost = host;
+        uri->cloudHost = address;
 
         if (path.isEmpty())
         {
