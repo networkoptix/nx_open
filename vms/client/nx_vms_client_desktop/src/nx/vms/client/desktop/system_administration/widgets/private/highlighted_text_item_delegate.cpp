@@ -12,6 +12,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/vms/common/html/html.h>
 
 namespace {
 
@@ -28,37 +29,6 @@ struct CacheKey
 static size_t qHash(const CacheKey& key, size_t seed = 0)
 {
     return qHashMulti(seed, key.text, key.width, key.color.rgba(), key.font);
-}
-
-QString highlightMatch(const QString& text, const QRegularExpression& rx)
-{
-    QString result;
-
-    if (!text.isEmpty())
-    {
-        static const QString kColorName =
-            nx::vms::client::core::colorTheme()->color("yellow_d1").name();
-
-        const QString fontBegin = QString("<font color=\"%1\">").arg(kColorName);
-        static const QString fontEnd = "</font>";
-        int pos = 0;
-        auto matchIterator = rx.globalMatch(text);
-        while (matchIterator.hasNext())
-        {
-            auto match = matchIterator.next();
-            if (match.capturedLength() == 0)
-                break;
-
-            result.append(text.mid(pos, match.capturedStart() - pos).toHtmlEscaped());
-            result.append(fontBegin);
-            result.append(match.captured().toHtmlEscaped());
-            result.append(fontEnd);
-            pos = match.capturedEnd();
-        }
-        result.append(text.mid(pos).toHtmlEscaped());
-    }
-
-    return result;
 }
 
 } // namespace
@@ -179,9 +149,10 @@ QSize HighlightedTextItemDelegate::sizeHint(
     initStyleOption(&opt, index);
 
     QTextDocument doc;
-    const auto text = highlightMatch(
+    const auto text = common::html::highlightMatch(
         opt.text,
-        Private::getSearchRx(opt));
+        Private::getSearchRx(opt),
+        core::colorTheme()->color("yellow_d1"));
 
     doc.setDefaultFont(option.font);
     doc.setDocumentMargin(0);
@@ -209,9 +180,10 @@ void HighlightedTextItemDelegate::paint(
     opt.rect = opt.rect.adjusted(
         style::Metrics::kStandardPadding, 0, -style::Metrics::kStandardPadding, 0);
 
-    const auto text = highlightMatch(
+    const auto text = common::html::highlightMatch(
         opt.text,
-        Private::getSearchRx(opt));
+        Private::getSearchRx(opt),
+        core::colorTheme()->color("yellow_d1"));
 
     if (QPixmap* pixmap = d->getPixmap(text, opt))
     {

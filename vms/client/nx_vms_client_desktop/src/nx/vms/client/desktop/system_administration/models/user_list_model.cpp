@@ -20,6 +20,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
@@ -355,6 +356,8 @@ int UserListModel::columnCount(const QModelIndex &parent) const
 
 QVariant UserListModel::data(const QModelIndex& index, int role) const
 {
+    using namespace common::html;
+
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
@@ -425,16 +428,18 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 }
 
                 case LoginColumn:
-                    return user->getName().toHtmlEscaped();
+                    return taggedIfNotEmpty(
+                        toHtmlEscaped(user->getName()), "div", "style=\"white-space:nowrap\"");
 
                 case FullNameColumn:
-                    return user->fullName().toHtmlEscaped();
+                    return taggedIfNotEmpty(
+                        toHtmlEscaped(user->fullName()), "div", "style=\"white-space:nowrap\"");
 
                 case EmailColumn:
                     return user->getEmail();
 
                 case UserGroupsColumn:
-                    return nx::vms::common::userGroupNames(user).join("<br>");
+                    return nx::vms::common::userGroupNames(user).join(kLineBreak);
 
                 default:
                     return QString(); // not QVariant() because we want to hide a tooltip if shown.

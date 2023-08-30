@@ -17,6 +17,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -284,6 +285,8 @@ int UserGroupListModel::columnCount(const QModelIndex& parent) const
 
 QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
 {
+    using namespace common::html;
+
     if (!index.isValid() || !NX_ASSERT(checkIndex(index)))
         return {};
 
@@ -344,10 +347,13 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                 }
 
                 case ParentGroupsColumn:
-                    return d->getParentGroupNames(group).join("<br>");
+                    return d->getParentGroupNames(group).join(kLineBreak);
 
                 default:
-                    return data(index, Qt::DisplayRole).toString();
+                    return taggedIfNotEmpty(
+                        toHtmlEscaped(data(index, Qt::DisplayRole).toString()),
+                        "div",
+                        "style=\"white-space:nowrap\"");
             }
         }
 
