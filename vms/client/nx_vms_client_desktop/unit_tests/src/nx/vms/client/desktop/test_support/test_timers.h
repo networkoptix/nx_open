@@ -43,6 +43,6 @@ private:
     QMultiMap<milliseconds, TestTimer*> m_timerEvents;
 };
 
-
+using TestTimerFactoryPtr = QSharedPointer<TestTimerFactory>;
 
 } // namespace nx::vms::client::desktop::test

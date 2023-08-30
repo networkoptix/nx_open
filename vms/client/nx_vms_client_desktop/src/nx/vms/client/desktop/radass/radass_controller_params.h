@@ -33,6 +33,9 @@ static constexpr double kLqToHqSizeThreshold = 1.34;
 // Try to balance every 500ms
 static constexpr auto kTimerInterval = 500ms;
 
+// How often recalculate whether overall CPU usage should be considered.
+static constexpr auto kUpdateCpuUsageModeInterval = 1min;
+
 // Every 10 minutes try to raise quality. Value in counter ticks.
 static constexpr int kAdditionalHQRetryCounter = 10 * 60 * 1000
     / static_cast<std::chrono::milliseconds>(kTimerInterval).count();
