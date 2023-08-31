@@ -132,12 +132,14 @@ void TemporaryUserExpirationWatcher::updateNotification()
 
     auto currentLevel = m_notificationManager->level(*m_notification);
 
-    if (duration_cast<std::chrono::hours>(timeLeft) >= kImportantNotificationTime
-        && currentLevel != QnNotificationLevel::Value::OtherNotification)
+    if (duration_cast<std::chrono::hours>(timeLeft) >= kImportantNotificationTime)
     {
-        m_notificationManager->setLevel(
-            *m_notification, QnNotificationLevel::Value::OtherNotification);
-        m_notificationManager->setIcon(*m_notification, qnSkin->pixmap("events/stopwatch.svg"));
+        if(currentLevel != QnNotificationLevel::Value::OtherNotification)
+        {
+            m_notificationManager->setLevel(
+                *m_notification, QnNotificationLevel::Value::OtherNotification);
+            m_notificationManager->setIcon(*m_notification, qnSkin->pixmap("events/stopwatch.svg"));
+        }
     }
     else if (currentLevel != QnNotificationLevel::Value::ImportantNotification)
     {
