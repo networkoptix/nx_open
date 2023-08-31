@@ -28,6 +28,9 @@ public:
 
     virtual QSize sizeHint() const override;
 
+signals:
+    void selectionUpdated();
+
 private:
     class Private;
     class Delegate;
