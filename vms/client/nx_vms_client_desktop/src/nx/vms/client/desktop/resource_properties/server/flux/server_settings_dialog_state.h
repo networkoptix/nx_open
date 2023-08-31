@@ -5,6 +5,7 @@
 #include <optional>
 
 #include <nx/vms/api/data/analytics_data.h>
+#include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/client/desktop/common/flux/abstract_flux_state.h>
 
 namespace nx::vms::client::desktop {
@@ -12,6 +13,21 @@ namespace nx::vms::client::desktop {
 struct NX_VMS_CLIENT_DESKTOP_API ServerSettingsDialogState: AbstractFluxState
 {
     bool isOnline = false;
+
+    struct BackupStoragesStatus
+    {
+        bool hasActiveBackupStorage = false;
+        bool usesCloudBackupStorage = false;
+        int enabledNonCloudStoragesCount = 0;
+    };
+    BackupStoragesStatus backupStoragesStatus;
+
+    struct SaasProperties
+    {
+        nx::vms::api::SaasState saasState = nx::vms::api::SaasState::uninitialized;
+        nx::vms::api::ServiceTypeStatus cloudStorageServicesStatus;
+    };
+    SaasProperties saasProperties;
 
     struct PluginsInformation
     {

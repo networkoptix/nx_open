@@ -17,6 +17,18 @@ public:
 
     static State setOnline(State state, bool value);
 
+    static State setBackupStoragesStatus(
+        State state,
+        ServerSettingsDialogState::BackupStoragesStatus storagesStatus);
+
+    static State setSaasState(
+        State state,
+        nx::vms::api::SaasState saasState);
+
+    static State setSaasCloudStorageServicesStatus(
+        State state,
+        nx::vms::api::ServiceTypeStatus servicesStatus);
+
     static State setPluginModules(
         State state, const nx::vms::api::PluginInfoList& value);
     static State selectCurrentPlugin(State state, const QString& libraryFilename);

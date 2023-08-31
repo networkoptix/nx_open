@@ -7,17 +7,66 @@
 
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
+#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
+#include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
-#include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
-#include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
-#include <ui/workbench/workbench_context.h>
+#include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <ui/delegates/resource_item_delegate.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+void defaultDetailsPanelUpdateFunction(
+    const QModelIndex& index,
+    ResourceDetailsWidget* detailsWidget)
+{
+    static constexpr int kResourceColumn = 0;
+
+    if (!index.isValid())
+    {
+        detailsWidget->clear();
+        return;
+    }
+
+    const auto resourceIndex = index.siblingAtColumn(kResourceColumn);
+    detailsWidget->setCaption(resourceIndex.data(Qt::DisplayRole).toString());
+    detailsWidget->setThumbnailCameraResource(
+        resourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>());
+}
+
+bool isIndexWithinRange(
+    const QModelIndex& index,
+    const QModelIndex& topLeft,
+    const QModelIndex& bottomRight)
+{
+    if (!index.isValid())
+        return false;
+
+    if (!NX_ASSERT(topLeft.isValid() && bottomRight.isValid()))
+        return false;
+
+    if (!NX_ASSERT(index.model() == topLeft.model()))
+        return false;
+
+    if (index.parent() != topLeft.parent())
+        return false;
+
+    if (index.column() < topLeft.column() || index.column() > bottomRight.column())
+        return false;
+
+    if (index.row() < topLeft.row() || index.row() > bottomRight.row())
+        return false;
+
+    return true;
+}
+
+} //namespace
 
 using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 
@@ -30,7 +79,8 @@ DetailedResourceTreeWidget::DetailedResourceTreeWidget(
     ui(new Ui::DetailedResourceTreeWidget()),
     m_treeEntityBuilder(new entity_resource_tree::ResourceTreeEntityBuilder(systemContext())),
     m_entityModel(new entity_item_model::EntityItemModel(columnCount)),
-    m_iconDecoratorModel(new ResourceTreeIconDecoratorModel())
+    m_iconDecoratorModel(new ResourceTreeIconDecoratorModel()),
+    m_detailsPanelUpdateFunction(defaultDetailsPanelUpdateFunction)
 {
     ui->setupUi(this);
 
@@ -46,7 +96,10 @@ DetailedResourceTreeWidget::DetailedResourceTreeWidget(
             m_treeEntity = std::move(newTreeEntity);
         });
 
-    connect(resourceViewWidget(), &FilteredResourceViewWidget::itemHovered,
+    connect(resourceViewWidget()->itemViewHoverTracker(), &ItemViewHoverTracker::itemEnter,
+        this, &DetailedResourceTreeWidget::updateDetailsPanel);
+
+    connect(resourceViewWidget()->itemViewHoverTracker(), &ItemViewHoverTracker::itemLeave,
         this, &DetailedResourceTreeWidget::updateDetailsPanel);
 
     m_treeEntityBuilder->setUser(accessController()->user());
@@ -103,25 +156,20 @@ ResourceDetailsWidget* DetailedResourceTreeWidget::detailsPanelWidget() const
     return ui->detailsWidget;
 }
 
-void DetailedResourceTreeWidget::updateDetailsPanel(const QModelIndex& index)
+void DetailedResourceTreeWidget::updateDetailsPanel()
 {
+    if (isDetailsPanelHidden())
+        return;
+
     if (m_detailsPanelUpdateFunction)
     {
-        m_detailsPanelUpdateFunction(index, detailsPanelWidget());
-    }
-    else
-    {
-        if (!index.isValid())
-        {
-            ui->detailsWidget->setCaptionText({});
-            ui->detailsWidget->setThumbnailCameraResource({});
-            return;
-        }
+        detailsPanelWidget()->setUpdatesEnabled(false);
 
-        const auto resourceIndex = index.siblingAtColumn(0);
-        ui->detailsWidget->setCaptionText(resourceIndex.data(Qt::DisplayRole).toString());
-        ui->detailsWidget->setThumbnailCameraResource(
-            resourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>());
+        const auto sourceIndex = resourceViewWidget()->toSourceIndex(
+            resourceViewWidget()->itemViewHoverTracker()->hoveredIndex());
+        m_detailsPanelUpdateFunction(sourceIndex, detailsPanelWidget());
+
+        detailsPanelWidget()->setUpdatesEnabled(true);
     }
 }
 
@@ -160,6 +208,14 @@ void DetailedResourceTreeWidget::showEvent(QShowEvent* event)
     {
         resourceViewWidget()->setSourceModel(model());
         setupHeader();
+        connect(model(), &QAbstractItemModel::dataChanged, this,
+            [this](const QModelIndex& topLeft, const QModelIndex& bottomRight)
+            {
+                const auto sourceIndex = resourceViewWidget()->toSourceIndex(
+                    resourceViewWidget()->itemViewHoverTracker()->hoveredIndex());
+                if (isIndexWithinRange(sourceIndex, topLeft, bottomRight))
+                    updateDetailsPanel();
+            });
     }
 
     ui->filteredResourceSelectionWidget->makeRequiredItemsVisible();
@@ -174,9 +230,17 @@ bool DetailedResourceTreeWidget::isDetailsPanelHidden() const
     return ui->detailsContainer->isHidden();
 }
 
-void DetailedResourceTreeWidget::setDetailsPanelHidden(bool value)
+void DetailedResourceTreeWidget::setDetailsPanelHidden(bool hide)
 {
-    ui->detailsContainer->setHidden(value);
+    if (isDetailsPanelHidden() == hide)
+        return;
+
+    ui->detailsContainer->setHidden(hide);
+
+    if (hide)
+        ui->detailsWidget->clear();
+    else
+        updateDetailsPanel();
 }
 
 } // namespace nx::vms::client::desktop

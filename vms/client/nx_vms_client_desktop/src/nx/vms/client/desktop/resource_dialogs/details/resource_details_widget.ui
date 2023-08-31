@@ -15,10 +15,10 @@
     <widget class="nx::vms::client::desktop::AsyncImageWidget" name="cameraPreviewWidget" native="true"/>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::TextEditLabel" name="captionTextLabel"/>
+    <widget class="nx::vms::client::desktop::TextEditLabel" name="captionLabel"/>
    </item>
    <item>
-    <widget class="QLabel" name="descriptionLabel">
+    <widget class="QLabel" name="messageLabel">
      <property name="wordWrap">
       <bool>true</bool>
      </property>
@@ -27,9 +27,6 @@
    <item>
     <widget class="QWidget" name="warningContainer" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="spacing">
-       <number>2</number>
-      </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -42,53 +39,6 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QWidget" name="warningCaptionContainer" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="spacing">
-          <number>4</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="warningIconLabel"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="warningCaptionLabel"/>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="warningExplanationLabel">
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>

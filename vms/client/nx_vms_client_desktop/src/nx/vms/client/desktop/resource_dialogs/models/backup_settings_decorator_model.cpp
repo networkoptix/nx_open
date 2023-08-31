@@ -19,9 +19,12 @@
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
+#include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/system_settings.h>
 
 namespace {
@@ -118,6 +121,11 @@ bool cameraHasNotRemovedFlag(const QnVirtualCameraResourcePtr& camera)
     return !camera->hasFlags(Qn::ResourceFlag::removed);
 }
 
+int cameraMaxResolutionMegaPixels(const QnVirtualCameraResourcePtr& camera)
+{
+    return camera->cameraMediaCapability().maxResolution.megaPixels();
+}
+
 ScopedChangeNotifier<bool> makeHasChangesNotifier(
     nx::vms::client::desktop::BackupSettingsDecoratorModel* decoratorModel)
 {
@@ -134,6 +142,9 @@ ScopedChangeNotifier<nx::vms::api::BackupSettings> makeGlobalBackupSettingsChang
         [decoratorModel]{ emit decoratorModel->globalBackupSettingsChanged(); });
 }
 
+using MessageTexts = std::pair<QString, QString>;
+using MessageTextsList = QVector<MessageTexts>;
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -141,144 +152,143 @@ namespace nx::vms::client::desktop {
 using namespace nx::vms::api;
 using namespace backup_settings_view;
 
-BackupSettingsDecoratorModel::BackupSettingsDecoratorModel(SystemContext* systemContext):
-    base_type(nullptr),
-    SystemContextAware(systemContext)
+//-------------------------------------------------------------------------------------------------
+// BackupSettingsDecoratorModel::Private declaration.
+
+struct BackupSettingsDecoratorModel::Private
 {
-    connect(this, &BackupSettingsDecoratorModel::rowsAboutToBeRemoved,
-        this, &BackupSettingsDecoratorModel::onRowsAboutToBeRemoved);
-}
+    BackupSettingsDecoratorModel* const q;
 
-BackupSettingsDecoratorModel::~BackupSettingsDecoratorModel()
-{
-}
+    QHash<QnVirtualCameraResourcePtr, BackupContentTypes> changedContentTypes;
+    QHash<QnVirtualCameraResourcePtr, CameraBackupQuality> changedQuality;
+    QHash<QnVirtualCameraResourcePtr, bool> changedEnabledState;
+    std::optional<nx::vms::api::BackupSettings> changedGlobalBackupSettings;
 
-QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) const
-{
-    const auto camera = cameraResource(index);
+    bool isCloudBackupStorage = false;
+    std::unique_ptr<nx::vms::common::saas::CloudStorageServiceUsageHelper> cloudStorageUsageHelper;
 
-    if (isNewAddedCamerasRow(mapToSource(index)))
-    {
-        switch (role)
-        {
-            case Qt::DisplayRole:
-                if (index.column() == ContentTypesColumn)
-                    return backupContentTypesToString(BackupContentType::archive);
-                break;
-            case Qt::ToolTipRole:
-                if (index.column() == ContentTypesColumn)
-                    return tr("Cannot be modified for new added cameras");
-                break;
-            case BackupEnabledRole:
-                if (index.column() == SwitchColumn)
-                    return globalBackupSettings().backupNewCameras;
-                break;
-            case BackupQualityRole:
-                if (index.column() == QualityColumn)
-                    return globalBackupSettings().quality;
-                break;
-            case HasDropdownMenuRole:
-                if (!isDropdownColumn(index))
-                    return {};
-                return index.column() == QualityColumn;
-            default:
-                break;
-        }
-    }
-    else if (!camera.isNull())
-    {
-        if (!isBackupSupported(camera))
-        {
-            if (index.column() == ContentTypesColumn)
-            {
-                if (role == Qt::DisplayRole)
-                    return tr("Not supported");
-                if (role == Qt::ToolTipRole)
-                    return tr("Backup is not supported for this device");
-            }
-            return base_type::data(index, role);
-        }
+    BackupContentTypes backupContentTypes(const QnVirtualCameraResourcePtr& camera) const;
+    CameraBackupQuality backupQuality(const QnVirtualCameraResourcePtr& camera) const;
+    bool backupEnabled(const QnVirtualCameraResourcePtr& camera) const;
 
-        switch (role)
-        {
-            case Qt::ToolTipRole:
-                if (index.column() == QualityColumn && !camera->hasVideo())
-                    return tr("Stream setting is not applicable to this device type");
-                if (index.column() == QualityColumn && !camera->hasDualStreaming())
-                    return tr("This device provides only one data stream");
-                break;
-            case BackupEnabledRole:
-                return backupEnabled(camera);
-            case BackupContentTypesRole:
-                return static_cast<int>(backupContentTypes(camera));
-            case BackupQualityRole:
-                return static_cast<int>(backupQuality(camera));
-            case HasDropdownMenuRole:
-                if (!isDropdownColumn(index))
-                    return {};
-                return index.column() != QualityColumn || camera->hasDualStreaming();
-            case NothingToBackupWarningRole:
-                return nothingToBackupWarningData(index);
-            case IsItemHighlightedRole:
-                if (index.column() == ResourceColumn)
-                    return backupEnabled(camera);
-                break;
+    void setGlobalBackupSettings(const nx::vms::api::BackupSettings& backupSettings);
 
-            default:
-                break;
-        }
-    }
+    QnVirtualCameraResourceList camerasToApplySettings() const;
+    void onRowsAboutToBeRemoved(const QModelIndex& parent, int first, int last);
 
-    return base_type::data(index, role);
-}
+    std::optional<MessageTexts> nothingToBackupWarning(const QModelIndex& index) const;
+    std::optional<MessageTexts> servicesOveruseWarning(const QModelIndex& index) const;
 
-BackupContentTypes BackupSettingsDecoratorModel::backupContentTypes(
+    int availableCloudStorageServices(const QnVirtualCameraResourcePtr& camera) const;
+    void proposeServicesUsageChange();
+
+    bool hasChanges() const;
+    void applyChanges();
+    void discardChanges();
+};
+
+//-------------------------------------------------------------------------------------------------
+// BackupSettingsDecoratorModel::Private definition.
+
+BackupContentTypes BackupSettingsDecoratorModel::Private::backupContentTypes(
     const QnVirtualCameraResourcePtr& camera) const
 {
-    if (m_changedContentTypes.contains(camera))
-        return m_changedContentTypes.value(camera);
+    if (changedContentTypes.contains(camera))
+        return changedContentTypes.value(camera);
 
     return camera->getBackupContentType();
 }
 
-CameraBackupQuality BackupSettingsDecoratorModel::backupQuality(
+CameraBackupQuality BackupSettingsDecoratorModel::Private::backupQuality(
     const QnVirtualCameraResourcePtr& camera) const
 {
     if (!camera->hasDualStreaming())
         return CameraBackupQuality::CameraBackup_Both;
 
-    if (m_changedQuality.contains(camera))
-        return m_changedQuality.value(camera);
+    if (changedQuality.contains(camera))
+        return changedQuality.value(camera);
 
     return camera->getActualBackupQualities();
 }
 
-bool BackupSettingsDecoratorModel::backupEnabled(
+bool BackupSettingsDecoratorModel::Private::backupEnabled(
     const QnVirtualCameraResourcePtr& camera) const
 {
-    if (m_changedEnabledState.contains(camera))
-        return m_changedEnabledState.value(camera);
+    if (changedEnabledState.contains(camera))
+        return changedEnabledState.value(camera);
 
     return camera->isBackupEnabled();
 }
 
-QVariant BackupSettingsDecoratorModel::nothingToBackupWarningData(const QModelIndex& index) const
+void BackupSettingsDecoratorModel::Private::setGlobalBackupSettings(
+    const BackupSettings& backupSettings)
 {
-    if (index.column() != ContentTypesColumn)
+    auto globalBackupSettingsChangesNotifier = makeGlobalBackupSettingsChangesNotifier(q);
+    auto hasChangesNotifier = makeHasChangesNotifier(q);
+
+    const auto savedGlobalBackupSettings = q->systemContext()->systemSettings()->backupSettings;
+    if (savedGlobalBackupSettings == backupSettings)
+        changedGlobalBackupSettings.reset();
+    else
+        changedGlobalBackupSettings = backupSettings;
+}
+
+QnVirtualCameraResourceList BackupSettingsDecoratorModel::Private::camerasToApplySettings() const
+{
+    QnVirtualCameraResourceList cameras =
+        changedContentTypes.keys() + changedQuality.keys() + changedEnabledState.keys();
+
+    if (changedGlobalBackupSettings)
+    {
+        cameras.append(q->resourcePool()->getAllCameras(QnResourcePtr(), /*ignoreDesktopCameras*/ true)
+            .filtered(cameraHasDefaultBackupSettings));
+    }
+
+    std::sort(cameras.begin(), cameras.end());
+    const auto newEnd = std::unique(cameras.begin(), cameras.end());
+    cameras.erase(newEnd, cameras.end());
+
+    return cameras.filtered(cameraHasNotRemovedFlag);
+}
+
+void BackupSettingsDecoratorModel::Private::onRowsAboutToBeRemoved(
+    const QModelIndex& parent, int first, int last)
+{
+    auto hasChangesNotifier = makeHasChangesNotifier(q);
+
+    for (int row = first; row <= last; ++row)
+    {
+        if (const auto camera = q->cameraResource(q->index(row, ResourceColumn, parent)))
+        {
+            changedContentTypes.remove(camera);
+            changedQuality.remove(camera);
+            changedEnabledState.remove(camera);
+        }
+    }
+}
+
+std::optional<MessageTexts> BackupSettingsDecoratorModel::Private::nothingToBackupWarning(
+    const QModelIndex& index) const
+{
+    const auto warningCaption = tr("Nothing to backup");
+
+    if (index.column() != ContentTypesColumn && index.column() != WarningIconColumn)
         return {};
 
-    const auto camera = cameraResource(index);
+    const auto camera = q->cameraResource(index);
     if (camera.isNull() || !backupEnabled(camera))
         return {};
 
-    const auto resourceExtraStatus = mapToSource(index).siblingAtColumn(ResourceColumn)
+    const auto resourceExtraStatus = q->mapToSource(index).siblingAtColumn(ResourceColumn)
         .data(Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>();
 
     if (!resourceExtraStatus.testFlag(ResourceExtraStatusFlag::hasArchive)
         && !resourceExtraStatus.testFlag(ResourceExtraStatusFlag::scheduled)
         && !resourceExtraStatus.testFlag(ResourceExtraStatusFlag::recording))
     {
-        return tr("The camera has neither recorded footage nor recording scheduled");
+        return {{
+            warningCaption,
+            tr("The camera has neither recorded footage nor recording scheduled")}};
     }
 
     const auto cameraHasAnalytics = !camera->supportedObjectTypes().empty();
@@ -288,42 +298,315 @@ QVariant BackupSettingsDecoratorModel::nothingToBackupWarningData(const QModelIn
     if (backupContentTypes(camera) == BackupContentTypes(BackupContentType::motion)
         && !camera->isMotionDetectionActive())
     {
-        return noMotionWarningText;
+        return {{warningCaption, noMotionWarningText}};
     }
 
     if (backupContentTypes(camera) == BackupContentTypes(BackupContentType::analytics)
         && !cameraHasAnalytics)
     {
-        return noAnalyticsWarningText;
+        return {{warningCaption, noAnalyticsWarningText}};
     }
 
     if (backupContentTypes(camera) == BackupContentTypes(
         {BackupContentType::motion, BackupContentType::analytics})
             && (!camera->isMotionDetectionActive() && !cameraHasAnalytics))
     {
-        return QStringList({noMotionWarningText, noAnalyticsWarningText}).join(QChar::LineFeed);
+        return {{warningCaption,
+            QStringList({noMotionWarningText, noAnalyticsWarningText}).join(QChar::LineFeed)}};
     }
 
     return {};
 }
 
-BackupSettings BackupSettingsDecoratorModel::globalBackupSettings() const
+std::optional<MessageTexts> BackupSettingsDecoratorModel::Private::servicesOveruseWarning(
+    const QModelIndex& index) const
 {
-    return m_changedGlobalBackupSettings
-        ? *m_changedGlobalBackupSettings
-        : systemContext()->systemSettings()->backupSettings;
+    if (!isCloudBackupStorage)
+        return {};
+
+    const auto camera = q->cameraResource(index);
+    if (camera.isNull() || !backupEnabled(camera))
+        return {};
+
+    const auto availableServices = availableCloudStorageServices(camera);
+    if (availableServices < 0) //< Services overflow.
+    {
+        return {{
+            tr("Insufficient services"),
+            tr("%n suitable cloud storage services are required", "", -availableServices)}};
+    }
+
+    return {};
 }
 
-void BackupSettingsDecoratorModel::setGlobalBackupSettings(const BackupSettings& backupSettings)
+int BackupSettingsDecoratorModel::Private::availableCloudStorageServices(
+    const QnVirtualCameraResourcePtr& camera) const
 {
-    auto globalBackupSettingsChangesNotifier = makeGlobalBackupSettingsChangesNotifier(this);
-    auto hasChangesNotifier = makeHasChangesNotifier(this);
+    const auto resolution = cameraMaxResolutionMegaPixels(camera);
+    const auto servicesSummary = cloudStorageUsageHelper->allInfoForResolution(resolution);
+    return servicesSummary.available - servicesSummary.inUse;
+}
 
-    const auto savedGlobalBackupSettings = systemContext()->systemSettings()->backupSettings;
-    if (savedGlobalBackupSettings == backupSettings)
-        m_changedGlobalBackupSettings.reset();
-    else
-        m_changedGlobalBackupSettings = backupSettings;
+void BackupSettingsDecoratorModel::Private::proposeServicesUsageChange()
+{
+    std::set<QnUuid> toAdd;
+    std::set<QnUuid> toRemove;
+    for (auto i = changedEnabledState.begin(); i != changedEnabledState.end(); ++i)
+    {
+        if (i.value())
+            toAdd.insert(i.key()->getId());
+        else
+            toRemove.insert(i.key()->getId());
+    }
+    cloudStorageUsageHelper->proposeChange(toAdd, toRemove);
+}
+
+bool BackupSettingsDecoratorModel::Private::hasChanges() const
+{
+    return !changedContentTypes.isEmpty()
+        || !changedQuality.isEmpty()
+        || !changedEnabledState.isEmpty()
+        || changedGlobalBackupSettings;
+}
+
+void BackupSettingsDecoratorModel::Private::applyChanges()
+{
+    const auto cameras = camerasToApplySettings();
+    if (!cameras.isEmpty())
+    {
+        qnResourcesChangesManager->saveCameras(cameras,
+            [this](const auto& camera)
+            {
+                camera->setBackupContentType(backupContentTypes(camera));
+                camera->setBackupQuality(backupQuality(camera));
+                camera->setBackupPolicy(backupEnabled(camera)
+                    ? BackupPolicy::on
+                    : BackupPolicy::off);
+            });
+    }
+
+    if (changedGlobalBackupSettings)
+    {
+        q->systemContext()->systemSettings()->backupSettings = changedGlobalBackupSettings.value();
+        q->systemContext()->systemSettingsManager()->saveSystemSettings();
+    }
+
+    changedContentTypes.clear();
+    changedQuality.clear();
+    changedEnabledState.clear();
+    changedGlobalBackupSettings.reset();
+}
+
+void BackupSettingsDecoratorModel::Private::discardChanges()
+{
+    auto hasChangesNotifier = makeHasChangesNotifier(q);
+
+    changedContentTypes.clear();
+    changedQuality.clear();
+    changedEnabledState.clear();
+    changedGlobalBackupSettings.reset();
+}
+
+//-------------------------------------------------------------------------------------------------
+// BackupSettingsDecoratorModel definition.
+
+BackupSettingsDecoratorModel::BackupSettingsDecoratorModel(
+    ServerSettingsDialogStore* store,
+    SystemContext* systemContext)
+    :
+    base_type(nullptr),
+    SystemContextAware(systemContext),
+    d(new Private{this})
+{
+    connect(this, &BackupSettingsDecoratorModel::rowsAboutToBeRemoved,
+        [this](const QModelIndex& parent, int first, int last)
+        {
+            d->onRowsAboutToBeRemoved(parent, first, last);
+        });
+
+    connect(store, &ServerSettingsDialogStore::stateChanged,
+        this, &BackupSettingsDecoratorModel::loadState);
+}
+
+BackupSettingsDecoratorModel::~BackupSettingsDecoratorModel()
+{
+}
+
+QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) const
+{
+    if (!index.isValid())
+        return {};
+
+    const auto column = index.column();
+
+    // Data for 'New added cameras' pinned row. Doesn't make sense for cloud storage backup
+    // settings since model doesn't contain that row in that case.
+    if (isNewAddedCamerasRow(mapToSource(index)))
+    {
+        switch (role)
+        {
+            case Qt::DisplayRole:
+                if (column == ContentTypesColumn)
+                    return backupContentTypesToString(BackupContentType::archive);
+                break;
+            case Qt::ToolTipRole:
+                if (column == ContentTypesColumn)
+                    return tr("Cannot be modified for new added cameras");
+                break;
+            case BackupEnabledRole:
+                if (column == SwitchColumn)
+                    return globalBackupSettings().backupNewCameras;
+                break;
+            case BackupQualityRole:
+                if (column == QualityColumn)
+                    return globalBackupSettings().quality;
+                break;
+            case HasDropdownMenuRole:
+                return column == QualityColumn;
+
+            default:
+                return base_type::data(index, role);
+        }
+    }
+
+    // No additional data for rows that doesn't contain camera resource.
+    const auto camera = cameraResource(index);
+    if (camera.isNull())
+        return base_type::data(index, role);
+
+    // Data for rows that contain camera resource which doesn't support backup, lile NVRs.
+    if (!isBackupSupported(camera) && column == ContentTypesColumn)
+    {
+        switch (role)
+        {
+            case Qt::DisplayRole:
+                return tr("Not supported");
+
+            case Qt::ToolTipRole:
+                return tr("Backup is not supported for this device");
+
+            default:
+                return base_type::data(index, role);;
+        }
+    }
+
+    // Data for rows that contain camera resource which supports backup.
+    const auto backupEnabled = d->backupEnabled(camera);
+    const auto cameraResolution = cameraMaxResolutionMegaPixels(camera);
+
+    const auto availableServices = d->isCloudBackupStorage
+        ? d->availableCloudStorageServices(camera) : 0;
+    const auto insufficientServices = d->isCloudBackupStorage && availableServices <= 0;
+
+    const auto nothingToBackupWarning = d->nothingToBackupWarning(index);
+    const auto servicesOveruseWarning = d->servicesOveruseWarning(index);
+
+    switch (role)
+    {
+        case Qt::DisplayRole:
+            if (column == ResolutionColumn && cameraResolution > 0)
+                return tr("%n MP", "", cameraResolution);
+            break;
+
+        case Qt::ToolTipRole:
+            if (column == ResolutionColumn)
+            {
+                return cameraResolution > 0
+                    ? tr("%n Megapixels", "", cameraResolution)
+                    : tr("Unknown resolution");
+            }
+
+            if (column == QualityColumn && !camera->hasVideo())
+                return tr("Stream setting is not applicable to this device type");
+
+            if (column == QualityColumn && !camera->hasDualStreaming())
+                return tr("This device provides only one data stream");
+
+            if (column == SwitchColumn && insufficientServices && !backupEnabled)
+                return tr("No suitable cloud storage services available");
+            break;
+
+        case Qn::ItemMouseCursorRole:
+            if (column == SwitchColumn && insufficientServices && !backupEnabled)
+                return QVariant::fromValue<int>(Qt::ForbiddenCursor);
+            break;
+
+        case IsItemHighlightedRole:
+            if (column == ResourceColumn)
+                return backupEnabled;
+            break;
+
+        case BackupEnabledRole:
+            return backupEnabled;
+
+        case BackupContentTypesRole:
+            return static_cast<int>(d->backupContentTypes(camera));
+
+        case BackupQualityRole:
+            return static_cast<int>(d->backupQuality(camera));
+
+        case HasDropdownMenuRole:
+            if (!isDropdownColumn(index))
+                return {};
+            return column != QualityColumn || camera->hasDualStreaming();
+
+        case InfoMessageRole:
+            if (d->isCloudBackupStorage && !backupEnabled && !servicesOveruseWarning)
+            {
+                return availableServices > 0
+                    ? tr("%n suitable cloud storage services available", "", availableServices)
+                    : tr("No suitable cloud storage services available");
+            }
+            break;
+
+        case IsItemWarningStyleRole:
+            if ((column == ContentTypesColumn || column == WarningIconColumn)
+                && nothingToBackupWarning)
+            {
+                return true;
+            }
+            if (column == ResourceColumn && servicesOveruseWarning)
+            {
+                return true;
+            }
+            break;
+
+        case WarningMessagesRole:
+            {
+                MessageTextsList warningMessages;
+
+                if (servicesOveruseWarning)
+                    warningMessages.append(servicesOveruseWarning.value());
+
+                if ((column == ContentTypesColumn || column == WarningIconColumn)
+                    && nothingToBackupWarning)
+                {
+                    warningMessages.append(nothingToBackupWarning.value());
+                }
+                return QVariant::fromValue(warningMessages);
+            }
+            break;
+
+        case ResolutionMegaPixelRole:
+            return cameraResolution;
+
+        case AvailableCloudStorageServices:
+            if (d->isCloudBackupStorage)
+                return d->availableCloudStorageServices(camera);
+            break;
+
+        default:
+            break;
+    }
+
+    return base_type::data(index, role);
+}
+
+BackupSettings BackupSettingsDecoratorModel::globalBackupSettings() const
+{
+    return d->changedGlobalBackupSettings
+        ? *d->changedGlobalBackupSettings
+        : systemContext()->systemSettings()->backupSettings;
 }
 
 void BackupSettingsDecoratorModel::setBackupContentTypes(
@@ -341,9 +624,9 @@ void BackupSettingsDecoratorModel::setBackupContentTypes(
         if (!NX_ASSERT(isBackupSupported(camera)))
             continue;
 
-        if (backupContentTypes(camera) != contentTypes)
+        if (d->backupContentTypes(camera) != contentTypes)
         {
-            m_changedContentTypes.insert(camera, contentTypes);
+            d->changedContentTypes.insert(camera, contentTypes);
             dataChangedScopedAccumulator.rowDataChanged(index);
         }
     }
@@ -365,7 +648,7 @@ void BackupSettingsDecoratorModel::setBackupQuality(
             if (backupSettings.quality != quality)
             {
                 backupSettings.quality = quality;
-                setGlobalBackupSettings(backupSettings);
+                d->setGlobalBackupSettings(backupSettings);
                 dataChangedScopedAccumulator.rowDataChanged(index);
             }
         }
@@ -377,9 +660,9 @@ void BackupSettingsDecoratorModel::setBackupQuality(
             if (!camera->hasDualStreaming())
                 continue;
 
-            if (backupQuality(camera) != quality)
+            if (d->backupQuality(camera) != quality)
             {
-                m_changedQuality.insert(camera, quality);
+                d->changedQuality.insert(camera, quality);
                 dataChangedScopedAccumulator.rowDataChanged(index);
             }
         }
@@ -402,7 +685,7 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
             if (backupSettings.backupNewCameras != enabled)
             {
                 backupSettings.backupNewCameras = enabled;
-                setGlobalBackupSettings(backupSettings);
+                d->setGlobalBackupSettings(backupSettings);
                 dataChangedScopedAccumulator.rowDataChanged(index);
             }
         }
@@ -411,15 +694,25 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
             if (!NX_ASSERT(isBackupSupported(camera)))
                 continue;
 
-            if (backupEnabled(camera) != enabled)
+            if (enabled
+                && d->isCloudBackupStorage
+                && d->availableCloudStorageServices(camera) < 1)
             {
-                if (m_changedEnabledState.contains(camera))
-                    m_changedEnabledState.remove(camera);
-                else
-                    m_changedEnabledState.insert(camera, enabled);
+                continue;
+            }
 
+            if (d->backupEnabled(camera) != enabled)
+            {
+                if (d->changedEnabledState.contains(camera))
+                    d->changedEnabledState.remove(camera);
+                else
+                    d->changedEnabledState.insert(camera, enabled);
+                
                 dataChangedScopedAccumulator.rowDataChanged(index);
             }
+
+            if (d->isCloudBackupStorage)
+                d->proposeServicesUsageChange();
         }
     }
 }
@@ -437,6 +730,8 @@ QVariant BackupSettingsDecoratorModel::headerData(
         case ResourceColumn:
             // TODO: #vbreus Find smarter way of header text aligning.
             return tr("Cameras").prepend(QString(10, QChar::Space));
+        case ResolutionColumn:
+            return tr("Resolution");
         case ContentTypesColumn:
             return tr("What to backup");
         case QualityColumn:
@@ -462,89 +757,41 @@ QnVirtualCameraResourcePtr BackupSettingsDecoratorModel::cameraResource(
     return resourceData.value<QnResourcePtr>().dynamicCast<QnVirtualCameraResource>();
 }
 
+void BackupSettingsDecoratorModel::loadState(const ServerSettingsDialogState& state)
+{
+    if (d->isCloudBackupStorage == state.backupStoragesStatus.usesCloudBackupStorage)
+        return;
+
+    d->isCloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage;
+
+    d->cloudStorageUsageHelper.reset(d->isCloudBackupStorage
+        ? new nx::vms::common::saas::CloudStorageServiceUsageHelper(systemContext())
+        : nullptr);
+}
+
 bool BackupSettingsDecoratorModel::hasChanges() const
 {
-    return !m_changedContentTypes.isEmpty()
-        || !m_changedQuality.isEmpty()
-        || !m_changedEnabledState.isEmpty()
-        || m_changedGlobalBackupSettings;
+    return d->hasChanges();
 }
 
 void BackupSettingsDecoratorModel::discardChanges()
 {
-    auto hasChangesNotifier = makeHasChangesNotifier(this);
+    d->discardChanges();
 
-    m_changedContentTypes.clear();
-    m_changedQuality.clear();
-    m_changedEnabledState.clear();
-    m_changedGlobalBackupSettings.reset();
+    if (d->isCloudBackupStorage)
+        d->proposeServicesUsageChange();
 
     if (rowCount() > 0)
-        emit dataChanged(index(0, ContentTypesColumn), index(rowCount() - 1, SwitchColumn));
+    {
+        emit dataChanged(
+            index(0, WarningIconColumn),
+            index(rowCount() - 1, ColumnCount - 1));
+    }
 }
 
 void BackupSettingsDecoratorModel::applyChanges()
 {
-    const auto cameras = camerasToApplySettings();
-    if (!cameras.isEmpty())
-    {
-        qnResourcesChangesManager->saveCameras(cameras,
-            [this](const auto& camera)
-            {
-                camera->setBackupContentType(backupContentTypes(camera));
-                camera->setBackupQuality(backupQuality(camera));
-                camera->setBackupPolicy(backupEnabled(camera)
-                    ? BackupPolicy::on
-                    : BackupPolicy::off);
-            });
-    }
-
-    if (m_changedGlobalBackupSettings)
-    {
-        systemContext()->systemSettings()->backupSettings =
-            m_changedGlobalBackupSettings.value();
-
-        systemContext()->systemSettingsManager()->saveSystemSettings();
-    }
-
-    m_changedContentTypes.clear();
-    m_changedQuality.clear();
-    m_changedEnabledState.clear();
-    m_changedGlobalBackupSettings.reset();
-}
-
-QnVirtualCameraResourceList BackupSettingsDecoratorModel::camerasToApplySettings() const
-{
-    QnVirtualCameraResourceList cameras =
-        m_changedContentTypes.keys() + m_changedQuality.keys() + m_changedEnabledState.keys();
-
-    if (m_changedGlobalBackupSettings)
-    {
-        cameras.append(resourcePool()->getAllCameras(QnResourcePtr(), /*ignoreDesktopCameras*/ true)
-            .filtered(cameraHasDefaultBackupSettings));
-    }
-
-    std::sort(cameras.begin(), cameras.end());
-    const auto newEnd = std::unique(cameras.begin(), cameras.end());
-    cameras.erase(newEnd, cameras.end());
-
-    return cameras.filtered(cameraHasNotRemovedFlag);
-}
-
-void BackupSettingsDecoratorModel::onRowsAboutToBeRemoved(
-    const QModelIndex& parent, int first, int last)
-{
-    auto hasChangesNotifier = makeHasChangesNotifier(this);
-
-    for (int row = first; row <= last; ++row)
-    {
-        if (const auto camera = cameraResource(index(row, ResourceColumn, parent)))
-        {
-            m_changedContentTypes.remove(camera);
-            m_changedQuality.remove(camera);
-            m_changedEnabledState.remove(camera);
-        }
-    }
+    d->applyChanges();
 }
 
 } // namespace nx::vms::client::desktop

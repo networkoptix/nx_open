@@ -171,6 +171,26 @@ void ServerSettingsDialogStore::setOnline(bool value)
     d->executeAction([&](State state) { return Reducer::setOnline(std::move(state), value); });
 }
 
+void ServerSettingsDialogStore::setBackupStoragesStatus(
+    ServerSettingsDialogState::BackupStoragesStatus backupStoragesStatus)
+{
+    d->executeAction([&](State state)
+        { return Reducer::setBackupStoragesStatus(std::move(state), backupStoragesStatus); });
+}
+
+void ServerSettingsDialogStore::setSaasState(nx::vms::api::SaasState saasState)
+{
+    d->executeAction([&](State state)
+        { return Reducer::setSaasState(std::move(state), saasState); });
+}
+
+void ServerSettingsDialogStore::setSaasCloudStorageServicesStatus(
+    nx::vms::api::ServiceTypeStatus servicesStatus)
+{
+    d->executeAction([&](State state)
+        { return Reducer::setSaasCloudStorageServicesStatus(std::move(state), servicesStatus); });
+}
+
 QVariantList ServerSettingsDialogStore::pluginModules() const
 {
     QVariantList result;

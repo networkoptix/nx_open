@@ -12,6 +12,8 @@ namespace Ui { class BackupSettingsWidget; }
 
 namespace nx::vms::client::desktop {
 
+class ServerSettingsDialogStore;
+struct ServerSettingsDialogState;
 class BackupSettingsViewWidget;
 
 class BackupSettingsWidget:
@@ -22,7 +24,7 @@ class BackupSettingsWidget:
     using base_type = QnAbstractPreferencesWidget;
 
 public:
-    BackupSettingsWidget(QWidget* parent = nullptr);
+    BackupSettingsWidget(ServerSettingsDialogStore* store, QWidget* parent = nullptr);
     virtual ~BackupSettingsWidget() override;
 
     void setServer(const QnMediaServerResourcePtr& server);
@@ -36,8 +38,9 @@ signals:
     void storageManagementShortcutClicked();
 
 private:
-    void setupPlaceholderPageAppearance();
-    void updateBackupSettingsAvailability();
+    void loadState(const ServerSettingsDialogState& state);
+
+    void setupPlaceholders();
     void updateMessageBarText();
 
 private:

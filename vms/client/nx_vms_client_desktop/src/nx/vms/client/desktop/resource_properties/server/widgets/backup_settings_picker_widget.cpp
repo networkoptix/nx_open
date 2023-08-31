@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/backup_settings_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/backup_settings_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
+#include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
 #include <ui/common/palette.h>
 #include <utils/math/color_transformations.h>
 
@@ -30,11 +31,12 @@ namespace nx::vms::client::desktop {
 using namespace backup_settings_view;
 using namespace nx::vms::api;
 
-BackupSettingsPickerWidget::BackupSettingsPickerWidget(QWidget* parent):
+BackupSettingsPickerWidget::BackupSettingsPickerWidget(
+    ServerSettingsDialogStore* store,
+    QWidget* parent)
+    :
     base_type(parent),
-    ui(new Ui::BackupSettingsPickerWidget()),
-    m_contentTypesDropdownMenu(createContentTypesMenu()),
-    m_qualityDropdownMenu(createQualityMenu())
+    ui(new Ui::BackupSettingsPickerWidget())
 {
     ui->setupUi(this);
 
@@ -73,8 +75,11 @@ BackupSettingsPickerWidget::BackupSettingsPickerWidget(QWidget* parent):
 
     ui->shortcutHintLayout->setSpacing(fontMetrics().horizontalAdvance(QChar::Space));
 
-    setupContentTypesDropdown();
+    setupContentTypesDropdown(store->state().backupStoragesStatus.usesCloudBackupStorage);
     setupQualityDropdown();
+
+    connect(store, &ServerSettingsDialogStore::stateChanged,
+        this, &BackupSettingsPickerWidget::loadState);
 }
 
 BackupSettingsPickerWidget::~BackupSettingsPickerWidget()
@@ -148,7 +153,7 @@ void BackupSettingsPickerWidget::setupFromSelection(const QModelIndexList& index
 
     const auto selectionHasDualStreamingDevices =
         std::any_of(camerasIndexes.cbegin(), camerasIndexes.cend(),
-            [this](const QModelIndex& cameraIndex)
+            [](const QModelIndex& cameraIndex)
             {
                 const auto camera = cameraIndex.data(Qn::ResourceRole).value<QnResourcePtr>()
                     .dynamicCast<QnVirtualCameraResource>();
@@ -161,8 +166,14 @@ void BackupSettingsPickerWidget::setupFromSelection(const QModelIndexList& index
         tr("Set for %n selected devices", "", camerasIndexes.size()));
 }
 
-void BackupSettingsPickerWidget::setupContentTypesDropdown()
+void BackupSettingsPickerWidget::loadState(const ServerSettingsDialogState& state)
 {
+    setupContentTypesDropdown(state.backupStoragesStatus.usesCloudBackupStorage);
+}
+
+void BackupSettingsPickerWidget::setupContentTypesDropdown(bool isCloudBackupStorage)
+{
+    m_contentTypesDropdownMenu = createContentTypesMenu(isCloudBackupStorage);
     connect(m_contentTypesDropdownMenu.get(), &QMenu::triggered, this,
         [this](QAction* action)
         {
@@ -174,6 +185,7 @@ void BackupSettingsPickerWidget::setupContentTypesDropdown()
 
 void BackupSettingsPickerWidget::setupQualityDropdown()
 {
+    m_qualityDropdownMenu = createQualityMenu();
     connect(m_qualityDropdownMenu.get(), &QMenu::triggered, this,
         [this](QAction* action)
         {

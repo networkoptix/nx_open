@@ -169,15 +169,14 @@ void BackupSettingsItemDelegate::initStyleOption(
 {
     base_type::initStyleOption(option, index);
 
-    if (!isDropdownColumn(index))
-        return;
-
-    const auto textColor = m_dropdownColorTable.value(dropdownStateFlags(*option, index));
-
-    option->font.setWeight(QFont::Normal);
-    option->fontMetrics = QFontMetrics(option->font);
-    option->palette.setColor(QPalette::Text, textColor);
-    option->palette.setColor(QPalette::HighlightedText, textColor);
+    if (isDropdownColumn(index))
+    {
+        const auto textColor = m_dropdownColorTable.value(dropdownStateFlags(*option, index));
+        option->font.setWeight(QFont::Normal);
+        option->fontMetrics = QFontMetrics(option->font);
+        option->palette.setColor(QPalette::Text, textColor);
+        option->palette.setColor(QPalette::HighlightedText, textColor);
+    }
 }
 
 void BackupSettingsItemDelegate::paintWarningIcon(
@@ -185,10 +184,8 @@ void BackupSettingsItemDelegate::paintWarningIcon(
     const QStyleOptionViewItem& styleOption,
     const QModelIndex& index) const
 {
-    const auto nothingToBackupWarningData =
-        index.siblingAtColumn(ContentTypesColumn).data(NothingToBackupWarningRole);
-
-    if (nothingToBackupWarningData.isNull())
+    const auto isWarningStyleData = index.data(IsItemWarningStyleRole);
+    if (isWarningStyleData.isNull() || !isWarningStyleData.toBool())
         return;
 
     const auto itemRect = styleOption.rect;
@@ -254,8 +251,9 @@ BackupSettingsItemDelegate::DropdownStateFlags BackupSettingsItemDelegate::dropd
     dropdownState.setFlag(DropdownStateFlag::selected,
         styleOption.state.testFlag(QStyle::State_Selected));
 
+    const auto isWarningStyleData = index.data(IsItemWarningStyleRole);
     dropdownState.setFlag(DropdownStateFlag::warning,
-        !index.data(NothingToBackupWarningRole).isNull());
+        !isWarningStyleData.isNull() && isWarningStyleData.toBool());
 
     return dropdownState;
 }
