@@ -62,6 +62,14 @@
         <source>Proxy LDAP requests&lt;br&gt;via server</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AdvancedUpdateSettings</name>
@@ -308,6 +316,48 @@
     </message>
     <message>
         <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BatchUserEditDialog</name>
+    <message numerus="yes">
+        <source>Batch Edit - %n Users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>User status</source>
+        <comment>Whether users are enabled or disabled</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insecure (digest) authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -662,6 +712,14 @@
         <source>Filter</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FisheyeDewarpingSettings</name>
@@ -905,6 +963,10 @@
         <source>Nothing found</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No groups</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GroupsFlow</name>
@@ -967,6 +1029,33 @@
         <source>Refreshing...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Insufficient services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n suitable integration service is required to turn on the integration</source>
+        <comment>Required integration count</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>There are more cameras using this integration than available
+                services. Please disable integration for some cameras or add more suitable services.
+                Otherwise, it will be done automatically on %1</source>
+        <comment>%1 will be substituted by a date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 suitable services available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Services Required</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>IntegrationPanel</name>
@@ -984,6 +1073,10 @@
     </message>
     <message>
         <source>Select video stream from the camera for analysis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Usage</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1314,6 +1407,21 @@
     </message>
 </context>
 <context>
+    <name>NewLinkDialog</name>
+    <message>
+        <source>New Link - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The previous link will be invalidated once a new one has been issued</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NoListsPage</name>
     <message>
         <source>No Lists</source>
@@ -1411,10 +1519,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Selected groups</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No groups</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1424,6 +1528,11 @@
     </message>
     <message>
         <source>LDAP group membership is managed in LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Member of</source>
+        <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1464,15 +1573,11 @@
 <context>
     <name>PermissionsTab</name>
     <message>
-        <source>No resources</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Try changing search criteria</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Automatically add dependent access rights</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No resources found</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2006,6 +2111,30 @@ to activate PTZ</source>
     </message>
 </context>
 <context>
+    <name>TemporaryLinkSettings</name>
+    <message>
+        <source>Link Valid Until</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The link will remain accessible until the date specified (including, based on server time)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Revoke access after login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Access may be revoked earlier if the link validity period ends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In</source>
+        <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TileGridPlaceholder</name>
     <message>
         <source>Nothing Found</source>
@@ -2173,6 +2302,18 @@ to activate PTZ</source>
         <source>Permission Groups</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Access</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regular user with credentials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temporary with link</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UserEditDialog</name>
@@ -2252,6 +2393,30 @@ to activate PTZ</source>
     </message>
     <message>
         <source>Permission Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Access expires</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Access Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Terminate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Link...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No valid link for this user</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
