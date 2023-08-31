@@ -163,9 +163,12 @@ struct UserSettingsDialog::Private
     QDateTime serverDate(milliseconds msecsSinceEpoch) const
     {
         const auto timeWatcher = q->systemContext()->serverTimeWatcher();
-        return timeWatcher->serverTime(
-            timeWatcher->currentServer().dynamicCast<core::ServerResource>(),
-            msecsSinceEpoch.count());
+        const auto server = timeWatcher->currentServer().dynamicCast<core::ServerResource>();
+
+        if (!server) //< The server may absent on reconnection.
+            return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch.count());
+
+        return timeWatcher->serverTime(server, msecsSinceEpoch.count());
     }
 
     int getDisplayOffsetMs() const
