@@ -102,6 +102,7 @@ struct NX_VMS_API ResourceWithParameters
     void setFromParameter(const ResourceParamData& parameter);
     std::optional<QJsonValue> parameter(const QString& key) const;
 
+    /**%apidoc [opt] Extended resource parameters. */
     std::map<QString, QJsonValue> parameters;
 
     template<typename Derived, typename DbBaseType, typename DbListTypes>
