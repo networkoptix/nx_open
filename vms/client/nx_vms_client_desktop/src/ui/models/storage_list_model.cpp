@@ -15,34 +15,39 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 
-namespace
+namespace {
+
+// TODO: #sivanov #vkutin Refactor to use HumanReadable helper class.
+const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
+const qreal kBytesInTb = 1024.0 * kBytesInGB;
+
+static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
+    kThemeSubstitutions = {
+        {QIcon::Normal, {.primary = "light16"}},
+        {QIcon::Active, {.primary = "light17"}},
+        {QIcon::Selected, {.primary = "light15"}},
+};
+
+int storageIndex(const QnStorageModelInfoList& list, const QnStorageModelInfo& storage)
 {
-    // TODO: #sivanov #vkutin Refactor to use HumanReadable helper class.
-    const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
-    const qreal kBytesInTb = 1024.0 * kBytesInGB;
+    auto byId = [storage](const QnStorageModelInfo& info)  { return storage.id == info.id;  };
+    return nx::utils::algorithm::index_of(list, byId);
+}
 
-    static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-        kThemeSubstitutions = {
-            {QIcon::Normal, {.primary = "light16"}},
-            {QIcon::Active, {.primary = "light17"}},
-            {QIcon::Selected, {.primary = "light15"}},
-    };
+int storageIndex(const QnStorageModelInfoList& list, const QString& path)
+{
+    auto byPath = [path](const QnStorageModelInfo& info)  { return path == info.url;  };
+    return nx::utils::algorithm::index_of(list, byPath);
+}
 
-    int storageIndex(const QnStorageModelInfoList& list, const QnStorageModelInfo& storage)
-    {
-        auto byId = [storage](const QnStorageModelInfo& info)  { return storage.id == info.id;  };
-        return nx::utils::algorithm::index_of(list, byId);
-    }
+bool isCloudBackupStorage(const QnStorageModelInfo& storageInfo)
+{
+    return storageInfo.isBackup && storageInfo.storageType == "cloud";
+}
 
-    int storageIndex(const QnStorageModelInfoList& list, const QString& path)
-    {
-        auto byPath = [path](const QnStorageModelInfo& info)  { return path == info.url;  };
-        return nx::utils::algorithm::index_of(list, byPath);
-    }
+} // namespace
 
-} // anonymous namespace
-
-// ------------------ QnStorageListMode --------------------------
+// ------------------ QnStorageListModel --------------------------
 
 QnStorageListModel::QnStorageListModel(QObject* parent):
     base_type(parent),
@@ -132,7 +137,9 @@ void QnStorageListModel::setMetadataStorageId(const QnUuid &id)
         index(rowCount() - 1, ActionsColumn));
 }
 
-void QnStorageListModel::updateRebuildInfo(QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& rebuildStatus)
+void QnStorageListModel::updateRebuildInfo(
+    QnServerStoragesPool pool,
+    const nx::vms::api::StorageScanInfo& rebuildStatus)
 {
     nx::vms::api::StorageScanInfo old = m_rebuildStatus[static_cast<int>(pool)];
     int oldRow = storageIndex(m_storages, old.path);
@@ -158,6 +165,16 @@ QnStorageModelInfo QnStorageListModel::storage(const QModelIndex& index) const
 QnStorageModelInfoList QnStorageListModel::storages() const
 {
     return m_storages;
+}
+
+std::optional<QnStorageModelInfo> QnStorageListModel::cloudBackupStorage() const
+{
+    for (const auto& storageInfo: m_storages)
+    {
+        if (isCloudBackupStorage(storageInfo))
+            return storageInfo;
+    }
+    return {};
 }
 
 int QnStorageListModel::rowCount(const QModelIndex& parent) const
@@ -238,6 +255,8 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                 return tr("network");
             if (storageData.storageType == "usb")
                 return tr("usb");
+            if (storageData.storageType == "cloud")
+                return tr("cloud");
 
             // Note: Plugins can register own out-of-enum storage types (e.g. 'smb'). It should not
             // be translated in general case, though we can make a hardcode for popular plugins.
@@ -309,8 +328,8 @@ QVariant QnStorageListModel::checkstateData(const QModelIndex& index) const
     if (index.column() != CheckBoxColumn)
         return QVariant();
 
-    QnStorageModelInfo storageData = storage(index);
-    return storageData.isUsed && storageData.isWritable
+    QnStorageModelInfo storageInfo = storage(index);
+    return storageInfo.isUsed && storageInfo.isWritable
         ? Qt::Checked
         : Qt::Unchecked;
 }
@@ -393,8 +412,13 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
 
 bool QnStorageListModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()) || m_readOnly)
+    if (!index.isValid()
+        || index.model() != this
+        || !hasIndex(index.row(), index.column(), index.parent())
+        || m_readOnly)
+    {
         return false;
+    }
 
     QnStorageModelInfo& storageData = m_storages[index.row()];
     if (!storageData.isWritable)
@@ -408,7 +432,22 @@ bool QnStorageListModel::setData(const QModelIndex& index, const QVariant& value
 
         storageData.isUsed = checked;
 
-        emit dataChanged(index, index, { Qt::CheckStateRole });
+        if (storageData.isUsed && isCloudBackupStorage(storageData))
+        {
+            for (auto& otherStorageData: m_storages)
+            {
+                if (otherStorageData.isBackup && !isCloudBackupStorage(otherStorageData))
+                    otherStorageData.isUsed = false;
+            }
+            emit dataChanged(
+                index.siblingAtRow(0),
+                index.siblingAtRow(rowCount() - 1),
+                {Qt::CheckStateRole});
+
+            return true;
+        }
+
+        emit dataChanged(index, index, {Qt::CheckStateRole});
         return true;
     }
 
@@ -448,14 +487,51 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex& index) const
     if (index.column() == StoragePoolColumn)
     {
         auto s = storage(index);
-        if (s.isWritable && canChangeStoragePool(s))
+        if (s.isWritable && canChangeStoragePool(s) && !isCloudBackupStorage(s))
             flags |= Qt::ItemIsEditable;
     }
 
     if (index.column() == CheckBoxColumn)
+    {
         flags |= Qt::ItemIsUserCheckable;
 
+        const auto storageInfo = storage(index);
+        if (storageInfo.isBackup && !isCloudBackupStorage(storageInfo))
+        {
+            const auto cloudStorageInfo = cloudBackupStorage();
+            if (cloudStorageInfo && cloudStorageInfo->isUsed)
+                flags.setFlag(Qt::ItemIsUserCheckable, false);
+        }
+    }
+
     return flags;
+}
+
+QVariant QnStorageListModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation != Qt::Horizontal)
+        return base_type::headerData(section, orientation, role);
+
+    if (role != Qt::DisplayRole)
+        return base_type::headerData(section, orientation, role);
+
+    switch (section)
+    {
+        case UrlColumn:
+            return tr("Path");
+
+        case TypeColumn:
+            return tr("Type");
+
+        case StoragePoolColumn:
+            return tr("Purpose");
+
+        case TotalSpaceColumn:
+            return tr("Size");
+
+        default:
+            return {};
+    }
 }
 
 bool QnStorageListModel::isReadOnly() const
@@ -531,6 +607,9 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
     if (isStoragePoolInRebuild(data))
         return false;
 
+    if (isCloudBackupStorage(data))
+        return false;
+
     if (data.id == m_metadataStorageId)
         return false;
 
@@ -550,11 +629,12 @@ bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const
     if (!m_server)
         return false;
 
-    QnClientStorageResourcePtr storage = m_server->getStorageByUrl(data.url).dynamicCast<QnClientStorageResource>();
-    if (!storage)
+    auto storageResource = m_server->getStorageByUrl(data.url).dynamicCast<QnClientStorageResource>();
+
+    if (!storageResource)
         return false;
 
-    return storage->isActive();
+    return storageResource->isActive();
 }
 
 bool QnStorageListModel::isStoragePoolInRebuild(const QnStorageModelInfo& storage) const

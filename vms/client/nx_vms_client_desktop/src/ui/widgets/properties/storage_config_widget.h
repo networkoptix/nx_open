@@ -4,6 +4,7 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QDateTime>
+#include <QtCore/QFlags>
 #include <QtCore/QModelIndex>
 #include <QtWidgets/QWidget>
 
@@ -46,28 +47,64 @@ protected:
     virtual void hideEvent(QHideEvent* event) override;
 
 private:
-    // Load initial storages data from resource pool.
-    void loadStoragesFromResources();
+    enum StorageConfigWarningFlag
+    {
+        analyticsIsOnSystemDrive = 1,
+        analyticsIsOnDisabledStorage = 1 << 1,
+        hasDisabledStorage = 1 << 2,
+        hasUsbStorage = 1 << 3,
+        cloudBackupStorageBeingEnabled = 1 << 4,
+        backupStorageBeingReplacedByCloudStorage = 1 << 5,
+    };
+    Q_DECLARE_FLAGS(StorageConfigWarningFlags, StorageConfigWarningFlag)
+
+    StorageConfigWarningFlags storageConfigurationWarningFlags() const;
+    void updateWarnings();
+
+private:
+    void loadStoragesFromResources(); //< Load initial storages data from resource pool.
 
     void updateRebuildInfo();
-    void at_storageView_clicked(const QModelIndex& index);
+    void atStorageViewClicked(const QModelIndex& index);
 
     void updateRebuildUi(QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& reply);
 
     void confirmNewMetadataStorage(const QnUuid& storageId);
 
-    void updateWarnings();
-
     void startRebuid(bool isMain);
     void cancelRebuild(bool isMain);
 
-    void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr& server,
-        QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& status);
+    void atServerRebuildStatusChanged(
+        const QnMediaServerResourcePtr& server,
+        QnServerStoragesPool pool,
+        const nx::vms::api::StorageScanInfo& status);
 
-    void at_serverRebuildArchiveFinished(const QnMediaServerResourcePtr& server,
+    void atServerRebuildArchiveFinished(
+        const QnMediaServerResourcePtr& server,
         QnServerStoragesPool pool);
 
-    void at_addExtStorage(bool addToMain);
+    void atAddExtStorage(bool addToMain);
+
+    /**
+     * @return True if initially disabled cloud backup storage has been enabled. In such case,
+     * there is a possibility that cameras backup settings should be updated to be compatible
+     * with cloud storage.
+     */
+    bool cloudStorageToggledOn() const;
+
+    /**
+     * Cloud backup storage doesn't support 'All archive' option, so it should be replaced to the
+     * 'Motion, Objects, Bookmarks' wherever it needed for cameras on the current server.
+     */
+    void updateBackupSettingsForCloudStorage();
+
+private:
+    void applyStoragesChanges(
+        QnStorageResourceList& result,
+        const QnStorageModelInfoList& storages) const;
+
+    bool hasStoragesChanges(const QnStorageModelInfoList& storages) const;
+    bool isServerOnline() const;
 
 private:
     QScopedPointer<Ui::StorageConfigWidget> ui;
@@ -91,9 +128,4 @@ private:
     QScopedPointer<MetadataWatcher> m_metadataWatcher;
 
     rest::Handle m_currentRequest = 0;
-private:
-    void applyStoragesChanges(QnStorageResourceList& result,
-        const QnStorageModelInfoList& storages) const;
-    bool hasStoragesChanges(const QnStorageModelInfoList& storages) const;
-    bool isServerOnline() const;
 };
