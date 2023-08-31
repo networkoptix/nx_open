@@ -50,6 +50,8 @@ public:
     std::optional<UserGroupData> findGroup(const QnUuid& groupId) const;
     int groupRow(const QnUuid& groupId) const;
 
+    QSet<QnUuid> nonEditableGroupIds() const;
+
     QSet<QnUuid> checkedGroupIds() const;
     void setCheckedGroupIds(const QSet<QnUuid>& value);
     void setChecked(const QnUuid& groupId, bool checked);
@@ -60,6 +62,8 @@ public:
     void reset(const UserGroupDataList& groups);
     bool addOrUpdateGroup(const UserGroupData& group);
     bool removeGroup(const QnUuid& groupId);
+
+    bool canDeleteGroup(const QnUuid& groupId) const;
 
 signals:
     void notFoundGroupsChanged();
