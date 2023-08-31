@@ -117,7 +117,7 @@ GridView
 
         AdaptiveMouseWheelTransmission { id: gearbox }
 
-        onWheel:
+        onWheel: (wheel) =>
         {
             // TODO: imlement pixel scrolling for high precision touchpads.
             scrollBar.scrollBySteps(gearbox.transform(-wheel.angleDelta.y / 120.0))

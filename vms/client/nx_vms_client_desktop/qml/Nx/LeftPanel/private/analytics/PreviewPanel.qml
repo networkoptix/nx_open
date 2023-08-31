@@ -275,12 +275,15 @@ Rectangle
             ResourceList
             {
                 id: resourceList
+
                 width: parent.width
-                palette: {
-                    "light": ColorTheme.colors.light10,
-                    "windowText": ColorTheme.colors.light16
-                }
-                resourceNames: previewPanel.selectedItem ? previewPanel.selectedItem.resourceList : []
+
+                color: ColorTheme.colors.light10
+                remainderColor: ColorTheme.colors.light16
+
+                resourceNames: previewPanel.selectedItem
+                    ? previewPanel.selectedItem.resourceList
+                    : []
             }
         }
 

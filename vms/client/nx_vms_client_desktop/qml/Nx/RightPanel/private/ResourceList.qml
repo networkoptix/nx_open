@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Layouts 1.11
+import QtQuick
+import QtQuick.Layouts
 
 ColumnLayout
 {
@@ -12,7 +12,8 @@ ColumnLayout
     readonly property int count: resourceNames ? resourceNames.length : 0
     readonly property int displayedCount: Math.min(count, maxDisplayedCount)
 
-    property var palette: tile.palette
+    property color color: "grey"
+    property color remainderColor: "grey"
 
     spacing: 0
 
@@ -25,7 +26,7 @@ ColumnLayout
             id: resourceName
 
             Layout.fillWidth: true
-            color: resourceList.palette.light
+            color: resourceList.color
             elide: Text.ElideRight
             text: resourceNames[index]
             font { pixelSize: 11; weight: Font.Medium }
@@ -37,7 +38,7 @@ ColumnLayout
         id: andMore
         readonly property int remainder: count - displayedCount
 
-        color: (resourceList.palette && resourceList.palette.windowText) ?? "transparent"
+        color: resourceList.remainderColor
         text: qsTr("...and %n more", "", remainder)
         visible: remainder > 0
         topPadding: 4
