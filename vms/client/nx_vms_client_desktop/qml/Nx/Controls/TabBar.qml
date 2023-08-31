@@ -90,16 +90,6 @@ TabBar
         ensureIndexIsVisible(index)
     }
 
-    palette
-    {
-        buttonText: ColorTheme.colors.light12
-        brightText: ColorTheme.colors.light10
-        highlightedText: ColorTheme.colors.brand_core
-        base: tabBar.color
-        dark: bottomBorderColor
-        mid: ColorTheme.colors.dark12
-    }
-
     Component.onCompleted:
     {
         // contentItem is a ListView, set its properties to better serve tab bar scrolling.
@@ -240,13 +230,13 @@ TabBar
 
     background: Rectangle
     {
-        color: palette.base
+        color: tabBar.color
 
         Rectangle
         {
             id: border
 
-            color: palette.dark
+            color: tabBar.bottomBorderColor
             width: parent.width
             height: 1
             anchors.bottom: parent.bottom

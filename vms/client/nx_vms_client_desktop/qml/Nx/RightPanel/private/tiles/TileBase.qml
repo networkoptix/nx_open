@@ -28,17 +28,27 @@ Control
 
     hoverEnabled: true
 
-    palette
+    property color backgroundColor: model.isInformer
+        ? ColorTheme.colors.dark8
+        : ColorTheme.colors.dark7
+
+    property color hoveredBackgroundColor: model.isInformer
+        ? ColorTheme.colors.dark9
+        : ColorTheme.colors.dark8
+
+    property color effectiveBackgroundColor:
     {
-        base: model.isInformer ? ColorTheme.colors.dark8 : ColorTheme.colors.dark7
-        midlight: model.isInformer ? ColorTheme.colors.dark9 : ColorTheme.colors.dark8
-        light: ColorTheme.colors.light10
-        windowText: ColorTheme.colors.light16
-        text: ColorTheme.colors.light4
-        highlight: ColorTheme.colors.brand_core
-        shadow: ColorTheme.colors.dark5
-        dark: ColorTheme.colors.dark6
+        let highlightAmount = model.highlighted ? 2 : 0
+        if (controller && controller.selectedRow === index)
+            highlightAmount += 6
+
+        return ColorTheme.lighter(
+            tile.hovered ? tile.hoveredBackgroundColor : tile.backgroundColor,
+            highlightAmount)
     }
+
+    property color foregroundColor: ColorTheme.colors.light10
+    property color secondaryForegroundColor: ColorTheme.colors.light16
 
     leftPadding: 8
     topPadding: 8
@@ -47,17 +57,7 @@ Control
 
     background: Rectangle
     {
-        color:
-        {
-            let highlightAmount = model.highlighted ? 2 : 0
-            if (controller && controller.selectedRow === index)
-                highlightAmount += 6
-
-            ColorTheme.lighter(
-                tile.hovered ? tile.palette.midlight : tile.palette.base,
-                highlightAmount)
-        }
-
+        color: tile.effectiveBackgroundColor
         radius: 2
 
         TapHandler
