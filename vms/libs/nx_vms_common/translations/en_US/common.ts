@@ -66,16 +66,20 @@
         <source>Unable to verify LDAP server SSL/TLS certificate.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>BookmarkFacade</name>
     <message>
-        <source>Removed camera</source>
+        <source>The ticket key is invalid or expired.</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>BookmarkSort</name>
     <message>
         <source>System Event</source>
         <comment>Shows that the bookmark was created by a system event</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Removed camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -187,36 +191,29 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
+        <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
+        <source>Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can view and export archive and Bookmarks.</source>
+        <source>Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can view live videos, I/O modules and web pages.</source>
+        <source>Members of this group can view and export archive and Bookmarks.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can view System Health Monitoring information.</source>
+        <source>Members of this group can view live videos, I/O modules and web pages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
+        <source>Members of this group can view System Health Monitoring information.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <source>System Event</source>
-        <comment>Shows that the bookmark was created by a system event</comment>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -832,21 +829,23 @@
         </translation>
     </message>
     <message>
-        <source>%1 Licenses</source>
-        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <source>Local Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Recording service</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>%n %1 Licenses</source>
-        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <source>%n Local Recording Services</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n/%1 %2 Licenses</source>
-        <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
+        <source>%n/%1 Local Recording Services</source>
+        <comment>%n will be replaced by the total count</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1209,6 +1208,21 @@
     <message>
         <source>Session authorization required.</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ServiceTypeDisplayStringHelper</name>
+    <message>
+        <source>Local recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Integration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud storage</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1632,6 +1646,10 @@
     <message>
         <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
         <comment>%1 is a company name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -32,6 +32,14 @@
     </message>
 </context>
 <context>
+    <name>BookmarkUtilStrings</name>
+    <message>
+        <source>System Event</source>
+        <comment>Shows that the bookmark was created by a system event</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
         <source>No connection to Server %1.</source>
@@ -65,6 +73,14 @@
     <message>
         <source>Expires</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ClipboardButton</name>
+    <message>
+        <source>Copied</source>
+        <comment>to Clipboard</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1061,6 +1077,10 @@
         <source>Import From Devices...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>User Manual...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -1121,6 +1141,10 @@
     </message>
     <message>
         <source>Event Stops</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>automatic</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1955,6 +1979,17 @@ License Key: %2</source>
     <message>
         <source>NVIDIA hardware acceleration is in beta mode</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnAttachToVideowallDialog</name>
+    <message>
+        <source>SaaS suspended. To attach to Video Wall, SaaS must be in active state. Contact your channel partner for details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SaaS shut down. To attach to Video Wall, SaaS must be in active state. Contact your channel partner for details.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3969,10 +4004,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Zoom Window</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>I/O Module</source>
         <translation></translation>
     </message>
@@ -4447,6 +4478,10 @@ to %1</source>
         <source>Enter Fullscreen</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Zoom Window</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRoutingManagementWidget</name>
@@ -4499,6 +4534,10 @@ to %1</source>
     <message>
         <source>Search</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4944,6 +4983,14 @@ to %1</source>
         <source>Provide</source>
         <translation></translation>
     </message>
+    <message>
+        <source>SAAS SUSPENDED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SAAS SHUT DOWN</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -5262,6 +5309,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Integrations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Services</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5845,6 +5896,18 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
         <source>Activate License...</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>SaaS suspended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SaaS shut down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To add Video Wall, SaaS should be in active state. Contact your channel partner for details.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7876,6 +7939,14 @@ We recommend you not to open this integration. If you understand the risks, you 
         <comment>Dialog button text.</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>Enter access link to continue your session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your session has expired. Please sign in again with your link to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
@@ -8000,6 +8071,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
         <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Recording will not be enabled on some cameras.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9044,6 +9119,10 @@ Remember to return the Logging Level to its default setting after you have colle
         <source>Version %1</source>
         <translation></translation>
     </message>
+    <message>
+        <source>The provided link is not valid or has expired</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::LogsManagementModel</name>
@@ -9679,12 +9758,12 @@ You can force it, but it may significantly increase CPU load.</source>
         <translation></translation>
     </message>
     <message>
-        <source>Uploading client packages to Servers...</source>
+        <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
         <translation></translation>
     </message>
     <message>
-        <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-        <translation></translation>
+        <source>Uploading offline update packages to Servers...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10865,6 +10944,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>Unknown error</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Access Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Link</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
@@ -11017,6 +11104,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
             <numerusform>System storage is used for analytics data on %n Server</numerusform>
             <numerusform>System storage is used for analytics data on %n Servers</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::TemporaryUserExpirationWatcher</name>
+    <message>
+        <source>and</source>
+        <comment>Example: 1 month and 2 days</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your access to the System expires %1</source>
+        <comment>%1 is a date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your access to the System expires in %1</source>
+        <comment>%1 is a duration</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11218,6 +11323,18 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>Permissions</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Group is not found in the LDAP database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
@@ -11245,8 +11362,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete failed</source>
+        <source>Failed to delete group &quot;%1&quot;.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to delete group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Failed to delete %n groups.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -11284,23 +11412,27 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>Full Name</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>LDAP server is offline. Users are not able to log in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User is not found in the LDAP database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are multiple users with the same credentials in the system. To avoid issues with log in it is required for all users to have unique credentials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temporary user</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::UserListWidget</name>
     <message>
-        <source>Enable</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Disable</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Delete</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Force Secure Authentication</source>
         <translation></translation>
     </message>
     <message>
@@ -11320,7 +11452,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete failed</source>
+        <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11392,6 +11524,47 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Email cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Access Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to terminate access link?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will instantly remove an access to the system for this user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Terminate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Terminate access link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create access link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Access link has been successfully created!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and</source>
+        <comment>Example: 1 month and 2 days</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User %1 has been successfully created!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11509,6 +11682,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
         <source>Select folder to upload</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Developer Tools</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12029,13 +12206,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::rules::OutputPortPicker</name>
-    <message>
-        <source>automatic</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
         <source>Event</source>
@@ -12220,6 +12390,25 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::saas::ServicesUsageModel</name>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Used</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
         <source>Analytics events can be set up on a certain cameras.</source>
@@ -12336,6 +12525,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Hotspots</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toolbar</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

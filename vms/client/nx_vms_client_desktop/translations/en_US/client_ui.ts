@@ -1725,6 +1725,18 @@
         <source>Test</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Use Credentials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Link</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LogsManagementWidget</name>
@@ -2431,6 +2443,25 @@
     <message>
         <source>Live</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>SaasInfoWidget</name>
+    <message>
+        <source>No services found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contact your Channel Partner to add services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Partner Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Services Usage</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
