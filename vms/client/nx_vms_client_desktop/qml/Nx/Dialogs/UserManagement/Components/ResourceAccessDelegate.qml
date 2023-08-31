@@ -137,7 +137,6 @@ Item
 
                         const toggledOn = isToggledOn()
 
-                        // Temporarily treat frame initialization as frame selection.
                         const nextCheckValue =
                             frameSelectionMode != ResourceAccessDelegate.FrameUnselection
 
@@ -160,7 +159,9 @@ Item
                         // Highlight access rights dependency from hovered other cell.
                         const base = delegateRoot.hoveredCell
 
-                        if (base && base.toggleable && toggledOn == base.isToggledOn())
+                        if (base && base.toggleable
+                            && frameSelectionMode == ResourceAccessDelegate.NoFrameOperation
+                            && toggledOn == base.isToggledOn())
                         {
                             return toggledOn
                                 ? context.isDependingOn(accessRight, base.accessRight)

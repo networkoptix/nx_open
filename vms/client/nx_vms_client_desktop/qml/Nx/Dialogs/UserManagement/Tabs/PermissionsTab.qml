@@ -320,11 +320,11 @@ Item
                 visible: frameSelector.currentMode != ResourceAccessDelegate.NoFrameOperation
                 z: 2
 
-                color: ColorTheme.transparent(border.color, 0.2)
+                color: ColorTheme.transparent(border.color, 0.1)
 
-                border.color: frameSelector.currentMode != ResourceAccessDelegate.FrameUnselection
-                    ? ColorTheme.colors.brand_core
-                    : ColorTheme.colors.light16
+                border.color: frameSelector.currentMode == ResourceAccessDelegate.FrameUnselection
+                    ? ColorTheme.colors.red_d1
+                    : ColorTheme.colors.brand_core
 
                 x: selectionArea.frameRect.left
                 y: selectionArea.frameRect.top
