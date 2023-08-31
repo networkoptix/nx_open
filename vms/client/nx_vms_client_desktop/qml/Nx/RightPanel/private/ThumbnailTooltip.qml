@@ -47,14 +47,6 @@ Bubble
                 minimumAspectRatio: 0.25
                 visible: toolTip.thumbnailVisible
                 showHighlightBorder: true
-
-                palette
-                {
-                    windowText: ColorTheme.colors.light16
-                    shadow: ColorTheme.colors.dark5
-                    dark: ColorTheme.colors.dark6
-                    highlight: ColorTheme.colors.brand_core
-                }
             }
 
             TextEdit

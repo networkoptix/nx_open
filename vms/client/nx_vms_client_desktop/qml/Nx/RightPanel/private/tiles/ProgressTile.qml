@@ -43,7 +43,7 @@ TileBase
 
                 wrapMode: Text.Wrap
                 visible: text.length
-                color: tile.palette.windowText
+                color: tile.secondaryForegroundColor
                 font { pixelSize: 11; weight: Font.Normal }
 
                 text: (model && model.description) || ""

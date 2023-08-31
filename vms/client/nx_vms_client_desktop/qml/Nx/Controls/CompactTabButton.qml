@@ -9,12 +9,6 @@ import Nx.Core
 /**
  * TabButton that shows icon and text when selected, and only icon when not selected.
  * The transition is animated.
- *
- * Used palette entries:
- *     ButtonText - normal color
- *     BrightText - hovered color
- *     HighlightedText - selected color
- *     Mid - hover underline color
  */
 TabButton
 {
@@ -32,15 +26,20 @@ TabButton
 
     readonly property bool isCurrent: TabBar.tabBar && TabBar.index === TabBar.tabBar.currentIndex
 
-    readonly property color color: isCurrent
-        ? palette.highlightedText
-        : (hovered && !pressed) ? palette.brightText : palette.buttonText
+    property color color: ColorTheme.colors.light12
+    property color hoveredColor: ColorTheme.colors.light10
+    property color highlightedColor: ColorTheme.colors.brand_core
 
-    readonly property color backgroundColor:
+    readonly property color effectiveColor: isCurrent
+        ? highlightedColor
+        : (hovered && !pressed) ? hoveredColor : color
+
+    property color inactiveUnderlineColor: ColorTheme.colors.dark12
+
+    property color backgroundColor:
     {
         if (secondaryStyle)
             return "transparent"
-
         if (pressed)
             return ColorTheme.colors.dark9
         if (hovered)
@@ -50,7 +49,6 @@ TabButton
 
     property alias textHeight: tabText.height
     property alias underlineHeight: underline.height
-    property color inactiveUnderlineColor: palette.mid
 
     leftPadding: secondaryStyle ? 2 : 10
     rightPadding: secondaryStyle ? 2 : 10
@@ -84,7 +82,7 @@ TabButton
 
                 source: tabButton.icon.source
                 sourceSize: Qt.size(tabButton.icon.width, tabButton.icon.height)
-                color: tabButton.color
+                color: tabButton.effectiveColor
                 name: tabButton.icon.name
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -95,7 +93,7 @@ TabButton
 
                 text: tabButton.text
                 font: tabButton.font
-                color: tabButton.color
+                color: tabButton.effectiveColor
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -159,7 +157,10 @@ TabButton
             width: content.implicitWidth
             height: tabButton.secondaryStyle ? 1 : 2
             visible: !tabButton.compact || tabButton.isCurrent || tabButton.hovered
-            color: tabButton.isCurrent ? palette.highlightedText : inactiveUnderlineColor
+
+            color: tabButton.isCurrent
+                ? tabButton.highlightedColor
+                : tabButton.inactiveUnderlineColor
         }
     }
 

@@ -86,7 +86,7 @@ TileBase
                 maximumLineCount: 2
                 elide: Text.ElideRight
 
-                color: (model && model.foregroundColor) || tile.palette.light
+                color: (model && model.foregroundColor) || tile.foregroundColor
                 font { pixelSize: 13; weight: Font.Medium }
 
                 rightPadding: (isCloseable && !timestamp.text.length)
@@ -108,7 +108,7 @@ TileBase
                 Layout.leftMargin: 8
 
                 topPadding: 2
-                color: tile.palette.windowText
+                color: tile.secondaryForegroundColor
                 visible: !!text && !(tile.isCloseable && tile.hovered)
                 font { pixelSize: 11; weight: Font.Normal }
 
@@ -119,7 +119,10 @@ TileBase
         ResourceList
         {
             id: resourceList
+
             width: tileContent.width
+            color: tile.foregroundColor
+            remainderColor: tile.secondaryForegroundColor
             resourceNames: (model && model.resourceList) || []
         }
 
@@ -169,7 +172,7 @@ TileBase
             height: Math.min(implicitHeight, Metrics.kMaxDescriptionHeight)
             visible: !!text
 
-            color: tile.palette.light
+            color: tile.foregroundColor
             font { pixelSize: 11; weight: Font.Normal }
             textFormat: NxGlobals.mightBeHtml(textSource) ? Text.RichText : Text.PlainText
             wrapMode: Text.Wrap
@@ -204,7 +207,7 @@ TileBase
             width: tileContent.width
             visible: !!text
 
-            color: tile.palette.light
+            color: tile.foregroundColor
             font { pixelSize: 11; weight: Font.Normal }
             textFormat: Text.RichText
             wrapMode: Text.Wrap

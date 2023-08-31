@@ -19,30 +19,20 @@ AbstractButton
     property color pressedBackground: ColorTheme.transparent(ColorTheme.colors.dark1, 0.1)
     property color pressedForeground: normalForeground
 
-    property bool useInheritedPalette: false //< Use inherited palette instead of color properties.
-
     // The most common defaults.
     icon.width: 20
     icon.height: 20
 
-    palette
-    {
-        button: useInheritedPalette ? undefined : normalBackground
-        buttonText: useInheritedPalette ? undefined : normalForeground
-        light: useInheritedPalette ? undefined : hoveredBackground
-        brightText: useInheritedPalette ? undefined : hoveredForeground
-        window: useInheritedPalette ? undefined : pressedBackground
-        windowText: useInheritedPalette ? undefined : pressedForeground
-    }
-
     icon.color: down || checked
-        ? palette.windowText
-        : (hovered ? palette.brightText : palette.buttonText)
+        ? pressedForeground
+        : (hovered ? hoveredForeground : normalForeground)
 
     background: Rectangle
     {
         id: rectangle
-        color: down || checked ? palette.window : (hovered ? palette.light : palette.button)
+        color: down || checked
+            ? pressedBackground
+            : (hovered ? hoveredBackground : normalBackground)
     }
 
     contentItem: IconImage
