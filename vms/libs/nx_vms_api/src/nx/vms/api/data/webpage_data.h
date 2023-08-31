@@ -6,15 +6,6 @@
 
 namespace nx::vms::api {
 
-/**%apidoc Web page information object.
- * %param[unused] typeId
- * %param[proprietary] parentId
- * %param[immutable] id Web page unique id.
- * %param name Web page name.
- *     %example Web page
- * %param url Web page URL.
- *     %example https://example.com
- */
 struct NX_VMS_API WebPageData: ResourceData
 {
     WebPageData(): ResourceData(kResourceTypeId) {}
