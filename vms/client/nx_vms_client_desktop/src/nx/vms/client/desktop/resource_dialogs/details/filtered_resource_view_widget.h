@@ -47,6 +47,13 @@ public:
     QModelIndex toViewIndex(const QModelIndex& sourceIndex) const;
 
     /**
+     * @param viewIndex Valid index that belongs to the encapsulated filter proxy model which is
+     *     data source for the tree view.
+     * @return Model index that belongs to a source model set by setSourceModel method.
+     */
+    QModelIndex toSourceIndex(const QModelIndex& viewIndex) const;
+
+    /**
      * Sets source item model. Single column data model expected regardless of whether the model
      * hierarchical or flat. Header data provided by model won't be displayed.
      * @param Valid pointer to the source item model, ownership of model doesn't transferred to the
@@ -212,7 +219,8 @@ public:
 
     /**
      * @return Instance of item view hover tracker attached to the encapsulated tree view.
-     *     Hover tracker won't be instantiated if this method will never called.
+     *     Keep in mind that hover tracker operates in view model indexes, to get source index use
+     *     toSourceIndex.
      */
     ItemViewHoverTracker* itemViewHoverTracker();
 
@@ -225,13 +233,6 @@ public:
     void clearInfoMessage();
 
 signals:
-
-    /**
-     * Signal is emitted when the mouse cursor enters or leaves an item boundaries.
-     * @param sourceIndex Source model index of item under mouse cursor, invalid QModelIndex if
-     *     there is no such item.
-     */
-    void itemHovered(const QModelIndex& sourceIndex);
 
     /**
      * Signal is emitted when item is clicked by left mouse button.
@@ -250,9 +251,6 @@ signals:
      * Signal is emitted whenever the item selection changes.
      */
     void selectionChanged();
-
-protected:
-    virtual void leaveEvent(QEvent* event) override;
 
 private:
     TreeView* treeView() const;

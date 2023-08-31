@@ -158,6 +158,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Dev] The maximum number of requests to the server per minute, after which it is\n"
         "considered that there are too many requests.");
 
+    NX_INI_FLAG(false, emulateCloudBackupSettingsOnNonCloudStorage,
+        "[Dev] Treat plain backup storage as cloud one on the systems with SaaS enabled.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.

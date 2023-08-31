@@ -11,6 +11,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/tree_view.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
@@ -18,6 +19,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/backup_settings_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/backup_settings_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
+#include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_properties/server/widgets/backup_settings_picker_widget.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -39,26 +41,38 @@ void detailsPanelUpdateFunction(const QModelIndex& index, ResourceDetailsWidget*
         return;
     }
 
-    detailsWidget->setUpdatesEnabled(false);
-
     const auto resourceIndex = index.siblingAtColumn(backup_settings_view::ResourceColumn);
-    detailsWidget->setCaptionText(backup_settings_view::isNewAddedCamerasRow(index)
+    detailsWidget->setCaption(backup_settings_view::isNewAddedCamerasRow(index)
         ? QString()
         : resourceIndex.data(Qt::DisplayRole).toString());
 
     detailsWidget->setThumbnailCameraResource(
         resourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>());
 
-    const auto nothingToBackupWarningData =
-        index.siblingAtColumn(backup_settings_view::ContentTypesColumn)
-            .data(NothingToBackupWarningRole);
+    const auto infoMessageData = index.data(InfoMessageRole);
+    if (!infoMessageData.isNull())
+    {
+        const auto accentColor = nx::vms::client::core::colorTheme()->color("red_core");
+        const auto availableServicesData = index.data(AvailableCloudStorageServices);
+        if (!availableServicesData.isNull() && availableServicesData.toInt() < 1)
+            detailsWidget->setMessage(infoMessageData.toString(), accentColor);
+        else
+            detailsWidget->setMessage(infoMessageData.toString());
+    }
+    else
+    {
+        detailsWidget->clearMessage();
+    }
 
-    detailsWidget->setWarningCaptionText(nothingToBackupWarningData.isNull()
-        ? QString()
-        : BackupSettingsViewWidget::tr("Nothing to backup"));
-    detailsWidget->setWarningExplanationText(nothingToBackupWarningData.toString());
-
-    detailsWidget->setUpdatesEnabled(true);
+    detailsWidget->clearWarningMessages();
+    const auto warningMessagesData = index.data(WarningMessagesRole);
+    if (!warningMessagesData.isNull())
+    {
+        const auto warningMessages =
+            warningMessagesData.value<QVector<std::pair<QString, QString>>>();
+        for (const auto& [caption, message]: warningMessages)
+            detailsWidget->addWarningMessage(caption, message);
+    }
 }
 
 QModelIndexList filterSelectedIndexes(const QModelIndexList& selectedIndexes)
@@ -79,11 +93,15 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::vms::api;
 
-BackupSettingsViewWidget::BackupSettingsViewWidget(QWidget* parent):
+BackupSettingsViewWidget::BackupSettingsViewWidget(
+    ServerSettingsDialogStore* store,
+    QWidget* parent)
+    :
     base_type(backup_settings_view::ColumnCount, parent),
-    m_backupSettingsDecoratorModel(new BackupSettingsDecoratorModel(systemContext())),
+    m_backupSettingsDecoratorModel(new BackupSettingsDecoratorModel(store, systemContext())),
     m_viewItemDelegate(new BackupSettingsItemDelegate(resourceViewWidget()->itemViewHoverTracker()))
 {
+    resourceViewWidget()->itemViewHoverTracker()->setMouseCursorRole(Qn::ItemMouseCursorRole);
     m_viewItemDelegate->setShowRecordingIndicator(true);
     resourceViewWidget()->setSelectionMode(QAbstractItemView::ExtendedSelection);
     resourceViewWidget()->setItemDelegate(m_viewItemDelegate.get());
@@ -99,45 +117,45 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(QWidget* parent):
 
     detailsPanelWidget()->setAutoFillBackground(false);
 
-    auto backupSettingsPicker = new BackupSettingsPickerWidget();
-    resourceViewWidget()->setFooterWidget(backupSettingsPicker);
+    m_backupSettingsPicker = new BackupSettingsPickerWidget(store);
+    resourceViewWidget()->setFooterWidget(m_backupSettingsPicker);
 
     connect(resourceViewWidget(), &FilteredResourceViewWidget::selectionChanged, this,
-        [this, backupSettingsPicker]()
+        [this]()
         {
-            backupSettingsPicker->setupFromSelection(resourceViewWidget()->selectedIndexes());
+            m_backupSettingsPicker->setupFromSelection(resourceViewWidget()->selectedIndexes());
         });
 
-    connect(backupSettingsPicker, &BackupSettingsPickerWidget::backupContentTypesPicked, this,
-        [this, backupSettingsPicker](BackupContentTypes contentTypes)
+    connect(m_backupSettingsPicker, &BackupSettingsPickerWidget::backupContentTypesPicked, this,
+        [this](BackupContentTypes contentTypes)
         {
             const auto selectedIndexes =
                 filterSelectedIndexes(resourceViewWidget()->selectedIndexes());
             m_backupSettingsDecoratorModel->setBackupContentTypes(selectedIndexes, contentTypes);
             m_backupSettingsDecoratorModel->setBackupEnabled(selectedIndexes, true);
-            backupSettingsPicker->setupFromSelection(selectedIndexes);
+            m_backupSettingsPicker->setupFromSelection(selectedIndexes);
         });
 
-    connect(backupSettingsPicker, &BackupSettingsPickerWidget::backupQualityPicked, this,
-        [this, backupSettingsPicker](CameraBackupQuality quality)
+    connect(m_backupSettingsPicker, &BackupSettingsPickerWidget::backupQualityPicked, this,
+        [this](CameraBackupQuality quality)
         {
             const auto selectedIndexes =
                 filterSelectedIndexes(resourceViewWidget()->selectedIndexes());
             m_backupSettingsDecoratorModel->setBackupQuality(selectedIndexes, quality);
             m_backupSettingsDecoratorModel->setBackupEnabled(selectedIndexes, true);
-            backupSettingsPicker->setupFromSelection(selectedIndexes);
+            m_backupSettingsPicker->setupFromSelection(selectedIndexes);
         });
 
-    connect(backupSettingsPicker, &BackupSettingsPickerWidget::backupEnabledChanged, this,
-        [this, backupSettingsPicker](bool enabled)
+    connect(m_backupSettingsPicker, &BackupSettingsPickerWidget::backupEnabledChanged, this,
+        [this](bool enabled)
         {
             const auto selectedIndexes =
                 filterSelectedIndexes(resourceViewWidget()->selectedIndexes());
             m_backupSettingsDecoratorModel->setBackupEnabled(selectedIndexes, enabled);
-            backupSettingsPicker->setupFromSelection(selectedIndexes);
+            m_backupSettingsPicker->setupFromSelection(selectedIndexes);
         });
 
-    backupSettingsPicker->setupLayoutSyncWithHeaderView(resourceViewWidget()->treeHeaderView());
+    m_backupSettingsPicker->setupLayoutSyncWithHeaderView(resourceViewWidget()->treeHeaderView());
 
     connect(m_backupSettingsDecoratorModel.get(), &BackupSettingsDecoratorModel::hasChangesChanged,
         this, &BackupSettingsViewWidget::hasChangesChanged);
@@ -147,7 +165,7 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(QWidget* parent):
         this, &BackupSettingsViewWidget::globalBackupSettingsChanged);
 
     connect(resourceViewWidget(), &FilteredResourceViewWidget::itemClicked, this,
-        [this, backupSettingsPicker](const QModelIndex& index)
+        [this](const QModelIndex& index)
         {
             const auto modifiers = QApplication::keyboardModifiers();
             if (modifiers.testFlag(Qt::ShiftModifier) || modifiers.testFlag(Qt::ControlModifier))
@@ -160,7 +178,7 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(QWidget* parent):
                         return;
 
                     switchItemClicked(index);
-                    backupSettingsPicker->setupFromSelection(
+                    m_backupSettingsPicker->setupFromSelection(
                         resourceViewWidget()->selectedIndexes());
                     break;
 
@@ -182,6 +200,9 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(QWidget* parent):
                     break;
             }
         });
+
+    connect(store, &ServerSettingsDialogStore::stateChanged,
+        this, &BackupSettingsViewWidget::loadState);
 }
 
 BackupSettingsViewWidget::~BackupSettingsViewWidget()
@@ -213,11 +234,14 @@ void BackupSettingsViewWidget::setupHeader()
     header->resizeSection(SwitchColumn, kSwitchColumnWidth);
 
     header->setSectionResizeMode(ResourceColumn, QHeaderView::ResizeMode::Stretch);
+    header->setSectionResizeMode(ResolutionColumn, QHeaderView::ResizeMode::ResizeToContents);
     header->setSectionResizeMode(WarningIconColumn, QHeaderView::ResizeMode::Fixed);
     header->setSectionResizeMode(ContentTypesColumn, QHeaderView::ResizeMode::ResizeToContents);
     header->setSectionResizeMode(QualityColumn, QHeaderView::ResizeMode::ResizeToContents);
     header->setSectionResizeMode(SwitchColumn, QHeaderView::ResizeMode::Fixed);
     header->setSectionsMovable(false);
+
+    header->setSectionHidden(ResolutionColumn, !m_isCloudBackupStorage);
 }
 
 bool BackupSettingsViewWidget::hasChanges() const
@@ -246,6 +270,26 @@ nx::vms::api::BackupSettings BackupSettingsViewWidget::globalBackupSettings() co
     return m_backupSettingsDecoratorModel->globalBackupSettings();
 }
 
+void BackupSettingsViewWidget::loadState(const ServerSettingsDialogState& state)
+{
+    m_isCloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage;
+
+    const auto storageServicesStatus = state.saasProperties.cloudStorageServicesStatus;
+    if (storageServicesStatus.status == nx::vms::api::UseStatus::overUse)
+    {
+        // TODO: #vbreus Following string is poorly translatable. Also figure out which date format should be used.
+        const auto bannerMessage = tr("There are more cameras being backed up than available "
+            "services. Please disable backup for some cameras or add more suitable services. "
+            "Otherwise, it will be done automatically on %1")
+                .arg(storageServicesStatus.issueExpirationDate.toString());
+        resourceViewWidget()->setInvalidMessage(bannerMessage);
+    }
+    else
+    {
+        resourceViewWidget()->setInvalidMessage({});
+    }
+}
+
 void BackupSettingsViewWidget::switchItemClicked(const QModelIndex& index)
 {
     const auto backupEnabledData = index.data(BackupEnabledRole);
@@ -266,9 +310,10 @@ void BackupSettingsViewWidget::dropdownItemClicked(const QModelIndex& index)
     if (index.column() == backup_settings_view::ContentTypesColumn)
     {
         menuCreator =
-            [](const auto& index)
+            [this](const auto& index)
             {
                 return createContentTypesMenu(
+                    m_isCloudBackupStorage,
                     static_cast<BackupContentTypes>(index.data(BackupContentTypesRole).toInt()));
             };
 

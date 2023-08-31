@@ -14,9 +14,13 @@ enum ResourceDialogItemRole
     BackupEnabledRole, //< Type is bool.
     BackupContentTypesRole, //< Type is nx::vms::api::BackupContentTypes.
     BackupQualityRole, //< Type is nx::vms::api::CameraBackupQuality.
-    HasDropdownMenuRole, //< Type is bool.
-    NothingToBackupWarningRole, //< Type is QString, contains warning explanation.
-    NewAddedCamerasItemRole, //< Type is bool.
+    HasDropdownMenuRole, //< Type is bool.      
+    InfoMessageRole, //< Type is QString.
+    IsItemWarningStyleRole, //< Type is bool, true if item should have special 'Warning' appearance.
+    WarningMessagesRole, //< Type is QVector<QPair<QString, QString>>, warning caption and warning description.
+    NewAddedCamerasItemRole, //< Type is bool, true if item from 'New Added Cameras' pinned row.
+    ResolutionMegaPixelRole, //< Type is int.
+    AvailableCloudStorageServices, //< Type is int, number of available services suitable for a camera.
 };
 
 enum class ResourceSelectionMode
@@ -55,6 +59,7 @@ namespace backup_settings_view {
 enum Column
 {
     ResourceColumn,
+    ResolutionColumn,
     WarningIconColumn,
     ContentTypesColumn,
     QualityColumn,

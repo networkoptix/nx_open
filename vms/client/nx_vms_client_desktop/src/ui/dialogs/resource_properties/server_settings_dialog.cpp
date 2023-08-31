@@ -22,6 +22,8 @@
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.h>
 #include <nx/vms/client/desktop/resource_properties/server/watchers/server_plugin_data_watcher.h>
+#include <nx/vms/client/desktop/resource_properties/server/watchers/server_settings_backup_storages_watcher.h>
+#include <nx/vms/client/desktop/resource_properties/server/watchers/server_settings_saas_state_watcher.h>
 #include <nx/vms/client/desktop/resource_properties/server/widgets/backup_settings_widget.h>
 #include <nx/vms/client/desktop/resource_properties/server/widgets/server_plugins_settings_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -45,6 +47,8 @@ struct QnServerSettingsDialog::Private
     QnMediaServerResourcePtr server;
     const QPointer<ServerSettingsDialogStore> store;
     const QPointer<ServerPluginDataWatcher> pluginDataWatcher;
+    const QPointer<ServerSettingsBackupStoragesWatcher> backupStoragesWatcher;
+    const QPointer<ServerSettingsSaasStateWatcher> saasStateWatcher;
 
     QnServerSettingsWidget* const generalPage;
     QnStorageAnalyticsWidget* const statisticsPage;
@@ -58,6 +62,8 @@ struct QnServerSettingsDialog::Private
         q(q),
         store(new ServerSettingsDialogStore(q)),
         pluginDataWatcher(new ServerPluginDataWatcher(store, q)),
+        backupStoragesWatcher(new ServerSettingsBackupStoragesWatcher(store, q)),
+        saasStateWatcher(new ServerSettingsSaasStateWatcher(store, q)),
         generalPage(new QnServerSettingsWidget(q)),
         statisticsPage(new QnStorageAnalyticsWidget(q)),
         storagesPage(new QnStorageConfigWidget(q)),
@@ -65,7 +71,7 @@ struct QnServerSettingsDialog::Private
         pluginsPage(ini().pluginInformationInServerSettings
             ? new ServerPluginsSettingsWidget(store, qnClientCoreModule->mainQmlEngine(), q)
             : nullptr),
-        backupPage(new BackupSettingsWidget(q)),
+        backupPage(new BackupSettingsWidget(store, q)),
         webPageLink(new QLabel(q))
     {
     }
@@ -197,6 +203,12 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
 
     if (d->pluginDataWatcher)
         d->pluginDataWatcher->setServer(server);
+
+    if (d->backupStoragesWatcher)
+        d->backupStoragesWatcher->setServer(server);
+
+    if (d->saasStateWatcher)
+        d->saasStateWatcher->setServer(server);
 
     d->generalPage->setServer(server);
     d->statisticsPage->setServer(server);

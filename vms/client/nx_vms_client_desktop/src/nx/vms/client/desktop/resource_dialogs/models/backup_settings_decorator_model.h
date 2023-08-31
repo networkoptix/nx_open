@@ -14,6 +14,9 @@
 
 namespace nx::vms::client::desktop {
 
+class ServerSettingsDialogStore;
+struct ServerSettingsDialogState;
+
 class BackupSettingsDecoratorModel:
     public QIdentityProxyModel,
     public SystemContextAware
@@ -26,7 +29,7 @@ public:
     using CameraBackupQuality = nx::vms::api::CameraBackupQuality;
 
 public:
-    BackupSettingsDecoratorModel(SystemContext* systemContext);
+    BackupSettingsDecoratorModel(ServerSettingsDialogStore* store, SystemContext* systemContext);
     virtual ~BackupSettingsDecoratorModel() override;
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
@@ -47,27 +50,16 @@ public:
     void applyChanges();
     void discardChanges();
 
+private:
+    void loadState(const ServerSettingsDialogState& state);
+
 signals:
     void hasChangesChanged();
     void globalBackupSettingsChanged();
 
 private:
-    BackupContentTypes backupContentTypes(const QnVirtualCameraResourcePtr& camera) const;
-    CameraBackupQuality backupQuality(const QnVirtualCameraResourcePtr& camera) const;
-    bool backupEnabled(const QnVirtualCameraResourcePtr& camera) const;
-
-    void setGlobalBackupSettings(const nx::vms::api::BackupSettings& backupSettings);
-
-    QnVirtualCameraResourceList camerasToApplySettings() const;
-    void onRowsAboutToBeRemoved(const QModelIndex& parent, int first, int last);
-
-    QVariant nothingToBackupWarningData(const QModelIndex& index) const;
-
-private:
-    QHash<QnVirtualCameraResourcePtr, BackupContentTypes> m_changedContentTypes;
-    QHash<QnVirtualCameraResourcePtr, CameraBackupQuality> m_changedQuality;
-    QHash<QnVirtualCameraResourcePtr, bool> m_changedEnabledState;
-    std::optional<nx::vms::api::BackupSettings> m_changedGlobalBackupSettings;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

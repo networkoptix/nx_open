@@ -407,6 +407,9 @@ LicenseSummaryData CloudStorageServiceUsageHelper::allInfoForResolution(int mega
     if (!m_cache)
         updateCacheUnsafe();
 
+    if (megapixels == 0)
+        megapixels = SaasCloudStorageParameters::kUnlimitedResolution;
+
     LicenseSummaryData result;
     for (const auto& [key, value]: *m_cache)
     {

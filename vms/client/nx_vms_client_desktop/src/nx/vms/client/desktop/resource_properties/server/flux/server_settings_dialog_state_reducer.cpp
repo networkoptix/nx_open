@@ -44,6 +44,30 @@ State ServerSettingsDialogStateReducer::setOnline(State state, bool value)
     return state;
 }
 
+ServerSettingsDialogStateReducer::State ServerSettingsDialogStateReducer::setBackupStoragesStatus(
+    State state,
+    ServerSettingsDialogState::BackupStoragesStatus storagesStatus)
+{
+    state.backupStoragesStatus = storagesStatus;
+    return state;
+}
+
+ServerSettingsDialogStateReducer::State ServerSettingsDialogStateReducer::setSaasState(
+    State state,
+    nx::vms::api::SaasState saasState)
+{
+    state.saasProperties.saasState = saasState;
+    return state;
+}
+
+ServerSettingsDialogStateReducer::State ServerSettingsDialogStateReducer::setSaasCloudStorageServicesStatus(
+    State state,
+    nx::vms::api::ServiceTypeStatus servicesStatus)
+{
+    state.saasProperties.cloudStorageServicesStatus = servicesStatus;
+    return state;
+}
+
 State ServerSettingsDialogStateReducer::setPluginModules(
     State state, const nx::vms::api::PluginInfoList& value)
 {

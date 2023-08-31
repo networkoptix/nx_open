@@ -5,14 +5,12 @@
 #include "ui_resource_details_widget.h"
 
 #include <core/resource/camera_resource.h>
-
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
+#include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/palette.h>
-#include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
-#include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
-#include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 namespace {
 
@@ -40,6 +38,51 @@ QFont captionFont()
     return font;
 }
 
+QWidget* createWarningWidget(const QString& caption, const QString& message)
+{
+    if (!NX_ASSERT(!caption.isEmpty() || !message.isEmpty()))
+        return nullptr;
+
+    const auto iconSize = QSize(
+        nx::style::Metrics::kDefaultIconSize,
+        nx::style::Metrics::kDefaultIconSize);
+    const auto warningPixmap = qnSkin->icon("tree/buggy.png").pixmap(iconSize);
+    const auto warningCaptionColor = nx::vms::client::core::colorTheme()->color("yellow_core");
+    const auto warningMessageColor = nx::vms::client::core::colorTheme()->color("yellow_d2");
+
+    auto warningWidget = new QWidget();
+
+    auto warningWidgetLayout = new QVBoxLayout(warningWidget);
+    warningWidgetLayout->setSpacing(2);
+    warningWidgetLayout->setContentsMargins({});
+
+    auto warningCaptionLayout = new QHBoxLayout();
+    warningCaptionLayout->setSpacing(4);
+    warningCaptionLayout->setContentsMargins({});
+
+    auto warningIconLabel = new QLabel(warningWidget);
+    warningIconLabel->setPixmap(warningPixmap);
+
+    auto warningCaptionLabel = new QLabel(warningWidget);
+    warningCaptionLabel->setText(caption);
+    warningCaptionLabel->setFont(captionFont());
+    setPaletteColor(warningCaptionLabel, QPalette::WindowText, warningCaptionColor);
+
+    warningCaptionLayout->addWidget(warningIconLabel);
+    warningCaptionLayout->addWidget(warningCaptionLabel);
+    warningCaptionLayout->addStretch();
+
+    auto warningMessageLabel = new QLabel(warningWidget);
+    warningMessageLabel->setText(message);
+    warningMessageLabel->setWordWrap(true);
+    setPaletteColor(warningMessageLabel, QPalette::WindowText, warningMessageColor);
+
+    warningWidgetLayout->addLayout(warningCaptionLayout);
+    warningWidgetLayout->addWidget(warningMessageLabel);
+
+    return warningWidget;
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -59,23 +102,11 @@ ResourceDetailsWidget::ResourceDetailsWidget(QWidget* parent):
     ui->cameraPreviewWidget->setImageProvider(m_cameraThumbnailManager.get());
     ui->cameraPreviewWidget->setProperty(nx::style::Properties::kDontPolishFontProperty, true);
 
-    ui->captionTextLabel->setFont(captionFont());
-    ui->warningCaptionLabel->setFont(captionFont());
-
-    const auto warningCaptionColor = core::colorTheme()->color("yellow_core");
-    const auto warningDescriptionColor = core::colorTheme()->color("yellow_d2");
-    setPaletteColor(ui->warningCaptionLabel, QPalette::WindowText, warningCaptionColor);
-    setPaletteColor(ui->warningExplanationLabel, QPalette::WindowText, warningDescriptionColor);
-
-    const auto warningIcon = qnSkin->icon("tree/buggy.png");
-    ui->warningIconLabel->setPixmap(warningIcon.pixmap(
-        QSize(nx::style::Metrics::kDefaultIconSize, nx::style::Metrics::kDefaultIconSize)));
+    ui->captionLabel->setFont(captionFont());
 
     ui->cameraPreviewWidget->hide();
-    ui->captionTextLabel->hide();
-    ui->descriptionLabel->hide();
-    ui->warningCaptionContainer->hide();
-    ui->warningExplanationLabel->hide();
+    ui->captionLabel->hide();
+    ui->messageLabel->hide();
 }
 
 ResourceDetailsWidget::~ResourceDetailsWidget()
@@ -87,17 +118,11 @@ void ResourceDetailsWidget::clear()
     setUpdatesEnabled(false);
 
     setThumbnailCameraResource({});
-    setCaptionText({});
-    setDescriptionText({});
-    setWarningCaptionText({});
-    setWarningExplanationText({});
+    setCaption({});
+    clearMessage();
+    clearWarningMessages();
 
     setUpdatesEnabled(true);
-}
-
-QnResourcePtr ResourceDetailsWidget::thumbnailCameraResource() const
-{
-    return m_cameraThumbnailManager->selectedCamera();
 }
 
 void ResourceDetailsWidget::setThumbnailCameraResource(const QnResourcePtr& resource)
@@ -107,48 +132,44 @@ void ResourceDetailsWidget::setThumbnailCameraResource(const QnResourcePtr& reso
     ui->cameraPreviewWidget->setHidden(camera.isNull());
 }
 
-QString ResourceDetailsWidget::captionText() const
+void ResourceDetailsWidget::setCaption(const QString& caption)
 {
-    return ui->captionTextLabel->toPlainText();
+    const auto trimmedCaption = caption.trimmed();
+    ui->captionLabel->setPlainText(trimmedCaption);
+    ui->captionLabel->setHidden(trimmedCaption.isEmpty());
 }
 
-void ResourceDetailsWidget::setCaptionText(const QString& name)
+void ResourceDetailsWidget::setMessage(
+    const QString& message,
+    const QColor& color)
 {
-    ui->captionTextLabel->setPlainText(name.trimmed());
-    ui->captionTextLabel->setHidden(captionText().isEmpty());
+    setPaletteColor(ui->messageLabel, QPalette::WindowText, color);
+
+    const auto trimmedMessage = message.trimmed();
+    ui->messageLabel->setText(trimmedMessage);
+    ui->messageLabel->setHidden(trimmedMessage.isEmpty());
 }
 
-QString ResourceDetailsWidget::descriptionText() const
+void ResourceDetailsWidget::clearMessage()
 {
-    return ui->descriptionLabel->text();
+    setMessage({});
 }
 
-void ResourceDetailsWidget::setDescriptionText(const QString& description)
+void ResourceDetailsWidget::addWarningMessage(
+    const QString& warningCaption,
+    const QString& warningMessage)
 {
-    ui->descriptionLabel->setText(description.trimmed());
-    ui->descriptionLabel->setHidden(descriptionText().isEmpty());
+    if (const auto warningWidget = createWarningWidget(warningCaption, warningMessage))
+        ui->warningContainer->layout()->addWidget(warningWidget);
 }
 
-QString ResourceDetailsWidget::warningCaptionText() const
+void ResourceDetailsWidget::clearWarningMessages()
 {
-    return ui->warningCaptionLabel->text();
-}
-
-void ResourceDetailsWidget::setWarningCaptionText(const QString& text)
-{
-    ui->warningCaptionLabel->setText(text.trimmed());
-    ui->warningCaptionContainer->setHidden(warningCaptionText().isEmpty());
-}
-
-QString ResourceDetailsWidget::warningExplanationText() const
-{
-    return ui->warningExplanationLabel->text();
-}
-
-void ResourceDetailsWidget::setWarningExplanationText(const QString& text)
-{
-    ui->warningExplanationLabel->setText(text.trimmed());
-    ui->warningExplanationLabel->setHidden(warningExplanationText().isEmpty());
+    while (auto warningItem = ui->warningContainer->layout()->takeAt(0))
+    {
+        delete warningItem->widget();
+        delete warningItem;
+    }
 }
 
 } // namespace nx::vms::client::desktop
