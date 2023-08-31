@@ -34,7 +34,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <property name="spacing">
-        <number>16</number>
+        <number>8</number>
        </property>
        <item>
         <widget class="nx::vms::client::desktop::SearchLineEdit" name="filterLineEdit" native="true">
@@ -58,7 +58,7 @@
           <enum>Qt::TabFocus</enum>
          </property>
          <property name="text">
-          <string>+ Add Group</string>
+          <string>Add Group</string>
          </property>
         </widget>
        </item>
