@@ -14,6 +14,8 @@
 #include <nx/utils/log/format.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/ldap.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/skin/color_substitutions.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -54,6 +56,7 @@ struct UserGroupListModel::Private
 
     UserGroupDataList orderedGroups;
     QSet<QnUuid> checkedGroupIds;
+    QSet<QnUuid> nonEditableGroupIds;
     QList<QSet<QnUuid>> cycledGroupSets;
     QSet<QnUuid> cycledGroups;
     bool ldapServerOnline = true;
@@ -347,6 +350,11 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
         {
             switch (index.column())
             {
+                case CheckBoxColumn:
+                    if (d->nonEditableGroupIds.contains(group.id))
+                        return tr("You do not have permissions to modify or delete this group.");
+                    break;
+
                 case GroupWarningColumn:
                 {
                     if (d->ldapServerOnline && d->notFoundGroups.contains(group.id))
@@ -458,6 +466,11 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             return {};
         }
 
+        case Qn::DisabledRole:
+            if (index.column() == CheckBoxColumn)
+                return d->nonEditableGroupIds.contains(group.id);
+            return false;
+
         case Qn::FilterKeyRole:
         {
             switch (index.column())
@@ -551,10 +564,25 @@ QSet<QnUuid> UserGroupListModel::checkedGroupIds() const
     return d->checkedGroupIds;
 }
 
+QSet<QnUuid> UserGroupListModel::nonEditableGroupIds() const
+{
+    return d->nonEditableGroupIds;
+}
+
 void UserGroupListModel::setCheckedGroupIds(const QSet<QnUuid>& value)
 {
-    d->checkedGroupIds = value & groupIds();
-    NX_ASSERT(d->checkedGroupIds.size() == value.size());
+    d->checkedGroupIds.clear();
+    const auto allGroups = groupIds();
+    for (const auto& id: value)
+    {
+        if (!NX_ASSERT(allGroups.contains(id)))
+            continue;
+
+        if (d->nonEditableGroupIds.contains(id))
+            continue;
+
+        d->checkedGroupIds.insert(id);
+    }
 
     emit dataChanged(index(0, CheckBoxColumn), index(rowCount() - 1, CheckBoxColumn),
         {Qt::CheckStateRole});
@@ -576,6 +604,9 @@ void UserGroupListModel::setChecked(const QnUuid& groupId, bool checked)
     if (row < 0)
         return;
 
+    if (d->nonEditableGroupIds.contains(groupId))
+        return;
+
     if (checked)
         d->checkedGroupIds.insert(groupId);
     else
@@ -591,6 +622,7 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
     d->checkedGroupIds.clear();
     d->notFoundGroups.clear();
     d->nonUniqueNameTracker = {};
+    d->nonEditableGroupIds.clear();
     d->orderedGroups = groups;
 
     std::sort(d->orderedGroups.begin(), d->orderedGroups.end(),
@@ -607,6 +639,9 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
         if (d->ldapGroupNotFound(group))
             d->notFoundGroups.insert(group.id);
 
+        if (!canDeleteGroup(group.id))
+            d->nonEditableGroupIds.insert(group.id);
+
         d->nonUniqueNameTracker.update(group.id, group.name.toLower());
     }
     d->refreshCycledGroupSets();
@@ -614,10 +649,25 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
     emit nonUniqueGroupsChanged();
 }
 
+bool UserGroupListModel::canDeleteGroup(const QnUuid& groupId) const
+{
+    return systemContext()->accessController()->hasPermissions(groupId, Qn::RemovePermission);
+}
+
 bool UserGroupListModel::addOrUpdateGroup(const UserGroupData& group)
 {
     if (d->nonUniqueNameTracker.update(group.id, group.name.toLower()))
         emit nonUniqueGroupsChanged();
+
+    if (canDeleteGroup(group.id))
+    {
+        d->nonEditableGroupIds.remove(group.id);
+    }
+    else
+    {
+        d->nonEditableGroupIds.insert(group.id);
+        d->checkedGroupIds.remove(group.id);
+    }
 
     const auto position = d->findPosition(group.id);
     if (position == d->orderedGroups.end() || position->id != group.id)
@@ -670,6 +720,7 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
     const ScopedRemoveRows removeRows(this, row, row);
     d->orderedGroups.erase(it);
     d->checkedGroupIds.remove(groupId);
+    d->nonEditableGroupIds.insert(groupId);
     d->markGroupNotFound(groupId, false);
 
     // Remove group from other groups.

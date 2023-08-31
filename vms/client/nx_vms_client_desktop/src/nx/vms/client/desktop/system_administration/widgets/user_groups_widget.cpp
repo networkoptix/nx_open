@@ -240,8 +240,6 @@ public:
 
     nx::vms::api::UserGroupDataList userGroups() const;
 
-    bool canDeleteGroup(const QnUuid& group);
-
     void updateBanners();
 
 private:
@@ -535,7 +533,7 @@ void UserGroupsWidget::Private::setupUi()
                 return;
 
             const auto groupId = index.data(Qn::UuidRole).value<QnUuid>();
-            if (canDeleteGroup(groupId))
+            if (groupsModel->canDeleteGroup(groupId))
                 deleteGroups({groupId});
         });
 
@@ -601,12 +599,6 @@ void UserGroupsWidget::Private::handleModelChanged()
     handleSelectionChanged();
 }
 
-bool UserGroupsWidget::Private::canDeleteGroup(const QnUuid& groupId)
-{
-    return q->systemContext()->accessController()->hasPermissions(
-        groupId, Qn::RemovePermission);
-}
-
 void UserGroupsWidget::Private::updateBanners()
 {
     notFoundGroupsWarning->setText(
@@ -624,17 +616,20 @@ void UserGroupsWidget::Private::updateBanners()
 
 void UserGroupsWidget::Private::handleSelectionChanged()
 {
-    const auto checkedGroupIds = groupsModel->checkedGroupIds() & visibleGroupIds();
+    const auto visibleGroups = visibleGroupIds();
+    const auto nonEditableGroupIds = groupsModel->nonEditableGroupIds() & visibleGroups;
+    const auto checkedGroupIds = groupsModel->checkedGroupIds() & visibleGroups;
+
     if (checkedGroupIds.empty())
         header->setCheckState(Qt::Unchecked);
-    else if (checkedGroupIds.size() == sortModel->rowCount())
+    else if ((checkedGroupIds.size() + nonEditableGroupIds.size()) == sortModel->rowCount())
         header->setCheckState(Qt::Checked);
     else
         header->setCheckState(Qt::PartiallyChecked);
 
     const bool canDelete = !checkedGroupIds.empty()
         && std::any_of(checkedGroupIds.cbegin(), checkedGroupIds.cend(),
-            [this](const QnUuid& groupId) { return canDeleteGroup(groupId); });
+            [this](const QnUuid& groupId) { return groupsModel->canDeleteGroup(groupId); });
 
     deleteSelectedButton->setVisible(canDelete);
     selectionControls->setDisplayed(canDelete);
@@ -712,14 +707,14 @@ void UserGroupsWidget::Private::deleteGroups(const QSet<QnUuid>& groupsToDelete)
 void UserGroupsWidget::Private::deleteSelected()
 {
     QSet<QnUuid> toDelete = visibleSelectedGroupIds();
-    toDelete.removeIf([this](const QnUuid& id) { return !canDeleteGroup(id); });
+    toDelete.removeIf([this](const QnUuid& id) { return !groupsModel->canDeleteGroup(id); });
     deleteGroups(toDelete);
 }
 
 void UserGroupsWidget::Private::deleteNotFoundLdapGroups()
 {
     QSet<QnUuid> toDelete = groupsModel->notFoundGroups();
-    toDelete.removeIf([this](const QnUuid& id) { return !canDeleteGroup(id); });
+    toDelete.removeIf([this](const QnUuid& id) { return !groupsModel->canDeleteGroup(id); });
     deleteGroups(toDelete);
 }
 

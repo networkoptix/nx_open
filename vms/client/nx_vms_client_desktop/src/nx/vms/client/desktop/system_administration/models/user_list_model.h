@@ -52,6 +52,10 @@ public:
     bool isDigestEnabled(const QnUserResourcePtr& user) const;
     void setDigestEnabled(const QnUserResourcePtr& user, bool enabled);
 
+    bool canDelete(const QnUserResourcePtr& user) const;
+    bool canEnableDisable(const QnUserResourcePtr& user) const;
+    bool canChangeAuthentication(const QnUserResourcePtr& user) const;
+
     QnUserResourceList users() const;
     void resetUsers();
     void addUser(const QnUserResourcePtr& user);
