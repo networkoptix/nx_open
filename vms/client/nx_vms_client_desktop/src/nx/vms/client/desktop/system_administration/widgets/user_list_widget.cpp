@@ -451,15 +451,18 @@ void UserListWidget::Private::setupUi()
     header->setVisible(true);
     header->setHighlightCheckedIndicator(true);
     header->setMaximumSectionSize(kMaximumColumnWidth);
-    header->setResizeContentsPrecision(0); //< Calculate resize using only the visible area.
-    header->setSectionResizeMode(QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(UserListModel::UserGroupsColumn, QHeaderView::Stretch);
+    header->setSectionResizeMode(QHeaderView::Stretch);
+    header->setSectionResizeMode(UserListModel::IsCustomColumn, QHeaderView::ResizeToContents);
     header->setSectionsClickable(true);
-    for (const auto column: {UserListModel::UserWarningColumn, UserListModel::UserTypeColumn})
+    for (const auto column: {
+        UserListModel::CheckBoxColumn,
+        UserListModel::UserWarningColumn,
+        UserListModel::UserTypeColumn})
     {
         header->setSectionResizeMode(column, QHeaderView::Fixed);
         header->setAlignment(column, Qt::AlignHCenter);
     }
+    header->resizeSection(UserListModel::CheckBoxColumn, 32);
     header->resizeSection(UserListModel::UserWarningColumn, 20);
     header->resizeSection(UserListModel::UserTypeColumn, 30);
 
@@ -467,11 +470,11 @@ void UserListWidget::Private::setupUi()
         this, &Private::handleHeaderCheckStateChanged);
 
     ui->usersTable->sortByColumn(UserListModel::LoginColumn, Qt::AscendingOrder);
-
     const auto scrollBar = new SnappedScrollBar(q->window());
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
-
     connect(ui->usersTable, &QAbstractItemView::clicked, this, &Private::handleUsersTableClicked);
+
+    ui->createUserButton->setIcon(qnSkin->icon("user_settings/plus.svg"));
     connect(ui->createUserButton, &QPushButton::clicked, this, &Private::createUser);
 
     setPaletteColor(notFoundUsersWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));

@@ -473,6 +473,7 @@ void UserGroupsWidget::Private::setupUi()
                 ui->groupsTable->clearSelection();
         });
 
+    ui->createGroupButton->setIcon(qnSkin->icon("user_settings/plus.svg"));
     connect(ui->createGroupButton, &QPushButton::clicked, this, &Private::createGroup);
 
     setPaletteColor(notFoundGroupsWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
