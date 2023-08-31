@@ -695,7 +695,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             // Simple check is enough, exported layouts are checked on the client side.
             if (layout->isShared())
             {
-                if (!accessRights.testFlag(AccessRight::view))
+                if (!accessRights)
                     return Qn::NoPermissions;
 
                 // Global layouts editor.
