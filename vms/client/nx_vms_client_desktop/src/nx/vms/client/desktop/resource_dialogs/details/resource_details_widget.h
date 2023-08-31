@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/panel.h>
 
 namespace Ui { class ResourceDetailsWidget; }
@@ -24,20 +25,35 @@ public:
 
     void clear();
 
-    QnResourcePtr thumbnailCameraResource() const;
     void setThumbnailCameraResource(const QnResourcePtr& resource);
 
-    QString captionText() const;
-    void setCaptionText(const QString& text);
+    /*
+     * Sets text that will be displayed below thumbnail, if one will be acquired, and above other
+     * text blocks in any case. Caption is displayed in bright accented style.
+     */
+    void setCaption(const QString& text);
 
-    QString descriptionText() const;
-    void setDescriptionText(const QString& text);
+    /*
+     * Sets text of information message, optionally in user defined color.
+     */
+    void setMessage(const QString& text,
+        const QColor& color = nx::vms::client::core::colorTheme()->color("light10"));
 
-    QString warningCaptionText() const;
-    void setWarningCaptionText(const QString& text);
+    /*
+     * Removes information message, equivalent of setMessage({}) call.
+     */
+    void clearMessage();
 
-    QString warningExplanationText() const;
-    void setWarningExplanationText(const QString& text);
+    /*
+     * Adds warning message that consists of caption and more detailed explanation displayed as
+     * special warning block with exclamation mark icon and texts in a bright yellow color.
+     */
+    void addWarningMessage(const QString& warningCaption, const QString& warningMessage);
+
+    /*
+     * Removes all warning messages.
+     */
+    void clearWarningMessages();
 
 private:
     const std::unique_ptr<Ui::ResourceDetailsWidget> ui;

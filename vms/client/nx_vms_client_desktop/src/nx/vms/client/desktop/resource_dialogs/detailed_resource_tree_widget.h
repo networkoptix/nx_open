@@ -92,7 +92,7 @@ protected:
     virtual void setupHeader();
 
 private:
-    void updateDetailsPanel(const QModelIndex& index);
+    void updateDetailsPanel();
 
 private:
     const std::unique_ptr<Ui::DetailedResourceTreeWidget> ui;

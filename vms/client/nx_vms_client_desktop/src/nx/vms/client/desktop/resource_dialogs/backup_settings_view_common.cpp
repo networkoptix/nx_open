@@ -146,11 +146,16 @@ QString backupQualityToString(CameraBackupQuality backupQuality)
     return BackupSettingsViewStrings::backupQualityToString(backupQuality);
 }
 
-std::unique_ptr<QMenu> createContentTypesMenu(std::optional<BackupContentTypes> activeOption)
+std::unique_ptr<QMenu> createContentTypesMenu(
+    bool isCloudBackupStorage,
+    std::optional<BackupContentTypes> activeOption)
 {
     auto menu = std::make_unique<QMenu>();
     for (const auto& contentTypesOption: kBackupContentTypesMenuOptions)
     {
+        if (isCloudBackupStorage && contentTypesOption == BackupContentType::archive)
+            continue;
+
         auto action = menu->addAction(backupContentTypesToString(contentTypesOption));
         action->setData(QVariant::fromValue<int>(contentTypesOption));
         if (activeOption && *activeOption == contentTypesOption)
