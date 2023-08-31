@@ -32,6 +32,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -43,6 +44,7 @@
 #include <server/server_storage_manager.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/models/storage_list_model.h>
+#include <ui/models/storage_model_info.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
@@ -69,6 +71,12 @@ NX_REFLECTION_ENUM_CLASS(StorageType,
     unknown
 );
 
+enum class StoragePoolMenuItem
+{
+    main,
+    backup,
+};
+
 static int storageTypeInfo(const QnStorageModelInfo& storageData)
 {
     StorageType storageType = StorageType::unknown;
@@ -93,6 +101,52 @@ static bool strLessThan(const QString& strLeft, const QString& strRight)
     return strLeft.length() < strRight.length();
 }
 
+bool backupSettingsCompatibleForCloudBackup(const QnVirtualCameraResourcePtr& camera)
+{
+    using namespace nx::vms::api;
+
+    NX_ASSERT(backup_settings_view::isBackupSupported(camera));
+
+    return !camera->getBackupContentType().testFlag(BackupContentType::archive);
+}
+
+void fixupBackupSettingsForForCloudBackup(const QnVirtualCameraResourcePtr& camera)
+{
+    using namespace nx::vms::api;
+
+    if (!NX_ASSERT(backup_settings_view::isBackupSupported(camera)))
+        return;
+
+    if (!camera->getBackupContentType().testFlag(BackupContentType::archive))
+        return;
+
+    camera->setBackupContentType(
+        {BackupContentType::analytics,
+         BackupContentType::motion,
+         BackupContentType::bookmarks});
+}
+
+QnVirtualCameraResourceList getCamerasWithIncompatibleCloudBackupSettings(
+    const QnMediaServerResourcePtr& server)
+{
+    const auto allCameras = server->resourcePool()->getAllCameras(
+        server->getId(),
+        /*ignoreDesktopCameras*/ true);
+
+    return allCameras.filtered(
+        [](const auto& camera)
+        {
+            // TODO: #vbreus Better move 'isBackupSupported' function to the another module.
+            // Despite the fact that it's trivial and have single line check it's good to have
+            // single implementation of it the common module
+            return backup_settings_view::isBackupSupported(camera)
+                && !backupSettingsCompatibleForCloudBackup(camera);
+        });
+}
+
+//-------------------------------------------------------------------------------------------------
+// StoragesSortModel
+
 class StoragesSortModel: public QSortFilterProxyModel
 {
 public:
@@ -115,6 +169,9 @@ protected:
             (groupOrderLeft == groupOrderRight && strLessThan(left.url, right.url));
     }
 };
+
+//-------------------------------------------------------------------------------------------------
+// StorageTableItemDelegate
 
 class StorageTableItemDelegate: public QStyledItemDelegate
 {
@@ -236,6 +293,9 @@ private:
     int m_editedRow = -1;
 };
 
+//-------------------------------------------------------------------------------------------------
+// ColumnResizer
+
 class ColumnResizer: public QObject
 {
 public:
@@ -267,6 +327,9 @@ protected:
 static constexpr int kUpdateStatusTimeoutMs = 5 * 1000;
 
 } // namespace
+
+//-------------------------------------------------------------------------------------------------
+// MetadataWatcher
 
 class QnStorageConfigWidget::MetadataWatcher:
     public QObject,
@@ -454,6 +517,9 @@ private:
     nx::utils::PendingOperation m_updateEngines;
 };
 
+//-------------------------------------------------------------------------------------------------
+// QnStorageConfigWidget
+
 QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -467,8 +533,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     ui->setupUi(this);
 
     m_storagePoolMenu->setProperty(style::Properties::kMenuAsDropdown, true);
-    m_storagePoolMenu->addAction(tr("Main"))->setData(false);
-    m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
+    const auto mainAction = m_storagePoolMenu->addAction(tr("Main"));
+    const auto backupAction = m_storagePoolMenu->addAction(tr("Backup"));
+
+    mainAction->setData(static_cast<int>(StoragePoolMenuItem::main));
+    backupAction->setData(static_cast<int>(StoragePoolMenuItem::backup));
 
     setHelpTopic(this, HelpTopic::Id::ServerSettings_Storages);
 
@@ -495,6 +564,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     ui->storageView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->storageView->header()->setSectionResizeMode(
         QnStorageListModel::SeparatorColumn, QHeaderView::Stretch);
+    ui->storageView->header()->setSectionsMovable(false);
 
     ui->storageView->setMouseTracking(true);
     ui->storageView->installEventFilter(m_columnResizer.data());
@@ -504,7 +574,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
         {
             itemDelegate->setEditedRow(index.row());
             ui->storageView->update(index);
-            at_storageView_clicked(index);
+            atStorageViewClicked(index);
             itemDelegate->setEditedRow(-1);
             ui->storageView->update(index);
         };
@@ -512,7 +582,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     connect(ui->storageView, &TreeView::clicked, this, itemClicked);
 
     connect(ui->addExtStorageToMainBtn, &QPushButton::clicked, this,
-        [this]() { at_addExtStorage(true); });
+        [this]() { atAddExtStorage(true); });
 
     connect(ui->rebuildMainButton, &QPushButton::clicked, this,
         [this] { startRebuid(true); });
@@ -527,10 +597,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
         [this]{ cancelRebuild(false); });
 
     connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildStatusChanged,
-        this, &QnStorageConfigWidget::at_serverRebuildStatusChanged);
+        this, &QnStorageConfigWidget::atServerRebuildStatusChanged);
 
     connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished,
-        this, &QnStorageConfigWidget::at_serverRebuildArchiveFinished);
+        this, &QnStorageConfigWidget::atServerRebuildArchiveFinished);
 
     connect(qnServerStorageManager, &QnServerStorageManager::storageAdded, this,
         [this](const QnStorageResourcePtr& storage)
@@ -641,6 +711,129 @@ void QnStorageConfigWidget::hideEvent(QHideEvent* event)
     m_updateStatusTimer->stop();
 }
 
+QnStorageConfigWidget::StorageConfigWarningFlags
+    QnStorageConfigWidget::storageConfigurationWarningFlags() const
+{
+    StorageConfigWarningFlags flags;
+
+    for (const auto& storageInfo: m_model->storages())
+    {
+        const auto storageResource =
+            resourcePool()->getResourceById<QnStorageResource>(storageInfo.id);
+
+        if (!storageResource || storageResource->getParentId() != m_server->getId())
+            continue;
+
+        // Metadata related flags.
+        if (storageInfo.id == m_model->metadataStorageId())
+        {
+            const auto isSystemStorage = storageResource->persistentStatusFlags()
+                .testFlag(vms::api::StoragePersistentFlag::system);
+
+            if (isSystemStorage)
+                flags.setFlag(analyticsIsOnSystemDrive);
+
+            if (!storageInfo.isUsed)
+                flags.setFlag(analyticsIsOnDisabledStorage);
+        }
+
+        // Storage enabled state wasn's affected, skipping further checks.
+        if (storageInfo.isUsed == storageResource->isUsedForWriting())
+            continue;
+
+        // TODO: Get rid of serialized literals, use PartitionType enum value instead.
+
+        // Storages status and configuratiom messages.
+        if (!storageInfo.isUsed)
+            flags.setFlag(hasDisabledStorage);
+
+        if (storageInfo.isUsed && storageInfo.storageType == "usb")
+            flags.setFlag(hasUsbStorage);
+
+        // Cloud backup storage related flags.
+        if (storageInfo.isUsed && storageInfo.storageType == "cloud")
+            flags.setFlag(cloudBackupStorageBeingEnabled);
+
+        if (!storageInfo.isUsed && storageResource->isUsedForWriting() && storageResource->isBackup())
+            flags.setFlag(backupStorageBeingReplacedByCloudStorage);
+    }
+
+    return flags;
+}
+
+void QnStorageConfigWidget::updateWarnings()
+{
+    QScopedValueRollback<bool> updatingGuard(m_updating, true);
+
+    const auto flags = storageConfigurationWarningFlags();
+
+    std::vector<BarDescription> messages;
+
+    if (flags.testFlag(analyticsIsOnSystemDrive))
+    {
+        messages.push_back(
+            {
+                .text = tr("Analytics data can take up large amounts of space. We recommend "
+                    "choosing another location for it instead of the system partition."),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty =
+                    &messageBarSettings()->storageConfigAnalyticsOnSystemStorageWarning
+            });
+    }
+    if (flags.testFlag(analyticsIsOnDisabledStorage))
+    {
+        messages.push_back(
+            {
+                .text = tr("Analytics and motion data will continue to be stored on the "
+                    "disabled storage"),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty =
+                    &messageBarSettings()->storageConfigAnalyticsOnDisabledStorageWarning
+            });
+    }
+    if (flags.testFlag(hasDisabledStorage))
+    {
+        messages.push_back(
+            {
+                .text = tr("Recording to disabled storage location will stop. However,"
+                    " deleting outdated footage from it will continue."),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->storageConfigHasDisabledWarning
+            });
+    }
+    if (flags.testFlag(hasUsbStorage))
+    {
+        messages.push_back(
+            {
+                .text = tr("Recording was enabled on the USB storage"),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->storageConfigUsbWarning
+            });
+    }
+    if (flags.testFlags({cloudBackupStorageBeingEnabled, backupStorageBeingReplacedByCloudStorage}))
+    {
+        messages.push_back(
+            {
+                .text = tr("If cloud storage is activated for backup, other backup storages will "
+                    "be deactivated and the “All archive” option for already configured devices "
+                    "will be changed to “Motion, Object, Bookmarks”"),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
+            });
+    }
+    else if (flags.testFlag(cloudBackupStorageBeingEnabled))
+    {
+        messages.push_back(
+            {
+                .text = tr("If cloud storage is activated for backup, the “All archive” option "
+                    "for already configured devices will be changed to “Motion, Object, Bookmarks”"),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
+            });
+    }
+    ui->messageBarBlock->setMessageBars(messages);
+}
+
 bool QnStorageConfigWidget::hasChanges() const
 {
     if (isReadOnly())
@@ -649,7 +842,7 @@ bool QnStorageConfigWidget::hasChanges() const
     return hasStoragesChanges(m_model->storages());
 }
 
-void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
+void QnStorageConfigWidget::atAddExtStorage(bool addToMain)
 {
     if (!m_server || isReadOnly())
         return;
@@ -687,6 +880,45 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
     emit hasChangesChanged();
 }
 
+bool QnStorageConfigWidget::cloudStorageToggledOn() const
+{
+    const auto cloudStorage = m_model->cloudBackupStorage();
+
+    if (!cloudStorage)
+        return false;
+
+    if (!cloudStorage->isUsed)
+        return false;
+
+    const auto storageResource =
+        resourcePool()->getResourceById<QnStorageResource>(cloudStorage->id);
+
+    return !storageResource->isUsedForWriting();
+}
+
+void QnStorageConfigWidget::updateBackupSettingsForCloudStorage()
+{
+    const auto cameras = getCamerasWithIncompatibleCloudBackupSettings(m_server);
+    if (cameras.empty())
+        return;
+
+    const auto applyChanges =
+        [cameras]
+        {
+            for (const auto& camera: cameras)
+                fixupBackupSettingsForForCloudBackup(camera);
+        };
+
+    // TODO: #vbreus Implement saving via REST, add returned handle to requests list.
+
+    // TODO: #vbreus This is not really correct way to alter backup settings, changes done on
+    // 'Backup' tab should be merged with this ones and applied via single request.
+
+    // TODO: #vbreus Move applied backup settings to the ServerSettingsDialogState.
+
+    qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges);
+}
+
 void QnStorageConfigWidget::loadDataToUi()
 {
     if (!m_server)
@@ -708,7 +940,7 @@ void QnStorageConfigWidget::loadStoragesFromResources()
     m_model->setStorages(storages);
 }
 
-void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
+void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
 {
     if (!m_server || isReadOnly())
         return;
@@ -717,21 +949,44 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
 
     if (index.column() == QnStorageListModel::StoragePoolColumn)
     {
-        if (!m_model->canChangeStoragePool(record) || !index.flags().testFlag(Qt::ItemIsEditable))
+        if (!m_model->canChangeStoragePool(record)
+            || !index.flags().testFlag(Qt::ItemIsEditable)
+            || !index.flags().testFlag(Qt::ItemIsUserCheckable))
+        {
             return;
+        }
 
         auto findAction =
-            [this](bool isBackup) -> QAction*
+            [this](StoragePoolMenuItem menuItem) -> QAction*
             {
                 for (auto action: m_storagePoolMenu->actions())
                 {
-                    if (!action->data().isNull() && action->data().toBool() == isBackup)
+                    const auto actionData = action->data();
+                    if (actionData.isNull())
+                        continue;
+
+                    StoragePoolMenuItem actionItem =
+                        static_cast<StoragePoolMenuItem>(actionData.toInt());
+
+                    if (menuItem == actionItem)
                         return action;
                 }
+
+                NX_ASSERT(false, "Unexpected action type passed as parameter");
                 return nullptr;
             };
 
-        m_storagePoolMenu->setActiveAction(findAction(record.isBackup));
+        const auto activeAction = findAction(record.isBackup
+            ? StoragePoolMenuItem::backup
+            : StoragePoolMenuItem::main);
+
+        m_storagePoolMenu->setActiveAction(activeAction);
+
+        // Disable "Backup" menu option if cloud is used for backup, otherwise storage will be
+        // disabled and become non-interactive.
+        const auto cloudStorageInfo = m_model->cloudBackupStorage();
+        const auto backupMenuActionEnabled = !cloudStorageInfo || !cloudStorageInfo->isUsed;
+        findAction(StoragePoolMenuItem::backup)->setEnabled(backupMenuActionEnabled);
 
         QPoint point = ui->storageView->viewport()->mapToGlobal(
             ui->storageView->visualRect(index).bottomLeft()) + QPoint(0, 1);
@@ -740,11 +995,29 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
         if (!selection)
             return;
 
-        bool isBackup = selection->data().toBool();
-        if (record.isBackup == isBackup)
-            return;
+        const auto selectedMenuItem = static_cast<StoragePoolMenuItem>(selection->data().toInt());
 
-        record.isBackup = isBackup;
+        switch (selectedMenuItem)
+        {
+            case StoragePoolMenuItem::backup:
+                if (!backupMenuActionEnabled || record.isBackup)
+                    return;
+
+                record.isBackup = true;
+                break;
+
+            case StoragePoolMenuItem::main:
+                if (!record.isBackup)
+                    return;
+
+                record.isBackup = false;
+                break;
+
+            default:
+                NX_ASSERT(false, "Unexpected action type picked from context menu");
+                return;
+        }
+
         m_model->updateStorage(record);
     }
     else if (index.column() == QnStorageListModel::ActionsColumn)
@@ -761,9 +1034,14 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
             {
                 // Check storage access rights.
                 if (record.isDbReady || globalSettings()->forceAnalyticsDbStoragePermissions())
+                {
                     confirmNewMetadataStorage(storageId);
+                }
                 else
-                    QnMessageBox::critical(this, tr("Insufficient permissions to store analytics data."));
+                {
+                    QnMessageBox::critical(
+                        this, tr("Insufficient permissions to store analytics data."));
+                }
             }
         }
     }
@@ -888,6 +1166,9 @@ void QnStorageConfigWidget::applyChanges()
 
     QnStorageResourceList storagesToUpdate;
     vms::api::IdDataList storagesToRemove;
+
+    if (cloudStorageToggledOn())
+        updateBackupSettingsForCloudStorage();
 
     applyStoragesChanges(storagesToUpdate, m_model->storages());
 
@@ -1052,89 +1333,6 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
     }
 }
 
-void QnStorageConfigWidget::updateWarnings()
-{
-    QScopedValueRollback<bool> updatingGuard(m_updating, true);
-
-    bool analyticsIsOnSystemDrive = false;
-    bool analyticsIsOnDisabledStorage = false;
-    bool hasDisabledStorage = false;
-    bool hasUsbStorage = false;
-
-    for (const auto& storageData: m_model->storages())
-    {
-        const auto storage = resourcePool()->getResourceById<QnStorageResource>(storageData.id);
-        if (!storage || storage->getParentId() != m_server->getId())
-            continue;
-
-        if (storageData.id == m_model->metadataStorageId())
-        {
-            if (storage->persistentStatusFlags().testFlag(vms::api::StoragePersistentFlag::system))
-                analyticsIsOnSystemDrive = true;
-
-            if (!storageData.isUsed)
-                analyticsIsOnDisabledStorage = true;
-        }
-
-        // Storage was not modified.
-        if (storageData.isUsed == storage->isUsedForWriting())
-            continue;
-
-        if (!storageData.isUsed)
-            hasDisabledStorage = true;
-
-        // TODO: use PartitionType enum value here instead of the serialized literal.
-        if (storageData.isUsed && storageData.storageType == lit("usb"))
-            hasUsbStorage = true;
-    }
-
-    std::vector<BarDescription> messages;
-
-    if (analyticsIsOnSystemDrive)
-    {
-        messages.push_back(
-            {
-                .text = tr("Analytics data can take up large amounts of space. We recommend "
-                    "choosing another location for it instead of the system partition."),
-                .level = BarDescription::BarLevel::Warning,
-                .isEnabledProperty =
-                    &messageBarSettings()->storageConfigAnalyticsOnSystemStorageWarning
-            });
-    }
-    if (analyticsIsOnDisabledStorage)
-    {
-        messages.push_back(
-            {
-                .text = tr("Analytics and motion data will continue to be stored on the "
-                    "disabled storage"),
-                .level = BarDescription::BarLevel::Warning,
-                .isEnabledProperty =
-                    &messageBarSettings()->storageConfigAnalyticsOnDisabledStorageWarning
-            });
-    }
-    if (hasDisabledStorage)
-    {
-        messages.push_back(
-            {
-                .text = tr("Recording to disabled storage location will stop. However,"
-                    " deleting outdated footage from it will continue."),
-                .level = BarDescription::BarLevel::Warning,
-                .isEnabledProperty = &messageBarSettings()->storageConfigHasDisabledWarning
-            });
-    }
-    if (hasUsbStorage)
-    {
-        messages.push_back(
-            {
-                .text = tr("Recording was enabled on the USB storage"),
-                .level = BarDescription::BarLevel::Warning,
-                .isEnabledProperty = &messageBarSettings()->storageConfigUsbWarning
-            });
-    }
-
-    ui->messageBarBlock->setMessageBars(messages);
-}
-
 void QnStorageConfigWidget::updateRebuildUi(
     QnServerStoragesPool pool,
     const nx::vms::api::StorageScanInfo& reply)
@@ -1175,7 +1373,7 @@ void QnStorageConfigWidget::updateRebuildUi(
     }
 }
 
-void QnStorageConfigWidget::at_serverRebuildStatusChanged(
+void QnStorageConfigWidget::atServerRebuildStatusChanged(
     const QnMediaServerResourcePtr& server,
     QnServerStoragesPool pool,
     const nx::vms::api::StorageScanInfo& status)
@@ -1184,7 +1382,7 @@ void QnStorageConfigWidget::at_serverRebuildStatusChanged(
         updateRebuildUi(pool, status);
 }
 
-void QnStorageConfigWidget::at_serverRebuildArchiveFinished(
+void QnStorageConfigWidget::atServerRebuildArchiveFinished(
     const QnMediaServerResourcePtr& server,
     QnServerStoragesPool pool)
 {
