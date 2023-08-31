@@ -3,14 +3,15 @@
 #pragma once
 
 #include <array>
+#include <optional>
 
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QBrush>
 
-#include <nx/vms/api/data/storage_space_reply.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/api/data/storage_scan_info.h>
+#include <nx/vms/api/data/storage_space_reply.h>
 #include <server/server_storage_manager_fwd.h>
 #include <ui/models/storage_model_info.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -56,7 +57,11 @@ public:
     QnStorageModelInfo storage(const QModelIndex& index) const;
     QnStorageModelInfoList storages() const;
 
-    void updateRebuildInfo(QnServerStoragesPool pool, const nx::vms::api::StorageScanInfo& rebuildStatus);
+    std::optional<QnStorageModelInfo> cloudBackupStorage() const;
+
+    void updateRebuildInfo(
+        QnServerStoragesPool pool,
+        const nx::vms::api::StorageScanInfo& rebuildStatus);
 
     /** Check if the storage can be moved from this model to another. */
     bool canChangeStoragePool(const QnStorageModelInfo& data) const;
@@ -72,23 +77,27 @@ public:
     bool couldStoreAnalytics(const QnStorageModelInfo& data) const;
 
     /**
-     *  Check if storage is active on the server.
-     *  Inactive storages are:
-     *      - newly added remote storages, until changes are applied
-     *      - auto-found server-side partitions without storage
+     * Check if storage is active on the server.
+     * Inactive storages are:
+     *     - newly added remote storages, until changes are applied
+     *     - auto-found server-side partitions without storage
      */
     bool storageIsActive(const QnStorageModelInfo& data) const;
-
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation,
+        int role = Qt::DisplayRole) const override;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
 protected:
-    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+    virtual bool setData(
+        const QModelIndex& index,
+        const QVariant& value,
+        int role = Qt::EditRole) override;
 
 private:
     QString displayData(const QModelIndex& index, bool forcedText) const;

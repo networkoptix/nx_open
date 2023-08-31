@@ -39,6 +39,7 @@ public:
         this, "storageConfigAnalyticsOnDisabledStorageWarning", true};
     Property<bool> storageConfigHasDisabledWarning{this, "storageConfigHasDisabledWarning", true};
     Property<bool> storageConfigUsbWarning{this, "storageConfigUsbWarning", true};
+    Property<bool> storageConfigCloudStorageWarning{this, "storageConfigCloudStorageWarning", true};
 };
 
 MessageBarSettings* messageBarSettings();
