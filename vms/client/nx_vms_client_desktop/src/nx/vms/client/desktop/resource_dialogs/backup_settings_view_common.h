@@ -28,6 +28,7 @@ bool isBackupSupported(const QnVirtualCameraResourcePtr& camera);
 bool isBackupSupported(const QModelIndex& index);
 
 std::unique_ptr<QMenu> createContentTypesMenu(
+    bool isCloudBackupStorage,
     std::optional<nx::vms::api::BackupContentTypes> activeOption = std::nullopt);
 
 std::unique_ptr<QMenu> createQualityMenu(

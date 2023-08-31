@@ -12,17 +12,21 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <nx/vms/api/data/storage_flags.h>
+#include <nx/vms/api/data/storage_space_data.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
+#include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
 #include <ui/common/palette.h>
@@ -33,54 +37,40 @@ static constexpr auto kPlaceholderImageSize = QSize(128, 128);
 static constexpr int kPlaceholderTextPixelSize = 16;
 static constexpr auto kPlaceholderTextWeight = QFont::Light;
 
-bool backupStorageConfigured(const QnMediaServerResourcePtr& server)
+QFont placeholderMessageCaptionFont()
 {
-    if (server.isNull())
-        return false;
+    static constexpr auto kPlaceholderMessageCaptionFontSize = 16;
+    static constexpr auto kPlaceholderMessageCaptionFontWeight = QFont::Medium;
 
-    const auto storageResourceList = server->getStorages();
-    return std::any_of(std::cbegin(storageResourceList), std::cend(storageResourceList),
-        [](const auto& storageResource)
-        {
-            const auto statusFlags = storageResource->runtimeStatusFlags();
-            return !statusFlags.testFlag(nx::vms::api::StorageRuntimeFlag::disabled)
-                && storageResource->isBackup()
-                && storageResource->isUsedForWriting();
-        });
+    QFont font;
+    font.setPixelSize(kPlaceholderMessageCaptionFontSize);
+    font.setWeight(kPlaceholderMessageCaptionFontWeight);
+    return font;
 }
 
-int enabledStoragesCount(const QnMediaServerResourcePtr& server)
+QFont placeholderMessageFont()
 {
-    if (!server)
-        return 0;
+    static constexpr auto kPlaceholderMessageFontSize = 14;
+    static constexpr auto kPlaceholderMessageFontWeight = QFont::Normal;
 
-    const auto storageResourceList = server->getStorages();
-    return std::count_if(std::cbegin(storageResourceList), std::cend(storageResourceList),
-        [](const auto& storageResource)
-        {
-            const auto statusFlags = storageResource->runtimeStatusFlags();
-            return !statusFlags.testFlag(nx::vms::api::StorageRuntimeFlag::disabled)
-                && storageResource->isUsedForWriting();
-        });
+    QFont font;
+    font.setPixelSize(kPlaceholderMessageFontSize);
+    font.setWeight(kPlaceholderMessageFontWeight);
+    return font;
 }
 
 } // namespace
 
 namespace nx::vms::client::desktop {
 
-BackupSettingsWidget::BackupSettingsWidget(QWidget* parent):
+BackupSettingsWidget::BackupSettingsWidget(ServerSettingsDialogStore* store, QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::BackupSettingsWidget())
 {
     ui->setupUi(this);
 
-    setupPlaceholderPageAppearance();
-
-    setWarningStyle(ui->offlinePlaceholderPage);
-
-    connect(ui->unconfiguredPlaceholderLabel, &QLabel::linkActivated,
-        this, &BackupSettingsWidget::storageManagementShortcutClicked);
+    setupPlaceholders();
 
     using namespace nx::style;
     ui->emptyTabBarFiller->setProperty(Properties::kTabShape, static_cast<int>(TabShape::Compact));
@@ -92,19 +82,13 @@ BackupSettingsWidget::BackupSettingsWidget(QWidget* parent):
         ui->settingsStackedWidget, &QStackedWidget::setCurrentIndex);
 
     // Widget initialized with this pointer as parent to setup workbench context.
-    m_backupSettingsViewWidget = new BackupSettingsViewWidget(this);
+    m_backupSettingsViewWidget = new BackupSettingsViewWidget(store, this);
 
     // Ownership of widget is transferred to the layout.
     ui->viewWidgetPageLayout->insertWidget(0, m_backupSettingsViewWidget);
 
-    connect(qnServerStorageManager, &QnServerStorageManager::storageAdded, this,
-        [this] { updateBackupSettingsAvailability(); });
-
-    connect(qnServerStorageManager, &QnServerStorageManager::storageChanged, this,
-        [this] { updateBackupSettingsAvailability(); });
-
-    connect(qnServerStorageManager, &QnServerStorageManager::storageRemoved, this,
-        [this] { updateBackupSettingsAvailability(); });
+    connect(store, &ServerSettingsDialogStore::stateChanged, this,
+        &BackupSettingsWidget::loadState);
 
     connect(m_backupSettingsViewWidget, &BackupSettingsViewWidget::hasChangesChanged,
         this, &BackupSettingsWidget::hasChangesChanged);
@@ -125,20 +109,9 @@ void BackupSettingsWidget::setServer(const QnMediaServerResourcePtr& server)
     if (m_server == server)
         return;
 
-    if (m_server)
-        m_server->disconnect(this);
-
     m_server = server;
     ui->backupStatusWidget->setServer(m_server);
     ui->backupBandwidthSettingsWidget->setServer(m_server);
-
-    if (m_server)
-    {
-        connect(m_server.get(),
-            &QnResource::statusChanged,
-            this,
-            &BackupSettingsWidget::updateBackupSettingsAvailability);
-    }
 }
 
 bool BackupSettingsWidget::hasChanges() const
@@ -149,29 +122,6 @@ bool BackupSettingsWidget::hasChanges() const
 
 void BackupSettingsWidget::loadDataToUi()
 {
-    if (m_server.isNull())
-        return;
-
-    m_backupSettingsViewWidget->setTreeEntityFactoryFunction(
-        [this](const entity_resource_tree::ResourceTreeEntityBuilder* builder)
-        {
-            using namespace entity_item_model;
-
-            AbstractItemPtr newAddedCamerasItem = GenericItemBuilder()
-                .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
-                .withRole(Qt::DisplayRole, tr("New added cameras"))
-                .withRole(ResourceDialogItemRole::NewAddedCamerasItemRole, true)
-                .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});
-
-            return builder->addPinnedItem(builder->createDialogServerCamerasEntity(m_server, {}),
-                std::move(newAddedCamerasItem));
-        });
-    m_backupSettingsViewWidget->loadDataToUi();
-    m_backupSettingsViewWidget->resourceViewWidget()->makeRequiredItemsVisible();
-    ui->backupBandwidthSettingsWidget->loadDataToUi();
-
-    updateMessageBarText();
-    updateBackupSettingsAvailability();
 }
 
 void BackupSettingsWidget::applyChanges()
@@ -192,41 +142,23 @@ void BackupSettingsWidget::discardChanges()
     ui->backupBandwidthSettingsWidget->discardChanges();
 }
 
-void BackupSettingsWidget::setupPlaceholderPageAppearance()
+void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
 {
-    QFont placeholderFont;
-    placeholderFont.setPixelSize(kPlaceholderTextPixelSize);
-    placeholderFont.setWeight(kPlaceholderTextWeight);
-
-    setPaletteColor(ui->unconfiguredPlaceholderLabel, QPalette::WindowText,
-        core::colorTheme()->color("dark17"));
-    ui->unconfiguredPlaceholderLabel->setFont(placeholderFont);
-
-    const auto pixmap = qnSkin->pixmap(
-        "placeholders/backup_placeholder.svg", true, kPlaceholderImageSize);
-    ui->unconfiguredPlaceholderImageLabel->setPixmap(qnSkin->maximumSizePixmap(pixmap));
-}
-
-void BackupSettingsWidget::updateBackupSettingsAvailability()
-{
-    const bool serverIsOffline = m_server.isNull() || !m_server->isOnline();
-    const bool storageConfigured = backupStorageConfigured(m_server);
-    if (!storageConfigured && hasChanges())
-        discardChanges();
-
-    if (serverIsOffline)
+    if (!state.isOnline)
     {
-        ui->stackedWidget->setCurrentWidget(ui->offlinePlaceholderPage);
-
+        ui->stackedWidget->setCurrentWidget(ui->genericPlaceholderPage);
+        ui->genericPlaceholderCaptionLabel->setText(tr("Server is offline"));
+        ui->genericPlaceholderMessageLabel->setText(tr("Backup settings are not available"));
+        m_backupSettingsViewWidget->setTreeEntityFactoryFunction({});
         return;
     }
 
-    if (!storageConfigured)
+    if (!state.backupStoragesStatus.hasActiveBackupStorage)
     {
         const auto storageManagementLink =
             QString("<a href=\"#\" style=\"text-decoration:none\">%1</a>")
                .arg(tr("Storage Management"));
-        auto storagesCount = enabledStoragesCount(m_server);
+        auto storagesCount = state.backupStoragesStatus.enabledNonCloudStoragesCount;
         QString labelStringTemplate;
         if (storagesCount > 1)
         {
@@ -241,12 +173,88 @@ void BackupSettingsWidget::updateBackupSettingsAvailability()
                 tr("To enable backup add more drives to use them as backup storage in %1");
         }
         ui->unconfiguredPlaceholderLabel->setText(labelStringTemplate.arg(storageManagementLink));
-        ui->stackedWidget->setCurrentWidget(ui->unconfiguredPlaceholderPage);
+        ui->stackedWidget->setCurrentWidget(ui->noActiveBackupStoragePlaceholder);
+        m_backupSettingsViewWidget->setTreeEntityFactoryFunction({});
     }
     else
     {
+        const auto cloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage;
+        const auto saasState = state.saasProperties.saasState;
+
+        if (saasState != nx::vms::api::SaasState::uninitialized
+            && saasState != nx::vms::api::SaasState::active
+            && cloudBackupStorage)
+        {
+            ui->stackedWidget->setCurrentWidget(ui->genericPlaceholderPage);
+
+            ui->genericPlaceholderCaptionLabel->setText(
+                saasState == nx::vms::api::SaasState::suspend
+                    ? tr("SaaS suspended")
+                    : tr("SaaS shut down"));
+
+            ui->genericPlaceholderMessageLabel->setText(
+                tr("To perform a backup to the cloud storage SaaS must be in active state. "
+                    "Contact your channel partner for details"));
+
+            m_backupSettingsViewWidget->setTreeEntityFactoryFunction({});
+            return;
+        }
+
         ui->stackedWidget->setCurrentWidget(ui->settingsPage);
+        m_backupSettingsViewWidget->setTreeEntityFactoryFunction(
+            [this, cloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage]
+            (const entity_resource_tree::ResourceTreeEntityBuilder* builder)
+            {
+                using namespace entity_item_model;
+
+                auto serverCamerasEntity =
+                    builder->createDialogServerCamerasEntity(m_server, {});
+
+                if (cloudBackupStorage)
+                    return serverCamerasEntity;
+
+                AbstractItemPtr newAddedCamerasItem = GenericItemBuilder()
+                    .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
+                    .withRole(Qt::DisplayRole, tr("New added cameras"))
+                    .withRole(ResourceDialogItemRole::NewAddedCamerasItemRole, true)
+                    .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});
+
+                return builder->addPinnedItem(
+                    std::move(serverCamerasEntity),
+                    std::move(newAddedCamerasItem));
+            });
+
+        m_backupSettingsViewWidget->resourceViewWidget()->makeRequiredItemsVisible();
+        ui->backupBandwidthSettingsWidget->loadDataToUi();
     }
+
+    updateMessageBarText();
+
+    if (!state.backupStoragesStatus.hasActiveBackupStorage && hasChanges())
+        discardChanges();
+}
+
+void BackupSettingsWidget::setupPlaceholders()
+{
+    // No active backup storage placeholder.
+    QFont placeholderFont;
+    placeholderFont.setPixelSize(kPlaceholderTextPixelSize);
+    placeholderFont.setWeight(kPlaceholderTextWeight);
+
+    setPaletteColor(ui->unconfiguredPlaceholderLabel, QPalette::WindowText,
+        core::colorTheme()->color("dark17"));
+    ui->unconfiguredPlaceholderLabel->setFont(placeholderFont);
+
+    const auto pixmap = qnSkin->pixmap(
+        "placeholders/backup_placeholder.svg", true, kPlaceholderImageSize);
+    ui->unconfiguredPlaceholderImageLabel->setPixmap(qnSkin->maximumSizePixmap(pixmap));
+
+    connect(ui->unconfiguredPlaceholderLabel, &QLabel::linkActivated,
+        this, &BackupSettingsWidget::storageManagementShortcutClicked);
+
+    // 'Server offline' / 'SaaS suspended' / 'SaaS shut down' placeholder.
+    ui->genericPlaceholderCaptionLabel->setFont(placeholderMessageCaptionFont());
+    ui->genericPlaceholderMessageLabel->setFont(placeholderMessageFont());
 }
 
 void BackupSettingsWidget::updateMessageBarText()

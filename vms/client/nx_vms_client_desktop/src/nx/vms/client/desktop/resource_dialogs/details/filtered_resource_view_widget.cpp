@@ -311,18 +311,6 @@ void FilteredResourceViewWidget::setupFilter()
 
 void FilteredResourceViewWidget::setupSignals()
 {
-    connect(treeView(), &QAbstractItemView::entered, this,
-        [this](const QModelIndex& proxyIndex)
-        {
-            emit itemHovered(m_filterProxyModel->mapToSource(proxyIndex));
-        });
-
-    connect(treeView(), &QAbstractItemView::viewportEntered, this,
-        [this]
-        {
-            emit itemHovered(QModelIndex());
-        });
-
     connect(treeView(), &QAbstractItemView::clicked, this,
         [this](const QModelIndex& proxyIndex)
         {
@@ -475,20 +463,30 @@ ItemViewHoverTracker* FilteredResourceViewWidget::itemViewHoverTracker()
 
 QModelIndex FilteredResourceViewWidget::toViewIndex(const QModelIndex& sourceIndex) const
 {
-    if (!m_filterProxyModel->sourceModel()
-        || !sourceIndex.isValid()
-        || m_filterProxyModel->sourceModel() != sourceIndex.model())
-    {
-        return QModelIndex();
-    }
+    if (!(NX_ASSERT(m_filterProxyModel->sourceModel())))
+        return {};
+
+    if (!sourceIndex.isValid())
+        return {};
+
+    if (!NX_ASSERT(m_filterProxyModel->sourceModel() == sourceIndex.model()))
+        return {};
 
     return m_filterProxyModel->mapFromSource(sourceIndex);
 }
 
-void FilteredResourceViewWidget::leaveEvent(QEvent* event)
+QModelIndex FilteredResourceViewWidget::toSourceIndex(const QModelIndex& viewIndex) const
 {
-    base_type::leaveEvent(event);
-    emit itemHovered(QModelIndex());
+    if (!(NX_ASSERT(m_filterProxyModel->sourceModel())))
+        return {};
+
+    if (!viewIndex.isValid())
+        return {};
+
+    if (!NX_ASSERT(m_filterProxyModel.get() == viewIndex.model()))
+        return {};
+
+    return m_filterProxyModel->mapToSource(viewIndex);
 }
 
 } // namespace nx::vms::client::desktop

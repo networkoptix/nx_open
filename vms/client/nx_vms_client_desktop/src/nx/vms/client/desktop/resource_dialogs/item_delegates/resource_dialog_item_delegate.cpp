@@ -86,11 +86,11 @@ void ResourceDialogItemDelegate::initStyleOption(
     const QModelIndex& index) const
 {
 
-    static const auto kTextColor = core::colorTheme()->color("light7");
-    static const auto kSelectedTextColor = core::colorTheme()->color("light10");
+    static const auto kTextColor = core::colorTheme()->color("light10");
+    static const auto kSelectedTextColor = core::colorTheme()->color("light7");
 
-    static const auto kExtraTextColor = core::colorTheme()->color("dark17");
-    static const auto kSelectedExtraTextColor = core::colorTheme()->color("light13");
+    static const auto kExtraTextColor = core::colorTheme()->color("dark13");
+    static const auto kSelectedExtraTextColor = core::colorTheme()->color("light17");
 
     base_type::initStyleOption(option, index);
 
@@ -140,8 +140,8 @@ void ResourceDialogItemDelegate::paintItemText(
     const auto style = option.widget ? option.widget->style() : QApplication::style();
 
     const auto textColor = option.state.testFlag(QStyle::State_Selected)
-        ? option.palette.color(QPalette::Text)
-        : option.palette.color(QPalette::HighlightedText);
+        ? option.palette.color(QPalette::HighlightedText)
+        : option.palette.color(QPalette::Text);
     const auto extraTextColor = option.palette.color(QPalette::PlaceholderText);
 
     const auto textFont = option.font;
@@ -232,8 +232,16 @@ void ResourceDialogItemDelegate::paintItemIcon(
 
     option.icon.paint(painter, iconRect, option.decorationAlignment, mode, QIcon::On);
 
-    if (showRecordingIndicator())
+    const auto isWarningStyle = index.data(IsItemWarningStyleRole).toBool();
+    if (isWarningStyle)
+    {
+        const auto warningIcon = qnSkin->icon("tree/buggy.png");
+        warningIcon.paint(painter, iconRect.translated(-style::Metrics::kDefaultIconSize, 0));
+    }
+    else if (showRecordingIndicator())
+    {
         paintRecordingIndicator(painter, iconRect, index);
+    }
 }
 
 void ResourceDialogItemDelegate::paintRecordingIndicator(

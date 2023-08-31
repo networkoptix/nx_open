@@ -17,13 +17,16 @@ class QHeaderView;
 
 namespace nx::vms::client::desktop {
 
+class ServerSettingsDialogStore;
+struct ServerSettingsDialogState;
+
 class BackupSettingsPickerWidget: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
-    BackupSettingsPickerWidget(QWidget* parent = nullptr);
+    BackupSettingsPickerWidget(ServerSettingsDialogStore* store, QWidget* parent = nullptr);
     virtual ~BackupSettingsPickerWidget() override;
 
     static QString backupContentTypesPlaceholderText();
@@ -38,13 +41,14 @@ signals:
     void backupEnabledChanged(bool enabled);
 
 private:
-    void setupContentTypesDropdown();
+    void loadState(const ServerSettingsDialogState& state);
+    void setupContentTypesDropdown(bool isCloudBackupStorage);
     void setupQualityDropdown();
 
 private:
     const std::unique_ptr<Ui::BackupSettingsPickerWidget> ui;
-    const std::unique_ptr<QMenu> m_contentTypesDropdownMenu;
-    const std::unique_ptr<QMenu> m_qualityDropdownMenu;
+    std::unique_ptr<QMenu> m_contentTypesDropdownMenu;
+    std::unique_ptr<QMenu> m_qualityDropdownMenu;
 };
 
 } // namespace nx::vms::client::desktop
