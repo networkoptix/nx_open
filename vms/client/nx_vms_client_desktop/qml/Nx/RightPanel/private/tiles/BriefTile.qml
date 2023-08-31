@@ -29,7 +29,10 @@ TileBase
             ResourceList
             {
                 id: resourceList
+
                 resourceNames: (model && model.resourceList) || []
+                color: tile.foregroundColor
+                remainderColor: tile.secondaryForegroundColor
             }
 
             Text
@@ -39,7 +42,7 @@ TileBase
                 Layout.minimumWidth: implicitWidth
                 Layout.alignment: Qt.AlignRight | Qt.AlignTop
 
-                color: tile.palette.windowText
+                color: tile.secondaryForegroundColor
                 visible: !!text
                 font { pixelSize: 11; weight: Font.Normal }
 
@@ -57,6 +60,8 @@ TileBase
             previewState: (model && model.previewState) || 0
             previewAspectRatio: (model && model.previewAspectRatio) || 1
             highlightRect: (model && model.previewHighlightRect) || Qt.rect(0, 0, 0, 0)
+
+            foregroundColor: tile.secondaryForegroundColor
 
             visible: (model && model.previewResource
                 && (!tile.controller || tile.controller.showThumbnails))

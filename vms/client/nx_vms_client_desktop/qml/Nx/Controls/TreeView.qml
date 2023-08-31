@@ -417,7 +417,7 @@ FocusScope
 
                     anchors.fill: parent
 
-                    onEntered:
+                    onEntered: (drag) =>
                     {
                         drag.accepted = (itemFlags & Qt.ItemIsDropEnabled)
                             && (checkDrop(drag, drag.proposedAction)
@@ -426,7 +426,7 @@ FocusScope
                                 || checkDrop(drag, Qt.LinkAction))
                     }
 
-                    onDropped:
+                    onDropped: (drop) =>
                     {
                         drop.accepted = (itemFlags & Qt.ItemIsDropEnabled)
                             && DragAndDrop.drop(currentMimeData, drop.action, modelIndex)

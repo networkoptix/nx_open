@@ -21,6 +21,11 @@ Control
     property rect highlightRect: Qt.rect(0, 0, 0, 0)
     property bool showHighlightBorder: false
 
+    property color backgroundColor: ColorTheme.colors.dark6
+    property color borderColor: ColorTheme.colors.dark5
+    property color highlightColor: ColorTheme.colors.brand_core
+    property color foregroundColor: ColorTheme.colors.light16
+
     // Preview item will not have aspect ratio lesser than this value.
     // Actual preview image will be fit into these bounds keeping its own aspect ratio.
     property real minimumAspectRatio: 16.0 / 9.0
@@ -35,8 +40,8 @@ Control
     {
         id: backgroundRect
 
-        border.color: preview.palette.shadow
-        color: preview.palette.dark
+        border.color: preview.borderColor
+        color: preview.backgroundColor
     }
 
     contentItem: Item
@@ -68,7 +73,7 @@ Control
                 Rectangle
                 {
                     color: "transparent"
-                    border.color: preview.palette.highlight
+                    border.color: preview.highlightColor
 
                     x: preview.highlightRect.x * mask.width
                     y: preview.highlightRect.y * mask.height
@@ -99,7 +104,7 @@ Control
             verticalAlignment: Qt.AlignVCenter
             horizontalAlignment: Qt.AlignHCenter
             visible: previewState == RightPanel.PreviewState.missing
-            color: preview.palette.windowText
+            color: preview.foregroundColor
             text: qsTr("NO DATA")
         }
 
@@ -108,7 +113,7 @@ Control
             id: preloader
 
             anchors.centerIn: parent
-            color: preview.palette.windowText
+            color: preview.foregroundColor
 
             running: previewState == RightPanel.PreviewState.busy
                 || previewState == RightPanel.PreviewState.initial
