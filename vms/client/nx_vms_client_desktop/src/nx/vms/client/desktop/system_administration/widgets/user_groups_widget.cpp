@@ -49,7 +49,7 @@ constexpr int kMaximumInteractiveColumnWidth = 600;
 constexpr int kDefaultInteractiveColumnWidth = 200;
 
 static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-    kTextButtonColors = {{QIcon::Normal, {"light14"}}, {QIcon::Active, {"light13"}}};
+    kTextButtonColors = {{QIcon::Normal, {"light4"}}, {QIcon::Active, {"light3"}}};
 
 } // namespace
 
@@ -176,7 +176,7 @@ public:
     ControlBar* const selectionControls{new ControlBar(q)};
 
     QPushButton* const deleteSelectedButton{new QPushButton(
-        qnSkin->icon("text_buttons/delete_20_deprecated.svg", kTextButtonColors),
+        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
         tr("Delete"),
         selectionControls)};
 
@@ -345,7 +345,7 @@ void UserGroupsWidget::Private::setupUi()
     selectionControls->setFixedHeight(kButtonBarHeight);
 
     setPaletteColor(selectionControls, QPalette::Window, core::colorTheme()->color("dark11"));
-    setPaletteColor(selectionControls, QPalette::WindowText, core::colorTheme()->color("light14"));
+    setPaletteColor(selectionControls, QPalette::WindowText, core::colorTheme()->color("light4"));
     setPaletteColor(selectionControls, QPalette::Dark, core::colorTheme()->color("dark15"));
 
     const auto buttonsLayout = selectionControls->horizontalLayout();
