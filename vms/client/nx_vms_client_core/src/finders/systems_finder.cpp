@@ -188,7 +188,8 @@ void QnSystemsFinder::onSystemLost(const QString& systemId, int priority)
         return;
 
     const auto aggregator = *it;
-    NX_ASSERT(aggregator->containsSystem(priority), "System is lost before being found");
+    if (!aggregator->containsSystem(priority))
+        return;
 
     if (aggregator->isAggregator())
     {
