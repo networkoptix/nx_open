@@ -190,6 +190,7 @@ class UserListWidget::Private: public QObject
     UserListWidget* const q;
     nx::utils::ImplPtr<Ui::UserListWidget> ui{new Ui::UserListWidget()};
     QSet<QnUserResourcePtr> m_visibleSelected;
+    QSet<QnUserResourcePtr> m_visibleDisabled;
 
 public:
     UserListModel* const usersModel{new UserListModel(q)};
@@ -247,12 +248,9 @@ private:
     void handleHeaderCheckStateChanged(Qt::CheckState state);
     void handleUsersTableClicked(const QModelIndex& index);
 
-    bool canDelete(const QnUserResourcePtr& user) const;
-    bool canDelete(const QnUserResourceList& users) const;
-    bool canEnableDisable(const QnUserResourcePtr& user) const;
-    bool canEnableDisable(const QnUserResourceList& users) const;
-    bool canChangeAuthentication(const QnUserResourcePtr& user) const;
-    bool canChangeAuthentication(const QnUserResourceList& users) const;
+    bool canDelete(const QSet<QnUserResourcePtr>& users) const;
+    bool canEnableDisable(const QSet<QnUserResourcePtr>& users) const;
+    bool canChangeAuthentication(const QSet<QnUserResourcePtr>& users) const;
 
     QnUserResourceList visibleUsers() const;
     QnUserResourceList visibleSelectedUsers() const;
@@ -396,6 +394,7 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
             emit this->q->hasChangesChanged();
 
             m_visibleSelected.clear();
+            m_visibleDisabled.clear();
             if (sortModel->rowCount() > 0)
                 visibleAdded(0, sortModel->rowCount() - 1);
 
@@ -599,7 +598,7 @@ void UserListWidget::Private::setupUi()
                 return;
 
             const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
-            if (canDelete(user))
+            if (usersModel->canDelete(user))
                 deleteUsers({user});
         });
 
@@ -704,19 +703,20 @@ void UserListWidget::Private::modelUpdated()
 
 void UserListWidget::Private::updateSelection()
 {
-    const auto users = visibleSelectedUsers();
     Qt::CheckState selectionState = Qt::Unchecked;
 
-    const bool hasSelection = !users.isEmpty();
+    const bool hasSelection = !m_visibleSelected.isEmpty();
     if (hasSelection)
     {
-        selectionState = users.size() == sortModel->rowCount()
-            ? Qt::Checked
-            : Qt::PartiallyChecked;
+        selectionState =
+            (m_visibleSelected.size() + m_visibleDisabled.size()) == sortModel->rowCount()
+                ? Qt::Checked
+                : Qt::PartiallyChecked;
     }
 
-    const auto canDelete = this->canDelete(users);
-    const auto canEdit = canEnableDisable(users) || canChangeAuthentication(users);
+    const auto canDelete = this->canDelete(m_visibleSelected);
+    const auto canEdit = canEnableDisable(m_visibleSelected)
+        || canChangeAuthentication(m_visibleSelected);
 
     deleteButton->setVisible(canDelete);
     editButton->setVisible(canEdit);
@@ -724,6 +724,7 @@ void UserListWidget::Private::updateSelection()
     selectionControls->setDisplayed(canDelete || canEdit);
     header->setCheckState(selectionState);
 
+    emit q->selectionUpdated();
     q->update();
 }
 
@@ -766,7 +767,7 @@ void UserListWidget::Private::deleteUsers(const QnUserResourceList& usersToDelet
 void UserListWidget::Private::deleteSelected()
 {
     const auto usersToDelete = visibleSelectedUsers().filtered(
-        [this](const QnUserResourcePtr& user) { return canDelete(user); });
+        [this](const QnUserResourcePtr& user) { return usersModel->canDelete(user); });
     deleteUsers(usersToDelete);
 }
 
@@ -777,31 +778,62 @@ void UserListWidget::Private::deleteNotFoundLdapUsers()
 
 void UserListWidget::Private::editSelected()
 {
-    const auto usersToEdit = visibleSelectedUsers().filtered(
-        [this](const QnUserResourcePtr& user)
-        {
-            return canEnableDisable(user) || canChangeAuthentication(user);
-        });
+    const auto getSelectedUsers = [this]() -> std::tuple<QSet<QnUserResourcePtr>, QVariantMap>
+    {
+        const auto usersToEdit = nx::utils::toQSet(visibleSelectedUsers().filtered(
+            [this](const QnUserResourcePtr& user)
+            {
+                return usersModel->canEnableDisable(user)
+                    || usersModel->canChangeAuthentication(user);
+            }));
+
+        return {usersToEdit, QVariantMap{
+            {"usersCount", usersToEdit.size()},
+            {"enableUsersEditable", canEnableDisable(usersToEdit)},
+            {"digestEditable", canChangeAuthentication(usersToEdit)}}};
+    };
+
+    QSet<QnUserResourcePtr> usersToEdit;
+    QVariantMap dialogParameters;
+    std::tie(usersToEdit, dialogParameters) = getSelectedUsers();
 
     if (usersToEdit.empty())
         return;
 
     if (usersToEdit.size() == 1)
     {
-        editUser(usersToEdit.front());
+        editUser(*usersToEdit.begin());
         return;
     }
-
-    const QVariantMap dialogParameters{
-        {"usersCount", usersToEdit.size()},
-        {"enableUsersEditable", canEnableDisable(usersToEdit)},
-        {"digestEditable", canChangeAuthentication(usersToEdit)}};
 
     QmlDialogWrapper batchUserEditDialog(
         QUrl("Nx/Dialogs/UserManagement/BatchUserEditDialog.qml"), dialogParameters, q);
 
+    q->connect(q, &UserListWidget::selectionUpdated, &batchUserEditDialog,
+        [&batchUserEditDialog, &usersToEdit, getSelectedUsers]
+        {
+            if (!NX_ASSERT(batchUserEditDialog.window()))
+                return;
+
+            QVariantMap dialogParameters;
+            std::tie(usersToEdit, dialogParameters) = getSelectedUsers();
+
+            if (usersToEdit.empty())
+            {
+                batchUserEditDialog.reject();
+                return;
+            }
+
+            for (const auto& [k, v]: dialogParameters.asKeyValueRange())
+                batchUserEditDialog.window()->setProperty(k.toStdString().c_str(), v);
+        });
+
     if (!batchUserEditDialog.exec())
         return; //< Cancelled.
+
+    // Selection might change during dialog execution.
+    if (usersToEdit.empty())
+        return;
 
     const auto enableUsers = batchUserEditDialog.window()->property("enableUsers")
         .value<Qt::CheckState>();
@@ -885,7 +917,12 @@ void UserListWidget::Private::visibleAdded(int first, int last)
 
         const bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
+        {
+            if (index.data(Qn::DisabledRole).toBool())
+                m_visibleDisabled.insert(user);
+
             continue;
+        }
 
         if (user)
             m_visibleSelected.insert(user);
@@ -900,6 +937,7 @@ void UserListWidget::Private::visibleAboutToBeRemoved(int first, int last)
         const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
         m_visibleSelected.remove(user);
+        m_visibleDisabled.remove(user);
     }
 }
 
@@ -911,10 +949,20 @@ void UserListWidget::Private::visibleModified(int first, int last)
         const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
         const bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
+
         if (!checked)
+        {
             m_visibleSelected.remove(user);
+            if (index.data(Qn::DisabledRole).toBool())
+                m_visibleDisabled.insert(user);
+            else
+                m_visibleDisabled.remove(user);
+        }
         else
+        {
             m_visibleSelected.insert(user);
+            m_visibleDisabled.remove(user);
+        }
     }
 }
 
@@ -922,17 +970,7 @@ QnUserResourceList UserListWidget::Private::visibleSelectedUsers() const
 {
     QnUserResourceList result;
     for (const auto& user: m_visibleSelected)
-    {
-        const int row = usersModel->userRow(user);
-        const QModelIndex index = usersModel->index(row, UserListModel::CheckBoxColumn);
-
-        const bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
-        if (!checked)
-            continue;
-
-        result.push_back(user);
-    }
-
+        result << user;
     return result;
 }
 
@@ -944,39 +982,25 @@ int UserListWidget::Private::getLdapUserCount() const
     return ldapUsers.size();
 }
 
-bool UserListWidget::Private::canDelete(const QnUserResourcePtr& user) const
-{
-    return q->accessController()->hasPermissions(user, Qn::RemovePermission);
-}
-
-bool UserListWidget::Private::canDelete(const QnUserResourceList& users) const
+bool UserListWidget::Private::canDelete(const QSet<QnUserResourcePtr>& users) const
 {
     return !users.empty() && std::any_of(users.cbegin(), users.cend(),
-        [this](const QnUserResourcePtr& user) { return canDelete(user); });
+        [this](const QnUserResourcePtr& user) { return usersModel->canDelete(user); });
 }
 
-bool UserListWidget::Private::canEnableDisable(const QnUserResourcePtr& user) const
-{
-    return q->accessController()->hasPermissions(user,
-        Qn::WritePermission | Qn::WriteAccessRightsPermission | Qn::SavePermission);
-}
-
-bool UserListWidget::Private::canEnableDisable(const QnUserResourceList& users) const
+bool UserListWidget::Private::canEnableDisable(const QSet<QnUserResourcePtr>& users) const
 {
     return !users.empty() && std::all_of(users.cbegin(), users.cend(),
-        [this](const QnUserResourcePtr& user) { return canEnableDisable(user); });
+        [this](const QnUserResourcePtr& user) { return usersModel->canEnableDisable(user); });
 }
 
-bool UserListWidget::Private::canChangeAuthentication(const QnUserResourcePtr& user) const
-{
-    return q->accessController()->hasPermissions(user,
-        Qn::WritePermission | Qn::WriteDigestPermission | Qn::SavePermission);
-}
-
-bool UserListWidget::Private::canChangeAuthentication(const QnUserResourceList& users) const
+bool UserListWidget::Private::canChangeAuthentication(const QSet<QnUserResourcePtr>& users) const
 {
     return !users.empty() && std::all_of(users.cbegin(), users.cend(),
-        [this](const QnUserResourcePtr& user) { return canChangeAuthentication(user); });
+        [this](const QnUserResourcePtr& user)
+        {
+            return usersModel->canChangeAuthentication(user);
+        });
 }
 
 void UserListWidget::Private::handleHeaderCheckStateChanged(Qt::CheckState state)
@@ -1003,6 +1027,9 @@ void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
     {
         case UserListModel::CheckBoxColumn:
         {
+            if (index.data(Qn::DisabledRole).toBool())
+                break;
+
             const auto nextCheckState = index.data(Qt::CheckStateRole).toInt() == Qt::Checked
                 ? Qt::Unchecked
                 : Qt::Checked;
