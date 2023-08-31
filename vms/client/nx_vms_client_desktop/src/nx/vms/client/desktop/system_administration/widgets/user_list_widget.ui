@@ -34,7 +34,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <property name="spacing">
-        <number>16</number>
+        <number>8</number>
        </property>
        <item>
         <widget class="nx::vms::client::desktop::SearchLineEdit" name="filterLineEdit" native="true">
@@ -49,16 +49,6 @@
          </property>
          <property name="placeholderText" stdset="0">
           <string>Search users</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="createUserButton">
-         <property name="focusPolicy">
-          <enum>Qt::TabFocus</enum>
-         </property>
-         <property name="text">
-          <string>+ Add User</string>
          </property>
         </widget>
        </item>
@@ -78,6 +68,16 @@
          </property>
          <property name="flat">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="createUserButton">
+         <property name="focusPolicy">
+          <enum>Qt::TabFocus</enum>
+         </property>
+         <property name="text">
+          <string>Add User</string>
          </property>
         </widget>
        </item>
