@@ -28,15 +28,38 @@
  * SUCH DAMAGE.
  */
 
+#pragma once
+
+#include <chrono>
+#include <ctime>
+#include <optional>
+#include <string>
+
+#include <stddef.h>
+#include <stdint.h>
+
 namespace nx::network::stun {
 
-struct EncryptedBlock {
-  uint16_t nonce_length;
-  uint8_t nonce[OAUTH_MAX_NONCE_SIZE];
-  uint16_t key_length;
-  uint8_t mac_key[MAXSHASIZE];
-  uint64_t timestamp;
-  uint32_t lifetime;
+struct EncryptedBlock
+{
+    uint16_t nonceLength = 0;
+    uint8_t nonce[256] = {0};
+    uint16_t keyLength = 0;
+    uint8_t macKey[20] = {0};
+    // The integer number of seconds is contained in the first 48 bits of the field, and the
+    // remaining 16 bits indicate the number of 1/64000 fractions of a second. Here the last
+    // 16 bits are always 0.
+    uint64_t timestamp = 0;
+    uint32_t lifetime = 0;
 };
+
+std::optional<EncryptedBlock> decodeToken(const std::string& serverName,
+    const std::string& base64EncodedKey,
+    const std::string& base64EncodedToken);
+
+std::optional<std::string> encodeToken(
+    const std::string& serverName,
+    const std::string& key,
+    const EncryptedBlock& encryptedBlock);
 
 } // namespace nx::network::stun
