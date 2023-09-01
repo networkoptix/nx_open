@@ -140,18 +140,6 @@ struct ExportLayoutTool::Private
     }
 };
 
-ExportLayoutTool::ItemInfo::ItemInfo():
-    name(),
-    timezone(0)
-{
-}
-
-ExportLayoutTool::ItemInfo::ItemInfo(const QString& name, qint64 timezone):
-    name(name),
-    timezone(timezone)
-{
-}
-
 ExportLayoutTool::ExportLayoutTool(
     ExportLayoutSettings settings,
     LayoutResourcePtr layout,
@@ -163,7 +151,7 @@ ExportLayoutTool::ExportLayoutTool(
     d->originalLayout = layout;
     // Make d->layout a deep exact copy of original layout.
     d->layout = (settings.mode == ExportLayoutSettings::Mode::LocalSave
-        ? LayoutResourcePtr(new QnFileLayoutResource())
+        ? LayoutResourcePtr(new QnFileLayoutResource({}))
         : LayoutResourcePtr(new LayoutResource()));
     d->layout->setIdUnsafe(layout->getId()); //before update() uuid's must be the same
     d->layout->update(layout);
@@ -206,9 +194,9 @@ bool ExportLayoutTool::prepareStorage()
     return true;
 }
 
-ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
+NovMetadata ExportLayoutTool::prepareLayoutAndMetadata()
 {
-    ItemInfoList result;
+    NovMetadata metadata{.version = NovMetadata::kCurrentVersion};
 
     QSet<QnUuid> idList;
     common::LayoutItemDataMap items;
@@ -236,10 +224,10 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
         localItem.resource.path = fileNameForResource(resource);
         items.insert(localItem.uuid, localItem);
 
-        ItemInfo info(resource->getName(), Qn::InvalidUtcOffset);
-        info.timezone = nx::vms::client::core::ServerTimeWatcher::utcOffset(mediaResource,
-            Qn::InvalidUtcOffset);
-        result.append(info);
+        metadata.itemProperties[localItem.uuid] = {
+            .name = resource->getName(),
+            .timeZoneOffset =
+                core::ServerTimeWatcher::utcOffset(mediaResource, Qn::InvalidUtcOffset)};
     }
     d->layout->setItems(items);
 
@@ -247,39 +235,39 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     if (d->layout->data(Qn::LayoutWatermarkRole).isNull() && d->settings.watermark.visible())
         d->layout->setData(Qn::LayoutWatermarkRole, QVariant::fromValue(d->settings.watermark));
 
-    return result;
+    return metadata;
 }
 
 
-bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
+bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
 {
     // NOV-file metadata.
     {
-        NovMetadata metadata{.version=NovMetadata::kVersion51};
-
         QByteArray rawData = QByteArray::fromStdString(nx::reflect::json::serialize(metadata));
         if (!writeData("metadata.json", rawData))
             return false;
     }
 
-    // Names of exported resources.
+    // Names of exported resources. Needed for compatibility with older VMS versions.
     {
         QByteArray names;
         QTextStream itemNames(&names, QIODevice::WriteOnly);
-        for (const ItemInfo& info: items)
-            itemNames << info.name << "\n";
+        // It is important to use the same order as d->layout->getItems() has.
+        for (const auto& [itemId, _]: d->layout->getItems().asKeyValueRange())
+            itemNames << metadata.itemProperties.at(itemId).name << "\n";
         itemNames.flush();
 
         if (!writeData("item_names.txt", names))
             return false;
     }
 
-    // Timezones of exported resources.
+    // Timezones of exported resources. Needed for compatibility with older VMS versions.
     {
         QByteArray timezones;
         QTextStream itemTimeZonesStream(&timezones, QIODevice::WriteOnly);
-        for (const ItemInfo &info : items)
-            itemTimeZonesStream << info.timezone << "\n";
+        // It is important to use the same order as d->layout->getItems() has.
+        for (const auto& [itemId, _]: d->layout->getItems().asKeyValueRange())
+            itemTimeZonesStream << metadata.itemProperties.at(itemId).timeZoneOffset << "\n";
         itemTimeZonesStream.flush();
 
         if (!writeData("item_timezones.txt", timezones))
@@ -423,9 +411,9 @@ bool ExportLayoutTool::start()
         return false;
     }
 
-    ItemInfoList items = prepareLayout();
+    const NovMetadata metadata = prepareLayoutAndMetadata();
 
-    if (!exportMetadata(items))
+    if (!exportMetadata(metadata))
     {
         d->lastError = ExportProcessError::fileAccess;
         d->setStatus(ExportProcessStatus::failure);

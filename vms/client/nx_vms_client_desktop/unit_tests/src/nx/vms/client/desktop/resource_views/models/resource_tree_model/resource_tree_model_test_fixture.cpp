@@ -155,7 +155,7 @@ QnFileLayoutResourcePtr ResourceTreeModelTest::addFileLayout(
     const QString& path,
     bool isEncrypted) const
 {
-    QnFileLayoutResourcePtr fileLayout(new QnFileLayoutResource());
+    QnFileLayoutResourcePtr fileLayout(new QnFileLayoutResource({}));
     fileLayout->setIdUnsafe(guidFromArbitraryData(path));
     fileLayout->setUrl(path);
     fileLayout->setName(QFileInfo(path).fileName());
