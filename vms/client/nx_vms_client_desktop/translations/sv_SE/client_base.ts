@@ -10708,7 +10708,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Export</source>
-      <translation>Export</translation>
+      <translation>Exportera</translation>
     </message>
     <message>
       <source>On-device recordings were found</source>
