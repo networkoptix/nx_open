@@ -302,7 +302,8 @@ void DesktopCameraConnection::run()
     const auto setupNetwork =
         [this](
             std::unique_ptr<nx::network::http::HttpClient> newClient,
-            std::unique_ptr<nx::network::AbstractStreamSocket> newSocket)
+            std::unique_ptr<nx::network::AbstractStreamSocket> newSocket,
+            nx::utils::SoftwareVersion version)
         {
             auto newProcessor = newSocket
                 ? std::make_shared<DesktopCameraConnectionProcessor>(
@@ -311,7 +312,7 @@ void DesktopCameraConnection::run()
                     d->owner)
                 : std::shared_ptr<DesktopCameraConnectionProcessor>();
             if (newProcessor)
-                newProcessor->setServerVersion(d->server->getVersion());
+                newProcessor->setServerVersion(version);
 
             NX_MUTEX_LOCKER lock(&d->mutex);
             std::swap(d->httpClient, newClient);
@@ -320,45 +321,41 @@ void DesktopCameraConnection::run()
 
     while (!m_needStop)
     {
-        QnUuid serverId;
+        QnMediaServerResourcePtr server;
         RemoteConnectionPtr connection;
         {
             NX_MUTEX_LOCKER lock(&d->mutex);
-            if (!d->server)
-                break;
-
-            serverId = d->server->getId();
-            auto systemContext = SystemContext::fromResource(d->server);
-            if (NX_ASSERT(systemContext))
-                connection = systemContext->connection();
-
-            if (!connection)
-                break;
+            server = d->server;
+            if (server)
+            {
+                const auto systemContext = SystemContext::fromResource(server);
+                if (NX_ASSERT(systemContext))
+                    connection = systemContext->connection();
+            }
         }
 
-        auto certificateVerifier = connection->certificateCache();
-        auto newClient = std::make_unique<nx::network::http::HttpClient>(
-            certificateVerifier->makeAdapterFunc(serverId));
-        setupNetwork(std::move(newClient), nullptr);
+        if (!connection)
+            break;
 
-        d->httpClient->addAdditionalHeader("user-name", d->credentials.username);
+        const auto serverId = server->getId();
+        const auto serverVersion = server->getVersion();
+        auto url = server->getApiUrl();
+        server.reset();
+
+        auto newClient = std::make_unique<nx::network::http::HttpClient>(
+            connection->certificateCache()->makeAdapterFunc(serverId));
+
+        newClient->addAdditionalHeader("user-name", d->credentials.username);
         const auto uniqueId = DesktopResource::calculateUniqueId(
             d->moduleGuid, d->userId).toStdString();
-        d->httpClient->addAdditionalHeader("unique-id", uniqueId); //< Support for 4.2 and below.
-        d->httpClient->addAdditionalHeader("physical-id", uniqueId);
-        d->httpClient->setSendTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
-        d->httpClient->setResponseReadTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
+        newClient->addAdditionalHeader("unique-id", uniqueId); //< Support for 4.2 and below.
+        newClient->addAdditionalHeader("physical-id", uniqueId);
+        newClient->setSendTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
+        newClient->setResponseReadTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
+        newClient->setCredentials(d->credentials);
 
-        d->httpClient->setCredentials(d->credentials);
+        setupNetwork(std::move(newClient), {}, serverVersion);
 
-        nx::utils::Url url;
-        {
-            NX_MUTEX_LOCKER lock(&d->mutex);
-            if (!d->server)
-                break;
-
-            url = d->server->getApiUrl();
-        }
         url.setPath("/desktop_camera");
 
         if (!d->httpClient->doGet(url))
@@ -367,7 +364,7 @@ void DesktopCameraConnection::run()
             continue;
         }
 
-        setupNetwork(nullptr, takeSocketFromHttpClient(d->httpClient));
+        setupNetwork({}, takeSocketFromHttpClient(d->httpClient), serverVersion);
 
         QElapsedTimer timeout;
         timeout.start();
@@ -388,7 +385,7 @@ void DesktopCameraConnection::run()
         }
     }
 
-    setupNetwork(nullptr, {});
+    setupNetwork({}, {}, {});
 }
 
 } // namespace nx::vms::client::core

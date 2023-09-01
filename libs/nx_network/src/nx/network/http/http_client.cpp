@@ -440,6 +440,8 @@ template<typename AsyncClientFunc>
 bool HttpClient::doRequest(AsyncClientFunc func)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
+    if (m_terminated)
+        return false;
 
     if (!m_done || m_error)
     {
