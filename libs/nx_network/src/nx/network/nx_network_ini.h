@@ -10,6 +10,8 @@ struct NX_NETWORK_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("nx_network.ini") { reload(); }
 
+    NX_INI_INT(0, aioThreadCount, "Number of AIO threads, 0 means the number of CPU cores.");
+
     NX_INI_FLAG(true, verifySslCertificates, "Enables SSL certificate validation in general.");
 
     // VMS-20300

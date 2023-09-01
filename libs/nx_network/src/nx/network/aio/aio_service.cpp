@@ -9,6 +9,7 @@
 
 #include <QtCore/QThread>
 
+#include <nx/network/nx_network_ini.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
@@ -34,6 +35,8 @@ void AIOService::pleaseStopSync()
 
 bool AIOService::initialize(unsigned int aioThreadPoolSize)
 {
+    if (!aioThreadPoolSize)
+        aioThreadPoolSize = nx::network::ini().aioThreadCount;
     if (!aioThreadPoolSize)
         aioThreadPoolSize = QThread::idealThreadCount();
     initializeAioThreadPool(aioThreadPoolSize);
