@@ -14,7 +14,7 @@
                     Root="HKCR"
                     Type="string"
                     Key="HDW.nov\shell\open\command"
-                    Value="&quot;[#client.exe]&quot; &quot;%1&quot;"/>
+                    Value="&quot;[#minilauncher_binary]&quot; &quot;%1&quot;"/>
 
                 <RegistryValue
                     Root="HKCR"
@@ -31,14 +31,14 @@
                 <RegistryValue
                     Root="HKLM"
                     Type="string"
-                    Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${client.binary.name}"
+                    Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${minilauncher.binary.name}"
                     Value="Play with ${customization.vmsName}"/>
 
                 <RegistryValue
                     Root="HKLM"
                     Type="string"
-                    Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${client.binary.name}\command"
-                    Value="&quot;[#client.exe]&quot; &quot;%1&quot;"/>
+                    Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${minilauncher.binary.name}\command"
+                    Value="&quot;[#minilauncher_binary]&quot; &quot;%1&quot;"/>
 
                 <RegistryValue
                     Root="HKCR"
