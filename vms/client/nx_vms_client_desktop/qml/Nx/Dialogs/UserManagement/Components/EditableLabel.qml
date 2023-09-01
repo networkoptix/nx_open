@@ -15,10 +15,8 @@ Item
 
     property var font: Qt.font({pixelSize: 24, weight: Font.Medium})
 
-    property bool cancelEditOnEmpty: true
-
     property bool enabled: true
-    onEnabledChanged: control.finishEdit()
+    onEnabledChanged: control.forceFinishEdit()
 
     property alias text: labelTextField.text
     property alias validateFunc: labelTextField.validateFunc
@@ -128,6 +126,10 @@ Item
         if (!enabled)
             return true
 
+        // When edited text is empty just revert it to original value.
+        if (!labelTextField.text)
+            labelTextField.text = control.originalText
+
         const success = labelTextField.validate()
 
         // Switch to editing to show validation error.
@@ -145,21 +147,28 @@ Item
         labelTextField.focus = true
     }
 
-    function finishEdit()
+    function forceFinishEdit()
     {
-        labelTextField.focus = false
-
         if (!control.editing)
             return
 
-        if (!control.cancelEditOnEmpty && !validate())
-            return
-
         // Switch state.
+        labelTextField.focus = false
         labelTextField.visible = false
         if (!labelTextField.text)
             labelTextField.text = control.originalText
         label.visible = true
+    }
+
+    function finishEdit()
+    {
+        if (!control.editing)
+            return
+
+        if (labelTextField.text && !validate())
+            return
+
+        forceFinishEdit()
     }
 
     Connections

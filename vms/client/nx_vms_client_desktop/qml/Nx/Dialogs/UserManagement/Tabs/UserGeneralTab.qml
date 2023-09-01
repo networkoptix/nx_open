@@ -139,6 +139,13 @@ Item
                     ? (text) => (control.userType == UserSettingsGlobal.CloudUser
                         ? control.self.validateEmail(text) : control.self.validateLogin(text))
                     : null
+
+                Connections
+                {
+                    target: control.model
+
+                    function onUserIdChanged() { userLoginText.forceFinishEdit() }
+                }
             }
 
             UserEnabledSwitch
