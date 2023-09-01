@@ -681,8 +681,10 @@ void UserListWidget::Private::updateBanners()
         tr("LDAP server is offline. %n users are not able to log in.", "", getLdapUserCount()));
 
     ldapServerOfflineWarning->setVisible(!hideLdapServerOfflineWarning
-        && (q->systemContext()->ldapStatusWatcher()->status()->state
-            != api::LdapStatus::State::online));
+        && (q->systemContext()->ldapStatusWatcher()->status()
+            && q->systemContext()->ldapStatusWatcher()->status()->state
+                != api::LdapStatus::State::online)
+        && getLdapUserCount() > 0);
 
     notFoundUsersWarning->setVisible(!hideNotFoundUsersWarning
         && !ldapServerOfflineWarning->isVisible()
