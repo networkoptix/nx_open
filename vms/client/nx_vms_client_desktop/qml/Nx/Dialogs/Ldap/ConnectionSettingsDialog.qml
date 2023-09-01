@@ -36,7 +36,7 @@ Dialog
     property alias password: passwordTextField.text
     property alias startTls: startTlsCheckbox.checked
     property alias ignoreCertErrors: ignoreCertErrorsCheckbox.checked
-    property bool showFakePassword: false
+    property bool hasConfig: false
 
     property var self
     property var testState: LdapSettings.TestState.initial
@@ -175,8 +175,7 @@ Dialog
             {
                 id: passwordTextField
 
-                showFakePassword: dialog.showFakePassword
-                    && dialog.originalAdminDn == dialog.adminDn
+                showFakePassword: dialog.hasConfig && dialog.originalAdminDn == dialog.adminDn
 
                 showStrength: false
                 width: parent.width
@@ -350,12 +349,14 @@ Dialog
         if (!ldapUri.text
             && !adminDnTextField.text
             && !passwordTextField.text
-            && !dialog.showFakePassword
             && !startTlsCheckbox.checked
             && !ignoreCertErrorsCheckbox.checked)
         {
-            dialog.close()
-            return
+            if (!dialog.hasConfig || self.requestLdapReset())
+            {
+                dialog.close()
+                return
+            }
         }
 
         if (validate())

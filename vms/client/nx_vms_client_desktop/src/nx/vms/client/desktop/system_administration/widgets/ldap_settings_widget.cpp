@@ -376,7 +376,7 @@ void LdapSettingsWidget::loadDataToUi()
     checkOnlineAndSyncStatus();
 }
 
-void LdapSettingsWidget::resetLdap()
+bool LdapSettingsWidget::requestLdapReset()
 {
     const QString mainText = tr("Disconnect LDAP server?");
     const QString extraText =
@@ -392,7 +392,7 @@ void LdapSettingsWidget::resetLdap()
         this);
     messageBox.addButton(tr("Disconnect"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     if (messageBox.exec() != QDialogButtonBox::AcceptRole)
-        return;
+        return false;
 
     auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
         this,
@@ -433,6 +433,8 @@ void LdapSettingsWidget::resetLdap()
 
     if (auto api = connectedServerApi())
         d->currentHandle = api->resetLdapAsync(sessionTokenHelper, resetCallback, thread());
+
+    return true;
 }
 
 void LdapSettingsWidget::applyChanges()
