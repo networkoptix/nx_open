@@ -18,11 +18,15 @@ Control
 
     property var model
     property var currentSearchRegExp: null
+    property int maxRows: 3
+    property bool expandable: true //< Can grow or shrink its height (up to maxRows).
+    property bool stickyPopup: false //< Popup follows bottom border when control height changes.
+
     readonly property color highlightColor: ColorTheme.colors.yellow_d1
 
     readonly property real kMinHeight: 28
 
-    height: groupFlow.maxHeight
+    height: expandable && maxRows > 1 ? Math.max(groupFlow.height, kMinHeight) : groupFlow.maxHeight
 
     onEnabledChanged: popupObject.close()
 
@@ -78,6 +82,7 @@ Control
                     left: parent.left
                     leftMargin: 6
                     verticalCenter: parent.verticalCenter
+                    verticalCenterOffset: 1
                 }
                 text: control.enabled ? qsTr("Select") : ("<" + qsTr("No groups") + ">")
 
@@ -98,28 +103,29 @@ Control
             {
                 const clickY = mouse.y
                 let showAbove = false
-                popupObject.y = Qt.binding(() =>
-                    {
-                        // Open popup at line border below mouse click.
-                        let popupY = control.height
 
-                        const popupBottom = popupObject.parent.mapToGlobal(
-                            0,
-                            popupY + popupObject.maxHeight)
+                const getYPosition = () => {
+                    // Open popup at line border below mouse click.
+                    let popupY = control.height
 
-                        // Place popup above mouse click if the popup does not fit within window.
-                        const w = control.Window.window
-                        const windowBottomY = w.y + w.height
+                    const popupBottom = popupObject.parent.mapToGlobal(
+                        0,
+                        popupY + popupObject.maxHeight)
 
-                        if (!popupObject.visible)
-                            showAbove = popupBottom.y > windowBottomY
+                    // Place popup above mouse click if the popup does not fit within window.
+                    const w = control.Window.window
+                    const windowBottomY = w.y + w.height
 
-                        if (showAbove)
-                            popupY -= (popupObject.height + control.height)
+                    if (!popupObject.visible)
+                        showAbove = popupBottom.y > windowBottomY
 
-                        return popupY
-                    })
+                    if (showAbove)
+                        popupY -= (popupObject.height + control.height)
 
+                    return popupY
+                }
+
+                popupObject.y = control.stickyPopup ? Qt.binding(getYPosition) : getYPosition()
                 popupObject.open()
             }
 
@@ -142,6 +148,8 @@ Control
             LimitedFlow
             {
                 id: groupFlow
+
+                rowLimit: control.maxRows
 
                 spacing: 2
                 leftPadding: 4
@@ -188,9 +196,7 @@ Control
                     implicitWidth: groupText.implicitWidth + 20
                         + (model.canEditMembers ? 20 : 7) + 4 + 4 + 1
 
-                    width: Math.min(
-                        implicitWidth,
-                        groupFlow.width - 8)
+                    width: Math.min(implicitWidth, groupFlow.availableWidth)
 
                     height: 22
                     radius: 2
