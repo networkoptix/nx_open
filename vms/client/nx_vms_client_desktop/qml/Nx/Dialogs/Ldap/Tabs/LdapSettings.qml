@@ -474,7 +474,7 @@ Rectangle
                             connectionSettingsDialog.password = control.password
                             connectionSettingsDialog.startTls = control.startTls
                             connectionSettingsDialog.ignoreCertErrors = control.ignoreCertErrors
-                            connectionSettingsDialog.showFakePassword = control.hasConfig
+                            connectionSettingsDialog.hasConfig = control.hasConfig
                             connectionSettingsDialog.show()
                         }
                     }
@@ -524,7 +524,7 @@ Rectangle
                         color: ColorTheme.colors.light16
                         icon.source: "image://svg/skin/user_settings/disconnect.svg"
 
-                        onClicked: self.resetLdap()
+                        onClicked: self.requestLdapReset()
                     }
                 }
             }
