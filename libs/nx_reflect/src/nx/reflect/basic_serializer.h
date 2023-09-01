@@ -116,6 +116,9 @@ namespace detail {
 template<typename SerializationContext, typename Data>
 void serializeAdl(SerializationContext* ctx, const Data& data);
 
+template<typename SerializationContext, typename Data>
+void serializeAdl(SerializationContext* ctx, const std::optional<Data>& data);
+
 template<typename T>
 inline constexpr bool IsStringAlikeV =
     std::is_convertible_v<T, std::string> ||
@@ -292,6 +295,15 @@ void serializeAdl(SerializationContext* ctx, const Data& data)
 {
     // ADL kicks in. A custom serialization function is invoked here.
     serialize(ctx, data);
+}
+
+template<typename SerializationContext, typename Data>
+void serializeAdl(SerializationContext* ctx, const std::optional<Data>& data)
+{
+    if (data)
+        serializeAdl(ctx, *data);
+    else
+        ctx->composer.writeNull();
 }
 
 } // namespace detail

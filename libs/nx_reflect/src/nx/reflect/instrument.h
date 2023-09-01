@@ -43,6 +43,8 @@ public:
         return obj.*m_fieldPtr;
     }
 
+    Field Class::* ptr() const { return m_fieldPtr; }
+
 private:
     const char* m_name = nullptr;
     Field Class::* m_fieldPtr = nullptr;

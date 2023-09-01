@@ -7,6 +7,8 @@
 #include <type_traits>
 #include <unordered_set>
 
+#include "generic_visitor.h"
+
 namespace nx::reflect {
 
 /**
@@ -203,5 +205,59 @@ struct IsStdChronoTimePoint<std::chrono::time_point<Args...>>: std::true_type {}
 
 template<typename... Args>
 constexpr bool IsStdChronoTimePointV = IsStdChronoTimePoint<Args...>::value;
+
+//-------------------------------------------------------------------------------------------------
+
+namespace detail {
+
+template<typename Func>
+struct EachFieldVisitor
+{
+    template<typename F>
+    EachFieldVisitor(F&& f): m_f(std::forward<F>(f)) {}
+
+    template<typename... Fields>
+    constexpr void operator()(Fields... fields)
+    {
+        (m_f(fields), ...);
+    }
+
+private:
+    Func m_f;
+};
+
+} // namespace detail
+
+/**
+ * Invokes f on each field of an instrumented type T.
+ * Field is passed as either nx::reflect::WrappedMemberVariableField or nx::reflect::WrappedProperty.
+ */
+template<typename T, typename Func>
+requires IsInstrumentedV<T>
+void forEachField(Func&& f)
+{
+    nx::reflect::visitAllFields<T>(
+        detail::EachFieldVisitor<std::decay_t<Func>>(std::forward<Func>(f)));
+}
+
+template<typename C, typename T>
+constexpr bool isSameField(const WrappedMemberVariableField<C, T>& field, T C::*ptr)
+{
+    return field.ptr() == ptr;
+}
+
+template<typename C, typename T, typename OtherC, typename OtherT,
+    typename = std::enable_if_t<!std::is_same_v<T, OtherT>>
+>
+constexpr bool isSameField(const WrappedMemberVariableField<C, T>&, OtherT OtherC::*)
+{
+    return false;
+}
+
+template<typename G, typename S, typename C, typename T>
+constexpr bool isSameField(const WrappedProperty<G, S>&, T C::*)
+{
+    return false;
+}
 
 } // namespace nx::reflect

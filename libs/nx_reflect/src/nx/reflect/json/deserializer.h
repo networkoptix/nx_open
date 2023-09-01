@@ -409,6 +409,16 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
     }
 }
 
+template<typename T>
+DeserializationResult deserializeValue(const DeserializationContext& ctx, std::optional<T>* data)
+{
+    T val;
+    auto result = deserializeValue(ctx, &val);
+    if (result)
+        *data = std::move(val);
+    return result;
+}
+
 template<typename Data>
 class Deserializer:
     public nx::reflect::GenericVisitor<Deserializer<Data>>
