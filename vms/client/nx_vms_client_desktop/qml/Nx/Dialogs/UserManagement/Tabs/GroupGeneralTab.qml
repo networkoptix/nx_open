@@ -84,6 +84,13 @@ Item
 
                 anchors.right: parent.right
                 anchors.rightMargin: 16
+
+                Connections
+                {
+                    target: control.model
+
+                    function onUserIdChanged() { groupNameTextField.forceFinishEdit() }
+                }
             }
 
             Row
