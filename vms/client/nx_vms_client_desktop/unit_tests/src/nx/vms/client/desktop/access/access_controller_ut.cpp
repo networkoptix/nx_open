@@ -62,7 +62,7 @@ protected:
     {
         QnLayoutResourcePtr layout;
         if (flags.testFlag(Qn::exported_layout))
-            layout.reset(new QnFileLayoutResource());
+            layout.reset(new QnFileLayoutResource({}));
         else
             layout.reset(new LayoutResource());
         layout->setIdUnsafe(QnUuid::createUuid());
