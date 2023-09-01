@@ -2,19 +2,29 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include <nx/reflect/instrument.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
+
+struct NovItemProperties
+{
+    QString name;
+    qint64 timeZoneOffset = 0;
+};
+using NovItemPropertiesMap = std::unordered_map<QnUuid, NovItemProperties>;
+NX_REFLECTION_INSTRUMENT(NovItemProperties, (name)(timeZoneOffset))
 
 /** Metadata file, describing exported nov-file contents. */
 struct NovMetadata
 {
-    static constexpr int kVersion51 = 51;
+    static constexpr int kCurrentVersion = 52;
 
     int version = 0;
+    NovItemPropertiesMap itemProperties;
 };
-#define NovMetadata_Fields (version)
-
-NX_REFLECTION_INSTRUMENT(NovMetadata, NovMetadata_Fields)
+NX_REFLECTION_INSTRUMENT(NovMetadata, (version)(itemProperties))
 
 } // namespace nx::vms::client::desktop

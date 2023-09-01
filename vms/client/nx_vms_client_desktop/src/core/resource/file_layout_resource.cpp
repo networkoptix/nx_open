@@ -9,8 +9,10 @@
 
 #include <client/client_globals.h>
 
-QnFileLayoutResource::QnFileLayoutResource():
-    base_type()
+using namespace nx::vms::client::desktop;
+
+QnFileLayoutResource::QnFileLayoutResource(const nx::vms::client::desktop::NovMetadata& metadata):
+    m_metadata(metadata)
 {
     addFlags(Qn::exported_layout);
 }
@@ -57,6 +59,11 @@ QString QnFileLayoutResource::password() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return m_password;
+}
+
+NovMetadata QnFileLayoutResource::metadata() const
+{
+    return m_metadata;
 }
 
 void QnFileLayoutResource::setStatus(nx::vms::api::ResourceStatus newStatus,
