@@ -300,12 +300,16 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
 
 GraphicsQmlView::~GraphicsQmlView()
 {
-    d->rootItem.reset();
-    d->qmlComponent.reset();
-    d->quickWindow.reset();
-    d->renderControl.reset();
+    // Try to delete resources in the same order as QQuickWidget does it.
+    d->renderControl->invalidate();
     if (d->renderTexture)
         d->openglContext->functions()->glDeleteTextures(1, &d->renderTexture);
+
+    // Delete quickWindow before rootItem to avoid a crash when Accessibility is enabled in macOS.
+    d->quickWindow.reset();
+    d->renderControl.reset();
+    d->rootItem.reset();
+    d->qmlComponent.reset();
 }
 
 QQuickWindow* GraphicsQmlView::quickWindow() const
