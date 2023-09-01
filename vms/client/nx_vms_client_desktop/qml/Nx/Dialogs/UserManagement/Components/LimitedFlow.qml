@@ -10,7 +10,7 @@ Flow
 
     spacing: 8
 
-    property int rowLimit: 4
+    property int rowLimit: 3
     property alias sourceModel: limitedModel.sourceModel
 
     property alias delegate: groupsRepeater.delegate
@@ -22,6 +22,12 @@ Flow
         + bottomPadding
 
     default property alias data: moreGroupsButton.data
+
+    readonly property real widthAdjustment: leftPadding + rightPadding
+        + (rowLimit == 1 && remaining > 0
+            ? (moreGroupsButton.childrenRect.width + spacing)
+            : 0)
+    readonly property real availableWidth: width - widthAdjustment
 
     Repeater
     {
@@ -61,7 +67,7 @@ Flow
         if (!groupsRepeater.repositioning)
             return
 
-        const rowHeight = moreGroupsButton.height + control.spacing
+        const rowHeight = moreGroupsButton.height + (control.rowLimit > 1 ? control.spacing : 0)
         const errorMargin = control.spacing * 0.5
         const yLimit = control.topPadding + control.rowLimit * rowHeight - errorMargin
 
@@ -74,6 +80,6 @@ Flow
         }
 
         groupsRepeater.repositioning = false
-        --limitedModel.limit
+        limitedModel.limit = Math.max(1, limitedModel.limit - 1)
     }
 }
