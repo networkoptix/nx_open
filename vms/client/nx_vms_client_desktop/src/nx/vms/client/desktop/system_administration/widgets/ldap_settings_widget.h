@@ -52,7 +52,7 @@ public:
 
     Q_INVOKABLE void cancelCurrentRequest();
 
-    Q_INVOKABLE void resetLdap();
+    Q_INVOKABLE bool requestLdapReset();
 
     Q_INVOKABLE void requestSync();
 
