@@ -69,11 +69,9 @@ SessionRefreshDialog::SessionRefreshDialog(
 
         m_linkField = new InputField(this);
 
-        m_linkField->setValidator([](const QString& link)
+        m_linkField->setValidator([this](const QString& /*link*/)
             {
-                return ValidationResult{nx::utils::Url::fromUserInput(link).isValid()
-                        ? QValidator::Acceptable
-                        : QValidator::Invalid};
+                return m_validationResult;
             });
 
         addCustomWidget(
@@ -267,6 +265,12 @@ void SessionRefreshDialog::validationResultReady()
         {
             m_passwordField->clear();
             m_passwordField->validate();
+        }
+
+        if (m_linkField)
+        {
+            m_validationResult.errorMessage = tr("The provided link is not valid");
+            m_linkField->validate();
         }
         // Reset validation result after displaying error message.
         m_validationResult = ValidationResult(QValidator::Intermediate);

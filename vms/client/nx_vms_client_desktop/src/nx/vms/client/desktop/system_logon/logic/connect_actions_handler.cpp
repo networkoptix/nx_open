@@ -251,9 +251,12 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
                     refreshSessionResult.tokenExpirationTime);
 
                 const auto localSystemId = connection()->moduleInformation().localSystemId;
-                nx::vms::client::core::CredentialsManager::storeCredentials(
-                    localSystemId,
-                    credentials);
+                const auto savedCredentials =
+                    CredentialsManager::credentials(localSystemId, credentials.username);
+                const bool passwordIsAlreadySaved =
+                    savedCredentials && !savedCredentials->authToken.empty();
+                if (passwordIsAlreadySaved)
+                    CredentialsManager::storeCredentials(localSystemId, credentials);
             }
         });
 
