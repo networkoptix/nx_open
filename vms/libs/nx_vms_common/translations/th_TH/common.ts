@@ -158,7 +158,7 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>ผู้ดูแลระบบ</translation>
     </message>
     <message>
       <source>Power Users</source>
@@ -170,11 +170,11 @@
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>ผู้ชม</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>ผู้ชมภาพสด</translation>
     </message>
     <message>
       <source>System Health Viewers</source>

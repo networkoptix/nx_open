@@ -660,7 +660,7 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Web-страница</translation>
+      <translation>Web-интерфейс</translation>
     </message>
     <message>
       <source>Web Page Port</source>
