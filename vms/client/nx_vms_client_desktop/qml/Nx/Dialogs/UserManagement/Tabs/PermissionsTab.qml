@@ -446,7 +446,9 @@ Item
             visible: control.editingEnabled
                 && GlobalTemporaries.automaticAccessDependencySwitchVisible
 
-            text: qsTr("Automatically add dependent access rights")
+            text: qsTr("Automatically add dependent permissions")
+
+            color: ColorTheme.colors.light10
 
             readonly property bool windowVisible: Window.visibility !== Window.Hidden
 
