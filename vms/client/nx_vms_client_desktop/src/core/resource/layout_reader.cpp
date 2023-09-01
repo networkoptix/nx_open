@@ -25,6 +25,13 @@
 
 using namespace nx::vms::client::desktop;
 
+namespace {
+
+constexpr int kUtf8UsedVersion = 51;
+constexpr int kItemMetadataIntroducedVersion = 52;
+
+} // namespace
+
 QnFileLayoutResourcePtr layout::layoutFromFile(
     const QString& layoutUrl, const QString& password)
 {
@@ -47,7 +54,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
     QByteArray layoutData = layoutFile->readAll();
     layoutFile.reset();
 
-    QnFileLayoutResourcePtr layout(new QnFileLayoutResource());
+    QnFileLayoutResourcePtr layout(new QnFileLayoutResource(metadata));
 
     const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
     if (!fileInfo.isValid)
@@ -150,13 +157,24 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 
     nx::vms::common::LayoutItemDataMap updatedItems;
 
-    QIODevicePtr itemNamesIO(layoutStorage.open("item_names.txt", QIODevice::ReadOnly));
-    QTextStream itemNames(itemNamesIO.data());
-    if (metadata.version < NovMetadata::kVersion51)
-        itemNames.setEncoding(QStringConverter::System);
+    if (metadata.version < kItemMetadataIntroducedVersion)
+    {
+        QIODevicePtr itemNamesDevice(layoutStorage.open("item_names.txt", QIODevice::ReadOnly));
+        QTextStream itemNamesStream(itemNamesDevice.data());
+        if (metadata.version < kUtf8UsedVersion)
+            itemNamesStream.setEncoding(QStringConverter::System);
+        for (const auto& item: orderedItems)
+            metadata.itemProperties[item.uuid].name = itemNamesStream.readLine();
 
-    QIODevicePtr itemTimeZonesIO(layoutStorage.open("item_timezones.txt", QIODevice::ReadOnly));
-    QTextStream itemTimeZones(itemTimeZonesIO.data());
+        QIODevicePtr itemTimeZonesDevice(
+            layoutStorage.open("item_timezones.txt", QIODevice::ReadOnly));
+        QTextStream itemTimeZonesStream(itemTimeZonesDevice.data());
+        for (const auto& item: orderedItems)
+        {
+            metadata.itemProperties[item.uuid].timeZoneOffset =
+                itemNamesStream.readLine().toLongLong();
+        }
+    }
 
     // TODO: #sivanov Here is bad place to add resources to the pool. Need refactor.
     // All AVI resources are added to pool here. Layout itself is added later outside this module.
@@ -180,12 +198,18 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
             aviResource->addFlags(Qn::utc | Qn::sync | Qn::periods | Qn::motion);
         aviResource->setStorage(storage);
         aviResource->setParentId(layout->getId());
-        QString itemName(itemNames.readLine());
-        if (!itemName.isEmpty())
-            aviResource->setName(itemName);
-        qint64 timeZoneOffset = itemTimeZones.readLine().toLongLong();
-        if (timeZoneOffset != Qn::InvalidUtcOffset)
-            aviResource->setTimeZoneOffset(timeZoneOffset);
+
+        if (auto it = metadata.itemProperties.find(item.uuid); it != metadata.itemProperties.end())
+        {
+            if (const auto name = it->second.name; !name.isEmpty())
+                aviResource->setName(name);
+
+            if (const auto timeZoneOffset = it->second.timeZoneOffset;
+                timeZoneOffset != Qn::InvalidUtcOffset)
+            {
+                aviResource->setTimeZoneOffset(timeZoneOffset);
+            }
+        }
 
         auto resourcePool = qnClientCoreModule->resourcePool();
         resourcePool->addResource(aviResource, QnResourcePool::SkipAddingTransaction);

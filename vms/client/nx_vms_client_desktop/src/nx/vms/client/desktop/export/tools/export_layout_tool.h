@@ -14,6 +14,8 @@ class QnClientVideoCamera;
 
 namespace nx::vms::client::desktop {
 
+struct NovMetadata;
+
 /**
  * Utility class for exporting multi-video layouts. New instance of the class should be created for
  * every new export process. Correct behaviour while re-using is not guarantied. Notifies about
@@ -51,24 +53,14 @@ private slots:
         const QString& filename);
 
 private:
-    /** Info about layout items */
-    struct ItemInfo {
-        QString name;
-        qint64 timezone;
-
-        ItemInfo();
-        ItemInfo(const QString& name, qint64 timezone);
-    };
-    typedef QList<ItemInfo> ItemInfoList;
-
     /** Create and setup storage resource. */
     bool prepareStorage();
 
     /** Create and setup layout resource. */
-    ItemInfoList prepareLayout();
+    NovMetadata prepareLayoutAndMetadata();
 
     /** Write metadata to storage file. */
-    bool exportMetadata(const ItemInfoList &items);
+    bool exportMetadata(const NovMetadata& metadata);
 
     bool exportNextCamera();
     void finishExport(bool success);
