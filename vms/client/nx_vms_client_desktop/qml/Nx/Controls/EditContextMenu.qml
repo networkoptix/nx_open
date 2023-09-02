@@ -31,7 +31,7 @@ Menu
         text: "Cut"
         shortcut: "Ctrl+X"
         onTriggered: menu.cutAction()
-        visible: menu.readActionsVisible
+        visible: menu.readActionsVisible && menu.editingEnabled
         enabled: menu.selectionActionsEnabled && menu.editingEnabled
     }
 
@@ -49,13 +49,14 @@ Menu
         text: "Paste"
         shortcut: "Ctrl+V"
         onTriggered: menu.pasteAction()
-        enabled: menu.editingEnabled
+        visible: menu.editingEnabled
     }
 
     Action
     {
         text: "Delete"
         onTriggered: menu.deleteAction()
+        visible: menu.editingEnabled
         enabled: menu.selectionActionsEnabled && menu.editingEnabled
     }
 }
