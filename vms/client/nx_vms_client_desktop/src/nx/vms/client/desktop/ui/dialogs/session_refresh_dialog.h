@@ -22,7 +22,7 @@ public:
     struct SessionRefreshResult
     {
         nx::network::http::AuthToken token;
-        std::chrono::microseconds tokenExpirationTime;
+        std::chrono::microseconds tokenExpirationTime{};
         QString password;
     };
 
@@ -64,9 +64,9 @@ private:
     void validatePassword(const nx::vms::api::LoginSessionRequest& loginRequest);
 
 private:
-    InputField* m_passwordField;
-    InputField* m_linkField;
-    BusyIndicatorButton* m_actionButton;
+    InputField* m_passwordField = nullptr;
+    InputField* m_linkField = nullptr;
+    BusyIndicatorButton* m_actionButton = nullptr;
 
     bool m_passwordValidationMode = false;
     SessionRefreshResult m_refreshResult;
