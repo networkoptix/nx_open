@@ -82,17 +82,13 @@ Dialog
                     visible: dialog.enableUsersEditable
                     Layout.alignment: Qt.AlignLeft | Qt.AlignBaseline
 
-                    model: ListModel
-                    {
-                        ListElement
-                        {
-                            text: `<${qsTr("keep current value")}>`
-                            value: Qt.PartiallyChecked
-                        }
-
-                        ListElement { text: qsTr("Enabled"); value: Qt.Checked }
-                        ListElement { text: qsTr("Disabled"); value: Qt.Unchecked }
-                    }
+                    model:
+                    [
+                        {"text": "<" + qsTr("keep current value") + ">",
+                            "value": Qt.PartiallyChecked},
+                        {"text": qsTr("Enabled"), "value": Qt.Checked},
+                        {"text": qsTr("Disabled"), "value": Qt.Unchecked}
+                    ]
                 }
 
                 Label
@@ -111,11 +107,12 @@ Dialog
                     visible: dialog.digestEditable
                     Layout.alignment: Qt.AlignLeft | Qt.AlignBaseline
 
-                    model: ListModel
-                    {
-                        ListElement { text: qsTr("Do not change"); value: Qt.PartiallyChecked }
-                        ListElement { text: qsTr("Disable"); value: Qt.Unchecked }
-                    }
+                    model:
+                    [
+                        {"text": "<" + qsTr("keep current value") + ">",
+                            "value": Qt.PartiallyChecked},
+                        {"text": qsTr("Disabled"), "value": Qt.Unchecked}
+                    ]
                 }
             }
         }
