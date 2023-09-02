@@ -32,6 +32,7 @@ T.TextField
         EditContextMenu
         {
             readActionsVisible: control.echoMode == TextInput.Normal
+            editingEnabled: control.enabled && !control.readOnly
             onCutAction: control.cut()
             onCopyAction: control.copy()
             onPasteAction: control.paste()
