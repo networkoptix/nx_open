@@ -479,13 +479,13 @@ void CamLicenseUsageHelper::propose(
     invalidate();
 }
 
-bool CamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr& camera)
+bool CamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr& camera) const
 {
     return isOverflowForCamera(camera, camera->isScheduleEnabled());
 }
 
 bool CamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr& camera,
-    bool cachedLicenseUsed)
+    bool cachedLicenseUsed) const
 {
     bool requiresLicense = cachedLicenseUsed;
     requiresLicense &= !m_proposedToDisable.contains(camera);
