@@ -341,9 +341,12 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
             auto connection = this->connection();
             if (connection->credentials().authToken.isBearerToken())
             {
-                errorCode = connection->connectionInfo().isCloud()
-                    ? RemoteConnectionErrorCode::cloudSessionExpired
-                    : RemoteConnectionErrorCode::sessionExpired;
+                if (connection->connectionInfo().isCloud())
+                    errorCode = RemoteConnectionErrorCode::cloudSessionExpired;
+                else if (connection->connectionInfo().isTemporary())
+                    errorCode = RemoteConnectionErrorCode::temporaryTokenExpired;
+                else
+                    errorCode = RemoteConnectionErrorCode::sessionExpired;
             }
             makeServerMarkingFunction(errorCode)();
         });

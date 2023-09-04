@@ -43,6 +43,8 @@ public:
         const QString& errorDescription,
         QWidget* parentWidget);
 
+    static void showTemporaryUserReAuthMessage(QWidget* parentWidget);
+
     static void failedRestartClientMessage(QWidget* parent);
 
     static QString developerModeText(

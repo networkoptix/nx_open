@@ -302,6 +302,7 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
     switch (error.code)
     {
         case RemoteConnectionErrorCode::sessionExpired:
+        case RemoteConnectionErrorCode::temporaryTokenExpired:
         case RemoteConnectionErrorCode::cloudSessionExpired:
         case RemoteConnectionErrorCode::unauthorized:
         case RemoteConnectionErrorCode::userIsDisabled:
@@ -407,6 +408,17 @@ void QnConnectionDiagnosticsHelper::showCompatibilityModeFailureMessage(
         QnConnectionDiagnosticsHelper::tr("Failed to enter compatibility mode for version %1")
             .arg(version.toString()),
         errorDescription,
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::NoButton,
+        parentWidget);
+    dialog.exec();
+}
+
+void QnConnectionDiagnosticsHelper::showTemporaryUserReAuthMessage(QWidget* parentWidget)
+{
+    QnMessageBox dialog(QnMessageBoxIcon::Warning,
+        QnConnectionDiagnosticsHelper::tr("Your session has expired"),
+        QnConnectionDiagnosticsHelper::tr("Please sign in again with your link to continue"),
         QDialogButtonBox::Ok,
         QDialogButtonBox::NoButton,
         parentWidget);
