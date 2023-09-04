@@ -165,7 +165,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(ui->startTourButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_startTourButton_clicked);
 
-    ui->deleteButton->setIcon(qnSkin->icon("buttons/delete_20_deprecated.svg", kIconSubstitutions));
+    ui->deleteButton->setIcon(qnSkin->icon("buttons/delete_20.svg", kIconSubstitutions));
     connect(ui->deleteButton, &QPushButton::clicked, this,
         &QnPtzManageDialog::at_deleteButton_clicked);
 
