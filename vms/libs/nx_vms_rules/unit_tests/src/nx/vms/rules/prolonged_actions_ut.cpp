@@ -16,6 +16,7 @@
 #include <utils/common/synctime.h>
 
 #include "mock_engine_events.h"
+#include "test_infra.h"
 #include "test_plugin.h"
 #include "test_router.h"
 
@@ -24,27 +25,6 @@ namespace nx::vms::rules::test {
 static const auto resourceA = QnUuid("00000000-0000-0000-0001-00000000000A");
 static const auto resourceB = QnUuid("00000000-0000-0000-0001-00000000000B");
 static const auto resourceC = QnUuid("00000000-0000-0000-0001-00000000000C");
-
-class TestActionExecutor: public ActionExecutor
-{
-public:
-    void execute(const ActionPtr& action)
-    {
-        actions.push_back(action);
-    }
-
-public:
-    std::vector<ActionPtr> actions;
-};
-
-class TestEventConnector: public EventConnector
-{
-public:
-    void process(const EventPtr& e)
-    {
-        emit event(e);
-    }
-};
 
 class ProlongedActionsTest: public ::testing::Test
 {

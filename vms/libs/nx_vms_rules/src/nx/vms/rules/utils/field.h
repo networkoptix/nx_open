@@ -96,7 +96,7 @@ FieldDescriptor makeTimeFieldDescriptor(
         linkedFields);
 }
 
-FieldDescriptor makeIntervalFieldDescriptor(
+NX_VMS_RULES_API FieldDescriptor makeIntervalFieldDescriptor(
     const QString& displayName,
     const QString& description = {});
 
