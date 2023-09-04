@@ -57,6 +57,13 @@ struct RemoteSessionTimeoutWatcher::Private
         return std::nullopt;
     }
 
+    std::optional<seconds> temporaryTokenRemainingTime(
+        std::shared_ptr<RemoteSession> session) const
+    {
+        const QnUserResourcePtr user = session->systemContext()->userWatcher()->user();
+        return user ? user->temporarySessionExpiresIn() : std::nullopt;
+    }
+
     std::optional<seconds> calculatePasswordRemainingTime() const
     {
         // Check if password is unlimited.
@@ -140,7 +147,14 @@ void RemoteSessionTimeoutWatcher::tick()
             d->notificationVisible = false;
             emit hideNotification();
         }
-        emit sessionExpired();
+
+        const auto temporaryTokenRemainingTime = d->temporaryTokenRemainingTime(session);
+        const auto reason =
+            temporaryTokenRemainingTime && *temporaryTokenRemainingTime <= kForceDisconnectTime
+                ? SessionExpirationReason::temporaryTokenExpired
+                : SessionExpirationReason::sessionExpired;
+
+        emit sessionExpired(reason);
         return;
     }
 
@@ -157,10 +171,9 @@ void RemoteSessionTimeoutWatcher::tick()
         ((isTimeToNotify && !notificationWasCancelled)
             || (isTimeToLastNotify && (*d->timeLeftWhenCancelled > kLastNotificationTime)));
 
-    const auto currentUser = session->systemContext()->userWatcher()->user();
-    if (currentUser && currentUser->isTemporary())
+    if (const auto temporaryTokenRemainingTime = d->temporaryTokenRemainingTime(session))
     {
-        const auto deltaTime = currentUser->temporarySessionExpiresIn().value() - timeLeft.value();
+        const auto deltaTime = *temporaryTokenRemainingTime - timeLeft.value();
         notificationShouldBeVisible &= deltaTime > kForceDisconnectTime;
     }
 

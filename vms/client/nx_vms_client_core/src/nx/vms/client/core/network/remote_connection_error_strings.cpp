@@ -162,6 +162,14 @@ public:
                 };
             }
 
+            case RemoteConnectionErrorCode::temporaryTokenExpired:
+            {
+                return {
+                    tr("Your access to this system has expired."),
+                    tr("Please contact the system administrator to regain access.")
+                };
+            }
+
             case RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa:
             {
                 const QString message = tr("To log in to this System, disable “Ask for a "

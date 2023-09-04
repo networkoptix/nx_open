@@ -27,6 +27,11 @@ struct ConnectionInfo
     {
         return userType == nx::vms::api::UserType::cloud;
     }
+
+    bool isTemporary() const
+    {
+        return userType == nx::vms::api::UserType::temporaryLocal;
+    }
 };
 
 } // namespace nx::vms::client::core

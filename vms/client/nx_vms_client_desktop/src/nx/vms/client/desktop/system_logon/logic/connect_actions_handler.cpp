@@ -180,20 +180,40 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     {
         auto sessionTimeoutWatcher = qnClientCoreModule->networkModule()->sessionTimeoutWatcher();
         connect(sessionTimeoutWatcher, &RemoteSessionTimeoutWatcher::sessionExpired, this,
-            [this]()
+            [this](RemoteSessionTimeoutWatcher::SessionExpirationReason reason)
             {
+                const bool isTemporaryUser = connection()->connectionInfo().isTemporary();
                 executeDelayedParented(
-                    [this]()
+                    [this, isTemporaryUser, reason]()
                     {
-                        const auto errorCode = RemoteConnectionErrorCode::sessionExpired;
-                        d->handleWSError(errorCode);
+                        // When temporary token is used for authorization, common session token is
+                        // created and used instead. This session token can wear off earlier than
+                        // the temporary token, but for security reasons we should ask user to
+                        // re-enter temporary token manually.
+                        using SessionExpirationReason
+                            = RemoteSessionTimeoutWatcher::SessionExpirationReason;
 
-                        QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
-                            context(),
-                            errorCode,
-                            /*moduleInformation*/ {},
-                            appContext()->version()
-                        );
+                        if (isTemporaryUser && reason == SessionExpirationReason::sessionExpired)
+                        {
+                            QnConnectionDiagnosticsHelper::showTemporaryUserReAuthMessage(
+                                mainWindowWidget());
+                        }
+                        else
+                        {
+                            auto errorCode =
+                                reason == SessionExpirationReason::temporaryTokenExpired
+                                    ? RemoteConnectionErrorCode::temporaryTokenExpired
+                                    : RemoteConnectionErrorCode::sessionExpired;
+
+                            d->handleWSError(errorCode);
+
+                            QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
+                                context(),
+                                errorCode,
+                                /*moduleInformation*/ {},
+                                appContext()->version()
+                            );
+                        }
                     },
                     this);
 
