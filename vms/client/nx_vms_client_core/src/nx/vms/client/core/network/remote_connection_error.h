@@ -60,6 +60,9 @@ NX_REFLECTION_ENUM_CLASS(RemoteConnectionErrorCode,
     /** Saved or actual local session token expired. */
     sessionExpired,
 
+    /** Temporary token expired, session token can not be created. */
+    temporaryTokenExpired,
+
     /** System is not compatible with two-factor authentication. */
     systemIsNotCompatibleWith2Fa,
 
