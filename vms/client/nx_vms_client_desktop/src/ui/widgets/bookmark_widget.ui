@@ -10,7 +10,7 @@
     <height>192</height>
    </rect>
   </property>
-  <layout class="QFormLayout" name="formLayout_2">
+  <layout class="QFormLayout" name="mainFormLayout">
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
