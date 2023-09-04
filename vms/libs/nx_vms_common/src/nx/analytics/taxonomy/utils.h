@@ -46,4 +46,6 @@ NX_VMS_COMMON_API bool eventBelongsToGroup(
     const AbstractEventType* eventType,
     const QString& groupId);
 
+QString maybeUnscopedExtendedObjectTypeId(const QString& scopedExtendedObjectTypeId);
+
 } // namespace nx::analytics::taxonomy
