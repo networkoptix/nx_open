@@ -64,6 +64,8 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
 
     // Workaround for Shift+Tab to switch focus to previous widget.
     ui->tagsListLabel->installEventFilter(this);
+
+    ui->mainFormLayout->setAlignment(ui->tagsListLabel, Qt::AlignLeft);
 }
 
 bool QnBookmarkWidget::eventFilter(QObject *obj, QEvent *event)
