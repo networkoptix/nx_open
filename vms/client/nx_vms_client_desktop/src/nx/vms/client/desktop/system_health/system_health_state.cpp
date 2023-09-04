@@ -18,6 +18,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
+#include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -30,7 +31,8 @@
 #include <nx/vms/client/desktop/system_health/user_emails_watcher.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/api/data/storage_flags.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
@@ -73,6 +75,7 @@ private:
     void updateUsersWithInvalidEmail();
     void updateServersWithoutStorages();
     void updateServersWithMetadataStorageIssues();
+    void updateSaasIssues();
 
 private:
     std::array<bool, (int) SystemHealthIndex::count> m_state;
@@ -231,6 +234,14 @@ SystemHealthState::Private::Private(SystemHealthState* q):
     connect(q->context(), &QnWorkbenchContext::userChanged, q, update(metadataOnSystemStorage));
     update(metadataOnSystemStorage)();
 
+    // SaaS related issues.
+
+    connect(q->context(), &QnWorkbenchContext::userChanged, q, [this] { updateSaasIssues(); });
+    connect(q->systemContext()->saasServiceManager(), &saas::ServiceManager::dataChanged, q,
+        [this] { updateSaasIssues(); } );
+
+    updateSaasIssues();
+
 #undef update
 }
 
@@ -344,6 +355,15 @@ void SystemHealthState::Private::updateServersWithMetadataStorageIssues()
         serversWithMetadataOnSystemStorage);
 }
 
+void SystemHealthState::Private::updateSaasIssues()
+{
+    update(SystemHealthIndex::saasLocalRecordingServicesOverused);
+    update(SystemHealthIndex::saasCloudStorageServicesOverused);
+    update(SystemHealthIndex::saasIntegrationServicesOverused);
+    update(SystemHealthIndex::saasInSuspendedState);
+    update(SystemHealthIndex::saasInShutdownState);
+}
+
 bool SystemHealthState::Private::state(SystemHealthIndex index) const
 {
     return m_state[(int) index];
@@ -414,6 +434,30 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 
         case SystemHealthIndex::metadataOnSystemStorage:
             return hasPowerUserPermissions() && hasResourcesForMessageType(index);
+
+        case SystemHealthIndex::saasLocalRecordingServicesOverused:
+            return hasPowerUserPermissions()
+                && saas::saasInitialized(q->systemContext())
+                && saas::localRecordingServicesOverused(q->systemContext());
+
+        case SystemHealthIndex::saasCloudStorageServicesOverused:
+            return hasPowerUserPermissions()
+                && saas::saasInitialized(q->systemContext())
+                && saas::cloudStorageServicesOverused(q->systemContext());
+
+        case SystemHealthIndex::saasIntegrationServicesOverused:
+            return hasPowerUserPermissions()
+                && saas::saasInitialized(q->systemContext())
+                && saas::integrationServicesOverused(q->systemContext());
+
+        case SystemHealthIndex::saasInSuspendedState:
+            return hasPowerUserPermissions()
+                && q->systemContext()->saasServiceManager()->saasState()
+                    == nx::vms::api::SaasState::suspend;
+
+        case SystemHealthIndex::saasInShutdownState:
+            return hasPowerUserPermissions()
+                && q->systemContext()->saasServiceManager()->saasShutDown();
 
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");

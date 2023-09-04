@@ -61,6 +61,12 @@ bool isMessageLocked(MessageType message)
         case MessageType::remoteArchiveSyncError:
         case MessageType::metadataStorageNotSet:
         case MessageType::metadataOnSystemStorage:
+        case MessageType::saasLocalRecordingServicesOverused:
+        case MessageType::saasCloudStorageServicesOverused:
+        case MessageType::saasIntegrationServicesOverused:
+        case MessageType::saasInSuspendedState:
+        case MessageType::saasInShutdownState:
+
             return true;
         default:
             return false;
