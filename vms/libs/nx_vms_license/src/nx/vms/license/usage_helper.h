@@ -181,8 +181,8 @@ public:
 
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
-    bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
-    bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenseUsed);
+    bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera) const;
+    bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenseUsed) const;
 
     bool canEnableRecording(const QnVirtualCameraResourcePtr& proposedCamera);
     bool canEnableRecording(const QnVirtualCameraResourceList& proposedCameras);
