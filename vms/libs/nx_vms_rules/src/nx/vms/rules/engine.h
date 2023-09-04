@@ -12,7 +12,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtCore/QSet>
+#include <QtCore/QTimer>
 
+#include <nx/utils/time/timer_event_handler.h>
 #include <nx/utils/uuid.h>
 
 #include "event_cache.h"
@@ -72,14 +74,6 @@ public:
 
     /** Returns rule with the given id or nullptr. */
     ConstRulePtr rule(const QnUuid& id) const;
-
-    size_t ruleCount() const;
-
-    /**
-     * Creates a copy of Rules stored inside the Engine.
-     * This cloned state may be used to edit rules and to update Engine state later.
-     */
-    RuleSet cloneRules() const;
 
     /** Returns a copy of the rule with the given id or nullptr. */
     RulePtr cloneRule(const QnUuid& id) const;
@@ -164,6 +158,8 @@ public:
 
     EventCache* eventCache() const;
 
+    void toggleTimer(nx::utils::TimerEventHandler* handler, bool on);
+
 signals:
     void ruleAddedOrUpdated(QnUuid ruleId, bool added);
     void ruleRemoved(QnUuid ruleId);
@@ -194,7 +190,6 @@ private:
 
     std::unique_ptr<Rule> buildRule(const api::Rule& ruleData) const;
     std::unique_ptr<Rule> cloneRule(const Rule* rule) const;
-    RulePtr findRule(const QnUuid& id);
 
     void processAcceptedEvent(const QnUuid& ruleId, const EventData& eventData);
     void processAction(const ActionPtr& action);
@@ -238,12 +233,15 @@ private:
     QMap<QString, ItemDescriptor> m_actionDescriptors;
 
     // All the fields above are initialized on startup and remain unmodified at runtime.
-    // Rule set is guarded by corresponding mutex.
+    // Fields in the following section are guarded by mutex.
     mutable nx::Mutex m_ruleMutex;
     RuleSet m_rules;
+    QSet<nx::utils::TimerEventHandler*> m_timerHandlers;
 
-    // The event cache should be used by Engine's thread only.
+    // All the fields below should be used by Engine's thread only.
     std::unique_ptr<EventCache> m_eventCache;
+
+    QTimer* m_aggregationTimer;
 };
 
 } // namespace nx::vms::rules

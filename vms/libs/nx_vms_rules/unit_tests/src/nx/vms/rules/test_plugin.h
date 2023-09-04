@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/plugin.h>
@@ -28,6 +29,7 @@ public:
 
         registerActionField<TestActionField>();
         registerActionField<TargetDeviceField>();
+        registerActionField<OptionalTimeField>();
     }
 
     virtual void registerEvents() const override
@@ -40,6 +42,7 @@ public:
     {
         registerAction<TestAction>();
         registerAction<TestProlongedAction>();
+        registerAction<TestActionWithInterval>();
     }
 };
 

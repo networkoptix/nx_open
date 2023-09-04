@@ -50,6 +50,31 @@ public:
     QnUuidList m_deviceIds;
 };
 
+class TestActionWithInterval: public nx::vms::rules::BasicAction
+{
+    Q_OBJECT
+    Q_CLASSINFO("type", "nx.actions.test.withInterval")
+
+    Q_PROPERTY(std::chrono::microseconds interval MEMBER m_interval)
+    Q_PROPERTY(QnUuid cameraId MEMBER m_cameraId)
+
+public:
+    static ItemDescriptor manifest()
+    {
+        return ItemDescriptor{
+            .id = utils::type<TestActionWithInterval>(),
+            .displayName = "Test action with interval",
+            .flags = ItemFlag::instant,
+            .fields = {
+                utils::makeIntervalFieldDescriptor("Throttle")},
+        };
+    }
+
+public:
+    QnUuid m_cameraId;
+    std::chrono::microseconds m_interval;
+};
+
 class TestActionWithTargetUsers: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
