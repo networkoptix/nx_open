@@ -52,6 +52,11 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         case MessageType::cameraRecordingScheduleIsInvalid:
         case MessageType::replacedDeviceDiscovered:
         case MessageType::metadataStorageNotSet:
+        case MessageType::saasLocalRecordingServicesOverused:
+        case MessageType::saasCloudStorageServicesOverused:
+        case MessageType::saasIntegrationServicesOverused:
+        case MessageType::saasInSuspendedState:
+        case MessageType::saasInShutdownState:
             return QnNotificationLevel::Value::ImportantNotification;
 
         // Red notifications.

@@ -47,6 +47,17 @@ QString QnSystemHealthStringsHelper::messageTitle(MessageType messageType)
             return tr("Storage for analytics data is not set");
         case MessageType::metadataOnSystemStorage:
             return tr("System storage is used for analytics data");
+        case MessageType::saasLocalRecordingServicesOverused:
+            return tr("Local recording services overused");
+        case MessageType::saasCloudStorageServicesOverused:
+            return tr("Cloud storage services overused");
+        case MessageType::saasIntegrationServicesOverused:
+            return tr("Paid integrations services overused");
+        case MessageType::saasInSuspendedState:
+            return tr("System suspended");
+        case MessageType::saasInShutdownState:
+            return tr("System shut down");
+
         default:
             break;
     }

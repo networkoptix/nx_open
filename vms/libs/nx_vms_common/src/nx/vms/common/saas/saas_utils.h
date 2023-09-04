@@ -22,6 +22,12 @@ NX_VMS_COMMON_API bool saasInitialized(SystemContext* systemContext);
  */
 NX_VMS_COMMON_API bool saasServicesOperational(SystemContext* systemContext);
 
+NX_VMS_COMMON_API bool localRecordingServicesOverused(SystemContext* systemContext);
+
+NX_VMS_COMMON_API bool cloudStorageServicesOverused(SystemContext* systemContext);
+
+NX_VMS_COMMON_API bool integrationServicesOverused(SystemContext* systemContext);
+
 class NX_VMS_COMMON_API StringsHelper
 {
     Q_DECLARE_TR_FUNCTIONS(StringsHelper)

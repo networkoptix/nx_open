@@ -10,6 +10,26 @@ namespace nx::vms::common::saas {
 
 using namespace nx::vms::api;
 
+namespace {
+
+bool servicesOverused(SystemContext* systemContext, const QString& seriviceType)
+{
+    if (!NX_ASSERT(systemContext))
+        return false;
+
+    const auto saasServiceManager = systemContext->saasServiceManager();
+    if (!NX_ASSERT(saasServiceManager))
+        return false;
+
+    if (saasServiceManager->saasState() == SaasState::uninitialized)
+        return false;
+
+    return saasServiceManager->serviceStatus(seriviceType).status
+        == nx::vms::api::UseStatus::overUse;
+}
+
+} // namespace
+
 bool saasInitialized(SystemContext* systemContext)
 {
     return systemContext->saasServiceManager()->saasState() != SaasState::uninitialized;
@@ -19,6 +39,27 @@ bool saasServicesOperational(SystemContext* systemContext)
 {
     const auto state = systemContext->saasServiceManager()->saasState();
     return state == SaasState::active || state == SaasState::suspend;
+}
+
+bool localRecordingServicesOverused(SystemContext* systemContext)
+{
+    return servicesOverused(
+        systemContext,
+        nx::vms::api::SaasService::kLocalRecordingServiceType);
+}
+
+bool cloudStorageServicesOverused(SystemContext* systemContext)
+{
+    return servicesOverused(
+        systemContext,
+        nx::vms::api::SaasService::kCloudRecordingType);
+}
+
+bool integrationServicesOverused(SystemContext* systemContext)
+{
+    return servicesOverused(
+        systemContext,
+        nx::vms::api::SaasService::kAnalyticsIntegrationServiceType);
 }
 
 QString StringsHelper::shortState(nx::vms::api::SaasState state)
