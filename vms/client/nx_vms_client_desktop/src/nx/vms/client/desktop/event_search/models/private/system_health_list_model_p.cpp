@@ -31,9 +31,12 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_health/system_health_data_helper.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
@@ -42,6 +45,30 @@
 #include <nx/vms/client/desktop/system_administration/dialogs/user_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
+
+namespace {
+
+using namespace nx::vms::common::system_health;
+
+std::optional<QString> overusedSaasServiceType(MessageType messageType)
+{
+    switch (messageType)
+    {
+        case MessageType::saasLocalRecordingServicesOverused:
+            return nx::vms::api::SaasService::kLocalRecordingServiceType;
+
+        case MessageType::saasCloudStorageServicesOverused:
+            return nx::vms::api::SaasService::kCloudRecordingType;
+
+        case MessageType::saasIntegrationServicesOverused:
+            return nx::vms::api::SaasService::kAnalyticsIntegrationServiceType;
+
+        default:
+            return {};
+    }
+}
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -305,6 +332,39 @@ QString SystemHealthListModel::Private::toolTip(int index) const
 
         tooltipLines.append(
             tr("Click on the \"Undo Replace\" button to continue using two devices."));
+
+        return tooltipLines.join("<br>");
+    }
+
+    if (const auto serviceType = overusedSaasServiceType(item.message))
+    {
+        const auto serviceManager = systemContext()->saasServiceManager();
+        const auto issueExpirationDate =
+            serviceManager->serviceStatus(*serviceType).issueExpirationDate.date();
+        const auto formatter = nx::vms::time::Formatter::system();
+
+        QStringList tooltipLines;
+
+        tooltipLines.append(
+            tr("Add more services or fix overuse by stopping using services for some devices."));
+
+        tooltipLines.append(tr("If no action is taken, required number of services will be "
+            "released automatically on %1.").arg(formatter->toString(issueExpirationDate)));
+
+        return tooltipLines.join("<br>");
+    }
+
+    if (item.message == MessageType::saasInSuspendedState
+        || item.message == MessageType::saasInShutdownState)
+    {
+        using namespace nx::vms::common;
+
+        const auto serviceManager = systemContext()->saasServiceManager();
+
+        QStringList tooltipLines;
+
+        tooltipLines.append(tr("Some features may not be available."));
+        tooltipLines.append(saas::StringsHelper::recommendedAction(serviceManager->saasState()));
 
         return tooltipLines.join("<br>");
     }
