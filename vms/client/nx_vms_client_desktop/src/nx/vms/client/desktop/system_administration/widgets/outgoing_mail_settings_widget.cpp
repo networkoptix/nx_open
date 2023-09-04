@@ -46,8 +46,6 @@ static constexpr auto kStatueLabelFontWeight = QFont::Medium;
 static constexpr int kStatusHintLabelPixelSize = 12;
 static constexpr auto kStatusHintLabelFontWeight = QFont::Normal;
 
-static constexpr auto kSmtpTestingTimeout = 5s;
-
 static const QColor kLight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{kLight16Color, "light16"}}},
@@ -108,6 +106,8 @@ public:
     bool useCloudServiceChanged() const;
 
     bool ignoreInputNotifications() const;
+
+    bool validate() const;
 
 private:
     OutgoingMailSettingsWidget* const q;
@@ -382,7 +382,7 @@ void OutgoingMailSettingsWidget::Private::updateSmtpConfigurationStatus()
 
 void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
 {
-    if (!q->currentServer())
+    if (!q->currentServer() || !validate())
         return;
 
     std::optional<QnUuid> proxyServerId;
@@ -706,6 +706,28 @@ bool OutgoingMailSettingsWidget::Private::useCloudServiceChanged() const
     return q->systemSettings()->useCloudServiceToSendEmail() != getUseCloudServiceFromDialog();
 }
 
+bool OutgoingMailSettingsWidget::Private::validate() const
+{
+    ui->emailInput->reset();
+    ui->userInput->reset();
+    ui->passwordInput->reset();
+    // Validate Mail From field.
+    ui->emailInput->validate();
+
+    // Validate Username and Password fields.
+    if (ui->protocolComboBox->currentIndex()
+        != ui->protocolComboBox->findData(QVariant::fromValue(QnEmail::ConnectionType::insecure)))
+    {
+        // Check whether Username and Password fields are not empty.
+        if (ui->userInput->text().isEmpty())
+            ui->userInput->setInvalidValidationResult(tr("Username cannot be empty"));
+        if (ui->passwordInput->text().isEmpty())
+            ui->passwordInput->setInvalidValidationResult(tr("Password cannot be empty"));
+    }
+
+    return ui->emailInput->isValid() && ui->userInput->isValid() && ui->passwordInput->isValid();
+}
+
 //-------------------------------------------------------------------------------------------------
 // OutgoingMailSettingsWidget definition.
 
@@ -732,6 +754,9 @@ void OutgoingMailSettingsWidget::loadDataToUi()
 
 void OutgoingMailSettingsWidget::applyChanges()
 {
+    // Notify user about incorrect filling but allow him to apply changes when "Apply" button is pressed.
+    d->validate();
+
     if (isReadOnly())
         return;
 
