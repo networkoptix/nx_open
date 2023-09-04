@@ -17,12 +17,17 @@ public:
     MOCK_METHOD(void, onRuleRemoved, (QnUuid ruleId));
     MOCK_METHOD(void, onRulesReset, ());
 
+    MOCK_METHOD(void, onActionBuilt, (
+        const nx::vms::rules::AggregatedEventPtr& event,
+        const nx::vms::rules::ActionPtr& action));
+
     MockEngineEvents(Engine* engine):
         m_engine(engine)
     {
         connect(m_engine, &Engine::ruleAddedOrUpdated, this, &MockEngineEvents::onRuleAddedOrUpdated);
         connect(m_engine, &Engine::ruleRemoved, this, &MockEngineEvents::onRuleRemoved);
         connect(m_engine, &Engine::rulesReset, this, &MockEngineEvents::onRulesReset);
+        connect(m_engine, &Engine::actionBuilt, this, &MockEngineEvents::onActionBuilt);
     }
 
 private:

@@ -1,10 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <chrono>
 #include <thread>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <QtCore/QThread>
+
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
@@ -20,9 +24,13 @@
 #include "test_action.h"
 #include "test_event.h"
 #include "test_field.h"
+#include "test_infra.h"
+#include "test_plugin.h"
 #include "test_router.h"
 
 namespace nx::vms::rules::test {
+
+using namespace std::chrono;
 
 namespace {
 
@@ -62,13 +70,13 @@ protected:
 TEST_F(EngineTest, ruleAddedSuccessfully)
 {
     // No rules at the moment the engine is just created.
-    ASSERT_EQ(0, engine->ruleCount());
+    ASSERT_EQ(0, engine->rules().size());
 
     auto rule = std::make_unique<Rule>(QnUuid::createUuid(), engine.get());
     engine->updateRule(serialize(rule.get()));
 
-    ASSERT_EQ(engine->ruleCount(), 1);
-    ASSERT_TRUE(engine->cloneRule(rule->id()));
+    ASSERT_EQ(engine->rules().size(), 1);
+    ASSERT_TRUE(engine->rule(rule->id()));
 }
 
 TEST_F(EngineTest, ruleClonedSuccessfully)
@@ -312,7 +320,7 @@ TEST_F(EngineTest, updateRule)
     EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, false));
     engine->updateRule(ruleData1);
     engine->updateRule(ruleData1);
-    EXPECT_TRUE(engine->cloneRules()[ruleData1.id]);
+    EXPECT_TRUE(engine->rule(ruleData1.id));
 }
 
 TEST_F(EngineTest, removeRule)
@@ -324,7 +332,7 @@ TEST_F(EngineTest, removeRule)
     EXPECT_CALL(mockEvents, onRuleRemoved(ruleData1.id));
     engine->updateRule(ruleData1);
     engine->removeRule(ruleData1.id);
-    EXPECT_TRUE(engine->cloneRules().empty());
+    EXPECT_TRUE(engine->rules().empty());
     engine->removeRule(ruleData1.id);
 }
 
@@ -334,7 +342,7 @@ TEST_F(EngineTest, resetRules)
     auto ruleData1 = makeEmptyRuleData();
 
     EXPECT_CALL(mockEvents, onRulesReset());
-    EXPECT_EQ(engine->ruleCount(), 0);
+    EXPECT_EQ(engine->rules().size(), 0);
     engine->resetRules({});
 
     EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, true));
@@ -571,6 +579,52 @@ TEST_F(EngineTest, notStartedEventIsNotProcessed)
 
     // Event with stopped state without previous started state is ignored.
     EXPECT_EQ(engine->processEvent(event), 0);
+}
+
+TEST_F(EngineTest, timerThread)
+{
+    auto plugin = TestPlugin(engine.get());
+    auto executor = TestActionExecutor();
+    auto connector = TestEventConnector();
+    engine->addActionExecutor(utils::type<TestActionWithInterval>(), &executor);
+    engine->addEventConnector(&connector);
+
+    QThread thread;
+    thread.start();
+    engine->moveToThread(&thread);
+
+    auto ruleId = QnUuid::createUuid();
+    {
+        auto rule1 = std::make_unique<Rule>(ruleId, engine.get());
+        rule1->addEventFilter(engine->buildEventFilter(utils::type<TestEvent>()));
+        auto builder = engine->buildActionBuilder(utils::type<TestActionWithInterval>());
+        ASSERT_TRUE(builder);
+        builder->fieldByType<OptionalTimeField>()->setValue(30s);
+        rule1->addActionBuilder(std::move(builder));
+        engine->updateRule(serialize(rule1.get()));
+    }
+
+    // Event1 will be processed, event2 will be aggregated, timer will be started.
+    auto event1 = TestEventPtr::create(syncTime.currentTimePoint(), State::instant);
+    auto event2 = TestEventPtr::create(syncTime.currentTimePoint(), State::instant);
+
+    connector.process(event1);
+    connector.process(event2);
+
+    std::this_thread::sleep_for(50ms);
+    ASSERT_EQ(executor.actions.size(), 1);
+
+    // Timer will be stopped on rule removal in engine's thread.
+    engine->removeRule(ruleId);
+
+    nx::utils::AsyncHandlerExecutor(&thread).submit(
+        [this, &thread]
+        {
+            engine.reset();
+            thread.quit();
+        });
+
+    thread.wait();
 }
 
 } // namespace nx::vms::rules::test

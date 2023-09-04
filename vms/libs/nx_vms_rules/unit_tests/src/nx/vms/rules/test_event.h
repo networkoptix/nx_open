@@ -132,18 +132,4 @@ public:
 using SimpleEventPtr = QSharedPointer<SimpleEvent>;
 using TestEventPtr = QSharedPointer<TestEvent>;
 
-class TestTimestampDependentEvent: public nx::vms::rules::BasicEvent
-{
-    Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.time")
-
-public:
-    using BasicEvent::BasicEvent;
-
-    QString uniqueName() const override
-    {
-        return utils::makeName(QString::number(timestamp().count()), BasicEvent::uniqueName());
-    }
-};
-
 } // namespace nx::vms::rules::test

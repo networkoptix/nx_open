@@ -263,6 +263,7 @@ ActionBuilder::ActionBuilder(const QnUuid& id, const QString& actionType, const 
 
 ActionBuilder::~ActionBuilder()
 {
+    toggleAggregationTimer(false);
 }
 
 QnUuid ActionBuilder::id() const
@@ -388,21 +389,7 @@ QSet<QnUuid> ActionBuilder::affectedResources(const EventPtr& /*event*/) const
 void ActionBuilder::process(const EventPtr& event)
 {
     if (m_aggregator)
-    {
-        if (!m_timer)
-        {
-            m_timer.reset(new QTimer);
-            m_timer->setSingleShot(true);
-            // The interval is how often does it required to check if aggregator has events with
-            // the elapsed aggregation time.
-            constexpr auto kPollAggregatorInterval = seconds(1);
-            m_timer->setInterval(kPollAggregatorInterval);
-            connect(m_timer.get(), &QTimer::timeout, this, &ActionBuilder::onTimeout);
-        }
-
-        if (!m_timer->isActive())
-            m_timer->start();
-    }
+        toggleAggregationTimer(true);
 
     processEvent(event);
 }
@@ -452,6 +439,15 @@ microseconds ActionBuilder::aggregationInterval() const
     return m_interval;
 }
 
+void ActionBuilder::toggleAggregationTimer(bool on)
+{
+    if (on == m_timerActive || !engine())
+        return;
+
+    engine()->toggleTimer(this, on);
+    m_timerActive = on;
+}
+
 bool ActionBuilder::isProlonged() const
 {
     if (const auto engine = this->engine(); NX_ASSERT(engine))
@@ -469,14 +465,17 @@ void ActionBuilder::connectSignals()
     }
 }
 
-void ActionBuilder::onTimeout()
+void ActionBuilder::onTimer(const nx::utils::TimerId&)
 {
-    if (!NX_ASSERT(m_aggregator) || !NX_ASSERT(m_timer) || m_aggregator->empty())
-        return;
-
-    m_timer->start();
-
-    handleAggregatedEvents();
+    if (!NX_ASSERT(m_aggregator) || !NX_ASSERT(m_timerActive) || m_aggregator->empty())
+    {
+        toggleAggregationTimer(false);
+    }
+    else
+    {
+        toggleAggregationTimer(true);
+        handleAggregatedEvents();
+    }
 }
 
 void ActionBuilder::updateState()
@@ -668,9 +667,9 @@ void ActionBuilder::handleAggregatedEvents()
         buildAndEmitAction(event);
 }
 
-const Engine* ActionBuilder::engine() const
+Engine* ActionBuilder::engine() const
 {
-    return m_rule ? m_rule->engine() : nullptr;
+    return m_rule ? const_cast<Engine*>(m_rule->engine()) : nullptr;
 }
 
 } // namespace nx::vms::rules
