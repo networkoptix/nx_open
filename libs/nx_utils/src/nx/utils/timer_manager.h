@@ -13,26 +13,10 @@
 #include "std/optional.h"
 #include "thread/mutex.h"
 #include "thread/wait_condition.h"
+#include "time/timer_event_handler.h"
 
 namespace nx {
 namespace utils {
-
-typedef quint64 TimerId;
-
-/**
- * Abstract interface for receiving timer events.
- */
-class NX_UTILS_API TimerEventHandler
-{
-public:
-    virtual ~TimerEventHandler() = default;
-
-    /**
-     * Called on timer event.
-     * @param timerId
-     */
-    virtual void onTimer(const TimerId& timerId) = 0;
-};
 
 /**
  * Timer events scheduler.

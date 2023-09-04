@@ -8,6 +8,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
+#include <nx/utils/time/timer_event_handler.h>
 #include <nx/utils/uuid.h>
 
 #include "rules_fwd.h"
@@ -21,7 +22,7 @@ class Aggregator;
  * Action builders are used to construct actual action parameters from action settings
  * contained in rules, and fields of events that triggered these rules.
  */
-class NX_VMS_RULES_API ActionBuilder: public QObject
+class NX_VMS_RULES_API ActionBuilder: public QObject, public nx::utils::TimerEventHandler
 {
     Q_OBJECT
 
@@ -120,12 +121,15 @@ protected:
     void handleAggregatedEvents();
 
 private:
-    void onTimeout();
+    virtual void onTimer(const nx::utils::TimerId& timerId) override;
+
     void updateState();
     void setAggregationInterval(std::chrono::microseconds interval);
+    void toggleAggregationTimer(bool on);
     Actions buildActionsForTargetUsers(const AggregatedEventPtr& aggregatedEvent);
     ActionPtr buildAction(const AggregatedEventPtr& aggregatedEvent);
-    const Engine* engine() const;
+    Engine* engine() const;
+
 
     QnUuid m_id;
     QString m_actionType;
@@ -134,12 +138,11 @@ private:
     std::map<QString, std::unique_ptr<ActionBuilderField>> m_fields;
 
     std::chrono::microseconds m_interval = std::chrono::microseconds::zero();
-    QScopedPointer<QTimer> m_timer;
     QSharedPointer<Aggregator> m_aggregator;
 
     // Running flag for prolonged actions.
     bool m_isActionRunning = false;
-
+    bool m_timerActive = false;
     bool m_updateInProgress = false;
 
     template<class T>

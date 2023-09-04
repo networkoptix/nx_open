@@ -2,6 +2,8 @@
 
 #include "engine.h"
 
+#include <chrono>
+
 #include <QtCore/QMetaProperty>
 #include <QtCore/QThread>
 
@@ -12,6 +14,7 @@
 #include <nx/vms/common/utils/schedule.h>
 #include <nx/vms/rules/ini.h>
 #include <nx/vms/utils/translation/scoped_locale.h>
+#include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
 #include "action_builder.h"
@@ -32,6 +35,8 @@
 #include "utils/type.h"
 
 namespace nx::vms::rules {
+
+using namespace std::chrono;
 
 namespace {
 
@@ -55,17 +60,31 @@ bool isDescriptorValid(const ItemDescriptor& descriptor)
 Engine::Engine(std::unique_ptr<Router> router, QObject* parent):
     QObject(parent),
     m_router(std::move(router)),
-    m_eventCache(std::make_unique<EventCache>())
+    m_ruleMutex(nx::Mutex::Recursive),
+    m_eventCache(std::make_unique<EventCache>()),
+    m_aggregationTimer(new QTimer(this))
 {
     const QString rulesVersion(ini().rulesEngine);
     m_enabled = (rulesVersion == "new" || rulesVersion == "both");
     m_oldEngineEnabled = (rulesVersion != "new");
+
+    m_aggregationTimer->setInterval(1s);
+    connect(m_aggregationTimer, &QTimer::timeout, this,
+        [this]()
+        {
+            NX_MUTEX_LOCKER lock(&m_ruleMutex);
+
+            for (auto handler: m_timerHandlers)
+                handler->onTimer(0);
+        });
 
     connect(m_router.get(), &Router::eventReceived, this, &Engine::processAcceptedEvent);
 }
 
 Engine::~Engine()
 {
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
+    m_rules.clear();
 }
 
 void Engine::setId(QnUuid id)
@@ -85,13 +104,6 @@ bool Engine::isEnabled() const
 bool Engine::isOldEngineEnabled() const
 {
     return m_oldEngineEnabled;
-}
-
-size_t Engine::ruleCount() const
-{
-    NX_MUTEX_LOCKER lock(&m_ruleMutex);
-
-    return m_rules.size();
 }
 
 bool Engine::addEventConnector(EventConnector *eventConnector)
@@ -137,29 +149,6 @@ Engine::ConstRulePtr Engine::rule(const QnUuid& id) const
         return it->second;
 
     return {};
-}
-
-Engine::RulePtr Engine::findRule(const QnUuid& id)
-{
-    NX_MUTEX_LOCKER lock(&m_ruleMutex);
-    if (const auto it = m_rules.find(id); it != m_rules.end())
-        return it->second;
-
-    return {};
-}
-
-Engine::RuleSet Engine::cloneRules() const
-{
-    RuleSet result;
-    NX_MUTEX_LOCKER lock(&m_ruleMutex);
-
-    for (const auto& [id, rule]: m_rules)
-    {
-        if (auto cloned = cloneRule(rule.get()))
-            result[id] = std::move(cloned);
-    }
-
-    return result;
 }
 
 Engine::RulePtr Engine::cloneRule(const QnUuid& id) const
@@ -836,7 +825,7 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
     checkOwnThread();
     NX_DEBUG(this, "Processing accepted event, rule id: %1", ruleId);
 
-    const auto rule = this->findRule(ruleId);
+    const auto rule = this->rule(ruleId);
     if (!rule)
         return;
 
@@ -885,6 +874,30 @@ EventCache* Engine::eventCache() const
     checkOwnThread();
 
     return m_eventCache.get();
+}
+
+void Engine::toggleTimer(nx::utils::TimerEventHandler* handler, bool on)
+{
+    {
+        NX_MUTEX_LOCKER lock(&m_ruleMutex);
+
+        if (on)
+            m_timerHandlers.insert(handler);
+        else
+            m_timerHandlers.remove(handler);
+
+        on = !m_timerHandlers.empty();
+    }
+
+    executeInThread(
+        this->thread(),
+        [this, on]()
+        {
+            if (!on)
+                m_aggregationTimer->stop();
+            else if (!m_aggregationTimer->isActive())
+                m_aggregationTimer->start();
+        });
 }
 
 void Engine::checkOwnThread() const
