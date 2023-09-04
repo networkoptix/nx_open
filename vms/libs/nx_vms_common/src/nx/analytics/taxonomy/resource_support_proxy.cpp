@@ -7,6 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <nx/analytics/taxonomy/utils.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/utils/serialization/qjson.h>
@@ -153,7 +154,7 @@ struct ResourceSupportProxy::Private:
         return supportInfoCache[deviceId][engineId].eventTypeSupport.contains(eventTypeId);
     }
 
-    bool isObjectTypeSupported(const QString& eventTypeId, QnUuid deviceId, QnUuid engineId) const
+    bool isObjectTypeSupported(const QString& objectTypeId, QnUuid deviceId, QnUuid engineId) const
     {
         if (!NX_ASSERT(!deviceId.isNull()))
             return false;
@@ -166,8 +167,15 @@ struct ResourceSupportProxy::Private:
 
         if (!supportInfoCache[deviceId].contains(engineId))
             return false;
+        
+        const auto& objectTypeSupport = supportInfoCache[deviceId][engineId].objectTypeSupport;
 
-        return supportInfoCache[deviceId][engineId].objectTypeSupport.contains(eventTypeId);
+        // TODO: Remove later. For detailed information see the comment above 
+        // maybeUnscopedExtendedObjectTypeId().
+        if (objectTypeSupport.contains(objectTypeId))
+            return true;
+        const QString extendedObjectTypeId = maybeUnscopedExtendedObjectTypeId(objectTypeId);
+        return objectTypeSupport.contains(extendedObjectTypeId);            
     }
 
     bool isEventTypeAttributeSupported(
