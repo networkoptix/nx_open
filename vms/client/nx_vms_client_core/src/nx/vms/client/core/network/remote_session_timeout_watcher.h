@@ -21,6 +21,18 @@ class NX_VMS_CLIENT_CORE_API RemoteSessionTimeoutWatcher: public QObject
     using base_type = QObject;
 
 public:
+    /**
+     * When temporary token is used for authorization, common session token is created and used
+     * instead. This session token can wear off earlier than the temporary token, but for security
+     * reasons we should ask user to re-enter temporary token manually.
+     */
+    enum class SessionExpirationReason
+    {
+        sessionExpired,
+        temporaryTokenExpired
+    };
+
+public:
     RemoteSessionTimeoutWatcher(nx::vms::common::SystemSettings* globalSettings, QObject* parent = nullptr);
     virtual ~RemoteSessionTimeoutWatcher() override;
 
@@ -38,7 +50,7 @@ public:
 signals:
     void showNotification(std::chrono::minutes timeLeft);
     void hideNotification();
-    void sessionExpired();
+    void sessionExpired(SessionExpirationReason reason);
 
 private:
     struct Private;
