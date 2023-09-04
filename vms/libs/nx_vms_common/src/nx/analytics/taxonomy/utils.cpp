@@ -154,4 +154,19 @@ bool eventBelongsToGroup(const AbstractEventType* eventType, const QString& grou
     return false;
 };
 
+// TODO: Remove later, when the code debt issue described below is fixed.
+//
+// The problem should be solved differently: the notion of "Extended Object Type" must be fully
+// evaporated in the phase of compiling the taxonomy. Currently there is a tech debt which
+// prevents this - the manifests are accessed by the Client directly through Resource Properties,
+// which should be fixed in the first place.
+QString maybeUnscopedExtendedObjectTypeId(const QString& scopedExtendedObjectTypeId)
+{
+    if (!scopedExtendedObjectTypeId.contains("$"))
+        return scopedExtendedObjectTypeId;
+    
+    QStringList parts = scopedExtendedObjectTypeId.split("$");
+    return parts.last();
+}
+
 } // namespace nx::analytics::taxonomy
