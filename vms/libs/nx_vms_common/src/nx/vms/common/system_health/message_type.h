@@ -51,6 +51,13 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
     metadataStorageNotSet = 27, //< Generated on the client side.
     metadataOnSystemStorage = 28, //< Generated on the client side.
 
+    saasLocalRecordingServicesOverused = 29, //< Generated on the client side.
+    saasCloudStorageServicesOverused = 30, //< Generated on the client side.
+    saasIntegrationServicesOverused = 31, //< Generated on the client side.
+
+    saasInSuspendedState = 32, //< Generated on the client side.
+    saasInShutdownState = 33, //< Generated on the client side.
+
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.
 
