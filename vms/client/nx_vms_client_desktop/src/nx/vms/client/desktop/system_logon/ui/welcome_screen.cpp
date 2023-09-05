@@ -366,8 +366,10 @@ bool WelcomeScreen::checkUrlIsValid(const QString& urlText) const
     return url.isValid() && !url.scheme().isEmpty();
 }
 
-void WelcomeScreen::abortConnectionProcess() const
+void WelcomeScreen::abortConnectionProcess()
 {
+    NX_ASSERT(!m_connectingSystemId.isEmpty());
+    m_connectingSystemId.clear();
     menu()->trigger(ui::action::DisconnectAction, {Qn::ForceRole, true});
 }
 
