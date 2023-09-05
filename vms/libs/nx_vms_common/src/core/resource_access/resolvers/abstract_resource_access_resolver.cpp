@@ -8,6 +8,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/abstract_access_rights_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_connections.h>
@@ -106,6 +107,29 @@ void AbstractResourceAccessResolver::notifyAccessReset()
 {
     NX_DEBUG(this, "Notifying about a reset");
     emit notifier()->resourceAccessReset();
+}
+
+QString AbstractResourceAccessResolver::toLogString(
+    const QnUuid& resourceId, QnResourcePool* resourcePool)
+{
+    if (resourceId.isNull())
+        return "none";
+
+    const auto resource = resourcePool->getResourceById(resourceId);
+
+    return resource
+        ? nx::toString(resource)
+        : NX_FMT("%1 (not in the pool)", resourceId).toQString();
+}
+
+QString AbstractResourceAccessResolver::affectedCacheToLogString(
+    const QSet<QnUuid>& affectedSubjectIds)
+{
+    if (affectedSubjectIds.empty())
+        return "cached subjects weren't affected";
+
+    return nx::format("cache invalidated for %2 affected subjects: %3",
+        affectedSubjectIds.size(), affectedSubjectIds);
 }
 
 // ------------------------------------------------------------------------------------------------

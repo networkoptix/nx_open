@@ -165,18 +165,24 @@ VideowallItemAccessResolver::Private::Private(
     connect(videowallWatcher.get(), &VideowallLayoutWatcher::videowallLayoutRemoved,
         this, &Private::handleVideowallLayoutAddedOrRemoved, Qt::DirectConnection);
 
-    connect(resourcePool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
+    connect(resourcePool, &QnResourcePool::resourcesAdded, this,
+        [this](const QnResourceList& resources)
         {
-            if (const auto layout = resource.objectCast<QnLayoutResource>())
-                handleLayoutAdded(layout);
+            for (const auto& resource: resources)
+            {
+                if (const auto layout = resource.objectCast<QnLayoutResource>())
+                    handleLayoutAdded(layout);
+            }
         }, Qt::DirectConnection);
 
-    connect(resourcePool, &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
+    connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
+        [this](const QnResourceList& resources)
         {
-            if (const auto layout = resource.objectCast<QnLayoutResource>())
-                handleLayoutRemoved(layout);
+            for (const auto& resource: resources)
+            {
+                if (const auto layout = resource.objectCast<QnLayoutResource>())
+                    handleLayoutRemoved(layout);
+            }
         }, Qt::DirectConnection);
 
     const auto layouts = resourcePool->getResources<QnLayoutResource>();
@@ -230,7 +236,7 @@ ResourceAccessMap VideowallItemAccessResolver::Private::ensureAccessMap(
     cachedAccessMapRef += accessMap;
 
     NX_DEBUG(q, "Resolved and cached an access map for %1", subjectId);
-    NX_VERBOSE(q, cachedAccessMapRef);
+    NX_VERBOSE(q, toString(cachedAccessMapRef, resourcePool));
 
     return cachedAccessMapRef;
 }
@@ -331,8 +337,8 @@ void VideowallItemAccessResolver::Private::handleVideowallAdded(
             cachedAccessMaps.remove(subjectId);
     }
 
-    NX_DEBUG(q, "Videowall %1 added, cache invalidated for %2 affected subjects: %3",
-        videowall, affectedCachedSubjectIds.size(), affectedCachedSubjectIds);
+    NX_DEBUG(q, "Videowall %1 added to the pool, %2",
+        videowall, affectedCacheToLogString(affectedCachedSubjectIds));
 
     baseResolver->notifier()->releaseSubjects(affectedCachedSubjectIds);
     notifyResolutionChanged(videowall, /*knownAffectedSubjectIds*/ affectedCachedSubjectIds);
@@ -359,8 +365,8 @@ void VideowallItemAccessResolver::Private::handleVideowallRemoved(
     videowall->disconnect(this);
     const auto affectedCachedSubjectIds = invalidateVideowallData(videowall);
 
-    NX_DEBUG(q, "Videowall %1 removed, cache invalidated for %2 affected subjects: %3",
-        videowall, affectedCachedSubjectIds.size(), affectedCachedSubjectIds);
+    NX_DEBUG(q, "Videowall %1 removed from the pool, %2",
+        videowall, affectedCacheToLogString(affectedCachedSubjectIds));
 
     baseResolver->notifier()->releaseSubjects(affectedCachedSubjectIds);
     notifyResolutionChanged(videowall, /*knownAffectedSubjectIds*/ affectedCachedSubjectIds);
@@ -373,13 +379,18 @@ void VideowallItemAccessResolver::Private::handleVideowallLayoutAddedOrRemoved(
         ? resourcePool->getResourceById<QnLayoutResource>(layoutId)
         : QnLayoutResourcePtr();
 
-    NX_VERBOSE(q, "Videowall %1 layout %2 added or removed, %3", videowall, layoutId,
-        layout
-            ? QString("in the pool, parentId=%1").arg(layout->getParentId().toString())
-            : QString("not in the pool"));
+    if (layout)
+    {
+        NX_VERBOSE(q, "Videowall %1 layout %2 added or removed", videowall, layout);
 
-    if (layout && layout->getParentId() == videowall->getId())
-        handleVideowallLayoutsChanged(videowall);
+        if (layout->getParentId() == videowall->getId())
+            handleVideowallLayoutsChanged(videowall);
+    }
+    else
+    {
+        NX_VERBOSE(q, "Videowall %1 layout %2 (not in the pool) added or removed",
+            videowall, layoutId);
+    }
 }
 
 void VideowallItemAccessResolver::Private::handleVideowallLayoutsChanged(
@@ -399,8 +410,8 @@ void VideowallItemAccessResolver::Private::handleVideowallLayoutsChanged(
 
     const auto affectedCachedSubjectIds = invalidateVideowallSubjects(videowall);
 
-    NX_DEBUG(q, "Videowall %1 layout set changed, cache invalidated for %2 affected subjects: %3",
-        videowall, affectedCachedSubjectIds.size(), affectedCachedSubjectIds);
+    NX_DEBUG(q, "Videowall %1 set of layouts changed, %2",
+        videowall, affectedCacheToLogString(affectedCachedSubjectIds));
 
     baseResolver->notifier()->releaseSubjects(affectedCachedSubjectIds);
     notifyResolutionChanged(videowall, /*knownAffectedSubjectIds*/ affectedCachedSubjectIds);
@@ -434,8 +445,10 @@ void VideowallItemAccessResolver::Private::handleLayoutParentChanged(
     if (!NX_ASSERT(layout) || !resourcePool)
         return;
 
-    NX_VERBOSE(q, "Layout %1 parentId changed from %2 to %3",
-        layout, oldParentId, layout->getParentId());
+    NX_VERBOSE(q, "Layout %1 parent changed from %2 to %3",
+        layout,
+        toLogString(oldParentId, resourcePool),
+        toLogString(layout->getParentId(), resourcePool));
 
     if (const auto oldVideowall = resourcePool->getResourceById<QnVideoWallResource>(oldParentId))
     {

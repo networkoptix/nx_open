@@ -35,11 +35,6 @@ struct NX_VMS_COMMON_API LayoutItemData
     nx::vms::api::dewarping::ViewData dewarpingParams;
     bool displayHotspots = false;
 
-    // This convenience flag is set to true on the client for new items on an unsaved layout.
-    // It is checked by the layout item resolver. Layout access rights are not passed for
-    // its transient items.
-    bool transient = false;
-
     bool operator==(const LayoutItemData& other) const;
 };
 
