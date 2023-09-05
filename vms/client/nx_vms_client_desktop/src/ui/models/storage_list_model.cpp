@@ -542,8 +542,7 @@ bool QnStorageListModel::couldStoreAnalytics(const QnStorageModelInfo& data) con
     // TODO: #vbreus Fix QnClientStorageResource::getCapabilities() to make
     // QnStorageResource::isDbReady() method and subsequent
     // QnStorageResource::canStoreAnalytics() method work correctly in client.
-
-    return data.isWritable && data.isOnline && data.isDbReady;
+    return data.isOnline && data.isDbReady;
 }
 
 bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const
