@@ -95,6 +95,9 @@ public:
      * Returns qnSyncTime->currentTimePoint() but in milliseconds for easier usage with JS Date.
      */
     Q_INVOKABLE qint64 syncTimeCurrentTimePointMs() const;
+
+    /** Returns native string representation of QQuickAction shortcut property. */
+    Q_INVOKABLE QString shortcutText(const QVariant& var) const;
 };
 
 } // namespace nx::vms::client::core

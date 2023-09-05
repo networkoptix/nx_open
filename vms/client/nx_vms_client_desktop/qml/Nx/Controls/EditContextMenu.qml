@@ -1,10 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQuick.Controls 2.14
+import QtQuick
+import QtQuick.Controls
 
-import Nx.Controls 1.0
-import nx.vms.client.core 1.0
+import Nx
+import Nx.Controls
+
+import nx.vms.client.core
 
 Menu
 {
@@ -29,27 +31,28 @@ Menu
     Action
     {
         text: "Cut"
-        shortcut: "Ctrl+X"
+        shortcut: StandardKey.Cut
         onTriggered: menu.cutAction()
         visible: menu.readActionsVisible && menu.editingEnabled
-        enabled: menu.selectionActionsEnabled && menu.editingEnabled
+        enabled: menu.selectionActionsEnabled && menu.editingEnabled && menu.visible
     }
 
     Action
     {
         text: "Copy"
-        shortcut: "Ctrl+C"
+        shortcut: StandardKey.Copy
         onTriggered: menu.copyAction()
         visible: menu.readActionsVisible
-        enabled: menu.selectionActionsEnabled
+        enabled: menu.selectionActionsEnabled && menu.visible
     }
 
     Action
     {
         text: "Paste"
-        shortcut: "Ctrl+V"
+        shortcut: StandardKey.Paste
         onTriggered: menu.pasteAction()
         visible: menu.editingEnabled
+        enabled: menu.editingEnabled && menu.visible
     }
 
     Action
@@ -57,6 +60,6 @@ Menu
         text: "Delete"
         onTriggered: menu.deleteAction()
         visible: menu.editingEnabled
-        enabled: menu.selectionActionsEnabled && menu.editingEnabled
+        enabled: menu.selectionActionsEnabled && menu.editingEnabled && menu.visible
     }
 }
