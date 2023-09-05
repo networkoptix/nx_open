@@ -131,6 +131,7 @@ private:
     float m_speed;
     bool m_queueWasFilled;
     bool m_needResetDecoder;
+    mutable nx::Mutex m_lastDisplayedFrameMutex;
     CLConstVideoDecoderOutputPtr m_lastDisplayedFrame;
     QSize m_imageSize;
     mutable nx::Mutex m_imageSizeMtx;
