@@ -83,7 +83,8 @@ enum LinkHostPriority
 {
     cloud,
     dns,
-    other
+    other,
+    localHost
 };
 
 const auto customPriority =
@@ -96,6 +97,8 @@ const auto customPriority =
                 return LinkHostPriority::cloud;
             case ServerHostPriority::dns:
                 return LinkHostPriority::dns;
+            case ServerHostPriority::localHost:
+                return LinkHostPriority::localHost;
             default:
                 return LinkHostPriority::other;
         }
@@ -190,8 +193,8 @@ struct UserSettingsDialog::Private
 
         if (customPriority(serverUrl) == LinkHostPriority::other)
         {
-            if (auto url = server->getApiUrl(); url.host() != "localhost")
-                serverUrl = server->getApiUrl();
+            if (auto url = server->getApiUrl(); !nx::network::HostAddress(url.host()).isLoopback())
+                serverUrl = url;
         }
 
         if (customPriority(serverUrl) == LinkHostPriority::cloud)
