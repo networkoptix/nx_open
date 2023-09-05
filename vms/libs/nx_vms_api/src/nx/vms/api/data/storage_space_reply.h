@@ -8,7 +8,7 @@ namespace nx::vms::api {
 
 struct NX_VMS_API StorageSpaceReply
 {
-    StorageSpaceDataListV1 storages;
+    std::vector<StorageSpaceDataV1> storages;
     std::vector<std::string> storageProtocols;
 };
 
