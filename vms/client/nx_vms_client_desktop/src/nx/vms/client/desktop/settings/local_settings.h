@@ -130,6 +130,7 @@ public:
     Property<QString> lastDatabaseBackupDir{this, "lastDatabaseBackupDir"};
     Property<QString> lastDownloadDir{this, "lastDownloadDir"};
     Property<QString> lastExportDir{this, "lastExportDir"};
+    Property<QString> lastImportDir{this, "lastImportDir"};
     Property<QString> lastRecordingDir{this, "lastRecordingDir"};
     Property<SharedScreenshotParameters> lastScreenshotParams{this, "lastScreenshotParams"};
 

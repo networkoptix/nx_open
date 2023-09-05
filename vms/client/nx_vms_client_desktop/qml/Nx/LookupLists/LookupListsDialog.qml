@@ -19,7 +19,8 @@ Dialog
 
     required property SystemContext systemContext
     property Analytics.StateView taxonomy: systemContext.taxonomyManager().createStateView(control)
-    property var currentList: listComboBox.currentValue
+    // When comboBox is empty, currentValue is undefined. `??` used for suppressing warnings.
+    property LookupListModel currentList: listComboBox.currentValue ?? null
     property var dialog: null
     property bool loaded: false
     property bool saving: false
@@ -43,7 +44,7 @@ Dialog
     LookupListEntriesModel
     {
         id: entriesModel
-        listModel: currentList ?? null
+        listModel: currentList
     }
 
     function createNewList()
@@ -238,6 +239,7 @@ Dialog
                     {
                         text: qsTr("Import")
                         icon.source: "image://svg/skin/text_buttons/import.svg"
+                        onClicked: importDialog.visible = true
                     }
                     TextButton
                     {
@@ -342,6 +344,14 @@ Dialog
         }
     }
 
+    LookupListImportDialog
+    {
+        id: importDialog
+
+        model: entriesModel
+        visible: false
+    }
+
     contentItem: Loader
     {
         sourceComponent: !loaded
@@ -392,7 +402,6 @@ Dialog
                 default:
                     exportProgressBar.visible = false
             }
-
         }
     }
 }
