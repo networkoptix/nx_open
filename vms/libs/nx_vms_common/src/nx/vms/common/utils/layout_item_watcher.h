@@ -24,7 +24,6 @@ namespace nx::vms::common {
  * a resource is removed from the last layout it belongs to.
  *
  * NOTE: class does not depend on resource pool, so even deleted layouts must be removed manually.
- * WARNING: this class is not thread-safe.
  */
 class NX_VMS_COMMON_API LayoutItemWatcher: public QObject
 {

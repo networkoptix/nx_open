@@ -171,7 +171,7 @@ ResourceAccessMap IntercomLayoutAccessResolver::Private::ensureAccessMap(
     baseResolver->notifier()->subscribeSubjects({subjectId});
 
     NX_DEBUG(q, "Resolved and cached an access map for %1", subjectId);
-    NX_VERBOSE(q, accessMap);
+    NX_VERBOSE(q, toString(accessMap, resourcePool));
 
     return accessMap;
 }
@@ -262,8 +262,8 @@ void IntercomLayoutAccessResolver::Private::handleIntercomsAddedOrRemoved(
         }
     }
 
-    NX_DEBUG(q, "Intercoms %1 %2, cache invalidated for %3 affected subjects: %4", intercoms,
-        isAdded ? "added" : "removed", affectedCachedSubjectIds.size(), affectedCachedSubjectIds);
+    NX_DEBUG(q, "Intercoms %1 %2, %3", intercoms,
+        isAdded ? "added" : "removed", affectedCacheToLogString(affectedCachedSubjectIds));
 
     baseResolver->notifier()->releaseSubjects(affectedCachedSubjectIds);
     notifyResolutionChanged(intercoms, /*knownAffectedSubjectIds*/ affectedCachedSubjectIds);

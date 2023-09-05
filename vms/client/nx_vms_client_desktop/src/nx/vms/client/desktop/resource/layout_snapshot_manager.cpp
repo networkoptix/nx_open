@@ -158,8 +158,19 @@ void LayoutSnapshotManager::store(const LayoutResourcePtr &resource)
         return;
 
     resource->storeSnapshot();
-
     markChanged(resource->getId(), false);
+}
+
+void LayoutSnapshotManager::update(
+    const LayoutResourcePtr& resource, const QnLayoutResourcePtr& remoteResource)
+{
+    if (!NX_ASSERT(resource && remoteResource))
+        return;
+
+    resource->updateSnapshot(remoteResource);
+
+    // Remote layout was changed and may differ from the local one now.
+    markChanged(resource->getId(), true);
 }
 
 void LayoutSnapshotManager::restore(const LayoutResourcePtr &resource)

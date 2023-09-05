@@ -113,10 +113,10 @@ QnResourceAccessManager::QnResourceAccessManager(
         this, &QnResourceAccessManager::resourceAccessReset, Qt::DirectConnection);
 
     connect(resourcePool(), &QnResourcePool::resourcesAdded,
-        this, &QnResourceAccessManager::handleResourcesAdded);
+        this, &QnResourceAccessManager::handleResourcesAdded, Qt::DirectConnection);
 
     connect(resourcePool(), &QnResourcePool::resourcesRemoved,
-        this, &QnResourceAccessManager::handleResourcesRemoved);
+        this, &QnResourceAccessManager::handleResourcesRemoved, Qt::DirectConnection);
 
     connect(systemContext()->accessSubjectHierarchy(), &SubjectHierarchy::changed, this,
         [this](
@@ -346,46 +346,37 @@ void QnResourceAccessManager::handleResourcesAdded(const QnResourceList& resourc
     for (const auto& resource: resources)
     {
         connect(resource.get(), &QnResource::flagsChanged,
-            this, &QnResourceAccessManager::handleResourceUpdated);
+            this, &QnResourceAccessManager::handleResourceUpdated, Qt::DirectConnection);
 
         if (const auto& camera = resource.objectCast<QnVirtualCameraResource>())
         {
             connect(camera.get(), &QnVirtualCameraResource::scheduleEnabledChanged,
-                this, &QnResourceAccessManager::handleResourceUpdated);
+                this, &QnResourceAccessManager::handleResourceUpdated, Qt::DirectConnection);
 
             connect(camera.get(), &QnVirtualCameraResource::licenseTypeChanged,
-                this, &QnResourceAccessManager::handleResourceUpdated);
+                this, &QnResourceAccessManager::handleResourceUpdated, Qt::DirectConnection);
 
             connect(camera.get(), &QnVirtualCameraResource::capabilitiesChanged,
-                this, &QnResourceAccessManager::handleResourceUpdated);
+                this, &QnResourceAccessManager::handleResourceUpdated, Qt::DirectConnection);
         }
 
         if (const auto& layout = resource.objectCast<QnLayoutResource>())
         {
             connect(layout.get(), &QnLayoutResource::lockedChanged,
-                this, &QnResourceAccessManager::handleResourceUpdated);
+                this, &QnResourceAccessManager::handleResourceUpdated, Qt::DirectConnection);
         }
 
         if (const auto& user = resource.objectCast<QnUserResource>())
         {
             connect(user.get(), &QnUserResource::attributesChanged,
-                this, &QnResourceAccessManager::handleResourceUpdated);
+                this, &QnResourceAccessManager::handleResourceUpdated, Qt::DirectConnection);
         }
     }
 }
 
-void QnResourceAccessManager::checkOwnThread()
-{
-    NX_ASSERT(
-        QThread::currentThread() == thread(),
-        "Unexpected thread: %1",
-        QThread::currentThread()->objectName());
-}
-
 void QnResourceAccessManager::handleResourcesRemoved(const QnResourceList& resources)
 {
-    checkOwnThread();
-
+    NX_MUTEX_LOCKER lk(&m_updatingResourcesMutex);
     for (const auto& resource: resources)
     {
         resource->disconnect(this);
@@ -395,23 +386,35 @@ void QnResourceAccessManager::handleResourcesRemoved(const QnResourceList& resou
 
 void QnResourceAccessManager::handleResourceUpdated(const QnResourcePtr& resource)
 {
-    checkOwnThread();
+    {
+        NX_MUTEX_LOCKER lk(&m_updatingResourcesMutex);
+        if (isUpdating())
+        {
+            m_updatingResources.insert(resource);
+            return;
+        }
+    }
 
-    if (isUpdating())
-        m_updatingResources.insert(resource);
-    else
-        emit permissionsDependencyChanged({resource});
+    NX_VERBOSE(this, "Permissions dependency changed for %1", resource);
+    emit permissionsDependencyChanged({resource});
 }
 
 void QnResourceAccessManager::afterUpdate()
 {
-    checkOwnThread();
+    const QnResourceList updatedResources =
+        [this]()
+        {
+            NX_MUTEX_LOCKER lk(&m_updatingResourcesMutex);
+            const auto result = m_updatingResources.values();
+            m_updatingResources = {};
+            return result;
+        }();
 
-    if (!m_updatingResources.empty())
-    {
-        emit permissionsDependencyChanged(m_updatingResources.values());
-        m_updatingResources.clear();
-    }
+    if (updatedResources.empty())
+        return;
+
+    NX_VERBOSE(this, "Permissions dependencies changed for %1", updatedResources);
+    emit permissionsDependencyChanged(updatedResources);
 }
 
 bool QnResourceAccessManager::canCreateResourceInternal(

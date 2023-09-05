@@ -485,5 +485,5 @@ nx::vms::common::SystemContext* QnResource::systemContext() const
 
 QString QnResource::idForToStringFromPtr() const
 {
-    return getId().toSimpleString();
+    return NX_FMT("%1: %2", getId().toSimpleString(), getName());
 }

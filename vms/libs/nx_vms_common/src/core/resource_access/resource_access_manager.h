@@ -10,6 +10,7 @@
 #include <core/resource_access/resource_access_details.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx/core/core_fwd.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <utils/common/updatable.h>
 
@@ -314,9 +315,8 @@ private:
     void handleResourcesAdded(const QnResourceList& resources);
     void handleResourcesRemoved(const QnResourceList& resources);
 
-    void checkOwnThread();
-
 private:
     const std::unique_ptr<nx::core::access::AccessRightsResolver> m_accessRightsResolver;
     QSet<QnResourcePtr> m_updatingResources;
+    mutable nx::Mutex m_updatingResourcesMutex;
 };

@@ -171,7 +171,8 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         emit resourceAdded(resource);
     }
 
-    emit resourcesAdded(addedResources);
+    if (!addedResources.empty())
+        emit resourcesAdded(addedResources);
 }
 
 void QnResourcePool::removeResources(const QnResourceList& resources)
@@ -524,7 +525,6 @@ void QnResourcePool::clear()
         for (const auto& resource: std::as_const(m_incompatibleServers))
             tempList.append(resource);
 
-        NX_VERBOSE(this, "Clear resources: %1", nx::containerString(tempList));
         m_tmpResources.clear();
         m_resources.clear();
         m_incompatibleServers.clear();
@@ -537,6 +537,8 @@ void QnResourcePool::clear()
         d->resourcesByPhysicalId.clear();
         d->usersByName.clear();
     }
+
+    NX_VERBOSE(this, "Cleared resources: %1", nx::containerString(tempList));
 
     for (const auto& resource: std::as_const(tempList))
     {
