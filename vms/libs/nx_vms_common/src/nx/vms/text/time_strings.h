@@ -23,4 +23,6 @@ public:
     static QString suffix(Suffix value);
     static QString longSuffix(Suffix value);
     static QString fullSuffix(Suffix value, int count = -1);
+    static QString longSuffixCapitalized(Suffix value);
+    static QString fullSuffixCapitalized(Suffix value, int count = -1);
 };
