@@ -335,4 +335,13 @@ qint64 NxGlobalsObject::syncTimeCurrentTimePointMs() const
     return duration_cast<milliseconds>(qnSyncTime->currentTimePoint()).count();
 }
 
+QString NxGlobalsObject::shortcutText(const QVariant& var) const
+{
+    const QKeySequence sequence = var.metaType().id() == QMetaType::Int
+        ? QKeySequence(static_cast<QKeySequence::StandardKey>(var.toInt()))
+        : QKeySequence::fromString(var.toString());
+
+    return sequence.toString(QKeySequence::NativeText);
+}
+
 } // namespace nx::vms::client::core
