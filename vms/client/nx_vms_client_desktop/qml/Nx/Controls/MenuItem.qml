@@ -89,7 +89,7 @@ MenuItem
             font.pixelSize: 13
 
             visible: action && (action.shortcut !== null)
-            text: (action && action.shortcut) ? action.shortcut : ""
+            text: (action && action.shortcut) ? NxGlobals.shortcutText(action.shortcut) : ""
         }
     }
 
