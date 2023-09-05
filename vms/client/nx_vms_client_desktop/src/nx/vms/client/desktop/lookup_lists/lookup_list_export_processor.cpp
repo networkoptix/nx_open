@@ -7,7 +7,6 @@
 #include <QtCore/QString>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/message_box.h>
 #include <ui/utils/table_export_helper.h>
 
 namespace nx::vms::client::desktop {

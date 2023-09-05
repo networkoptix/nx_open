@@ -10,8 +10,6 @@
 
 #include "lookup_list_entries_model.h"
 
-class QnCustomFileDialog;
-
 namespace nx::vms::client::desktop {
 
 class LookupListExportProcessor: public QObject
