@@ -98,12 +98,9 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
         NX_DEBUG(NX_SCOPE_TAG, "Expect system version %1.", systemVersion);
     }
 
-    if (system->isCloudSystem())
-    {
-        // First system in the aggregator is the cloud one (if the system is cloud).
-        result.expectedCloudSystemId = system->id();
-        NX_DEBUG(NX_SCOPE_TAG, "Expect Cloud System ID %1.", system->id());
-    }
+    // First system in the aggregator is the cloud one (if the system is cloud).
+    result.expectedCloudSystemId = system->id();
+    NX_DEBUG(NX_SCOPE_TAG, "Expect Cloud System ID %1.", system->id());
 
     if (url.isEmpty())
     {
@@ -132,7 +129,6 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
         {
             result.expectedServerId = iter->id;
             result.expectedServerVersion = iter->version;
-            result.expectedCloudSystemId = iter->cloudSystemId;
             url = system->getServerHost(iter->id);
             if (NX_ASSERT(!url.isEmpty()))
             {
