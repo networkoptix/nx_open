@@ -119,7 +119,7 @@ void QnVideoStreamDisplay::endOfRun()
 int QnVideoStreamDisplay::addRenderer(QnResourceWidgetRenderer* renderer)
 {
     {
-        NX_MUTEX_LOCKER lock( &m_mtx );
+        NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
         renderer->setPaused(m_isPaused);
         if (m_lastDisplayedFrame)
             renderer->draw(m_lastDisplayedFrame, getMaxScreenSizeUnsafe());
@@ -513,7 +513,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
     {
         //  Clear previos frame, since decoder clear it on decode call
-        NX_MUTEX_LOCKER lock(&m_mtx);
+        NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
         if (m_lastDisplayedFrame && m_lastDisplayedFrame->isExternalData())
             m_lastDisplayedFrame.reset();
     }
@@ -661,7 +661,10 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         else
             return Status_Buffered;
     }
-    m_lastDisplayedFrame = decodedFrame;
+    {
+        NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
+        m_lastDisplayedFrame = decodedFrame;
+    }
     m_mtx.unlock();
     m_rawDataSize = QSize(decodedFrame->width,decodedFrame->height);
     if (decodedFrame->width)
@@ -718,7 +721,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
         // TODO In reverse mode we use downscaled frames to get frame that currently rendered?
         // Or we need to keep original frames in queue.
-        NX_MUTEX_LOCKER lock(&m_mtx);
+        NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
         m_lastDisplayedFrame = outFrame;
     }
 
@@ -778,7 +781,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(
 {
     {
         //  Clear previos frame, since decoder clear it on decode call
-        NX_MUTEX_LOCKER lock(&m_mtx);
+        NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
         if (m_lastDisplayedFrame && m_lastDisplayedFrame->isExternalData())
             m_lastDisplayedFrame.reset();
     }
@@ -1018,7 +1021,7 @@ void QnVideoStreamDisplay::clearReverseQueue()
 
 QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 {
-    NX_MUTEX_LOCKER mutex( &m_mtx );
+    NX_MUTEX_LOCKER mutex( &m_lastDisplayedFrameMutex );
 
     const AVFrame* frame = m_lastDisplayedFrame.data();
     if (!frame || !frame->width || !frame->data[0])
@@ -1036,7 +1039,7 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 
 CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
 {
-    NX_MUTEX_LOCKER mutex(&m_mtx);
+    NX_MUTEX_LOCKER mutex(&m_lastDisplayedFrameMutex);
     if (!m_lastDisplayedFrame || m_lastDisplayedFrame->isEmpty())
         return CLVideoDecoderOutputPtr();
 
