@@ -195,29 +195,33 @@ void RapidReviewSettingsWidgetPrivate::updateUnitsModel()
 {
     unitsModel->clear();
 
-    const auto maxExpectedLengthMs =  m_sourcePeriodLengthMs / kMinimalSpeed;
+    const auto maxExpectedLengthMs = m_sourcePeriodLengthMs / kMinimalSpeed;
 
     if (maxExpectedLengthMs >= kMsInSec)
     {
-        addModelItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Seconds), kMsInSec,
+        addModelItem(QnTimeStrings::longSuffixCapitalized(QnTimeStrings::Suffix::Seconds),
+            kMsInSec,
             unitsModel);
     }
 
     if (maxExpectedLengthMs >= kMsInMin)
     {
-        addModelItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Minutes), kMsInMin,
+        addModelItem(QnTimeStrings::longSuffixCapitalized(QnTimeStrings::Suffix::Minutes),
+            kMsInMin,
             unitsModel);
     }
 
     if (maxExpectedLengthMs >= kMsInHour)
     {
-        addModelItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Hours), kMsInHour,
+        addModelItem(QnTimeStrings::longSuffixCapitalized(QnTimeStrings::Suffix::Hours),
+            kMsInHour,
             unitsModel);
     }
 
     if (maxExpectedLengthMs >= kMsInDay)
     {
-        addModelItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Days), kMsInDay,
+        addModelItem(QnTimeStrings::longSuffixCapitalized(QnTimeStrings::Suffix::Days),
+            kMsInDay,
             unitsModel);
     }
 }
