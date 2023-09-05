@@ -6,6 +6,7 @@
 #include <QtCore/QSet>
 
 #include <core/resource/layout_resource.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::vms::common {
@@ -51,6 +52,8 @@ bool LayoutItemWatcher::addWatchedLayout(const QnLayoutResourcePtr& layout)
         d->watchedLayouts.insert(layout);
     }
 
+    NX_VERBOSE(this, "Added watched layout: %1", layout);
+
     for (auto item: layout->getItems())
         d->handleItemAdded(layout, item);
 
@@ -73,6 +76,8 @@ bool LayoutItemWatcher::removeWatchedLayout(const QnLayoutResourcePtr& layout)
     }
 
     layout->disconnect(d.get());
+
+    NX_VERBOSE(this, "Removed watched layout: %1", layout);
 
     for (auto item: layout->getItems())
         d->handleItemRemoved(layout, item);
@@ -115,6 +120,8 @@ void LayoutItemWatcher::Private::handleItemAdded(
     if (resourceId.isNull())
         return;
 
+    NX_VERBOSE(q, "Item added to layout %1, resource id %2", layout, item.resource.id);
+
     const bool newItem = !itemLayouts.contains(resourceId);
     if (itemLayouts[resourceId].insert(layout))
         emit q->addedToLayout(resourceId, layout);
@@ -129,6 +136,8 @@ void LayoutItemWatcher::Private::handleItemRemoved(
     const auto resourceId = item.resource.id;
     if (resourceId.isNull() || !NX_ASSERT(itemLayouts.contains(resourceId)))
         return;
+
+    NX_VERBOSE(q, "Item removed from layout %1, resource id %2", layout, item.resource.id);
 
     auto& layouts = itemLayouts[resourceId];
     if (layouts.remove(layout))

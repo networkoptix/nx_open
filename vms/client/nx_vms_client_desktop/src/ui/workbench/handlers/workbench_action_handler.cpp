@@ -554,7 +554,6 @@ void ActionHandler::addToLayout(
         data.combinedGeometry = QRectF(QPointF(0.5, 0.5), QPointF(-0.5, -0.5));
     }
 
-    data.transient = true;
     layout->addItem(data);
 
     if (resource.dynamicCast<QnAviResource>() && layoutSize == 0)

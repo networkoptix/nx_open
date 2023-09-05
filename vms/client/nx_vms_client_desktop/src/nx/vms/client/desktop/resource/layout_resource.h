@@ -62,6 +62,7 @@ public:
 
     nx::vms::api::LayoutData snapshot() const;
     void storeSnapshot();
+    void updateSnapshot(const QnLayoutResourcePtr& remoteLayout);
 
     /** Allowed time period range. Can be applied e.g for exported layout or for audit trail. */
     QnTimePeriod localRange() const;
@@ -127,6 +128,9 @@ public:
      */
     LayoutType layoutType() const;
 
+    /** Returns the persistent state of this layout, i.e. its snapshot. */
+    virtual QnLayoutResourcePtr storedLayout() const override;
+
 signals:
     void dataChanged(Qn::ItemDataRole role);
     void itemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
@@ -154,6 +158,7 @@ private:
 
     /** Saved state of the layout, which can be used to rollback unapplied changes. */
     nx::vms::api::LayoutData m_snapshot;
+    mutable QnLayoutResourcePtr m_snapshotLayout;
 
     std::atomic<LayoutType> m_layoutType{LayoutType::unknown};
     nx::utils::ScopedConnection m_resourcePoolConnection;

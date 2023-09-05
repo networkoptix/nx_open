@@ -101,6 +101,7 @@ void AccessController::setUser(const QnUserResourcePtr& value)
     if (d->user == newUser)
         return;
 
+    NX_VERBOSE(this, "Changing user from %1 to %2", d->user, newUser);
     d->user = newUser;
 
     if (d->resourceAccessNotifier)
@@ -311,12 +312,15 @@ void AccessController::Private::updatePermissions(const QnResourceList& targetRe
         }
     }
 
+    NX_VERBOSE(q, "Permissions maybe changed for %1", targetResources);
     emit q->permissionsMaybeChanged(targetResources, AccessController::QPrivateSignal{});
     emitChanges(changes);
 }
 
 void AccessController::Private::updateAllPermissions()
 {
+    NX_VERBOSE(q, "Updating all permissions");
+
     QHash<QnResourcePtr, ChangeData> changes;
     GlobalPermissions oldGlobal, currentGlobal;
     {
@@ -344,6 +348,8 @@ void AccessController::Private::updateAllPermissions()
 
     if (oldGlobal != currentGlobal)
     {
+        NX_VERBOSE(q, "Global permissions changed from %1 to %2", oldGlobal, currentGlobal);
+
         emit q->globalPermissionsChanged(currentGlobal, oldGlobal,
             AccessController::QPrivateSignal{});
     }
@@ -356,16 +362,20 @@ void AccessController::Private::updateAllPermissions()
 
     if (oldGlobal != currentGlobal)
     {
+        NX_VERBOSE(q, "Administrative permissions changed from %1 to %2", oldGlobal, currentGlobal);
+
         emit q->administrativePermissionsChanged(currentGlobal, oldGlobal,
             AccessController::QPrivateSignal{});
     }
 
+    NX_VERBOSE(q, "Permissions maybe changed for all resources");
     emit q->permissionsMaybeChanged({}, AccessController::QPrivateSignal{});
     emitChanges(changes);
 }
 
 void AccessController::Private::handleResourcesAdded(const QnResourceList& resources)
 {
+    NX_VERBOSE(q, "Resources added, permissions maybe changed for %1", resources);
     emit q->permissionsMaybeChanged(resources, AccessController::QPrivateSignal{});
 }
 
@@ -378,6 +388,7 @@ void AccessController::Private::handleResourcesRemoved(const QnResourceList& res
             resourceData.remove(resource);
     }
 
+    NX_VERBOSE(q, "Resources removed, permissions maybe changed for %1", resources);
     emit q->permissionsMaybeChanged(resources, AccessController::QPrivateSignal{});
 }
 
@@ -391,6 +402,9 @@ void AccessController::Private::emitChanges(const QHash<QnResourcePtr, ChangeDat
 {
     for (const auto& [targetResource, change]: nx::utils::constKeyValueRange(changes))
     {
+        NX_VERBOSE(q, "Notifying about permissions change for %1 from %2 to %3",
+            targetResource, change.old, change.current);
+
         emit change.notifier->permissionsChanged(targetResource, change.current, change.old,
             AccessController::QPrivateSignal{});
     }

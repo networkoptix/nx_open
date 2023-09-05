@@ -201,7 +201,7 @@ InheritedResourceAccessResolver::Private::ResourceAccessData
     cachedAccessDataRef.accessMap.remove(QnUuid{}); //< For compatibility with intermediate version.
 
     NX_DEBUG(q, "Resolved and cached an access map for %1", subjectId);
-    NX_VERBOSE(q, cachedAccessDataRef.accessMap);
+    NX_VERBOSE(q, toString(cachedAccessDataRef.accessMap));
 
     return cachedAccessDataRef;
 }

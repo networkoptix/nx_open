@@ -13,6 +13,8 @@
 #include <nx/vms/api/types/access_rights_types.h>
 #include <utils/common/counter_hash.h>
 
+class QnResourcePool;
+
 namespace nx::core::access {
 
 //-------------------------------------------------------------------------------------------------
@@ -70,6 +72,10 @@ protected:
 
     /** Notification sink to be called when access rights of all subjects are reset. */
     void notifyAccessReset();
+
+    /** Log pretty formatting functions. */
+    static QString toLogString(const QnUuid& resourceId, QnResourcePool* resourcePool);
+    static QString affectedCacheToLogString(const QSet<QnUuid>& affectedSubjectIds);
 
 private:
     const std::unique_ptr<Notifier> m_notifier;

@@ -59,6 +59,8 @@ CachingAccessController::Private::Private(CachingAccessController* q):
 
 void CachingAccessController::Private::handleResourcesAdded(const QnResourceList& resources)
 {
+    NX_VERBOSE(q, "Resources added, subscribing for notifications: %1", resources);
+
     for (const auto& resource: resources)
     {
         const auto notifier = q->createNotifier(resource);
@@ -75,6 +77,8 @@ void CachingAccessController::Private::handleResourcesAdded(const QnResourceList
 
 void CachingAccessController::Private::handleResourcesRemoved(const QnResourceList& resources)
 {
+    NX_VERBOSE(q, "Resources removed, unsubscribing from notifications: %1", resources);
+
     for (const auto& resource: resources)
         notifiers.remove(resource);
 }

@@ -38,6 +38,7 @@ public:
 
     void store(const LayoutResourcePtr& resource);
     void restore(const LayoutResourcePtr& resource);
+    void update(const LayoutResourcePtr& resource, const QnLayoutResourcePtr& remoteResource);
 
     SaveStateFlags flags(const LayoutResourcePtr& resource) const;
     SaveStateFlags flags(QnWorkbenchLayout* layout) const;

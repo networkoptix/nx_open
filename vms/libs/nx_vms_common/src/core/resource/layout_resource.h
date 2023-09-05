@@ -114,6 +114,19 @@ public:
      */
     bool isServiceLayout() const;
 
+    /**
+     * Returns the persistent state of this layout: either this layout itself (server),
+     * or its snapshot (client). The caller may query data and connect to notification signals
+     * of the returned layout, but may not modify it.
+     */
+    virtual QnLayoutResourcePtr storedLayout() const { return toSharedPointer(this); }
+
+    /**
+     * Returns the transient copy of this layout: either this layout itself (server, client),
+     * or parent layout of a snapshot layout (client).
+     */
+    virtual QnLayoutResourcePtr transientLayout() const { return toSharedPointer(this); }
+
 signals:
     void itemAdded(
         const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
