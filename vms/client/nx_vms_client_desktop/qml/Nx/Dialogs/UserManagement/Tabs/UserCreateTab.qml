@@ -51,7 +51,7 @@ Item
                 return loginTextField.validate()
                     && emailTextField.validate()
 
-            case UserSettingsGlobal.Cloud:
+            case UserSettingsGlobal.CloudUser:
                 return emailTextField.validate()
         }
 
