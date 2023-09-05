@@ -23,6 +23,7 @@ T.TextField
 
     property int prevSelectionStart: 0
     property int prevSelectionEnd: 0
+    property int prevCursorPosition: -1
 
     property var cursorShape: Qt.IBeamCursor
 
@@ -30,24 +31,47 @@ T.TextField
     {
         EditContextMenu
         {
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
             readActionsVisible: control.echoMode == TextInput.Normal
             editingEnabled: control.enabled && !control.readOnly
             onCutAction: control.cut()
             onCopyAction: control.copy()
             onPasteAction: control.paste()
             onDeleteAction: control.remove(control.selectionStart, control.selectionEnd);
-            onItemActiveFocusChanged:
+            onItemActiveFocusChanged: (itemActiveFocus) =>
             {
                 if (itemActiveFocus)
                     control.restoreSelection()
+            }
+
+            onAboutToHide:
+            {
+                if (control.focus && control.visible)
+                    control.forceActiveFocus()
             }
         }
     }
 
     function restoreSelection()
     {
-        select(control.prevSelectionStart, control.prevSelectionEnd)
-        focus = true
+        if (control.prevCursorPosition > control.prevSelectionStart)
+            select(control.prevSelectionStart, control.prevSelectionEnd)
+        else
+            select(control.prevSelectionEnd, control.prevSelectionStart)
+    }
+
+    function closeMenu()
+    {
+        if (menuMouseArea.menuItem)
+            menuMouseArea.menuItem.close()
+    }
+
+    onVisibleChanged:
+    {
+        closeMenu()
+        if (!visible)
+            focus = false
     }
 
     implicitWidth: 200
@@ -105,6 +129,8 @@ T.TextField
 
     ContextMenuMouseArea
     {
+        id: menuMouseArea
+
         anchors.fill: control
         anchors.topMargin: control.topPadding
         anchors.bottomMargin: control.bottomPadding
@@ -115,15 +141,19 @@ T.TextField
         cursorShape: control.cursorShape
         parentSelectionStart: control.selectionStart
         parentSelectionEnd: control.selectionEnd
+        parentCursorPosition: control.cursorPosition
 
         CursorOverride.shape: cursorShape
         CursorOverride.active: containsMouse
         hoverEnabled: true
 
-        onMenuOpened:
+        onMenuAboutToBeOpened: control.forceActiveFocus()
+
+        onMenuOpened: (prevSelectionStart, prevSelectionEnd, prevCursorPosition) =>
         {
             control.prevSelectionStart = prevSelectionStart
             control.prevSelectionEnd = prevSelectionEnd
+            control.prevCursorPosition = prevCursorPosition
             control.restoreSelection()
         }
     }
