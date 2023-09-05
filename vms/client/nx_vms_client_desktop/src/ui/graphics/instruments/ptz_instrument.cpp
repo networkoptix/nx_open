@@ -494,12 +494,14 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
             !showOnceSettings()->autoTrackingPromo());
 
         connect(data.promoOverlay.data(), &PtzPromoOverlay::closeRequested, this,
-            [widget, overlay = data.promoOverlay.data()]()
+            [this, widget, overlay = data.promoOverlay.data()]()
             {
                 showOnceSettings()->newPtzMechanicPromo = true;
                 showOnceSettings()->autoTrackingPromo = true;
                 widget->removeOverlayWidget(overlay);
+                overlay->setVisible(false);
                 overlay->deleteLater();
+                updateOverlayWidgetInternal(widget);
             });
 
         widget->addOverlayWidget(data.promoOverlay, {QnResourceWidget::Invisible,
@@ -601,6 +603,8 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
     if (!target->rect().contains(event->pos()))
         return false; /* Ignore clicks on widget frame. */
 
+    const PtzData& data = m_dataByWidget[target];
+
     PtzManipulatorWidget* manipulator = nullptr;
     if (const auto overlay = overlayWidget(target))
     {
@@ -609,10 +613,12 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
             || !manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
         {
             manipulator = nullptr;
+
+            if (data.promoOverlay && data.promoOverlay->isVisible())
+                return false; //< Ignore clicks on the promo pages background.
         }
     }
 
-    const PtzData& data = m_dataByWidget[target];
     if (manipulator)
     {
         m_movement = ContinuousMovement;
@@ -743,15 +749,16 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
     if (ptzModeEnabled)
         ensureOverlayWidget(widget);
 
-    const QnResourceWidget::OverlayVisibility visibility = ptzModeEnabled
-        ? QnResourceWidget::AutoVisible
-        : QnResourceWidget::Invisible;
-
     const PtzData& data = m_dataByWidget[widget];
     if (!data.overlayWidget)
         return;
 
     updatePromo(widget);
+
+    const auto isPromoVisible = data.promoOverlay && data.promoOverlay->isVisible();
+    const QnResourceWidget::OverlayVisibility visibility = ptzModeEnabled && !isPromoVisible
+        ? QnResourceWidget::AutoVisible
+        : QnResourceWidget::Invisible;
 
     widget->setOverlayWidgetVisibility(data.overlayWidget, visibility, animate);
     if (NX_ASSERT(data.cursorOverlay))
@@ -799,6 +806,12 @@ void PtzInstrument::updateOverlayCursor(QnMediaResourceWidget* widget)
     const PtzData& data = m_dataByWidget[widget];
     if (!data.cursorOverlay)
         return;
+
+    if (data.promoOverlay && data.promoOverlay->isVisible())
+    {
+        data.cursorOverlay->unsetCursor();
+        return;
+    }
 
     const bool canMove = data.hasContinuousPanOrTilt();
     const bool showManipulator = canMove && appContext()->localSettings()->ptzAimOverlayEnabled();

@@ -4,6 +4,8 @@
 
 #include <QtQuick/QQuickItem>
 
+#include <nx/vms/client/desktop/utils/qml_property.h>
+
 namespace nx::vms::client::desktop {
 
 struct PtzPromoOverlay::Private

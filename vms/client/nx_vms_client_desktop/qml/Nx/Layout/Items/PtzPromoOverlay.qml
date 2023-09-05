@@ -119,18 +119,4 @@ Control
             }
         }
     }
-
-    MouseArea
-    {
-        id: backgroundMouseBlocker
-
-        z: -1
-        anchors.fill: pages
-        acceptedButtons: Qt.AllButtons
-        onPressed: mouse.accepted = true
-        onReleased: mouse.accepted = true
-
-        CursorOverride.shape: Qt.ArrowCursor
-        CursorOverride.active: pages.hovered
-    }
 }
