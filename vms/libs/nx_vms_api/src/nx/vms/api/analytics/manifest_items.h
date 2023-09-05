@@ -93,13 +93,13 @@ using Item = std::variant<ItemObject, QString>;
 struct AttributeDescription
 {
     QString name;
-    AttributeType type;
-    QString subtype; //< One of: empty, a Name, "integer" or "float" for Numbers.
-    std::optional<std::vector<Item>> items; //< Only for Enums.
-    QString unit; //< Only for Number. Can be empty.
-    std::optional<double> minValue; //< Only for Number.
-    std::optional<double> maxValue; //< Only for Number.
-    QString attributeList; //< If not empty, all other fields are ignored.
+    std::optional<AttributeType> type; /**< Can be omitted for Enum and Color attributes. */
+    QString subtype; /**< One of: empty, a Name, "integer" or "float" for Numbers. */
+    std::optional<std::vector<Item>> items; /**< Only for Enums. */
+    QString unit; /**< Only for Number. Can be empty. */
+    std::optional<double> minValue; /**< Only for Number. */
+    std::optional<double> maxValue; /**< Only for Number. */
+    QString attributeList; /**< If not empty, all other fields are ignored. */
 
     /**
      * Condition string that defines whether this Attribute makes sense for the Object or Event

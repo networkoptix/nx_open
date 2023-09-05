@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "utils.h"
+#include <optional>
 
 #include "abstract_event_type.h"
 #include "abstract_group.h"
@@ -12,9 +13,12 @@ namespace nx::analytics::taxonomy {
 
 using namespace nx::vms::api::analytics;
 
-AbstractAttribute::Type fromDescriptorAttributeType(AttributeType attributeType)
+AbstractAttribute::Type fromDescriptorAttributeType(std::optional<nx::vms::api::analytics::AttributeType> attributeType)
 {
-    switch (attributeType)
+    if (attributeType == std::nullopt)
+        return AbstractAttribute::Type::undefined;
+
+    switch (const auto value = attributeType.value())
     {
         case AttributeType::number: return AbstractAttribute::Type::number;
         case AttributeType::boolean: return AbstractAttribute::Type::boolean;
@@ -23,7 +27,7 @@ AbstractAttribute::Type fromDescriptorAttributeType(AttributeType attributeType)
         case AttributeType::enumeration: return AbstractAttribute::Type::enumeration;
         case AttributeType::object: return AbstractAttribute::Type::object;
         default:
-            NX_ASSERT(false, "Unknown attribute type %1", (int)attributeType);
+            NX_ASSERT(false, "Unknown Attribute type %1", (int) value);
             return AbstractAttribute::Type::undefined;
     }
 }

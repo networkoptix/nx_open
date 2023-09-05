@@ -342,7 +342,9 @@ containing the following fields:
 
 - `"type"`: String
 
-    Must have one of the values listed below in the "Attribute types" section.
+    Must have one of the values listed below in the "Attribute types" section. If `"subtype"` is
+    specified, `"type"` can be omitted for `"Enum"` and `"Color"` attributes, except when there
+    exist both an Enum and a Color with the same id.
 
 - `"attributeList"`: String
 
