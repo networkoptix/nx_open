@@ -3,6 +3,7 @@
 #pragma once
 
 #include <map>
+#include <optional>
 #include <set>
 
 #include <nx/analytics/taxonomy/abstract_attribute.h>
@@ -37,7 +38,7 @@ std::vector<AbstractAttribute*> makeSupportedAttributes(
     EntityType rootEntityType);
 
 AbstractAttribute::Type fromDescriptorAttributeType(
-    nx::vms::api::analytics::AttributeType attributeType);
+    std::optional<nx::vms::api::analytics::AttributeType> attributeType);
 
 nx::vms::api::analytics::AttributeType toDescriptorAttributeType(
     AbstractAttribute::Type attributeType);

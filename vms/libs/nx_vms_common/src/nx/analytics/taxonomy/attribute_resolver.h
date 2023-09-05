@@ -90,6 +90,10 @@ private:
         std::vector<nx::vms::api::analytics::AttributeDescription>* outAttributeCandidateList,
         const std::set<QString>& uniqueAttributeListIds);
 
+    Attribute* tryToDeduceTypeFromSubtype(
+        nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
+        const AbstractAttribute* baseAttribute);
+
 private:
     Context m_context;
     ErrorHandler* m_errorHandler = nullptr;

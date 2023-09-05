@@ -205,7 +205,14 @@ Attribute* AttributeResolver::resolveOwnAttribute(
         }
     }
 
-    switch (inOutAttributeDescription->type)
+    // The type can be omitted for enum and color attributes, so we either try to deduce the type
+    // from the subtype, or fail.
+    if (inOutAttributeDescription->type == std::nullopt)
+        return tryToDeduceTypeFromSubtype(inOutAttributeDescription, baseAttribute);
+
+    AttributeType type = inOutAttributeDescription->type.value();
+
+    switch (type)
     {
         case AttributeType::boolean:
             return resolveBooleanAttribute(inOutAttributeDescription, baseAttribute);
@@ -230,7 +237,7 @@ Attribute* AttributeResolver::resolveOwnAttribute(
         default:
         {
             const QString errorDetails = NX_FMT("%1 %2: unknown attribute type (%3)",
-                m_context.typeName, m_context.typeId, (int) inOutAttributeDescription->type);
+                m_context.typeName, m_context.typeId, (int) type);
 
             m_errorHandler->handleError(ProcessingError{errorDetails});
             NX_ASSERT(false, errorDetails);
@@ -238,6 +245,49 @@ Attribute* AttributeResolver::resolveOwnAttribute(
             return nullptr;
         }
     }
+}
+
+Attribute* AttributeResolver::tryToDeduceTypeFromSubtype(
+    nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
+    const AbstractAttribute* baseAttribute)
+{
+    const QString& subtypeId = inOutAttributeDescription->subtype;
+    
+    const EnumType* enumType = m_context.internalState->getTypeById<EnumType>(subtypeId);
+    const ColorType* colorType = m_context.internalState->getTypeById<ColorType>(subtypeId);
+    
+    if (enumType && colorType)
+    {
+        m_errorHandler->handleError(
+            ProcessingError{NX_FMT(
+                "%1 %2: The \"type\" is omitted, but the subtype %3 is ambiguous (Enum or Color), "
+                "declared in the attribute %4",
+                m_context.typeName, m_context.typeId, subtypeId, inOutAttributeDescription->name)});
+
+        return nullptr;
+    }
+    else if (!enumType && !colorType)
+    {
+        m_errorHandler->handleError(
+            ProcessingError{NX_FMT(
+                "%1 %2: The \"type\" is omitted, but the subtype %3 doesn't exist, "
+                "declared in the attribute %4",
+                m_context.typeName, m_context.typeId, subtypeId, inOutAttributeDescription->name)});
+
+        return nullptr;
+    }
+    else if (enumType)
+    {
+        inOutAttributeDescription->type = AttributeType::enumeration;
+        return resolveEnumerationAttribute(inOutAttributeDescription, baseAttribute);
+    }
+    else if (colorType)
+    {
+        inOutAttributeDescription->type = AttributeType::color;
+        return resolveColorAttribute(inOutAttributeDescription, baseAttribute);
+    }
+
+    return nullptr;
 }
 
 Attribute* AttributeResolver::resolveBooleanAttribute(
