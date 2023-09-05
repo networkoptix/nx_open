@@ -134,8 +134,11 @@ GroupSettingsDialog::GroupSettingsDialog(
             });
     }
 
-    connect(rootObjectHolder()->object(), SIGNAL(addGroupRequested()),
-        this, SLOT(onAddGroupRequested()));
+    if (dialogType == DialogType::editGroup)
+    {
+        connect(rootObjectHolder()->object(), SIGNAL(addGroupRequested()),
+            this, SLOT(onAddGroupRequested()));
+    }
 
     if (dialogType == editGroup)
     {
