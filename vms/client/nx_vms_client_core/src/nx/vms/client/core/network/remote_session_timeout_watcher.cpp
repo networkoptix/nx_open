@@ -171,7 +171,7 @@ void RemoteSessionTimeoutWatcher::tick()
         ((isTimeToNotify && !notificationWasCancelled)
             || (isTimeToLastNotify && (*d->timeLeftWhenCancelled > kLastNotificationTime)));
 
-    if (const auto temporaryTokenRemainingTime = d->temporaryTokenRemainingTime(session))
+    if (const auto temporaryTokenRemainingTime = d->temporaryTokenRemainingTime(session); timeLeft)
     {
         const auto deltaTime = *temporaryTokenRemainingTime - timeLeft.value();
         notificationShouldBeVisible &= deltaTime > kForceDisconnectTime;
