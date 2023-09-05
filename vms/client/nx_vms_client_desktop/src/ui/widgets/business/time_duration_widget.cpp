@@ -19,9 +19,12 @@ TimeDurationWidget::TimeDurationWidget(QWidget *parent):
     ui(new Ui::TimeDurationWidget)
 {
     ui->setupUi(this);
-    ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Seconds), kSeconds);
-    ui->periodComboBox->setVisible(false); //< Have sense to be visible only when more than 1 item is added.
-    ui->prefixLabel->setText(QnTimeStrings::fullSuffix(QnTimeStrings::Suffix::Seconds, /*count*/ 0));
+    ui->periodComboBox->addItem(
+        QnTimeStrings::longSuffixCapitalized(QnTimeStrings::Suffix::Seconds), kSeconds);
+    ui->periodComboBox->setVisible(
+        false); //< Have sense to be visible only when more than 1 item is added.
+    ui->prefixLabel->setText(
+        QnTimeStrings::fullSuffixCapitalized(QnTimeStrings::Suffix::Seconds, /*count*/ 0));
     ui->valueSpinBox->setMinimum(m_min);
     ui->valueSpinBox->setMaximum(m_max);
 

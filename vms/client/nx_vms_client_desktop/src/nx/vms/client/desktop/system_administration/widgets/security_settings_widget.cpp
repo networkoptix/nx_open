@@ -23,6 +23,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/text/human_readable.h>
+#include <nx/vms/text/time_strings.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -114,9 +115,15 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
     // Need to sync checkbox to button, loadDataToUi() will do the rest.
     updateWatermarkState(ui->displayWatermarkCheckBox->checkState());
 
-    ui->limitSessionUnitsComboBox->addItem(tr("minutes"), QVariant::fromValue(1min));
-    ui->limitSessionUnitsComboBox->addItem(tr("hours"), QVariant::fromValue(1h));
-    ui->limitSessionUnitsComboBox->addItem(tr("days"), QVariant::fromValue(24h));
+    ui->limitSessionUnitsComboBox->addItem(
+        QnTimeStrings::fullSuffixCapitalized(QnTimeStrings::Suffix::Minutes),
+        QVariant::fromValue(1min));
+    ui->limitSessionUnitsComboBox->addItem(
+        QnTimeStrings::fullSuffixCapitalized(QnTimeStrings::Suffix::Hours),
+        QVariant::fromValue(1h));
+    ui->limitSessionUnitsComboBox->addItem(
+        QnTimeStrings::fullSuffixCapitalized(QnTimeStrings::Suffix::Days),
+        QVariant::fromValue(24h));
     ui->limitSessionUnitsComboBox->setCurrentIndex(2);
     ui->limitSessionValueSpinBox->setValue(
         std::chrono::duration_cast<std::chrono::days>(kSessionLengthAlertLimit).count());

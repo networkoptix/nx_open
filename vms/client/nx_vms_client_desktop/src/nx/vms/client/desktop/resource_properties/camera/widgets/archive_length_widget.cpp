@@ -239,7 +239,7 @@ void ArchiveLengthWidget::Private::addDurationUnitComboBoxItem(
     QnTimeStrings::Suffix unitSuffux,
     seconds unitDuration)
 {
-    const auto itemText = QnTimeStrings::fullSuffix(unitSuffux);
+    const auto itemText = QnTimeStrings::fullSuffixCapitalized(unitSuffux);
 
     unitComboBox->addItem(itemText);
     const auto itemIndex = unitComboBox->count() - 1;
@@ -265,7 +265,8 @@ void ArchiveLengthWidget::Private::updateDurationUnitItemsTextsForDisplayedValue
         const auto unitSuffix =
             static_cast<QnTimeStrings::Suffix>(unitComboBox->itemData(i, UnitSuffixRole).toInt());
 
-        unitComboBox->setItemText(i, QnTimeStrings::fullSuffix(unitSuffix, displayedValue));
+        unitComboBox->setItemText(
+            i, QnTimeStrings::fullSuffixCapitalized(unitSuffix, displayedValue));
     }
 }
 
