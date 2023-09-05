@@ -113,7 +113,7 @@ public: // Properties
 
     Q_INVOKABLE bool checkUrlIsValid(const QString& urlText) const;
 
-    Q_INVOKABLE void abortConnectionProcess() const;
+    Q_INVOKABLE void abortConnectionProcess();
 
 public:
     void setupFactorySystem(const nx::network::SocketAddress& address, const QnUuid& serverId);

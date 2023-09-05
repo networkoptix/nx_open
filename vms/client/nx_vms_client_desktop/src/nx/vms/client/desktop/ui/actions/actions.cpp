@@ -332,8 +332,7 @@ void initialize(Manager* manager, Action* root)
         .condition(!condition::showreelIsRunning());
 
     factory(DisconnectAction)
-        .flags(NoTarget)
-        .condition(condition::isLoggedIn());
+        .flags(NoTarget);
 
     factory(DisconnectMainMenuAction)
         .flags(Main | GlobalHotkey)
