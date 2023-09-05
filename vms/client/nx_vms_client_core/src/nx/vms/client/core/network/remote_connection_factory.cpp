@@ -774,6 +774,7 @@ struct RemoteConnectionFactory::Private
             && context->isCloudConnection() //< Actual for the Cloud User only.
             && context->expectedServerVersion() //< Required to get the credentials correctly.
             && context->expectedCloudSystemId() //< Required to set token scope.
+            && !context->expectedCloudSystemId()->isEmpty()
             && !context->cloudToken.valid()) //< Whether token is already requested.
         {
             NX_DEBUG(this, "Requesting Cloud access token.");
