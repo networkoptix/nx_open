@@ -424,6 +424,8 @@ void initialize(Manager* manager, Action* root)
             .pulledText(ContextMenu::tr("New Virtual Camera..."))
             .condition(condition::isLoggedIn())
             .autoRepeat(false);
+
+        vx::registerNewMonitoringLayoutAction(factory);
     }
     factory.endSubMenu();
 
@@ -433,8 +435,6 @@ void initialize(Manager* manager, Action* root)
         .condition(
             ConditionWrapper(new NewUserLayoutCondition())
         );
-
-    vx::registerNewMonitoringLayoutAction(factory);
 
     factory(OpenCurrentUserLayoutMenu)
         .flags(TitleBar | SingleTarget | NoTarget)
