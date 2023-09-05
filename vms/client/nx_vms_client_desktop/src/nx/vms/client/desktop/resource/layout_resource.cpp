@@ -13,6 +13,19 @@
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+class SnapshotLayoutResource: public QnLayoutResource
+{
+    const LayoutResourcePtr m_parentLayout;
+
+public:
+    SnapshotLayoutResource(const LayoutResourcePtr& parentLayout): m_parentLayout(parentLayout) {}
+    virtual QnLayoutResourcePtr transientLayout() const override { return m_parentLayout; }
+};
+
+} // namespace
+
 qreal LayoutResource::cellSpacingValue(Qn::CellSpacing spacing)
 {
     switch (spacing)
@@ -32,8 +45,7 @@ qreal LayoutResource::cellSpacingValue(Qn::CellSpacing spacing)
 
 LayoutResource::LayoutResource()
 {
-    connect(this, &LayoutResource::parentIdChanged,
-        this, &LayoutResource::updateLayoutType,
+    connect(this, &LayoutResource::parentIdChanged, this, &LayoutResource::updateLayoutType,
         Qt::DirectConnection);
 }
 
@@ -92,12 +104,34 @@ LayoutResourcePtr LayoutResource::clone(ItemsRemapHash* remapHash) const
 
 nx::vms::api::LayoutData LayoutResource::snapshot() const
 {
+    NX_MUTEX_LOCKER locker(&m_mutex);
     return m_snapshot;
 }
 
 void LayoutResource::storeSnapshot()
 {
-    ec2::fromResourceToApi(toSharedPointer(this), m_snapshot);
+    updateSnapshot(toSharedPointer(this));
+}
+
+void LayoutResource::updateSnapshot(const QnLayoutResourcePtr& remoteLayout)
+{
+    if (!NX_ASSERT(remoteLayout))
+        return;
+
+    auto snapshotLayout = storedLayout(); //< Ensure the stored layout object is created.
+
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    ec2::fromResourceToApi(remoteLayout, m_snapshot);
+    ec2::fromApiToResource(snapshot(), snapshotLayout);
+}
+
+QnLayoutResourcePtr LayoutResource::storedLayout() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    if (!m_snapshotLayout)
+        m_snapshotLayout.reset(new SnapshotLayoutResource(toSharedPointer(this)));
+
+    return m_snapshotLayout;
 }
 
 QnTimePeriod LayoutResource::localRange() const
@@ -266,7 +300,7 @@ void LayoutResource::setLayoutType(LayoutType value)
         return;
 
     m_layoutType = value;
-    emit layoutTypeChanged(toSharedPointer().staticCast<LayoutResource>());
+    emit layoutTypeChanged(toSharedPointer(this));
 }
 
 LayoutResource::LayoutType LayoutResource::calculateLayoutType() const

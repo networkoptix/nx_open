@@ -25,7 +25,7 @@ void QnDesktopClientMessageProcessor::updateResource(
     auto isFile =
         [](const QnResourcePtr &resource)
         {
-            const auto layout = resource.dynamicCast<QnLayoutResource>();
+            const auto layout = resource.objectCast<QnLayoutResource>();
             return layout && layout->isFile();
         };
 
@@ -36,22 +36,35 @@ void QnDesktopClientMessageProcessor::updateResource(
     if (isFile(resource) || isFile(ownResource))
         return;
 
-    auto layout = ownResource.dynamicCast<LayoutResource>();
-    auto systemContext = dynamic_cast<SystemContext*>(this->systemContext());
+    const auto layout = ownResource.objectCast<LayoutResource>();
+    const auto remoteLayout = resource.objectCast<QnLayoutResource>();
+    const auto systemContext = dynamic_cast<SystemContext*>(this->systemContext());
 
-    // Ignore remote layout update if user has unsaved data.
-    if (layout
-        && layout->hasFlags(Qn::remote)
-        && NX_ASSERT(!layout->hasFlags(Qn::local))
-        && NX_ASSERT(systemContext)
-        && systemContext->layoutSnapshotManager()->isChanged(layout))
+    if (!remoteLayout //< Not a layout is being processed.
+        || !layout //< A newly created layout is being processed.
+        || !NX_ASSERT(systemContext))
     {
+        base_type::updateResource(resource, source);
         return;
     }
 
-    base_type::updateResource(resource, source);
-    if (layout && NX_ASSERT(systemContext))
+    // Special processing of existing layouts updates.
+
+    const bool localCopyOfRemoteLayoutWasModified = layout->hasFlags(Qn::remote)
+        && NX_ASSERT(!layout->hasFlags(Qn::local), layout)
+        && systemContext->layoutSnapshotManager()->isChanged(layout);
+
+    // Update snapshot early to ensure all indirect access rights are resolved by the time
+    // the actual resource is updated.
+    systemContext->layoutSnapshotManager()->update(layout, remoteLayout);
+
+    if (!localCopyOfRemoteLayoutWasModified)
+    {
+        base_type::updateResource(resource, source);
+
+        // Snapshot is already updated at this point, but we need to clear `isChanged` flag.
         systemContext->layoutSnapshotManager()->store(layout);
+    }
 }
 
 void QnDesktopClientMessageProcessor::handleTourAddedOrUpdated(

@@ -2,6 +2,7 @@
 
 #include "workbench_layout_synchronizer.h"
 
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -32,6 +33,8 @@ QnWorkbenchLayoutSynchronizer::~QnWorkbenchLayoutSynchronizer()
 {
     NX_ASSERT(m_layout != nullptr && !resource().isNull());
 
+    NX_VERBOSE(this, "Removing synchronizer for %1", resource());
+
     submitPendingItems();
 
     m_update = m_submit = false;
@@ -48,6 +51,7 @@ LayoutResourcePtr QnWorkbenchLayoutSynchronizer::resource() const
 void QnWorkbenchLayoutSynchronizer::initialize()
 {
     auto resource = this->resource().get();
+    NX_VERBOSE(this, "Creating synchronizer for %1", this->resource());
 
     connect(m_layout,
         &QnWorkbenchLayout::itemAdded,
@@ -152,14 +156,18 @@ void QnWorkbenchLayoutSynchronizer::submitPendingItemsLater()
 // -------------------------------------------------------------------------- //
 void QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged()
 {
+    NX_VERBOSE(this, "Layout resource changed, %1", resource());
+
     update(); // TODO: #sivanov Check why there is no update guard here.
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(
-    const QnLayoutResourcePtr& /*layout*/, const nx::vms::common::LayoutItemData& itemData)
+    const QnLayoutResourcePtr& layout, const nx::vms::common::LayoutItemData& itemData)
 {
     if (!m_update)
         return;
+
+    NX_VERBOSE(this, "Item added to layout %1, resource id %2", layout, itemData.resource.id);
 
     /*
      * Check if was called back from at_layout_itemAdded because of layout resource living in a
@@ -180,10 +188,12 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(
-    const QnLayoutResourcePtr&, const nx::vms::common::LayoutItemData& itemData)
+    const QnLayoutResourcePtr& layout, const nx::vms::common::LayoutItemData& itemData)
 {
     if (!m_update)
         return;
+
+    NX_VERBOSE(this, "Item removed from layout %1, resource id %2", layout, itemData.resource.id);
 
     QScopedValueRollback<bool> guard(m_submit, false);
 

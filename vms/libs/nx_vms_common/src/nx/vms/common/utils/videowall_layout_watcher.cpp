@@ -9,11 +9,24 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
 class QnResourcePool;
 
 namespace nx::vms::common {
+
+namespace {
+
+QString layoutsToLogString(const auto& layouts)
+{
+    if (layouts.empty())
+        return "no layouts";
+
+    return NX_FMT("%1 layout(s): %2", layouts.size(), layouts);
+};
+
+} // namespace
 
 class VideowallLayoutWatcher::Private: public QObject
 {
@@ -124,18 +137,24 @@ VideowallLayoutWatcher::Private::Private(
     if (!NX_ASSERT(resourcePool))
         return;
 
-    connect(resourcePool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
+    connect(resourcePool, &QnResourcePool::resourcesAdded, this,
+        [this](const QnResourceList& resources)
         {
-            if (const auto videowall = resource.objectCast<QnVideoWallResource>())
-                handleVideowallAdded(videowall);
+            for (const auto& resource: resources)
+            {
+                if (const auto videowall = resource.objectCast<QnVideoWallResource>())
+                    handleVideowallAdded(videowall);
+            }
         }, Qt::DirectConnection);
 
-    connect(resourcePool, &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
+    connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
+        [this](const QnResourceList& resources)
         {
-            if (const auto videowall = resource.objectCast<QnVideoWallResource>())
-                handleVideowallRemoved(videowall);
+            for (const auto& resource: resources)
+            {
+                if (const auto videowall = resource.objectCast<QnVideoWallResource>())
+                    handleVideowallRemoved(videowall);
+            }
         }, Qt::DirectConnection);
 
     const auto videowalls = resourcePool->getResources<QnVideoWallResource>();
@@ -155,6 +174,9 @@ void VideowallLayoutWatcher::Private::handleVideowallAdded(
 void VideowallLayoutWatcher::Private::handleVideowallRemoved(
     const QnVideoWallResourcePtr& videowall)
 {
+    NX_VERBOSE(q, "Videowall %1 is removed from the pool, it had %2", videowall,
+        layoutsToLogString(videowallLayouts.value(videowall).keys()));
+
     videowall->disconnect(this);
 
     NX_MUTEX_LOCKER lk(&mutex);
@@ -208,10 +230,16 @@ void VideowallLayoutWatcher::Private::handleVideowallItemChanged(
     lk.unlock();
 
     if (removedLayout)
+    {
+        NX_VERBOSE(q, "Videowall %1 layout %2 is removed", videowall, oldItem.layout);
         emit q->videowallLayoutRemoved(videowall, oldItem.layout);
+    }
 
     if (addedLayout)
+    {
+        NX_VERBOSE(q, "Videowall %1 layout %2 is added", videowall, newItem.layout);
         emit q->videowallLayoutAdded(videowall, newItem.layout);
+    }
 }
 
 void VideowallLayoutWatcher::Private::addVideowall(const QnVideoWallResourcePtr& videowall)
@@ -237,6 +265,9 @@ void VideowallLayoutWatcher::Private::addVideowall(const QnVideoWallResourcePtr&
         layouts.insert(item.layout);
         allVideowallLayouts.insert(item.layout);
     }
+
+    NX_VERBOSE(q, "Videowall %1 is added to the pool, it has %2", videowall,
+        layoutsToLogString(layouts.keys()));
 }
 
 // -----------------------------------------------------------------------------------------------
