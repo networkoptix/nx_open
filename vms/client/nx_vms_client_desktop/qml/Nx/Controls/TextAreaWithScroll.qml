@@ -79,12 +79,31 @@ FocusScope
             onCopyAction: edit.copy()
             onPasteAction: edit.paste()
             onDeleteAction: edit.remove(edit.selectionStart, edit.selectionEnd)
-            onAboutToHide: edit.forceActiveFocus()
+            onAboutToHide:
+            {
+                if (control.focus && control.visible)
+                    edit.forceActiveFocus()
+            }
         }
+    }
+
+    function closeMenu()
+    {
+        if (menuMouseArea.menuItem)
+            menuMouseArea.menuItem.close()
+    }
+
+    onVisibleChanged:
+    {
+        closeMenu()
+        if (!visible)
+            focus = false
     }
 
     ContextMenuMouseArea
     {
+        id: menuMouseArea
+
         anchors.fill: control
         anchors.rightMargin: scrollBar.visible
             ? scrollBar.width + scrollBar.anchors.rightMargin
@@ -98,5 +117,7 @@ FocusScope
         CursorOverride.shape: control.cursorShape
         CursorOverride.active: containsMouse
         hoverEnabled: true
+
+        onMenuAboutToBeOpened: edit.forceActiveFocus()
     }
 }
