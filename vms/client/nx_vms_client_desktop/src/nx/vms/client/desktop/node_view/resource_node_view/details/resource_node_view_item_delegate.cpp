@@ -117,8 +117,10 @@ void ResourceNodeViewItemDelegate::paintItemText(
 
     if (textEnd > textPos.x())
     {
+        const auto devicePixelRatio = painter->device()->devicePixelRatio();
+
         const auto main = m_textPixmapCache->pixmap(nodeText, option.font, baseColor,
-            textEnd - textPos.x() + 1, option.textElideMode);
+            devicePixelRatio, textEnd - textPos.x() + 1, option.textElideMode);
 
         if (!main.pixmap.isNull())
         {
@@ -131,7 +133,7 @@ void ResourceNodeViewItemDelegate::paintItemText(
             option.font.setWeight(QFont::Normal);
 
             const auto extra = m_textPixmapCache->pixmap(nodeExtraText, option.font,
-                extraColor, textEnd - textPos.x(), option.textElideMode);
+                extraColor, devicePixelRatio, textEnd - textPos.x(), option.textElideMode);
 
             if (!extra.pixmap.isNull())
                 painter->drawPixmap(textPos + extra.origin, extra.pixmap);

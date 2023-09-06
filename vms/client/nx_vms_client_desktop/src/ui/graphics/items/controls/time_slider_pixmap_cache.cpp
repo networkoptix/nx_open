@@ -127,13 +127,23 @@ void QnTimeSliderPixmapCache::setTickmarkColor(int level, const QColor& color)
     }
 }
 
+qreal QnTimeSliderPixmapCache::devicePixelRatio() const
+{
+    return m_devicePixelRatio;
+}
+
+void QnTimeSliderPixmapCache::setDevicePixelRatio(qreal value)
+{
+    m_devicePixelRatio = value;
+}
+
 const QPixmap& QnTimeSliderPixmapCache::tickmarkTextPixmap(
     int level, milliseconds position, int height, const QnTimeStep& step)
 {
     level = qBound(0, level, numLevels() - 1);
-    qint32 key = shortCacheKey(position, height, step);
+    qint32 key = shortCacheKey(position, qRound(height * m_devicePixelRatio), step);
 
-    const QPixmap *result = m_pixmapByShortPositionKey[level]->object(key);
+    const QPixmap* result = m_pixmapByShortPositionKey[level]->object(key);
     if (result)
         return *result;
 
@@ -147,14 +157,15 @@ const QPixmap& QnTimeSliderPixmapCache::tickmarkTextPixmap(
 const QPixmap& QnTimeSliderPixmapCache::dateTextPixmap(
     milliseconds position, int height, const QnTimeStep& step)
 {
-    QnTimeStepLongCacheKey key = longCacheKey(position, height, step);
+    QnTimeStepLongCacheKey key = longCacheKey(position, qRound(height * m_devicePixelRatio), step);
 
-    const QPixmap *result = m_pixmapByLongPositionKey.object(key);
+    const QPixmap* result = m_pixmapByLongPositionKey.object(key);
     if (result)
         return *result;
 
     result = new QPixmap(textPixmap(toLongString(position, step), height, m_dateColor, m_dateFont));
-    m_pixmapByLongPositionKey.insert(key, result, result->width() * result->height() * result->depth() / 8);
+    m_pixmapByLongPositionKey.insert(
+        key, result, result->width() * result->height() * result->depth() / 8);
     return *result;
 }
 
@@ -163,7 +174,8 @@ const QPixmap& QnTimeSliderPixmapCache::textPixmap(const QString& text, int heig
     return textPixmap(text, height, m_defaultColor);
 }
 
-const QPixmap& QnTimeSliderPixmapCache::textPixmap(const QString& text, int height, const QColor& color)
+const QPixmap& QnTimeSliderPixmapCache::textPixmap(
+    const QString& text, int height, const QColor& color)
 {
     return textPixmap(text, height, color, m_defaultFont);
 }
@@ -179,7 +191,7 @@ const QPixmap& QnTimeSliderPixmapCache::textPixmap(
 const QPixmap& QnTimeSliderPixmapCache::textPixmap(
     const QString& text, const QColor& color, const QFont& font)
 {
-    return m_cache->pixmap(text, font, color);
+    return m_cache->pixmap(text, font, color, m_devicePixelRatio);
 }
 
 void QnTimeSliderPixmapCache::clear()
