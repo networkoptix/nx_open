@@ -19,7 +19,7 @@ struct NX_VMS_API BackupSettings
      */
 
     QnUuid id;
-    CameraBackupQuality quality = CameraBackupQuality::CameraBackup_Both;
+    CameraBackupQuality quality = CameraBackupQuality::CameraBackupBoth;
     bool backupNewCameras = false;
 
     bool operator==(const BackupSettings& other) const = default;
