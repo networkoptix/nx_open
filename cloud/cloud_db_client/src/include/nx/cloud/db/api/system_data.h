@@ -9,7 +9,30 @@
 #include <string>
 #include <vector>
 
+#include <nx/reflect/instrument.h>
+#include <nx/reflect/json.h>
+
 namespace nx::cloud::db::api {
+
+/**
+ * System attribute
+ */
+struct Attribute
+{
+    /**%apidoc Unique attribute name. */
+    std::string name;
+
+    /**%apidoc Attribute value. */
+    std::string value;
+
+    bool operator==(const Attribute& rhs) const
+    {
+        return name == rhs.name && value == rhs.value;
+    }
+};
+
+/**%apidoc Array of Attributes. */
+using AttributesList = std::vector<Attribute>;
 
 /**
  * Information required to register system in cloud.
@@ -87,9 +110,6 @@ struct SystemData
     std::string ownerAccountEmail;
     SystemStatus status = SystemStatus::invalid;
 
-    /**%apidoc DEPRECATED. true, if cloud connection is activated for this system. */
-    bool cloudConnectionSubscriptionStatus = true;
-
     /**%apidoc MUST be used as upper 64 bits of 128-bit transaction timestamp. */
     std::uint64_t systemSequence = 0;
 
@@ -112,18 +132,24 @@ struct SystemData
             customization == right.customization &&
             ownerAccountEmail == right.ownerAccountEmail &&
             status == right.status &&
-            cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus &&
             systemSequence == right.systemSequence &&
             opaque == right.opaque &&
             system2faEnabled == right.system2faEnabled;
     }
 };
 
+#define SystemData_Fields (id)(name)(customization)(authKey)(authKeyHash)(ownerAccountEmail) \
+                          (status)(systemSequence) (opaque)(registrationTime)(system2faEnabled)
+
+NX_REFLECTION_INSTRUMENT(SystemData, SystemData_Fields)
+
 struct SystemDataList
 {
     /**%apidoc Systems attributes. */
     std::vector<SystemData> systems;
 };
+
+NX_REFLECTION_INSTRUMENT(SystemDataList, (systems))
 
 ////////////////////////////////////////////////////////////
 //// system sharing data
@@ -290,8 +316,15 @@ struct SystemMergeInfo
     std::string anotherSystemId;
 };
 
+/**%apidoc Extended system information.
+ * Adds information that is defined by the request context. E.g., user access level,
+ * system health, etc...
+ * Also, system attributes managed via a separate "system attributes" API are also present here.
+ */
 struct SystemDataEx: SystemData
 {
+    using base_type = SystemData;
+
     std::string ownerFullName;
 
     /**%apidoc Access role of the entity (usually, an account) that requested the system information. */
@@ -321,6 +354,11 @@ struct SystemDataEx: SystemData
     /**%apidoc dictionary{capability: capability version (0-disabled)}. */
     std::map<std::string, int> capabilities;
 
+    // System attributes. These attributes are present on the same level with other fields
+    // of this structure in the JSON document. They are NOT represented as an "attributes" array
+    // in the JSON document.
+    AttributesList attributes;
+
     SystemDataEx() = default;
 
     SystemDataEx(SystemData systemData):
@@ -329,10 +367,30 @@ struct SystemDataEx: SystemData
     }
 };
 
+// NOTE: Have to move NX_REFLECTION_INSTRUMENT here because otherwise custom serialization functions
+// will not been seen anywhere SystemDataEx type is used.
+// TODO: #akolesnikov Move NX_REFLECTION_INSTRUMENT for other types here as well.
+NX_REFLECTION_INSTRUMENT(SystemDataEx,
+    (ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth) \
+    (usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(attributes)(version))
+
+// Providing custom JSON serialization functions so that SystemDataEx::attributes are added on the
+// same level with other fields in the resulting JSON document.
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const SystemDataEx& value);
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& ctx,
+    SystemDataEx* value);
+
 struct SystemDataExList
 {
     std::vector<SystemDataEx> systems;
 };
+
+NX_REFLECTION_INSTRUMENT(SystemDataExList, (systems))
 
 struct SystemHealthHistoryItem
 {
@@ -460,26 +518,6 @@ struct SystemOfferPatch
     /**%apidoc New status for the offer. */
     std::optional<OfferStatus> status;
 };
-
-/**
- * System attribute
- */
-struct Attribute
-{
-    /**%apidoc Unique attribute name. */
-    std::string name;
-
-    /**%apidoc Attribute value. */
-    std::string value;
-
-    bool operator==(const Attribute& rhs) const
-    {
-        return name == rhs.name && value == rhs.value;
-    }
-};
-
-/**%apidoc Array of Attributes. */
-using AttributesList = std::vector<Attribute>;
 
 /**
 * One system users batch item.
