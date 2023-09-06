@@ -42,7 +42,7 @@ MembershipSettings
         width: parent.width - 16
 
         text: section === UserSettingsGlobal.kBuiltInGroupsSection
-            ? qsTr("Built In")
+            ? qsTr("Built-in")
             : qsTr("Custom")
 
         AddGroupButton
