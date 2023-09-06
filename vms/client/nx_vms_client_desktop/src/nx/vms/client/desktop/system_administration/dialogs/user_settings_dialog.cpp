@@ -893,6 +893,9 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.linkEditable = accessController()->hasPowerUserPermissions()
         && permissions.testFlag(Qn::SavePermission);
 
+    state.continuousSync =
+        globalSettings()->ldap().continuousSync == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+
     return state;
 }
 

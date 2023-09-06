@@ -30,6 +30,7 @@ Item
     property int userCount: 0
     property int groupCount: 0
     property bool deleteAvailable: true
+    property bool continuousSync: true
     property var editingContext
 
     property alias model: groupsComboBox.model
@@ -187,5 +188,22 @@ Item
                 }
             }
         }
+    }
+
+    DialogBanner
+    {
+        id: bannerLdapContinousSyncDisabled
+
+        style: DialogBanner.Style.Warning
+        visible: control.isLdap && !control.continuousSync
+        closeVisible: true
+
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        text: qsTr("When Continuous Sync is disabled, groups do not synchronize automatically. "
+            + "To update this group, initiate a manual sync.")
+        onCloseClicked: bannerLdapContinousSyncDisabled.visible = false
     }
 }
