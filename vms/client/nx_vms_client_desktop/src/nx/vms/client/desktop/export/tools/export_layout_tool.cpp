@@ -20,8 +20,10 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
@@ -224,10 +226,16 @@ NovMetadata ExportLayoutTool::prepareLayoutAndMetadata()
         localItem.resource.path = fileNameForResource(resource);
         items.insert(localItem.uuid, localItem);
 
+        const auto accessController = SystemContext::fromResource(resource)->accessController();
+        const bool exportAllowed =
+            accessController->hasPermissions(resource, Qn::ExportPermission);
+
         metadata.itemProperties[localItem.uuid] = {
             .name = resource->getName(),
             .timeZoneOffset =
-                core::ServerTimeWatcher::utcOffset(mediaResource, Qn::InvalidUtcOffset)};
+                core::ServerTimeWatcher::utcOffset(mediaResource, Qn::InvalidUtcOffset),
+            .flags = exportAllowed
+                ? NovItemProperties::Flag::empty : NovItemProperties::Flag::noExportPermission};
     }
     d->layout->setItems(items);
 
