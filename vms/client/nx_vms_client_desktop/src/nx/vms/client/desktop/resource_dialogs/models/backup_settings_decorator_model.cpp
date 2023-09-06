@@ -106,7 +106,7 @@ private:
 
 bool cameraHasDefaultBackupSettings(const QnVirtualCameraResourcePtr& camera)
 {
-    return camera->getBackupQuality() == nx::vms::api::CameraBackupQuality::CameraBackup_Default
+    return camera->getBackupQuality() == nx::vms::api::CameraBackupQuality::CameraBackupDefault
         || camera->getBackupPolicy() == nx::vms::api::BackupPolicy::byDefault;
 }
 
@@ -242,7 +242,7 @@ CameraBackupQuality BackupSettingsDecoratorModel::backupQuality(
     const QnVirtualCameraResourcePtr& camera) const
 {
     if (!camera->hasDualStreaming())
-        return CameraBackupQuality::CameraBackup_Both;
+        return CameraBackupQuality::CameraBackupBoth;
 
     if (m_changedQuality.contains(camera))
         return m_changedQuality.value(camera);

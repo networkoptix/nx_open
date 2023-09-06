@@ -28,8 +28,8 @@ static constexpr std::array<BackupContentTypes, 8> kBackupContentTypesMenuOption
     BackupContentType::motion | BackupContentType::analytics | BackupContentType::bookmarks};
 
 static constexpr std::array<CameraBackupQuality, 2> kBackupQualityMenuOptions = {
-    CameraBackupQuality::CameraBackup_Both,
-    CameraBackupQuality::CameraBackup_LowQuality};
+    CameraBackupQuality::CameraBackupBoth,
+    CameraBackupQuality::CameraBackupLowQuality};
 
 } // namespace
 
@@ -65,13 +65,13 @@ public:
     {
         switch (backupQuality)
         {
-            case CameraBackup_HighQuality:
+            case CameraBackupHighQuality:
                 return tr("High-Res");
 
-            case CameraBackup_LowQuality:
+            case CameraBackupLowQuality:
                 return tr("Low-Res");
 
-            case CameraBackup_Both:
+            case CameraBackupBoth:
                 return tr("All streams");
 
             default:
