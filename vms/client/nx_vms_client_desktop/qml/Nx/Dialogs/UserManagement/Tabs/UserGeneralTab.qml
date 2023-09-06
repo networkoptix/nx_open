@@ -55,6 +55,7 @@ Item
     property alias displayOffsetMs: linkDates.displayOffsetMs
 
     property bool ldapError: false
+    property bool continuousSync: true
 
     property var self
 
@@ -685,7 +686,7 @@ Item
 
     DialogBanner
     {
-        id: banner
+        id: bannerUserNotFound
 
         style: DialogBanner.Style.Error
 
@@ -694,7 +695,7 @@ Item
 
         Binding
         {
-            target: banner
+            target: bannerUserNotFound
             property: "visible"
             value: control.ldapError
         }
@@ -708,6 +709,23 @@ Item
         buttonIcon: "image://svg/skin/user_settings/trash.svg"
 
         onButtonClicked: control.deleteRequested()
-        onCloseClicked: banner.visible = false
+        onCloseClicked: bannerUserNotFound.visible = false
+    }
+
+    DialogBanner
+    {
+        id: bannerLdapContinousSyncDisabled
+
+        style: DialogBanner.Style.Warning
+        visible: control.userType === UserSettingsGlobal.LdapUser && !control.continuousSync
+        closeVisible: true
+
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        text: qsTr("When Continuous Sync is disabled, user’s membership in groups do not "
+            + "synchronize automatically. To update this information, initiate a manual sync.")
+        onCloseClicked: bannerLdapContinousSyncDisabled.visible = false
     }
 }

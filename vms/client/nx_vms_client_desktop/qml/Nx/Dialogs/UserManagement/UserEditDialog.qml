@@ -58,6 +58,7 @@ DialogWithState
     property bool permissionsEditable: true
 
     property alias linkEditable: generalSettings.linkEditable
+    property alias continuousSync: generalSettings.continuousSync
     property alias linkValidFrom: generalSettings.linkValidFrom
     property alias linkValidUntil: generalSettings.linkValidUntil
     property alias expiresAfterLoginS: generalSettings.expiresAfterLoginS
