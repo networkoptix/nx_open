@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.11
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
-import Nx.Controls 1.0
+import Nx.Controls
 
 Control
 {
@@ -38,7 +38,7 @@ Control
 
     property int sizePolicy: TabControl.SizeToAllTabs
 
-    readonly property Tab currentTab: visibleTabs[tabBar.currentIndex] || null
+    readonly property alias currentTab: tabPages.currentTab
     readonly property Item currentPage: currentTab && currentTab.page || null
 
     function selectTab(tab)
@@ -53,15 +53,6 @@ Control
         var index = visibleTabs.findIndex(function(tab) { return tab.page === page })
         if (index !== -1)
             tabBar.currentIndex = index
-    }
-
-    Component.onCompleted: d.tabs = Array.prototype.filter.call(data, item => item instanceof Tab)
-
-    QtObject
-    {
-        id: d
-
-        property var tabs: []
     }
 
     contentItem: ColumnLayout
@@ -96,6 +87,9 @@ Control
 
                     currentIndex = Math.max(buttons.indexOf(previousTab), 0)
                 }
+
+                onCurrentIndexChanged:
+                    tabPages.currentTab = tabControl.visibleTabs[currentIndex] || null
             }
         }
 
@@ -108,6 +102,8 @@ Control
 
             implicitWidth: implicitSize.width
             implicitHeight: implicitSize.height
+
+            property Tab currentTab: tabControl.visibleTabs[0] || null
 
             readonly property var pages: tabControl.visibleTabs.map(
                 function(tab) { return tab.page })
@@ -138,16 +134,18 @@ Control
 
             Repeater
             {
-                model: tabPages.pages.length
+                model: tabControl.tabs
                 anchors.fill: parent
 
                 Fader
                 {
                     id: fader
 
+                    readonly property Tab tab: tabControl.tabs[index]
+
                     anchors.fill: parent
-                    opaque: tabBar.currentIndex === index
-                    contentItem: tabPages.pages[index]
+                    opaque: tab.visible && tab === tabPages.currentTab
+                    contentItem: tab.page
 
                     Binding
                     {
