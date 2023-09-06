@@ -211,6 +211,113 @@ void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const ur
 }
 
 //-------------------------------------------------------------------------------------------------
+// SystemDataEx
+
+namespace {
+
+template<typename T>
+static void writeJsonAttribute(
+    nx::reflect::json::SerializationContext* ctx,
+    const std::string& name,
+    const T& value)
+{
+    ctx->composer.writeAttributeName(name);
+    nx::reflect::json::serialize(ctx, value);
+}
+
+template<typename T>
+static void writeJsonAttribute(
+    nx::reflect::json::SerializationContext* ctx,
+    const std::string& name,
+    const std::optional<T>& value)
+{
+    if (!value)
+        return;
+
+    ctx->composer.writeAttributeName(name);
+    nx::reflect::json::serialize(ctx, *value);
+}
+
+} // namespace
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const SystemDataEx& value)
+{
+    ctx->composer.startObject();
+
+    nx::reflect::forEachField<SystemDataEx>(
+        [ctx, &value](const auto& field)
+        {
+            if (nx::reflect::isSameField(field, &SystemDataEx::attributes))
+            {
+                // Serializing "attributes" values on the top level of the JSON document.
+                for (const auto& attr: value.attributes)
+                    writeJsonAttribute(ctx, attr.name, attr.value);
+            }
+            else
+            {
+                // Serializing each field but "attributes" as usual.
+                writeJsonAttribute(ctx, field.name(), field.get(value));
+            }
+        });
+
+    ctx->composer.endObject();
+}
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& ctx,
+    SystemDataEx* value)
+{
+    nx::reflect::DeserializationResult result;
+
+    std::set<std::decay_t<decltype(ctx.value)>::ConstMemberIterator> readMembers;
+
+    // Deserializing all fields but "attributes" as usual.
+    nx::reflect::forEachField<SystemDataEx>(
+        [&ctx, value, &result, &readMembers](const auto& field)
+        {
+            if (!result)
+                return; //< Error happened earlier. Skipping...
+
+            if (nx::reflect::isSameField(field, &SystemDataEx::attributes))
+                return; //< Attributes will be parsed later.
+
+            auto it = ctx.value.FindMember(field.name());
+            if (it != ctx.value.MemberEnd())
+            {
+                typename std::decay_t<decltype(field)>::Type val;
+                result = nx::reflect::json::deserialize(
+                    nx::reflect::json::DeserializationContext{it->value, ctx.flags}, &val);
+                readMembers.insert(it);
+                if (result)
+                    field.set(value, val);
+            }
+        });
+
+    if (!result)
+        return result;
+
+    // Loading all remaining string members into "attributes".
+    value->attributes.reserve(ctx.value.MemberCount() - readMembers.size());
+    for (auto it = ctx.value.MemberBegin(); it != ctx.value.MemberEnd(); ++it)
+    {
+        if (!it->value.IsString())
+            continue;
+
+        if (!readMembers.contains(it))
+        {
+            Attribute attr;
+            attr.name.assign(it->name.GetString(), it->name.GetStringLength());
+            attr.value.assign(it->value.GetString(), it->value.GetStringLength());
+            value->attributes.push_back(std::move(attr));
+        }
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
 // UserSessionDescriptor
 
 MAKE_FIELD_NAME_STR_CONST(UserSessionDescriptor, accountEmail)

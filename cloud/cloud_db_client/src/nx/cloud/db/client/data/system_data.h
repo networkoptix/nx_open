@@ -34,16 +34,6 @@ NX_REFLECTION_INSTRUMENT_ENUM(SystemStatus,
 // TODO: #akolesnikov Add corresponding parser/serializer to fusion and remove this function.
 //bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
 
-#define SystemData_Fields (id)(name)(customization)(authKey)(authKeyHash)(ownerAccountEmail) \
-                          (status)(cloudConnectionSubscriptionStatus)(systemSequence) \
-                          (opaque)(registrationTime)(system2faEnabled)
-
-NX_REFLECTION_INSTRUMENT(SystemData, SystemData_Fields)
-
-#define SystemDataList_Fields (systems)
-
-NX_REFLECTION_INSTRUMENT(SystemDataList, SystemDataList_Fields)
-
 /**
  * For requests passing just system id.
  */
@@ -165,16 +155,6 @@ NX_REFLECTION_INSTRUMENT_ENUM(MergeRole, none, master, slave)
 #define SystemMergeInfo_Fields (role)(startTime)(anotherSystemId)
 
 NX_REFLECTION_INSTRUMENT(SystemMergeInfo, SystemMergeInfo_Fields)
-
-#define SystemDataEx_Fields SystemData_Fields \
-    (ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth) \
-    (usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(version)
-
-NX_REFLECTION_INSTRUMENT(SystemDataEx, SystemDataEx_Fields)
-
-#define SystemDataExList_Fields (systems)
-
-NX_REFLECTION_INSTRUMENT(SystemDataExList, SystemDataExList_Fields)
 
 //-------------------------------------------------------------------------------------------------
 // UserSessionDescriptor
