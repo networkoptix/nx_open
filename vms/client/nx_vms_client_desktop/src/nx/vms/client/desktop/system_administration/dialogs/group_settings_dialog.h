@@ -36,6 +36,7 @@ struct GroupSettingsDialogState
     Q_PROPERTY(nx::core::access::ResourceAccessMap sharedResources MEMBER sharedResources)
     Q_PROPERTY(bool permissionsEditable MEMBER permissionsEditable)
     Q_PROPERTY(bool deleteAvailable MEMBER deleteAvailable)
+    Q_PROPERTY(bool continuousSync MEMBER continuousSync)
 
 public:
     bool operator==(const GroupSettingsDialogState& other) const = default;
@@ -73,6 +74,7 @@ public:
     nx::core::access::ResourceAccessMap sharedResources;
     bool permissionsEditable = true;
     bool deleteAvailable = true;
+    bool continuousSync = true;
 };
 
 class NX_VMS_CLIENT_DESKTOP_API GroupSettingsDialog:

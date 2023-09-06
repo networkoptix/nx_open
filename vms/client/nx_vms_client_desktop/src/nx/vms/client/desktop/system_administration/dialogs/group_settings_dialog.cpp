@@ -12,6 +12,7 @@
 #include <nx/utils/algorithm/diff_sorted_lists.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
@@ -20,6 +21,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
@@ -367,6 +369,10 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
         state.deleteAvailable = systemContext()->accessController()->hasPermissions(
             state.groupId,
             Qn::RemovePermission);
+
+        state.continuousSync =
+            globalSettings()->ldap().continuousSync ==
+            nx::vms::api::LdapSettings::Sync::usersAndGroups;
     }
 
     return state;
