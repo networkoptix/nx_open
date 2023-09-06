@@ -123,7 +123,7 @@ struct DeviceOptions
     FailoverPriority failoverPriority = FailoverPriority::medium;
 
     /**%apidoc[opt] Combination (via "|") of the flags defining backup options. */
-    CameraBackupQuality backupQuality = CameraBackup_Default;
+    CameraBackupQuality backupQuality = CameraBackupDefault;
 
     /**%apidoc[opt] */
     BackupContentTypes backupContentType = BackupContentType::archive; //< What to backup content wise.
@@ -289,7 +289,7 @@ struct NX_VMS_API DeviceModel: DeviceModelGeneral, ResourceWithParameters
     bool isLicenseUsed = false;
 
     /**%apidoc[opt] */
-    CameraBackupQuality backupQuality = CameraBackup_Default;
+    CameraBackupQuality backupQuality = CameraBackupDefault;
 
     /**%apidoc[immutable]
      * %// Appeared starting from /rest/v2/devices.

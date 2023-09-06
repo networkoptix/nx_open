@@ -195,22 +195,22 @@ constexpr auto nxReflectVisitAllEnumItems(FailoverPriority*, Visitor&& visitor)
 
 enum CameraBackupQuality
 {
-    CameraBackup_Both = 0,
-    CameraBackup_HighQuality = 1,
-    CameraBackup_LowQuality = 2,
-    CameraBackup_Default = 3, //< Backup quality is not configured yet; the default will be used.
+    CameraBackupBoth = 0,
+    CameraBackupHighQuality = 1,
+    CameraBackupLowQuality = 2,
+    CameraBackupDefault = 3, //< Backup quality is not configured yet; the default will be used.
 };
 
 inline bool isHiQualityEnabled(const nx::vms::api::CameraBackupQuality& quality)
 {
-    return quality == nx::vms::api::CameraBackupQuality::CameraBackup_HighQuality
-        || quality == nx::vms::api::CameraBackupQuality::CameraBackup_Both;
+    return quality == nx::vms::api::CameraBackupQuality::CameraBackupHighQuality
+        || quality == nx::vms::api::CameraBackupQuality::CameraBackupBoth;
 }
 
 inline bool isLowQualityEnabled(const nx::vms::api::CameraBackupQuality& quality)
 {
-    return quality == nx::vms::api::CameraBackupQuality::CameraBackup_LowQuality
-        || quality == nx::vms::api::CameraBackupQuality::CameraBackup_Both;
+    return quality == nx::vms::api::CameraBackupQuality::CameraBackupLowQuality
+        || quality == nx::vms::api::CameraBackupQuality::CameraBackupBoth;
 }
 
 template<typename Visitor>
@@ -218,10 +218,10 @@ constexpr auto nxReflectVisitAllEnumItems(CameraBackupQuality*, Visitor&& visito
 {
     using Item = nx::reflect::enumeration::Item<CameraBackupQuality>;
     return visitor(
-        Item{ CameraBackup_HighQuality, "CameraBackupHighQuality" },
-        Item{ CameraBackup_LowQuality, "CameraBackupLowQuality" },
-        Item{ CameraBackup_Both, "CameraBackupBoth" },
-        Item{ CameraBackup_Default, "CameraBackupDefault" }
+        Item{ CameraBackupHighQuality, "CameraBackupHighQuality" },
+        Item{ CameraBackupLowQuality, "CameraBackupLowQuality" },
+        Item{ CameraBackupBoth, "CameraBackupBoth" },
+        Item{ CameraBackupDefault, "CameraBackupDefault" }
     );
 }
 

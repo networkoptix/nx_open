@@ -185,7 +185,7 @@ protected:
         auto camera = ContextBasedTest::addCamera();
         if (useBackup)
         {
-            camera->setBackupQuality(CameraBackupQuality::CameraBackup_Both);
+            camera->setBackupQuality(CameraBackupQuality::CameraBackupBoth);
             camera->setBackupPolicy(BackupPolicy::on);
         }
         auto capabilities = camera->cameraMediaCapability();
