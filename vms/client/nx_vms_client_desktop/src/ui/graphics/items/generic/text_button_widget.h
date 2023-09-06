@@ -55,7 +55,7 @@ protected:
     virtual void changeEvent(QEvent *event) override;
 
     void invalidatePixmap();
-    void ensurePixmap();
+    void ensurePixmap(qreal devicePixelRatio);
 
 protected:
     StateFlags validOpacityState(StateFlags flags) const;

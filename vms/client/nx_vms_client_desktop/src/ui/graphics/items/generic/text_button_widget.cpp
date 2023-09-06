@@ -92,8 +92,10 @@ void QnTextButtonWidget::setGeometry(const QRectF &geometry) {
     }
 }
 
-void QnTextButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    ensurePixmap();
+void QnTextButtonWidget::paint(
+    QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    ensurePixmap(painter->device()->devicePixelRatio());
 
     /* Skip Framed implementation. */
     QnImageButtonWidget::paint(painter, option, widget);
@@ -139,14 +141,17 @@ void QnTextButtonWidget::invalidatePixmap() {
     m_pixmapValid = false;
 }
 
-void QnTextButtonWidget::ensurePixmap() {
-    if(m_pixmapValid)
+void QnTextButtonWidget::ensurePixmap(qreal devicePixelRatio)
+{
+    if (m_pixmapValid && qFuzzyEquals(pixmap(Default).devicePixelRatio(), devicePixelRatio))
         return;
 
-    if(m_text.isEmpty())
+    if (m_text.isEmpty())
         return;
 
-    setPixmap(Default, QnTextPixmapCache::instance()->pixmap(m_text, font(), textColor()));
+    setPixmap(Default, QnTextPixmapCache::instance()->pixmap(
+        m_text, font(), textColor(), devicePixelRatio));
+
     m_pixmapValid = true;
 }
 

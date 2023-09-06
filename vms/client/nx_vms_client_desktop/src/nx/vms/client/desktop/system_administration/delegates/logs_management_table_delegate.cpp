@@ -3,6 +3,7 @@
 #include "logs_management_table_delegate.h"
 
 #include <QtGui/QPainter>
+#include <QtGui/QGuiApplication>
 
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -90,10 +91,13 @@ void LogsManagementTableDelegate::paintNameColumn(
 
     if (textEnd > textPos.x())
     {
+        const auto devicePixelRatio = painter->device()->devicePixelRatio();
+
         const auto main = m_textPixmapCache.pixmap(
             option.text,
             option.font,
             textColor,
+            devicePixelRatio,
             textEnd - textPos.x() + 1,
             option.textElideMode);
 
@@ -111,6 +115,7 @@ void LogsManagementTableDelegate::paintNameColumn(
                 extraInfo,
                 option.font,
                 ipAddressColor,
+                devicePixelRatio,
                 textEnd - textPos.x(),
                 option.textElideMode);
 
