@@ -681,6 +681,9 @@ void ConnectActionsHandler::storeConnectionRecord(
      * it is not initial connection to factory system.
      */
 
+    if (connectionInfo.isTemporary())
+        return;
+
     const bool storePassword = options.testFlag(StorePassword);
     if (!storePassword && ::helpers::isNewSystem(info))
         return;
