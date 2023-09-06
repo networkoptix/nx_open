@@ -225,8 +225,10 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
         if (textEnd > textPos.x())
         {
+            const auto devicePixelRatio = painter->device()->devicePixelRatio();
+
             const auto main = m_textPixmapCache.pixmap(baseName, option.font, mainColor,
-                textEnd - textPos.x() + 1, option.textElideMode);
+                devicePixelRatio, textEnd - textPos.x() + 1, option.textElideMode);
 
             if (!main.pixmap.isNull())
             {
@@ -239,7 +241,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
                 option.font.setWeight(QFont::Normal);
 
                 const auto extra = m_textPixmapCache.pixmap(extraInfo, option.font, extraColor,
-                    textEnd - textPos.x(), option.textElideMode);
+                    devicePixelRatio, textEnd - textPos.x(), option.textElideMode);
 
                 if (!extra.pixmap.isNull())
                     painter->drawPixmap(textPos + extra.origin, extra.pixmap);

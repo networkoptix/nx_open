@@ -1822,11 +1822,6 @@ void QnTimeSlider::updatePixmapCache()
     m_pixmapCache->setDateFont(localFont);
     m_pixmapCache->setDateColor(core::colorTheme()->color("light4"));
 
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(
-        tr("No thumbnails available"),
-        kNoThumbnailsFontPixelSize,
-        core::colorTheme()->color("dark16"));
-
     for (int i = 0; i < kNumTickmarkLevels; ++i)
     {
         localFont.setWeight(kTickmarkFontWeights[i]);
@@ -2443,6 +2438,8 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     QRectF lineBarRect = this->lineBarRect();
     qreal lineTop, lineUnit = qFuzzyIsNull(m_totalLineStretch) ? 0.0 : lineBarRect.height() / m_totalLineStretch;
 
+    m_pixmapCache->setDevicePixelRatio(painter->device()->devicePixelRatio());
+
     /* Draw background. */
     if (qFuzzyIsNull(m_totalLineStretch))
     {
@@ -3001,15 +2998,22 @@ void QnTimeSlider::drawThumbnails(
 
     if (!m_thumbnailManager)
     {
+        m_pixmapCache->setDevicePixelRatio(painter->device()->devicePixelRatio());
+
+        const auto noThumbnailsPixmap = m_pixmapCache->textPixmap(
+            tr("No thumbnails available"),
+            kNoThumbnailsFontPixelSize,
+            core::colorTheme()->color("dark16"));
+
         // Use logical coordinates for label size.
-        const auto pixelRatio = m_noThumbnailsPixmap.devicePixelRatio();
-        const QSizeF labelSizeBound(rect.width(), m_noThumbnailsPixmap.height() / pixelRatio);
+        const auto pixelRatio = noThumbnailsPixmap.devicePixelRatio();
+        const QSizeF labelSizeBound(rect.width(), noThumbnailsPixmap.height() / pixelRatio);
 
         QRect labelRect = Geometry::aligned(Geometry::expanded(
-            Geometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound,
+            Geometry::aspectRatio(noThumbnailsPixmap.size()), labelSizeBound,
             Qt::KeepAspectRatio), rect, Qt::AlignCenter).toRect();
 
-        drawCroppedPixmap(painter, labelRect, rect, m_noThumbnailsPixmap, m_noThumbnailsPixmap.rect());
+        drawCroppedPixmap(painter, labelRect, rect, noThumbnailsPixmap, noThumbnailsPixmap.rect());
         return;
     }
 

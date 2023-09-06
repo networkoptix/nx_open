@@ -15,6 +15,7 @@
 
 #include <ui/utils/blur_image.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/math/fuzzy.h>
 
 #include "hashed_font.h"
 #include <utils/common/hash.h>
@@ -49,7 +50,7 @@ QImage getShadowImage(
 }
 
 QnTextPixmap renderText(const QString& text, const QPen& pen, const QFont& font,
-    int width, Qt::TextElideMode elideMode, qreal shadowRadius = 0.0)
+    qreal devicePixelRatio, int width, Qt::TextElideMode elideMode, qreal shadowRadius = 0.0)
 {
     const QFontMetrics metrics(font);
 
@@ -69,11 +70,10 @@ QnTextPixmap renderText(const QString& text, const QPen& pen, const QFont& font,
 
     const QPoint origin(metrics.leftBearing(renderText[0]), -metrics.ascent());
 
-    const auto pixelRatio = qApp->devicePixelRatio();
-    const auto pixmapSize = size * pixelRatio;
+    const auto pixmapSize = (QSizeF(size) * devicePixelRatio).toSize();
 
     QPixmap pixmap(pixmapSize);
-    pixmap.setDevicePixelRatio(pixelRatio);
+    pixmap.setDevicePixelRatio(devicePixelRatio);
     pixmap.fill(Qt::transparent);
 
     QPainter painter(&pixmap);
@@ -81,7 +81,7 @@ QnTextPixmap renderText(const QString& text, const QPen& pen, const QFont& font,
     if (shadowRadius > 0)
     {
         const auto shadowImage =
-            getShadowImage(renderText, pixmapSize, pixelRatio, origin, font, shadowRadius);
+            getShadowImage(renderText, pixmapSize, devicePixelRatio, origin, font, shadowRadius);
         painter.drawImage(QPoint{0, 0}, shadowImage);
     }
 
@@ -129,24 +129,27 @@ public:
         QString text;
         QnHashedFont font;
         QColor color;
+        qreal devicePixelRatio = 1.0;
 
-        Key(const QString& text, const QFont& font, const QColor& color):
-            text(text), font(font), color(color)
+        Key(const QString& text, const QFont& font, const QColor& color, qreal devicePixelRatio):
+            text(text),
+            font(font),
+            color(color),
+            devicePixelRatio(devicePixelRatio)
         {
         }
 
-        friend size_t qHash(const Key& key)
+        friend size_t qHash(const Key& key, uint seed = 0)
         {
-            using ::qHash;
-            return
-                (929 * qHash(key.text)) ^
-                (883 * qHash(key.font)) ^
-                (547 * qHash(key.color));
+            return qHashMulti(seed, key.text, key.font, key.color, key.devicePixelRatio);
         }
 
         bool operator == (const Key& other) const
         {
-            return text == other.text && font == other.font && color == other.color;
+            return text == other.text
+                && font == other.font
+                && color == other.color
+                && qFuzzyEquals(devicePixelRatio, other.devicePixelRatio);
         }
     };
 
@@ -168,15 +171,17 @@ const QPixmap& QnTextPixmapCache::pixmap(
     const QString& text,
     const QFont& font,
     const QColor& color,
+    qreal devicePixelRatio,
     qreal shadowRadius)
 {
-    return pixmap(text, font, color, 0, Qt::ElideNone, shadowRadius).pixmap;
+    return pixmap(text, font, color, devicePixelRatio, 0, Qt::ElideNone, shadowRadius).pixmap;
 }
 
 const QnTextPixmap& QnTextPixmapCache::pixmap(
     const QString& text,
     const QFont& font,
     const QColor& color,
+    qreal devicePixelRatio,
     int width,
     Qt::TextElideMode elideMode,
     qreal shadowRadius)
@@ -185,7 +190,7 @@ const QnTextPixmap& QnTextPixmapCache::pixmap(
     if (!localColor.isValid())
         localColor = QColor(0, 0, 0, 255);
 
-    QnTextPixmapCachePrivate::Key key(text, font, localColor);
+    QnTextPixmapCachePrivate::Key key(text, font, localColor, devicePixelRatio);
     auto result = d->pixmapByKey.object(key);
     if (result)
     {
@@ -212,7 +217,7 @@ const QnTextPixmap& QnTextPixmapCache::pixmap(
     }
 
     const auto textPixmapStruct = renderText(
-        text, QPen(localColor, 0), font, width, elideMode, shadowRadius);
+        text, QPen(localColor, 0), font, devicePixelRatio, width, elideMode, shadowRadius);
 
     static const QnTextPixmap kEmptyTextPixmap;
 

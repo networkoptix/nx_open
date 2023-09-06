@@ -3,6 +3,7 @@
 #include "io_module_overlay_contents_p.h"
 
 #include <QtGui/QFontMetrics>
+#include <QtGui/QPainter>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -177,7 +178,8 @@ void QnIoModuleOverlayContentsPrivate::PortItem::paintId(
 {
     const auto pixmap = QnTextPixmapCache::instance()->pixmap(m_id,
         on ? m_activeIdFont : m_idFont,
-        palette().color(on ? QPalette::HighlightedText : QPalette::WindowText));
+        palette().color(on ? QPalette::HighlightedText : QPalette::WindowText),
+        painter->device()->devicePixelRatio());
 
     paintPixmap(painter, pixmap, rect, Qt::AlignLeft | Qt::AlignVCenter);
 }
@@ -188,7 +190,7 @@ void QnIoModuleOverlayContentsPrivate::PortItem::paintLabel(
     ensureElidedLabel(rect.width());
 
     const auto pixmap = QnTextPixmapCache::instance()->pixmap(m_elidedLabel,
-        m_labelFont, palette().color(QPalette::ButtonText));
+        m_labelFont, palette().color(QPalette::ButtonText), painter->device()->devicePixelRatio());
 
     paintPixmap(painter, pixmap, rect, horizontalAlignment | Qt::AlignVCenter);
 }

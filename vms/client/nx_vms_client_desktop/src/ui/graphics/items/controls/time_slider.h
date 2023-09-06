@@ -600,7 +600,6 @@ private:
     qreal m_thumbnailsAspectRatio;
     QTimer* m_thumbnailsUpdateTimer;
     milliseconds m_lastThumbnailsUpdateTime;
-    QPixmap m_noThumbnailsPixmap;
     QMap<milliseconds, ThumbnailData> m_thumbnailData;
     QList<ThumbnailData> m_oldThumbnailData;
     QRectF m_thumbnailsPaintRect;
