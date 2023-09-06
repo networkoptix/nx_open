@@ -122,11 +122,18 @@ void LayoutItemWatcher::Private::handleItemAdded(
 
     NX_VERBOSE(q, "Item added to layout %1, resource id %2", layout, item.resource.id);
 
-    const bool newItem = !itemLayouts.contains(resourceId);
-    if (itemLayouts[resourceId].insert(layout))
+    bool addedToLayout = false;
+    bool addedToFirstLayout = false;
+    {
+        NX_MUTEX_LOCKER lk(&mutex);
+        addedToFirstLayout = !itemLayouts.contains(resourceId);
+        addedToLayout = itemLayouts[resourceId].insert(layout);
+    }
+
+    if (addedToLayout)
         emit q->addedToLayout(resourceId, layout);
 
-    if (newItem)
+    if (addedToFirstLayout)
         emit q->resourceAdded(resourceId);
 }
 
@@ -134,23 +141,29 @@ void LayoutItemWatcher::Private::handleItemRemoved(
     const QnLayoutResourcePtr& layout, const LayoutItemData& item)
 {
     const auto resourceId = item.resource.id;
-    if (resourceId.isNull() || !NX_ASSERT(itemLayouts.contains(resourceId)))
+    if (resourceId.isNull())
         return;
 
     NX_VERBOSE(q, "Item removed from layout %1, resource id %2", layout, item.resource.id);
 
-    auto& layouts = itemLayouts[resourceId];
-    if (layouts.remove(layout))
+    bool removedFromLayout = false;
+    bool removedFromLastLayout = false;
     {
-        const bool wasLast = layouts.empty();
-        if (wasLast)
+        NX_MUTEX_LOCKER lk(&mutex);
+        if (!NX_ASSERT(itemLayouts.contains(resourceId)))
+            return;
+        auto& layouts = itemLayouts[resourceId];
+        removedFromLayout = layouts.remove(layout);
+        removedFromLastLayout = layouts.empty();
+        if (removedFromLastLayout)
             itemLayouts.remove(resourceId);
+    }
 
+    if (removedFromLayout)
         emit q->removedFromLayout(resourceId, layout);
 
-        if (wasLast)
-            emit q->resourceRemoved(resourceId);
-    }
+    if (removedFromLastLayout)
+        emit q->resourceRemoved(resourceId);
 }
 
 } // namespace nx::vms::common
