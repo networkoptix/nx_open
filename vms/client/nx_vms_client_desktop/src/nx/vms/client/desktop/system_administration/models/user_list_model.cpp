@@ -43,12 +43,78 @@ bool isCustomUser(const QnUserResourcePtr& user)
 
 nx::vms::api::UserType userTypeForSort(nx::vms::api::UserType userType)
 {
-    switch (userType) {
+    switch (userType)
+    {
         case nx::vms::api::UserType::temporaryLocal:
             return nx::vms::api::UserType::local;
 
         default:
             return userType;
+    }
+}
+
+bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortColumn)
+{
+    const auto leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+    const auto rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+
+    if (!NX_ASSERT(rightUser))
+        return true;
+
+    if (!NX_ASSERT(leftUser))
+        return false;
+
+    switch (sortColumn)
+    {
+        case UserListModel::UserWarningColumn:
+        {
+            const QString leftText = left.data(Qt::ToolTipRole).toString();
+            const QString rightText = right.data(Qt::ToolTipRole).toString();
+
+            if (leftText != rightText)
+                return leftText < rightText;
+
+            return userLessThan(left, right, UserListModel::UserTypeColumn);
+        }
+
+        case UserListModel::UserTypeColumn:
+        {
+            const auto leftType = userTypeForSort(leftUser->userType());
+            const auto rightType = userTypeForSort(rightUser->userType());
+            if (leftType != rightType)
+                return leftType < rightType;
+
+            return userLessThan(left, right, UserListModel::LoginColumn);
+        }
+
+        case UserListModel::FullNameColumn:
+        case UserListModel::EmailColumn:
+        case UserListModel::UserGroupsColumn:
+        {
+            const QString leftText = left.data(Qt::DisplayRole).toString();
+            const QString rightText = right.data(Qt::DisplayRole).toString();
+
+            if (leftText != rightText)
+                return leftText < rightText;
+
+            return userLessThan(left, right, UserListModel::UserTypeColumn);
+        }
+
+        case UserListModel::IsCustomColumn:
+        {
+            const bool leftCustom = isCustomUser(leftUser);
+            const bool rightCustom = isCustomUser(rightUser);
+            if (leftCustom != rightCustom)
+                return leftCustom;
+
+            return userLessThan(left, right, UserListModel::UserTypeColumn);
+        }
+
+        default:
+        {
+            // Otherwise sort by login (which is unique):
+            return nx::utils::naturalStringLess(leftUser->getName(), rightUser->getName());
+        }
     }
 }
 
@@ -805,68 +871,7 @@ void SortedUserListModel::setSyncId(const QString& syncId)
 
 bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-    const auto leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
-    const auto rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
-
-    if (!NX_ASSERT(rightUser))
-        return true;
-
-    if (!NX_ASSERT(leftUser))
-        return false;
-
-    switch (sortColumn())
-    {
-        case UserListModel::UserWarningColumn:
-        {
-            const bool l =
-                leftUser->externalId().dn.isEmpty() || leftUser->externalId().syncId == m_syncId;
-            const bool r =
-                rightUser->externalId().dn.isEmpty() || rightUser->externalId().syncId == m_syncId;
-            if (l != r)
-                return r;
-
-            break;
-        }
-
-        case UserListModel::UserTypeColumn:
-        {
-            const auto leftType = userTypeForSort(leftUser->userType());
-            const auto rightType = userTypeForSort(rightUser->userType());
-            if (leftType != rightType)
-                return leftType < rightType;
-
-            break;
-        }
-
-        case UserListModel::FullNameColumn:
-        case UserListModel::EmailColumn:
-        case UserListModel::UserGroupsColumn:
-        {
-            const QString leftText = left.data(Qt::DisplayRole).toString();
-            const QString rightText = right.data(Qt::DisplayRole).toString();
-
-            if (leftText != rightText)
-                return leftText < rightText;
-
-            break;
-        }
-
-        case UserListModel::IsCustomColumn:
-        {
-            const bool leftCustom = isCustomUser(leftUser);
-            const bool rightCustom = isCustomUser(rightUser);
-            if (leftCustom != rightCustom)
-                return leftCustom;
-
-            break;
-        }
-
-        default:
-            break;
-    }
-
-    // Otherwise sort by login (which is unique):
-    return nx::utils::naturalStringLess(leftUser->getName(), rightUser->getName());
+    return userLessThan(left, right, sortColumn());
 }
 
 bool SortedUserListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
