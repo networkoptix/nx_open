@@ -363,6 +363,10 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
         state.parentGroupsEditable = systemContext()->accessController()->hasPermissions(
             state.groupId,
             Qn::WriteAccessRightsPermission);
+
+        state.deleteAvailable = systemContext()->accessController()->hasPermissions(
+            state.groupId,
+            Qn::RemovePermission);
     }
 
     return state;

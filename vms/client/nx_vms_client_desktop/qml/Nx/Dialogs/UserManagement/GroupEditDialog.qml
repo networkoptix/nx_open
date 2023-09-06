@@ -47,6 +47,7 @@ DialogWithState
     property bool parentGroupsEditable
     property bool membersEditable
     property bool permissionsEditable
+    property bool deleteAvailable
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
@@ -106,7 +107,7 @@ DialogWithState
                 groups: dialog.parentGroups
                 userCount: membersModel.users.length
                 groupCount: membersModel.groups.length
-                deleteAvailable: !dialog.isLdap && !dialog.isPredefined && !dialog.isSaving
+                deleteAvailable: !dialog.isSaving && dialog.deleteAvailable
                 editingContext: membersModel.editingContext
                 model: membersModel
                 parentGroupsEditable: dialog.parentGroupsEditable
