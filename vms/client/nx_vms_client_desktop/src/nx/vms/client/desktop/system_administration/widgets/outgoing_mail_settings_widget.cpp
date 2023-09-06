@@ -304,7 +304,12 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
         [this] { testSmtpConfiguration(); });
 
     q->connect(q->systemSettings(), &nx::vms::common::SystemSettings::cloudSettingsChanged, q,
-        [this] { ui->serviceTypeDropdown->setMenu(effectiveServiceTypeDropdownMenu()); });
+        [this]
+        {
+            ui->serviceTypeDropdown->setMenu(effectiveServiceTypeDropdownMenu());
+            if (getUseCloudServiceFromDialog())
+                updateCloudServiceStatus();
+        });
 
     q->connect(q, &OutgoingMailSettingsWidget::hasChangesChanged,
         [this]()
