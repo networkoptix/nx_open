@@ -139,14 +139,6 @@ struct UserGroupListModel::Private
         switch (index.column())
         {
             case GroupWarningColumn:
-            {
-                if (!NX_ASSERT(q->checkIndex(index)))
-                    return QString();
-
-                const auto& externalId = orderedGroups[index.row()].externalId;
-                return (externalId.dn.isEmpty() || externalId.syncId == syncId) ? "0" : "1";
-            }
-
             case GroupTypeColumn:
                 return q->data(index, Qt::ToolTipRole).toString();
 
@@ -162,8 +154,20 @@ struct UserGroupListModel::Private
 
     QString combinedSortKey(const QModelIndex& index) const
     {
-        const int ldapDefaultKey = (q->checkIndex(index)
-            && orderedGroups[index.row()].id == nx::vms::api::kDefaultLdapGroupId) ? 0 : 1;
+        if (!q->checkIndex(index))
+            return {};
+
+        const auto groupId = orderedGroups[index.row()].id;
+        const int ldapDefaultKey = groupId == nx::vms::api::kDefaultLdapGroupId ? 0 : 1;
+
+        const auto groupsPreSortKey =
+            [&]() -> QString
+            {
+                if (common::PredefinedUserGroups::contains(groupId))
+                    return groupId.toString();
+
+                return QString::number(ldapDefaultKey);
+            };
 
         switch (index.column())
         {
@@ -175,7 +179,7 @@ struct UserGroupListModel::Private
             case GroupTypeColumn:
                 return nx::format("%1\n%2\n%3",
                     sortKey(index.siblingAtColumn(GroupTypeColumn)),
-                    ldapDefaultKey,
+                    groupsPreSortKey(),
                     sortKey(index.siblingAtColumn(NameColumn))).toQString();
 
             case NameColumn:
@@ -194,14 +198,14 @@ struct UserGroupListModel::Private
                 return nx::format("%1\n%2\n%3\n%4",
                     sortKey(index.siblingAtColumn(ParentGroupsColumn)),
                     sortKey(index.siblingAtColumn(GroupTypeColumn)),
-                    ldapDefaultKey,
+                    groupsPreSortKey(),
                     sortKey(index.siblingAtColumn(NameColumn))).toQString();
 
             case PermissionsColumn:
                 return nx::format("%1\n%2\n%3\n%4",
                     sortKey(index.siblingAtColumn(PermissionsColumn)),
                     sortKey(index.siblingAtColumn(GroupTypeColumn)),
-                    ldapDefaultKey,
+                    groupsPreSortKey(),
                     sortKey(index.siblingAtColumn(NameColumn))).toQString();
 
             default:
