@@ -27,7 +27,7 @@ TextFieldWithValidator
     property bool showFakePassword: false
 
     textField.placeholderTextColor: showFakePassword
-        ? (textField.focus ? textField.selectedTextColor : textField.color)
+        ? (focus ? textField.selectedTextColor : textField.color)
         : ""
     textField.placeholderText: !showFakePassword
         ? ""
