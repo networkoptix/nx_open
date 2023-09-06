@@ -308,6 +308,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     d->isExportedLayout = layoutResource()->isFile();
     d->isPreviewSearchLayout = layoutResource()->isPreviewSearchLayout();
 
+    if (d->isExportedLayout)
+    {
+        const auto layout = layoutResource().dynamicCast<QnFileLayoutResource>();
+        if (NX_ASSERT(layout))
+        {
+            d->noExportPermission = layout->metadata().itemProperties[item->uuid()].flags.testFlag(
+                NovItemProperties::Flag::noExportPermission);
+        }
+    }
+
     initRenderer();
     initDisplay();
 
@@ -2346,6 +2356,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::VideowallWithoutLicenseOverlay;
         }
     }
+
+    if (d->noExportPermission)
+        return Qn::NoExportPermissionOverlay;
 
     if (!d->hasAccess())
         return Qn::AccessDeniedOverlay;

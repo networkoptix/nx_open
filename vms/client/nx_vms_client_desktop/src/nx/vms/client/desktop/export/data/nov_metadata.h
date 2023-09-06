@@ -13,9 +13,15 @@ struct NovItemProperties
 {
     QString name;
     qint64 timeZoneOffset = 0;
+
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Flag,
+        empty,
+        noExportPermission)
+    using Flags = QFlags<Flag>;
+    Flags flags = Flag::empty;
 };
 using NovItemPropertiesMap = std::unordered_map<QnUuid, NovItemProperties>;
-NX_REFLECTION_INSTRUMENT(NovItemProperties, (name)(timeZoneOffset))
+NX_REFLECTION_INSTRUMENT(NovItemProperties, (name)(timeZoneOffset)(flags))
 
 /** Metadata file, describing exported nov-file contents. */
 struct NovMetadata

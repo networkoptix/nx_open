@@ -53,6 +53,8 @@ public:
 
     core::IOModuleMonitorPtr ioModuleMonitor;
 
+    bool noExportPermission = false; //< Relevant on for items on an exported layout.
+
     QScopedPointer<nx::vms::client::core::ConsumingMotionMetadataProvider> motionMetadataProvider;
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;
 
