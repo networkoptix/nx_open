@@ -57,11 +57,11 @@ TEST(Lexical, enumSerialization)
     EXPECT_EQ("Low", nx::reflect::toString(FailoverPriority::low));
     EXPECT_EQ(
         "CameraBackupHighQuality",
-        nx::reflect::toString(CameraBackupQuality::CameraBackup_HighQuality));
+        nx::reflect::toString(CameraBackupQuality::CameraBackupHighQuality));
     EXPECT_EQ(
         "CameraBackupHighQuality",
         nx::reflect::toString(
-            CameraBackupQuality(CameraBackupQuality::CameraBackup_HighQuality)));
+            CameraBackupQuality(CameraBackupQuality::CameraBackupHighQuality)));
     EXPECT_EQ("Form", nx::reflect::toString(IoModuleVisualStyle::form));
     EXPECT_EQ("SF_RemoteEC", nx::reflect::toString(ServerFlag::SF_RemoteEC));
     EXPECT_EQ("SF_RemoteEC", nx::reflect::toString(ServerFlags(ServerFlag::SF_RemoteEC)));
@@ -71,16 +71,16 @@ TEST(Lexical, enumSerialization)
 }
 
 TEST(Lexical, deprecatedServerFlags)
-{    
+{
     // The following Server Flags have been declared obsolete, but must be properly deserialized
     // from their original names for compatibility.
-    
+
     EXPECT_EQ(ServerFlag::SF_deprecated_AutoSystemName,
         nx::reflect::fromString<ServerFlag>("SF_AutoSystemName"));
 
     EXPECT_EQ(ServerFlag::SF_deprecated_RequiresEdgeLicense,
         nx::reflect::fromString<ServerFlag>("SF_RequiresEdgeLicense"));
-        
+
     EXPECT_EQ(ServerFlag::SF_deprecated_HasHDD,
         nx::reflect::fromString<ServerFlag>("SF_Has_HDD"));
 }
@@ -91,20 +91,20 @@ TEST(Lexical, simpleStringsEnumDeserialization)
 
     EXPECT_EQ(
         nx::reflect::fromString<Quality>("CameraBackupHighQuality"),
-        Quality::CameraBackup_HighQuality);
+        Quality::CameraBackupHighQuality);
 
 
     EXPECT_EQ(
         nx::reflect::fromString<Quality>("CameraBackupBoth"),
-        Quality::CameraBackup_Both);
+        Quality::CameraBackupBoth);
 }
 
 TEST(Lexical, numericDeserialization)
 {
     using Quality = CameraBackupQuality;
 
-    EXPECT_EQ(nx::reflect::fromString<Quality>("1"), Quality::CameraBackup_HighQuality);
-    EXPECT_EQ(nx::reflect::fromString<Quality>("0"), Quality::CameraBackup_Both);
+    EXPECT_EQ(nx::reflect::fromString<Quality>("1"), Quality::CameraBackupHighQuality);
+    EXPECT_EQ(nx::reflect::fromString<Quality>("0"), Quality::CameraBackupBoth);
 }
 
 TEST(Lexical, peerType)

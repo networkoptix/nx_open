@@ -144,7 +144,7 @@ struct NX_VMS_API CameraAttributesData
     FailoverPriority failoverPriority = FailoverPriority::medium;
 
     /**%apidoc[opt] Combination (via "|") of the flags defining backup options. */
-    CameraBackupQuality backupQuality = CameraBackup_Default;
+    CameraBackupQuality backupQuality = CameraBackupDefault;
 
     /**%apidoc[opt] Logical id of the device, set by user. */
     QString logicalId;
