@@ -48,6 +48,7 @@ DialogWithState
     property bool membersEditable
     property bool permissionsEditable
     property bool deleteAvailable
+    property bool continuousSync
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
@@ -108,6 +109,7 @@ DialogWithState
                 userCount: membersModel.users.length
                 groupCount: membersModel.groups.length
                 deleteAvailable: !dialog.isSaving && dialog.deleteAvailable
+                continuousSync: dialog.continuousSync
                 editingContext: membersModel.editingContext
                 model: membersModel
                 parentGroupsEditable: dialog.parentGroupsEditable
