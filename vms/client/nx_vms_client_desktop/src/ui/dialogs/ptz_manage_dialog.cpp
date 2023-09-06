@@ -44,7 +44,7 @@ static const QColor kLight1Color = "#FFFFFF";
 static const QColor kLight10Color = "#A5B7C0";
 static const QColor kLight4Color = "#E1E7EA";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kLight1Color, "light1"}, {kLight10Color, "light10"}, {kLight4Color, "light4"}}},
+    {QnIcon::Normal, {{kLight1Color, "light1"}, {kLight10Color, "light1"}, {kLight4Color, "light4"}}},
 };
 
 } // namespace
