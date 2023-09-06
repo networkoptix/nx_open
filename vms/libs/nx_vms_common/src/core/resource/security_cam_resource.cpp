@@ -1460,7 +1460,7 @@ void QnSecurityCamResource::setBackupQuality(nx::vms::api::CameraBackupQuality v
 nx::vms::api::CameraBackupQuality QnSecurityCamResource::getActualBackupQualities() const
 {
     nx::vms::api::CameraBackupQuality result = getBackupQuality();
-    if (result != nx::vms::api::CameraBackupQuality::CameraBackup_Default)
+    if (result != nx::vms::api::CameraBackupQuality::CameraBackupDefault)
         return result;
 
     /* If backup is not configured on this camera, use 'Backup newly added cameras' value */
