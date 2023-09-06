@@ -4,6 +4,9 @@
 
 #include <cmath>
 
+#include <QtGui/QGuiApplication>
+#include <QtGui/QPainter>
+
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -151,10 +154,13 @@ void TimeSynchronizationServersDelegate::paintName(
 
     if (textEnd > textPos.x())
     {
+        const auto devicePixelRatio = painter->device()->devicePixelRatio();
+
         const auto main = m_textPixmapCache.pixmap(
             option.text,
             option.font,
             textColor,
+            devicePixelRatio,
             textEnd - textPos.x() + 1,
             option.textElideMode);
 
@@ -172,6 +178,7 @@ void TimeSynchronizationServersDelegate::paintName(
                 extraInfo,
                 option.font,
                 ipAddressColor,
+                devicePixelRatio,
                 textEnd - textPos.x(),
                 option.textElideMode);
 
@@ -229,10 +236,13 @@ void TimeSynchronizationServersDelegate::paintTime(
 
     if (textEnd > textPos.x())
     {
+        const auto devicePixelRatio = painter->device()->devicePixelRatio();
+
         const auto main = m_textPixmapCache.pixmap(
             option.text,
             option.font,
             textColor,
+            devicePixelRatio,
             textEnd - textPos.x() + 1,
             option.textElideMode);
 
@@ -251,6 +261,7 @@ void TimeSynchronizationServersDelegate::paintTime(
                 extraInfo,
                 option.font,
                 extraColor,
+                devicePixelRatio,
                 textEnd - textPos.x(),
                 option.textElideMode);
 

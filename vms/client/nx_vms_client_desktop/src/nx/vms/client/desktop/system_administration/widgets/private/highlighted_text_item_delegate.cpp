@@ -48,12 +48,13 @@ public:
     {
     }
 
-    QPixmap* getPixmap(const QString& text, const QStyleOptionViewItem& option) const
+    QPixmap* getPixmap(
+        const QString& text, const QStyleOptionViewItem& option, qreal pixelRatio) const
     {
         CacheKey key
         {
             .text = text,
-            .width = option.rect.width(),
+            .width = qRound(option.rect.width() * pixelRatio),
             .color = option.palette.color(QPalette::Text),
             .font = option.font
         };
@@ -70,8 +71,7 @@ public:
 
             WidgetUtils::elideTextRight(&doc, key.width);
 
-            const auto pixelRatio = qApp->devicePixelRatio();
-            const auto pixmapSize = doc.size().toSize() * pixelRatio;
+            const auto pixmapSize = (doc.size() * pixelRatio).toSize();
 
             QImage image(pixmapSize, QImage::Format_ARGB32_Premultiplied);
 
@@ -188,7 +188,7 @@ void HighlightedTextItemDelegate::paint(
         Private::getSearchRx(opt),
         core::colorTheme()->color("yellow_d1"));
 
-    if (QPixmap* pixmap = d->getPixmap(text, opt))
+    if (QPixmap* const pixmap = d->getPixmap(text, opt, painter->device()->devicePixelRatio()))
     {
         painter->save();
 

@@ -49,6 +49,9 @@ public:
     const QColor& tickmarkColor(int level) const;
     void setTickmarkColor(int level, const QColor& color);
 
+    qreal devicePixelRatio() const;
+    void setDevicePixelRatio(qreal value);
+
     const QPixmap& tickmarkTextPixmap(int level, milliseconds position, int height, const QnTimeStep& step);
     const QPixmap& dateTextPixmap(milliseconds position, int height, const QnTimeStep& step);
 
@@ -69,12 +72,14 @@ private:
     QVector<QFont> m_tickmarkFonts;
     QVector<QColor> m_tickmarkColors;
 
-    QnTextPixmapCache* m_cache;
+    qreal m_devicePixelRatio = 1.0;
 
-    typedef QCache<qint32, const QPixmap> ShortKeyCache;
+    QnTextPixmapCache* const m_cache;
+
+    using ShortKeyCache = QCache<qint32, const QPixmap>;
     QVector<ShortKeyCache*> m_pixmapByShortPositionKey;
 
-    typedef QCache<QnTimeStepLongCacheKey, const QPixmap> LongKeyCache;
+    using LongKeyCache = QCache<QnTimeStepLongCacheKey, const QPixmap>;
     LongKeyCache m_pixmapByLongPositionKey;
 };
 
