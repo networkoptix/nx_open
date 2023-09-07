@@ -90,6 +90,27 @@ QVariant ParentGroupsProvider::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return group().name;
 
+        case Qt::ToolTipRole:
+        {
+            const auto currentGroup = group();
+
+            if (currentGroup.type == nx::vms::api::UserType::ldap)
+                return tr("LDAP group membership is managed in LDAP");
+
+            QStringList names;
+            for (const QnUuid& id: currentGroup.parentGroupIds)
+            {
+                const auto group = m_context->systemContext()->userGroupManager()->find(id);
+                if (group)
+                    names.append(group->name);
+            }
+
+            if (!names.isEmpty())
+                return tr("Inherited from %1").arg("<b>" + names.join("</b>, <b>") + "</b>");
+
+            return {};
+        }
+
         case MembersModel::IsLdap:
             return group().type == nx::vms::api::UserType::ldap;
 
