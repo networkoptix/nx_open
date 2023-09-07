@@ -70,6 +70,7 @@ void SettingsDialogManager::editUser(const QnUuid& userId, int tab, QWidget* par
     {
         d->userSettingsDialog = new UserSettingsDialog(
             UserSettingsDialog::DialogType::EditUser, systemContext(), parent);
+        d->userSettingsDialog->setRestoreLastPositionWhenOpened();
         connect(d->userSettingsDialog.get(), &UserSettingsDialog::done, this,
             [this]() { setCurrentEditedUserId({}); });
         d->userSettingsDialog->setUser(resourcePool()->getResourceById<QnUserResource>(userId));
@@ -128,6 +129,7 @@ void SettingsDialogManager::editGroup(const QnUuid& groupId, QWidget* parent)
     {
         d->groupSettingsDialog = new GroupSettingsDialog(
             GroupSettingsDialog::editGroup, systemContext(), parent);
+        d->groupSettingsDialog->setRestoreLastPositionWhenOpened();
         connect(d->groupSettingsDialog.get(), &GroupSettingsDialog::done, this,
             [this]() { setCurrentEditedGroupId({}); });
         d->groupSettingsDialog->setGroup(groupId);
