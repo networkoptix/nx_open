@@ -29,6 +29,8 @@ class NX_VMS_CLIENT_DESKTOP_API QmlDialogWrapper: public QObject
         NOTIFY initialPropertiesChanged)
     Q_PROPERTY(QWindow* transientParent READ transientParent WRITE setTransientParent
         NOTIFY transientParentChanged)
+    Q_PROPERTY(bool restoreLastPositionWhenOpened READ restoreLastPositionWhenOpened
+        WRITE setRestoreLastPositionWhenOpened NOTIFY restoreLastPositionWhenOpenedChanged)
 
 public:
     QmlDialogWrapper();
@@ -69,11 +71,16 @@ public:
     /** Change dialog maximized state now or when shown if currently it isn't visible. */
     void setMaximized(bool value);
 
+    /** If true, the dialog will restore its previous position when opened after being closed. */
+    bool restoreLastPositionWhenOpened() const;
+    void setRestoreLastPositionWhenOpened(bool value = true);
+
 signals:
     void initialized();
     void sourceChanged();
     void initialPropertiesChanged();
     void transientParentChanged();
+    void restoreLastPositionWhenOpenedChanged();
 
     /** Emitted when the wrapped dialog changes either accepted or rejected. */
     void done(bool accepted);
