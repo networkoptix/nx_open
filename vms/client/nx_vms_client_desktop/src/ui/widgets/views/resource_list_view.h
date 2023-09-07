@@ -6,6 +6,7 @@
 
 #include <QtWidgets/QTreeView>
 
+#include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/widgets/tree_view.h>
 
@@ -29,10 +30,24 @@ public:
      * If parent is not specified, the view uses normal vertical scroll bar. */
     explicit QnResourceListView(QWidget* parent = nullptr);
 
+    explicit QnResourceListView(Qn::ResourceInfoLevel infoLevel, QWidget* parent = nullptr);
+
     /** Default constructor. Will set SortAsInTreeOption as options. */
     explicit QnResourceListView(const QnResourceList& resources, QWidget* parent = nullptr);
 
-    QnResourceListView(const QnResourceList& resources, Options options, QWidget* parent = nullptr);
+    explicit QnResourceListView(
+        const QnResourceList& resources,
+        Qn::ResourceInfoLevel infoLevel,
+        QWidget* parent = nullptr);
+
+    QnResourceListView(
+        const QnResourceList& resources, Options options, QWidget* parent = nullptr);
+
+    QnResourceListView(
+        const QnResourceList& resources,
+        Options options,
+        Qn::ResourceInfoLevel infoLevel,
+        QWidget* parent = nullptr);
 
     QnResourceList resources() const;
     void setResources(const QnResourceList& resources);

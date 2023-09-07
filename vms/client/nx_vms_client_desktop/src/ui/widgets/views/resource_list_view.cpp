@@ -23,6 +23,11 @@ static constexpr int kRecommendedWidth = 284;
 }
 
 QnResourceListView::QnResourceListView(QWidget* parent):
+    QnResourceListView(Qn::RI_WithUrl, parent)
+{
+}
+
+QnResourceListView::QnResourceListView(Qn::ResourceInfoLevel infoLevel, QWidget* parent):
     base_type(parent),
     m_model(new QnResourceListModel(this))
 {
@@ -37,7 +42,7 @@ QnResourceListView::QnResourceListView(QWidget* parent):
     setProperty(nx::style::Properties::kSideIndentation, QVariant::fromValue(QnIndents()));
 
     auto itemDelegate = new QnResourceItemDelegate(this);
-    itemDelegate->setCustomInfoLevel(Qn::RI_WithUrl);
+    itemDelegate->setCustomInfoLevel(infoLevel);
     setItemDelegate(itemDelegate);
 
     if (parent)
@@ -47,18 +52,33 @@ QnResourceListView::QnResourceListView(QWidget* parent):
     }
 }
 
+QnResourceListView::QnResourceListView(const QnResourceList& resources, QWidget* parent):
+    QnResourceListView(resources, Qn::RI_WithUrl, parent)
+{
+}
+
 QnResourceListView::QnResourceListView(const QnResourceList& resources,
     Options options,
+    Qn::ResourceInfoLevel infoLevel,
     QWidget* parent)
     :
-    QnResourceListView(parent)
+    QnResourceListView(infoLevel, parent)
 {
     setOptions(options);
     setResources(resources);
 }
 
-QnResourceListView::QnResourceListView(const QnResourceList& resources, QWidget* parent):
-    QnResourceListView(resources, SortAsInTreeOption, parent)
+QnResourceListView::QnResourceListView(
+    const QnResourceList& resources, Qn::ResourceInfoLevel infoLevel, QWidget* parent)
+    :
+    QnResourceListView(resources, SortAsInTreeOption, infoLevel, parent)
+{
+}
+
+QnResourceListView::QnResourceListView(
+    const QnResourceList& resources, Options options, QWidget* parent)
+    :
+    QnResourceListView(resources, options, Qn::RI_WithUrl, parent)
 {
 }
 
