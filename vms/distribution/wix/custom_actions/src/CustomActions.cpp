@@ -404,16 +404,16 @@ UINT __stdcall CleanAutorunRegistryKeys(MSIHANDLE hInstall)
         return wca.failure();
     }
 
-	if (keyPrefix.GetLength() == 0)
+    if (keyPrefix.GetLength() == 0)
     {
-		WcaLog(LOGMSG_STANDARD, "Client name is empty");
+        WcaLog(LOGMSG_STANDARD, "Client name is empty");
         return wca.failure();
-	}
+    }
 
     DWORD dwSize = MAX_PATH, dwIndex = 0;
     TCHAR tcsStringName[MAX_PATH];
 
-	std::vector<CAtlString> valuesToRemove;
+    std::vector<CAtlString> valuesToRemove;
 
     while (RegEnumValue(
         RegKey.m_hKey, dwIndex, tcsStringName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
@@ -422,7 +422,7 @@ UINT __stdcall CleanAutorunRegistryKeys(MSIHANDLE hInstall)
         WcaLog(LOGMSG_STANDARD, "Found key: %S", tcsStringName);
         if (stringName.Find(keyPrefix) == 0)
         {
-			valuesToRemove.push_back(stringName);
+            valuesToRemove.push_back(stringName);
             WcaLog(LOGMSG_STANDARD, "Deleting");
         }
         else
@@ -431,11 +431,11 @@ UINT __stdcall CleanAutorunRegistryKeys(MSIHANDLE hInstall)
         }
 
         dwIndex++;
-		dwSize = MAX_PATH;
+        dwSize = MAX_PATH;
     }
 
-	for (const auto& value: valuesToRemove)
-		RegKey.DeleteValue(value);
+    for (const auto& value: valuesToRemove)
+        RegKey.DeleteValue(value);
     RegKey.Close();
 
     return wca.success();
@@ -457,15 +457,63 @@ UINT __stdcall CleanClientRegistryKeys(MSIHANDLE hInstall)
     CRegKey regKey;
     if(regKey.Open(HKEY_CURRENT_USER,
         keyParent,
-        KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS)
-    {
-        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)keyParent);
-        return wca.failure();
-    }
-    else
+        KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) == ERROR_SUCCESS)
     {
         regKey.RecurseDeleteKey(keyName);
         regKey.Close();
     }
+    else
+    {
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key `%S` for `%S` deletion. Skipping operation.",
+            (LPCWSTR)keyParent, (LPCWSTR)keyName);
+    }
+    return wca.success();
+}
+
+bool dirExists(const CString& dirName)
+{
+    return GetFileAttributes(dirName) != INVALID_FILE_ATTRIBUTES;
+}
+
+UINT __stdcall DeleteClientConfigFiles(MSIHANDLE hInstall)
+{
+    WcaHelper wca;
+    if (!wca.open(hInstall, "DeleteClientConfigFiles"))
+        return wca.failure();
+
+    CString configsFolder = GetProperty(hInstall, L"CustomActionData");
+
+    try
+    {
+        WcaLog(LOGMSG_STANDARD, "Deleting client configs `%S`.", configsFolder);
+
+        if (!dirExists(configsFolder))
+        {
+            WcaLog(LOGMSG_STANDARD, "Configs directory doesn't exist `%S`.", configsFolder);
+            return wca.success();
+        }
+
+        configsFolder += '\0';
+
+        SHFILEOPSTRUCT fileOperationDescription = {0};
+        fileOperationDescription.wFunc = FO_DELETE;
+        fileOperationDescription.pFrom = configsFolder;
+        // Do not show any dialogs.
+        fileOperationDescription.fFlags =
+            FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;
+
+        if (SHFileOperation(&fileOperationDescription) != 0)
+        {
+            WcaLog(LOGMSG_STANDARD, "Couldn't delete configs directory `%S`.", configsFolder);
+            return wca.failure();
+        }
+    }
+    catch (const Error& e)
+    {
+        WcaLog(LOGMSG_STANDARD, "Couldn't delete client config directory `%S`. Error: %S",
+            configsFolder, e.msg());
+        return wca.failure();
+    }
+
     return wca.success();
 }

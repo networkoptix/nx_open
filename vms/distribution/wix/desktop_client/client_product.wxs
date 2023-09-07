@@ -61,6 +61,20 @@
             Impersonate="yes"/>
 
         <CustomAction
+            Id="DeleteClientConfigFiles_Cmd"
+            Property="DeleteClientConfigFiles"
+            Value="${client_configs_path}"
+            Execute="immediate"
+            Impersonate="yes"/>
+
+        <CustomAction
+            Id="DeleteClientConfigFiles"
+            BinaryKey="CustomActions.dll"
+            DllEntry="DeleteClientConfigFiles"
+            Execute="deferred"
+            Impersonate="yes"/>
+
+        <CustomAction
             Id="ResetPreselected"
             Property="Preselected"
             Value="" />
@@ -142,9 +156,11 @@
             <Custom Action="CleanClientRegistryKeys" After="CleanClientRegistryKeys_Cmd">$(var.msiFullUninstall)</Custom>
             <Custom Action="CloseApplauncherAction_Cmd" After="CleanClientRegistryKeys">$(var.msiFullUninstall)</Custom>
             <Custom Action="CloseApplauncherAction" After="CloseApplauncherAction_Cmd">$(var.msiFullUninstall)</Custom>
+            <Custom Action="DeleteClientConfigFiles_Cmd" After="CloseApplauncherAction">$(var.msiFullUninstall)</Custom>
+            <Custom Action="DeleteClientConfigFiles" After="DeleteClientConfigFiles_Cmd">$(var.msiFullUninstall)</Custom>
 
             <!-- Old applauncher must be killed in any scenario except clean install. -->
-            <Custom Action="CloseOldApplauncherAction_Cmd" Before="CloseApplauncherAction">Installed</Custom>
+            <Custom Action="CloseOldApplauncherAction_Cmd" Before="DeleteClientConfigFiles">Installed</Custom>
             <Custom Action="CloseOldApplauncherAction" Before="StopServices">Installed</Custom>
         </InstallExecuteSequence>
 
