@@ -13,7 +13,10 @@
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/password_input_field.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
@@ -144,8 +147,19 @@ void SessionRefreshDialog::refreshSession()
             if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
             {
                 NX_DEBUG(this, "Received token with length: %1", session->token.length());
-
-                if (NX_ASSERT(!session->token.empty()))
+                
+                if (context()->user()->isTemporary() && context()->user()->getId() != session->id)
+                {
+                    desktop::LogonData logonData;
+                    logonData.address = m_address;
+                    logonData.credentials = {session->username.toStdString(), m_token};
+                    logonData.userType = nx::vms::api::UserType::temporaryLocal;
+                    logonData.storeSession = false;
+                    menu()->trigger(ui::action::ConnectAction,
+                        ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
+                    base_type::reject();
+                }
+                else if (NX_ASSERT(!session->token.empty()))
                 {
                     m_validationResult = ValidationResult::kValid;
                     m_refreshResult.token = nx::network::http::BearerAuthToken(session->token);
@@ -192,6 +206,9 @@ void SessionRefreshDialog::refreshSession()
             const QUrlQuery query{url.toQUrl()};
             loginRequest.token  = query.queryItemValue("auth");
         }
+
+        m_address = nx::network::SocketAddress(url.host(), url.port());
+        m_token = nx::network::http::BearerAuthToken{loginRequest.token.toStdString()};
 
         lockUi(true);
         if (auto api = connectedServerApi(); NX_ASSERT(api, "No Server connection"))
