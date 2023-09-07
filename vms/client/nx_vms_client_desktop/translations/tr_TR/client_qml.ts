@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Giriş Ekle</translation>
     </message>
     <message>
       <source>Add</source>
@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>Name Attribute</source>
-      <translation type="unfinished">Name Attribute</translation>
+      <translation>Ad Özniteliği</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>Group Attribute</source>
-      <translation type="unfinished">Group Attribute</translation>
+      <translation>Grup Özelliği</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
@@ -269,7 +269,7 @@
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>%1 etkinleştirilsin mi?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -289,11 +289,11 @@
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>%1 kaldırılsın mı?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Bu, Entegrasyon isteğini kaldıracak</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -469,7 +469,7 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>LDAP sunucusu sertifikası hatalarını yoksay</translation>
     </message>
     <message>
       <source>Test</source>
@@ -814,7 +814,7 @@
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Grup - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -884,7 +884,7 @@
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Üye eklemek için soldaki kontrolleri kullanın</translation>
     </message>
     <message>
       <source>Members summary</source>
@@ -1623,19 +1623,19 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 saat</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 saat</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 gün</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 gün</translation>
     </message>
   </context>
   <context>
@@ -1694,7 +1694,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>İzinlerle Kullanılabilir</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -1706,7 +1706,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Web Sayfaları &amp; Entegrasyonlar</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -2165,7 +2165,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Güvenli olmayan (özet) kimlik doğrulamasına izin ver</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
