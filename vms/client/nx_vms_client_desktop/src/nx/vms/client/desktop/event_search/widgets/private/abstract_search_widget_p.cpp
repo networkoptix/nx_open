@@ -67,16 +67,17 @@ constexpr milliseconds kPlaceholderFadeDuration = 150ms;
 constexpr auto kPlaceholderFadeEasing = QEasingCurve::InOutQuad;
 
 static const QColor kLight16Color = "#698796";
+static const QColor kDark17Color = "#53707F";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}}},
+    {QIcon::Normal, {{kLight16Color, "light16"}, {kDark17Color, "light16"}}},
+    {QIcon::Active, {{kLight16Color, "light17"}, {kDark17Color, "light17"}}},
+    {QIcon::Selected, {{kLight16Color, "light15"}, {kDark17Color, "light15"}}},
 };
 
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kCheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light2"}}},
-    {QIcon::Active, {{kLight16Color, "light1"}}},
-    {QIcon::Selected, {{kLight16Color, "light3"}}},
+    {QIcon::Normal, {{kLight16Color, "light2"}, {kDark17Color, "light2"}}},
+    {QIcon::Active, {{kLight16Color, "light1"}, {kDark17Color, "light1"}}},
+    {QIcon::Selected, {{kLight16Color, "light3"}, {kDark17Color, "light3"}}},
 };
 
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
