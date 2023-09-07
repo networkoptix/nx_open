@@ -73,7 +73,9 @@ static QString makeRectLogLinesIfNeeded(
     {
         const auto& object = objectMetadataList.at(i);
         result.append(kIndent);
-        result.append(objectLogLinePrefix + " ");
+
+        if (!objectLogLinePrefix.isEmpty())
+            result.append("(" + objectLogLinePrefix + ") ");
 
         result.append(toString(object));
 
@@ -104,11 +106,11 @@ static QString makeBestShotDescriptionLines(const std::vector<ObjectMetadata>& o
         bestShotMetadataList,
         (bestShotMetadataList.size() == 1
             ? ""
-            : "WARNING: Multiple best shot items in the object packet:"));
+            : "WARNING: Multiple best shot items in the object packet"));
 
     result += makeRectLogLinesIfNeeded(
         nonBestShotObjectMetadataList,
-        "WARNING: Best shot packet contains non-best-shot metadata:");
+        "WARNING: Best shot packet contains non-best-shot metadata");
 
     return result;
 }
@@ -315,7 +317,7 @@ QString MetadataLogger::buildObjectMetadataLogString(
         + "diffFromCurrentTimeMs " + toMsString(currentPacketTimestamp - vmsSystemTime)
         + additionalInfoStr
         + (metadataPacket.containsBestShotMetadata()
-            ? "; bestShot:" + makeBestShotDescriptionLines(metadataPacket.objectMetadataList)
+            ? "; bestShot:\n" + makeBestShotDescriptionLines(metadataPacket.objectMetadataList)
             : "; objects: " + QString::number(metadataPacket.objectMetadataList.size()) + ":\n"
                 + makeRectLogLinesIfNeeded(metadataPacket.objectMetadataList));
 }
