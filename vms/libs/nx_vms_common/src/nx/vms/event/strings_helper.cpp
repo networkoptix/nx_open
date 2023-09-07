@@ -14,8 +14,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/network/nettools.h> //< For resolveAddress.
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/assert.h>
@@ -24,8 +23,8 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/html/html.h>
-#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/time/formatter.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/id.h>
@@ -1003,12 +1002,14 @@ QString StringsHelper::actionSubjects(
         if (users.size() == 1 && groups.empty())
             return users.front()->getName();
 
-        if (users.empty() && groups.size() == 1)
+        if (users.empty() && groups.size() <= 2)
         {
-            return lit("%1 %2 %3")
-                .arg(tr("Group"))
-                .arg(QChar(L'\x2013')) //< En-dash.
-                .arg(groups.front().name);
+            QStringList groupNames;
+            for (const auto& group: groups)
+                groupNames.push_back(std::move(group.name));
+            groupNames.sort(Qt::CaseInsensitive);
+
+            return groupNames.join(", ");
         }
     }
 
@@ -1021,13 +1022,6 @@ QString StringsHelper::actionSubjects(
             .arg(tr("%n Groups", "", groups.size()))
             .arg(tr("%n Users", "", users.size()));
     }
-
-    std::set<QnUuid> groupIds;
-    for (const auto& group: groups)
-        groupIds.insert(group.id);
-
-    if (groupIds == kAllPowerUserGroupIds)
-        return tr("All Power Users");
 
     return tr("%n Groups", "", groups.size());
 }
