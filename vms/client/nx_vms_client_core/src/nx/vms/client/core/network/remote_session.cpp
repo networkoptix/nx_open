@@ -18,7 +18,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
@@ -364,7 +363,7 @@ void RemoteSession::setState(State value)
     if (d->state == value)
         return;
 
-    NX_DEBUG(this, "Setting new session state: %1", value);
+    NX_DEBUG(this, "Session state change: %1 -> %2", d->state, value);
     d->state = value;
     emit stateChanged(value);
 }
@@ -394,6 +393,16 @@ void RemoteSession::tryToRestoreConnection()
         return;
 
     d->reconnectHelper = std::make_unique<ReconnectHelper>(systemContext(), d->stickyReconnect);
+
+    // Message bus may disconnect before full info processing.
+    if (d->reconnectHelper->empty() && state() != State::connected)
+    {
+        d->activeServerReconnectErrorCode = RemoteConnectionErrorCode::genericNetworkError;
+        NX_ASSERT(checkIfReconnectFailed(), "State: %1", state());
+
+        return;
+    }
+
     setState(State::reconnecting);
     reconnectStep();
 }
