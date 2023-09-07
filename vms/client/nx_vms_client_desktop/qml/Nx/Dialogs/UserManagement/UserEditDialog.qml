@@ -58,7 +58,6 @@ DialogWithState
     property bool permissionsEditable: true
 
     property alias linkEditable: generalSettings.linkEditable
-    property alias continuousSync: generalSettings.continuousSync
     property alias linkValidFrom: generalSettings.linkValidFrom
     property alias linkValidUntil: generalSettings.linkValidUntil
     property alias expiresAfterLoginS: generalSettings.expiresAfterLoginS
@@ -70,6 +69,7 @@ DialogWithState
     property alias tabIndex: tabControl.currentTabIndex
     property bool isSaving: false
     property bool ldapError: false
+    property bool continuousSync: true
     property alias editingContext: membersModel.editingContext
     property var self
 
@@ -112,6 +112,7 @@ DialogWithState
                 parentGroupsEditable: dialog.parentGroupsEditable
                 enabled: !dialog.isSaving
                 ldapError: dialog.ldapError
+                continuousSync: dialog.continuousSync
 
                 onDeleteRequested: dialog.deleteRequested()
                 onAuditTrailRequested: dialog.auditTrailRequested()

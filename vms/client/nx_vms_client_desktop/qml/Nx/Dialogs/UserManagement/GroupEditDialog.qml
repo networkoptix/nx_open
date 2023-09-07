@@ -48,13 +48,13 @@ DialogWithState
     property bool membersEditable
     property bool permissionsEditable
     property bool deleteAvailable
-    property bool continuousSync
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
     property bool isSaving: false
     property alias editingContext: membersModel.editingContext
     property var self
+    property bool continuousSync: true
 
     signal deleteRequested()
     signal addGroupRequested()
