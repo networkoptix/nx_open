@@ -339,6 +339,7 @@ Item
         anchors.left: parent.left
         anchors.top: accessRightsHeader.bottom
         anchors.bottom: parent.bottom
+        anchors.right: permissionsBackground.left
 
         width: searchField.width
 
