@@ -46,7 +46,6 @@ struct UserSettingsDialogState
     Q_PROPERTY(nx::vms::api::GlobalPermissions globalPermissions MEMBER globalPermissions)
     Q_PROPERTY(bool permissionsEditable MEMBER permissionsEditable)
     Q_PROPERTY(bool linkEditable MEMBER linkEditable)
-    Q_PROPERTY(bool continuousSync MEMBER continuousSync)
 
 public:
     bool operator==(const UserSettingsDialogState& other) const = default;
@@ -90,7 +89,6 @@ public:
     nx::vms::api::GlobalPermissions globalPermissions;
     bool permissionsEditable = true;
     bool linkEditable = true;
-    bool continuousSync = true;
 };
 
 class NX_VMS_CLIENT_DESKTOP_API UserSettingsDialog:

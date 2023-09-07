@@ -72,6 +72,7 @@ struct GroupSettingsDialog::Private
     QmlProperty<bool> isSaving;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<GroupSettingsDialog*> self; //< Used to call validate functions from QML.
+    QmlProperty<bool> continuousSync;
 
     QnUuid groupId;
     GroupSettingsDialogState originalState;
@@ -82,7 +83,8 @@ struct GroupSettingsDialog::Private
         tabIndex(q->rootObjectHolder(), "tabIndex"),
         isSaving(q->rootObjectHolder(), "isSaving"),
         editingContext(q->rootObjectHolder(), "editingContext"),
-        self(q->rootObjectHolder(), "self")
+        self(q->rootObjectHolder(), "self"),
+        continuousSync(q->rootObjectHolder(), "continuousSync")
     {
     }
 
@@ -146,6 +148,16 @@ GroupSettingsDialog::GroupSettingsDialog(
     {
         connect(rootObjectHolder()->object(), SIGNAL(deleteRequested()),
             this, SLOT(onDeleteRequested()));
+
+        connect(globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
+            [this]()
+            {
+                d->continuousSync = globalSettings()->ldap().continuousSync
+                    == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+            });
+
+        d->continuousSync = globalSettings()->ldap().continuousSync
+            == nx::vms::api::LdapSettings::Sync::usersAndGroups;
     }
 
     connect(systemContext->userGroupManager(), &common::UserGroupManager::addedOrUpdated, this,
@@ -369,10 +381,6 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
         state.deleteAvailable = systemContext()->accessController()->hasPermissions(
             state.groupId,
             Qn::RemovePermission);
-
-        state.continuousSync =
-            globalSettings()->ldap().continuousSync ==
-            nx::vms::api::LdapSettings::Sync::usersAndGroups;
     }
 
     return state;
