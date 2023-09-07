@@ -155,9 +155,7 @@ MembershipSettings
             offset: 0
             interactive: model.isParent
             enabled: control.enabled && control.editable && model.isParent && model.canEditMembers
-            GlobalToolTip.text: model.isLdap
-                ? qsTr("LDAP group membership is managed in LDAP")
-                : ""
+            GlobalToolTip.text: model.toolTip || ""
         }
     }
 }

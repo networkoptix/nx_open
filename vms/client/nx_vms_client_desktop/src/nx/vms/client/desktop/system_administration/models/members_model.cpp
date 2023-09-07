@@ -558,7 +558,7 @@ void MembersModel::removeMember(const QnUuid& memberId)
 
 QHash<int, QByteArray> MembersModel::roleNames() const
 {
-    QHash<int, QByteArray> roles;
+    QHash<int, QByteArray> roles = base_type::roleNames();
     roles[Qt::DisplayRole] = "text";
     roles[DescriptionRole] = "description";
     roles[IdRole] = "id";
@@ -702,6 +702,22 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
 
     switch (role)
     {
+        case Qt::ToolTipRole:
+        {
+            if (!isUser)
+            {
+                QStringList names;
+                for (const QnUuid& id: m_subjectContext->subjectHierarchy()->directParents(id))
+                {
+                    if (const QString name = m_cache->info(id).name; !name.isEmpty())
+                        names.append(name);
+                }
+
+                if (!names.isEmpty())
+                    return tr("Inherited from %1").arg("<b>" + names.join("</b>, <b>") + "</b>");
+            }
+            return {};
+        }
         case IsMemberRole:
             return !m_subjectIsUser
                 && m_subjectContext->subjectHierarchy()->directMembers(m_subjectId)

@@ -169,6 +169,8 @@ Item
             }
         }
 
+        GlobalToolTip.text: model.toolTip || ""
+
         MouseArea
         {
             id: groupMouseArea
