@@ -107,7 +107,7 @@ Dialog
                     validateFunc: (text) =>
                     {
                         return text == ""
-                            ? qsTr("This field cannot be empty")
+                            ? qsTr("Host cannot be empty")
                             : ""
                     }
 
