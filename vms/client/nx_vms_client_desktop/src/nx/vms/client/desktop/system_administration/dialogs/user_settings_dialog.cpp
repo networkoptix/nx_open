@@ -190,12 +190,12 @@ struct UserSettingsDialog::Private
         const auto server = q->systemContext()->currentServer();
         const auto info = server->getModuleInformationWithAddresses();
         auto serverUrl = nx::vms::common::mainServerUrl(info.remoteAddresses, customPriority);
+        const auto currentServerUrl = server->getApiUrl();
+        const auto needChangeUrl = (customPriority(serverUrl) == LinkHostPriority::other
+            && !nx::network::HostAddress(currentServerUrl.host()).isLoopback());
 
-        if (customPriority(serverUrl) == LinkHostPriority::other)
-        {
-            if (auto url = server->getApiUrl(); !nx::network::HostAddress(url.host()).isLoopback())
-                serverUrl = url;
-        }
+        if (needChangeUrl || serverUrl.isEmpty())
+            serverUrl = currentServerUrl;
 
         if (customPriority(serverUrl) == LinkHostPriority::cloud)
             serverUrl.setHost(serverUrl.host().split('.').back());
