@@ -68,7 +68,17 @@ QString toString(const ObjectMetadata& objectMetadata)
         + ", trackId " + objectMetadata.trackId.toString();
 
     if (objectMetadata.isBestShot())
+    {
+        if (!objectMetadata.imageUrl.isNull()) 
+            s += ", imageUrl " + nx::kit::utils::toString(objectMetadata.imageUrl);
+        if (!objectMetadata.imageDataFormat.isNull())
+            s += ", imageDataFormat " + nx::kit::utils::toString(objectMetadata.imageDataFormat);
+        if (objectMetadata.isImageDataPresent)
+            s += ", imageData present";
+        if (objectMetadata.isImageDataPresent || objectMetadata.imageDataSize != 0)
+            s += ", imageDataSize " + std::to_string(objectMetadata.imageDataSize);
         return s;
+    }
 
     s += ", typeId " + objectMetadata.typeId + ", attributes {";
 
