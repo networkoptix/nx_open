@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
@@ -64,6 +65,7 @@ struct SystemContext::Private
     std::unique_ptr<RestApiHelper> restApiHelper;
     std::unique_ptr<DelayedDataLoader> delayedDataLoader;
     std::unique_ptr<analytics::TaxonomyManager> taxonomyManager;
+    std::unique_ptr<NonEditableUsersAndGroups> nonEditableUsersAndGroups;
 
     void initLocalRuntimeInfo()
     {
@@ -118,6 +120,7 @@ SystemContext::SystemContext(
             d->delayedDataLoader = std::make_unique<DelayedDataLoader>(this);
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->ldapStatusWatcher = std::make_unique<LdapStatusWatcher>(this);
+            d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             break;
 
         case Mode::crossSystem:
@@ -133,6 +136,7 @@ SystemContext::SystemContext(
             break;
 
         case Mode::unitTests:
+            d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             break;
     }
 }
@@ -163,6 +167,11 @@ VideoWallOnlineScreensWatcher* SystemContext::videoWallOnlineScreensWatcher() co
 LdapStatusWatcher* SystemContext::ldapStatusWatcher() const
 {
     return d->ldapStatusWatcher.get();
+}
+
+NonEditableUsersAndGroups* SystemContext::nonEditableUsersAndGroups() const
+{
+    return d->nonEditableUsersAndGroups.get();
 }
 
 ServerRuntimeEventConnector* SystemContext::serverRuntimeEventConnector() const
