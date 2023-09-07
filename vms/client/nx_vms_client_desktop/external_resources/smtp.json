@@ -205,5 +205,9 @@
     "zoho.com": {
         "connectionType": "ssl",
         "server": "smtp.zoho.com"
+    },
+    "bk.ru": {
+        "connectionType": "ssl",
+        "server": "smtp.mail.ru"
     }
 }
