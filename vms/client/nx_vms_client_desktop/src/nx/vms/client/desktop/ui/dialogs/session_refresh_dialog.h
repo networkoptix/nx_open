@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/socket_common.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -71,6 +72,8 @@ private:
     bool m_passwordValidationMode = false;
     SessionRefreshResult m_refreshResult;
     ValidationResult m_validationResult = ValidationResult{QValidator::Intermediate};
+    nx::network::SocketAddress m_address;
+    nx::network::http::AuthToken m_token;
 };
 
 } // nx::vms::client::desktop
