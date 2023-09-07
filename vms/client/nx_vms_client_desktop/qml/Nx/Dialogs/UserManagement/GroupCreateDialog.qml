@@ -54,6 +54,7 @@ DialogWithState
     property bool isSaving: false
     property alias editingContext: membersModel.editingContext
     property var self
+    property bool continuousSync //< Not used by current dialog type.
 
     title: qsTr("New Group")
 
