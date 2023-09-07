@@ -4,6 +4,8 @@
 
 #include <QtQml/QtQml>
 
+#include <nx/vms/common/html/html.h>
+
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -51,7 +53,9 @@ AccessRightsList::AccessRightsList(QObject* parent):
         AccessRightDescriptor{
             .accessRight = AccessRight::edit,
             .name = tr("Edit Settings"),
-            .description = tr("Can edit device settings and video wall layouts"),
+            .description = common::html::bold(tr("Edit Camera Settings.")) + " " + tr("Depending"
+                " on the resource type it either allows user to modify device settings or to"
+                " control video wall."),
             .icon = QUrl(kIconsDir + "edit_settings.svg")}})
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
