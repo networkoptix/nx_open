@@ -26,10 +26,16 @@ public:
     QUrl source;
     bool done = false;
     bool shownMaximized = false;
+    bool restoreLastPositionWhenOpened = false;
+    QRect lastGeometry;
 
 public:
     Private(QmlDialogWrapper* q);
     void handleStatusChanged(QQmlComponent::Status status);
+
+    void restoreGeometryIfNecessary();
+
+    virtual bool eventFilter(QObject* object, QEvent* event) override;
 };
 
 QmlDialogWrapper::Private::Private(QmlDialogWrapper* q):
@@ -83,7 +89,22 @@ void QmlDialogWrapper::Private::handleStatusChanged(QQmlComponent::Status status
         connect(object, SIGNAL(applied()), q, SIGNAL(applied()));
 
     rootObjectHolder.setObject(window.get());
+    window->installEventFilter(this);
     emit q->initialized();
+}
+
+void QmlDialogWrapper::Private::restoreGeometryIfNecessary()
+{
+    if (restoreLastPositionWhenOpened && !window->isVisible() && lastGeometry.isValid())
+        window->setGeometry(lastGeometry);
+}
+
+bool QmlDialogWrapper::Private::eventFilter(QObject* /*object*/, QEvent* event)
+{
+    if (event->type() == QEvent::Close)
+        lastGeometry = window->geometry();
+
+    return false;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -209,6 +230,20 @@ void QmlDialogWrapper::setMaximized(bool value)
         d->window->setWindowState(value ? Qt::WindowMaximized : Qt::WindowNoState);
 }
 
+bool QmlDialogWrapper::restoreLastPositionWhenOpened() const
+{
+    return d->restoreLastPositionWhenOpened;
+}
+
+void QmlDialogWrapper::setRestoreLastPositionWhenOpened(bool value)
+{
+    if (d->restoreLastPositionWhenOpened == value)
+        return;
+
+    d->restoreLastPositionWhenOpened = value;
+    emit restoreLastPositionWhenOpenedChanged();
+}
+
 bool QmlDialogWrapper::exec(Qt::WindowModality modality)
 {
     if (!d->window)
@@ -218,6 +253,8 @@ bool QmlDialogWrapper::exec(Qt::WindowModality modality)
         return false;
 
     d->done = false;
+
+    d->restoreGeometryIfNecessary();
 
     const auto oldModality = d->window->modality();
     d->window->setModality(modality);
@@ -244,6 +281,8 @@ void QmlDialogWrapper::open()
         return;
 
     d->done = false;
+
+    d->restoreGeometryIfNecessary();
 
     const auto oldModality = d->window->modality();
     d->window->setModality(Qt::NonModal);
