@@ -556,6 +556,32 @@ TEST_F(LayoutItemAccessResolverTest, sharedLayoutRemoved)
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), kNoAccessRights);
 }
 
+TEST_F(LayoutItemAccessResolverTest, videowallLayoutRemovedFromThePoolFirst)
+{
+    auto camera = addCamera();
+    auto videowall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videowall);
+    addToLayout(layout, camera);
+
+    manager->setOwnResourceAccessMap(
+        kTestSubjectId, {{videowall->getId(), kVideoWallControlAccessRights}});
+
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kViewAccessRights);
+
+    resourcePool()->removeResource(layout);
+
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
+
+    QnVideoWallItem item = *videowall->items()->getItems().cbegin();
+    item.layout = {};
+    videowall->items()->updateItem(item);
+
+    NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
+}
+
 TEST_F(LayoutItemAccessResolverTest, noSignalsForPrivateLayoutChanges)
 {
     auto layout = createLayout();
