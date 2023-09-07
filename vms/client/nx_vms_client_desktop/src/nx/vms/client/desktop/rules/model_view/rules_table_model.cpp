@@ -507,9 +507,6 @@ QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* action
             users,
             groups);
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
-        std::set<QnUuid> groupIds;
-        for (const auto& group: groups)
-            groupIds.insert(group.id);
 
         if (role == Qt::DisplayRole)
         {
@@ -519,12 +516,14 @@ QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* action
             if (users.size() == 1 && groups.empty())
                 return users.front()->getName();
 
-            if (users.empty() && groups.size() == 1)
+            if (users.empty() && groups.size() <= 2)
             {
-                return QString{"%1 %2 %3"}
-                    .arg(tr("Group"))
-                    .arg(nx::UnicodeChars::kEnDash)
-                    .arg(groups.front().name);
+                QStringList groupNames;
+                for (const auto& group: groups)
+                    groupNames.push_back(std::move(group.name));
+                groupNames.sort(Qt::CaseInsensitive);
+
+                return groupNames.join(", ");
             }
 
             if (groups.empty())
@@ -537,15 +536,12 @@ QVariant RulesTableModel::targetUserData(const vms::rules::ActionBuilder* action
                     .arg(tr("%n Users", "", users.size()));
             }
 
-            if (groupIds == api::kAllPowerUserGroupIds)
-                return tr("All Power Users");
-
             return tr("%n Groups", "", groups.size());
         }
 
         if (role == Qt::DecorationRole)
         {
-            return (targetUserField->acceptAll() || users.size() > 1 || !groupIds.empty())
+            return (targetUserField->acceptAll() || users.size() > 1 || !groups.empty())
                 ? iconPath(QnResourceIconCache::Users)
                 : iconPath(QnResourceIconCache::User);
         }

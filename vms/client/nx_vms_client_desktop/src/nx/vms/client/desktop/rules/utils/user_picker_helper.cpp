@@ -78,13 +78,14 @@ QString UserPickerHelper::text() const
     if (m_users.size() == 1 && m_groups.empty())
         return makeText(m_users.front()->getName(), additional);
 
-    if (m_users.empty() && m_groups.size() == 1)
+    if (m_users.empty() && m_groups.size() <= 2)
     {
-        const auto groupText = QString("%1 %2 %3")
-            .arg(tr("Group"))
-            .arg(nx::UnicodeChars::kEnDash)
-            .arg(m_groups.front().name);
-        return makeText(groupText, additional);
+        QStringList groupNames;
+        for (const auto& group: m_groups)
+            groupNames.push_back(std::move(group.name));
+        groupNames.sort(Qt::CaseInsensitive);
+
+        return groupNames.join(", ");
     }
 
     if (m_groups.empty())
@@ -96,12 +97,6 @@ QString UserPickerHelper::text() const
             .arg(tr("%n Groups", "", m_groups.size()))
             .arg(tr("%n Users", "", m_users.size()));
         return makeText(usersText, additional);
-    }
-
-    if (m_groups.size() == kAllPowerUserGroupIds.size() && std::all_of(m_groups.cbegin(), m_groups.cend(),
-        [](const api::UserGroupData& group) { return kAllPowerUserGroupIds.contains(group.id); }))
-    {
-        return makeText(tr("All Power Users"), additional);
     }
 
     return makeText(tr("%n Groups", "", m_groups.size()), additional);
