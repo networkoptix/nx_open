@@ -236,9 +236,11 @@ bool Resources::deleteResources(
 
     QString text;
     QString extras;
+    Qn::ResourceInfoLevel infoLevel = Qn::RI_WithUrl;
 
     if (usersOnly)
     {
+        infoLevel = Qn::RI_NameOnly;
         text = resources.size() == 1
             ? tr("Delete user?")
             : tr("Delete %n users?", "", resources.size());
@@ -286,7 +288,7 @@ bool Resources::deleteResources(
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(resources, infoLevel, &messageBox));
     if (allowSilent)
         messageBox.setCheckBoxEnabled();
 
