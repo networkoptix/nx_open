@@ -374,7 +374,10 @@ void LayoutItemAccessResolver::Private::notifyResolutionChanged(const QnLayoutRe
     const QSet<QnUuid>& knownAffectedSubjectIds, bool fromLayoutItem)
 {
     if (!fromLayoutItem && isVideowallLayout(layout))
-        return; //< Should be already notified by the base resolver.
+    {
+        NX_VERBOSE(q, "Skipping notification: already notified by the base resolver");
+        return;
+    }
 
     const auto watchedSubjectIds = q->notifier()->watchedSubjectIds();
     QSet<QnUuid> affectedWatchedSubjectIds;

@@ -204,6 +204,33 @@ TEST_F(VideowallItemAccessResolverTest, layoutRemovedFromVideowallItems)
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 }
 
+TEST_F(VideowallItemAccessResolverTest, layoutRemovedFromThePoolFirst)
+{
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideoWallsGroupId, kTestAccessRights}});
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+
+    auto videowall = addVideoWall();
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+
+    auto layout = addLayoutForVideoWall(videowall);
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout),
+        videowallItemAccessRights(kTestAccessRights));
+
+    resourcePool()->removeResource(layout);
+
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+
+    QnVideoWallItem item = *videowall->items()->getItems().cbegin();
+    item.layout = {};
+    videowall->items()->updateItem(item);
+
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+    NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
+}
+
 TEST_F(VideowallItemAccessResolverTest, videowallLayoutBecomesParentless)
 // Not a standard scenario, but should work nonetheless.
 {

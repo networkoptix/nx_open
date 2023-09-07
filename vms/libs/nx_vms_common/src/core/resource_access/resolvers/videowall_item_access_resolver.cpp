@@ -44,7 +44,10 @@ public:
     void handleVideowallRemoved(const QnVideoWallResourcePtr& videowall);
     void handleVideowallLayoutsChanged(const QnVideoWallResourcePtr& videowall);
 
-    void handleVideowallLayoutAddedOrRemoved(const QnVideoWallResourcePtr& videowall,
+    void handleVideowallLayoutAdded(const QnVideoWallResourcePtr& videowall,
+        const QnUuid& layoutId);
+
+    void handleVideowallLayoutRemoved(const QnVideoWallResourcePtr& videowall,
         const QnUuid& layoutId);
 
     void handleLayoutAdded(const QnLayoutResourcePtr& layout);
@@ -160,10 +163,10 @@ VideowallItemAccessResolver::Private::Private(
         this, &Private::handleVideowallRemoved, Qt::DirectConnection);
 
     connect(videowallWatcher.get(), &VideowallLayoutWatcher::videowallLayoutAdded,
-        this, &Private::handleVideowallLayoutAddedOrRemoved, Qt::DirectConnection);
+        this, &Private::handleVideowallLayoutAdded, Qt::DirectConnection);
 
     connect(videowallWatcher.get(), &VideowallLayoutWatcher::videowallLayoutRemoved,
-        this, &Private::handleVideowallLayoutAddedOrRemoved, Qt::DirectConnection);
+        this, &Private::handleVideowallLayoutRemoved, Qt::DirectConnection);
 
     connect(resourcePool, &QnResourcePool::resourcesAdded, this,
         [this](const QnResourceList& resources)
@@ -372,7 +375,7 @@ void VideowallItemAccessResolver::Private::handleVideowallRemoved(
     notifyResolutionChanged(videowall, /*knownAffectedSubjectIds*/ affectedCachedSubjectIds);
 }
 
-void VideowallItemAccessResolver::Private::handleVideowallLayoutAddedOrRemoved(
+void VideowallItemAccessResolver::Private::handleVideowallLayoutAdded(
     const QnVideoWallResourcePtr& videowall, const QnUuid& layoutId)
 {
     const auto layout = resourcePool
@@ -381,16 +384,43 @@ void VideowallItemAccessResolver::Private::handleVideowallLayoutAddedOrRemoved(
 
     if (layout)
     {
-        NX_VERBOSE(q, "Videowall %1 layout %2 added or removed", videowall, layout);
+        NX_VERBOSE(q, "Videowall %1 layout %2 added", videowall, layout);
 
+        // Handle videowall change only if the layout is in the pool
+        // and is already owned by the videowall.
         if (layout->getParentId() == videowall->getId())
             handleVideowallLayoutsChanged(videowall);
+        else
+            NX_VERBOSE(q, "The layout isn't owned by the videowall yet");
     }
     else
     {
-        NX_VERBOSE(q, "Videowall %1 layout %2 (not in the pool) added or removed",
+        NX_VERBOSE(q, "Videowall %1 layout %2 (not in the pool) added",
             videowall, layoutId);
     }
+}
+
+void VideowallItemAccessResolver::Private::handleVideowallLayoutRemoved(
+    const QnVideoWallResourcePtr& videowall, const QnUuid& layoutId)
+{
+    const auto layout = resourcePool
+        ? resourcePool->getResourceById<QnLayoutResource>(layoutId)
+        : QnLayoutResourcePtr();
+
+    if (layout)
+    {
+        NX_VERBOSE(q, "Videowall %1 layout %2 removed", videowall, layout);
+    }
+    else
+    {
+        NX_VERBOSE(q, "Videowall %1 layout %2 (not in the pool) removed",
+            videowall, layoutId);
+    }
+
+    // Handle videowall change in two cases:
+    // - a videowall layout was removed from its items
+    // - a videowall layout was removed from the resource pool
+    handleVideowallLayoutsChanged(videowall);
 }
 
 void VideowallItemAccessResolver::Private::handleVideowallLayoutsChanged(
