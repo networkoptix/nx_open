@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/common/html/html.h>
@@ -147,7 +148,6 @@ public:
     boost::container::flat_set<QnUserResourcePtr> users;
     QSet<QnUuid> notFoundUsers;
     QSet<QnUserResourcePtr> checkedUsers;
-    QSet<QnUserResourcePtr> nonEditableUsers;
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
     NonUniqueNameTracker nonUniqueNameTracker;
@@ -210,6 +210,25 @@ public:
                     q->index(q->rowCount() - 1, UserWarningColumn),
                     {Qn::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
             });
+
+        connect(systemContext()->nonEditableUsersAndGroups(),
+            &NonEditableUsersAndGroups::userModified,
+            this,
+            [this, q](const QnUserResourcePtr& user)
+            {
+                if (systemContext()->nonEditableUsersAndGroups()->containsUser(user))
+                    setCheckState(Qt::Unchecked, user);
+
+                const auto it = users.find(user);
+                if (it == users.end())
+                    return;
+
+                const auto row = users.index_of(it);
+                emit q->dataChanged(
+                    q->index(row, CheckBoxColumn),
+                    q->index(row, CheckBoxColumn),
+                    {Qn::DisabledRole, Qt::ToolTipRole});
+            });
     }
 
     void at_resourcePool_resourceChanged(const QnResourcePtr& resource);
@@ -255,16 +274,6 @@ void UserListModel::Private::handleUserChanged(const QnUserResourcePtr& user)
 
     markUserNotFound(user, ldapUserNotFound(user));
 
-    if (canEditUser(user))
-    {
-        nonEditableUsers.remove(user);
-    }
-    else
-    {
-        nonEditableUsers.insert(user);
-        setCheckState(Qt::Unchecked, user);
-    }
-
     const auto row = users.index_of(it);
     QModelIndex index = model->index(row);
     emit model->dataChanged(index, index.sibling(row, UserListModel::ColumnCount - 1));
@@ -288,8 +297,11 @@ Qt::CheckState UserListModel::Private::checkState() const
     if (checkedUsers.isEmpty())
         return Qt::Unchecked;
 
-    if ((checkedUsers.size() + nonEditableUsers.size()) == users.size())
+    if ((checkedUsers.size() + systemContext()->nonEditableUsersAndGroups()->userCount())
+        == users.size())
+    {
         return Qt::Checked;
+    }
 
     return Qt::PartiallyChecked;
 }
@@ -374,9 +386,6 @@ void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
     if (nonUniqueNameTracker.update(user->getId(), user->getName().toLower()))
         emit model->nonUniqueUsersChanged();
 
-    if (!canEditUser(user))
-        nonEditableUsers.insert(user);
-
     connect(user.get(), &QnUserResource::nameChanged, this,
         &UserListModel::Private::at_resourcePool_resourceChanged);
     connect(user.get(), &QnUserResource::fullNameChanged, this,
@@ -419,7 +428,6 @@ void UserListModel::Private::removeUserInternal(const QnUserResourcePtr& user)
     disconnect(user.get(), &QnUserResource::digestChanged, this, nullptr);
 
     checkedUsers.remove(user);
-    nonEditableUsers.remove(user);
     enableChangedUsers.remove(user);
     digestChangedUsers.remove(user);
 }
@@ -466,9 +474,7 @@ void UserListModel::Private::updateLdapUsersNotFound()
 
 bool UserListModel::Private::canEditUser(const QnUserResourcePtr& user) const
 {
-    return model->canDelete(user)
-        || model->canEnableDisable(user)
-        || model->canChangeAuthentication(user);
+    return systemContext()->nonEditableUsersAndGroups()->canEdit(user);
 }
 
 UserListModel::UserListModel(QObject* parent):
@@ -533,7 +539,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             switch (index.column())
             {
                 case CheckBoxColumn:
-                    if (d->nonEditableUsers.contains(user))
+                    if (d->systemContext()->nonEditableUsersAndGroups()->containsUser(user))
                         return tr("You do not have permissions to modify this user.");
                     break;
 
@@ -686,7 +692,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
         case Qn::DisabledRole:
             if (index.column() == CheckBoxColumn)
-                return !d->canEditUser(user);
+                return d->systemContext()->nonEditableUsersAndGroups()->containsUser(user);
 
             return index.column() != CheckBoxColumn && !isUserEnabled(user);
 
@@ -824,19 +830,17 @@ void UserListModel::setDigestEnabled(const QnUserResourcePtr& user, bool enabled
 
 bool UserListModel::canDelete(const QnUserResourcePtr& user) const
 {
-    return accessController()->hasPermissions(user, Qn::RemovePermission);
+    return d->systemContext()->nonEditableUsersAndGroups()->canDelete(user);
 }
 
 bool UserListModel::canEnableDisable(const QnUserResourcePtr& user) const
 {
-    return accessController()->hasPermissions(user,
-        Qn::WritePermission | Qn::WriteAccessRightsPermission | Qn::SavePermission);
+    return d->systemContext()->nonEditableUsersAndGroups()->canEnableDisable(user);
 }
 
 bool UserListModel::canChangeAuthentication(const QnUserResourcePtr& user) const
 {
-    return accessController()->hasPermissions(user,
-        Qn::WritePermission | Qn::WriteDigestPermission | Qn::SavePermission);
+    return d->systemContext()->nonEditableUsersAndGroups()->canChangeAuthentication(user);
 }
 
 QnUserResourceList UserListModel::users() const

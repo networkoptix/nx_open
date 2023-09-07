@@ -27,6 +27,7 @@ class SystemSpecificLocalSettings;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
+class NonEditableUsersAndGroups;
 
 namespace analytics { class TaxonomyManager; }
 
@@ -60,6 +61,7 @@ public:
 
     VideoWallOnlineScreensWatcher* videoWallOnlineScreensWatcher() const;
     LdapStatusWatcher* ldapStatusWatcher() const;
+    NonEditableUsersAndGroups* nonEditableUsersAndGroups() const;
     ServerRuntimeEventConnector* serverRuntimeEventConnector() const;
     QnServerStorageManager* serverStorageManager() const;
     QnCameraBookmarksManager* cameraBookmarksManager() const;
