@@ -18,6 +18,7 @@
 #include <nx/vms/client/core/skin/color_substitutions.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/common/html/html.h>
@@ -56,7 +57,6 @@ struct UserGroupListModel::Private
 
     UserGroupDataList orderedGroups;
     QSet<QnUuid> checkedGroupIds;
-    QSet<QnUuid> nonEditableGroupIds;
     QList<QSet<QnUuid>> cycledGroupSets;
     QSet<QnUuid> cycledGroups;
     bool ldapServerOnline = true;
@@ -65,6 +65,24 @@ struct UserGroupListModel::Private
 
     Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId())
     {
+        connect(q->systemContext()->nonEditableUsersAndGroups(),
+            &NonEditableUsersAndGroups::groupModified,
+            q,
+            [q, this](const QnUuid &id)
+            {
+                const int row = q->groupRow(id);
+                if (row == -1)
+                    return;
+
+                if (q->systemContext()->nonEditableUsersAndGroups()->containsGroup(id))
+                    checkedGroupIds.remove(id);
+
+                emit q->dataChanged(
+                    q->index(row, CheckBoxColumn),
+                    q->index(row, CheckBoxColumn),
+                    {Qn::DisabledRole, Qt::ToolTipRole});
+            });
+
         connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
             [this]()
             {
@@ -383,7 +401,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             switch (index.column())
             {
                 case CheckBoxColumn:
-                    if (d->nonEditableGroupIds.contains(group.id))
+                    if (systemContext()->nonEditableUsersAndGroups()->containsGroup(group.id))
                         return tr("You do not have permissions to modify or delete this group.");
                     break;
 
@@ -500,7 +518,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
 
         case Qn::DisabledRole:
             if (index.column() == CheckBoxColumn)
-                return d->nonEditableGroupIds.contains(group.id);
+                return systemContext()->nonEditableUsersAndGroups()->containsGroup(group.id);
             return false;
 
         case Qn::FilterKeyRole:
@@ -598,7 +616,7 @@ QSet<QnUuid> UserGroupListModel::checkedGroupIds() const
 
 QSet<QnUuid> UserGroupListModel::nonEditableGroupIds() const
 {
-    return d->nonEditableGroupIds;
+    return systemContext()->nonEditableUsersAndGroups()->groups();
 }
 
 void UserGroupListModel::setCheckedGroupIds(const QSet<QnUuid>& value)
@@ -610,7 +628,7 @@ void UserGroupListModel::setCheckedGroupIds(const QSet<QnUuid>& value)
         if (!NX_ASSERT(allGroups.contains(id)))
             continue;
 
-        if (d->nonEditableGroupIds.contains(id))
+        if (systemContext()->nonEditableUsersAndGroups()->containsGroup(id))
             continue;
 
         d->checkedGroupIds.insert(id);
@@ -636,7 +654,7 @@ void UserGroupListModel::setChecked(const QnUuid& groupId, bool checked)
     if (row < 0)
         return;
 
-    if (d->nonEditableGroupIds.contains(groupId))
+    if (systemContext()->nonEditableUsersAndGroups()->containsGroup(groupId))
         return;
 
     if (checked)
@@ -654,7 +672,6 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
     d->checkedGroupIds.clear();
     d->notFoundGroups.clear();
     d->nonUniqueNameTracker = {};
-    d->nonEditableGroupIds.clear();
     d->orderedGroups = groups;
 
     std::sort(d->orderedGroups.begin(), d->orderedGroups.end(),
@@ -670,9 +687,6 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
     {
         if (d->ldapGroupNotFound(group))
             d->notFoundGroups.insert(group.id);
-
-        if (!canDeleteGroup(group.id))
-            d->nonEditableGroupIds.insert(group.id);
 
         d->nonUniqueNameTracker.update(group.id, group.name.toLower());
     }
@@ -690,16 +704,6 @@ bool UserGroupListModel::addOrUpdateGroup(const UserGroupData& group)
 {
     if (d->nonUniqueNameTracker.update(group.id, group.name.toLower()))
         emit nonUniqueGroupsChanged();
-
-    if (canDeleteGroup(group.id))
-    {
-        d->nonEditableGroupIds.remove(group.id);
-    }
-    else
-    {
-        d->nonEditableGroupIds.insert(group.id);
-        d->checkedGroupIds.remove(group.id);
-    }
 
     const auto position = d->findPosition(group.id);
     if (position == d->orderedGroups.end() || position->id != group.id)
@@ -752,7 +756,6 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
     const ScopedRemoveRows removeRows(this, row, row);
     d->orderedGroups.erase(it);
     d->checkedGroupIds.remove(groupId);
-    d->nonEditableGroupIds.insert(groupId);
     d->markGroupNotFound(groupId, false);
 
     // Remove group from other groups.
