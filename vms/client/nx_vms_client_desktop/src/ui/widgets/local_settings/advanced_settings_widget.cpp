@@ -244,6 +244,8 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
         };
     connect(ui->cancelLogsDownloadButton, &QPushButton::clicked, this, resetLogsDownloadState);
     connect(ui->logsDownloadDoneButton, &QPushButton::clicked, this, resetLogsDownloadState);
+
+    ui->doubleBufferingWidget->setVisible(nx::build_info::isWindows() || ini().developerMode);
 }
 
 QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
