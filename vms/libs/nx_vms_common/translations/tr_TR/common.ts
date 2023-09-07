@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Bu kullanıcı mevcut değil veya oturum açamıyor.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
@@ -64,7 +64,7 @@
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>LDAP sunucusu SSL/TLS sertifikası doğrulanamıyor.</translation>
     </message>
   </context>
   <context>
@@ -168,7 +168,7 @@
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Uzman Kullanıcılar</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
@@ -435,15 +435,15 @@
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>Cihazdan geçersiz veri alındı. Ayrıntılar: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Kameradan geçersiz veri alındı. Ayrıntılar: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>G/Ç modülünden geçersiz veri alındı. Ayrıntılar: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -834,13 +834,13 @@
     <message>
       <source>%1 Licenses</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Licenses</translation>
+      <translation>%1 Lisanslar</translation>
     </message>
     <message numerus="yes">
       <source>%n %1 Licenses</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">
-        <numerusform>%n %1 Licenses</numerusform>
+        <numerusform>%n %1 Lisanslar</numerusform>
         <numerusform>%n %1 Licenses</numerusform>
       </translation>
     </message>
@@ -848,7 +848,7 @@
       <source>%n/%1 %2 Licenses</source>
       <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 %2 Licenses</numerusform>
+        <numerusform>%n %1 %2 Lisanslar</numerusform>
         <numerusform>%n/%1 %2 Licenses</numerusform>
       </translation>
     </message>
@@ -1143,7 +1143,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Çoklu gruplar</translation>
     </message>
   </context>
   <context>
@@ -1623,7 +1623,7 @@
     </message>
     <message>
       <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
+      <translation>SMTP ayarları</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
@@ -1668,7 +1668,7 @@
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>bir hafta önce</translation>
     </message>
   </context>
   <context>
@@ -1984,7 +1984,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
