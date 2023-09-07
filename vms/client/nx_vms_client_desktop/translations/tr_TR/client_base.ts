@@ -2899,7 +2899,7 @@ to %1</source>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>Sistemin %1 ile bağlantısını kesmek üzeresiniz</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -7322,7 +7322,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>%1 üzerinde yedeklemeyi etkinleştirmek için bazı depolama alanlarını &quot;Ana&quot; yerine &quot; Yedek&quot; olarak değiştirin</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
@@ -7334,7 +7334,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+      <translation>Yedekleme işlemi mevcut görüntüleri yok sayacaktır. Yalnızca daha sonraki kayıtlar yedeklenecektir.</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
@@ -10234,7 +10234,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Seçilen cihazlardan bazılarının yalnızca bir akışı var. Hareketli ve hareketsiz kayıtlar aynı çözünürlüğü veya kaliteyi paylaşacaktır.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
@@ -10405,11 +10405,11 @@ Dikkat: Bu parola sıfırlanamaz. Kaybederseniz arşiv kurtarılamaz.</translati
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>Bu, %1 üzerine yüklenen özel bir sertifikadır</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>Bu sertifika %1 için sabitlensin mi?</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -11560,7 +11560,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
+      <translation>Analitik nesne algılama belirli kameralarda aktif edilebilir.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
