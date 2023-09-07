@@ -160,6 +160,18 @@ struct NX_VMS_COMMON_API ObjectMetadata
     /**%apidoc Unique Id of the analytics engine. */
     QnUuid analyticsEngineId;
 
+    /**%apidoc Image url, only for Best Shot packets. */
+    QString imageUrl;
+
+    /**%apidoc Image data format, only for Best Shot packets. */
+    QString imageDataFormat;
+
+    /**%apidoc Image data size, only for Best Shot packets. */
+    int imageDataSize;
+
+    /**%apidoc Whether the image data is not null, only for Best Shot packets. */
+    bool isImageDataPresent;
+
     bool isBestShot() const
     {
         return objectMetadataType == ObjectMetadataType::bestShot
