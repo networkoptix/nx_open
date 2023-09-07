@@ -120,6 +120,7 @@ struct UserSettingsDialog::Private
     QmlProperty<int> tabIndex;
     QmlProperty<bool> isSaving;
     QmlProperty<bool> ldapError;
+    QmlProperty<bool> continuousSync;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
     QmlProperty<int> displayOffsetMs;
@@ -140,6 +141,7 @@ struct UserSettingsDialog::Private
         tabIndex(q->rootObjectHolder(), "tabIndex"),
         isSaving(q->rootObjectHolder(), "isSaving"),
         ldapError(q->rootObjectHolder(), "ldapError"),
+        continuousSync(q->rootObjectHolder(), "continuousSync"),
         editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self"),
         displayOffsetMs(q->rootObjectHolder(), "displayOffsetMs"),
@@ -150,7 +152,12 @@ struct UserSettingsDialog::Private
         firstLoginTime(q->rootObjectHolder(), "firstLoginTime")
     {
         connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
-            [this]() { syncId = q->globalSettings()->ldap().syncId(); });
+            [this]()
+            {
+                syncId = q->globalSettings()->ldap().syncId();
+                continuousSync = q->globalSettings()->ldap().continuousSync
+                    == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+            });
 
         const auto updateDisplayOffset = [this](){ displayOffsetMs = getDisplayOffsetMs(); };
 
@@ -161,6 +168,9 @@ struct UserSettingsDialog::Private
             updateDisplayOffset);
 
         updateDisplayOffset();
+
+        continuousSync = q->globalSettings()->ldap().continuousSync
+            == nx::vms::api::LdapSettings::Sync::usersAndGroups;
     }
 
     QDateTime serverDate(milliseconds msecsSinceEpoch) const
@@ -892,9 +902,6 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     state.linkEditable = accessController()->hasPowerUserPermissions()
         && permissions.testFlag(Qn::SavePermission);
-
-    state.continuousSync =
-        globalSettings()->ldap().continuousSync == nx::vms::api::LdapSettings::Sync::usersAndGroups;
 
     return state;
 }
