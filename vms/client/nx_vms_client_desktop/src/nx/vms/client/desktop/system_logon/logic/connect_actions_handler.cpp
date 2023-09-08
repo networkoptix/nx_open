@@ -1365,13 +1365,17 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
 
     // Store username case-sensitive as it was entered (actual only for the digest auth method).
     std::string originalUsername = logonData.credentials.username;
+    const auto isLink = logonData.connectScenario == ConnectScenario::connectUsingCommand;
 
     auto callback = d->makeSingleConnectionCallback(
-        [this, options, connectScenario, originalUsername]
+        [this, options, connectScenario, originalUsername, isLink]
             (RemoteConnectionFactory::ConnectionOrError result)
         {
-            if (const auto error = std::get_if<RemoteConnectionError>(&result))
+            if (auto error = std::get_if<RemoteConnectionError>(&result))
             {
+                if (error->code == RemoteConnectionErrorCode::unauthorized && isLink)
+                    error->externalDescription = tr("Authentication details are incorrect");
+
                 handleConnectionError(*error);
                 disconnectFromServer(DisconnectFlag::Force);
             }
