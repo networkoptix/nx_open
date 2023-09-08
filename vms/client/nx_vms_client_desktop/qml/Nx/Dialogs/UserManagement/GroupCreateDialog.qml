@@ -35,9 +35,11 @@ DialogWithState
     // State properties.
     property alias groupId: membersModel.groupId
     property alias name: generalSettings.name
+    property bool nameEditable //< Not used by current dialog type.
     property bool isLdap: false
     property bool isPredefined: false
     property alias description: generalSettings.description
+    property bool descriptionEditable //< Not used by current dialog type.
     property alias parentGroups: membersModel.parentGroups
     property alias groups: membersModel.groups
     property alias users: membersModel.users
