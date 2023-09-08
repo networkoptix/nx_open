@@ -155,10 +155,14 @@ void ClientLogCollector::run()
 {
     using namespace nx::utils::log;
 
-    auto file = std::make_unique<QFile>(m_target);
+    QFileInfo fileInfo(m_target);
+    const auto& tempTarget = fileInfo.dir().filePath(
+        fileInfo.baseName() + kPartialSuffix + '.' + fileInfo.completeSuffix());
+
+    auto file = std::make_unique<QFile>(tempTarget);
     if (!file->open(QIODevice::ReadWrite))
     {
-        NX_ERROR(this, "Could not open file for writing: %1", m_target);
+        NX_ERROR(this, "Could not open file for writing: %1", tempTarget);
         emit error();
         return;
     }
@@ -324,7 +328,16 @@ void ClientLogCollector::run()
     }
 
     archive.close();
-    emit success();
+
+    if (QFile::rename(tempTarget, m_target))
+    {
+        emit success();
+    }
+    else
+    {
+        NX_DEBUG(this, "Error renaming temporary log file %1 to %2", tempTarget, m_target);
+        emit error();
+    }
 }
 
 struct LogsManagementWatcher::Unit::Private
