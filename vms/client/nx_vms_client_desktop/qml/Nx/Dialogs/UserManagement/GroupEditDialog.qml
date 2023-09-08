@@ -36,9 +36,11 @@ DialogWithState
     // State properties.
     property alias groupId: membersModel.groupId
     property alias name: generalSettings.name
+    property bool nameEditable: true
     property bool isLdap: false
     property bool isPredefined: false
     property alias description: generalSettings.description
+    property bool descriptionEditable: true
     property alias parentGroups: membersModel.parentGroups
     property alias groups: membersModel.groups
     property alias users: membersModel.users
@@ -101,8 +103,8 @@ DialogWithState
 
                 enabled: !dialog.isSaving
 
-                nameEditable: !dialog.isLdap && !dialog.isPredefined && !dialog.isSaving
-                descriptionEditable: !dialog.isPredefined && !dialog.isSaving
+                nameEditable: dialog.nameEditable && !dialog.isSaving
+                descriptionEditable: dialog.descriptionEditable && !dialog.isSaving
                 isLdap: dialog.isLdap
                 isPredefined: dialog.isPredefined
                 groups: dialog.parentGroups

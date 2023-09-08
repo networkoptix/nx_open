@@ -22,7 +22,9 @@ struct GroupSettingsDialogState
     Q_PROPERTY(QnUuid groupId MEMBER groupId)
 
     Q_PROPERTY(QString name MEMBER name)
+    Q_PROPERTY(bool nameEditable MEMBER nameEditable)
     Q_PROPERTY(QString description MEMBER description)
+    Q_PROPERTY(bool descriptionEditable MEMBER descriptionEditable)
     Q_PROPERTY(bool isLdap MEMBER isLdap)
     Q_PROPERTY(bool isPredefined MEMBER isPredefined)
     Q_PROPERTY(QList<nx::vms::client::desktop::MembersModelGroup> parentGroups
@@ -43,7 +45,9 @@ public:
     QnUuid groupId;
 
     QString name;
+    bool nameEditable = true;
     QString description;
+    bool descriptionEditable = true;
 
     bool isLdap = false;
     bool isPredefined = false;
