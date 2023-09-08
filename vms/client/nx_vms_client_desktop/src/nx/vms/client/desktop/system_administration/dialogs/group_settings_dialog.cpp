@@ -339,6 +339,17 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
         state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(
             groupId);
         state.isLdap = (groupData->type == nx::vms::api::UserType::ldap);
+
+        state.nameEditable = !state.isLdap
+            && systemContext()->accessController()->hasPermissions(
+                state.groupId,
+                Qn::WriteNamePermission);
+
+        state.descriptionEditable = !state.isLdap
+            && systemContext()->accessController()->hasPermissions(
+                state.groupId,
+                Qn::SavePermission);
+
         state.isPredefined = groupData->attributes.testFlag(nx::vms::api::UserAttribute::readonly);
 
         for (const auto& parentGroupId: groupData->parentGroupIds)
