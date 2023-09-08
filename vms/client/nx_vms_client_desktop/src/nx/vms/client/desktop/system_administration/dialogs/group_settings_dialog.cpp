@@ -16,6 +16,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
+#include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -73,6 +74,7 @@ struct GroupSettingsDialog::Private
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<GroupSettingsDialog*> self; //< Used to call validate functions from QML.
     QmlProperty<bool> continuousSync;
+    QmlProperty<bool> deleteAvailable;
 
     QnUuid groupId;
     GroupSettingsDialogState originalState;
@@ -84,7 +86,8 @@ struct GroupSettingsDialog::Private
         isSaving(q->rootObjectHolder(), "isSaving"),
         editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self"),
-        continuousSync(q->rootObjectHolder(), "continuousSync")
+        continuousSync(q->rootObjectHolder(), "continuousSync"),
+        deleteAvailable(q->rootObjectHolder(), "deleteAvailable")
     {
     }
 
@@ -108,7 +111,7 @@ struct GroupSettingsDialog::Private
 
 GroupSettingsDialog::GroupSettingsDialog(
     DialogType dialogType,
-    nx::vms::common::SystemContext* systemContext,
+    nx::vms::client::desktop::SystemContext* systemContext,
     QWidget* parent)
     :
     base_type(
@@ -142,6 +145,18 @@ GroupSettingsDialog::GroupSettingsDialog(
     {
         connect(rootObjectHolder()->object(), SIGNAL(addGroupRequested()),
             this, SLOT(onAddGroupRequested()));
+
+        connect(systemContext->nonEditableUsersAndGroups(),
+            &NonEditableUsersAndGroups::groupModified,
+            this,
+            [this](const QnUuid& groupId)
+            {
+                if (d->groupId != groupId)
+                    return;
+
+                d->deleteAvailable =
+                    !this->systemContext()->nonEditableUsersAndGroups()->containsGroup(groupId);
+            });
     }
 
     if (dialogType == editGroup)
@@ -158,6 +173,19 @@ GroupSettingsDialog::GroupSettingsDialog(
 
         d->continuousSync = globalSettings()->ldap().continuousSync
             == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+
+        connect(systemContext->accessSubjectHierarchy(),
+            &nx::core::access::SubjectHierarchy::changed,
+            this,
+            [this](
+                const QSet<QnUuid>& /*added*/,
+                const QSet<QnUuid>& /*removed*/,
+                const QSet<QnUuid>& groupsWithChangedMembers,
+                const QSet<QnUuid>& /*subjectsWithChangedParents*/)
+            {
+                if (groupsWithChangedMembers.contains(d->groupId))
+                    updateStateFrom(d->groupId);
+            });
     }
 
     connect(systemContext->userGroupManager(), &common::UserGroupManager::addedOrUpdated, this,
@@ -389,9 +417,7 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
             state.groupId,
             Qn::WriteAccessRightsPermission);
 
-        state.deleteAvailable = systemContext()->accessController()->hasPermissions(
-            state.groupId,
-            Qn::RemovePermission);
+        d->deleteAvailable = !systemContext()->nonEditableUsersAndGroups()->containsGroup(groupId);
     }
 
     return state;
