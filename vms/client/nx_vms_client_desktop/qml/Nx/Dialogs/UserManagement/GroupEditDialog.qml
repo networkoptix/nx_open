@@ -49,7 +49,6 @@ DialogWithState
     property bool parentGroupsEditable
     property bool membersEditable
     property bool permissionsEditable
-    property bool deleteAvailable
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
@@ -57,6 +56,7 @@ DialogWithState
     property alias editingContext: membersModel.editingContext
     property var self
     property bool continuousSync: true
+    property bool deleteAvailable: true
 
     signal deleteRequested()
     signal addGroupRequested()
