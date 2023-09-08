@@ -106,7 +106,7 @@ struct ResourceSelectionModelAdapter::Private
         if (resourceFilter)
         {
             const auto resource = sourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
-            if (!resourceFilter(resource))
+            if (resource && !resourceFilter(resource))
                 return false;
         }
 
