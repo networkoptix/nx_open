@@ -37,7 +37,6 @@ struct GroupSettingsDialogState
     Q_PROPERTY(nx::vms::api::GlobalPermissions globalPermissions MEMBER globalPermissions)
     Q_PROPERTY(nx::core::access::ResourceAccessMap sharedResources MEMBER sharedResources)
     Q_PROPERTY(bool permissionsEditable MEMBER permissionsEditable)
-    Q_PROPERTY(bool deleteAvailable MEMBER deleteAvailable)
 
 public:
     bool operator==(const GroupSettingsDialogState& other) const = default;
@@ -76,7 +75,6 @@ public:
     nx::vms::api::GlobalPermissions globalPermissions;
     nx::core::access::ResourceAccessMap sharedResources;
     bool permissionsEditable = true;
-    bool deleteAvailable = true;
 };
 
 class NX_VMS_CLIENT_DESKTOP_API GroupSettingsDialog:
@@ -97,7 +95,7 @@ public:
 public:
     GroupSettingsDialog(
         DialogType dialogType,
-        nx::vms::common::SystemContext* systemContext,
+        nx::vms::client::desktop::SystemContext* systemContext,
         QWidget* parent = nullptr);
 
     ~GroupSettingsDialog();

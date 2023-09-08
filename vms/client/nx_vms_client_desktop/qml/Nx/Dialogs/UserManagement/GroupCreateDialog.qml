@@ -49,7 +49,6 @@ DialogWithState
     property bool parentGroupsEditable //< Not used by current dialog type.
     property bool membersEditable //< Not used by current dialog type.
     property bool permissionsEditable //< Not used by current dialog type.
-    property bool deleteAvailable //< Not used by current dialog type.
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
@@ -57,6 +56,7 @@ DialogWithState
     property alias editingContext: membersModel.editingContext
     property var self
     property bool continuousSync //< Not used by current dialog type.
+    property bool deleteAvailable //< Not used by current dialog type.
 
     title: qsTr("New Group")
 
