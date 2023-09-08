@@ -240,10 +240,7 @@ bool Resources::deleteResources(
 
     if (usersOnly)
     {
-        infoLevel = Qn::RI_NameOnly;
-        text = resources.size() == 1
-            ? tr("Delete user?")
-            : tr("Delete %n users?", "", resources.size());
+        text = tr("Delete %n users?", "Numerical form depends on users count", resources.size());
     }
     else
     {
