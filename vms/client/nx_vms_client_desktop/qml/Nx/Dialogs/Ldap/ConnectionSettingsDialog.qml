@@ -222,13 +222,15 @@ Dialog
                         if (!enabled)
                         {
                             prevChecked = checked
-                            checked = false
+                            if (dialog.testState != LdapSettings.TestState.connecting)
+                                checked = false
                         }
                         else
                         {
                             checked = prevChecked
                         }
                     }
+                    onCheckedChanged: testStatus.visible = false
                 }
 
                 CheckBox
@@ -236,6 +238,7 @@ Dialog
                     id: ignoreCertErrorsCheckbox
                     text: qsTr("Ignore LDAP server certificate errors")
                     wrapMode: Text.WordWrap
+                    onCheckedChanged: testStatus.visible = false
                 }
             }
         }
