@@ -22,13 +22,14 @@ struct CacheKey
     int width = 0;
     QColor color;
     QFont font;
+    int pixelPercentage = 100;
 
     bool operator==(const CacheKey&) const = default;
 };
 
 static size_t qHash(const CacheKey& key, size_t seed = 0)
 {
-    return qHashMulti(seed, key.text, key.width, key.color.rgba(), key.font);
+    return qHashMulti(seed, key.text, key.width, key.color.rgba(), key.font, key.pixelPercentage);
 }
 
 } // namespace
@@ -54,9 +55,10 @@ public:
         CacheKey key
         {
             .text = text,
-            .width = qRound(option.rect.width() * pixelRatio),
+            .width = option.rect.width(),
             .color = option.palette.color(QPalette::Text),
-            .font = option.font
+            .font = option.font,
+            .pixelPercentage = qRound(pixelRatio * 100)
         };
 
         auto result = cache.object(key);
@@ -69,7 +71,7 @@ public:
             doc.setDocumentMargin(0);
             doc.setHtml(text);
 
-            WidgetUtils::elideTextRight(&doc, key.width);
+            WidgetUtils::elideTextRight(&doc, option.rect.width());
 
             const auto pixmapSize = (doc.size() * pixelRatio).toSize();
 
