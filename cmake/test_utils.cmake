@@ -13,6 +13,10 @@ include(test_metainformation)
 
 
 function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
+    if(NOT withTests)
+        message(FATAL_ERROR "Function nx_add_test can be used only with enabled withTests.")
+    endif()
+
     set(options NO_GTEST NO_QT NO_NX_UTILS)
     set(oneValueArgs FOLDER PROJECT COMPONENT EPIC)
     cmake_parse_arguments(NX_ADD_TEST "${options}"
@@ -44,6 +48,10 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
     if(NOT NX_ADD_TEST_NO_GTEST AND NOT NX_ADD_TEST_NO_NX_UTILS AND NOT NX_ADD_TEST_NO_QT)
         set(force_include_header
             ${nx_utils_dir}/src/nx/utils/test_support/custom_gtest_printers.h)
+        set(additional_test_support_private_libs
+            PRIVATE_LIBS
+                nx_utils
+                Qt6::Core)
     endif()
 
     nx_add_target(${target}
@@ -53,6 +61,7 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
         NO_RC_FILE
         NO_MOC
         ${additional_private_libs}
+        ${additional_test_support_private_libs}
         FOLDER ${folder}
         ${NX_ADD_TEST_UNPARSED_ARGUMENTS}
     )
