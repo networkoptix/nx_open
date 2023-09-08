@@ -2534,6 +2534,10 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         }
 
         case Qn::AccessDeniedOverlay:
+        {
+            return Qn::ResourceOverlayButton::Empty;
+        }
+
         case Qn::OldFirmwareOverlay:
         case Qn::OfflineOverlay:
         {
