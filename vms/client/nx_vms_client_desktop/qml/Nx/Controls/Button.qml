@@ -139,8 +139,14 @@ Button
     onClicked:
     {
         if (menu instanceof Menu)
-            menu.popup(this, menuXOffset, height)
+        {
+            menu.popup(this)
+            menu.x = Qt.binding(() => control.menuXOffset)
+            menu.y = Qt.binding(() => control.height)
+        }
         else if (menu instanceof PlatformMenu)
+        {
             menu.open(this)
+        }
     }
 }

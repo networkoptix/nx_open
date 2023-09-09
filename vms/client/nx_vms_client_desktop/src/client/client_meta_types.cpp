@@ -264,7 +264,7 @@ void QnClientMetaTypes::registerQmlTypes()
     ProximityScrollHelper::registerQmlType();
     ContextHelp::registerQmlType();
     WhatsThis::registerQmlType();
-    MouseSpy::registerQmlType();
+    MouseSpyInterface::registerQmlType();
     AudioDispatcher::registerQmlType();
     UserSettingsGlobal::registerQmlTypes();
     MembersModel::registerQmlType();

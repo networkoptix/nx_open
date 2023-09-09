@@ -290,9 +290,7 @@ ComboBox
 
         y: control.height
         width: control.width
-
         implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
-
         padding: 0
         topPadding: 2
         bottomPadding: 2
