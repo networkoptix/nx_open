@@ -60,6 +60,6 @@ if(withDesktopClient)
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
         DEPENDENCIES applauncher minilauncher desktop_client)
     if(NOT openSourceBuild)
-        nx_create_openssl_signature(generate_client_update_package ${client_update_file})
+        nx_sign_update_package(generate_client_update_package ${client_update_file})
     endif()
 endif()
