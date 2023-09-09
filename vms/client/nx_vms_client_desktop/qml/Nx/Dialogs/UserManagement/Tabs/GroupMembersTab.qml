@@ -19,6 +19,7 @@ MembershipSettings
 
     showDescription: true
     editableProperty: "isMember"
+    enabledProperty: "canEditParents"
     editableSection.property: "memberSection"
     editableSection.delegate: SectionHeader
     {
