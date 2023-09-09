@@ -160,12 +160,11 @@ Bubble
             bubble.show()
         }
 
-        Connections
-        {
-            target: MouseSpy
-            function onMouseMove() { d.setSuppressed(false) }
-            function onMousePress() { d.setSuppressed(true) }
-        }
+        MouseSpy.onMouseMove:
+            d.setSuppressed(false)
+
+        MouseSpy.onMousePress:
+            d.setSuppressed(true)
 
         Connections
         {
