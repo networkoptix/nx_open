@@ -52,12 +52,18 @@ MouseSpy::MouseSpy(QObject* parent):
 MouseSpy* MouseSpy::instance()
 {
     static MouseSpy instance;
+    QQmlEngine::setObjectOwnership(&instance, QQmlEngine::CppOwnership);
     return &instance;
 }
 
-void MouseSpy::registerQmlType()
+MouseSpy* MouseSpyInterface::qmlAttachedProperties(QObject* /*parent*/)
 {
-    qmlRegisterSingletonInstance("nx.vms.client.desktop", 1, 0, "MouseSpy", MouseSpy::instance());
+    return MouseSpy::instance();
+}
+
+void MouseSpyInterface::registerQmlType()
+{
+    qmlRegisterType<MouseSpyInterface>("nx.vms.client.desktop", 1, 0, "MouseSpy");
 }
 
 } // namespace nx::vms::client::desktop

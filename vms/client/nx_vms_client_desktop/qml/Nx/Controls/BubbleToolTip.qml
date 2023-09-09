@@ -133,21 +133,16 @@ NxObject
             }
         }
 
-        Connections
+        MouseSpy.onMouseMove:
         {
-            target: MouseSpy
+            if (d.state === BubbleToolTip.Suppressed)
+                d.setState(BubbleToolTip.Shown)
+        }
 
-            function onMouseMove()
-            {
-                if (d.state === BubbleToolTip.Suppressed)
-                    d.setState(BubbleToolTip.Shown)
-            }
-
-            function onMousePress()
-            {
-                if (d.state === BubbleToolTip.Shown)
-                    d.setState(BubbleToolTip.Suppressed)
-            }
+        MouseSpy.onMousePress:
+        {
+            if (d.state === BubbleToolTip.Shown)
+                d.setState(BubbleToolTip.Suppressed)
         }
     }
 }
