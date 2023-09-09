@@ -36,6 +36,7 @@ MembershipSettings
     }
 
     editableProperty: "isParent"
+    enabledProperty: "canEditMembers"
     editableSection.property: "groupSection"
     editableSection.delegate: SectionHeader
     {

@@ -259,7 +259,7 @@ Control
 
                         ImageButton
                         {
-                            visible: model.canEditMembers
+                            visible: model.canEditMembers && control.enabled
 
                             Layout.rightMargin: 4
                             Layout.alignment: Qt.AlignVCenter
@@ -567,6 +567,7 @@ Control
                                 id: groupCheckbox
 
                                 checked: model.isParent
+                                enabled: model.canEditMembers
 
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.topMargin: 6
