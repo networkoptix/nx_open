@@ -117,5 +117,5 @@ add_custom_target(distribution_deb_client ALL
 nx_add_targets_to_strengthened(${installer_output_list})
 
 if(NOT openSourceBuild)
-    nx_create_openssl_signature(distribution_deb_client ${zip_file})
+    nx_sign_update_package(distribution_deb_client ${zip_file})
 endif()
