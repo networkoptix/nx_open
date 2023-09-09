@@ -49,6 +49,7 @@ Panel 1.0 Panel.qml
 PlatformMenu 1.0 PlatformMenu.qml
 PlatformMenuItem 1.0 PlatformMenuItem.qml
 PlatformMenuSeparator 1.0 PlatformMenuSeparator.qml
+Popup 1.0 Popup.qml
 PopupShadow 1.0 PopupShadow.qml
 PreserveAspectFitter 1.0 PreserveAspectFitter.qml
 ProgressBar 1.0 ProgressBar.qml
