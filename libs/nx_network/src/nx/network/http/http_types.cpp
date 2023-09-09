@@ -255,8 +255,6 @@ std::string toString(Value val)
             return "OK";
         case created:
             return "Created";
-        case accepted:
-            return "Accepted";
         case noContent:
             return "No Content";
         case partialContent:
