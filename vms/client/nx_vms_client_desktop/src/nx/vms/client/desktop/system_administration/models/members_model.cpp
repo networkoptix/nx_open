@@ -818,6 +818,9 @@ bool MembersModel::setData(const QModelIndex& index, const QVariant& value, int 
         if (m_subjectIsUser) //< Users cannot have members.
             return false;
 
+        if (!data(index, CanEditParents).toBool())
+            return false;
+
         if (currentValue)
             removeMember(selectedId);
         else
@@ -833,6 +836,9 @@ bool MembersModel::setData(const QModelIndex& index, const QVariant& value, int 
     else if (role == IsParentRole)
     {
         if (isUser)
+            return false;
+
+        if (!canEditMembers(selectedId))
             return false;
 
         if (currentValue)
@@ -930,8 +936,9 @@ public:
 
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
         return (sourceModel()->data(sourceIndex, MembersModel::IsAllowedMember).toBool()
-                || (sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool()))
-            && sourceModel()->data(sourceIndex, MembersModel::CanEditParents).toBool()
+                || sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool())
+            && (sourceModel()->data(sourceIndex, MembersModel::CanEditParents).toBool()
+                || sourceModel()->data(sourceIndex, MembersModel::IsMemberRole).toBool())
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };
@@ -966,7 +973,8 @@ public:
         const auto sourceIndex = sourceModel()->index(sourceRow, 0);
         return (sourceModel()->data(sourceIndex, MembersModel::IsAllowedParent).toBool()
                 || sourceModel()->data(sourceIndex, MembersModel::IsParentRole).toBool())
-            && sourceModel()->data(sourceIndex, MembersModel::CanEditMembers).toBool()
+            && (sourceModel()->data(sourceIndex, MembersModel::CanEditMembers).toBool()
+                || sourceModel()->data(sourceIndex, MembersModel::IsParentRole).toBool())
             && base_type::filterAcceptsRow(sourceRow, sourceParent);
     }
 };

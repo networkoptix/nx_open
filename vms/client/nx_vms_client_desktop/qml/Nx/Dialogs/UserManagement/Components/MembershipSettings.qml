@@ -21,6 +21,7 @@ Item
     property var currentSearchRegExp: null
 
     property string editableProperty: "checked"
+    property string enabledProperty: ""
 
     property bool editable: true
     property bool enabled: true
@@ -114,6 +115,8 @@ Item
                     id: groupCheckbox
 
                     checked: model[control.editableProperty]
+
+                    enabled: control.enabledProperty ? model[control.enabledProperty] : true
 
                     baselineOffset: checkboxText.baselineOffset + checkboxText.y
                 }
