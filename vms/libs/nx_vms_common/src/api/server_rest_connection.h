@@ -32,13 +32,13 @@
 #include <nx/vms/api/analytics/device_agent_active_setting_changed_response.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>
 #include <nx/vms/api/data/analytics_data.h>
-#include <nx/vms/api/data/email_settings.h>
 #include <nx/vms/api/data/backup_position.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/database_dump_data.h>
 #include <nx/vms/api/data/device_model.h>
 #include <nx/vms/api/data/device_replacement.h>
 #include <nx/vms/api/data/device_search.h>
+#include <nx/vms/api/data/email_settings.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/log_settings.h>
@@ -942,13 +942,21 @@ private:
     Callback<ResultType> makeSessionAwareCallback(
         nx::vms::common::SessionTokenHelperPtr helper,
         nx::network::http::ClientPool::Request request,
-        Callback<ResultType> callback);
+        Callback<ResultType> callback,
+        std::optional<nx::network::http::AsyncClient::Timeouts> timeouts = {});
 
     Result<QByteArray>::type makeSessionAwareCallback(
         nx::vms::common::SessionTokenHelperPtr helper,
         nx::network::http::ClientPool::Request request,
         Result<QByteArray>::type callback,
         nx::network::http::AsyncClient::Timeouts timeouts);
+
+    template<typename ResultType, typename... CallbackParameters>
+    typename Result<ResultType>::type makeSessionAwareCallbackInternal(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        nx::network::http::ClientPool::Request request,
+        typename Result<ResultType>::type callback,
+        std::optional<nx::network::http::AsyncClient::Timeouts> timeouts);
 
     template <typename ResultType>
     Handle executeRequest(
