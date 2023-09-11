@@ -290,7 +290,7 @@ struct UserSettingsDialog::Private
         return userData;
     }
 
-    void showMessageBoxWithLink(const QString& text, const std::string& token)
+    void showMessageBoxWithLink(const QString& title, const QString& text, const std::string& token)
     {
         const QString linkText = linkFromToken(token);
 
@@ -314,7 +314,7 @@ struct UserSettingsDialog::Private
 
         messageBox.addCustomWidget(
             copyButton, QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
-        messageBox.setWindowTitle(qApp->applicationDisplayName());
+        messageBox.setWindowTitle(title);
         messageBox.exec();
     }
 
@@ -714,6 +714,7 @@ void UserSettingsDialog::onResetLink(
                     NX_ASSERT(data->temporaryToken);
 
                     d->showMessageBoxWithLink(
+                        tr("New Link - %1").arg(data->name),
                         tr("Access link has been successfully created!"),
                         data->temporaryToken->token);
 
@@ -994,6 +995,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                             NX_ASSERT(data->temporaryToken);
 
                             d->showMessageBoxWithLink(
+                                tr("New User"),
                                 tr("User %1 has been successfully created!")
                                     .arg(common::html::colored(
                                         data->name,
