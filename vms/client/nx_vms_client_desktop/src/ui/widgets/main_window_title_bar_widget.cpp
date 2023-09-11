@@ -609,6 +609,7 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
+    d->layoutBar->setFixedHeight(kSystemBarHeight);
 
     layout->addWidget(d->mainMenuButton);
     layout->addWidget(newVLine());
