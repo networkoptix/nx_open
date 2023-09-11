@@ -91,7 +91,7 @@ void TimeDurationWidget::setMinimum(int secs)
 
 void TimeDurationWidget::addDurationSuffix(QnTimeStrings::Suffix suffix)
 {
-    QString suffixName = QnTimeStrings::longSuffix(suffix);
+    QString suffixName = QnTimeStrings::longSuffixCapitalized(suffix);
 
     int period = 1;
     switch (suffix)
