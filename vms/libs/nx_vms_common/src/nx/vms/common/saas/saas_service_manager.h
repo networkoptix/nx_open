@@ -73,9 +73,20 @@ public:
     std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> cloudStorageData() const;
 
     /**
-     * @return Whether Saas is in blocked state.
+     * @return Whether Saas is in suspended or shutdown state. It doesn't matter if shutdown state
+     * was received from license server or set due lost connection to a licence server.
      */
-    bool isBlocked() const;
+    bool saasSuspendedOrShutDown() const;
+
+    static bool saasSuspendedOrShutDown(nx::vms::api::SaasState state);
+
+    /**
+     * @return Whether Saas is in shutdown state. It doesn't matter if shutdown state
+     * was received from license server or set due lost connection to a licence server.
+     */
+    bool saasShutDown() const;
+
+    static bool saasShutDown(nx::vms::api::SaasState state);
 
     /**
      * Depending on the SaaS licensing state, adds or removes License object converted from

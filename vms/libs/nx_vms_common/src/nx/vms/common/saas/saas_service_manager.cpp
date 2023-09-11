@@ -152,12 +152,28 @@ std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloud
     return purchasedServices<SaasCloudStorageParameters>(SaasService::kCloudRecordingType);
 }
 
-bool ServiceManager::isBlocked() const
+bool ServiceManager::saasSuspendedOrShutDown() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return saasSuspendedOrShutDown(m_data.state);
+}
+
+bool ServiceManager::saasSuspendedOrShutDown(nx::vms::api::SaasState state)
 {
     using namespace nx::vms::api;
+    return state == SaasState::suspend || saasShutDown(state);
+}
 
+bool ServiceManager::saasShutDown() const
+{
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    return m_data.state == SaasState::suspend || m_data.state == SaasState::shutdown;
+    return saasShutDown(m_data.state);
+}
+
+bool ServiceManager::saasShutDown(nx::vms::api::SaasState state)
+{
+    using namespace nx::vms::api;
+    return state == SaasState::shutdown || state == SaasState::autoShutdown;
 }
 
 void ServiceManager::updateLocalRecordingLicenseV1()
@@ -221,7 +237,7 @@ QnLicensePtr ServiceManager::localRecordingLicenseV1Unsafe() const
     using namespace nx::vms::api;
 
     QnLicensePtr license = QnLicense::createSaasLocalRecordingLicense();
-    if (m_data.state == SaasState::uninitialized || m_data.state == SaasState::shutdown)
+    if (m_data.state == SaasState::uninitialized || saasShutDown(m_data.state))
     {
         // Dont use SAAS -> licenseV1 conversion for shutdown state.
         // Local recording will be stopped due there are no V1 licenses.
