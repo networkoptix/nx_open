@@ -15,8 +15,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
@@ -126,6 +126,8 @@ QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource):
             if (role == Qn::LayoutIconRole)
                 emit titleChanged();
         });
+
+    setStreamSynchronizationState(StreamSynchronizationState::live());
 }
 
 QnWorkbenchLayout::~QnWorkbenchLayout()
