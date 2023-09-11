@@ -2,7 +2,9 @@
 
 #include "graphics_web_view.h"
 
+#include <QtCore/QMimeData>
 #include <QtQuick/QQuickItem>
+#include <QtWidgets/QGraphicsSceneDragDropEvent>
 
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
@@ -118,6 +120,22 @@ void GraphicsWebEngineView::setViewStatus(int status)
             setStatus(kPageLoadFailed);
             emit loadFinished(false);
     }
+}
+
+void GraphicsWebEngineView::dragEnterEvent(QGraphicsSceneDragDropEvent* event)
+{
+    if (const QMimeData* mimeData = event->mimeData();
+        mimeData->hasText()
+        || mimeData->hasHtml()
+        || mimeData->hasUrls()
+        || mimeData->hasImage()
+        || mimeData->hasColor())
+    {
+        return GraphicsQmlView::dragEnterEvent(event);
+    }
+
+    event->ignore();
+    return;
 }
 
 void GraphicsWebEngineView::updateCanGoBack()

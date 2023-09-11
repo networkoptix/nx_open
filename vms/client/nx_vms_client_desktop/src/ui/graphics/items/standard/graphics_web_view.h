@@ -63,6 +63,9 @@ signals:
 
     void loadFinished(bool ok);
 
+protected:
+    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent* event) override;
+
 private slots:
     void updateCanGoBack();
 
