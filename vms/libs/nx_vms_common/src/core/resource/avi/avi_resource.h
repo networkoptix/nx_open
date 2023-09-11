@@ -67,8 +67,6 @@ public:
     /** Returns true if the entity is contained inside a layout file. */
     bool isEmbedded() const;
 private:
-    void updateFromMedia() const;
-private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
     qint64 m_timeZoneOffset;
