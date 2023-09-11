@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/saas/saas_utils.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
 #include <ui/common/palette.h>
@@ -178,23 +179,19 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
     }
     else
     {
+        using namespace nx::vms::common::saas;
+
         const auto cloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage;
         const auto saasState = state.saasProperties.saasState;
 
-        if (saasState != nx::vms::api::SaasState::uninitialized
-            && saasState != nx::vms::api::SaasState::active
-            && cloudBackupStorage)
+        if (ServiceManager::saasShutDown(saasState) && cloudBackupStorage)
         {
             ui->stackedWidget->setCurrentWidget(ui->genericPlaceholderPage);
-
-            ui->genericPlaceholderCaptionLabel->setText(
-                saasState == nx::vms::api::SaasState::suspend
-                    ? tr("SaaS suspended")
-                    : tr("SaaS shut down"));
+            ui->genericPlaceholderCaptionLabel->setText(StringsHelper::shortState(saasState));
 
             ui->genericPlaceholderMessageLabel->setText(
-                tr("To perform a backup to the cloud storage SaaS must be in active state. "
-                    "Contact your channel partner for details"));
+                tr("To perform backup to the cloud storage SaaS must be in active state. %1")
+                    .arg( StringsHelper::recommendedAction(saasState)).trimmed());
 
             m_backupSettingsViewWidget->setTreeEntityFactoryFunction({});
             return;

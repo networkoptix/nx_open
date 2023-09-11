@@ -26,7 +26,7 @@ CameraSettingsSaasStateWatcher::CameraSettingsSaasStateWatcher(
     const auto setSaasInitializedStateToStore =
         [systemContext, store]
         {
-            store->setSaasInitialized(saas::saasIsInitialized(systemContext));
+            store->setSaasInitialized(saas::saasInitialized(systemContext));
         };
 
     connect(systemContext->saasServiceManager(), &saas::ServiceManager::dataChanged,

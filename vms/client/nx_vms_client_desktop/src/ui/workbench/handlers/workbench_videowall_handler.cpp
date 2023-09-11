@@ -1528,18 +1528,18 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 {
-    if (nx::vms::common::saas::saasIsInitialized(context()->systemContext()))
+    if (nx::vms::common::saas::saasInitialized(context()->systemContext()))
     {
-        if (!nx::vms::common::saas::saasIsActive(context()->systemContext()))
+        if (context()->systemContext()->saasServiceManager()->saasShutDown())
         {
             const auto saasState = context()->systemContext()->saasServiceManager()->saasState();
-            const auto caption = saasState == nx::vms::api::SaasState::suspend
-                ? tr("SaaS suspended")
-                : tr("SaaS shut down");
-            QnMessageBox::critical(mainWindowWidget(),
-                caption,
-                tr("To add Video Wall, SaaS should be in active state. "
-                    "Contact your channel partner for details."));
+
+            const auto caption = nx::vms::common::saas::StringsHelper::shortState(saasState);
+            const auto text = tr("To add Video Wall, SaaS should be in active state. %1")
+                .arg(nx::vms::common::saas::StringsHelper::recommendedAction(saasState)).trimmed();
+
+            QnMessageBox::critical(mainWindowWidget(), caption, text);
+
             return;
         }
     }

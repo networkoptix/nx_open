@@ -210,10 +210,11 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
 
 void NotificationListWidget::Private::changeFilterVisibilityIfNeeded()
 {
-    using namespace nx::vms;
+    using namespace nx::vms::common;
+
     if (auto user = context()->user();
         user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1
-        && (common::saas::saasIsActive(systemContext()) || rules::ini().enableCSNwithoutSaaS))
+        && (saas::saasServicesOperational(systemContext()) || rules::ini().enableCSNwithoutSaaS))
     {
         m_headerWidget->show();
         m_separatorLine->show();
