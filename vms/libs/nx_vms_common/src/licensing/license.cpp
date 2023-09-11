@@ -559,7 +559,6 @@ void QnLicense::parseLicenseBlock(
     int n = 0;
     m_orderType.clear();
 
-
     for (QByteArray line: licenseBlock.split('\n'))
     {
         line = line.trimmed();
