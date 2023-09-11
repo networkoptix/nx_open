@@ -559,7 +559,7 @@ void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst)
         src.digest,
         src.cryptSha512Hash});
 
-    dst->m_resourceAccessRights = src.resourceAccessRights;
+    dst->setResourceAccessRights(src.resourceAccessRights);
 }
 
 void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
