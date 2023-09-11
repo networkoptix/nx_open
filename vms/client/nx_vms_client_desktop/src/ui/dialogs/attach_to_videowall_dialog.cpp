@@ -66,22 +66,24 @@ void QnAttachToVideowallDialog::updateLicencesUsage()
 {
     const auto systemContext = m_videowall->systemContext();
 
-    if (nx::vms::common::saas::saasIsInitialized(systemContext))
+    if (nx::vms::common::saas::saasInitialized(systemContext))
     {
-        const auto saasIsActive = nx::vms::common::saas::saasIsActive(systemContext);
-        if (!saasIsActive)
+        using namespace nx::vms::common;
+
+        const auto isShutdown = systemContext->saasServiceManager()->saasShutDown();
+        if (isShutdown)
         {
             const auto saasState = systemContext->saasServiceManager()->saasState();
-            ui->licensesLabel->setText(saasState == nx::vms::api::SaasState::suspend
-                ? tr("SaaS suspended. To attach to Video Wall, SaaS must be in active state. "
-                    "Contact your channel partner for details.")
-                : tr("SaaS shut down. To attach to Video Wall, SaaS must be in active state. "
-                    "Contact your channel partner for details."));
+            ui->licensesLabel->setText(nx::format(
+                tr("%1. To attach to Video Wall, SaaS must be in active state. %2"),
+                saas::StringsHelper::shortState(saasState),
+                saas::StringsHelper::recommendedAction(saasState)));
+
             setWarningStyle(ui->licensesLabel);
         }
 
-        ui->licensesLabel->setHidden(saasIsActive);
-        ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(saasIsActive);
+        ui->licensesLabel->setHidden(!isShutdown);
+        ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!isShutdown);
         return;
     }
 

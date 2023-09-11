@@ -404,8 +404,8 @@ namespace Qn
         CannotDecryptMediaOverlay,
         MismatchedCertificateOverlay,
         InformationRequiredOverlay,
-        SaasSuspended,
         SaasShutDown,
+        SaasShutDownAutomatically,
 
         OverlayCount
     };
