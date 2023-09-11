@@ -41,11 +41,13 @@ NotificationActionExecutor::~NotificationActionExecutor()
 
 void NotificationActionExecutor::onContextUserChanged()
 {
+    using namespace nx::vms;
+
     const auto user = context()->user();
 
-    using namespace nx::vms;
     if (user && user->isCloud()
-        && (common::saas::saasIsActive(systemContext()) || rules::ini().enableCSNwithoutSaaS))
+        && (common::saas::saasServicesOperational(systemContext())
+            || rules::ini().enableCSNwithoutSaaS))
     {
         m_listener = std::make_unique<CrossSystemNotificationsListener>();
         connect(m_listener.get(),

@@ -267,8 +267,8 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
         { Qn::OldFirmwareOverlay, tr("UNSUPPORTED FIRMWARE VERSION") },
         { Qn::CannotDecryptMediaOverlay, tr("ARCHIVE ENCRYPTED") },
         { Qn::InformationRequiredOverlay, tr("INFORMATION REQUIRED") },
-        { Qn::SaasSuspended, tr("SAAS SUSPENDED") },
         { Qn::SaasShutDown, tr("SAAS SHUT DOWN") },
+        { Qn::SaasShutDownAutomatically, tr("NO CONNECTION TO THE LICENSE SERVER") },
     };
     return extractValue(overlay, kCaptions);
 }
@@ -319,8 +319,8 @@ QString QnStatusOverlayController::statusIconPath(Qn::ResourceStatusOverlay over
         { Qn::PasswordRequiredOverlay, "item_placeholders/alert.png" },
         { Qn::CannotDecryptMediaOverlay, "item_placeholders/encrypted.svg" },
         { Qn::InformationRequiredOverlay, "item_placeholders/alert.png" },
-        { Qn::SaasSuspended, "item_placeholders/offline.svg" }, //< TODO: #vbreus Change icon if needed.
-        { Qn::SaasShutDown, "item_placeholders/offline.png" },
+        { Qn::SaasShutDown, "item_placeholders/offline.svg" }, //< TODO: #vbreus Change icon if needed.
+        { Qn::SaasShutDownAutomatically, "item_placeholders/offline.png" },
     };
 
     return extractValue(overlay, kIconPaths);

@@ -62,7 +62,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     const auto updateLicenseAndSaasInfoPagesVisibility =
         [this]
         {
-            const bool saasInitialized = nx::vms::common::saas::saasIsInitialized(systemContext());
+            const bool saasInitialized = nx::vms::common::saas::saasInitialized(systemContext());
             setPageVisible(LicensesPage, !saasInitialized);
             setPageVisible(SaasInfoPage, saasInitialized);
         };

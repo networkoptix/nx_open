@@ -2503,14 +2503,22 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (qnRuntime->isVideoWallMode())
     {
-        if (nx::vms::common::saas::saasIsInitialized(systemContext()))
+        if (nx::vms::common::saas::saasInitialized(systemContext()))
         {
-            if (!nx::vms::common::saas::saasIsActive(systemContext()))
+            if (systemContext()->saasServiceManager()->saasShutDown())
             {
-                const auto saasState = systemContext()->saasServiceManager()->saasState();
-                return saasState == nx::vms::api::SaasState::suspend
-                    ? Qn::SaasSuspended
-                    : Qn::SaasShutDown;
+                switch (systemContext()->saasServiceManager()->saasState())
+                {
+                    case nx::vms::api::SaasState::shutdown:
+                        return Qn::SaasShutDown;
+
+                    case nx::vms::api::SaasState::autoShutdown:
+                        return Qn::SaasShutDownAutomatically;
+
+                    default:
+                        NX_ASSERT(false);
+                        return Qn::SaasShutDown;
+                }
             }
         }
         else if (!isVideoWallLicenseValid())
