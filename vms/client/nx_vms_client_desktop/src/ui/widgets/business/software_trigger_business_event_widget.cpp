@@ -10,6 +10,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
@@ -173,13 +174,16 @@ void QnSoftwareTriggerBusinessEventWidget::at_usersButton_clicked()
 
 void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
 {
+    static const QColor mainColor = "#A5B7C0";
+    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
+        {QnIcon::Normal, {{mainColor, "light10"}}}};
+
     const auto params = model()->eventParams();
 
     const auto icon =
         [](const QString& path) -> QIcon
         {
-            static const QnIcon::Suffixes suffixes {{ QnIcon::Normal, lit("selected") }};
-            return qnSkin->icon(path, QString(), &suffixes);
+            return qnSkin->icon(path, QString(), {}, colorSubs);
         };
 
     if (params.metadata.allUsers)
@@ -211,7 +215,7 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
         if (users.empty() && groups.empty())
         {
             ui->usersButton->setText(vms::event::StringsHelper::needToSelectUserText());
-            ui->usersButton->setIcon(qnSkin->icon(lit("tree/user_alert.svg")));
+            ui->usersButton->setIcon(qnSkin->icon(lit("tree/user_alert.svg"), colorSubs));
         }
         else
         {

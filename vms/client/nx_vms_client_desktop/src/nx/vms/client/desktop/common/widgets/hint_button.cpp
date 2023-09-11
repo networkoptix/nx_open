@@ -35,7 +35,7 @@ QString makeColoredText(const QString& text, const QColor& color)
 
 namespace nx::vms::client::desktop {
 
-const QColor HintButton::kBasicColor = "#707070";
+const QColor HintButton::kBasicColor = "#49626F";
 const nx::vms::client::core::SvgIconColorer::IconSubstitutions HintButton::kIconSubstitutions = {
     {QIcon::Normal, {{kBasicColor, "dark15"}}},
     {QIcon::Active, {{kBasicColor, "dark14"}}},

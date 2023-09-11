@@ -11,6 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -265,6 +266,10 @@ Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
 
 QVariant UserListModel::data(const QModelIndex& index, int role) const
 {
+    static const QColor mainColor = "#A5B7C0";
+    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
+        {QnIcon::Normal, {{mainColor, "light10"}}}};
+
     switch (role)
     {
         case Qt::CheckStateRole:
@@ -281,7 +286,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 return base_type::data(index, role);
 
             return !m_allUsers && isIndirectlyChecked(index)
-                ? QVariant(qnSkin->icon(lit("tree/users.svg")))
+                ? QVariant(qnSkin->icon(lit("tree/users.svg"), colorSubs))
                 : QVariant();
         }
 
@@ -383,13 +388,17 @@ GroupListDelegate::~GroupListDelegate()
 void GroupListDelegate::initStyleOption(QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
+    static const QColor mainColor = "#A5B7C0";
+    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
+        {QnIcon::Normal, {{mainColor, "light10"}}}};
+
     base_type::initStyleOption(option, index);
     if (index.column() == QnUserRolesModel::NameColumn)
     {
         const auto validationState = index.data(Qn::ValidationStateRole).value<QValidator::State>();
         option->icon = validationState == QValidator::Acceptable
-            ? qnSkin->icon(lit("tree/users.svg"))
-            : qnSkin->icon(lit("tree/users_alert.svg"));
+            ? qnSkin->icon(lit("tree/users.svg"), colorSubs)
+            : qnSkin->icon(lit("tree/users_alert.svg"), colorSubs);
 
         option->decorationSize = core::Skin::maximumSize(option->icon);
         option->features |= QStyleOptionViewItem::HasDecoration;

@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/unicode_chars.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -104,10 +105,15 @@ QString UserPickerHelper::text() const
 
 QIcon UserPickerHelper::icon() const
 {
+    static const QColor mainColor = "#A5B7C0";
+    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
+        {QnIcon::Normal, {{mainColor, "light10"}}}};
+
     if (m_acceptAll)
     {
-        return core::Skin::maximumSizePixmap(
-            m_isValid ? qnSkin->icon("tree/users.svg") : qnSkin->icon("tree/users_alert.svg"),
+        return core::Skin::maximumSizePixmap(m_isValid
+                ? qnSkin->icon("tree/users.svg", colorSubs)
+                : qnSkin->icon("tree/users_alert.svg", colorSubs),
             QIcon::Selected,
             QIcon::Off,
             /*correctDevicePixelRatio*/ false);
@@ -120,7 +126,7 @@ QIcon UserPickerHelper::icon() const
     const bool multiple = users > 1 || !m_groups.empty();
     const QIcon icon = qnSkin->icon(multiple
         ? (m_isValid ? "tree/users.svg" : "tree/users_alert.svg")
-        : (m_isValid ? "tree/user.svg" : "tree/user_alert.svg"));
+        : (m_isValid ? "tree/user.svg" : "tree/user_alert.svg"), colorSubs);
 
     return core::Skin::maximumSizePixmap(
         icon,
