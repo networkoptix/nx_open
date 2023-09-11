@@ -644,67 +644,13 @@ void LicenseManagerWidget::handleWidgetStateChange()
     if (ui->licenseWidget->state() != QnLicenseWidget::Waiting)
         return;
 
+    auto sessionTokenHelper = systemContext()->restApiHelper()->getSessionTokenHelper();
+    nx::vms::api::LicenseData body;
+    body.licenseBlock = {};
+
     if (ui->licenseWidget->isOnline())
     {
-        auto sessionTokenHelper = systemContext()->restApiHelper()->getSessionTokenHelper();
-
-        nx::vms::api::LicenseData body;
-        body.licenseBlock = {};
         body.key = ui->licenseWidget->serialKey().toLatin1();
-
-        auto callback =
-            [this, body](
-                bool success,
-                rest::Handle /*requestId*/,
-                rest::ServerConnection::ErrorOrEmpty result)
-            {
-                NX_VERBOSE(this, "Received response from license server. License key: %1",
-                    body.key);
-                if (!success)
-                {
-                    if (!std::holds_alternative<rest::Empty>(result))
-                    {
-                        auto res = std::get<nx::network::rest::Result>(result);
-                        if (res.error == nx::network::rest::Result::ServiceUnavailable)
-                        {
-                            NX_VERBOSE(this, "Network error occured activating license key.");
-                            handleDownloadError();
-                        }
-                        else
-                        {
-                            NX_VERBOSE(this,
-                                "License was not activated: %1",
-                                nx::network::rest::Result::errorToString(res.error));
-                            LicenseActivationDialogs::failure(this, res.errorString);
-                        }
-                    }
-                    else
-                    {
-                        NX_VERBOSE(this, "License was not activated for unknown reason.");
-                        LicenseActivationDialogs::failure(this);
-                    }
-                }
-                else
-                {
-                    NX_VERBOSE(this, "License activated successfully.");
-                    LicenseActivationDialogs::success(this);
-                }
-
-                ui->licenseWidget->setState(QnLicenseWidget::Normal);
-            };
-
-        NX_VERBOSE(this,
-            "Activating license using VMS Server. License key: %1",
-            body.key);
-
-        connection()->serverApi()->putRest(
-            sessionTokenHelper,
-            QString("/rest/v2/licenses/%1").arg(body.key),
-            nx::network::rest::Params{{{"lang", qnRuntime->locale()}}},
-            QByteArray::fromStdString(nx::reflect::json::serialize(body)),
-            callback,
-            this
-        );
     }
     else
     {
@@ -715,6 +661,8 @@ void LicenseManagerWidget::handleWidgetStateChange()
         switch (errorCode)
         {
             case QnLicenseErrorCode::NoError:
+                body.key = license->key();
+                break;
             case QnLicenseErrorCode::Expired:
             case QnLicenseErrorCode::TemporaryExpired:
                 ui->licenseWidget->clearManualActivationUserInput();
@@ -736,8 +684,64 @@ void LicenseManagerWidget::handleWidgetStateChange()
                 break;
         }
 
-        ui->licenseWidget->setState(QnLicenseWidget::Normal);
+        if (body.key.isEmpty())
+            return;
     }
+
+    auto callback =
+        [this, body](
+            bool success,
+            rest::Handle /*requestId*/,
+            rest::ServerConnection::ErrorOrEmpty result)
+        {
+            NX_VERBOSE(this, "Received response from license server. License key: %1",
+                body.key);
+            if (!success)
+            {
+                if (!std::holds_alternative<rest::Empty>(result))
+                {
+                    auto res = std::get<nx::network::rest::Result>(result);
+                    if (res.error == nx::network::rest::Result::ServiceUnavailable)
+                    {
+                        NX_VERBOSE(this, "Network error occured activating license key.");
+                        handleDownloadError();
+                    }
+                    else
+                    {
+                        NX_VERBOSE(this,
+                            "License was not activated: %1",
+                            nx::network::rest::Result::errorToString(res.error));
+                        LicenseActivationDialogs::failure(this, res.errorString);
+                    }
+                }
+                else
+                {
+                    NX_VERBOSE(this, "License was not activated for unknown reason.");
+                    LicenseActivationDialogs::failure(this);
+                }
+            }
+            else
+            {
+                NX_VERBOSE(this, "License activated successfully.");
+                LicenseActivationDialogs::success(this);
+            }
+
+            ui->licenseWidget->setState(QnLicenseWidget::Normal);
+        };
+
+    NX_VERBOSE(this,
+        "Activating license using VMS Server. License key: %1",
+        body.key);
+
+    connection()->serverApi()->putRest(
+        sessionTokenHelper,
+        QString("/rest/v2/licenses/%1").arg(body.key),
+        nx::network::rest::Params{{{"lang", qnRuntime->locale()}}},
+        QByteArray::fromStdString(nx::reflect::json::serialize(body)),
+        callback,
+        this
+    );
+    
 }
 
 } // namespace nx::vms::client::desktop
