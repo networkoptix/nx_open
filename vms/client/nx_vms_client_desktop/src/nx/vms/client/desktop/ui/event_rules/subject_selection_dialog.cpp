@@ -322,11 +322,15 @@ void SubjectSelectionDialog::setValidationPolicy(QnSubjectValidationPolicy* poli
 
 void SubjectSelectionDialog::validateAllUsers()
 {
+    static const QColor mainColor = "#A5B7C0";
+    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
+        {QnIcon::Normal, {{mainColor, "light10"}}}};
+
     const auto validationState = m_roles->validateUsers(std::move(allSubjects()));
 
     QIcon icon = (validationState == QValidator::Acceptable
-        ? qnSkin->icon(lit("tree/users.svg"))
-        : qnSkin->icon(lit("tree/users_alert.svg")));
+        ? qnSkin->icon(lit("tree/users.svg"), colorSubs)
+        : qnSkin->icon(lit("tree/users_alert.svg"), colorSubs));
 
     ui->allUsersCheckableLine->setIcon(icon);
 

@@ -8,6 +8,8 @@
 #include <business/business_resource_validation.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -125,8 +127,10 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
     const auto icon =
         [](const QString& path) -> QIcon
         {
-            static const QnIcon::Suffixes suffixes {{ QnIcon::Normal, lit("selected") }};
-            return qnSkin->icon(path, QString(), &suffixes);
+            static const QColor mainColor = "#A5B7C0";
+            static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
+                {QnIcon::Normal, {{mainColor, "light10"}}}};
+            return qnSkin->icon(path, QString(), {}, colorSubs);
         };
 
     const auto params = model()->actionParams();
