@@ -127,6 +127,8 @@ QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource):
             if (role == Qn::LayoutIconRole)
                 emit titleChanged();
         });
+
+    setStreamSynchronizationState(StreamSynchronizationState::live());
 }
 
 QnWorkbenchLayout::~QnWorkbenchLayout()
