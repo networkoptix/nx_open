@@ -1530,7 +1530,7 @@ TEST_F(ResourceAccessManagerTest, checkServerAsPowerUser)
 {
     loginAs(kPowerUsersGroupId);
     const auto server = addServer();
-    ASSERT_EQ(permissions(server), Qn::FullServerPermissions);
+    ASSERT_EQ(permissions(server), Qn::FullServerPermissions & ~Qn::RemovePermission);
 }
 
 // Custom users can't view health monitors by default.

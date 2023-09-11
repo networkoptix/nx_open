@@ -574,7 +574,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnMediaServerResourcePtr& server) const
 {
     if (hasPowerUserPermissions(subject))
-        return Qn::FullServerPermissions;
+    {
+        Qn::Permissions result = Qn::FullServerPermissions;
+        if (!hasGlobalPermission(subject, GlobalPermission::administrator))
+            result &= ~Qn::RemovePermission;
+        return result;
+    }
 
     Qn::Permissions result = Qn::ReadPermission;
 
@@ -598,12 +603,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return Qn::ReadPermission;
     }
 
-    const auto serverPermissions = permissions(subject, parentServer);
-
-    if (serverPermissions.testFlag(Qn::RemovePermission))
+    if (hasPowerUserPermissions(subject))
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
 
-    if (serverPermissions.testFlag(Qn::SavePermission))
+    if (permissions(subject, parentServer).testFlag(Qn::SavePermission))
         return Qn::ReadWriteSavePermission;
 
     return Qn::NoPermissions;
