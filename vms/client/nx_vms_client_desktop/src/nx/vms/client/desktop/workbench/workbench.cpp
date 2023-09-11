@@ -35,6 +35,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_grid_mapper.h>
@@ -361,10 +362,16 @@ QnWorkbenchLayout* Workbench::replaceLayout(
     // Replace layout only if it is already on the workbench.
     if (const auto workbenchLayout = layout(replaceableLayout))
     {
-        int index = layoutIndex(workbenchLayout);
-        const auto newWorkbenchLayout = insertLayout(newLayout, index);
+        const bool isCurrentLayout = currentLayout() == workbenchLayout;
+        const auto savedSyncState = isCurrentLayout
+            ? windowContext()->streamSynchronizer()->state()
+            : workbenchLayout->streamSynchronizationState();
 
-        if (currentLayout() == workbenchLayout)
+        const int index = layoutIndex(workbenchLayout);
+        const auto newWorkbenchLayout = insertLayout(newLayout, index);
+        newWorkbenchLayout->setStreamSynchronizationState(savedSyncState);
+
+        if (isCurrentLayout)
             setCurrentLayoutIndex(index);
 
         removeLayout(index + 1);
