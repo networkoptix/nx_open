@@ -139,18 +139,14 @@ bool QnAviResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) c
         return dataProvider->hasVideo();
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    updateFromMedia();
-    return *m_hasVideo;
-}
-
-void QnAviResource::updateFromMedia() const
-{
     if (!m_hasVideo.has_value())
     {
+        // Read actual data from the file. Warning: this can be very slow!
         const QScopedPointer<QnAviArchiveDelegate> archiveDelegate(createArchiveDelegate());
         archiveDelegate->open(toSharedPointer(this));
         m_hasVideo = archiveDelegate->hasVideo();
     }
+    return *m_hasVideo;
 }
 
 AudioLayoutConstPtr QnAviResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
@@ -222,7 +218,6 @@ std::optional<int> QnAviResource::forcedRotation() const
         return userSetRotation;
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-    updateFromMedia();
     if (m_aviMetadata)
         return m_aviMetadata->rotation;
     return std::nullopt;
