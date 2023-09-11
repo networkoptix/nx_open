@@ -559,8 +559,9 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
         kControlButtonSize));
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     {
-        const QColor background = core::colorTheme()->color("dark7");
+        const QColor background = "#212A2F";
         const core::SvgIconColorer::IconSubstitutions colorSubs = {
+            { QnIcon::Normal, {{ background, "dark7" }}},
             { QnIcon::Active, {{ background, "red_d1" }}},
             { QnIcon::Pressed, {{ background, "red_d1" }}}};
         QIcon icon = qnSkin->icon("titlebar/window_close.svg", "", nullptr, colorSubs);
@@ -645,8 +646,9 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
         kControlButtonSize));
     layout->addWidget(newVLine("dark8", "dark6"));
     {
-        const QColor background = core::colorTheme()->color("dark7");
+        const QColor background = "#212A2F";
         const core::SvgIconColorer::IconSubstitutions colorSubs = {
+            { QnIcon::Normal, {{ background, "dark7" }}},
             { QnIcon::Active, {{ background, "red_d1" }}},
             { QnIcon::Pressed, {{ background, "red_d1" }}}};
         QIcon icon = qnSkin->icon("titlebar/window_close.svg",

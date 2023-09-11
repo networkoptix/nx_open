@@ -90,7 +90,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(
     ui->setupUi(m_owner);
     ui->refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     ui->clearFilterButton->setIcon(
-        qnSkin->icon("text_buttons/cross_close_20.svg", kIconSubstitutions));
+        qnSkin->icon("text_buttons/close_medium_20x20.svg", kIconSubstitutions));
 
     ui->gridBookmarks->setModel(m_model);
 
