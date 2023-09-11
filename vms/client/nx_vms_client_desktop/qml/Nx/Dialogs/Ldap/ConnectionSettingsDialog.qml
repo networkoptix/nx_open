@@ -388,7 +388,7 @@ Dialog
             anchors.verticalCenter: parent.verticalCenter
             x: 16
 
-            toolTipText: qsTr("To allow LDAP users to log in to %1, it is necessary"
+            toolTipText: qsTr("To allow LDAP users to log in to %1, it is necessary "
                 + "to establish a connection between %1 and a corporate LDAP server.").arg(
                     Branding.vmsName())
             helpTopic: HelpTopic.Ldap
