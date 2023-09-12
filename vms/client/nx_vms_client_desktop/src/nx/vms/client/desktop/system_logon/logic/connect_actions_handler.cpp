@@ -71,6 +71,7 @@
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -1342,6 +1343,8 @@ void ConnectActionsHandler::clearConnection()
 
     NX_DEBUG(this, "Clear connection: removing resources");
     resourcePool()->removeResources(resourcesToRemove);
+
+    systemContext()->showreelManager()->resetShowreels();
 
     systemContext()->resourcePropertyDictionary()->clear(idList);
     systemContext()->resourceStatusDictionary()->clear(idList);
