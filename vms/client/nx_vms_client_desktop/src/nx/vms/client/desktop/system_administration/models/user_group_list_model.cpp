@@ -66,7 +66,11 @@ struct UserGroupListModel::Private
     Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId())
     {
         connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
-            [this]() { syncId = this->q->globalSettings()->ldap().syncId(); });
+            [this]()
+            {
+                syncId = this->q->globalSettings()->ldap().syncId();
+                updateLdapGroupsNotFound();
+            });
 
         connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::statusChanged, q,
             [this, q]()
@@ -293,6 +297,30 @@ struct UserGroupListModel::Private
         {
             if (notFoundGroups.remove(groupId))
                 emit q->notFoundGroupsChanged();
+        }
+    }
+
+    void updateLdapGroupsNotFound()
+    {
+        int groupIndex = -1;
+        for (const auto& group: orderedGroups)
+        {
+            ++groupIndex;
+
+            if (group.type != api::UserType::ldap)
+                continue;
+
+            const bool notFound = notFoundGroups.contains(group.id);
+            const bool notFoundNewValue = ldapGroupNotFound(group);
+
+            if (notFound != notFoundNewValue)
+            {
+                markGroupNotFound(group.id, notFoundNewValue);
+                emit q->dataChanged(
+                    q->index(groupIndex, GroupWarningColumn),
+                    q->index(groupIndex, GroupWarningColumn),
+                    {Qn::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
+            }
         }
     }
 };
