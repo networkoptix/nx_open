@@ -5,7 +5,9 @@
 /**
  * Some c++20 features missing in Clang are defined here
  */
-#if defined(__clang__)
+
+#define kClangMissingCpp20SupportVersion 15
+#if defined(__clang__) && (__clang_major__ < kClangMissingCpp20SupportVersion)
 
 #if defined(_LIBCPP_COMPILER_CLANG_BASED) || \
     defined(__ANDROID_MIN_SDK_VERSION__) && __ANDROID_MIN_SDK_VERSION__ <= 21
@@ -271,4 +273,4 @@ inline detail::synth3way_t<Tp> operator<=>(
 
 #endif // defined(_LIBCPP_COMPILER_CLANG_BASED)
 
-#endif // defined(__clang__)
+#endif // defined(__clang__) && (__clang_major__ < kClangMissingCpp20SupportVersion)
