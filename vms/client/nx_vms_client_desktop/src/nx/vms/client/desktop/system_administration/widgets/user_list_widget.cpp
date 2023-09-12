@@ -420,12 +420,11 @@ void UserListWidget::Private::setupUi()
 
     auto alertsLayout = new QVBoxLayout();
     alertsLayout->setSpacing(0);
+    alertsLayout->addWidget(selectionControls);
     alertsLayout->addWidget(notFoundUsersWarning);
     alertsLayout->addWidget(ldapServerOfflineWarning);
     alertsLayout->addWidget(nonUniqueUsersWarning);
-    alertsLayout->addWidget(selectionControls);
     q->layout()->addItem(alertsLayout);
-    q->layout()->addWidget(selectionControls);
 
     ui->filterButton->menu()->addAction(
         tr("All Users"),
