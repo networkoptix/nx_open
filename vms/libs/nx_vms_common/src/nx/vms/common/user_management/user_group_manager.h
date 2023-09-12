@@ -50,6 +50,14 @@ public:
     template<class IDList>
     nx::vms::api::UserGroupDataList getGroupsByIds(const IDList& idList) const;
 
+    // TODO: #skolesnik Document return type traits. Or add a template Result type
+    /**
+     * Returns a new list populated with the results of calling a provided function on every user
+     * group data specified by id list.
+     */
+    template<class IDList, typename UnaryFunction>
+    auto mapGroupsByIds(const IDList& idList, UnaryFunction f) const;
+
     /** Sets all custom user groups. */
     void resetAll(const nx::vms::api::UserGroupDataList& groups);
 
@@ -80,6 +88,31 @@ nx::vms::api::UserGroupDataList UserGroupManager::getGroupsByIds(const IDList& i
     {
         if (auto group = find(id))
             result.push_back(std::move(*group));
+    }
+
+    return result;
+}
+
+template <class IDList, typename UnaryFunction>
+auto UserGroupManager::mapGroupsByIds(const IDList& idList, UnaryFunction f) const
+{
+    using result_value_type =
+        std::decay_t<decltype(f(*find(std::declval<typename IDList::value_type>())))>;
+    struct Result
+    {
+        QnUuid id;
+
+        // TODO: (?) Rename to something like `existing` of `found` for better semantics.
+        std::optional<result_value_type> value;
+    };
+    std::vector<Result> result;
+    result.reserve(idList.size());
+
+    for (const auto& id: idList)
+    {
+        const auto group = find(id);
+        result.push_back(Result{.id = id,
+            .value = group ? f(*group) : std::optional<result_value_type>{std::nullopt}});
     }
 
     return result;

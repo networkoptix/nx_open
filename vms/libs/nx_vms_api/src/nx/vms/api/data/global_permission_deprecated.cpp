@@ -149,14 +149,8 @@ std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool
     if (permissions.testFlag(GlobalPermission::generateEvents))
         deprecatedPermissions |= GlobalPermissionDeprecated::userInput;
 
-    const bool isDefaultLdapRights = deprecatedPermissions == GlobalPermissionDeprecated::none
-        && groups.size() == 1 && groups.front() == kDefaultLdapGroupId;
-    if (!isDefaultLdapRights)
-    {
-        std::erase(groups, kDefaultLdapGroupId);
-        if (groups.empty() || !UserDataDeprecated::permissionPresetToGroupId(deprecatedPermissions))
-            deprecatedPermissions |= GlobalPermissionDeprecated::customUser;
-    }
+    if (groups.empty() || !UserDataDeprecated::permissionPresetToGroupId(deprecatedPermissions))
+        deprecatedPermissions |= GlobalPermissionDeprecated::customUser;
 
     return {
         deprecatedPermissions,
