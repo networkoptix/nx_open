@@ -62,14 +62,15 @@ public:
     virtual const char* bestShotImageData() const = 0;
 
     /**
-     * @return Size of the image data array. If the track has no explicit best shot image 0 is
+     * @return Size of the image data array. If the track has no explicit best shot image, 0 is
      *     returned.
      */
     virtual int bestShotImageDataSize() const = 0;
 
     /**
      * @return Format of the best shot image. Can contain one of the following values:
-     *     "image/jpeg", "image/png", "image/tiff".
+     *     "image/jpeg", "image/png", "image/tiff". If the track has no explicit best shot image,
+     *     an empty string is returned.
      */
     virtual const char* bestShotImageDataFormat() const = 0;
 };
