@@ -179,7 +179,7 @@ QnUuid QnUuid::fromArbitraryData(const QString& data)
     return fromArbitraryData(data.toUtf8());
 }
 
-QnUuid QnUuid::fromArbitraryData(const std::string_view& data)
+QnUuid QnUuid::fromArbitraryData(std::string_view data)
 {
     return fromArbitraryData(QByteArray::fromRawData(data.data(), (int) data.size()));
 }

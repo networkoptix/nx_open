@@ -75,6 +75,7 @@ UserModelBase UserModelBase::fromUserData(UserData&& baseData)
 QN_FUSION_ADAPT_STRUCT(UserModelV1, UserModelV1_Fields)
 QN_FUSION_DEFINE_FUNCTIONS(UserModelV1, (json))
 
+// This method doesn't preserve LDAP `groupIds` which are immutable for PATCH requests.
 UserModelV1::DbUpdateTypes UserModelV1::toDbTypes() &&
 {
     auto user = std::move(*this).toUserData();
