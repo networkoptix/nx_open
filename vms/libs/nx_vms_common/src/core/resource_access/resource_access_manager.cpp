@@ -792,6 +792,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                     return permissions & ~(
                         Qn::WritePasswordPermission
                         | Qn::WriteDigestPermission
+                        | Qn::WriteNamePermission
                         | Qn::WriteEmailPermission
                         | Qn::WriteFullNamePermission);
                 }
