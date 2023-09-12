@@ -54,6 +54,189 @@ struct ServerApiErrors
     Q_DECLARE_TR_FUNCTIONS(ServerApiErrors);
 };
 
+class CanAddOrRemoveParentGroups final
+{
+public:
+    /**
+     * Checks whether a new or existing User can be added to the given parent User Groups.
+     * @param manager
+     * @param accessData
+     * @param existingUser existing User. Value `nullptr` is considered as a new user to be
+     * created.
+     * @param parentGroups parent User Groups to add the User into
+     * @return
+     */
+    [[nodiscard]] Result operator()(nx::vms::common::UserGroupManager* const manager,
+        const Qn::UserAccessData& accessData,
+        const QnSharedResourcePointer<QnUserResource>& existingUser,
+        const std::vector<QnUuid>& parentGroups) const
+    {
+        return canAddOrRemove(manager, accessData, existingUser, parentGroups);
+    }
+
+    /**
+     * Checks whether a new or existing User Group can be added to the given parent User Groups.
+     * @param manager
+     * @param accessData
+     * @param existingGroup existing User Group. Value `nullptr` is considered as a new User Group
+     * to be created.
+     * @param parentGroups parent User Groups to add the User Group into
+     * @return
+     */
+    [[nodiscard]] Result operator()(nx::vms::common::UserGroupManager* const manager,
+        const Qn::UserAccessData& accessData,
+        const std::optional<api::UserGroupData>& existingGroup,
+        const std::vector<QnUuid>& parentGroups) const
+    {
+        return canAddOrRemove(manager, accessData, existingGroup, parentGroups);
+    }
+
+private:
+    template<typename ChildT>
+    [[nodiscard]] Result canAddOrRemove(nx::vms::common::UserGroupManager* const manager,
+        const Qn::UserAccessData& /*accessData*/,
+        const ChildT& existingChild,
+        std::vector<QnUuid> parentIds) const
+    {
+        if (!NX_ASSERT(manager))
+            return {ErrorCode::serverError};
+
+        // returns elements from `rangeToSearch` which are not found in `rangeContaining`
+        // TODO: #skolesnik Consider moving to `open/libs/nx_utils/src/nx/utils/std/algorithm.h`
+        const auto setDifference =
+            [](const auto& rangeToSearch, const auto& rangeContaining)
+            {
+                std::vector<QnUuid> notFound;
+                std::set_difference(rangeToSearch.cbegin(), rangeToSearch.cend(),
+                    rangeContaining.cbegin(), rangeContaining.cend(),
+                    std::back_inserter(notFound));
+                return notFound;
+            };
+
+        const auto selectGroupProps =
+            [](const api::UserGroupData& groupData)
+            {
+                struct
+                {
+                    QnUuid id;
+                    QString name;
+                    api::UserType type;
+                } selected{.id = groupData.id, .name = groupData.name, .type = groupData.type};
+
+                return selected;
+            };
+
+        using nx::utils::unique_sorted;
+
+        const auto existing = unique_sorted(parentGroups(existingChild));
+        const auto updated = unique_sorted(std::move(parentIds));
+
+        const auto newParents = manager->mapGroupsByIds(
+            setDifference(updated, existing),
+            selectGroupProps);
+
+        const auto removeParents = manager->mapGroupsByIds(
+            setDifference(existing, updated),
+            selectGroupProps);
+
+        for (const auto& parent: newParents)
+        {
+            if (!parent.value)
+            {
+                return {ErrorCode::badRequest,
+                    nx::format(ServerApiErrors::tr("User Group '%1' does not exist."),
+                        parent.id.toString())};
+            }
+        }
+
+        for (const auto& parentGroup: removeParents)
+        {
+            if (!parentGroup.value)
+            {
+                NX_WARNING(this,
+                    "Requested to remove from non-existing User Group '%1'.",
+                    parentGroup.id);
+                continue;
+            }
+        }
+
+        for (const auto& parent: newParents)
+        {
+            if (parent.value->type == api::UserType::ldap)
+                return errorCantAddToLdap(existingChild, *parent.value);
+        }
+
+        for (const auto& parent: removeParents)
+        {
+            if (parent.value->type == api::UserType::ldap)
+                return errorCantRemoveFromLdap(existingChild, *parent.value);
+        }
+
+        return {};
+    }
+
+    static std::vector<QnUuid> parentGroups(
+        const QnSharedResourcePointer<QnUserResource>& existingUser)
+    {
+        return existingUser ? existingUser->groupIds() : std::vector<QnUuid>{};
+    }
+
+    static std::vector<QnUuid> parentGroups(
+        const std::optional<api::UserGroupData>& existingGroup)
+    {
+        return existingGroup ? existingGroup->parentGroupIds : std::vector<QnUuid>{};
+    }
+
+    template<typename GroupInfo>
+    static Result errorCantAddToLdap(
+        const QnSharedResourcePointer<QnUserResource>& /*existingUser*/, const GroupInfo& group)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(
+                ServerApiErrors::tr(
+                    "Forbidden to add any Users to a LDAP User Group '%1(%2)'"),
+                group.name,
+                group.id.toString())};
+    }
+
+    template<typename GroupInfo>
+    static Result errorCantRemoveFromLdap(
+        const QnSharedResourcePointer<QnUserResource>& /*existingUser*/, const GroupInfo& group)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(
+                ServerApiErrors::tr(
+                    "Forbidden to remove any Users from a LDAP User Group '%1(%2)'"),
+                group.name,
+                group.id.toString())};
+    }
+
+    template<typename GroupInfo>
+    static Result errorCantAddToLdap(
+        const std::optional<api::UserGroupData>& /*existingGroup*/, const GroupInfo& group)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(
+                ServerApiErrors::tr(
+                    "Forbidden to add any User Groups to a LDAP User Group '%1(%2)'"),
+                group.name,
+                group.id.toString())};
+    }
+
+    template<typename GroupInfo>
+    static Result errorCantRemoveFromLdap(
+        const std::optional<api::UserGroupData>& /*existingGroup*/, const GroupInfo& group)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(
+                ServerApiErrors::tr(
+                    "Forbidden to remove any User Groups from a LDAP User Group '%1(%2)'"),
+                group.name,
+                group.id.toString())};
+    }
+
+} const canAddOrRemoveParentGroups{};
+
 } // namespace
 
 struct InvalidGetHashHelper
@@ -718,7 +901,7 @@ struct SaveUserAccess
 
             if (existingUser->externalId() != param.externalId)
             {
-                return Result(ErrorCode::badRequest, ServerApiErrors::tr(
+                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
                     "Change of `externalId` is forbidden."));
             }
 
@@ -761,10 +944,14 @@ struct SaveUserAccess
                 "Creating an Administrator user is not allowed.")));
         }
 
-        if (!nx::vms::common::allUserGroupsExist(systemContext, param.groupIds))
+        if (const auto res = canAddOrRemoveParentGroups(
+                    systemContext->userGroupManager(),
+                    accessData,
+                    existingUser,
+                    param.groupIds);
+            !res)
         {
-            return Result(ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
-                "User Group does not exist.")));
+            return res;
         }
 
         if (param.type == nx::vms::api::UserType::cloud
@@ -1540,23 +1727,35 @@ struct SaveUserRoleAccess
         if (hasSystemAccess(accessData))
             return {};
 
+        const auto existing = systemContext->userGroupManager()->find(param.id);
+
         if (param.type == nx::vms::api::UserType::ldap)
         {
-            const auto group = systemContext->userGroupManager()->find(param.id);
-            if (!group)
+            if (!existing)
             {
                 return Result(ErrorCode::forbidden,
                     ServerApiErrors::tr("LDAP Group creation is forbidden."));
             }
 
-            if (group->externalId != param.externalId)
+            // TODO: (?) Is this change forbidden only for LDAP users?
+            if (existing->externalId != param.externalId)
             {
                 return Result(ErrorCode::badRequest,
                     ServerApiErrors::tr("Change of `externalId` is forbidden."));
             }
         }
 
-        return Result();
+        if (const auto res = canAddOrRemoveParentGroups(
+                    systemContext->userGroupManager(),
+                    accessData,
+                    existing,
+                    param.parentGroupIds);
+            !res)
+        {
+            return res;
+        }
+
+        return {};
     }
 };
 
