@@ -9,6 +9,7 @@
 #include <core/resource_access/abstract_access_rights_manager.h>
 #include <core/resource_access/abstract_global_permissions_watcher.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/api/data/user_group_data.h>
 
 namespace nx::core::access {
 
@@ -68,13 +69,18 @@ AccessRights OwnResourceAccessResolver::accessRights(const QnUuid& subjectId,
 
 GlobalPermissions OwnResourceAccessResolver::globalPermissions(const QnUuid& subjectId) const
 {
-    // A workaround for the built-in local admin having own permissions duplicating inherited ones.
-    if (subjectId == QnUserResource::kAdminGuid)
+    if (!NX_ASSERT(d->globalPermissionsWatcher))
         return {};
 
-    return NX_ASSERT(d->globalPermissionsWatcher)
-        ? d->globalPermissionsWatcher->ownGlobalPermissions(subjectId)
-        : GlobalPermissions{};
+    auto result = d->globalPermissionsWatcher->ownGlobalPermissions(subjectId);
+
+    // A workaround for administrators having own permissions duplicating inherited ones.
+    // We assume that a user or group can get administrator or power user permissions only
+    // by inheriting from a predefined group.
+    if (!nx::vms::api::kPredefinedGroupIds.contains(subjectId))
+        result &= ~(GlobalPermission::powerUser | GlobalPermission::administrator);
+
+    return result;
 }
 
 ResourceAccessDetails OwnResourceAccessResolver::accessDetails(
