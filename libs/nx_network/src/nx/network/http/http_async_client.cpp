@@ -8,12 +8,10 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/thread/mutex.h>
-
 #include <nx/utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
-#include <nx/network/nx_network_ini.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "auth_cache.h"
 #include "auth_tools.h"
@@ -389,14 +387,15 @@ void AsyncClient::doRequest(
     NX_VERBOSE(this, "Issuing request %1 %2 to %3", method, urlOriginal.path(), urlOriginal);
 
     nx::utils::Url url = urlOriginal;
-    if (url.host().isEmpty() && m_messagePipeline != nullptr)
+    NX_ASSERT(!url.host().isEmpty() || m_messagePipeline, "Url: %1", url);
+
+    if (m_messagePipeline && url.host().isEmpty())
     {
         url.setHost(m_messagePipeline->socket()->getForeignAddress().address.toString());
         url.setPort(m_messagePipeline->socket()->getForeignAddress().port);
     }
 
-    NX_ASSERT(!url.host().isEmpty() || m_messagePipeline, url.toString());
-    NX_ASSERT(url.isValid(), url.toString());
+    NX_ASSERT(url.isValid(), "Url: %1", url);
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;

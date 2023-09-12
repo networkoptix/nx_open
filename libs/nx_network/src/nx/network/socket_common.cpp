@@ -282,6 +282,11 @@ bool HostAddress::isMulticast() const
     return false;
 }
 
+bool HostAddress::isEmpty() const
+{
+    return !m_ipV4 && !m_ipV6 && !(m_string && !m_string->empty());
+}
+
 HostAddress HostAddress::toPureIpAddress(int desiredIpVersion) const
 {
     if (desiredIpVersion == AF_INET6)
