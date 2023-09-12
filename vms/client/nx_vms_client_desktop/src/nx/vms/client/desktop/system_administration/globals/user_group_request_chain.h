@@ -14,6 +14,12 @@ namespace nx::vms::client::desktop {
 
 struct UserGroupRequest
 {
+    // A request to remove user by id.
+    struct RemoveUser
+    {
+        QnUuid id;
+    };
+
     // A request to remove group by id.
     struct RemoveGroup
     {
@@ -53,7 +59,12 @@ struct UserGroupRequest
     };
 
     using Type = std::variant<
-        ModifyUserParents, ModifyGroupParents, RemoveGroup, AddOrUpdateGroup, UpdateUser>;
+        ModifyUserParents,
+        ModifyGroupParents,
+        RemoveUser,
+        RemoveGroup,
+        AddOrUpdateGroup,
+        UpdateUser>;
 };
 
 /**
@@ -92,6 +103,7 @@ private:
     void requestModifyGroupParents(const UserGroupRequest::ModifyGroupParents& mod);
     void requestModifyUserParents(const UserGroupRequest::ModifyUserParents& mod);
     void requestSaveGroup(const UserGroupRequest::AddOrUpdateGroup& data);
+    void requestRemoveUser(const UserGroupRequest::RemoveUser& data);
     void requestRemoveGroup(const UserGroupRequest::RemoveGroup& data);
     void requestUpdateUser(const UserGroupRequest::UpdateUser& data);
 

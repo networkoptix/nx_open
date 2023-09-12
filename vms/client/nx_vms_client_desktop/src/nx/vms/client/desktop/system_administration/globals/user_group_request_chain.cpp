@@ -9,8 +9,10 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -51,6 +53,8 @@ void UserGroupRequestChain::makeRequest(const UserGroupRequest::Type& data)
         requestSaveGroup(*updateData);
     else if (const auto removalData = std::get_if<UserGroupRequest::RemoveGroup>(&data))
         requestRemoveGroup(*removalData);
+    else if (const auto updateData = std::get_if<UserGroupRequest::RemoveUser>(&data))
+        requestRemoveUser(*updateData);
     else if (const auto updateData = std::get_if<UserGroupRequest::UpdateUser>(&data))
         requestUpdateUser(*updateData);
 }
@@ -179,6 +183,34 @@ void UserGroupRequestChain::requestSaveGroup(const UserGroupRequest::AddOrUpdate
         tokenHelper(),
         onGroupSaved,
         thread());
+}
+
+void UserGroupRequestChain::requestRemoveUser(const UserGroupRequest::RemoveUser& data)
+{
+    auto onUserRemoved = nx::utils::guarded(this,
+        [this, id = data.id](bool success, int handle, const rest::ErrorOrEmpty& result)
+        {
+            if (NX_ASSERT(handle == m_currentRequest))
+                m_currentRequest = -1;
+
+            QString errorString;
+
+            if (success)
+            {
+                // Remove if not already removed.
+                if (auto resource = systemContext()->resourcePool()->getResourceById(id))
+                    systemContext()->resourcePool()->removeResource(resource);
+            }
+            else if (auto error = std::get_if<nx::network::rest::Result>(&result))
+            {
+                errorString = error->errorString;
+            }
+
+            requestComplete(success, errorString);
+        });
+
+    m_currentRequest = connectedServerApi()->removeUserAsync(
+        data.id, tokenHelper(), onUserRemoved, thread());
 }
 
 void UserGroupRequestChain::requestRemoveGroup(const UserGroupRequest::RemoveGroup& data)

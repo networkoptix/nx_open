@@ -752,27 +752,53 @@ void UserListWidget::Private::deleteUsers(const QnUserResourceList& usersToDelet
     if (!messages::Resources::deleteResources(q, usersToDelete, /*allowSilent*/ false))
         return;
 
-    auto callback = nx::utils::mutableGuarded(q,
-        [this, n = usersToDelete.size(), nonDeletedResources = QnResourceList()](
-            bool success,
-            const QnResourcePtr& resource) mutable
-        {
-            if (!success)
-                nonDeletedResources.push_back(resource);
+    auto chain = new UserGroupRequestChain(q->systemContext());
 
-            if (--n != 0)
-                return;
-
-            q->setEnabled(true);
-
-            if (!nonDeletedResources.isEmpty())
-                ui::messages::Resources::deleteResourcesFailed(q, nonDeletedResources);
-        });
-
-    for (const auto& resource: usersToDelete)
-        qnResourcesChangesManager->deleteResource(resource, callback);
+    for (const auto& user: usersToDelete)
+        chain->append(UserGroupRequest::RemoveUser{.id = user->getId()});
 
     q->setEnabled(false);
+
+    chain->start(nx::utils::guarded(this,
+        [this, chain, usersToDelete](bool success, const QString& errorString)
+        {
+            q->setEnabled(true);
+
+            if (!success)
+            {
+                QnResourceList nonDeletedUsers;
+                for (const auto& user: usersToDelete)
+                {
+                    if (!user->hasFlags(Qn::removed))
+                        nonDeletedUsers << user;
+                }
+
+                if (!nonDeletedUsers.isEmpty())
+                {
+                    QString text;
+                    if (const auto count = nonDeletedUsers.count(); count == 1)
+                    {
+                        text = tr("Failed to delete user \"%1\".").arg(
+                            nonDeletedUsers.first()->getName().toHtmlEscaped());
+                    }
+                    else
+                    {
+                        text = tr("Failed to delete %n users.", /*comment*/ "", count);
+                    }
+
+                    QnMessageBox messageBox(
+                        QnMessageBoxIcon::Critical,
+                        text,
+                        errorString,
+                        QDialogButtonBox::Ok,
+                        QDialogButtonBox::Ok,
+                        q);
+                    messageBox.exec();
+                }
+            }
+
+            chain->deleteLater();
+        }));
 }
 
 void UserListWidget::Private::deleteSelected()
