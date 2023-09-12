@@ -654,6 +654,7 @@ void UserListWidget::Private::setupUi()
 
 void UserListWidget::Private::setupPlaceholder()
 {
+    ui->nothingFoundPlaceholder->setFixedWidth(180);
     const auto placeholderIcon = new QLabel(ui->nothingFoundPlaceholder);
     placeholderIcon->setPixmap(qnSkin->pixmap("left_panel/placeholders/search.svg"));
 
@@ -666,11 +667,17 @@ void UserListWidget::Private::setupPlaceholder()
 
     const auto descriptionText = new QLabel(ui->nothingFoundPlaceholder);
     descriptionText->setText(tr("Change search criteria or create a new user"));
+    descriptionText->setWordWrap(true);
+    descriptionText->setAlignment(Qt::AlignHCenter);
+    font = descriptionText->font();
+    font.setPixelSize(14);
+    descriptionText->setFont(font);
 
     ui->nothingFoundPlaceholderLayout->addWidget(placeholderIcon, /*stretch*/ 0, Qt::AlignHCenter);
+    ui->nothingFoundPlaceholderLayout->addSpacing(15);
     ui->nothingFoundPlaceholderLayout->addWidget(placeholderText, /*stretch*/ 0, Qt::AlignHCenter);
-    ui->nothingFoundPlaceholderLayout->addSpacing(8);
-    ui->nothingFoundPlaceholderLayout->addWidget(descriptionText, /*stretch*/ 0, Qt::AlignHCenter);
+    ui->nothingFoundPlaceholderLayout->addSpacing(9);
+    ui->nothingFoundPlaceholderLayout->addWidget(descriptionText);
 }
 
 void UserListWidget::Private::updateBanners()
