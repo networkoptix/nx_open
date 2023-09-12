@@ -193,7 +193,11 @@ public:
             });
 
         connect(globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
-            [this]() { syncId = globalSettings()->ldap().syncId(); });
+            [this]()
+            {
+                syncId = globalSettings()->ldap().syncId();
+                updateLdapUsersNotFound();
+            });
 
         connect(systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::statusChanged, this,
             [this, q]()
@@ -248,6 +252,7 @@ private:
     void removeUserInternal(const QnUserResourcePtr& user);
 
     void markUserNotFound(const QnUserResourcePtr& user, bool notFound = true);
+    void updateLdapUsersNotFound();
 };
 
 void UserListModel::Private::at_resourcePool_resourceChanged(const QnResourcePtr& resource)
@@ -440,6 +445,30 @@ void UserListModel::Private::markUserNotFound(const QnUserResourcePtr& user, boo
     {
         if (notFoundUsers.remove(user->getId()))
             emit model->notFoundUsersChanged();
+    }
+}
+
+void UserListModel::Private::updateLdapUsersNotFound()
+{
+    int userIndex = -1;
+    for (const auto& user: users)
+    {
+        ++userIndex;
+
+        if (!user->isLdap())
+            continue;
+
+        const bool notFound = notFoundUsers.contains(user->getId());
+        const bool notFoundNewValue = ldapUserNotFound(user);
+
+        if (notFound != notFoundNewValue)
+        {
+            markUserNotFound(user, notFoundNewValue);
+            emit model->dataChanged(
+                model->index(userIndex, UserWarningColumn),
+                model->index(userIndex, UserWarningColumn),
+                {Qn::DecorationPathRole, Qt::DecorationRole, Qt::ToolTipRole});
+        }
     }
 }
 
