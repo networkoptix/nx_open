@@ -26,6 +26,7 @@ public:
         const QnLayoutResourcePtr& layout,
         const QSize& maximumSize,
         qint64 msecSinceEpoch,
+        bool skipExportPermissionCheck = false,
         QObject* parent = nullptr);
 
     virtual ~LayoutThumbnailLoader() override;
