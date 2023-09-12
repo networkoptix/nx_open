@@ -772,6 +772,12 @@ public:
         Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
         QThread* targetThread);
 
+    Handle removeUserAsync(
+        const QnUuid& userId,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrEmpty>::type&& callback,
+        QThread* targetThread);
+
     Handle saveGroupAsync(
         bool newGroup,
         const nx::vms::api::UserGroupModel& groupData,

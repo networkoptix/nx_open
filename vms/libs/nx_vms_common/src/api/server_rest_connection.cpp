@@ -2030,6 +2030,28 @@ Handle ServerConnection::saveUserAsync(
     return handle;
 }
 
+Handle ServerConnection::removeUserAsync(
+    const QnUuid& userId,
+    nx::vms::common::SessionTokenHelperPtr helper,
+    Result<ErrorOrEmpty>::type&& callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::delete_,
+        prepareUrl(
+            QString("/rest/v3/users/%1").arg(userId.toString()),
+            /*params*/ {}));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
 Handle ServerConnection::saveGroupAsync(
     bool newGroup,
     const nx::vms::api::UserGroupModel& groupData,
