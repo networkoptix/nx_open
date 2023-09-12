@@ -86,7 +86,13 @@ public:
      */
     static QnUuid fromArbitraryData(const QByteArray& data);
     static QnUuid fromArbitraryData(const QString& data);
-    static QnUuid fromArbitraryData(const std::string_view& data);
+    static QnUuid fromArbitraryData(std::string_view data);
+
+    template<size_t N>
+    static QnUuid fromArbitraryData(const char (&data)[N])
+    {
+        return fromArbitraryData(std::string_view(data, N));
+    }
 
     static bool isUuidString(const QByteArray& data);
     static bool isUuidString(const QString& data);

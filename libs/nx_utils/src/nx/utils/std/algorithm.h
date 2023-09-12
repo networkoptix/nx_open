@@ -193,5 +193,104 @@ decltype(auto) y_combinator(Functor&& functor)
     return detail::y_combinator_result<std::decay_t<Functor>>(std::forward<Functor>(functor));
 }
 
+/**
+ * Sorts and removes duplicate elements of the `vector` in place using a comparison function.
+ * @param vec vector to sort
+ * @param comp comparison function object (i.e. an object that satisfies the requirements of
+ *     Compare) which returns `true` if the first argument is less than (i.e. is ordered before)
+ *     the second.<br>
+ *     The signature of the comparison function should be equivalent to the following:<br>
+ *     `bool cmp(const Type1& a, const Type2& b);`
+ */
+template <typename T, typename Allocator, typename Compare>
+void unique_sort(std::vector<T, Allocator> &vec, Compare comp)
+{
+    std::sort(vec.begin(), vec.end(), comp);
+    vec.erase(
+        std::unique(vec.begin(), vec.end(),
+            [comp](const auto& lhs, const auto& rhs) -> bool
+            {
+                return !comp(lhs, rhs) && !comp(rhs, lhs);
+            }), vec.end());
+}
+
+/**
+ * Sorts and removes duplicate elements of the `vector` in place.
+ * @param vec vector to sort
+ */
+template <typename T, typename Allocator>
+void unique_sort(std::vector<T, Allocator> &vec)
+{
+    return unique_sort(vec, std::less<T>{});
+}
+
+/**
+ * Returns a sorted vector of items without duplicates.
+ * @param items container to sort
+ * @param comp comparison function object (i.e. an object that satisfies the requirements of
+ *     Compare) which returns `true` if the first argument is less than (i.e. is ordered before)
+ *     the second.<br>
+ *     The signature of the comparison function should be equivalent to the following:<br>
+ *     `bool cmp(const Type1& a, const Type2& b);`
+ * @return sorted vector of unique items.
+ */
+template <typename Container, typename Compare>
+[[nodiscard]] auto unique_sorted(Container items, Compare comp)
+{
+    using value_type = typename std::decay_t<Container>::value_type;
+    std::vector<value_type> result(
+        std::move_iterator(items.begin()), std::move_iterator(items.end()));
+    unique_sort(result, comp);
+    return result;
+}
+
+/**
+ * Returns a sorted vector of items without duplicates.
+ * @param items container to sort
+ * @return sorted vector of unique items.
+ */
+template <typename Container>
+[[nodiscard]] auto unique_sorted(Container items)
+{
+    using value_type = typename std::decay_t<Container>::value_type;
+    std::vector<value_type> result(
+        std::move_iterator(items.begin()), std::move_iterator(items.end()));
+    unique_sort(result);
+    return result;
+}
+
+/**
+ * Returns a sorted vector of items without duplicates.
+ * @param items vector to sort
+ * @param comp comparison function object (i.e. an object that satisfies the requirements of
+ *     Compare) which returns `true` if the first argument is less than (i.e. is ordered before)
+ *     the second.<br>
+ *     The signature of the comparison function should be equivalent to the following:<br>
+ *     `bool cmp(const Type1& a, const Type2& b);`
+ * @return sorted vector of unique items.
+ *
+ * @example `items = unique_sorted(std::move(items), isLess);`
+ */
+template <typename Compare, typename T, typename Allocator>
+[[nodiscard]] std::vector<T, Allocator> unique_sorted(std::vector<T, Allocator> items, Compare comp)
+{
+    unique_sort(items, comp);
+    return items;
+}
+
+/**
+ * Returns a sorted vector of items without duplicates.
+ * @param items vector to sort
+ * @return sorted vector of unique items.
+ *
+ * @example `items = unique_sorted(std::move(items));`
+ */
+template <typename T, typename Allocator>
+[[nodiscard]] std::vector<T, Allocator> unique_sorted(std::vector<T, Allocator> items)
+{
+    unique_sort(items);
+    return items;
+}
+
 } // namespace utils
 } // namespace nx
