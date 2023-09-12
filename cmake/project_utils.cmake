@@ -221,6 +221,10 @@ function(nx_add_target name type)
         nx_store_known_file("${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name}.pdb")
     endif()
 
+    # Avoids build problems with Clang 15. Should be removed when we update boost library to the
+    # newest one.
+    add_definitions(-D_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION)
+
     if(WINDOWS AND NOT NX_GDI)
         add_definitions(-DNOGDI=)
     endif()
