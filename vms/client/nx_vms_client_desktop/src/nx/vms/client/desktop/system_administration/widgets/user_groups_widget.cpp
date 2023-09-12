@@ -376,9 +376,13 @@ void UserGroupsWidget::Private::setupUi()
     ui->setupUi(q);
     q->addAction(ui->searchShortcut);
     ui->groupsTable->addAction(ui->deleteGroupAction);
-    q->layout()->addWidget(notFoundGroupsWarning);
-    q->layout()->addWidget(nonUniqueGroupsWarning);
-    q->layout()->addWidget(selectionControls);
+
+    auto alertsLayout = new QVBoxLayout();
+    alertsLayout->setSpacing(0);
+    alertsLayout->addWidget(selectionControls);
+    alertsLayout->addWidget(notFoundGroupsWarning);
+    alertsLayout->addWidget(nonUniqueGroupsWarning);
+    q->layout()->addItem(alertsLayout);
 
     const auto hoverTracker = new ItemViewHoverTracker(ui->groupsTable);
 
