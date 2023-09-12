@@ -30,6 +30,7 @@ Item
     property alias expiresAfterLoginS: temporaryLinkSettings.expiresAfterLoginS
     property alias revokeAccessEnabled: temporaryLinkSettings.revokeAccessEnabled
     property alias displayOffsetMs: temporaryLinkSettings.displayOffsetMs
+    property alias loginText: loginTextField
 
     property int userType: UserSettingsGlobal.LocalUser
 
