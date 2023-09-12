@@ -569,7 +569,9 @@ Rectangle
 
         Text
         {
-            text: qsTr("VMS imports and synchronizes users and groups with LDAP in real time")
+            text: control.continuousSync
+                ? qsTr("VMS imports and synchronizes users and groups with LDAP server in real time")
+                : qsTr("VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.")
             font: Qt.font({pixelSize: 14, weight: Font.Normal})
             color: ColorTheme.colors.light16
 
