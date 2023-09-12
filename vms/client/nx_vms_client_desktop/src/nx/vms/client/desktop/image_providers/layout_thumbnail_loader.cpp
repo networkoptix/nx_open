@@ -64,6 +64,7 @@ struct LayoutThumbnailLoader::Private
     QnLayoutResourcePtr layout;
     QSize maximumSize;
     qint64 msecSinceEpoch;
+    bool skipExportPermissionCheck = false;
 
     // Pretty name for debug output.
     QString layoutName;
@@ -96,12 +97,14 @@ struct LayoutThumbnailLoader::Private
     Private(LayoutThumbnailLoader* q,
         const QnLayoutResourcePtr& layout,
         const QSize& maximumSize,
-        qint64 msecSinceEpoch)
+        qint64 msecSinceEpoch,
+        bool skipExportPermissionCheck)
         :
         q(q),
         layout(layout),
         maximumSize(maximumSize),
         msecSinceEpoch(msecSinceEpoch),
+        skipExportPermissionCheck(skipExportPermissionCheck),
         noDataWidget(new AutoscaledPlainText()),
         offlineWidget(new QWidget()),
         noExportPermissionWidget(new QWidget()),
@@ -185,7 +188,7 @@ struct LayoutThumbnailLoader::Private
         qreal rotation = qMod(item->rotation, 180.0);
         QRectF cellRect = item->outCellRect;
 
-        const bool exportAllowed = hasExportPermission(item->resource);
+        const bool exportAllowed = skipExportPermissionCheck || hasExportPermission(item->resource);
 
         // Aspect ratio is invalid when there is no image. No need to rotate in this case.
         if (qFuzzyIsNull(rotation) || !aspectRatio.isValid())
@@ -451,10 +454,11 @@ LayoutThumbnailLoader::LayoutThumbnailLoader(
     const QnLayoutResourcePtr& layout,
     const QSize& maximumSize,
     qint64 msecSinceEpoch,
+    bool skipExportPermissionCheck,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, layout, maximumSize, msecSinceEpoch))
+    d(new Private(this, layout, maximumSize, msecSinceEpoch, skipExportPermissionCheck))
 {
 }
 
@@ -723,7 +727,7 @@ void LayoutThumbnailLoader::doLoadAsync()
                 d->updateTileStatus(status, sourceAr, thumbnailItem);
             };
 
-        if (hasExportPermission(resource))
+        if (d->skipExportPermissionCheck || hasExportPermission(resource))
         {
             // We connect only to statusChanged event.
             // We expect that provider sends signals in a proper order
