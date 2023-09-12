@@ -152,6 +152,8 @@ public:
 
     bool isMulticast() const;
 
+    bool isEmpty() const;
+
     /**
      * @return Address similar to result of getForeignAddress function.
      * Removes string representation, making address explicit ipv4 / ipv6.

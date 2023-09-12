@@ -537,7 +537,7 @@ void WelcomeScreen::connectToSystemInternal(
     if (!m_connectingSystemId.isEmpty())
         return; //< Connection process is in progress
 
-    NX_DEBUG(this, "Delayed connect to the system %1 after click on tile", address);
+    NX_DEBUG(this, "Delayed connect to the system %1 after click on tile", systemId);
     LogonData logonData(core::LogonData{
         .address = address,
         .credentials = credentials,
@@ -548,11 +548,23 @@ void WelcomeScreen::connectToSystemInternal(
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction =
-        [this, systemId, logonData, completionTracker]()
+        [this, systemId, logonData = std::move(logonData), completionTracker]()
         {
+            NX_DEBUG(this, "Connecting to the system: %1, address: %2, server: %3, scenario: %4",
+                systemId,
+                logonData.address,
+                logonData.expectedServerId,
+                logonData.connectScenario);
+
+            if (!NX_ASSERT(logonData.address.port && !logonData.address.address.isEmpty(),
+                "Wrong system address: %1", logonData.address))
+            {
+                emit dropConnectingState();
+                return;
+            }
+
             setConnectingToSystem(systemId);
-            NX_DEBUG(this, "Connecting to the system %1 after click on tile",
-                logonData.address);
+
             menu()->trigger(ui::action::ConnectAction,
                 ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
         };
