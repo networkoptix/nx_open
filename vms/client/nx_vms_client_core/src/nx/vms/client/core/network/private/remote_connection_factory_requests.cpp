@@ -402,7 +402,15 @@ nx::vms::api::UserModelV1 RemoteConnectionFactoryRequestsManager::getUserModel(
     const auto url = makeUrl(context->address(), "/rest/v1/users/" + encodedUsername);
     auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
     request->setCredentials(context->credentials());
-    return d->doGet<nx::vms::api::UserModelV1>(url, context, std::move(request));
+    return d->doGet<nx::vms::api::UserModelV1>(
+        url,
+        context,
+        std::move(request),
+        expectedErrorCodes({
+            // We are forming REST api url including a user name, so "not found" error can be
+            // returned in case of server-cloud db desync.
+            {StatusCode::notFound, RemoteConnectionErrorCode::networkContentError}
+        }));
 }
 
 nx::vms::api::LoginUser RemoteConnectionFactoryRequestsManager::getUserType(
