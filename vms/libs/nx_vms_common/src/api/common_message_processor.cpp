@@ -542,8 +542,6 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->discoveryNotificationManager()->disconnect(this);
     connection->miscNotificationManager()->disconnect(this);
     connection->showreelNotificationManager()->disconnect(this);
-
-    m_context->showreelManager()->resetShowreels();
 }
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(
