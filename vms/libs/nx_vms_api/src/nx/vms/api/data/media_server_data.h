@@ -139,7 +139,7 @@ nx::reflect::DeserializationResult NX_VMS_API deserialize(
  *     Here <code>DAY_OF_WEEK</code> is one of <code>monday</code>, <code>tuesday</code>,
  *     <code>wednesday</code>, <code>thursday</code>, <code>friday</code>, <code>saturday</code>,
  *     <code>sunday</code>; <code>HOUR</code> is an integer in range 0..23;
- *     <code>BYTES_PER_SECOND</code> is an integer.
+ *     <code>BYTES_PER_SECOND</code> is an integer that can be represented as a number or a string.
  *     <br/>
  *     For any day-hour position, a missing value means "unlimited bitrate", and a zero value means
  *     "don't perform backup".
@@ -154,7 +154,7 @@ nx::reflect::DeserializationResult NX_VMS_API deserialize(
  *     %value sunday
  * %param:integer backupBitrateBytesPerSecond[].key.hour
  *     %example 0
- * %param:integer backupBitrateBytesPerSecond[].value
+ * %param:string backupBitrateBytesPerSecond[].value
  *     %example 0
  */
 struct NX_VMS_API MediaServerUserAttributesData
