@@ -235,6 +235,13 @@ Engine Manifest is a JSON Object containing the following fields:
                 not set, then IObjectTrackInfo::bestShotVideoFrame() will return null to the
                 plugin.
 
+            - `needBestShotImage` - Whether the Action requires the Server to provide it with the
+                Best Shot image, Best Shot image data size and Best Shot image data format via
+                IAction::getObjectTrackInfo(). If this capability is not set, then
+                IObjectTrackInfo::bestShotImageData() will return null to the plugin,
+                IObjectTrackInfo::bestShotImageDataFormat() will return an empty string to the
+                plugin, and IObjectTrackInfo::bestShotImageDataSize() will return 0 to the plugin.
+
             - `needBestShotObjectMetadata` - Whether the Action requires the Server to provide it
                 with the Best Shot rectangle via IAction::getObjectTrackInfo(). If this capability
                 is not set, then IObjectTrackInfo::bestShotObjectMetadata() will return null to the
