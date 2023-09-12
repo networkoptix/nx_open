@@ -345,8 +345,7 @@ void ShowreelExecutor::restoreWorkbenchState(const QnUuid& tourId)
 
     const bool validState = !workbench()->layouts().empty()
         && workbench()->currentLayout()->resource();
-    NX_ASSERT(validState);
-    if (!validState)
+    if (!NX_ASSERT(validState))
         menu()->trigger(ui::action::OpenNewTabAction);
 }
 
