@@ -74,6 +74,12 @@ DialogWithState
 
     signal addGroupRequested()
 
+    onVisibleChanged:
+    {
+        if (visible)
+            generalSettings.loginText.forceActiveFocus()
+    }
+
     title: qsTr("New User")
 
     validateFunc: () =>
@@ -217,7 +223,7 @@ DialogWithState
             NxDotPreloader
             {
                 anchors.centerIn: parent
-                running:  dialog.isSaving
+                running: dialog.isSaving
             }
         }
     }
