@@ -159,7 +159,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
     m_serverSettingsDialog->setServer(server);
     if (params.hasArgument(Qn::FocusTabRole))
-        m_serverSettingsDialog->setCurrentPage(params.argument<int>(Qn::FocusTabRole), true);
+        m_serverSettingsDialog->setCurrentPage(params.argument<int>(Qn::FocusTabRole));
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()

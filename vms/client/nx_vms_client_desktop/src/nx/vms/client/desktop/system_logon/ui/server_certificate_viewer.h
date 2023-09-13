@@ -17,6 +17,7 @@ namespace nx::network { class SocketAddress; }
 
 namespace nx::vms::client::desktop {
 
+class BusyIndicatorButton;
 class SystemContext;
 
 class ServerCertificateViewer: public QnButtonBoxDialog
@@ -81,6 +82,7 @@ private:
     QScopedPointer<Ui::ServerCertificateViewer> ui;
     std::vector<nx::network::ssl::Certificate> m_certificates;
     QnMediaServerResourcePtr m_server;
+    BusyIndicatorButton* m_okButton = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

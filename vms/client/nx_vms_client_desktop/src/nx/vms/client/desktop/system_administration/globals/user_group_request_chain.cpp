@@ -30,8 +30,13 @@ UserGroupRequestChain::UserGroupRequestChain(
 
 UserGroupRequestChain::~UserGroupRequestChain()
 {
-    if (m_currentRequest != -1)
+    if (m_currentRequest != 0)
         systemContext()->connectedServerApi()->cancelRequest(m_currentRequest);
+}
+
+bool UserGroupRequestChain::isRunning() const
+{
+    return m_currentRequest != 0;
 }
 
 nx::vms::common::SessionTokenHelperPtr UserGroupRequestChain::tokenHelper() const
@@ -43,7 +48,7 @@ nx::vms::common::SessionTokenHelperPtr UserGroupRequestChain::tokenHelper() cons
 
 void UserGroupRequestChain::makeRequest(const UserGroupRequest::Type& data)
 {
-    NX_ASSERT(m_currentRequest == -1);
+    NX_ASSERT(m_currentRequest == 0);
 
     if (const auto mod = std::get_if<UserGroupRequest::ModifyGroupParents>(&data))
         requestModifyGroupParents(*mod);
@@ -82,7 +87,7 @@ void UserGroupRequestChain::requestModifyGroupParents(
                 const rest::ErrorOrData<nx::vms::api::UserGroupModel>& errorOrData)
             {
                 if (NX_ASSERT(handle == m_currentRequest))
-                    m_currentRequest = -1;
+                    m_currentRequest = 0;
 
                 QString errorString;
 
@@ -119,7 +124,7 @@ void UserGroupRequestChain::requestModifyUserParents(
                 const rest::ErrorOrData<nx::vms::api::UserModelV3>& errorOrData)
             {
                 if (NX_ASSERT(handle == m_currentRequest))
-                    m_currentRequest = -1;
+                    m_currentRequest = 0;
 
                 QString errorString;
 
@@ -142,7 +147,7 @@ void UserGroupRequestChain::requestSaveGroup(const UserGroupRequest::AddOrUpdate
             rest::ErrorOrData<nx::vms::api::UserGroupModel> errorOrData)
         {
             if (NX_ASSERT(handle == m_currentRequest))
-                m_currentRequest = -1;
+                m_currentRequest = 0;
 
             QString errorString;
 
@@ -219,7 +224,7 @@ void UserGroupRequestChain::requestRemoveGroup(const UserGroupRequest::RemoveGro
         [this, id = data.id](bool success, int handle, const rest::ErrorOrEmpty& result)
         {
             if (NX_ASSERT(handle == m_currentRequest))
-                m_currentRequest = -1;
+                m_currentRequest = 0;
 
             QString errorString;
 
@@ -263,7 +268,7 @@ void UserGroupRequestChain::requestUpdateUser(const UserGroupRequest::UpdateUser
                 const rest::ErrorOrData<nx::vms::api::UserModelV3>& errorOrData)
             {
                 if (NX_ASSERT(handle == m_currentRequest))
-                    m_currentRequest = -1;
+                    m_currentRequest = 0;
 
                 QString errorString;
 

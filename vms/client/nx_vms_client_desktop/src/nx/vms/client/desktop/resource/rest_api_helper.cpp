@@ -40,11 +40,6 @@ void RestApiHelper::setParent(QWidget *parentWidget)
         FreshSessionTokenHelper::ActionType::updateSettings);
 }
 
-bool RestApiHelper::restApiEnabled()
-{
-    return ini().restApiResourceChangesManager;
-}
-
 nx::vms::common::SessionTokenHelperPtr RestApiHelper::getSessionTokenHelper()
 {
     return d->sessionTokenHelper;

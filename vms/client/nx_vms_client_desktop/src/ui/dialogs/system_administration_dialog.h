@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <api/server_rest_connection_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -38,12 +39,13 @@ public:
     virtual ~QnSystemAdministrationDialog() override;
 
     virtual void applyChanges() override;
-    virtual void loadDataToUi() override;
+    virtual void discardChanges() override;
 
 protected:
-    virtual bool confirmChangesOnExit() override;
+    virtual bool isNetworkRequestRunning() const override;
 
 private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)
     nx::utils::ImplPtr<Ui::QnSystemAdministrationDialog> ui;
+    rest::Handle m_currentRequest = 0;
 };

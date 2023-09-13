@@ -34,6 +34,7 @@ public:
     virtual bool hasChanges() const override;
     virtual void discardChanges() override;
     virtual void resetWarnings() override;
+    virtual bool isNetworkRequestRunning() const override;
 
     Q_INVOKABLE void testConnection(
         const QString& url,

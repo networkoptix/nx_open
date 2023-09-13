@@ -258,16 +258,6 @@ void QnStorageAnalyticsWidget::loadDataToUi()
         updateDataFromServer();
 }
 
-void QnStorageAnalyticsWidget::applyChanges()
-{
-    /* This widget is read-only. */
-}
-
-bool QnStorageAnalyticsWidget::hasChanges() const
-{
-    return false;
-}
-
 void QnStorageAnalyticsWidget::updateDataFromServer()
 {
     querySpaceFromServer();

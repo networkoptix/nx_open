@@ -30,7 +30,7 @@
       </size>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel</set>
      </property>
     </widget>
    </item>
@@ -40,10 +40,4 @@
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
- <connections/>
- <slots>
-  <slot>buttonClicked(QAbstractButton*)</slot>
-  <slot>addClicked()</slot>
-  <slot>removeClicked()</slot>
- </slots>
 </ui>

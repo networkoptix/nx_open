@@ -46,16 +46,10 @@ public:
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
-
-    virtual void applyChanges() override;
     virtual void discardChanges() override;
 
     /** Updates UI state to match internal state. */
     virtual void loadDataToUi() override;
-
-    virtual bool hasChanges() const override;
-
-    virtual bool canDiscardChanges() const override;
 
     /**
      * Report for picked update version. Describes all possible display modes for update version.

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_map.h>
@@ -30,7 +31,6 @@ public:
     ~ResourcesChangesManager();
 
     using CameraChangesFunction = std::function<void(const QnVirtualCameraResourcePtr&)>;
-    using ServerChangesFunction = std::function<void(const QnMediaServerResourcePtr&)>;
     using UserChangesFunction = std::function<void(const QnUserResourcePtr&)>;
     using UserCallbackFunction = std::function<void(bool, const QnUserResourcePtr&)>;
     using RoleCallbackFunction = std::function<void(bool, const nx::vms::api::UserGroupData&)>;
@@ -52,10 +52,6 @@ public:
         const DeleteResourceCallbackFunction& callback = DeleteResourceCallbackFunction(),
         const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
-   void deleteResources(
-        const QnResourceList& resources,
-        const GenericCallbackWithErrorFunction& callback = GenericCallbackWithErrorFunction());
-
     /** Apply changes to the given camera. */
     void saveCamera(const QnVirtualCameraResourcePtr& camera,
         CameraChangesFunction applyChanges);
@@ -75,10 +71,11 @@ public:
     void saveCamerasCore(const QnVirtualCameraResourceList& cameras,
         CameraChangesFunction applyChanges);
 
-    /** Apply changes to the given server. */
-    void saveServer(const QnMediaServerResourcePtr& server,
-        ServerChangesFunction applyChanges,
-        const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
+    using SaveServerCallback = std::function<void(
+        bool /*success*/,
+        rest::Handle /*requestId*/)>;
+    /** Save changes to the given server. */
+    rest::Handle saveServer(const QnMediaServerResourcePtr& server, SaveServerCallback callback);
 
     /* User resource management is handled by UserGroupRequestChain class. */
 

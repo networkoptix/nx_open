@@ -4,6 +4,8 @@
 
 #include <functional>
 
+#include <range/v3/algorithm/any_of.hpp>
+
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/desktop/common/widgets/tab_widget.h>
@@ -22,14 +24,16 @@ struct UserManagementTabWidget::Private
     UserManagementTabWidget* const q;
     TabWidget* const tabWidget{new TabWidget(q)};
 
-    void forEachTab(std::function<void(QnAbstractPreferencesWidget*)> functor) const
+    QList<QnAbstractPreferencesWidget*> tabs() const
     {
+        QList<QnAbstractPreferencesWidget*> result;
         for (int i = 0; i < tabWidget->count(); ++i)
         {
             const auto tab = qobject_cast<QnAbstractPreferencesWidget*>(tabWidget->widget(i));
             if (NX_ASSERT(tab))
-                functor(tab);
+                result.push_back(tab);
         }
+        return result;
     }
 };
 
@@ -55,40 +59,46 @@ UserManagementTabWidget::UserManagementTabWidget(UserGroupManager* manager, QWid
 
     layout->addWidget(d->tabWidget);
 
-    d->forEachTab(
-        [this](QnAbstractPreferencesWidget* tab)
-        {
-            connect(tab, &QnAbstractPreferencesWidget::hasChangesChanged,
-                this, &QnAbstractPreferencesWidget::hasChangesChanged);
-        });
+    for (auto tab: d->tabs())
+    {
+        connect(tab, &QnAbstractPreferencesWidget::hasChangesChanged, this,
+            &QnAbstractPreferencesWidget::hasChangesChanged);
+    }
 }
 
 UserManagementTabWidget::~UserManagementTabWidget()
 {
-    // Required here for forward-declared scoped pointer destruction.
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void UserManagementTabWidget::loadDataToUi()
 {
-    d->forEachTab([](QnAbstractPreferencesWidget* tab) { tab->loadDataToUi(); });
+    for (auto tab: d->tabs())
+        tab->loadDataToUi();
 }
 
 void UserManagementTabWidget::applyChanges()
 {
-    d->forEachTab([](QnAbstractPreferencesWidget* tab) { tab->applyChanges(); });
+    for (auto tab: d->tabs())
+        tab->applyChanges();
 }
 
 bool UserManagementTabWidget::hasChanges() const
 {
-    bool result = false;
-    d->forEachTab(
-        [&result](QnAbstractPreferencesWidget* tab) { result = result || tab->hasChanges(); });
-    return result;
+    return ranges::any_of(d->tabs(), [](auto tab) { return tab->hasChanges(); });
 }
 
 void UserManagementTabWidget::discardChanges()
 {
-    d->forEachTab([](QnAbstractPreferencesWidget* tab) { tab->discardChanges(); });
+    for (auto tab: d->tabs())
+        tab->discardChanges();
+    NX_ASSERT(!isNetworkRequestRunning());
+}
+
+bool UserManagementTabWidget::isNetworkRequestRunning() const
+{
+    return ranges::any_of(d->tabs(), [](auto tab) { return tab->isNetworkRequestRunning(); });
 }
 
 void UserManagementTabWidget::manageDigestUsers()
@@ -103,7 +113,8 @@ void UserManagementTabWidget::manageDigestUsers()
 
 void UserManagementTabWidget::resetWarnings()
 {
-    d->forEachTab([](QnAbstractPreferencesWidget* tab) { tab->resetWarnings(); });
+    for (auto tab: d->tabs())
+        tab->resetWarnings();
 }
 
 } // namespace nx::vms::client::desktop

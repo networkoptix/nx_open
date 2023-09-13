@@ -20,8 +20,6 @@ public:
     virtual ~UserGroupsWidget() override;
 
     virtual void loadDataToUi() override;
-    virtual void applyChanges() override;
-    virtual bool hasChanges() const override;
     virtual void resetWarnings() override;
 
     virtual QSize sizeHint() const override;

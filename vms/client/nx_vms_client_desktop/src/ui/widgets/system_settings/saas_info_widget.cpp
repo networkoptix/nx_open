@@ -158,14 +158,4 @@ void SaasInfoWidget::loadDataToUi()
     d->updateUi();
 }
 
-bool SaasInfoWidget::hasChanges() const
-{
-    return false;
-}
-
-void SaasInfoWidget::applyChanges()
-{
-    // Widget is read-only.
-}
-
 } // namespace nx::vms::client::desktop

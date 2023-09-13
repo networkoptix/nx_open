@@ -2865,10 +2865,6 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
     ui->debugStateLabel->setVisible(m_showDebugData);
 }
 
-void MultiServerUpdatesWidget::applyChanges()
-{
-}
-
 void MultiServerUpdatesWidget::discardChanges()
 {
     // TODO: We should ask user only if we were pushing updates.
@@ -2890,17 +2886,6 @@ void MultiServerUpdatesWidget::discardChanges()
         if (dialog.clickedButton() == cancelUpdateButton)
             atCancelCurrentAction();
     }
-}
-
-bool MultiServerUpdatesWidget::hasChanges() const
-{
-    return false;
-}
-
-bool MultiServerUpdatesWidget::canDiscardChanges() const
-{
-    // TODO: #sivanov Now this prevents other tabs from discarding their changes.
-    return true;
 }
 
 void MultiServerUpdatesWidget::autoCheckForUpdates()

@@ -132,7 +132,7 @@ struct UserSettingsDialog::Private
     QmlProperty<QDateTime> firstLoginTime;
 
     QnUserResourcePtr user;
-    rest::Handle m_currentRequest = -1;
+    rest::Handle m_currentRequest = 0;
 
     Private(UserSettingsDialog* parent, DialogType dialogType):
         q(parent),
@@ -533,34 +533,18 @@ void UserSettingsDialog::onDeleteRequested()
 
     d->isSaving = true;
 
-    if (systemContext()->restApiHelper()->restApiEnabled())
-    {
-        auto callback = nx::utils::guarded(this,
-            [this](bool success, const QnResourcePtr& /*resource*/)
-            {
-                d->isSaving = false;
+    auto callback = nx::utils::guarded(this,
+        [this](bool success, const QnResourcePtr& /*resource*/)
+        {
+            d->isSaving = false;
 
-                if (success)
-                    reject();
-                else
-                    ui::messages::Resources::deleteResourcesFailed(d->parentWidget, {d->user});
-            });
+            if (success)
+                reject();
+            else
+                ui::messages::Resources::deleteResourcesFailed(d->parentWidget, {d->user});
+        });
 
-        qnResourcesChangesManager->deleteResource(d->user, callback);
-    }
-    else
-    {
-        auto callback = nx::utils::guarded(this,
-            [this](bool success, const QString& /*errorString*/)
-            {
-                d->isSaving = false;
-
-                if (success)
-                    reject();
-            });
-
-        qnResourcesChangesManager->deleteResources({d->user}, callback);
-    }
+    qnResourcesChangesManager->deleteResource(d->user, callback);
 }
 
 void UserSettingsDialog::onAuditTrailRequested()
@@ -620,7 +604,7 @@ void UserSettingsDialog::onTerminateLink()
         tr("Terminate"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
-    if (d->m_currentRequest != -1)
+    if (d->m_currentRequest != 0)
         connectedServerApi()->cancelRequest(d->m_currentRequest);
 
     d->isSaving = true;
@@ -634,7 +618,7 @@ void UserSettingsDialog::onTerminateLink()
                 bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
             {
                 if (NX_ASSERT(handle == d->m_currentRequest))
-                    d->m_currentRequest = -1;
+                    d->m_currentRequest = 0;
 
                 d->isSaving = false;
 
@@ -681,7 +665,7 @@ void UserSettingsDialog::onResetLink(
         tr("Create"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
-    if (d->m_currentRequest != -1)
+    if (d->m_currentRequest != 0)
         connectedServerApi()->cancelRequest(d->m_currentRequest);
 
     d->isSaving = true;
@@ -695,7 +679,7 @@ void UserSettingsDialog::onResetLink(
                 bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
             {
                 if (NX_ASSERT(handle == d->m_currentRequest))
-                    d->m_currentRequest = -1;
+                    d->m_currentRequest = 0;
 
                 d->isSaving = false;
 
@@ -725,7 +709,7 @@ void UserSettingsDialog::onResetLink(
 
 void UserSettingsDialog::cancelRequest()
 {
-    if (d->m_currentRequest != -1)
+    if (d->m_currentRequest != 0)
         connectedServerApi()->cancelRequest(d->m_currentRequest);
 }
 
@@ -955,7 +939,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         tr("Save"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
-    if (d->m_currentRequest != -1)
+    if (d->m_currentRequest != 0)
         connectedServerApi()->cancelRequest(d->m_currentRequest);
 
     d->isSaving = true;
@@ -969,7 +953,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                 bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
             {
                 if (NX_ASSERT(handle == d->m_currentRequest))
-                    d->m_currentRequest = -1;
+                    d->m_currentRequest = 0;
 
                 d->isSaving = false;
 
@@ -1065,7 +1049,7 @@ void UserSettingsDialog::refreshToken(const QString& password)
             rest::ErrorOrData<nx::vms::api::LoginSession> errorOrData)
         {
             if (NX_ASSERT(handle == d->m_currentRequest))
-                d->m_currentRequest = -1;
+                d->m_currentRequest = 0;
 
             if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
             {

@@ -611,12 +611,19 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
 
 QnStorageConfigWidget::~QnStorageConfigWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void QnStorageConfigWidget::setReadOnlyInternal(bool readOnly)
 {
     m_model->setReadOnly(readOnly);
     // TODO: #sivanov Handle safe mode.
+}
+
+bool QnStorageConfigWidget::isNetworkRequestRunning() const
+{
+    return m_currentRequest != 0;
 }
 
 void QnStorageConfigWidget::showEvent(QShowEvent* event)
@@ -905,6 +912,13 @@ void QnStorageConfigWidget::applyChanges()
     emit hasChangesChanged();
 }
 
+void QnStorageConfigWidget::discardChanges()
+{
+    if (auto api = connectedServerApi(); api && m_currentRequest > 0)
+        api->cancelRequest(m_currentRequest);
+    m_currentRequest = 0;
+}
+
 void QnStorageConfigWidget::startRebuid(bool isMain)
 {
     if (!m_server)
@@ -950,22 +964,34 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
     const auto updateServerSettings =
         [this](const vms::api::MetadataStorageChangePolicy policy, const QnUuid& storageId)
         {
+            NX_ASSERT(m_currentRequest == 0);
+
             systemContext()->systemSettings()->metadataStorageChangePolicy = policy;
 
-            const auto callback = nx::utils::guarded(this,
-                [this, storageId](bool success)
+            const auto callback =
+                [this, storageId](bool success, rest::Handle requestId)
                 {
+                    NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
+                    m_currentRequest = 0;
                     if (!success)
                         return;
 
-                    qnResourcesChangesManager->saveServer(m_server,
-                        [storageId](const auto& server)
+                    auto internalCallback = nx::utils::guarded(this,
+                        [this](bool /*success*/, rest::Handle requestId)
                         {
-                            server->setMetadataStorageId(storageId);
+                            NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
+                            m_currentRequest = 0;
                         });
-                });
 
-            systemContext()->systemSettingsManager()->saveSystemSettings(callback, this);
+                    m_server->setMetadataStorageId(storageId);
+                    m_currentRequest = qnResourcesChangesManager->saveServer(
+                        m_server,
+                        internalCallback);
+                };
+
+            m_currentRequest = systemContext()->systemSettingsManager()->saveSystemSettings(
+                callback,
+                this);
         };
 
     if (m_metadataWatcher->metadataMayExist())

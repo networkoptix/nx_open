@@ -6,7 +6,7 @@
 
 #include <QtCore/QScopedPointer>
 
-#include <ui/dialogs/common/generic_tabbed_dialog.h>
+#include <nx/vms/client/desktop/common/dialogs/abstract_preferences_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui
@@ -18,11 +18,13 @@ class QLabel;
 class QnAdvancedSettingsWidget;
 class QnLookAndFeelPreferencesWidget;
 
-class QnLocalSettingsDialog : public QnGenericTabbedDialog, public QnWorkbenchContextAware
+class QnLocalSettingsDialog:
+    public nx::vms::client::desktop::AbstractPreferencesDialog,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    using base_type = QnGenericTabbedDialog;
+    using base_type = nx::vms::client::desktop::AbstractPreferencesDialog;
 
     using Callback = std::function<void()>;
 
@@ -47,8 +49,6 @@ protected:
     virtual void updateButtonBox() override;
 
     virtual void accept() override;
-    virtual bool confirmChangesOnExit() override;
-
 private:
     bool isRestartRequired() const;
 
