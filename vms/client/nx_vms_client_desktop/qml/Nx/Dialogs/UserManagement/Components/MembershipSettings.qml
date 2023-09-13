@@ -50,6 +50,32 @@ Item
         return NxGlobals.toHtmlEscaped(text)
     }
 
+    function iconPath(model)
+    {
+        if (model.isUser)
+        {
+            switch (model.userType)
+            {
+                case UserSettingsGlobal.LocalUser:
+                    return "image://svg/skin/user_settings/user_local.svg"
+                case UserSettingsGlobal.TemporaryUser:
+                    return "image://svg/skin/user_settings/user_local_temp.svg"
+                case UserSettingsGlobal.CloudUser:
+                    return "image://svg/skin/user_settings/user_cloud.svg"
+                case UserSettingsGlobal.LdapUser:
+                    return "image://svg/skin/user_settings/user_ldap.svg"
+                default:
+                    return ""
+            }
+        }
+        if (model.groupSection == "B")
+            return "image://svg/skin/user_settings/group_built_in.svg"
+
+        return model.isLdap
+            ? "image://svg/skin/user_settings/group_ldap.svg"
+            : "image://svg/skin/user_settings/group_custom.svg"
+    }
+
     component SelectableGroupItem: Rectangle
     {
         id: checkableItem
@@ -118,25 +144,7 @@ Item
                     width: 20
                     height: 20
 
-                    source:
-                    {
-                        if (model.isUser)
-                        {
-                            return model.isLdap
-                                ? "image://svg/skin/user_settings/user_ldap.svg"
-                                : (model.isTemporary
-                                    ? "image://svg/skin/user_settings/user_local_temp.svg"
-                                    : "image://svg/skin/user_settings/user_local.svg")
-                        }
-
-                        if (model.groupSection == "B")
-                            return "image://svg/skin/user_settings/group_built_in.svg"
-                        else
-                            return model.isLdap
-                                ? "image://svg/skin/user_settings/group_ldap.svg"
-                                : "image://svg/skin/user_settings/group_custom.svg"
-                    }
-
+                    source: iconPath(model)
                     sourceSize: Qt.size(width, height)
                     color: checkableItem.selectedColor
                 }

@@ -575,6 +575,7 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     roles[CanEditParents] = "canEditParents";
     roles[CanEditMembers] = "canEditMembers";
     roles[IsPredefined] = "isPredefined";
+    roles[UserType] = "userType";
     return roles;
 }
 
@@ -778,6 +779,9 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
 
         case CanEditMembers:
             return canEditMembers(id);
+
+        case UserType:
+            return m_cache->info(id).userType;
 
         default:
             return {};
