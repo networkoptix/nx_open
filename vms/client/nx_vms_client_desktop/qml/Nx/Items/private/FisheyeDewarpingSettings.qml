@@ -171,7 +171,7 @@ Item
                     else
                     {
                         MessageBox.exec(MessageBox.Icon.Information,
-                            "Auto calibration failed",
+                            qsTr("Auto calibration failed"),
                             errorText(result),
                             MessageBox.Ok);
                     }
