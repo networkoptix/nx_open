@@ -81,6 +81,8 @@ public:
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;
 
+    bool canViewArchive(const QnVirtualCameraResourcePtr& camera) const;
+
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
