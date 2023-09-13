@@ -6,11 +6,11 @@
 
 #include <nx/core/access/access_types.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/test_support/test_context.h>
 
 class QnClientCoreModule;
 class QnCommonModule;
-
-namespace nx::vms::client::desktop { class SystemContext; }
 
 namespace nx::vms::client::desktop::test {
 
@@ -29,26 +29,10 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-class ContextBasedTest: public ::testing::Test
+class ContextBasedTest: public nx::vms::common::test::GenericContextBasedTest<Context>
 {
 public:
-    ContextBasedTest()
-    {
-        m_context = std::make_unique<Context>();
-    }
-
-    ~ContextBasedTest()
-    {
-        m_context.reset();
-    }
-
-    Context* context() const { return m_context.get(); }
-
-    QnCommonModule* commonModule() const { return m_context->commonModule(); }
-    SystemContext* systemContext() const { return m_context->systemContext(); }
-
-private:
-    std::unique_ptr<Context> m_context;
+    QnCommonModule* commonModule() const { return context()->commonModule(); }
 };
 
 } // namespace nx::vms::client::desktop::test
