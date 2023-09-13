@@ -2379,6 +2379,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         const auto calculateRequiredPermissions =
             [this]() -> Qn::Permissions
             {
+                if (d->isIoModule)
+                    return Qn::ViewContentPermission;
+
                 Qn::Permissions requiredPermissions = d->isPlayingLive()
                     ? Qn::ViewLivePermission
                     : Qn::ViewFootagePermission;
@@ -2411,6 +2414,22 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->isUnauthorized())
         return Qn::UnauthorizedOverlay;
 
+    if (d->isIoModule)
+    {
+        if (!d->isPlayingLive())
+        {
+            return d->display()->camDisplay()->isLongWaiting()
+                ? Qn::NoDataOverlay
+                : Qn::NoVideoDataOverlay;
+        }
+
+        if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
+            return Qn::EmptyOverlay;
+
+        if (!NX_ASSERT(d->camera) || !d->camera->isScheduleEnabled())
+            return Qn::IoModuleDisabledOverlay;
+    }
+
     if (d->camera)
     {
         if (d->isPlayingLive()
@@ -2428,22 +2447,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             if (!ResourceAccessManager::hasPermissions(d->camera, requiredPermission))
                 return Qn::AnalogWithoutLicenseOverlay;
         }
-    }
-
-    if (d->isIoModule)
-    {
-        if (!d->isPlayingLive())
-        {
-            if (d->display()->camDisplay()->isLongWaiting())
-                return Qn::NoDataOverlay;
-            return Qn::NoVideoDataOverlay;
-        }
-
-        if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
-            return Qn::EmptyOverlay;
-
-        if (!NX_ASSERT(d->camera) || !d->camera->isScheduleEnabled())
-            return Qn::IoModuleDisabledOverlay;
     }
 
     const auto mediaEvent = d->display()->camDisplay()->lastMediaEvent();
