@@ -629,9 +629,46 @@ Item
 
                             Button
                             {
-                                text: qsTr("Copy Link")
-                                onClicked: control.self.onCopyLink()
+                                id: copyLinkButton
+
+                                property bool copied: false
+                                readonly property string copyLinkText: qsTr("Copy Link")
+                                readonly property string copiedText: qsTr("Copied",
+                                    "Copied here means that a link is copied")
                                 enabled: control.enabled
+                                text: copied ? copiedText : copyLinkText
+                                icon.source:
+                                    copied ? "image://svg/skin/user_settings/copied.svg" : ""
+                                icon.width: 20
+                                icon.height: 20
+                                Layout.preferredWidth: 
+                                {
+                                    const copyLinkWidth = leftPaddingOnlyText 
+                                        + fontMetrics.advanceWidth(copyLinkText) + rightPadding
+                                    const copiedWidth = leftPaddingWithIcon + icon.width + 4
+                                        + fontMetrics.advanceWidth(copiedText) + rightPadding
+                                    return Math.max(copyLinkWidth, copiedWidth)
+                                }
+
+                                FontMetrics
+                                {
+                                    id: fontMetrics
+                                    font: copyLinkButton.font
+                                }
+
+                                Timer
+                                {
+                                    interval: 3000
+                                    repeat: false
+                                    running: copyLinkButton.copied
+                                    onTriggered: copyLinkButton.copied = false
+                                }
+
+                                onClicked: 
+                                {
+                                    control.self.onCopyLink()
+                                    copied = true
+                                }
                             }
 
                             TextButton
