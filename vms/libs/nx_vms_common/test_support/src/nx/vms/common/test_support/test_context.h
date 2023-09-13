@@ -6,16 +6,43 @@
 
 #include <nx/core/access/access_types.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/common/system_context.h>
 
 #include "resource/resource_pool_test_helper.h"
 
 class QnCommonModule;
 
-namespace nx::vms::common { class SystemContext; }
-
 namespace nx::vms::common::test {
 
 class MessageProcessorMock;
+
+template<typename ContextType, typename... ContextCreationArgs>
+class ContextHolder
+{
+public:
+    ContextHolder(ContextCreationArgs... args): m_context(std::make_unique<ContextType>(args...)) {}
+    ContextType* context() const { return m_context.get(); }
+
+private:
+    const std::unique_ptr<ContextType> m_context;
+};
+
+template<typename ContextType, typename...ContextCreationArgs>
+class GenericContextBasedTest:
+    public ::testing::Test,
+    public ContextHolder<ContextType, ContextCreationArgs...>,
+    protected QnResourcePoolTestHelper
+{
+public:
+    explicit GenericContextBasedTest(ContextCreationArgs... args):
+        ContextHolder<ContextType, ContextCreationArgs...>(args...),
+        QnResourcePoolTestHelper(this->context()->systemContext())
+    {
+    }
+
+    auto systemContext() const { return this->context()->systemContext(); }
+    virtual void TearDown() override { clear(); }
+};
 
 class NX_VMS_COMMON_TEST_SUPPORT_API Context
 {
@@ -31,30 +58,14 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-class NX_VMS_COMMON_TEST_SUPPORT_API ContextBasedTestBase:
-    public ::testing::Test
-{
-public:
-    ContextBasedTestBase(nx::core::access::Mode resourceAccessMode);
-    ~ContextBasedTestBase();
-
-    Context* context() const { return m_context.get(); }
-
-    MessageProcessorMock* createMessageProcessor();
-
-private:
-    std::unique_ptr<Context> m_context;
-};
-
-// QnResourcePoolTestHelper must be initialized after context already created.
 class NX_VMS_COMMON_TEST_SUPPORT_API ContextBasedTest:
-    public ContextBasedTestBase,
-    protected QnResourcePoolTestHelper
+    public GenericContextBasedTest<Context, nx::core::access::Mode>
 {
 public:
     ContextBasedTest(nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::direct);
+    virtual ~ContextBasedTest() override;
 
-    virtual void TearDown() override { clear(); }
+    MessageProcessorMock* createMessageProcessor();
 };
 
 } // namespace nx::vms::common::test

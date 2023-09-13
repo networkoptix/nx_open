@@ -189,7 +189,7 @@ Qn::Permissions AccessController::Private::permissionsForCamera(
         permissions &= ~(Qn::ViewLivePermission | Qn::ViewFootagePermission);
 
     if (camera->hasFlags(Qn::cross_system))
-        permissions &= ~(Qn::WritePermission | Qn::WriteNamePermission | Qn::SavePermission);
+        permissions &= ~Qn::GenericEditPermissions;
 
     // In desktop client, cameras are openable on the scene if they are generally accessible.
     if (permissions.testFlag(Qn::ReadPermission))
