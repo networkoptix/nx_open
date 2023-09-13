@@ -29,7 +29,9 @@ Item
         ? labelTextField.y + labelTextField.height
         : label.height
 
-    readonly property bool hovered: labelMouseArea.containsMouse || editButton.hovered
+    readonly property bool hovered: labelMouseArea.containsMouse
+        || editButton.hovered
+        || clipboardCopyButton.hovered
 
     Text
     {
@@ -48,10 +50,18 @@ Item
             id: labelMouseArea
             anchors.fill: parent
             anchors.rightMargin: - (editButton.anchors.leftMargin + editButton.width)
-            enabled: control.enabled
             hoverEnabled: true
-            onClicked: control.startEdit()
+            onClicked: { control.enabled ? control.startEdit() : clipboardCopyButton.copy() }
         }
+    }
+
+    ClipboardCopyButton
+    {
+        id: clipboardCopyButton
+        anchors.left: label.right
+        anchors.leftMargin: 4
+        anchors.verticalCenter: label.verticalCenter
+        visible: (label.visible && !control.enabled && control.hovered) || animationRunning
     }
 
     ImageButton
