@@ -437,13 +437,15 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                 }
 
                 case ParentGroupsColumn:
-                    return d->getParentGroupNames(group).join(kLineBreak);
+                {
+                    QStringList groupNames = d->getParentGroupNames(group);
+                    for (auto& line: groupNames)
+                        line = toHtmlEscaped(line);
+                    return noWrap(groupNames.join(kLineBreak));
+                }
 
                 default:
-                    return taggedIfNotEmpty(
-                        toHtmlEscaped(data(index, Qt::DisplayRole).toString()),
-                        "div",
-                        "style=\"white-space:nowrap\"");
+                    return noWrap(toHtmlEscaped(data(index, Qt::DisplayRole).toString()));
             }
         }
 
