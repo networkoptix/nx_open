@@ -16,6 +16,8 @@ Button
 
     property bool isAccentButton: false
     property var contentHAlignment: Qt.AlignHCenter
+    readonly property real leftPaddingWithIcon: 4
+    readonly property real leftPaddingOnlyText: 16
     property color backgroundColor:
         isAccentButton ? ColorTheme.colors.brand_core : ColorTheme.button
 
@@ -57,7 +59,7 @@ Button
 
     property var menu: null
 
-    leftPadding: icon.source.toString() ? 4 : 16
+    leftPadding: icon.source.toString() ? leftPaddingWithIcon : leftPaddingOnlyText
     rightPadding: 16
 
     implicitHeight: 28
