@@ -249,6 +249,7 @@ Control
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter
                             Layout.rightMargin: model.canEditMembers ? 0 : 7
+                            textFormat: Text.PlainText
 
                             elide: Text.ElideRight
                             text: model.text

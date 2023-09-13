@@ -318,6 +318,13 @@ QString highlightMatch(const QString& text, const QRegularExpression& rx, const 
     return result;
 }
 
+QString noWrap(const QString& text)
+{
+    // It would be better to use <span> here, but Qt 6.5 does not support attributes
+    // `style="white-space:nowrap"` for this tag. So, using <div> instead.
+    return taggedIfNotEmpty(text, "div", "style=\"white-space:nowrap\"");
+}
+
 } // namespace html
 } // namespace nx::vms::common
 

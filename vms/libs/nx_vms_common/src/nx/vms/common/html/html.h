@@ -123,6 +123,11 @@ NX_VMS_COMMON_API QString link(const QString& text, const QUrl& url);
 NX_VMS_COMMON_API QString link(const QString& text, const nx::utils::Url& url);
 
 /**
+ * Return text tagged as no-wrap.
+ */
+NX_VMS_COMMON_API QString noWrap(const QString& text);
+
+/**
  * Extended analog of QString::toHtmlEscaped() which also affect spaces.
  */
 NX_VMS_COMMON_API QString toHtmlEscaped(const QString& text);
