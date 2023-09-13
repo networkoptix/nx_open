@@ -5,6 +5,7 @@
 #include <QtCore/QHash>
 
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
+#include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
 #include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::desktop {
@@ -33,6 +34,7 @@ public:
         bool isGroup = false;
         bool isLdap = false;
         bool isTemporary = false;
+        UserSettingsGlobal::UserType userType = UserSettingsGlobal::LocalUser;
     };
 
     struct Stats
