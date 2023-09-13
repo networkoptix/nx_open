@@ -14,6 +14,8 @@
 
 using namespace nx::vms::common::ptz;
 
+constexpr double kAngleDiffThreshold = 1.0;
+
 enum class AngleSpace
 {
     DegreesSpace,
@@ -110,18 +112,31 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
         device[i] = deviceMultiplier * device[i];
     }
 
-    if(space == AngleSpace::Mm35EquivSpace) {
-        /* What is linear in 35mm-equiv space is non-linear in degrees,
-         * so we compensate by inserting additional data points. */
-        while(logical.size() < 16) {
-            for(int i = logical.size() - 2; i >= 0; i--) {
-                logical.insert(i + 1, (logical[i] + logical[i + 1]) / 2.0);
+    if(space == AngleSpace::Mm35EquivSpace)
+    {
+        // What is linear in 35mm-equiv space is non-linear in degrees,
+        // so we compensate by inserting additional data points.
+
+        auto degrees = logical;
+        for (auto& value: degrees)
+            value = q35mmEquivToDegrees(value);
+
+        int i = 0;
+        while (i < degrees.size() - 1)
+        {
+            if (std::fabs(degrees[i] - degrees[i + 1]) > kAngleDiffThreshold)
+            {
+                const auto mid = (logical[i] + logical[i + 1]) / 2.0;
+                degrees.insert(i + 1, q35mmEquivToDegrees(mid));
+                logical.insert(i + 1, mid);
                 device.insert(i + 1, (device[i] + device[i + 1]) / 2.0);
             }
+            else
+            {
+                ++i;
+            }
         }
-
-        for(int i = 0; i < logical.size(); i++)
-            logical[i] = q35mmEquivToDegrees(logical[i]);
+        logical = std::move(degrees);
     }
 
     QVector<QPair<qreal, qreal> > sourceToTarget;
