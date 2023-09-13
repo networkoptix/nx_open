@@ -372,11 +372,11 @@ void QnDeprecatedUserManagementWidget::Private::setupUi()
         QLineEdit::LeadingPosition);
 
     ui->filterButton->menu()->addAction(
-        tr("All users"),
+        QnDeprecatedUserManagementWidget::tr("All users"),
         [this] { sortModel->setDigestFilter(std::nullopt); });
 
     filterDigestAction = ui->filterButton->menu()->addAction(
-        tr("With enabled digest authentication"),
+        QnDeprecatedUserManagementWidget::tr("With enabled digest authentication"),
         [this] { sortModel->setDigestFilter(true); });
 
     ui->filterButton->setAdjustSize(true);
@@ -460,7 +460,7 @@ void QnDeprecatedUserManagementWidget::Private::setupUi()
     setHelpTopic(ui->fetchButton, Qn::Ldap_Help);
     setHelpTopic(ui->ldapTooltip, Qn::Ldap_Help);
 
-    ui->ldapTooltip->setHintText(tr(
+    ui->ldapTooltip->setHintText(QnDeprecatedUserManagementWidget::tr(
         "Users can be imported from an LDAP server. They will be able to log in only if LDAP "
         "server is online and their accounts are active on it."));
 
