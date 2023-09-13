@@ -2,6 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include <QtTest/QSignalSpy>
+
+#include <common/common_globals.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
@@ -14,7 +17,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/core/access/access_types.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/reflect/to_string.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 #include <nx/vms/common/test_support/test_context.h>
@@ -1710,6 +1715,122 @@ TEST_F(ResourceAccessManagerTest, accessRightsIndependency)
     setOwnAccessRights(m_currentUser->getId(), {{layout->getId(), AccessRight::viewArchive}});
     EXPECT_FALSE(hasPermissions(m_currentUser, camera, Qn::ExportPermission));
     EXPECT_TRUE(hasPermissions(m_currentUser, camera, Qn::ViewFootagePermission));
+}
+
+// ------------------------------------------------------------------------------------------------
+// Permission dependency changes
+
+class PermissionDependenciesTest: public ResourceAccessManagerTest
+{
+protected:
+    virtual void SetUp() override
+    {
+        ResourceAccessManagerTest::SetUp();
+
+        permissionsDependencyChanged.reset(new QSignalSpy(resourceAccessManager(),
+            &QnResourceAccessManager::permissionsDependencyChanged));
+    }
+
+    virtual void TearDown() override
+    {
+        permissionsDependencyChanged.reset();
+        ResourceAccessManagerTest::TearDown();
+    }
+
+public:
+    std::unique_ptr<QSignalSpy> permissionsDependencyChanged;
+};
+
+#define CHECK_NO_DEPENDENCY_NOTIFICATIONS() \
+    ASSERT_TRUE(permissionsDependencyChanged->empty());
+
+#define CHECK_DEPENDENCY_NOTIFICATION(resources) { \
+    ASSERT_EQ(permissionsDependencyChanged->size(), 1); \
+    const auto args = permissionsDependencyChanged->takeFirst(); \
+    ASSERT_EQ(args.size(), 1); \
+    const auto affectedResources = nx::utils::toQSet(args[0].value<QnResourceList>()); \
+    const auto expectedResources = nx::utils::toQSet( \
+        std::initializer_list<QnResourcePtr>resources); \
+    ASSERT_EQ(affectedResources, expectedResources); \
+    permissionsDependencyChanged->clear(); }
+
+TEST_F(PermissionDependenciesTest, resourceFlagsChanging)
+{
+    const auto layout = addLayout();
+    CHECK_NO_DEPENDENCY_NOTIFICATIONS();
+    layout->addFlags(Qn::remote);
+    CHECK_DEPENDENCY_NOTIFICATION({layout});
+}
+
+TEST_F(PermissionDependenciesTest, layoutLockChanging)
+{
+    const auto layout = addLayout();
+    CHECK_NO_DEPENDENCY_NOTIFICATIONS();
+    layout->setLocked(true);
+    CHECK_DEPENDENCY_NOTIFICATION({layout});
+}
+
+TEST_F(PermissionDependenciesTest, cameraCapabilitiesChanging)
+{
+    const auto camera = addCamera();
+    CHECK_NO_DEPENDENCY_NOTIFICATIONS();
+    camera->setCameraCapabilities(
+        camera->getCameraCapabilities() | nx::vms::api::DeviceCapability::setUserPassword);
+    CHECK_DEPENDENCY_NOTIFICATION({camera});
+}
+
+TEST_F(PermissionDependenciesTest, cameraLicenseTypeChanging)
+{
+    const auto camera = addCamera();
+    CHECK_NO_DEPENDENCY_NOTIFICATIONS();
+    camera->setProperty(ResourcePropertyKey::kForcedLicenseType,
+        QString::fromStdString(nx::reflect::toString(Qn::LC_Bridge)));
+    CHECK_DEPENDENCY_NOTIFICATION({camera});
+}
+
+TEST_F(PermissionDependenciesTest, cameraRecordingChanging)
+{
+    const auto camera = addCamera();
+    CHECK_NO_DEPENDENCY_NOTIFICATIONS();
+    camera->setScheduleEnabled(true);
+    CHECK_DEPENDENCY_NOTIFICATION({camera});
+}
+
+TEST_F(PermissionDependenciesTest, userAttributesChanging)
+{
+    const auto user = addUser(NoGroup);
+    CHECK_NO_DEPENDENCY_NOTIFICATIONS();
+    user->setAttributes(api::UserAttribute::readonly);
+    CHECK_DEPENDENCY_NOTIFICATION({user});
+}
+
+TEST_F(PermissionDependenciesTest, usersParentsChanging)
+{
+    auto group1 = createUserGroup("group1", api::kPowerUsersGroupId);
+    const auto group2 = createUserGroup("group2", group1.id);
+    const auto user1 = addUser(group1.id, "user1");
+    const auto user2 = addUser(group2.id, "user2");
+    CHECK_NO_DEPENDENCY_NOTIFICATIONS();
+
+    group1.parentGroupIds = {};
+    addOrUpdateUserGroup(group1);
+    CHECK_DEPENDENCY_NOTIFICATION(({user1, user2}));
+}
+
+TEST_F(PermissionDependenciesTest, batchUpdate)
+{
+    const auto layout = addLayout();
+    const auto camera = addCamera();
+    const auto user = addUser(NoGroup);
+    CHECK_NO_DEPENDENCY_NOTIFICATIONS();
+
+    {
+        const QnUpdatableGuard update(resourceAccessManager());
+        layout->setLocked(true);
+        camera->setScheduleEnabled(true);
+        user->setAttributes(api::UserAttribute::readonly);
+    }
+    CHECK_DEPENDENCY_NOTIFICATION(({camera, layout, user}));
 }
 
 } // namespace nx::vms::common::test

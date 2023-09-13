@@ -24,15 +24,8 @@ namespace test {
 
 using namespace nx::vms::api;
 
-class IntercomManagerTest:
-    public ContextBasedTest,
-    public QnResourcePoolTestHelper
+class IntercomManagerTest: public ContextBasedTest
 {
-public:
-    using ContextBasedTest::systemContext;
-
-    IntercomManagerTest(): QnResourcePoolTestHelper(systemContext()) {}
-
 protected:
     virtual void SetUp() override
     {
@@ -45,7 +38,7 @@ protected:
     {
         intercomManager.reset();
         logout();
-        clear();
+        ContextBasedTest::TearDown();
         systemContext()->deleteMessageProcessor();
     }
 
