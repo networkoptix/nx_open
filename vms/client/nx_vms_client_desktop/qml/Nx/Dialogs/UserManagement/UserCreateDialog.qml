@@ -192,10 +192,13 @@ DialogWithState
 
         closeVisible: true
 
-        visible: !!text && [0, 1].includes(tabControl.currentTabIndex)
+        visible: !!text
 
-        text: dialog.userType == UserSettingsGlobal.TemporaryUser
-            ? dialog.self.warningForGroups(membersModel.parentGroups)
+        text: dialog.userType === UserSettingsGlobal.TemporaryUser
+            ? dialog.self.warningForTemporaryUser(
+                parentGroups,
+                sharedResources,
+                globalPermissions)
             : ""
 
         onCloseClicked: visible = false

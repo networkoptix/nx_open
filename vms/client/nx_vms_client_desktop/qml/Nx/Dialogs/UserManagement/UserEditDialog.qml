@@ -192,10 +192,13 @@ DialogWithState
 
         closeVisible: true
 
-        visible: hasWarning()
+        visible: !!text
 
-        text: dialog.userType == UserSettingsGlobal.TemporaryUser
-            ? dialog.self.warningForGroups(membersModel.parentGroups)
+        text: dialog.userType === UserSettingsGlobal.TemporaryUser
+            ? dialog.self.warningForTemporaryUser(
+                parentGroups,
+                sharedResources,
+                globalPermissions)
             : ""
 
         onCloseClicked: visible = false
@@ -204,19 +207,6 @@ DialogWithState
         anchors.left: parent.left
         anchors.right: parent.right
         z: -1
-
-        function hasWarning()
-        {
-            return !!text && [0, 1].includes(tabControl.currentTabIndex)
-        }
-
-        Connections
-        {
-            target: dialog
-
-            // Switching to another user resets banner visibility.
-            function onUserIdChanged() { banner.visible = Qt.binding(banner.hasWarning) }
-        }
     }
 
     validateFunc: () =>

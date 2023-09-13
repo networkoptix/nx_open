@@ -3,6 +3,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
@@ -137,8 +138,10 @@ public:
     Q_INVOKABLE QDateTime newValidUntilDate() const;
     Q_INVOKABLE QString durationFormat(qint64 ms) const;
 
-    Q_INVOKABLE QString warningForGroups(
-        const QList<nx::vms::client::desktop::MembersModelGroup>& parentGroups) const;
+    Q_INVOKABLE QString warningForTemporaryUser(
+        const QList<nx::vms::client::desktop::MembersModelGroup>& parentGroups,
+        const nx::core::access::ResourceAccessMap& sharedResources,
+        const nx::vms::api::GlobalPermissions permissions) const;
 
     Q_INVOKABLE void cancelRequest();
 
