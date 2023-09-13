@@ -58,6 +58,7 @@ public:
 
     LiveProcessingMode liveProcessingMode() const;
     void setLiveProcessingMode(LiveProcessingMode value);
+    bool hasOnlyLiveCameras() const;
 
     // Methods for `LiveProcessingMode::manualAdd` mode.
     int availableNewTracks() const;
@@ -76,6 +77,9 @@ signals:
     void availableNewTracksChanged();
     void attributeFiltersChanged();
     void combinedTextFilterChanged();
+
+protected:
+    virtual bool isFilterDegenerate() const override;
 
 private:
     class Private;

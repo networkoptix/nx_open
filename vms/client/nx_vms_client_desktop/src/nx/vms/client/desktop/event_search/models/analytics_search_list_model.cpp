@@ -1,11 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "analytics_search_list_model.h"
-#include "private/analytics_search_list_model_p.h"
 
 #include <common/common_globals.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/managed_camera_set.h>
+
+#include "private/analytics_search_list_model_p.h"
 
 namespace nx::vms::client::desktop {
 
@@ -121,5 +123,18 @@ bool AnalyticsSearchListModel::hasAccessRights() const
     return systemContext()->accessController()->isDeviceAccessRelevant(
         nx::vms::api::AccessRight::viewArchive);
 }
+
+bool AnalyticsSearchListModel::isFilterDegenerate() const
+{
+    return AbstractAsyncSearchListModel::isFilterDegenerate() || hasOnlyLiveCameras();
+}
+
+bool AnalyticsSearchListModel::hasOnlyLiveCameras() const
+{
+    const QnVirtualCameraResourceSet cameras = cameraSet()->cameras();
+    return !cameras.empty() && std::none_of(cameras.begin(), cameras.end(),
+        [this](const QnVirtualCameraResourcePtr& camera) { return d->canViewArchive(camera); });
+}
+
 
 } // namespace nx::vms::client::desktop

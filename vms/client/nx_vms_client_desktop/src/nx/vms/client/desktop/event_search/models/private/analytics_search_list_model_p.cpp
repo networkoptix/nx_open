@@ -34,6 +34,7 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/manifest_items.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -488,6 +489,12 @@ void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
         m_data.items, &startTime, q->relevantTimePeriod(), itemCleanupFunction(m_data));
 }
 
+bool AnalyticsSearchListModel::Private::canViewArchive(
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    return q->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+}
+
 AnalyticsSearchListModel::ItemCleanupFunction<nx::analytics::db::ObjectTrack>
     AnalyticsSearchListModel::Private::itemCleanupFunction(Storage& storage)
 {
@@ -636,7 +643,13 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     if (q->cameraSet()->type() != ManagedCameraSet::Type::all)
     {
         for (const auto& camera: q->cameraSet()->cameras())
-            request.deviceIds.insert(camera->getId());
+        {
+            if (canViewArchive(camera))
+                request.deviceIds.insert(camera->getId());
+        }
+
+        if (!NX_ASSERT(!request.deviceIds.empty()))
+            return {};
     }
 
     request.timePeriod = period;
@@ -773,7 +786,7 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
             {
                 return camera->isOnline()
                     && !camera->enabledAnalyticsEngines().empty()
-                    && q->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+                    && q->accessController()->hasPermissions(camera, Qn::ViewContentPermission);
             };
 
         // Preserve existing receivers that are still relevant.
@@ -895,7 +908,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
         && q->relevantTimePeriod().isInfinite() //< This check is required for manualAdd mode.
         && q->isOnline()
         && !q->livePaused()
-        && !q->isFilterDegenerate());
+        && (!q->isFilterDegenerate() || q->hasOnlyLiveCameras()));
 
     if (!m_liveReceptionActive)
         return;
