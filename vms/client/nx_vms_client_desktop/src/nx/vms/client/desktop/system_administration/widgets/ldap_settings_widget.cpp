@@ -347,7 +347,8 @@ LdapSettingsWidget::LdapSettingsWidget(QWidget* parent):
 
 LdapSettingsWidget::~LdapSettingsWidget()
 {
-    // Required here for forward-declared scoped pointer destruction.
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void LdapSettingsWidget::discardChanges()
@@ -679,11 +680,8 @@ void LdapSettingsWidget::showError(const QString& errorMessage)
 
 void LdapSettingsWidget::cancelCurrentRequest()
 {
-    if (d->currentHandle > 0)
-    {
-        if (auto api = connectedServerApi())
-            api->cancelRequest(d->currentHandle);
-    }
+    if (auto api = connectedServerApi(); api && d->currentHandle > 0)
+        api->cancelRequest(d->currentHandle);
     d->currentHandle = 0;
 }
 
@@ -701,6 +699,11 @@ void LdapSettingsWidget::resetWarnings()
 {
     d->hideEmptyLdapWarning = false;
     d->hideEditingWarning = false;
+}
+
+bool LdapSettingsWidget::isNetworkRequestRunning() const
+{
+    return d->currentHandle != 0;
 }
 
 } // namespace nx::vms::client::desktop

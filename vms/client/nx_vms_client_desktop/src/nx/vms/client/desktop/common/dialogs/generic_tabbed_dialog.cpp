@@ -173,16 +173,21 @@ void GenericTabbedDialog::initializeTabWidget()
     setTabWidget(tabWidgets[0]);
 }
 
-QList<GenericTabbedDialog::Page>::iterator GenericTabbedDialog::findPage(int key)
+GenericTabbedDialog::Pages::iterator GenericTabbedDialog::findPage(int key)
 {
     return std::find_if(m_pages.begin(), m_pages.end(),
         [key](const Page& page) { return page.key == key; });
 }
 
-QList<GenericTabbedDialog::Page>::const_iterator GenericTabbedDialog::findPage(int key) const
+GenericTabbedDialog::Pages::const_iterator GenericTabbedDialog::findPage(int key) const
 {
     return std::find_if(m_pages.cbegin(), m_pages.cend(),
         [key](const Page& page) { return page.key == key; });
+}
+
+GenericTabbedDialog::Pages GenericTabbedDialog::pages() const
+{
+    return m_pages;
 }
 
 void GenericTabbedDialog::initializeButtonBox()

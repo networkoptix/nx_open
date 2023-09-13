@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <api/server_rest_connection_fwd.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
 #include <ui/workbench/workbench_state_manager.h>
 
@@ -16,6 +17,9 @@ public:
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
+
+private:
+    rest::Handle m_currentRequest = 0;
 };
 
 } // namespace nx::vms::client::desktop

@@ -6,6 +6,7 @@
 #include <set>
 #include <utility>
 
+#include <api/server_rest_connection.h>
 #include <client/client_globals.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
@@ -167,6 +168,8 @@ struct BackupSettingsDecoratorModel::Private
     bool isCloudBackupStorage = false;
     std::unique_ptr<nx::vms::common::saas::CloudStorageServiceUsageHelper> cloudStorageUsageHelper;
 
+    QSet<rest::Handle> requests;
+
     BackupContentTypes backupContentTypes(const QnVirtualCameraResourcePtr& camera) const;
     CameraBackupQuality backupQuality(const QnVirtualCameraResourcePtr& camera) const;
     bool backupEnabled(const QnVirtualCameraResourcePtr& camera) const;
@@ -185,6 +188,7 @@ struct BackupSettingsDecoratorModel::Private
     bool hasChanges() const;
     void applyChanges();
     void discardChanges();
+    bool isNetworkRequestRunning() const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -374,6 +378,7 @@ void BackupSettingsDecoratorModel::Private::applyChanges()
     const auto cameras = camerasToApplySettings();
     if (!cameras.isEmpty())
     {
+        // TODO: #sivanov Switch saving to REST, add returned handle to requests list.
         qnResourcesChangesManager->saveCameras(cameras,
             [this](const auto& camera)
             {
@@ -387,8 +392,17 @@ void BackupSettingsDecoratorModel::Private::applyChanges()
 
     if (changedGlobalBackupSettings)
     {
+        auto callback =
+            [this](bool /*success*/, rest::Handle requestId)
+            {
+                NX_ASSERT(requests.contains(requestId) || requests.empty());
+                requests.remove(requestId);
+            };
+
         q->systemContext()->systemSettings()->backupSettings = changedGlobalBackupSettings.value();
-        q->systemContext()->systemSettingsManager()->saveSystemSettings();
+        auto handle = q->systemContext()->systemSettingsManager()->saveSystemSettings(callback, q);
+        if (handle > 0)
+            requests.insert(handle);
     }
 
     changedContentTypes.clear();
@@ -405,6 +419,18 @@ void BackupSettingsDecoratorModel::Private::discardChanges()
     changedQuality.clear();
     changedEnabledState.clear();
     changedGlobalBackupSettings.reset();
+
+    if (auto api = q->systemContext()->connectedServerApi())
+    {
+        for (auto handle: requests)
+            api->cancelRequest(handle);
+    }
+    requests.clear();
+}
+
+bool BackupSettingsDecoratorModel::Private::isNetworkRequestRunning() const
+{
+    return !requests.empty();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -430,6 +456,8 @@ BackupSettingsDecoratorModel::BackupSettingsDecoratorModel(
 
 BackupSettingsDecoratorModel::~BackupSettingsDecoratorModel()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) const
@@ -707,7 +735,7 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
                     d->changedEnabledState.remove(camera);
                 else
                     d->changedEnabledState.insert(camera, enabled);
-                
+
                 dataChangedScopedAccumulator.rowDataChanged(index);
             }
 
@@ -787,6 +815,12 @@ void BackupSettingsDecoratorModel::discardChanges()
             index(0, WarningIconColumn),
             index(rowCount() - 1, ColumnCount - 1));
     }
+    NX_ASSERT(!isNetworkRequestRunning());
+}
+
+bool BackupSettingsDecoratorModel::isNetworkRequestRunning() const
+{
+    return d->isNetworkRequestRunning();
 }
 
 void BackupSettingsDecoratorModel::applyChanges()

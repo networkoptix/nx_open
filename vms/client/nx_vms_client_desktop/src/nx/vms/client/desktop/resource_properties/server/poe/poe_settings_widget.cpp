@@ -1,16 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "poe_settings_widget.h"
-
-#include "poe_settings_store.h"
-
 #include "ui_poe_settings_widget.h"
 
-#include <nx/vms/client/desktop/resource_properties/server/poe/poe_controller.h>
-#include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_reducer.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
-#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource_properties/server/poe/poe_controller.h>
+#include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_reducer.h>
+
+#include "poe_settings_store.h"
 
 namespace nx::vms::client::desktop {
 
@@ -116,15 +115,13 @@ PoeSettingsWidget::PoeSettingsWidget(QWidget* parent):
 
 PoeSettingsWidget::~PoeSettingsWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 bool PoeSettingsWidget::hasChanges() const
 {
     return d->store.state().hasChanges;
-}
-
-void PoeSettingsWidget::loadDataToUi()
-{
 }
 
 void PoeSettingsWidget::applyChanges()
@@ -144,6 +141,16 @@ void PoeSettingsWidget::applyChanges()
 
     d->store.applyUserChanges();
     d->controller.setPowerModes(modes);
+}
+
+void PoeSettingsWidget::discardChanges()
+{
+    d->controller.cancelRequest();
+}
+
+bool PoeSettingsWidget::isNetworkRequestRunning() const
+{
+    return d->controller.isNetworkRequestRunning();
 }
 
 void PoeSettingsWidget::setServerId(const QnUuid& value)

@@ -10,6 +10,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/ssl/helpers.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/helpers.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -18,6 +19,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -83,7 +85,7 @@ ServerCertificateViewer::ServerCertificateViewer(
 
     if (systemContext)
     {
-        connect(systemContext->userWatcher(), &core::UserWatcher::userChanged, this, 
+        connect(systemContext->userWatcher(), &core::UserWatcher::userChanged, this,
             [this, server](const QnUserResourcePtr& user)
             {
                 updateWarningLabel(
@@ -101,6 +103,11 @@ ServerCertificateViewer::ServerCertificateViewer(
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
+
+    m_okButton = new BusyIndicatorButton(this);
+    m_okButton->setText(tr("OK"));
+    setAccentStyle(m_okButton);
+    ui->buttonBox->addButton(m_okButton, QDialogButtonBox::AcceptRole);
 
     const int kScrollBarWidth = 6;
     const int kCertificateChainLineHeight = 20;
@@ -313,12 +320,20 @@ void ServerCertificateViewer::pinCertificate()
     std::string pem;
     for (const auto& cert: m_certificates)
         pem += nx::network::ssl::X509Certificate(cert.x509()).pemString();
-    qnResourcesChangesManager->saveServer(
-        m_server,
-        [pem=QString::fromStdString(pem)](const auto& server)
+    m_server->setProperty(ResourcePropertyKey::Server::kCertificate, QString::fromStdString(pem));
+
+    rest::Handle handle;
+    handle = qnResourcesChangesManager->saveServer(m_server, nx::utils::guarded(this,
+        [&handle](bool success, rest::Handle requestId)
         {
-            server->setProperty(ResourcePropertyKey::Server::kCertificate, pem);
-        });
+            NX_ASSERT(requestId == handle);
+            handle = 0;
+        }));
+
+    m_okButton->showIndicator();
+    m_okButton->setEnabled(false);
+    while (handle > 0)
+        qApp->processEvents();
 
     // Close the dialog.
     accept();

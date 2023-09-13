@@ -7,9 +7,9 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 
+#include <nx/vms/client/desktop/common/dialogs/abstract_preferences_dialog.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/generic_tabbed_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/message_box_helper.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -77,10 +77,12 @@ protected:
  * Tabbed dialog that will be closed if we are disconnected from server.
  * Warning: class is QnWorkbenchContextAware
  */
-class QnSessionAwareTabbedDialog: public QnGenericTabbedDialog, public QnSessionAwareDelegate
+class QnSessionAwareTabbedDialog:
+    public nx::vms::client::desktop::AbstractPreferencesDialog,
+    public QnSessionAwareDelegate
 {
     Q_OBJECT;
-    typedef QnGenericTabbedDialog base_type;
+    typedef nx::vms::client::desktop::AbstractPreferencesDialog base_type;
 
 public:
     QnSessionAwareTabbedDialog(QWidget* parent, Qt::WindowFlags windowFlags = {});
@@ -89,15 +91,4 @@ public:
 
     /** Forcibly update dialog contents. */
     virtual void forcedUpdate() override;
-
-protected:
-    bool tryToApplyOrDiscardChanges();
-    virtual QDialogButtonBox::StandardButton getConfirmationResult() override;
-
-    /**
-     * Show the dialog, asking what to do with unsaved changes.
-     * @returns QDialogButtonBox::Yes if the changes should be saved, QDialogButtonBox::No if the
-     *     changes should be discarded, QDialogButtonBox::Cancel to abort the process.
-     */
-    virtual QDialogButtonBox::StandardButton showConfirmationDialog();
 };

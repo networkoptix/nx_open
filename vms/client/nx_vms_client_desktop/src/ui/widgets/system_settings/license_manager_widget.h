@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <api/server_rest_connection_fwd.h>
 #include <licensing/license_fwd.h>
 #include <nx/vms/client/desktop/license/license_helpers.h>
 #include <nx/vms/license/license_usage_fwd.h>
@@ -28,13 +29,13 @@ public:
     virtual ~LicenseManagerWidget() override;
 
     virtual void loadDataToUi() override;
-    virtual bool hasChanges() const override;
-    virtual void applyChanges() override;
+    virtual bool isNetworkRequestRunning() const override;
+    virtual void discardChanges() override;
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
 
-private slots:
+private:
     void updateLicenses();
     void updateButtons();
 
@@ -45,7 +46,6 @@ private slots:
 
 private:
     QnLicensePool* licensePool() const;
-    QnUuid serverId() const;
 
     void showLicenseDetails(const QnLicensePtr& license);
 
@@ -83,6 +83,7 @@ private:
 
     using RequestInfo = nx::vms::client::desktop::license::RequestInfo;
     RequestInfo m_deactivationReason;
+    rest::Handle m_currentRequest = 0;
 };
 
 } // namespace nx::vms::client::desktop

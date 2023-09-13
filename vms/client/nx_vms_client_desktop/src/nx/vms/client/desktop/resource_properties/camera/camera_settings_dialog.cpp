@@ -96,10 +96,10 @@ struct CameraSettingsDialog::Private: public QObject
     QPointer<QPushButton> fixupScheduleButton;
     std::unique_ptr<CameraAdvancedParametersManifestManager> advancedParametersManifestManager;
     std::unique_ptr<CameraSettingsAdvancedManifestWatcher> advancedParametersManifestWatcher;
-    QSharedPointer<QnMessageBox> confirmationMessageBox;
 
     const QSharedPointer<LiveCameraThumbnail> cameraPreview{new LiveCameraThumbnail()};
     bool isPreviewRefreshRequired = true;
+    bool isNetworkRequestRunning = false;
 
     Private(CameraSettingsDialog* q): q(q)
     {
@@ -119,8 +119,6 @@ struct CameraSettingsDialog::Private: public QObject
             store));
 
         advancedSettingsWidget = new CameraAdvancedParamsWidget(store, q->ui->tabWidget);
-        connect(advancedSettingsWidget, &CameraAdvancedParamsWidget::hasChangesChanged,
-            this, [this]() { q->updateButtonsAvailability(store->state()); });
     }
 
     bool hasChanges() const
@@ -132,6 +130,8 @@ struct CameraSettingsDialog::Private: public QObject
 
     void applyChanges()
     {
+        NX_ASSERT(!isNetworkRequestRunning);
+
         if (store->state().recording.enabled.valueOr(false))
         {
             if (!licenseUsageHelper->canEnableRecording(cameras))
@@ -175,14 +175,16 @@ struct CameraSettingsDialog::Private: public QObject
                 resetChanges();
             };
 
-        const auto backout =
+        const auto callback =
             [this, camerasCopy = cameras](bool success)
             {
+                isNetworkRequestRunning = false;
                 if (!success && camerasCopy == cameras)
                     resetChanges();
             };
 
-        qnResourcesChangesManager->saveCamerasBatch(cameras, apply, backout);
+        isNetworkRequestRunning = true;
+        qnResourcesChangesManager->saveCamerasBatch(cameras, apply, callback);
     }
 
     void resetChanges()
@@ -288,12 +290,10 @@ struct CameraSettingsDialog::Private: public QObject
 
 CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     base_type(parent),
-    QnSessionAwareDelegate(parent, InitializationMode::lazy),
     ui(new Ui::CameraSettingsDialog()),
     d(new Private(this))
 {
     ui->setupUi(this);
-    setButtonBox(ui->buttonBox);
     d->store = new CameraSettingsDialogStore(this);
 
     d->licenseWatcher = new CameraSettingsLicenseWatcher(d->store, this);
@@ -331,58 +331,61 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
         [this](ui::action::IDType action) { d->handleAction(action); });
 
-    addPage(
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::general),
         generalTab,
         tr("General"));
 
-    addPage(
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::recording),
         recordingTab,
         tr("Recording"));
 
-    addPage(
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::io),
         new IoModuleSettingsWidget(d->store, ui->tabWidget),
         tr("I/O Ports"));
 
-    addPage(
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::motion),
         new CameraMotionSettingsWidget(d->store, ui->tabWidget),
         tr("Motion"));
 
-    addPage(
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::dewarping),
         new CameraDewarpingSettingsWidget(d->store, d->cameraPreview,
             qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
         tr("Dewarping"));
 
-    addPage(
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::hotspots),
         new CameraHotspotsSettingsWidget(systemContext()->resourcePool(), d->store,
             d->cameraPreview),
         tr("Hotspots"));
 
     d->initializeAdvancedSettingsWidget();
-    addPage(
+    connect(d->advancedSettingsWidget, &CameraAdvancedParamsWidget::hasChangesChanged,
+        this, &CameraSettingsDialog::updateButtonBox);
+
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::advanced),
         d->advancedSettingsWidget,
         tr("Advanced"));
 
     auto cameraWebPage = new CameraWebPageWidget(systemContext(), d->store, ui->tabWidget);
     connect(this, &QDialog::finished, cameraWebPage, &CameraWebPageWidget::cleanup);
-    addPage(
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::web),
         cameraWebPage,
         tr("Web Page"));
 
-    addPage(
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::analytics),
         new CameraAnalyticsSettingsWidget(
             systemContext(), d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
         ini().enableMetadataApi ? tr("Integrations") : tr("Plugins"));
 
-    addPage(
+    GenericTabbedDialog::addPage(
         int(CameraSettingsTab::expert),
         new CameraExpertSettingsWidget(d->store, ui->tabWidget),
         tr("Expert"));
@@ -463,25 +466,6 @@ CameraSettingsDialog::~CameraSettingsDialog()
 {
 }
 
-bool CameraSettingsDialog::tryClose(bool force)
-{
-    auto result = setCameras({}, force);
-    result |= force;
-    if (result)
-        hide();
-
-    return result;
-}
-
-void CameraSettingsDialog::reject()
-{
-    tryClose(false);
-}
-
-void CameraSettingsDialog::forcedUpdate()
-{
-}
-
 bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
 {
     // Ignore click on the same camera.
@@ -490,30 +474,14 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
 
     const bool askConfirmation =
         !force
-        && isVisible()
+        && !isHidden()
+        && !cameras.empty()
+        && !d->cameras.empty()
         && d->cameras != cameras
         && d->hasChanges();
 
-    if (askConfirmation)
-    {
-        const auto result = showConfirmationDialog();
-        switch (result)
-        {
-            case QDialogButtonBox::Apply:
-                d->applyChanges();
-                break;
-            case QDialogButtonBox::Discard:
-                break;
-            default:
-                /* Cancel changes. */
-                return false;
-        }
-    }
-    else if (!askConfirmation && d->confirmationMessageBox)
-    {
-        d->confirmationMessageBox->setEscapeButton(QDialogButtonBox::Cancel);
-        d->confirmationMessageBox->close();
-    }
+    if (askConfirmation && !switchCamerasWithConfirmation())
+        return false;
 
     const auto singleCamera = cameras.size() == 1 ? cameras.first() : QnVirtualCameraResourcePtr();
 
@@ -567,33 +535,47 @@ void CameraSettingsDialog::done(int result)
 
 void CameraSettingsDialog::showEvent(QShowEvent* event)
 {
-    // Load state into tabs in case the state was changed outside current client process.
-    d->resetChanges();
-    d->deviceAgentSettingsAdapter->refreshSettings();
-
     base_type::showEvent(event);
     d->updatePreviewIfNeeded(/*forceRefresh*/ true);
 }
 
-void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
+void CameraSettingsDialog::loadDataToUi()
 {
-    base_type::buttonBoxClicked(button);
-    switch (button)
-    {
-        case QDialogButtonBox::Ok:
-        case QDialogButtonBox::Apply:
-            if (d->hasChanges())
-                d->applyChanges();
-            break;
-        default:
-            break;
-    }
+    // Load state into tabs in case the state was changed outside current client process.
+    d->resetChanges();
+    d->deviceAgentSettingsAdapter->refreshSettings();
 }
 
-QDialogButtonBox::StandardButton CameraSettingsDialog::showConfirmationDialog()
+void CameraSettingsDialog::applyChanges()
 {
-    if (d->cameras.empty())
-        return QDialogButtonBox::Discard;
+    d->applyChanges();
+}
+
+void CameraSettingsDialog::discardChanges()
+{
+    // TODO: #sivanov Implement requests cancelling logic when saving switched to REST API.
+    d->resetChanges();
+}
+
+bool CameraSettingsDialog::canApplyChanges() const
+{
+    return !d->store->state().readOnly;
+}
+
+bool CameraSettingsDialog::isNetworkRequestRunning() const
+{
+    return d->isNetworkRequestRunning;
+}
+
+bool CameraSettingsDialog::hasChanges() const
+{
+    return d->hasChanges();
+}
+
+bool CameraSettingsDialog::switchCamerasWithConfirmation()
+{
+    if (!NX_ASSERT(!d->cameras.empty()))
+        return true;
 
     const auto extras = QnDeviceDependentStrings::getNameFromSet(
         resourcePool(),
@@ -604,34 +586,27 @@ QDialogButtonBox::StandardButton CameraSettingsDialog::showConfirmationDialog()
         ),
         d->cameras);
 
-    d->confirmationMessageBox =
-        QSharedPointer<QnMessageBox>(new QnMessageBox(QnMessageBoxIcon::Question,
-            tr("Apply changes before switching to another camera?"),
-            extras,
-            QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Apply,
-            this));
+    QnMessageBox messageBox(
+        QnMessageBoxIcon::Question,
+        tr("Apply changes before switching to another camera?"),
+        extras,
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply,
+        this);
 
-    d->confirmationMessageBox->addCustomWidget(
-        new QnResourceListView(d->cameras, d->confirmationMessageBox.get()));
-    const auto result = QDialogButtonBox::StandardButton(d->confirmationMessageBox->exec());
-    d->confirmationMessageBox.reset();
-    return result;
-}
+    messageBox.addCustomWidget(new QnResourceListView(d->cameras, &messageBox));
+    const auto result = static_cast<QDialogButtonBox::StandardButton>(messageBox.exec());
 
-void CameraSettingsDialog::updateButtonsAvailability(const CameraSettingsDialogState& state)
-{
-    if (!buttonBox())
-        return;
+    // Logic of requests canceling or waiting will not work if we switch to another camera before
+    // closing the dialog. That's why we should wait for network request completion here.
+    if (result == QDialogButtonBox::Apply)
+        applyChangesSync();
+    else if (result == QDialogButtonBox::Discard)
+        discardChangesSync();
+    else // result == QDialogButtonBox::Cancel
+        return false;
 
-    const auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    const auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
-
-    if (okButton)
-        okButton->setEnabled(!state.readOnly);
-
-    if (applyButton)
-        applyButton->setEnabled(d->hasChanges());
+    return true;
 }
 
 void CameraSettingsDialog::updateScheduleAlert(const CameraSettingsDialogState& state)
@@ -686,7 +661,6 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
 
-    updateButtonsAvailability(state);
     updateScheduleAlert(state);
 
     static const int kLastTabKey = (int)CameraSettingsTab::expert;
@@ -695,6 +669,7 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
         setPageVisible(key, state.isPageVisible((CameraSettingsTab)key));
 
     setCurrentPage((int)state.selectedTab);
+    updateButtonBox();
 }
 
 } // namespace nx::vms::client::desktop

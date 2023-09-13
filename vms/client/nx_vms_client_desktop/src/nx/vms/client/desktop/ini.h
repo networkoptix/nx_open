@@ -142,9 +142,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, allowOwnCloudNotifications,
         "[Dev] Allow receiving cloud notifications from the current cloud system");
 
-    NX_INI_FLAG(true, restApiResourceChangesManager,
-        "[Dev] Enable rest api for resource change manager requests");
-
     NX_INI_FLAG(false, joystickInvestigationWizard,
         "[Dev] Enables joystick investigation wizard (works only on MacOS).");
 

@@ -8,8 +8,8 @@
 #include <QtWidgets/QWidget>
 
 #include <api/model/recording_stats_reply.h>
-#include <nx/vms/api/data/storage_space_reply.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/data/storage_space_reply.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -33,8 +33,6 @@ public:
     virtual ~QnStorageAnalyticsWidget();
 
     virtual void loadDataToUi() override;
-    virtual void applyChanges() override;
-    virtual bool hasChanges() const override;
 
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr& server);

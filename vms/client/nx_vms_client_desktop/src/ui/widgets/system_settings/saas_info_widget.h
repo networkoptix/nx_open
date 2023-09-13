@@ -20,8 +20,6 @@ public:
     virtual ~SaasInfoWidget() override;
 
     virtual void loadDataToUi() override;
-    virtual bool hasChanges() const override;
-    virtual void applyChanges() override;
 
 private:
     struct Private;

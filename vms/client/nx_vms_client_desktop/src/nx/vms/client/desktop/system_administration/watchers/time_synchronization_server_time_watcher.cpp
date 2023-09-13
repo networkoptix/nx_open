@@ -30,8 +30,7 @@ public:
     Private(TimeSynchronizationServerTimeWatcher* q, TimeSynchronizationWidgetStore* store) :
         QObject(),
         q(q),
-        m_store(store),
-        m_currentRequest(rest::Handle())
+        m_store(store)
     {
         NX_ASSERT(store);
 
@@ -47,7 +46,7 @@ public:
         if (m_tickCount++ < kDelayTickCount) //< In case of refactoring don't lose the ++
             return;
 
-        if (m_currentRequest)
+        if (m_currentRequest != 0)
             return;
 
         if (!connection())
@@ -60,7 +59,7 @@ public:
                 if (m_currentRequest != handle)
                     return;
 
-                m_currentRequest = rest::Handle(); //< Reset.
+                m_currentRequest = 0; //< Reset.
                 if (!success)
                     return;
 
@@ -104,7 +103,7 @@ public:
     void forceUpdate()
     {
         m_tickCount = kDelayTickCount;
-        m_currentRequest = rest::Handle();
+        m_currentRequest = 0;
     }
 
     milliseconds elapsedTime() const
@@ -114,7 +113,7 @@ public:
 
 private:
     QPointer<TimeSynchronizationWidgetStore> m_store;
-    rest::Handle m_currentRequest;
+    rest::Handle m_currentRequest = 0;
     qint64 m_currentRequestStartTime = 0;
     int m_tickCount = 0;
     QTimer m_timer;

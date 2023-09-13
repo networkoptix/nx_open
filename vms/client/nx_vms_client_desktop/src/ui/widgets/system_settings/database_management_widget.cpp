@@ -48,15 +48,42 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     connect(ui->backupButton, &QPushButton::clicked, this, &QnDatabaseManagementWidget::backupDb);
     connect(ui->restoreButton, &QPushButton::clicked, this, &QnDatabaseManagementWidget::restoreDb);
 
+    auto cancelRequest =
+        [this]()
+        {
+            if (auto connection = connectedServerApi(); NX_ASSERT(connection))
+                connection->cancelRequest(m_currentRequest);
+            m_currentRequest = 0;
+        };
+
+    connect(ui->cancelCreateBackupButton, &QPushButton::clicked, this, cancelRequest);
+    connect(ui->cancelRestoreBackupButton, &QPushButton::clicked, this, cancelRequest);
+
     updateVisible();
 }
 
 QnDatabaseManagementWidget::~QnDatabaseManagementWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
+}
+
+void QnDatabaseManagementWidget::discardChanges()
+{
+    if (auto api = connectedServerApi(); api && m_currentRequest > 0)
+        api->cancelRequest(m_currentRequest);
+    m_currentRequest = 0;
+}
+
+bool QnDatabaseManagementWidget::isNetworkRequestRunning() const
+{
+    return m_currentRequest != 0;
 }
 
 void QnDatabaseManagementWidget::backupDb()
 {
+    NX_ASSERT(m_currentRequest == 0);
+
     QScopedPointer<QnCustomFileDialog> fileDialog(new QnCustomFileDialog(
         this,
         tr("Save Database Backup..."),
@@ -93,9 +120,10 @@ void QnDatabaseManagementWidget::backupDb()
     auto dumpDatabaseHandler = nx::utils::guarded(this,
         [this, fileName](
             bool success,
-            rest::Handle,
+            rest::Handle requestId,
             rest::ErrorOrData<QByteArray> errorOrData)
         {
+            NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
             success = false;
             if (auto data = std::get_if<QByteArray>(&errorOrData))
             {
@@ -130,15 +158,10 @@ void QnDatabaseManagementWidget::backupDb()
         tr("Create"),
         FreshSessionTokenHelper::ActionType::backup);
 
-    auto handle = connection->dumpDatabase(
+    m_currentRequest = connection->dumpDatabase(
         sessionTokenHelper, std::move(dumpDatabaseHandler), thread());
 
-    connect(
-        ui->cancelCreateBackupButton,
-        &QPushButton::clicked,
-        this,
-        [handle, connection]() { connection->cancelRequest(handle); });
-
+    ui->openFolderButton->disconnect(this);
     connect(
         ui->openFolderButton,
         &QPushButton::clicked,
@@ -154,6 +177,8 @@ void QnDatabaseManagementWidget::backupDb()
 
 void QnDatabaseManagementWidget::restoreDb()
 {
+    NX_ASSERT(m_currentRequest == 0);
+
     QString fileName = QFileDialog::getOpenFileName(
         this,
         tr("Open Database Backup..."),
@@ -196,8 +221,9 @@ void QnDatabaseManagementWidget::restoreDb()
     ui->labelMessage->setText(tr("Database backup is being uploaded to the server. Please wait."));
 
     auto restoreDatabaseHandler = nx::utils::guarded(this,
-        [this, fileName](bool, rest::Handle, rest::ErrorOrEmpty reply)
+        [this, fileName](bool, rest::Handle requestId, rest::ErrorOrEmpty reply)
         {
+            NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
             m_state = State::restoreFinished;
             updateVisible();
             if (std::holds_alternative<rest::Empty>(reply))
@@ -225,13 +251,8 @@ void QnDatabaseManagementWidget::restoreDb()
         tr("Restore"),
         FreshSessionTokenHelper::ActionType::restore);
 
-    auto handle = connection->restoreDatabase(
+    m_currentRequest = connection->restoreDatabase(
         sessionTokenHelper, data, std::move(restoreDatabaseHandler), thread());
-    connect(
-        ui->cancelRestoreBackupButton,
-        &QPushButton::clicked,
-        this,
-        [handle, connection]() { connection->cancelRequest(handle); });
 }
 
 void QnDatabaseManagementWidget::updateVisible(bool operationSuccess)
@@ -305,19 +326,4 @@ void QnDatabaseManagementWidget::hideEvent(QHideEvent* event)
         m_state = State::empty;
         updateVisible();
     }
-}
-
-void QnDatabaseManagementWidget::applyChanges()
-{
-    /* Widget is read-only */
-}
-
-void QnDatabaseManagementWidget::loadDataToUi()
-{
-    /* Widget is read-only */
-}
-
-bool QnDatabaseManagementWidget::hasChanges() const
-{
-    return false;
 }

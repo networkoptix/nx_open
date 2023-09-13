@@ -6,7 +6,6 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/branding.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -49,8 +48,6 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     auto userManagementWidget = new UserManagementTabWidget(
         systemContext()->userGroupManager(), this);
     addPage(UserManagement, userManagementWidget, tr("User Management"));
-    connect(this, &QnGenericTabbedDialog::dialogClosed,
-        this, [userManagementWidget]() { userManagementWidget->resetWarnings(); });
 
     // This is a page for updating many servers in one run.
     auto multiUpdatesWidget = new MultiServerUpdatesWidget(this);
@@ -118,49 +115,46 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
 
     autoResizePagesToContents(
         ui->tabWidget, {QSizePolicy::Preferred, QSizePolicy::Preferred}, true);
-
-    connect(this, &QnGenericTabbedDialog::dialogClosed,
-        this, [securityWidget]() { securityWidget->resetWarnings(); });
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog()
 {
-    // Required here for forward-declared scoped pointer destruction.
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
-bool QnSystemAdministrationDialog::confirmChangesOnExit()
+bool QnSystemAdministrationDialog::isNetworkRequestRunning() const
 {
-    return true;
+    return base_type::isNetworkRequestRunning() || m_currentRequest > 0;
 }
 
 void QnSystemAdministrationDialog::applyChanges()
 {
-    for (const Page& page: modifiedPages())
-    {
-        if (page.enabled && page.visible && page.widget->hasChanges())
-            page.widget->applyChanges();
-    }
+    base_type::applyChanges();
 
-    const auto callback = nx::utils::guarded(this,
-        [this] (bool success)
+    const auto callback =
+        [this](bool success, rest::Handle requestId)
         {
-            systemContext()->systemSettingsManager()->requestSystemSettings(
-                [this, success]
-                {
-                    if (success)
-                        loadDataToUi();
+            NX_ASSERT(requestId == m_currentRequest || m_currentRequest == 0);
+            m_currentRequest = 0;
+            if (success)
+                loadDataToUi();
 
-                    updateButtonBox();
-                });
-        });
+            updateButtonBox();
+        };
 
-    systemContext()->systemSettingsManager()->saveSystemSettings(callback, this);
+    m_currentRequest = systemContext()->systemSettingsManager()->saveSystemSettings(
+        callback,
+        this);
 
     updateButtonBox();
 }
 
-void QnSystemAdministrationDialog::loadDataToUi()
+void QnSystemAdministrationDialog::discardChanges()
 {
-    for (const Page& page: allPages())
-        page.widget->loadDataToUi();
+    base_type::discardChanges();
+    if (auto api = connectedServerApi(); api && m_currentRequest > 0)
+        api->cancelRequest(m_currentRequest);
+    m_currentRequest = 0;
+    NX_ASSERT(!isNetworkRequestRunning());
 }

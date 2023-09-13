@@ -21,8 +21,10 @@ public:
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
+    virtual void discardChanges() override;
     virtual bool hasChanges() const override;
     virtual void resetWarnings() override;
+    virtual bool isNetworkRequestRunning() const override;
 
     void filterDigestUsers();
 

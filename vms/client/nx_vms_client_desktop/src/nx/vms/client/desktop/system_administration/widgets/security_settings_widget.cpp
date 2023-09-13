@@ -214,6 +214,8 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
 
 SecuritySettingsWidget::~SecuritySettingsWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void SecuritySettingsWidget::updateLimitSessionControls()
@@ -334,6 +336,9 @@ void SecuritySettingsWidget::applyChanges()
     if (!hasChanges())
         return;
 
+    if (!NX_ASSERT(m_currentRequest == 0, "Request was already sent"))
+        return;
+
     const auto systemSetting = systemContext()->systemSettings();
     systemSetting->auditTrailEnabled = ui->auditTrailCheckBox->isChecked();
     systemSetting->trafficEncryptionForced = ui->forceTrafficEncryptionCheckBox->isChecked();
@@ -347,8 +352,14 @@ void SecuritySettingsWidget::applyChanges()
     resetWarnings();
 
     const auto callback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle, const rest::ServerConnection::EmptyResponseType&)
+        [this](
+            bool success,
+            rest::Handle requestId,
+            const rest::ServerConnection::EmptyResponseType& /*response*/)
         {
+            NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
+            m_currentRequest = 0;
+
             if (!success)
             {
                 m_archivePasswordState = ArchivePasswordState::failedToSet;
@@ -362,10 +373,9 @@ void SecuritySettingsWidget::applyChanges()
     if (m_archivePasswordState == ArchivePasswordState::changed
         || m_archivePasswordState == ArchivePasswordState::failedToSet)
     {
-        auto api = connectedServerApi();
-        if (NX_ASSERT(api))
+        if (auto api = connectedServerApi(); NX_ASSERT(api, "Connection must be established"))
         {
-            api->setStorageEncryptionPassword(
+            m_currentRequest = api->setStorageEncryptionPassword(
                 m_archiveEncryptionPasswordDialog->password(),
                 /*makeCurrent*/ true,
                 /*salt*/ QByteArray(),
@@ -373,6 +383,13 @@ void SecuritySettingsWidget::applyChanges()
                 thread());
         }
     }
+}
+
+void SecuritySettingsWidget::discardChanges()
+{
+    if (auto api = connectedServerApi(); api && m_currentRequest > 0)
+        api->cancelRequest(m_currentRequest);
+    m_currentRequest = 0;
 }
 
 bool SecuritySettingsWidget::hasChanges() const
@@ -395,6 +412,11 @@ bool SecuritySettingsWidget::hasChanges() const
         || m_archivePasswordState == ArchivePasswordState::failedToSet
         || ui->showServersInTreeCheckBox->isChecked()
             != systemSetting->showServersInTreeForNonAdmins;
+}
+
+bool SecuritySettingsWidget::isNetworkRequestRunning() const
+{
+    return m_currentRequest != 0;
 }
 
 void SecuritySettingsWidget::resetWarnings()

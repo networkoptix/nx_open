@@ -96,8 +96,6 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     );
 
     addRestartLabel();
-
-    loadDataToUi();
 }
 
 QnLocalSettingsDialog::~QnLocalSettingsDialog() {}
@@ -120,11 +118,6 @@ void QnLocalSettingsDialog::updateButtonBox()
 {
     base_type::updateButtonBox();
     m_restartLabel->setVisible(isRestartRequired());
-}
-
-bool QnLocalSettingsDialog::confirmChangesOnExit()
-{
-    return true;
 }
 
 void QnLocalSettingsDialog::accept()

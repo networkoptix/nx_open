@@ -3,10 +3,8 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/common/dialogs/generic_tabbed_dialog.h>
-#include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_state_manager.h>
 
 namespace Ui { class CameraSettingsDialog; }
 
@@ -14,19 +12,14 @@ namespace nx::vms::client::desktop {
 
 struct CameraSettingsDialogState;
 
-class CameraSettingsDialog:
-    public GenericTabbedDialog,
-    public QnSessionAwareDelegate
+class CameraSettingsDialog: public QnSessionAwareTabbedDialog
 {
     Q_OBJECT
-    using base_type = GenericTabbedDialog;
+    using base_type = QnSessionAwareTabbedDialog;
 
 public:
     explicit CameraSettingsDialog(QWidget* parent = nullptr);
     virtual ~CameraSettingsDialog() override;
-
-    virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
 
     bool setCameras(const QnVirtualCameraResourceList& cameras, bool force = false);
 
@@ -36,15 +29,40 @@ public:
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
-    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
-    virtual void reject() override;
+
+    /**
+     * Refresh ui state based on model data. Should be called from derived classes.
+     */
+    virtual void loadDataToUi();
+
+    /**
+     * Apply changes to model. Called when user presses OK or Apply buttons.
+     */
+    virtual void applyChanges();
+
+    /**
+     * Discard unsaved changes.
+     */
+    virtual void discardChanges();
+
+    /**
+     * @return Whether all values are correct so saving is possible.
+     */
+    virtual bool canApplyChanges() const;
+
+    /** Whether dialog has running network request. */
+    virtual bool isNetworkRequestRunning() const;
+
+    /**
+     * @return Whether there are any unsaved changes in the dialog.
+     */
+    virtual bool hasChanges() const;
 
 private:
-    QDialogButtonBox::StandardButton showConfirmationDialog();
+    bool switchCamerasWithConfirmation();
 
     void loadState(const CameraSettingsDialogState& state);
 
-    void updateButtonsAvailability(const CameraSettingsDialogState& state);
     void updateScheduleAlert(const CameraSettingsDialogState& state);
 
 private:

@@ -3,11 +3,9 @@
 #include "button_box_dialog.h"
 
 #include <QtCore/QEvent>
-
 #include <QtWidgets/QPushButton>
 
 #include <nx/utils/log/assert.h>
-
 #include <nx/vms/client/desktop/style/custom_style.h>
 
 QnButtonBoxDialog::QnButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlags):
@@ -73,15 +71,20 @@ void QnButtonBoxDialog::initializeButtonBox() {
     setButtonBox(buttonBoxes[0]);
 }
 
-void QnButtonBoxDialog::at_buttonBox_clicked(QAbstractButton *button) {
-    if(m_buttonBox)
+void QnButtonBoxDialog::at_buttonBox_clicked(QAbstractButton* button)
+{
+    if (m_buttonBox)
         m_clickedButton = m_buttonBox.data()->standardButton(button);
+    buttonBoxClicked(button);
     buttonBoxClicked(m_clickedButton);
 }
 
-void QnButtonBoxDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
-    //do nothing
-    Q_UNUSED(button);
+void QnButtonBoxDialog::buttonBoxClicked(QAbstractButton* /*button*/)
+{
+}
+
+void QnButtonBoxDialog::buttonBoxClicked(QDialogButtonBox::StandardButton /*button*/)
+{
 }
 
 bool QnButtonBoxDialog::isReadOnly() const

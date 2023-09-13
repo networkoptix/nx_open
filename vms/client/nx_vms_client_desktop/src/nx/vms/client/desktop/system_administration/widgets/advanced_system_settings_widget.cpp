@@ -1,7 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "advanced_system_settings_widget.h"
-#include "advanced_system_settings_widget_p.h"
+
+#include <range/v3/algorithm/any_of.hpp>
 
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
@@ -18,6 +19,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
 #include <ui/workbench/workbench_context.h>
+
+#include "advanced_system_settings_widget_p.h"
 
 namespace {
 
@@ -131,6 +134,18 @@ QUrl AdvancedSystemSettingsWidget::urlFor(Subpage page)
     return Private::urlFor(page);
 }
 
+QList<QnAbstractPreferencesWidget*> AdvancedSystemSettingsWidget::Private::tabs() const
+{
+    QList<QnAbstractPreferencesWidget*> result;
+    for (int i = 0; i < m_stack->count(); ++i)
+    {
+        const auto tab = qobject_cast<QnAbstractPreferencesWidget*>(m_stack->widget(i));
+        if (NX_ASSERT(tab))
+            result.push_back(tab);
+    }
+    return result;
+}
+
 AdvancedSystemSettingsWidget::AdvancedSystemSettingsWidget(
     SystemContext* context,
     QWidget *parent)
@@ -146,6 +161,13 @@ AdvancedSystemSettingsWidget::AdvancedSystemSettingsWidget(
 
 AdvancedSystemSettingsWidget::~AdvancedSystemSettingsWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
+}
+
+bool AdvancedSystemSettingsWidget::isNetworkRequestRunning() const
+{
+    return ranges::any_of(d->tabs(), [](auto tab) { return tab->isNetworkRequestRunning(); });
 }
 
 bool AdvancedSystemSettingsWidget::activate(const QUrl& url)
@@ -156,21 +178,11 @@ bool AdvancedSystemSettingsWidget::activate(const QUrl& url)
     return d->openSubpage(url);
 }
 
-void AdvancedSystemSettingsWidget::loadDataToUi()
+void AdvancedSystemSettingsWidget::discardChanges()
 {
-}
-
-void AdvancedSystemSettingsWidget::applyChanges()
-{
-}
-
-bool AdvancedSystemSettingsWidget::hasChanges() const
-{
-    return false;
-}
-
-void AdvancedSystemSettingsWidget::setReadOnlyInternal(bool readOnly)
-{
+    for (auto tab: d->tabs())
+        tab->discardChanges();
+    NX_ASSERT(!isNetworkRequestRunning());
 }
 
 void AdvancedSystemSettingsWidget::showEvent(QShowEvent* event)

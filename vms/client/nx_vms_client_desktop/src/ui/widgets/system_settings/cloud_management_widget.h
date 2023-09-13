@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <api/server_rest_connection_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -21,8 +22,8 @@ public:
     virtual ~QnCloudManagementWidget();
 
     virtual void loadDataToUi() override;
-    virtual void applyChanges() override;
-    virtual bool hasChanges() const override;
+    virtual bool isNetworkRequestRunning() const override;
+    virtual void discardChanges() override;
 
 private:
     void connectToCloud();
@@ -33,4 +34,5 @@ private:
 private:
     QScopedPointer<Ui::CloudManagementWidget> ui;
     QPointer<nx::vms::client::desktop::ConnectToCloudTool> m_connectTool;
+    rest::Handle m_currentRequest = 0;
 };

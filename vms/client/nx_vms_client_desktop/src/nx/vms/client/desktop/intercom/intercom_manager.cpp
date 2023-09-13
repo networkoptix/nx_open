@@ -180,10 +180,7 @@ struct IntercomManager::Private: public QObject
             else if (!localOnly)
             {
                 const auto systemContext = SystemContext::fromResource(layoutResource);
-                if (systemContext->restApiHelper()->restApiEnabled())
-                    qnResourcesChangesManager->deleteResource(layoutResource);
-                else
-                    qnResourcesChangesManager->deleteResources({layoutResource});
+                qnResourcesChangesManager->deleteResource(layoutResource);
             }
         }
     }
