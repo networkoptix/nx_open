@@ -40,14 +40,18 @@ RowLayout
             (new Date(year, month, day, 23, 59, 59)).getTime() - control.displayOffset)
     }
 
-    TextField
+    DateField
     {
         id: dateField
 
-        implicitWidth: 120
+        minimum: new Date(monthGrid.nowDate.getTime() + control.displayOffset)
 
-        text: NxGlobals.dateInShortFormat(getDateForDisplay())
-        readOnly: true
+        Binding on date { value: getDateForDisplay() }
+
+        onDateEdited: (date) =>
+        {
+            control.currentDate = generateDate(date.getFullYear(), date.getMonth(), date.getDate())
+        }
     }
 
     ImageButton
