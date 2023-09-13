@@ -208,7 +208,6 @@ TEST_F(ResourceAccessManagerTest, checkLockedLayoutAsPowerUser)
     resourcePool()->addResource(layout);
 
     const Qn::Permissions forbidden = Qn::RemovePermission
-        | Qn::WritePermission
         | Qn::AddRemoveItemsPermission
         | Qn::WriteNamePermission;
 
@@ -239,7 +238,6 @@ TEST_F(ResourceAccessManagerTest, checkLockedLayoutAsViewer)
 
     const Qn::Permissions forbidden = Qn::RemovePermission
         | Qn::AddRemoveItemsPermission
-        | Qn::WritePermission
         | Qn::WriteNamePermission;
 
     ASSERT_EQ(permissions(layout), Qn::FullLayoutPermissions & ~forbidden);
@@ -458,7 +456,6 @@ TEST_F(ResourceAccessManagerTest, checkVideowallLockedLayout)
     resourcePool()->addResource(layout);
 
     const Qn::Permissions forbidden = Qn::AddRemoveItemsPermission
-        | Qn::WritePermission
         | Qn::WriteNamePermission;
 
     ASSERT_EQ(permissions(layout), Qn::FullLayoutPermissions & ~forbidden);

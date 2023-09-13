@@ -282,7 +282,6 @@ TEST_F(AccessControllerTest, layoutPermisionsUpdatedWhenLockedOrUnlocked)
 
     const Qn::Permissions forbiddenIfLocked = Qn::AddRemoveItemsPermission
         | Qn::WriteNamePermission
-        | Qn::WritePermission
         | Qn::RemovePermission;
 
     layout->setLocked(true);
