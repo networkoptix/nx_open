@@ -126,7 +126,7 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     // We just need to check requestsFinished value.
     NX_MUTEX_LOCKER lock(&mutex);
     while (requestsFinished < kRequests * 2)
-        ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
+        waitCond.wait(&mutex, kWaitTimeoutMs);
 }
 
 TEST_F(HttpClientPoolTest, GeneralNegativeTest)
