@@ -549,18 +549,21 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 }
 
                 case LoginColumn:
-                    return taggedIfNotEmpty(
-                        toHtmlEscaped(user->getName()), "div", "style=\"white-space:nowrap\"");
+                    return noWrap(toHtmlEscaped(user->getName()));
 
                 case FullNameColumn:
-                    return taggedIfNotEmpty(
-                        toHtmlEscaped(user->fullName()), "div", "style=\"white-space:nowrap\"");
+                    return noWrap(toHtmlEscaped(user->fullName()));
 
                 case EmailColumn:
                     return user->getEmail();
 
                 case UserGroupsColumn:
-                    return nx::vms::common::userGroupNames(user).join(kLineBreak);
+                {
+                    QStringList groupNames = nx::vms::common::userGroupNames(user);
+                    for (auto& line: groupNames)
+                        line = toHtmlEscaped(line);
+                    return noWrap(groupNames.join(kLineBreak));
+                }
 
                 default:
                     return QString(); // not QVariant() because we want to hide a tooltip if shown.
