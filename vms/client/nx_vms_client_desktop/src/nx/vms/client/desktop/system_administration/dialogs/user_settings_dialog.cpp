@@ -731,9 +731,14 @@ void UserSettingsDialog::onCopyLink()
     QGuiApplication::clipboard()->setText(d->linkFromToken(hash.temporaryToken->token));
 }
 
-QString UserSettingsDialog::warningForGroups(
-    const QList<nx::vms::client::desktop::MembersModelGroup>& parentGroups) const
+QString UserSettingsDialog::warningForTemporaryUser(
+    const QList<nx::vms::client::desktop::MembersModelGroup>& parentGroups,
+    const nx::core::access::ResourceAccessMap& sharedResources,
+    const nx::vms::api::GlobalPermissions permissions) const
 {
+    static constexpr nx::vms::api::GlobalPermissions kUserPermissions =
+        nx::vms::api::GlobalPermission::viewLogs | nx::vms::api::GlobalPermission::generateEvents;
+
     const auto hasGroups =
         [this, &parentGroups](const QSet<QnUuid>& permissionGroups)
         {
@@ -750,20 +755,32 @@ QString UserSettingsDialog::warningForGroups(
 
             return false;
         };
+    
+    const auto hasAccessRightAboveView =
+        [&sharedResources]
+        {
+            return std::any_of(
+                sharedResources.begin(),
+                sharedResources.end(),
+                [](const nx::vms::api::AccessRights& accessRights)
+                {
+                    return accessRights & ~nx::vms::api::kViewAccessRights;
+                });
+        };
 
     if (hasGroups({api::kAdministratorsGroupId, api::kPowerUsersGroupId}))
     {
         return tr("Granting broad permissions to the temporary user is not recommended."
             " Some actions may not work.");
     }
-    else if (hasGroups({api::kAdvancedViewersGroupId, api::kViewersGroupId}))
+    else if (hasGroups({api::kAdvancedViewersGroupId, api::kViewersGroupId})
+        || permissions & kUserPermissions || hasAccessRightAboveView())
     {
         return tr("Granting broad permissions to the temporary user is not recommended.");
     }
 
     return {};
 }
-
 
 QDateTime UserSettingsDialog::newValidUntilDate() const
 {

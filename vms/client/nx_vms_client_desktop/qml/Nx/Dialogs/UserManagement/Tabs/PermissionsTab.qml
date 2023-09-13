@@ -431,10 +431,11 @@ Item
     Row
     {
         // Covers dialog button box.
+        parent: control.buttonBox
+        visible: control.visible
 
-        anchors.top: parent.bottom
-
-        height: control.buttonBox.height
+        anchors.top: parent.top
+        height: parent.height
         x: 16
         spacing: 8
 
