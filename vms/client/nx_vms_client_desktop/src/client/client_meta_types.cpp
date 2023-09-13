@@ -89,6 +89,7 @@
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
+#include <nx/vms/client/desktop/utils/date_validator.h>
 #include <nx/vms/client/desktop/utils/mouse_spy.h>
 #include <nx/vms/client/desktop/utils/server_file_cache.h>
 #include <nx/vms/client/desktop/utils/session_aware_attached.h>
@@ -278,6 +279,7 @@ void QnClientMetaTypes::registerQmlTypes()
     TimeDurationSuffixModel::registerQmlType();
     SessionAware::registerQmlType();
     KeyboardModifiers::registerQmlType();
+    DateValidator::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");

@@ -21,6 +21,7 @@ ContextMenuMouseArea 1.0 ContextMenuMouseArea.qml
 CompactMenuSeparator 1.0 CompactMenuSeparator.qml
 ContextHintButton 1.0 ContextHintButton.qml
 ContextHintLabel 1.0 ContextHintLabel.qml
+DateField 1.0 DateField.qml
 DebugRect 1.0 DebugRect.qml
 DeprecatedIconButton 1.0 DeprecatedIconButton.qml
 DialogBanner 1.0 DialogBanner.qml
