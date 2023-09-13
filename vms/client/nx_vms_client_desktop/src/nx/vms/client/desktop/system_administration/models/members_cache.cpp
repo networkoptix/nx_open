@@ -51,7 +51,8 @@ MembersCache::Info MembersCache::infoFromContext(
             .description = user->fullName(),
             .isGroup = false,
             .isLdap = user->isLdap(),
-            .isTemporary = user->isTemporary()};
+            .isTemporary = user->isTemporary(),
+            .userType = (UserSettingsGlobal::UserType)user->userType()};
     }
 
     return {};
