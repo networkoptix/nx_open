@@ -91,6 +91,8 @@ public:
         m_tokenHelper = tokenHelper;
     }
 
+    bool isRunning() const;
+
     static void updateLayoutSharing(
         nx::vms::client::desktop::SystemContext* systemContext,
         const QnUuid& id,
@@ -129,7 +131,7 @@ private:
 
 private:
     nx::vms::common::SessionTokenHelperPtr m_tokenHelper;
-    rest::Handle m_currentRequest = -1;
+    rest::Handle m_currentRequest{};
 };
 
 } // namespace nx::vms::client::desktop

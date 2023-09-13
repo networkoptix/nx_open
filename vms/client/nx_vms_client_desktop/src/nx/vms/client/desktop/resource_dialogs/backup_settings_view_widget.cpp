@@ -207,6 +207,8 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(
 
 BackupSettingsViewWidget::~BackupSettingsViewWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 QAbstractItemModel* BackupSettingsViewWidget::model() const
@@ -263,6 +265,12 @@ void BackupSettingsViewWidget::discardChanges()
     m_backupSettingsDecoratorModel->discardChanges();
     resourceViewWidget()->clearSelection();
     resourceViewWidget()->clearFilter();
+    NX_ASSERT(!isNetworkRequestRunning());
+}
+
+bool BackupSettingsViewWidget::isNetworkRequestRunning() const
+{
+    return m_backupSettingsDecoratorModel->isNetworkRequestRunning();
 }
 
 nx::vms::api::BackupSettings BackupSettingsViewWidget::globalBackupSettings() const

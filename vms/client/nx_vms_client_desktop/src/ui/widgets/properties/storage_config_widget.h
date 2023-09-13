@@ -8,6 +8,7 @@
 #include <QtWidgets/QWidget>
 
 #include <api/model/api_model_fwd.h>
+#include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/api/types/resource_types.h>
@@ -35,8 +36,9 @@ public:
 
     void setServer(const QnMediaServerResourcePtr& server);
     virtual void applyChanges() override;
-
+    virtual void discardChanges() override;
     virtual bool hasChanges() const override;
+    virtual bool isNetworkRequestRunning() const override;
 
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
@@ -88,6 +90,7 @@ private:
     class MetadataWatcher;
     QScopedPointer<MetadataWatcher> m_metadataWatcher;
 
+    rest::Handle m_currentRequest = 0;
 private:
     void applyStoragesChanges(QnStorageResourceList& result,
         const QnStorageModelInfoList& storages) const;

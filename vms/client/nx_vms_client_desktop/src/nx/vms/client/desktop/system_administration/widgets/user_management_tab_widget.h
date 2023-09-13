@@ -23,6 +23,7 @@ public:
     virtual void applyChanges() override;
     virtual bool hasChanges() const override;
     virtual void discardChanges() override;
+    virtual bool isNetworkRequestRunning() const override;
 
     void resetWarnings();
 

@@ -7,9 +7,7 @@
 
 #include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
@@ -27,13 +25,11 @@
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -45,7 +41,6 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
-#include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
 using namespace nx::vms::common;
@@ -237,14 +232,12 @@ QList<QnUuid> idListFromResList(const QList<ResourcePtrType>& resList)
 
 ResourcesChangesManager::ResourcesChangesManager(QObject* parent):
     base_type(parent)
-{}
+{
+}
 
 ResourcesChangesManager::~ResourcesChangesManager()
-{}
-
-/************************************************************************/
-/* Generic block                                                        */
-/************************************************************************/
+{
+}
 
 void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
     const DeleteResourceCallbackFunction& callback,
@@ -272,7 +265,7 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
         {
             if (success)
             {
-                NX_DEBUG(this, "About to remove user");
+                NX_DEBUG(this, "About to remove resource %1", resource);
                 resourcePool()->removeResource(resource);
             }
 
@@ -320,69 +313,6 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
 
     api->deleteRest(tokenHelper, action, network::rest::Params{}, handler, thread());
 }
-
-void ResourcesChangesManager::deleteResources(const QnResourceList& resources,
-    const GenericCallbackWithErrorFunction& callback)
-{
-    const auto safeCallback = safeProcedure(callback);
-
-    if (resources.isEmpty())
-    {
-        safeCallback(false, tr("Resource list is empty"));
-        return;
-    }
-
-    const auto connection = messageBusConnection();
-    if (!connection)
-    {
-        safeCallback(false, tr("No connection"));
-        return;
-    }
-
-    auto handler =
-        [this, safeCallback, resources](int /*reqID*/, ec2::ErrorCode errorCode)
-        {
-            const bool success = errorCode == ec2::ErrorCode::ok;
-
-            // We don't want to wait until transaction is received.
-            if (success)
-            {
-                NX_DEBUG(this, "About to remove resources");
-                resourcePool()->removeResources(resources);
-            }
-
-            safeCallback(success, success ? ec2::toString(errorCode) : QString{});
-
-            if (!success)
-                emit resourceDeletingFailed(resources);
-        };
-
-    QVector<QnUuid> idToDelete;
-    for (const QnResourcePtr& resource: resources)
-    {
-        // If we are deleting an edge camera, also delete its server.
-        // Check for camera to avoid unnecessary parent lookup.
-        QnUuid parentToDelete;
-        if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-        {
-            const bool isHiddenEdgeServer =
-                QnMediaServerResource::isHiddenEdgeServer(camera->getParentResource());
-            if (isHiddenEdgeServer && !camera->hasFlags(Qn::virtual_camera))
-                parentToDelete = camera->getParentId();
-        }
-
-        if (!parentToDelete.isNull())
-            idToDelete << parentToDelete; //< Parent remove its children by server side.
-        else
-            idToDelete << resource->getId();
-    }
-    connection->getResourceManager(Qn::kSystemAccess)->remove(
-        idToDelete, makeReplyProcessor(this, handler), this);
-}
-
-/************************************************************************/
-/* Cameras block                                                        */
-/************************************************************************/
 
 void ResourcesChangesManager::saveCamera(const QnVirtualCameraResourcePtr& camera,
     CameraChangesFunction applyChanges)
@@ -497,113 +427,64 @@ void ResourcesChangesManager::saveCamerasCore(
         apiCameras, makeReplyProcessor(this, handler), this);
 }
 
-/************************************************************************/
-/* Servers block                                                        */
-/************************************************************************/
-
-void ResourcesChangesManager::saveServer(const QnMediaServerResourcePtr& server,
-    ServerChangesFunction applyChanges,
-    const nx::vms::common::SessionTokenHelperPtr& helper)
+rest::Handle ResourcesChangesManager::saveServer(
+    const QnMediaServerResourcePtr& server,
+    SaveServerCallback callback)
 {
-    if (!applyChanges)
-        return;
-
-    if (!server)
-        return;
-
-    nx::vms::api::MediaServerUserAttributesData backup = server->userAttributes();
-
-    auto restore =
-        [this, server, backup]
-        {
-            // Restore attributes from backup.
-            if (!server->setUserAttributesAndNotify(backup))
-                return;
-
-            emit saveChangesFailed(QnResourceList() << server);
-        };
-
-    applyChanges(server);
+    if (!NX_ASSERT(server))
+        return {};
 
     const auto systemContext = SystemContext::fromResource(server);
-    if (systemContext->restApiHelper()->restApiEnabled())
-    {
-        auto api = connectedServerApi();
-        if (!api)
+    if (!NX_ASSERT(systemContext))
+        return {};
+
+    const auto api = systemContext->connectedServerApi();
+    if (!api) //< Connection is broken already.
+        return {};
+
+    auto internalCallback =
+        [this, server, callback=std::move(callback)](
+            bool success,
+            rest::Handle requestId,
+            rest::ServerConnection::ErrorOrEmpty reply)
         {
-            restore();
-            return;
-        }
-
-        auto handler =
-            [restore](bool success,
-                rest::Handle /*requestId*/,
-                rest::ServerConnection::ErrorOrEmpty /*result*/)
+            if (success && std::holds_alternative<nx::network::rest::Result>(reply))
             {
-                if (success)
-                    return;
+                const auto& error = std::get<nx::network::rest::Result>(reply);
+                NX_ERROR(this, "Save changes failed: %1", error.errorString);
+                success = false;
+            }
 
-                restore();
-            };
+            if (!success)
+                emit saveChangesFailed({{server}});
 
-        nx::vms::api::ServerModel body;
+            if (callback)
+                callback(success, requestId);
+        };
 
-        auto change = server->userAttributes();
+    nx::vms::api::ServerModel body;
 
-        body.id = change.serverId;
-        body.backupBitrateBytesPerSecond = change.backupBitrateBytesPerSecond;
-        body.name = change.serverName.isEmpty() ? server->getName() : change.serverName;
-        body.url = server->getUrl();
-        body.isFailoverEnabled = change.allowAutoRedundancy;
-        body.maxCameras = change.maxCameras;
-        body.locationId = change.locationId;
-        body.version = server->getVersion().toString();
-        auto modifiedProperties = resourcePropertyDictionary()->modifiedProperties(server->getId());
+    auto change = server->userAttributes();
 
-        std::map<QString, QJsonValue> result;
-        for (auto itr = modifiedProperties.begin(); itr != modifiedProperties.end(); ++itr)
-            result[itr.key()] = QJsonValue(itr.value());
+    body.id = change.serverId;
+    body.backupBitrateBytesPerSecond = change.backupBitrateBytesPerSecond;
+    body.name = change.serverName.isEmpty() ? server->getName() : change.serverName;
+    body.url = server->getUrl();
+    body.isFailoverEnabled = change.allowAutoRedundancy;
+    body.maxCameras = change.maxCameras;
+    body.locationId = change.locationId;
+    body.version = server->getVersion().toString();
 
-        body.parameters = result;
+    auto modifiedProperties = resourcePropertyDictionary()->modifiedProperties(server->getId());
+    for (auto [key, value]: nx::utils::keyValueRange(modifiedProperties))
+        body.parameters[key] = QJsonValue(value);
 
-        const auto tokenHelper = helper
-            ? helper
-            : systemContext->restApiHelper()->getSessionTokenHelper();
-
-        api->putRest(tokenHelper,
-            QString("/rest/v3/servers/%1").arg(server->getId().toString()),
-            network::rest::Params{},
-            QByteArray::fromStdString(nx::reflect::json::serialize(body)),
-            handler,
-            thread());
-    }
-    else
-    {
-        auto connection = messageBusConnection();
-        if (!connection)
-        {
-            restore();
-            return;
-        }
-
-        auto handler =
-            [restore](int /*reqID*/, ec2::ErrorCode errorCode)
-            {
-                // Check if everithing is OK.
-                if (errorCode == ec2::ErrorCode::ok)
-                    return;
-
-                restore();
-            };
-        nx::vms::api::MediaServerUserAttributesDataList changes;
-        changes.push_back(server->userAttributes());
-        connection->getMediaServerManager(Qn::kSystemAccess)
-            ->saveUserAttributes(changes, makeReplyProcessor(this, handler), this);
-
-        // TODO: #sivanov Values are not rolled back in case of failure.
-        auto idList = idListFromResList(QnResourceList() << server);
-        resourcePropertyDictionary()->saveParamsAsync(idList);
-    }
+    return api->putRest(systemContext->restApiHelper()->getSessionTokenHelper(),
+        QString("/rest/v3/servers/%1").arg(server->getId().toString()),
+        network::rest::Params{},
+        QByteArray::fromStdString(nx::reflect::json::serialize(body)),
+        internalCallback,
+        this);
 }
 
 void ResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& videoWall,
@@ -646,7 +527,9 @@ void ResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
         [this, callback](bool success, const QnWebPageResourcePtr& webPage)
         {
             // TODO: #sivanov Properties are not rolled back in case of failure.
-            resourcePropertyDictionary()->saveParamsAsync({webPage->getId()});
+            // Save resource properties only after resource itself is saved.
+            if (success)
+                resourcePropertyDictionary()->saveParamsAsync({webPage->getId()});
 
             if (callback)
                 callback(success, webPage);

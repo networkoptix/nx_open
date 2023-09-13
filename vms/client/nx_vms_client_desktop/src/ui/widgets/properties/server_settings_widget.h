@@ -26,9 +26,10 @@ public:
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
+    virtual void discardChanges() override;
     virtual void retranslateUi() override;
-
     virtual bool canApplyChanges() const override;
+    virtual bool isNetworkRequestRunning() const override;
 
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);

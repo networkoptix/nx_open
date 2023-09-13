@@ -21,14 +21,10 @@ public:
     explicit LogsManagementWidget(SystemContext* context, QWidget* parent = nullptr);
     virtual ~LogsManagementWidget();
 
-    virtual void loadDataToUi() override;
-    virtual void applyChanges() override;
-
-    virtual bool hasChanges() const override;
+    virtual bool isNetworkRequestRunning() const override;
+    virtual void discardChanges() override;
 
 protected:
-    virtual void setReadOnlyInternal(bool readOnly) override;
-
     virtual void showEvent(QShowEvent* event) override;
     virtual void hideEvent(QHideEvent* event) override;
 

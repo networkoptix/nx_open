@@ -359,6 +359,8 @@ private:
      */
     QSet<QnUuid> m_serversAreInstalling;
     QnUuid m_systemId;
+
+    rest::Handle m_settingsRequest = 0;
 };
 
 } // namespace nx::vms::client::desktop

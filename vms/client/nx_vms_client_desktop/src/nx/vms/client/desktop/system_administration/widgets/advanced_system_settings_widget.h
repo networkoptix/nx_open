@@ -30,15 +30,11 @@ public:
     explicit AdvancedSystemSettingsWidget(SystemContext* context, QWidget *parent = nullptr);
     ~AdvancedSystemSettingsWidget();
 
+    virtual bool isNetworkRequestRunning() const override;
     virtual bool activate(const QUrl& url) override;
-
-    virtual void loadDataToUi() override;
-    virtual void applyChanges() override;
-    virtual bool hasChanges() const override;
+    virtual void discardChanges() override;
 
 protected:
-    void setReadOnlyInternal(bool readOnly) override;
-
     virtual void showEvent(QShowEvent* event) override;
 
 private:

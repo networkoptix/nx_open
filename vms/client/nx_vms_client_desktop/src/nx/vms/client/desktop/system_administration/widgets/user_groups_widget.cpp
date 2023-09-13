@@ -303,16 +303,6 @@ void UserGroupsWidget::loadDataToUi()
     d->groupsModel->reset(d->userGroups());
 }
 
-void UserGroupsWidget::applyChanges()
-{
-    // TODO: Apply changes to visibleSelectedGroupIds().
-}
-
-bool UserGroupsWidget::hasChanges() const
-{
-    return false;
-}
-
 void UserGroupsWidget::resetWarnings()
 {
     d->hideNotFoundGroupsWarning = false;

@@ -30,6 +30,7 @@ public:
 
     bool backupAndRestoreIsVisible() const;
     void updateBackupAndRestoreTabVisibility();
+    QList<QnAbstractPreferencesWidget*> tabs() const;
 
 private:
     AdvancedSystemSettingsWidget* const q = nullptr;

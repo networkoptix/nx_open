@@ -110,6 +110,8 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
 
 QnCloudManagementWidget::~QnCloudManagementWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void QnCloudManagementWidget::loadDataToUi()
@@ -131,13 +133,16 @@ void QnCloudManagementWidget::loadDataToUi()
     ui->unlinkButton->setVisible(isAdministrator);
 }
 
-void QnCloudManagementWidget::applyChanges()
+bool QnCloudManagementWidget::isNetworkRequestRunning() const
 {
+    return m_currentRequest != 0;
 }
 
-bool QnCloudManagementWidget::hasChanges() const
+void QnCloudManagementWidget::discardChanges()
 {
-    return false;
+    if (auto api = connectedServerApi(); api && m_currentRequest > 0)
+        api->cancelRequest(m_currentRequest);
+    m_currentRequest = 0;
 }
 
 void QnCloudManagementWidget::connectToCloud()
@@ -156,6 +161,9 @@ void QnCloudManagementWidget::connectToCloud()
 
 void QnCloudManagementWidget::disconnectFromCloud()
 {
+    if (!NX_ASSERT(m_currentRequest == 0, "Request was already sent"))
+        return;
+
     const bool isAdministrator = context()->user() && context()->user()->isAdministrator();
     if (!NX_ASSERT(isAdministrator, "Button must be unavailable for non-administrator"))
         return;
@@ -175,29 +183,37 @@ void QnCloudManagementWidget::disconnectFromCloud()
 
     auto handler = nx::utils::guarded(
         this,
-        [this](bool, rest::Handle, rest::ErrorOrEmpty reply)
+        [this](bool success, rest::Handle requestId, rest::ErrorOrEmpty reply)
         {
-            if (std::holds_alternative<rest::Empty>(reply))
+            NX_ASSERT(m_currentRequest == requestId);
+            m_currentRequest = 0;
+
+            if (success && std::holds_alternative<rest::Empty>(reply))
             {
                 NX_DEBUG(this, "Cloud unbind succeded");
                 onDisconnectSuccess();
                 return;
             }
 
-            const auto& error = std::get<nx::network::rest::Result>(reply);
-            NX_DEBUG(this,
-                "Cloud unbind failed, error: %1, string: %2",
-                error.error,
-                error.errorString);
+            QString errorString;
+            if (std::holds_alternative<nx::network::rest::Result>(reply))
+            {
+                const auto& error = std::get<nx::network::rest::Result>(reply);
+                NX_DEBUG(this,
+                    "Cloud unbind failed, error: %1, string: %2",
+                    error.error,
+                    error.errorString);
+                errorString = error.errorString;
+            }
 
             QnSessionAwareMessageBox::critical(this,
                 tr("Cannot disconnect the System from %1",
                     "%1 is the cloud name (like Nx Cloud)")
                     .arg(nx::branding::cloudName()),
-                error.errorString);
+                errorString);
         });
 
-    connectedServerApi()->unbindSystemFromCloud(
+    m_currentRequest = connectedServerApi()->unbindSystemFromCloud(
         sessionTokenHelper,
         /*password*/ QString(),
         std::move(handler),

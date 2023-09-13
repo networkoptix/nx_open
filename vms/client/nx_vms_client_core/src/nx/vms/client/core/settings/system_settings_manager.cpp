@@ -33,53 +33,55 @@ struct SystemSettingsManager::Private
     std::unique_ptr<SystemSettings> systemSettings = std::make_unique<SystemSettings>();
     QTimer* requestDataTimer = nullptr;
 
-    void requestSystemSettings(std::function<void()> callback = {})
+    bool loadSerializedSettings(const QByteArray& data)
     {
-        const auto handle = nx::utils::guarded(q,
-            [this, callback](bool success,
+        nx::reflect::DeserializationResult deserializationResult;
+        SystemSettings result;
+
+        std::tie(result, deserializationResult) =
+            nx::reflect::json::deserialize<SystemSettings>(data.data());
+        if (!NX_ASSERT(deserializationResult.success, "Settings cannot be deserialized"))
+            return false;
+
+        NX_VERBOSE(this, "System settings received");
+
+        auto hasChange = *systemSettings != result;
+        if (hasChange)
+            *systemSettings = result;
+
+        if (hasChange)
+            emit q->systemSettingsChanged();
+
+        return true;
+    }
+
+    rest::Handle requestSystemSettings(RequestCallback callback = {})
+    {
+        const auto internalCallback = nx::utils::guarded(q,
+            [this, callback=std::move(callback)](
+                bool success,
                 rest::Handle requestId,
                 QByteArray data,
                 nx::network::http::HttpHeaders)
             {
-                if (!success)
-                {
-                     NX_WARNING(this, "System settings request failed");
-                     return;
-                }
-
-                nx::reflect::DeserializationResult deserializationResult;
-                SystemSettings result;
-
-                std::tie(result, deserializationResult) =
-                   nx::reflect::json::deserialize<SystemSettings>(data.data());
-                if (!deserializationResult.success)
-                {
-                    NX_WARNING(this, "Server settings cannot be deserialized");
-                    return;
-                }
-
-                NX_VERBOSE(this, "System settings received");
-
-                auto hasChange = *systemSettings != result;
-                if (hasChange)
-                    *systemSettings = result;
+                if (success)
+                    success = loadSerializedSettings(data);
+                else
+                    NX_WARNING(this, "System settings request failed");
 
                 if (callback)
-                    callback();
-
-                if (hasChange)
-                    emit q->systemSettingsChanged();
+                    callback(success, requestId);
             }
         );
 
         auto api = q->connectedServerApi();
         if (!NX_ASSERT(api))
-            return;
+            return rest::Handle{};
 
-        api->getRawResult(
+        return api->getRawResult(
             "/rest/v3/system/settings",
             {},
-            handle,
+            internalCallback,
             q->thread());
     }
 };
@@ -112,9 +114,9 @@ SystemSettingsManager::~SystemSettingsManager()
 {
 }
 
-void SystemSettingsManager::requestSystemSettings(std::function<void()> callback)
+rest::Handle SystemSettingsManager::requestSystemSettings(RequestCallback callback)
 {
-    d->requestSystemSettings(callback);
+    return d->requestSystemSettings(std::move(callback));
 }
 
 SystemSettings* SystemSettingsManager::systemSettings()
@@ -122,7 +124,8 @@ SystemSettings* SystemSettingsManager::systemSettings()
     return d->systemSettings.get();
 }
 
-void SystemSettingsManager::saveSystemSettings(std::function<void(bool)> callback,
+rest::Handle SystemSettingsManager::saveSystemSettings(
+    RequestCallback callback,
     nx::utils::AsyncHandlerExecutor executor,
     const common::SessionTokenHelperPtr& helper)
 {
@@ -130,25 +133,29 @@ void SystemSettingsManager::saveSystemSettings(std::function<void(bool)> callbac
     const auto tokenHelper = helper ? helper : systemContext()->getSessionTokenHelper();
 
     if (!NX_ASSERT(api && tokenHelper))
-    {
-        if (callback)
-            callback(false);
+        return rest::Handle{};
 
-        return;
-    }
-
-    auto handler =
-        [callback](bool success,
-            rest::Handle /*requestId*/,
-            rest::ServerConnection::ErrorOrEmpty /*result*/)
+    auto handler = nx::utils::guarded(this,
+        [this, callback = std::move(callback)](
+            bool success,
+            rest::Handle requestId,
+            rest::ErrorOrData<QByteArray> result)
         {
+            if (auto data = std::get_if<QByteArray>(&result))
+            {
+                d->loadSerializedSettings(*data);
+            }
+            else if (auto error = std::get_if<nx::network::rest::Result>(&result))
+            {
+                NX_WARNING(this, "Error while applying changes: %1", error->errorString);
+                success = false;
+            }
+
             if (callback)
-                callback(success);
+                callback(success, requestId);
+        });
 
-            return;
-        };
-
-    api->patchRest(tokenHelper,
+    return api->patchRest(tokenHelper,
         QString("/rest/v3/system/settings"),
         network::rest::Params{},
         nx::reflect::json::serialize(*d->systemSettings.get()),

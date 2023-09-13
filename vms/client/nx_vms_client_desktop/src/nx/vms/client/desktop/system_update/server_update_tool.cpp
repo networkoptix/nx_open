@@ -113,6 +113,9 @@ ServerUpdateTool::ServerUpdateTool(SystemContext* systemContext, QObject* parent
 
 ServerUpdateTool::~ServerUpdateTool()
 {
+    if (auto api = connectedServerApi(); api && m_settingsRequest > 0)
+        api->cancelRequest(m_settingsRequest);
+
     saveInternalState();
     m_downloader->disconnect(this);
     m_serverConnection.reset();
@@ -124,9 +127,18 @@ void ServerUpdateTool::onConnectToSystem(QnUuid systemId)
     m_systemId = systemId;
     if (!branding::customReleaseListUrl().isEmpty())
     {
-        systemContext()->systemSettings()->customReleaseListUrl =
-            branding::customReleaseListUrl();
-        systemContext()->systemSettingsManager()->saveSystemSettings();
+        auto callback =
+            [this](bool /*success*/, rest::Handle requestId)
+            {
+                NX_ASSERT(m_settingsRequest == requestId || m_settingsRequest == 0);
+                m_settingsRequest = 0;
+            };
+
+        NX_ASSERT(m_settingsRequest == 0);
+        systemContext()->systemSettings()->customReleaseListUrl = branding::customReleaseListUrl();
+        m_settingsRequest = systemContext()->systemSettingsManager()->saveSystemSettings(
+            callback,
+            this);
     }
     loadInternalState();
     m_downloader->startDownloads();

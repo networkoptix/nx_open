@@ -34,10 +34,11 @@ public:
 
 protected:
     virtual void retranslateUi() override;
-    virtual void showEvent(QShowEvent* event) override;
-    virtual bool confirmChangesOnExit() override;
+    virtual void applyChanges() override;
+    virtual void discardChanges() override;
+    virtual bool isNetworkRequestRunning() const override;
 
-    virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
+    bool switchServerWithConfirmation();
     virtual bool event(QEvent* event) override;
 
 private:

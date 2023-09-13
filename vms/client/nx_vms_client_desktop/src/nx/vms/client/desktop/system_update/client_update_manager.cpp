@@ -10,6 +10,7 @@
 #include <QtGui/QAction>
 #include <QtQml/QtQml>
 
+#include <api/server_rest_connection.h>
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -102,6 +103,7 @@ public:
 
     nx::vms::api::ClientUpdateSettings globalClientUpdateSettings() const;
     void setGlobalClientUpdateSettings(const nx::vms::api::ClientUpdateSettings& settings);
+    void cancelRequest();
 
 public:
     ClientUpdateManager* q = nullptr;
@@ -126,6 +128,7 @@ public:
     QnUuid installationNotificationId;
     QnUuid autoUpdateFeatureNotificationId;
     QnUuid errorNotificationId;
+    rest::Handle currentRequest = 0;
 };
 
 ClientUpdateManager::Private::Private(ClientUpdateManager* q):
@@ -665,8 +668,22 @@ nx::vms::api::ClientUpdateSettings ClientUpdateManager::Private::globalClientUpd
 void ClientUpdateManager::Private::setGlobalClientUpdateSettings(
     const nx::vms::api::ClientUpdateSettings& settings)
 {
+    auto callback =
+        [this](bool /*success*/, rest::Handle requestId)
+        {
+            NX_ASSERT(requestId == currentRequest || currentRequest == 0);
+            currentRequest = 0;
+        };
+
     systemContext()->systemSettings()->clientUpdateSettings = settings;
-    systemContext()->systemSettingsManager()->saveSystemSettings();
+    currentRequest = systemContext()->systemSettingsManager()->saveSystemSettings(callback, this);
+}
+
+void ClientUpdateManager::Private::cancelRequest()
+{
+    if (auto api = connectedServerApi(); api && currentRequest > 0)
+        api->cancelRequest(currentRequest);
+    currentRequest = 0;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -684,6 +701,7 @@ ClientUpdateManager::ClientUpdateManager(QObject* parent):
 
 ClientUpdateManager::~ClientUpdateManager()
 {
+    d->cancelRequest();
 }
 
 bool ClientUpdateManager::clientUpdateEnabled() const

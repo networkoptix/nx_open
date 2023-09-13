@@ -22,6 +22,7 @@ public:
     virtual void applyChanges() override;
     virtual void discardChanges() override;
     virtual bool hasChanges() const override;
+    virtual bool isNetworkRequestRunning() const override;
     virtual bool activate(const QUrl& url) override;
 
     bool shouldBeVisible() const;

@@ -2,9 +2,11 @@
 
 #include "session_aware_dialog.h"
 
-/************************************************************************/
-/* QnSessionAwareButtonBoxDialog                             */
-/************************************************************************/
+#include <QtWidgets/QPushButton>
+
+//-------------------------------------------------------------------------------------------------
+// QnSessionAwareButtonBoxDialog
+
 QnSessionAwareButtonBoxDialog::QnSessionAwareButtonBoxDialog(
     QWidget* parent,
     Qt::WindowFlags windowFlags)
@@ -28,9 +30,9 @@ void QnSessionAwareButtonBoxDialog::forcedUpdate()
     tryClose(true);
 }
 
-/************************************************************************/
-/* QnSessionAwareTabbedDialog                                */
-/************************************************************************/
+//-------------------------------------------------------------------------------------------------
+// QnSessionAwareTabbedDialog
+
 QnSessionAwareTabbedDialog::QnSessionAwareTabbedDialog(
     QWidget* parent,
     Qt::WindowFlags windowFlags)
@@ -44,73 +46,14 @@ bool QnSessionAwareTabbedDialog::tryClose(bool force)
 {
     if (force)
     {
-        forcefullyClose();
+        reject();
         return true;
     }
 
-    if (!tryToApplyOrDiscardChanges())
-        return false;
-
-    hide();
-    return true;
-}
-
-QDialogButtonBox::StandardButton QnSessionAwareTabbedDialog::getConfirmationResult()
-{
-    return QnSessionAwareMessageBox::question(this,
-        tr("Apply changes before exit?"),
-        QString(),
-        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Apply);
-}
-
-bool QnSessionAwareTabbedDialog::tryToApplyOrDiscardChanges()
-{
-    if (!canDiscardChanges())
-        return false;
-
-    if (isHidden() || !hasChanges())
-        return true;
-
-    switch (showConfirmationDialog())
-    {
-        case QDialogButtonBox::Yes:
-        case QDialogButtonBox::Apply:
-            if (!canApplyChanges())
-                return false;
-            applyChanges();
-            break;
-
-        case QDialogButtonBox::No:
-        case QDialogButtonBox::Discard:
-            loadDataToUi();
-            break;
-
-        default:
-            return false; //< Cancel was pressed.
-    }
-
-    return true;
+    return closeDialogWithConfirmation();
 }
 
 void QnSessionAwareTabbedDialog::forcedUpdate()
 {
     loadDataToUi();
-}
-
-QDialogButtonBox::StandardButton QnSessionAwareTabbedDialog::showConfirmationDialog()
-{
-    QStringList details;
-    for (const Page& page: modifiedPages())
-        details << "* " + page.title;
-
-    static const auto kDelimiter = '\n';
-    const auto extraMessage = tr("Unsaved changes:") + kDelimiter + details.join(kDelimiter);
-
-    return QnMessageBox::question(
-        this,
-        tr("Save changes before exit?"),
-        extraMessage,
-        QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Yes);
 }

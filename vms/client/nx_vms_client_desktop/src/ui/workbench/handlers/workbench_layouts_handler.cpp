@@ -818,15 +818,8 @@ void LayoutsHandler::removeLayouts(const LayoutResourceList &layouts)
             remoteResources << layout;
     }
 
-    if (systemContext()->restApiHelper()->restApiEnabled())
-    {
-        for (const auto& resource: remoteResources)
-            qnResourcesChangesManager->deleteResource(resource);
-    }
-    else
-    {
-        qnResourcesChangesManager->deleteResources(remoteResources);
-    }
+    for (const auto& resource: remoteResources)
+        qnResourcesChangesManager->deleteResource(resource);
 }
 
 bool LayoutsHandler::closeLayouts(const QnWorkbenchLayoutList& layouts)

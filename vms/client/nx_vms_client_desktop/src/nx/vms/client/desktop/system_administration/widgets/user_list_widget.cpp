@@ -223,8 +223,8 @@ public:
         tr("Edit"),
         selectionControls)};
 
-    bool m_hasChanges = false;
-    std::unique_ptr<UserGroupRequestChain> m_requestChain;
+    bool hasChanges = false;
+    std::unique_ptr<UserGroupRequestChain> requestChain;
 
 public:
     explicit Private(UserListWidget* q);
@@ -274,7 +274,8 @@ UserListWidget::UserListWidget(QWidget* parent):
 
 UserListWidget::~UserListWidget()
 {
-    // Required here for forward-declared scoped pointer destruction.
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void UserListWidget::loadDataToUi()
@@ -284,7 +285,7 @@ void UserListWidget::loadDataToUi()
 
 void UserListWidget::applyChanges()
 {
-    d->m_requestChain.reset(new UserGroupRequestChain(systemContext()));
+    d->requestChain.reset(new UserGroupRequestChain(systemContext()));
     for (auto user: resourcePool()->getResources<QnUserResource>())
     {
         UserGroupRequest::UpdateUser updateUser;
@@ -307,16 +308,16 @@ void UserListWidget::applyChanges()
         }
 
         if (!updateUser.id.isNull())
-            d->m_requestChain->append(updateUser);
+            d->requestChain->append(updateUser);
     }
 
     setEnabled(false);
 
-    d->m_requestChain->start(
+    d->requestChain->start(
         [this](bool success, const QString& errorString)
         {
             setEnabled(true);
-            d->m_hasChanges = false;
+            d->hasChanges = false;
             emit hasChangesChanged();
 
             if (success)
@@ -333,12 +334,17 @@ void UserListWidget::applyChanges()
         });
 }
 
+void UserListWidget::discardChanges()
+{
+    d->requestChain.reset();
+}
+
 bool UserListWidget::hasChanges() const
 {
     if (!isEnabled())
         return false;
 
-    return d->m_hasChanges;
+    return d->hasChanges;
 }
 
 void UserListWidget::resetWarnings()
@@ -347,6 +353,11 @@ void UserListWidget::resetWarnings()
     d->hideNotFoundUsersWarning = false;
     d->hideNonUniqueUsersWarning = false;
     d->updateBanners();
+}
+
+bool UserListWidget::isNetworkRequestRunning() const
+{
+    return d->requestChain && d->requestChain->isRunning();
 }
 
 void UserListWidget::filterDigestUsers()
@@ -390,7 +401,7 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
     connect(sortModel, &QAbstractItemModel::modelReset, this,
         [this]()
         {
-            m_hasChanges = false;
+            hasChanges = false;
             emit this->q->hasChangesChanged();
 
             m_visibleSelected.clear();
@@ -881,7 +892,7 @@ void UserListWidget::Private::editSelected()
     if (enableUsers == Qt::PartiallyChecked && disableDigest == Qt::PartiallyChecked)
         return; //< No changes.
 
-    m_requestChain.reset(new UserGroupRequestChain(q->systemContext()));
+    requestChain.reset(new UserGroupRequestChain(q->systemContext()));
     for (auto user: usersToEdit)
     {
         UserGroupRequest::UpdateUser updateUser;
@@ -897,12 +908,12 @@ void UserListWidget::Private::editSelected()
             ? (disableDigest == Qt::Checked)
             : user->shouldDigestAuthBeUsed();
 
-        m_requestChain->append(updateUser);
+        requestChain->append(updateUser);
     }
 
     q->setEnabled(false);
 
-    m_requestChain->start(
+    requestChain->start(
         [this](bool success, const QString& errorString)
         {
             q->setEnabled(true);

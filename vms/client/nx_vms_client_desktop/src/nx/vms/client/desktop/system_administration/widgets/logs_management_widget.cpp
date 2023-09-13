@@ -45,23 +45,19 @@ LogsManagementWidget::LogsManagementWidget(
 
 LogsManagementWidget::~LogsManagementWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
-void LogsManagementWidget::loadDataToUi()
+bool LogsManagementWidget::isNetworkRequestRunning() const
 {
+    return m_watcher->state() == LogsManagementWatcher::State::loading;
 }
 
-void LogsManagementWidget::applyChanges()
+void LogsManagementWidget::discardChanges()
 {
-}
-
-bool LogsManagementWidget::hasChanges() const
-{
-    return false;
-}
-
-void LogsManagementWidget::setReadOnlyInternal(bool readOnly)
-{
+    if (isNetworkRequestRunning())
+        m_watcher->cancelDownload();
 }
 
 void LogsManagementWidget::showEvent(QShowEvent* event)

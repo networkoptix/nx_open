@@ -7,7 +7,6 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui { class BackupBandwidthSettingsWidget; }
 
@@ -16,8 +15,7 @@ namespace nx::vms::client::desktop {
 class BackupBandwidthScheduleCellPainter;
 
 class BackupBandwidthSettingsWidget:
-    public QWidget,
-    public QnAbstractPreferencesInterface
+    public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
@@ -28,10 +26,10 @@ public:
 
     void setServer(const QnMediaServerResourcePtr& server);
 
-    virtual bool hasChanges() const override;
-    virtual void loadDataToUi() override;
-    virtual void applyChanges() override;
-    virtual void discardChanges() override;
+    bool hasChanges() const;
+    void loadDataToUi();
+    void applyChanges();
+    void discardChanges();
 
 signals:
     void hasChangesChanged();

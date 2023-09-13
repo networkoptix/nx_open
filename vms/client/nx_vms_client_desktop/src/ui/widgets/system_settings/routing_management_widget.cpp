@@ -14,6 +14,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
@@ -263,6 +264,8 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
 QnRoutingManagementWidget::~QnRoutingManagementWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void QnRoutingManagementWidget::loadDataToUi() {
@@ -281,7 +284,17 @@ void QnRoutingManagementWidget::applyChanges() {
     if (!connection)
         return;
 
+    if (!NX_ASSERT(m_requests.empty()))
+        return;
+
     updateFromModel();
+
+    auto requestCompletionHandler = nx::utils::guarded(this,
+        [this](int requestId, ec2::ErrorCode /*errorCode*/)
+        {
+            NX_ASSERT(m_requests.contains(requestId) || m_requests.empty());
+            m_requests.remove(requestId);
+        });
 
     for (auto it = m_changes->changes.begin(); it != m_changes->changes.end(); ++it) {
         QnUuid serverId = it.key();
@@ -307,12 +320,16 @@ void QnRoutingManagementWidget::applyChanges() {
                 if (ignored.contains(url))
                     ign = ignored.take(url);
 
-                discoveryManager->addDiscoveryInformation(
-                    serverId, url, ign, [](int /*requestId*/, ec2::ErrorCode) {});
+                const auto requestId = discoveryManager->addDiscoveryInformation(
+                    serverId, url, ign, requestCompletionHandler);
+                if (requestId > 0)
+                    m_requests.insert(requestId);
             } else {
                 ignored.remove(url);
-                discoveryManager->removeDiscoveryInformation(
-                    serverId, url, false, [](int /*requestId*/, ec2::ErrorCode) {});
+                const auto requestId = discoveryManager->removeDiscoveryInformation(
+                    serverId, url, false, requestCompletionHandler);
+                if (requestId > 0)
+                    m_requests.insert(requestId);
             }
         }
         for (auto it = ignored.begin(); it != ignored.end(); ++it) {
@@ -320,23 +337,35 @@ void QnRoutingManagementWidget::applyChanges() {
 
             if (it.value())
             {
-                discoveryManager->addDiscoveryInformation(
-                    serverId, url, true, [](int /*requestId*/, ec2::ErrorCode) {});
+                const auto requestId = discoveryManager->addDiscoveryInformation(
+                    serverId, url, true, requestCompletionHandler);
+                if (requestId > 0)
+                    m_requests.insert(requestId);
             }
             else if (autoUrls.contains(url))
             {
-                discoveryManager->removeDiscoveryInformation(
-                    serverId, url, false, [](int /*requestId*/, ec2::ErrorCode) {});
+                const auto requestId = discoveryManager->removeDiscoveryInformation(
+                    serverId, url, false, requestCompletionHandler);
+                if (requestId > 0)
+                    m_requests.insert(requestId);
             }
             else
             {
-                discoveryManager->addDiscoveryInformation(
-                    serverId, url, false, [](int /*requestId*/, ec2::ErrorCode) {});
+                const auto requestId = discoveryManager->addDiscoveryInformation(
+                    serverId, url, false, requestCompletionHandler);
+                if (requestId > 0)
+                    m_requests.insert(requestId);
             }
         }
     }
 
     m_changes->changes.clear();
+}
+
+void QnRoutingManagementWidget::discardChanges()
+{
+    // #TODO: sivanov Implement correct requests cancellation after switch to REST API.
+    m_requests.clear();
 }
 
 bool QnRoutingManagementWidget::hasChanges() const
@@ -348,6 +377,11 @@ bool QnRoutingManagementWidget::hasChanges() const
         m_changes->changes.cbegin(),
         m_changes->changes.cend(),
         [](const auto& change) { return !change.isEmpty(); });
+}
+
+bool QnRoutingManagementWidget::isNetworkRequestRunning() const
+{
+    return !m_requests.empty();
 }
 
 void QnRoutingManagementWidget::setReadOnlyInternal(bool readOnly) {

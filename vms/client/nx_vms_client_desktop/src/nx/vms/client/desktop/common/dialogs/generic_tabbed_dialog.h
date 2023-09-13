@@ -60,7 +60,7 @@ protected:
 
     void setTabWidget(QTabWidget* tabWidget);
 
-private:
+protected:
     struct Page
     {
         int key = kInvalidPage;
@@ -77,9 +77,10 @@ private:
 
     Pages::iterator findPage(int key);
     Pages::const_iterator findPage(int key) const;
+    Pages pages() const;
 
 private:
-    QList<Page> m_pages;
+    Pages m_pages;
     QPointer<QTabWidget> m_tabWidget;
 };
 
