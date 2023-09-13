@@ -21,8 +21,9 @@ public:
     virtual ~PoeSettingsWidget() override;
 
     virtual bool hasChanges() const override;
-    virtual void loadDataToUi() override;
     virtual void applyChanges() override;
+    virtual void discardChanges() override;
+    virtual bool isNetworkRequestRunning() const override;
 
     void setAutoUpdate(bool value);
 

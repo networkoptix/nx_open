@@ -286,11 +286,7 @@ void BackupBandwidthSettingsWidget::loadDataToUi()
 void BackupBandwidthSettingsWidget::applyChanges()
 {
     const auto newBackupBitrateLimits = getBackupBitrateLimitsFromGrid(ui->scheduleGridWidget);
-    qnResourcesChangesManager->saveServer(m_server,
-        [newBackupBitrateLimits](const QnMediaServerResourcePtr& server)
-        {
-            server->setBackupBitrateLimitsBps(newBackupBitrateLimits);
-        });
+    m_server->setBackupBitrateLimitsBps(newBackupBitrateLimits);
 }
 
 void BackupBandwidthSettingsWidget::discardChanges()

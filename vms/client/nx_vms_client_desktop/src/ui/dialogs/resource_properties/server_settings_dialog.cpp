@@ -7,17 +7,21 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 
+#include <api/server_rest_connection.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/http_types.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.h>
@@ -41,8 +45,6 @@ using namespace nx::vms::client::desktop::ui;
 
 struct QnServerSettingsDialog::Private
 {
-    void updatePoeSettingsPageVisibility();
-
     QnServerSettingsDialog* const q;
     QnMediaServerResourcePtr server;
     const QPointer<ServerSettingsDialogStore> store;
@@ -57,6 +59,8 @@ struct QnServerSettingsDialog::Private
     ServerPluginsSettingsWidget* const pluginsPage;
     BackupSettingsWidget* const backupPage;
     QLabel* const webPageLink;
+
+    rest::Handle requestHandle = 0;
 
     Private(QnServerSettingsDialog* q):
         q(q),
@@ -89,19 +93,29 @@ struct QnServerSettingsDialog::Private
             d->pluginsPage->setParent(this);
             anchorWidgetToParent(d->pluginsPage);
         }
-
-        virtual bool hasChanges() const override { return false; }
-        virtual void applyChanges() override {}
-        virtual void loadDataToUi() override {}
     };
-};
 
-void QnServerSettingsDialog::Private::updatePoeSettingsPageVisibility()
-{
-    q->setPageVisible(
-        PoePage,
-        server && server->getServerFlags().testFlag(nx::vms::api::SF_HasPoeManagementCapability));
-}
+    void updatePoeSettingsPageVisibility()
+    {
+        q->setPageVisible(
+            PoePage,
+            server && server->getServerFlags().testFlag(nx::vms::api::SF_HasPoeManagementCapability));
+    }
+
+    void cancelNetworkRequest()
+    {
+        if (server && requestHandle != 0)
+        {
+            auto systemContext = SystemContext::fromResource(server);
+            if (NX_ASSERT(systemContext))
+            {
+                if (auto api = systemContext->connectedServerApi())
+                    api->cancelRequest(requestHandle);
+            }
+        }
+        requestHandle = 0;
+    }
+};
 
 //--------------------------------------------------------------------------------------------------
 
@@ -155,14 +169,13 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
                 setServer(servers.first());
         });
 
-    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
-
     setHelpTopic(this, HelpTopic::Id::ServerSettings_General);
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void QnServerSettingsDialog::setupShowWebServerLink()
@@ -190,12 +203,13 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
     if (d->server == server)
         return;
 
-    if (!tryToApplyOrDiscardChanges())
+    if (!isHidden() && server && hasChanges() && !switchServerWithConfirmation())
         return;
 
     if (d->server)
         d->server->disconnect(this);
 
+    d->cancelNetworkRequest();
     d->server = server;
 
     if (d->store)
@@ -245,33 +259,66 @@ void QnServerSettingsDialog::retranslateUi()
     }
 }
 
-bool QnServerSettingsDialog::confirmChangesOnExit()
+void QnServerSettingsDialog::applyChanges()
 {
-    return true;
+    if (!NX_ASSERT(d->requestHandle == 0))
+        return;
+
+    base_type::applyChanges();
+
+    if (!d->server)
+        return;
+
+    auto callback = nx::utils::guarded(this,
+        [this](bool /*success*/, rest::Handle requestId)
+        {
+            if (NX_ASSERT(requestId == d->requestHandle || d->requestHandle == 0))
+                d->requestHandle = 0;
+        });
+
+    d->requestHandle = qnResourcesChangesManager->saveServer(d->server, callback);
 }
 
-void QnServerSettingsDialog::showEvent(QShowEvent* event)
+void QnServerSettingsDialog::discardChanges()
 {
-    loadDataToUi();
-    base_type::showEvent(event);
+    base_type::discardChanges();
+    d->cancelNetworkRequest();
+    NX_ASSERT(!isNetworkRequestRunning());
 }
 
-QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog()
+bool QnServerSettingsDialog::isNetworkRequestRunning() const
 {
-    NX_ASSERT(d->server, "Server must exist here");
+    return base_type::isNetworkRequestRunning() || d->requestHandle != 0;
+}
 
-    const auto result = QnMessageBox::question(this,
+bool QnServerSettingsDialog::switchServerWithConfirmation()
+{
+    if (!NX_ASSERT(d->server, "Server must exist here"))
+        return true;
+
+    QnMessageBox messageBox(
+        QnMessageBox::Icon::Question,
         tr("Apply changes before switching to another server?"),
-        QString(),
+        /*extraMessage*/ QString(),
         QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Apply);
+        QDialogButtonBox::Apply,
+        this);
 
+    if (!canApplyChanges())
+        messageBox.button(QDialogButtonBox::Apply)->setEnabled(false);
+
+    const auto result = static_cast<QDialogButtonBox::StandardButton>(messageBox.exec());
+
+    // Logic of requests canceling or waiting will not work if we switch to another server before
+    // closing the dialog. That's why we should wait for network request completion here.
     if (result == QDialogButtonBox::Apply)
-        return QDialogButtonBox::Yes;
-    if (result == QDialogButtonBox::Discard)
-        return QDialogButtonBox::No;
+        applyChangesSync();
+    else if (result == QDialogButtonBox::Discard)
+        discardChangesSync();
+    else // result == QDialogButtonBox::Cancel
+        return false;
 
-    return QDialogButtonBox::Cancel;
+    return true;
 }
 
 bool QnServerSettingsDialog::event(QEvent* e)

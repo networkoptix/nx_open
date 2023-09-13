@@ -5,6 +5,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <api/server_rest_connection_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -23,9 +24,8 @@ public:
     QnDatabaseManagementWidget(QWidget *parent = nullptr);
     virtual ~QnDatabaseManagementWidget();
 
-    virtual void applyChanges() override;
-    virtual void loadDataToUi() override;
-    virtual bool hasChanges() const override;
+    virtual void discardChanges() override;
+    virtual bool isNetworkRequestRunning() const override;
 
 protected:
     void setReadOnlyInternal(bool readOnly) override;
@@ -49,4 +49,5 @@ private:
 private:
     QScopedPointer<Ui::DatabaseManagementWidget> ui;
     State m_state = State::empty;
+    rest::Handle m_currentRequest = 0;
 };

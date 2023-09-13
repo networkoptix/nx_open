@@ -74,7 +74,7 @@ template<typename T>
 rest::RestResultWithData<T> parseMessageBody(
     Type<rest::RestResultWithData<T>>,
     Qn::SerializationFormat format,
-    nx::ConstBufferRefType msgBody,
+    const QByteArray& msgBody,
     nx::network::http::StatusCode::Value statusCode,
     bool* success)
 {
@@ -100,7 +100,7 @@ rest::RestResultWithData<T> parseMessageBody(
                 "Unsupported format '%1', status code: %2, message body: %3 ...",
                 nx::reflect::enumeration::toString(format),
                 statusCode,
-                msgBody.substr(0, kMessageBodyLogSize));
+                msgBody.left(kMessageBodyLogSize));
 
             break;
     }
@@ -112,7 +112,7 @@ template<typename T>
 T parseMessageBody(
     Type<T>,
     Qn::SerializationFormat format,
-    nx::ConstBufferRefType msgBody,
+    const QByteArray& msgBody,
     nx::network::http::StatusCode::Value statusCode,
     bool* success)
 {
@@ -136,7 +136,7 @@ T parseMessageBody(
                 "Unsupported format '%1', status code: %2, message body: %3 ...",
                 nx::reflect::enumeration::toString(format),
                 statusCode,
-                msgBody.substr(0, kMessageBodyLogSize));
+                msgBody.left(kMessageBodyLogSize));
 
             break;
     }
@@ -149,7 +149,7 @@ template<>
 nx::network::rest::Result parseMessageBody(
     Type<nx::network::rest::Result>,
     Qn::SerializationFormat format,
-    nx::ConstBufferRefType messageBody,
+    const QByteArray& messageBody,
     nx::network::http::StatusCode::Value httpStatusCode,
     bool* success)
 {
@@ -164,7 +164,7 @@ template<typename T>
 rest::ErrorOrData<T> parseMessageBody(
     Type<rest::ErrorOrData<T>>,
     Qn::SerializationFormat format,
-    nx::ConstBufferRefType messageBody,
+    const QByteArray& messageBody,
     nx::network::http::StatusCode::Value httpStatusCode,
     bool* success)
 {
@@ -174,7 +174,7 @@ rest::ErrorOrData<T> parseMessageBody(
             "Unsupported format '%1', status code: %2, message body: %3 ...",
             nx::reflect::enumeration::toString(format),
             httpStatusCode,
-            messageBody.substr(0, kMessageBodyLogSize));
+            messageBody.left(kMessageBodyLogSize));
     }
 
     if (httpStatusCode == nx::network::http::StatusCode::ok)
@@ -185,10 +185,18 @@ rest::ErrorOrData<T> parseMessageBody(
             *success = true;
             return data;
         }
+        else if constexpr (std::is_same_v<T, QByteArray>)
+        {
+            *success = true;
+            return messageBody;
+        }
         else
         {
-            if (*success = nx::reflect::json::deserialize(messageBody, &data))
+            if (*success = nx::reflect::json::deserialize(messageBody.data(), &data))
                 return data;
+
+            NX_ASSERT(false, "Data cannot be deserialized:\n %1",
+                messageBody.left(kMessageBodyLogSize));
             return nx::network::rest::Result::notImplemented();
         }
     }
@@ -200,7 +208,7 @@ rest::ErrorOrData<T> parseMessageBody(
 template <typename T>
 T parseMessageBody(
     Qn::SerializationFormat format,
-    nx::ConstBufferRefType messageBody,
+    const QByteArray& messageBody,
     nx::network::http::StatusCode::Value httpStatusCode,
     bool* success)
 {
@@ -1572,11 +1580,12 @@ Handle ServerConnection::putRest(
     return handle;
 }
 
-Handle ServerConnection::patchRest(nx::vms::common::SessionTokenHelperPtr helper,
+Handle ServerConnection::patchRest(
+    nx::vms::common::SessionTokenHelperPtr helper,
     const QString& action,
     const nx::network::rest::Params& params,
     const nx::String& body,
-    Result<ErrorOrEmpty>::type callback,
+    Result<ErrorOrData<QByteArray>>::type callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(nx::network::http::Method::patch,
@@ -2144,12 +2153,12 @@ Handle ServerConnection::replaceDevice(
 
     auto internal_callback =
         [callback = std::move(callback)]
-        (bool success, Handle handle, QByteArray responce,
+        (bool success, Handle handle, QByteArray messageBody,
             const nx::network::http::HttpHeaders& headers)
         {
             nx::vms::api::DeviceReplacementResponse response;
             if (success)
-                success = nx::reflect::json::deserialize(responce.toStdString(), &response).success;
+                success = nx::reflect::json::deserialize(messageBody.data(), &response).success;
             callback(success, handle, response);
         };
 

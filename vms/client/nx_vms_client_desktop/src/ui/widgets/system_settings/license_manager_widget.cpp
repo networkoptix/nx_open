@@ -64,15 +64,6 @@ namespace {
 
 static const QString kEmptyLine = QString(html::kLineBreak) + html::kLineBreak;
 
-QnPeerRuntimeInfo remoteInfo(QnRuntimeInfoManager* manager)
-{
-    auto currentServerId = qnClientCoreModule->networkModule()->currentServerId();
-    if (!manager->hasItem(currentServerId))
-        return QnPeerRuntimeInfo();
-
-    return manager->item(currentServerId);
-}
-
 license::DeactivationErrors filterDeactivationErrors(const license::DeactivationErrors& errors)
 {
     license::DeactivationErrors result;
@@ -251,22 +242,25 @@ LicenseManagerWidget::LicenseManagerWidget(QWidget* parent):
 
 LicenseManagerWidget::~LicenseManagerWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void LicenseManagerWidget::loadDataToUi()
 {
-    if (connection())
-        updateLicenses();
+    updateLicenses();
 }
 
-bool LicenseManagerWidget::hasChanges() const
+bool LicenseManagerWidget::isNetworkRequestRunning() const
 {
-    return false;
+    return m_currentRequest > 0;
 }
 
-void LicenseManagerWidget::applyChanges()
+void LicenseManagerWidget::discardChanges()
 {
-    // This widget is read-only.
+    if (auto api = connectedServerApi(); api && m_currentRequest > 0)
+        api->cancelRequest(m_currentRequest);
+    m_currentRequest = 0;
 }
 
 void LicenseManagerWidget::showEvent(QShowEvent* event)
@@ -277,27 +271,8 @@ void LicenseManagerWidget::showEvent(QShowEvent* event)
 
 void LicenseManagerWidget::updateLicenses()
 {
-    bool connected = false;
-    for (const QnPeerRuntimeInfo& info: runtimeInfoManager()->items()->getItems())
-    {
-        if (info.data.peer.peerType == nx::vms::api::PeerType::server)
-        {
-            connected = true;
-            break;
-        }
-    }
-
-    setEnabled(connected);
-
-    if (connected)
-    {
-        m_licenses = licensePool()->getLicenses();
-        ui->licenseWidget->setHardwareId(licensePool()->currentHardwareId(serverId()));
-    }
-    else
-    {
-        m_licenses.clear();
-    }
+    m_licenses = licensePool()->getLicenses();
+    ui->licenseWidget->setHardwareId(licensePool()->currentHardwareId(currentServerId()));
 
     ListHelper licenseListHelper(m_licenses);
 
@@ -366,14 +341,6 @@ void LicenseManagerWidget::updateLicenses()
 QnLicensePool* LicenseManagerWidget::licensePool() const
 {
     return systemContext()->licensePool();
-}
-
-QnUuid LicenseManagerWidget::serverId() const
-{
-    if (auto connection = this->connection(); NX_ASSERT(connection))
-        return connection->moduleInformation().id;
-
-    return QnUuid();
 }
 
 void LicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license)
@@ -622,7 +589,7 @@ void LicenseManagerWidget::handleDownloadError()
     if (ui->licenseWidget->isFreeLicenseKey())
     {
         LicenseActivationDialogs::freeLicenseNetworkError(
-            this, licensePool()->currentHardwareId(serverId()));
+            this, licensePool()->currentHardwareId(currentServerId()));
     }
     else
     {
@@ -644,6 +611,8 @@ void LicenseManagerWidget::handleWidgetStateChange()
     if (ui->licenseWidget->state() != QnLicenseWidget::Waiting)
         return;
 
+    if (!NX_ASSERT(m_currentRequest == 0, "Request was already sent"))
+        return;
     auto sessionTokenHelper = systemContext()->restApiHelper()->getSessionTokenHelper();
     nx::vms::api::LicenseData body;
     body.licenseBlock = {};
@@ -688,12 +657,15 @@ void LicenseManagerWidget::handleWidgetStateChange()
             return;
     }
 
-    auto callback =
+    auto callback = nx::utils::guarded(this,
         [this, body](
             bool success,
-            rest::Handle /*requestId*/,
+            rest::Handle requestId,
             rest::ServerConnection::ErrorOrEmpty result)
         {
+            NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
+            m_currentRequest = 0;
+
             NX_VERBOSE(this, "Received response from license server. License key: %1",
                 body.key);
             if (!success)
@@ -727,20 +699,23 @@ void LicenseManagerWidget::handleWidgetStateChange()
             }
 
             ui->licenseWidget->setState(QnLicenseWidget::Normal);
-        };
+        });
 
     NX_VERBOSE(this,
         "Activating license using VMS Server. License key: %1",
         body.key);
 
-    connection()->serverApi()->putRest(
-        sessionTokenHelper,
-        QString("/rest/v2/licenses/%1").arg(body.key),
-        nx::network::rest::Params{{{"lang", qnRuntime->locale()}}},
-        QByteArray::fromStdString(nx::reflect::json::serialize(body)),
-        callback,
-        this
-    );
+    if (auto api = connectedServerApi(); NX_ASSERT(api, "Connection must be established"))
+    {
+        m_currentRequest = api->putRest(
+            sessionTokenHelper,
+            QString("/rest/v2/licenses/%1").arg(body.key),
+            nx::network::rest::Params{{{"lang", qnRuntime->locale()}}},
+            QByteArray::fromStdString(nx::reflect::json::serialize(body)),
+            callback,
+            this
+        );
+    }
     
 }
 

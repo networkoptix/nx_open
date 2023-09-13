@@ -1610,22 +1610,20 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered()
 {
-    QnResourceList resources = menu()->currentParameters(sender()).resources();
+    QnVideoWallResourceList videowalls = menu()->currentParameters(sender()).resources()
+        .filtered<QnVideoWallResource>(
+            [this](const QnResourcePtr& resource)
+            {
+                return menu()->canTrigger(action::RemoveFromServerAction, resource);
+            });
 
-    resources = resources.filtered(
-        [this](const QnResourcePtr& resource)
-        {
-            return menu()->canTrigger(action::RemoveFromServerAction, resource)
-                && resource->hasFlags(Qn::videowall);
-        });
-
-    if (resources.isEmpty())
+    if (videowalls.isEmpty())
         return;
 
-    if (messages::Resources::deleteResources(mainWindowWidget(), resources))
+    if (messages::Resources::deleteResources(mainWindowWidget(), videowalls))
     {
         VideoWallShortcutHelper videoWallShortcutHelper;
-        for (const auto& videoWall: resources.filtered<QnVideoWallResource>())
+        for (const auto& videoWall: videowalls)
         {
             // Cleanup registry for the local pc. Remote PCs will cleanup autorun on first run.
             videoWallShortcutHelper.setVideoWallAutorunEnabled(videoWall->getId(), false);
@@ -1635,16 +1633,8 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered()
             {
                 videoWallShortcutHelper.deleteShortcut(videoWall);
             }
-        }
 
-        if (systemContext()->restApiHelper()->restApiEnabled())
-        {
-            for (const auto& resource: resources)
-                qnResourcesChangesManager->deleteResource(resource);
-        }
-        else
-        {
-            qnResourcesChangesManager->deleteResources(resources);
+            qnResourcesChangesManager->deleteResource(videoWall);
         }
     }
 }

@@ -87,6 +87,16 @@ class QnServerSettingsWidget::Private
 public:
     Private(QnServerSettingsWidget* parent): q(parent) {}
 
+    void cancelRequests()
+    {
+        if (auto api = q->connectedServerApi())
+        {
+            for (auto handle: requests)
+                api->cancelRequest(handle);
+        }
+        requests.clear();
+    }
+
     void query(const QnUuid& serverId)
     {
         using nx::network::rest::UbjsonResult;
@@ -95,12 +105,13 @@ public:
             return;
 
         m_data.clear();
-        m_requests.clear();
+        cancelRequests();
 
         m_result = {};
         m_serverId = serverId;
 
-        if (!q->connection())
+        auto api = q->connectedServerApi();
+        if (!NX_ASSERT(api))
             return;
 
         auto callback = nx::utils::guarded(q,
@@ -119,7 +130,7 @@ public:
         const auto onlineServers = q->resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online);
         for (const QnMediaServerResourcePtr& server: onlineServers)
         {
-            auto handle = q->connectedServerApi()->getAuditLogRecords(
+            auto handle = api->getAuditLogRecords(
                 now - kLookupInterval,
                 now,
                 callback,
@@ -127,7 +138,7 @@ public:
                 server->getId());
 
             if (handle > 0)
-                m_requests << handle;
+                requests << handle;
         }
     }
 
@@ -139,14 +150,14 @@ public:
 private:
     void processData(bool success, int requestNum, const QnAuditRecordList& records)
     {
-        if (!m_requests.contains(requestNum))
+        if (!requests.contains(requestNum))
             return;
 
-        m_requests.remove(requestNum);
+        requests.remove(requestNum);
         if (success)
             m_data << records;
 
-        if (m_requests.isEmpty())
+        if (requests.isEmpty())
             evalResult();
     }
 
@@ -174,11 +185,13 @@ private:
         q->showCertificateMismatchBanner(/*dataLoaded*/ true);
     }
 
+public:
+    QSet<int> requests;
+
 private:
     QPointer<QnServerSettingsWidget> q;
 
     QnAuditRecordList m_data;
-    QSet<int> m_requests;
 
     std::string m_result;
     QnUuid m_serverId;
@@ -257,6 +270,8 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
 
 QnServerSettingsWidget::~QnServerSettingsWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 QnMediaServerResourcePtr QnServerSettingsWidget::server() const
@@ -376,6 +391,11 @@ bool QnServerSettingsWidget::canApplyChanges() const
     return !ui->nameLineEdit->text().trimmed().isEmpty();
 }
 
+bool QnServerSettingsWidget::isNetworkRequestRunning() const
+{
+    return !d->requests.empty();
+}
+
 void QnServerSettingsWidget::loadDataToUi()
 {
     if (!m_server)
@@ -417,14 +437,16 @@ void QnServerSettingsWidget::applyChanges()
     if (isReadOnly())
         return;
 
-    qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server)
-    {
-        server->setName(ui->nameLineEdit->text());
-        server->setMaxCameras(ui->maxCamerasSpinBox->value());
-        server->setLocationId(ui->locationIdSpinBox->value());
-        server->setRedundancy(ui->failoverGroupBox->isChecked());
-        server->setWebCamerasDiscoveryEnabled(isWebCamerasDiscoveryEnabled());
-    });
+    m_server->setName(ui->nameLineEdit->text());
+    m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
+    m_server->setLocationId(ui->locationIdSpinBox->value());
+    m_server->setRedundancy(ui->failoverGroupBox->isChecked());
+    m_server->setWebCamerasDiscoveryEnabled(isWebCamerasDiscoveryEnabled());
+}
+
+void QnServerSettingsWidget::discardChanges()
+{
+    d->cancelRequests();
 }
 
 void QnServerSettingsWidget::updateUrl()

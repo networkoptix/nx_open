@@ -1760,7 +1760,7 @@ void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(
         m_systemAdministrationDialog, mainWindowWidget());
 
-    systemAdministrationDialog()->setCurrentPage(page, false, url);
+    systemAdministrationDialog()->setCurrentPage(page, url);
 }
 
 void ActionHandler::openLocalSettingsDialog(int page)
@@ -2523,8 +2523,13 @@ void ActionHandler::at_renameAction_triggered()
     }
     else if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
     {
-        qnResourcesChangesManager->saveServer(server,
-            [name](const auto& server) { server->setName(name); });
+        server->setName(name);
+        qnResourcesChangesManager->saveServer(server, nx::utils::guarded(this,
+            [server, oldName](bool success, rest::Handle /*requestId*/)
+            {
+                if (NX_ASSERT(success))
+                    server->setName(oldName);
+            }));
     }
     else if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
@@ -2572,34 +2577,27 @@ void ActionHandler::at_removeFromServerAction_triggered()
 
     if (ui::messages::Resources::deleteResources(mainWindowWidget(), resources))
     {
-        if (systemContext()->restApiHelper()->restApiEnabled())
-        {
-            auto callback =
-                [this,
-                    resourcesFailed = QnResourceList(),
-                    resourcesSuccess = QnResourceList(),
-                    n = resources.size()](bool result, const QnResourcePtr& resource) mutable
+        auto callback =
+            [this,
+                resourcesFailed = QnResourceList(),
+                resourcesSuccess = QnResourceList(),
+                n = resources.size()](bool result, const QnResourcePtr& resource) mutable
+            {
+                if (result)
+                    resourcesSuccess << resource;
+                else
+                    resourcesFailed << resource;
+
+                if ((resourcesFailed.size() + resourcesSuccess.size() == n)
+                    && !resourcesFailed.isEmpty())
                 {
-                    if (result)
-                        resourcesSuccess << resource;
-                    else
-                        resourcesFailed << resource;
+                    ui::messages::Resources::deleteResourcesFailed(
+                        mainWindowWidget(), resourcesFailed);
+                }
+            };
 
-                    if ((resourcesFailed.size() + resourcesSuccess.size() == n)
-                        && !resourcesFailed.isEmpty())
-                    {
-                        ui::messages::Resources::deleteResourcesFailed(
-                            mainWindowWidget(), resourcesFailed);
-                    }
-                };
-
-            for (const auto& resource: resources)
-                qnResourcesChangesManager->deleteResource(resource, callback);
-        }
-        else
-        {
-            qnResourcesChangesManager->deleteResources(resources);
-        }
+        for (const auto& resource: resources)
+            qnResourcesChangesManager->deleteResource(resource, callback);
     }
 }
 

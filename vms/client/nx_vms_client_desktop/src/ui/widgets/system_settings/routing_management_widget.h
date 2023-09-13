@@ -31,7 +31,9 @@ public:
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
+    virtual void discardChanges() override;
     virtual bool hasChanges() const override;
+    virtual bool isNetworkRequestRunning() const override;
 
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
@@ -60,6 +62,7 @@ private:
     QnServerAddressesModel *m_serverAddressesModel;
     QnSortedServerAddressesModel *m_sortedServerAddressesModel;
     QnMediaServerResourcePtr m_server;
+    QSet<int> m_requests;
 };
 
 #endif // ROUTING_MANAGEMENT_WIDGET_H

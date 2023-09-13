@@ -873,7 +873,7 @@ public:
         const QString& action,
         const nx::network::rest::Params& params,
         const nx::String& body,
-        Result<ErrorOrEmpty>::type callback,
+        Result<ErrorOrData<QByteArray>>::type callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle postRest(

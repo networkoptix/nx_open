@@ -4,6 +4,7 @@
 
 #include <functional>
 
+#include <api/server_rest_connection_fwd.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/system_context_aware.h>
@@ -25,11 +26,15 @@ public:
     SystemSettingsManager(SystemContext* context, QObject* parent = nullptr);
     ~SystemSettingsManager();
 
-    void requestSystemSettings(std::function<void()> callback = {});
+    using RequestCallback = std::function<void(bool /*success*/, rest::Handle /*requestId*/)>;
+
+    /** Request System Settings. Callback will be called in the manager's thread. */
+    rest::Handle requestSystemSettings(RequestCallback callback);
+
     nx::vms::api::SystemSettings* systemSettings();
 
-    void saveSystemSettings(std::function<void(bool)> callback = {},
-        nx::utils::AsyncHandlerExecutor executor = {},
+    rest::Handle saveSystemSettings(RequestCallback callback,
+        nx::utils::AsyncHandlerExecutor executor,
         const nx::vms::common::SessionTokenHelperPtr& helper = nullptr);
 
 signals:

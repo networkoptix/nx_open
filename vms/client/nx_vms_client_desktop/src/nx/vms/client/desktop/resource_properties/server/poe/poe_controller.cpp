@@ -39,11 +39,12 @@ struct PoeController::Private:
     void setPowered(const PoeController::PowerModes& value);
     void setUpdatingModeHandle(rest::Handle value);
     void resetHandles();
+    void cancelRequest();
 
     PoeController* const q;
 
-    rest::Handle handle = -1;
-    rest::Handle updatingModeHandle = -1;
+    rest::Handle handle = 0;
+    rest::Handle updatingModeHandle = 0;
 
     core::ResourceHolder<QnMediaServerResource> serverHolder;
     bool autoUpdate = true;
@@ -97,7 +98,7 @@ void PoeController::Private::updateTargetResource(const QnUuid& value)
     {
         // Cleanup.
         updateTimer.stop();
-        resetHandles();
+        cancelRequest();
         return;
     }
 
@@ -126,7 +127,7 @@ void PoeController::Private::handleReply(
 
 void PoeController::Private::update()
 {
-    if (!connection() || !serverHolder.resource())
+    if (!connection() || !serverHolder.resource() || handle != 0)
         return;
 
     updateTimer.stop();
@@ -143,6 +144,8 @@ void PoeController::Private::setPowered(const PoeController::PowerModes& value)
 {
     if (!connection() || !serverHolder.resource())
         return;
+
+    NX_ASSERT(updatingModeHandle == 0, "Behavior should be enforced on the UI level");
 
     updateTimer.stop();
     handle = connectedServerApi()->postJsonResult(
@@ -169,8 +172,15 @@ void PoeController::Private::setUpdatingModeHandle(rest::Handle value)
 
 void PoeController::Private::resetHandles()
 {
-    setUpdatingModeHandle(-1);
-    handle = -1;
+    setUpdatingModeHandle(0);
+    handle = 0;
+}
+
+void PoeController::Private::cancelRequest()
+{
+    if (auto api = connectedServerApi(); api && handle > 0)
+        api->cancelRequest(handle);
+    resetHandles();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -183,6 +193,7 @@ PoeController::PoeController(QObject* parent):
 
 PoeController::~PoeController()
 {
+    d->cancelRequest();
 }
 
 void PoeController::setResourceId(const QnUuid& value)
@@ -234,7 +245,17 @@ bool PoeController::initialUpdateInProgress() const
 
 bool PoeController::updatingPoweringModes() const
 {
-    return d->updatingModeHandle >= 0;
+    return d->updatingModeHandle > 0;
+}
+
+bool PoeController::isNetworkRequestRunning() const
+{
+    return d->handle > 0;
+}
+
+void PoeController::cancelRequest()
+{
+    d->cancelRequest();
 }
 
 } // namespace nx::vms::client::desktop

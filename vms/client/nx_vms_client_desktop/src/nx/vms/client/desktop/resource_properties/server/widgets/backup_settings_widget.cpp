@@ -103,6 +103,8 @@ BackupSettingsWidget::BackupSettingsWidget(ServerSettingsDialogStore* store, QWi
 
 BackupSettingsWidget::~BackupSettingsWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void BackupSettingsWidget::setServer(const QnMediaServerResourcePtr& server)
@@ -121,10 +123,6 @@ bool BackupSettingsWidget::hasChanges() const
         || ui->backupBandwidthSettingsWidget->hasChanges();
 }
 
-void BackupSettingsWidget::loadDataToUi()
-{
-}
-
 void BackupSettingsWidget::applyChanges()
 {
     using namespace std::chrono;
@@ -141,6 +139,12 @@ void BackupSettingsWidget::discardChanges()
 {
     m_backupSettingsViewWidget->discardChanges();
     ui->backupBandwidthSettingsWidget->discardChanges();
+    NX_ASSERT(!isNetworkRequestRunning());
+}
+
+bool BackupSettingsWidget::isNetworkRequestRunning() const
+{
+    return m_backupSettingsViewWidget->isNetworkRequestRunning();
 }
 
 void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)

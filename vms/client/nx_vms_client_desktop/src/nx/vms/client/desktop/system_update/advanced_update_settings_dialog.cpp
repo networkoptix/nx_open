@@ -5,10 +5,10 @@
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QWidget>
 
-#include <common/common_module.h>
+#include <api/server_rest_connection.h>
 #include <nx/vms/api/data/system_settings.h>
-#include <nx/vms/client/core/utils/qml_property.h>
 #include <nx/vms/client/core/settings/system_settings_manager.h>
+#include <nx/vms/client/core/utils/qml_property.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -37,8 +37,19 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
         this,
         [this, notifyAboutUpdates, systemSetting]()
         {
+            NX_ASSERT(m_currentRequest == 0);
+
+            auto callback =
+                [this](bool /*success*/, rest::Handle requestId)
+                {
+                    NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
+                    m_currentRequest = 0;
+                };
+
             systemSetting->updateNotificationsEnabled = notifyAboutUpdates;
-            systemContext()->systemSettingsManager()->saveSystemSettings();
+            m_currentRequest = systemContext()->systemSettingsManager()->saveSystemSettings(
+                callback,
+                this);
         });
 
     connect(systemContext()->systemSettingsManager(),
@@ -52,6 +63,10 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
 
 bool AdvancedUpdateSettingsDialog::tryClose(bool /*force*/)
 {
+    if (auto api = systemContext()->connectedServerApi(); api && m_currentRequest > 0)
+        api->cancelRequest(m_currentRequest);
+    m_currentRequest = 0;
+
     reject();
     return true;
 }

@@ -49,6 +49,7 @@ public:
     bool hasChanges() const;
     void applyChanges();
     void discardChanges();
+    bool isNetworkRequestRunning() const;
 
 private:
     void loadState(const ServerSettingsDialogState& state);

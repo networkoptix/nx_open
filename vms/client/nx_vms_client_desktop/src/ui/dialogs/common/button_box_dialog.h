@@ -34,6 +34,7 @@ protected:
 
     virtual bool event(QEvent *event) override;
 
+    virtual void buttonBoxClicked(QAbstractButton* button);
     virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button);
 
     virtual void initializeButtonBox();

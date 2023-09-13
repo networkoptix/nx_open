@@ -25,6 +25,8 @@ AnalyticsSettingsWidget::AnalyticsSettingsWidget(QWidget* parent):
 
 AnalyticsSettingsWidget::~AnalyticsSettingsWidget()
 {
+    if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
+        discardChanges();
 }
 
 void AnalyticsSettingsWidget::loadDataToUi()
@@ -42,11 +44,25 @@ void AnalyticsSettingsWidget::discardChanges()
 {
     d->settingsValuesByEngineId.clear();
     d->hasChanges = false;
+    if (auto api = d->connectedServerApi())
+    {
+        for (auto handle: d->pendingApplyRequests)
+            api->cancelRequest(handle);
+        for (auto handle: d->pendingRefreshRequests)
+            api->cancelRequest(handle);
+    }
+    d->pendingApplyRequests.clear();
+    d->pendingRefreshRequests.clear();
 }
 
 bool AnalyticsSettingsWidget::hasChanges() const
 {
     return d->hasChanges;
+}
+
+bool AnalyticsSettingsWidget::isNetworkRequestRunning() const
+{
+    return !d->pendingApplyRequests.empty() || !d->pendingRefreshRequests.empty();
 }
 
 bool AnalyticsSettingsWidget::activate(const QUrl& url)

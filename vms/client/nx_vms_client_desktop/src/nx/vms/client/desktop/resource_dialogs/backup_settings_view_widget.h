@@ -8,7 +8,6 @@
 
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/client/desktop/resource_dialogs/detailed_resource_tree_widget.h>
-#include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,8 +18,7 @@ class BackupSettingsItemDelegate;
 class BackupSettingsPickerWidget;
 
 class BackupSettingsViewWidget:
-    public DetailedResourceTreeWidget,
-    public QnAbstractPreferencesInterface
+    public DetailedResourceTreeWidget
 {
     Q_OBJECT
     using base_type = DetailedResourceTreeWidget;
@@ -29,10 +27,11 @@ public:
     BackupSettingsViewWidget(ServerSettingsDialogStore* store, QWidget* parent);
     virtual ~BackupSettingsViewWidget() override;
 
-    virtual bool hasChanges() const override;
-    virtual void loadDataToUi() override;
-    virtual void applyChanges() override;
-    virtual void discardChanges() override;
+    bool hasChanges() const;
+    void loadDataToUi();
+    void applyChanges();
+    void discardChanges();
+    bool isNetworkRequestRunning() const;
 
     nx::vms::api::BackupSettings globalBackupSettings() const;
 

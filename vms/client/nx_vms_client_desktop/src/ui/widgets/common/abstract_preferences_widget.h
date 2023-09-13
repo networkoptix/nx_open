@@ -4,62 +4,15 @@
 
 #include <QtWidgets/QWidget>
 
-class QnAbstractPreferencesInterface
-{
-public:
-    QnAbstractPreferencesInterface() = default;
-    virtual ~QnAbstractPreferencesInterface() = default;
-
-    /**
-     * Check if there are modified values.
-     * @return True if something is changed, false otherwise.
-     */
-    virtual bool hasChanges() const = 0;
-
-    /**
-     * Read widget elements' values from model data.
-     */
-    virtual void loadDataToUi() = 0;
-
-    /**
-     * Save widget elements' values to model data.
-     */
-    virtual void applyChanges() = 0;
-
-    /**
-     * Discard changes if needed. Called only on force closing.
-     */
-    virtual void discardChanges() {}
-
-    /**
-     * Check that all values are correct so saving is possible.
-     * @return False if saving should be aborted, true otherwise.
-     */
-    virtual bool canApplyChanges() const
-    {
-        return true;
-    }
-
-    /**
-     * Check that all values can be discarded safely.
-     * @return False if discarding should be aborted, true otherwise.
-     */
-    virtual bool canDiscardChanges() const
-    {
-        return true;
-    }
-
-    /**
-     * Activate sub-element denoted by the URL.
-     * @return True if element is found and activated.
-     */
-    virtual bool activate(const QUrl& /*url*/)
-    {
-        return true;
-    }
-};
-
-class QnAbstractPreferencesWidget: public QWidget, public QnAbstractPreferencesInterface
+/**
+ *  Base class for creating paged preferences dialogs (where each page is an instance of
+ *  `QnAbstractPreferencesWidget` class).
+ *
+ *  Derived pages basically should:
+ *  * Implement loadDataToUi / hasChanges / applyChanges methods.
+ *  * Emit hasChangesChanged in all cases where new changes can appear.
+ */
+class QnAbstractPreferencesWidget: public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -69,17 +22,58 @@ public:
     explicit QnAbstractPreferencesWidget(QWidget* parent = nullptr);
 
     /**
+     * Check if there are modified values.
+     * @return Whether something was changed.
+     */
+    virtual bool hasChanges() const { return false; };
+
+    /**
+     * Read widget elements' values from model data or directly from the server.
+     */
+    virtual void loadDataToUi() {};
+
+    /**
+     * Save widget elements' values to model data or directly to the server.
+     */
+    virtual void applyChanges() {};
+
+    /**
+     * Discard unsaved changes. Here widget should cancel all network requests if they are running.
+     * Please make sure `isNetworkRequestRunning()` will return false after this call.
+     */
+    virtual void discardChanges() {}
+
+    /**
+     * Check that all values are correct and saving is possible.
+     * @return Whether changes can be applied.
+     */
+    virtual bool canApplyChanges() const { return true; }
+
+    /** Whether widget has at least one running network request. */
+    virtual bool isNetworkRequestRunning() const { return false; }
+
+    /**
+     * Activate sub-element denoted by the URL.
+     * @return True if element is found and activated.
+     */
+    virtual bool activate(const QUrl& /*url*/) { return true; }
+
+    /**
      * Update ui strings (if required).
      */
     virtual void retranslateUi();
 
+    /** Whether widget is in read-only state. */
     bool isReadOnly() const;
+
+    /** Mark widget as read-only (e.g. if the system is in read-only state). */
     void setReadOnly(bool readOnly);
 
+    /** Hide all runtime warnings about proposed changes. */
     virtual void resetWarnings() {}
 
 signals:
-    /** Signal is emitted whenever hasChanges() is changed. */
+    /** Signal must be emitted whenever hasChanges() is potentially changed. */
     void hasChangesChanged();
 
 protected:

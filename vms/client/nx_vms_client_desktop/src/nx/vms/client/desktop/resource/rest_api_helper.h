@@ -23,7 +23,6 @@ public:
     virtual ~RestApiHelper() override;
 
     void setParent(QWidget* parentWidget);
-    bool restApiEnabled();
     nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper();
 
 private:

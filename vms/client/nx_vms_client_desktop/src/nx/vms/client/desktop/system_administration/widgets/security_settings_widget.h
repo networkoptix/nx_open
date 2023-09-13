@@ -5,6 +5,7 @@
 #include <chrono>
 #include <optional>
 
+#include <api/server_rest_connection_fwd.h>
 #include <nx/vms/api/data/watermark_settings.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -28,8 +29,9 @@ public:
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
-
+    virtual void discardChanges() override;
     virtual bool hasChanges() const override;
+    virtual bool isNetworkRequestRunning() const override;
 
     void resetWarnings();
 
@@ -63,6 +65,7 @@ private:
     RepeatedPasswordDialog* const m_archiveEncryptionPasswordDialog;
     ArchivePasswordState m_archivePasswordState = ArchivePasswordState::notSet;
     bool m_archiveEncryptionPasswordDialogOpenedViaButton = false;
+    rest::Handle m_currentRequest = 0;
 };
 
 } // namespace nx::vms::client::desktop
