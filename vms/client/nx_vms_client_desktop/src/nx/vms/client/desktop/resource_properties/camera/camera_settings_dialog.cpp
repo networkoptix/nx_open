@@ -17,6 +17,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/vms/client/core/ptz/remote_ptz_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -644,6 +645,8 @@ void CameraSettingsDialog::updateScheduleAlert(const CameraSettingsDialogState& 
 
 void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 {
+    NX_VERBOSE(this, "Loading state:\n%1", nx::reflect::json::serialize(state));
+
     static const QString kWindowTitlePattern = lit("%1 - %2");
 
     const QString caption = QnCameraDeviceStringSet(
