@@ -276,7 +276,7 @@ bool SubjectHierarchy::addOrUpdate(const QnUuid& subject, const QSet<QnUuid>& pa
     const auto removedFrom = currentParents - parents;
     auto addedTo = parents - currentParents;
 
-    if (!NX_ASSERT(!parents.contains(subject), "A subject cannot be a parent to itself"))
+    if (!parents.contains(subject))
         addedTo.remove(subject);
 
     NX_VERBOSE(this, "Subject %1 is being removed from %2 and added to %3",
