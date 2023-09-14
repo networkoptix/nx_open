@@ -13,8 +13,8 @@ Item
 {
     id: control
 
-    width: 20
-    height: 20
+    implicitWidth: copyButton.width
+    implicitHeight: copyButton.height
 
     readonly property bool hovered: copyButton.hovered
     readonly property bool animationRunning: iconsCrossFade.running
@@ -27,8 +27,8 @@ Item
         hoverEnabled: true
 
         icon.source: "image://svg/skin/text_buttons/copy_20.svg"
-        icon.width: width
-        icon.height: height
+        icon.width: 20
+        icon.height: 20
         icon.color: hovered ? ColorTheme.colors.light13 : ColorTheme.colors.light16
 
         background: null
@@ -44,8 +44,7 @@ Item
         opacity: 0
 
         source: "image://svg/skin/user_settings/ok.svg"
-        sourceSize.width: parent.width
-        sourceSize.height: parent.height
+        sourceSize: Qt.size(20, 20)
     }
 
     ParallelAnimation
