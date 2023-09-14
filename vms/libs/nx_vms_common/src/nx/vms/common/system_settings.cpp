@@ -1241,9 +1241,9 @@ nx::vms::api::LdapSettings SystemSettings::ldap() const
     return m_ldapAdaptor->value();
 }
 
-void SystemSettings::setLdap(const nx::vms::api::LdapSettings& settings)
+void SystemSettings::setLdap(nx::vms::api::LdapSettings settings)
 {
-    m_ldapAdaptor->setValue(settings);
+    m_ldapAdaptor->setValue(std::move(settings));
 }
 
 QnEmailSettings SystemSettings::emailSettings() const

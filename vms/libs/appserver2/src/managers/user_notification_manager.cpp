@@ -4,10 +4,6 @@
 
 namespace ec2 {
 
-QnUserNotificationManager::QnUserNotificationManager()
-{
-}
-
 void QnUserNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::UserData>& tran,
     NotificationSource source)
@@ -37,12 +33,20 @@ void QnUserNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::IdData>& tran,
     NotificationSource source)
 {
-    NX_ASSERT(tran.command == ApiCommand::removeUser || tran.command == ApiCommand::removeUserGroup)
-    ;
+    NX_ASSERT(tran.command == ApiCommand::removeUser
+        || tran.command == ApiCommand::removeUserGroup);
     if (tran.command == ApiCommand::removeUser)
         emit removed(tran.params.id, source);
     else if (tran.command == ApiCommand::removeUserGroup)
         emit userRoleRemoved(tran.params.id);
+}
+
+void QnUserNotificationManager::triggerNotification(
+    const QnTransaction<nx::vms::api::IdDataList>& tran, NotificationSource)
+{
+    NX_ASSERT(tran.command == ApiCommand::removeUserGroups);
+    for (const auto& resource: tran.params)
+        emit userRoleRemoved(resource.id);
 }
 
 void QnUserNotificationManager::triggerNotification(

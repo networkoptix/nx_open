@@ -219,7 +219,7 @@ public:
     void setEmailSettings(const QnEmailSettings& emailSettings);
 
     nx::vms::api::LdapSettings ldap() const;
-    void setLdap(const nx::vms::api::LdapSettings& settings);
+    void setLdap(nx::vms::api::LdapSettings settings);
 
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);

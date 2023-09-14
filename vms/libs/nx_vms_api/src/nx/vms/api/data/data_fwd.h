@@ -53,6 +53,7 @@ using CameraAttributesDataList = std::vector<CameraAttributesData>;
 using DiscoveredServerDataList = std::vector<DiscoveredServerData>;
 using DiscoveryDataList = std::vector<DiscoveryData>;
 using EventRuleDataList = std::vector<EventRuleData>;
+using IdDataList = std::vector<IdData>;
 using LayoutDataList = std::vector<LayoutData>;
 using ShowreelDataList = std::vector<ShowreelData>;
 using LicenseDataList = std::vector<LicenseData>;
