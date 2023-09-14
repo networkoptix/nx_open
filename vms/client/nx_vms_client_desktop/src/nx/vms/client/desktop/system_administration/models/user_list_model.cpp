@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/system_administration/models/members_sort.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
@@ -40,18 +41,6 @@ bool isCustomUser(const QnUserResourcePtr& user)
     return user->getRawPermissions() != GlobalPermission::none
         || !user->systemContext()->accessRightsManager()->ownResourceAccessMap(
             user->getId()).isEmpty();
-}
-
-nx::vms::api::UserType userTypeForSort(nx::vms::api::UserType userType)
-{
-    switch (userType)
-    {
-        case nx::vms::api::UserType::temporaryLocal:
-            return nx::vms::api::UserType::local;
-
-        default:
-            return userType;
-    }
 }
 
 bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortColumn)
@@ -80,8 +69,8 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
 
         case UserListModel::UserTypeColumn:
         {
-            const auto leftType = userTypeForSort(leftUser->userType());
-            const auto rightType = userTypeForSort(rightUser->userType());
+            const auto leftType = userTypeSortOrder(leftUser->userType());
+            const auto rightType = userTypeSortOrder(rightUser->userType());
             if (leftType != rightType)
                 return leftType < rightType;
 

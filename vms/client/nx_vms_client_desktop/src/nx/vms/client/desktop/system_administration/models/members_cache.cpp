@@ -9,9 +9,30 @@
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 
+#include "members_sort.h"
+
 namespace nx::vms::client::desktop {
 
-using nx::vms::common::PredefinedUserGroups;
+namespace {
+
+class ComparableId: public ComparableMember<ComparableId>
+{
+    const QnUuid& infoId;
+    const MembersCache::Info& info;
+
+public:
+    ComparableId(const QnUuid& infoId, const MembersCache::Info& info):
+        infoId(infoId), info(info)
+    {
+    }
+
+    QnUuid id() const { return infoId; }
+    bool isGroup() const { return info.isGroup; }
+    nx::vms::api::UserType userType() const { return (nx::vms::api::UserType) info.userType; }
+    QString name() const { return info.name; }
+};
+
+} // namespace
 
 MembersCache::MembersCache()
 {
@@ -24,11 +45,6 @@ MembersCache::~MembersCache()
 MembersCache::Info MembersCache::info(const QnUuid& id) const
 {
     return m_info.value(id);
-}
-
-bool MembersCache::isPredefined(const QnUuid& groupId)
-{
-    return PredefinedUserGroups::contains(groupId);
 }
 
 MembersCache::Info MembersCache::infoFromContext(
@@ -107,49 +123,7 @@ std::function<bool(const QnUuid&, const QnUuid&)> MembersCache::lessFunc() const
 {
     return [info = m_info](const QnUuid& l, const QnUuid& r)
         {
-            const auto leftInfo = info.value(l);
-            const auto rightInfo = info.value(r);
-
-            // Users go first.
-            if (leftInfo.isGroup != rightInfo.isGroup)
-                return rightInfo.isGroup;
-
-            // Predefined groups go first.
-            const auto predefinedLeft = isPredefined(l);
-            const auto predefinedRight = isPredefined(r);
-            if (predefinedLeft != predefinedRight)
-            {
-                return predefinedLeft;
-            }
-            else if (predefinedLeft)
-            {
-                const auto predefList = PredefinedUserGroups::ids();
-                return predefList.indexOf(l) < predefList.indexOf(r);
-            }
-
-            // TODO sort cloud users.
-
-            // LDAP groups go last.
-            if (leftInfo.isLdap != rightInfo.isLdap)
-                return rightInfo.isLdap;
-
-            // "LDAP Default" goes in front of all LDAP groups.
-            if (l == nx::vms::api::kDefaultLdapGroupId || r == nx::vms::api::kDefaultLdapGroupId)
-            {
-                // When doing a search, both l and r can be kDefaultLdapGroupId.
-                return l == nx::vms::api::kDefaultLdapGroupId
-                    && r != nx::vms::api::kDefaultLdapGroupId;
-            }
-
-            // Case Insensitive sort.
-            const int ret = nx::utils::naturalStringCompare(
-                leftInfo.name, rightInfo.name, Qt::CaseInsensitive);
-
-            // Sort identical names by UUID.
-            if (ret == 0)
-                return l < r;
-
-            return ret < 0;
+            return ComparableId(l, info.value(l)) < ComparableId(r, info.value(r));
         };
 }
 
