@@ -192,7 +192,7 @@ DialogWithState
 
         closeVisible: true
 
-        visible: !!text
+        visible: !!text && !dialog.isSelf
 
         text: dialog.userType === UserSettingsGlobal.TemporaryUser
             ? dialog.self.warningForTemporaryUser(
