@@ -236,7 +236,7 @@ QString GroupSettingsDialog::validateName(const QString& text)
     const auto name = text.trimmed().toLower();
 
     if (name.isEmpty())
-        return tr("Group name cannot be empty.");
+        return tr("Group name cannot be empty");
 
     for (const auto& group: systemContext()->userGroupManager()->groups())
     {
@@ -244,7 +244,7 @@ QString GroupSettingsDialog::validateName(const QString& text)
             continue;
 
         if (group.name.trimmed().toLower() == name)
-            return tr("Group with the same name already exists.");
+            return tr("Group with the same name already exists");
     }
 
     return {};

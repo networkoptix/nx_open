@@ -427,7 +427,7 @@ QString UserSettingsDialog::validateCurrentPassword(const QString& password)
         return tr("To modify your password please enter the existing one.");
 
     if (!systemContext()->accessController()->user()->getHash().checkPassword(password))
-        return tr("Invalid current password.");
+        return tr("Invalid current password");
 
     return {};
 }
@@ -481,12 +481,12 @@ QString UserSettingsDialog::validateLogin(const QString& login)
         [this](const QString& text) -> ValidationResult
         {
             if (text.trimmed().isEmpty())
-                return ValidationResult(tr("Login cannot be empty."));
+                return ValidationResult(tr("Login cannot be empty"));
 
             if (!std::all_of(text.cbegin(), text.cend(), &isAcceptedLoginCharacter))
             {
                 return ValidationResult(
-                    tr("Only letters, numbers and symbols %1 are allowed.")
+                    tr("Only letters, numbers and symbols %1 are allowed")
                         .arg(kAllowedLoginSymbols));
             }
 
@@ -502,7 +502,7 @@ QString UserSettingsDialog::validateLogin(const QString& login)
                 if (d->dialogType == CreateUser && currentState().userId == user->getId())
                     continue;
 
-                return ValidationResult(tr("User with specified login already exists."));
+                return ValidationResult(tr("User with specified login already exists"));
             }
 
             return ValidationResult::kValid;
