@@ -74,14 +74,14 @@ TextValidateFunction defaultPasswordValidator(bool allowEmpty, const QString& em
                     return ValidationResult::kValid;
 
                 return ValidationResult(emptyPasswordMessage.isEmpty()
-                    ? QnValidatorStrings::tr("Password cannot be empty.")
+                    ? QnValidatorStrings::tr("Password cannot be empty")
                     : emptyPasswordMessage);
             }
 
             if (text != text.trimmed())
             {
                 return ValidationResult(
-                    QnValidatorStrings::tr("Avoid leading and trailing spaces."));
+                    QnValidatorStrings::tr("Avoid leading and trailing spaces"));
             }
 
             return ValidationResult::kValid;

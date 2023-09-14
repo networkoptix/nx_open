@@ -180,7 +180,7 @@ Dialog
             {
                 return text == newPasswordTextField.text
                     ? ""
-                    : qsTr("Passwords do not match.")
+                    : qsTr("Passwords do not match")
             }
         }
     }

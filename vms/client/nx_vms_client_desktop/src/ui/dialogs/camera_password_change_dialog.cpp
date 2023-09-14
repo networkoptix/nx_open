@@ -72,7 +72,7 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     setupPasswordField(*ui->passwordEdit);
 
     ui->confirmPasswordEdit->setValidator(defaultConfirmationValidator(
-        [this](){ return ui->passwordEdit->text(); }, tr("Passwords do not match.")));
+        [this](){ return ui->passwordEdit->text(); }, tr("Passwords do not match")));
 
     const auto updateHint =
         [this]()

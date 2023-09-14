@@ -32,7 +32,7 @@ PasswordInformation::PasswordInformation(PasswordStrength strength)
 
         case PasswordStrength::Weak:
             m_text = tr("Weak");
-            m_hint = tr("Password should contain different types of symbols.");
+            m_hint = tr("Password should contain different types of symbols");
             break;
 
         case PasswordStrength::WeakAndFair:
@@ -49,31 +49,31 @@ PasswordInformation::PasswordInformation(PasswordStrength strength)
 
         case PasswordStrength::Short:
             m_text = tr("Short");
-            m_hint = tr("Password must be at least %n characters long.",
+            m_hint = tr("Password must be at least %n characters long",
                 "", PasswordLimitations::kMinimumLength);
             break;
 
         case PasswordStrength::Long:
             m_text = tr("Long");
-            m_hint = tr("Password must be no longer than %n characters.",
+            m_hint = tr("Password must be no longer than %n characters",
                 "", PasswordLimitations::kMaximumLengthForCamera);
             break;
 
         case PasswordStrength::Conseq:
             m_text = tr("Weak");
-            m_hint = tr("Password should not contain %n or more consecutive characters together.",
+            m_hint = tr("Password should not contain %n or more consecutive characters together",
                 "", PasswordLimitations::kConsecutiveCharactersLimit);
             break;
 
         case PasswordStrength::Repeat:
             m_text = tr("Weak");
-            m_hint = tr("Password should not contain %n or more repeating characters.",
+            m_hint = tr("Password should not contain %n or more repeating characters",
                 "", PasswordLimitations::kRepeatingCharactersLimit);
             break;
 
         case PasswordStrength::Common:
             m_text = tr("Common");
-            m_hint = tr("This password is in list of the most popular passwords.");
+            m_hint = tr("This password is in list of the most popular passwords");
             break;
 
         case PasswordStrength::IncorrectCamera:
