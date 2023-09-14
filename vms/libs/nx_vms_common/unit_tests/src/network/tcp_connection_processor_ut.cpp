@@ -13,6 +13,7 @@
 #include <network/tcp_connection_processor.h>
 #include <network/tcp_listener.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/system_error.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <recording/time_period_list.h>
@@ -91,7 +92,7 @@ protected:
 };
 
 
-TEST( TcpConnectionProcessor, sendAsyncData )
+TEST(TcpConnectionProcessor, sendAsyncData)
 {
     nx::vms::common::test::Context context;
 
@@ -117,7 +118,10 @@ TEST( TcpConnectionProcessor, sendAsyncData )
     while (gotBytes < kTotalTestBytes)
     {
         int bytesRead = clientSocket->recv(buffer, sizeof(buffer));
-        ASSERT_TRUE(bytesRead > 0);
+        if (bytesRead < 0 && SystemError::getLastOSErrorCode() == SystemError::timedOut)
+            continue;
+
+        ASSERT_GT(bytesRead, 0) << SystemError::getLastOSErrorText();
         gotBytes += bytesRead;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
