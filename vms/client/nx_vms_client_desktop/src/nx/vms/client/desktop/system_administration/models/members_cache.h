@@ -52,8 +52,6 @@ public:
     Members sorted(const QnUuid& groupId = {}) const;
     void loadInfo(nx::vms::common::SystemContext* systemContext);
 
-    static bool isPredefined(const QnUuid& groupId);
-
     void setContext(AccessSubjectEditingContext* context) { m_subjectContext = context; }
 
     void sortSubjects(QList<QnUuid>& subjects) const;
