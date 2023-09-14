@@ -96,11 +96,14 @@ Item
                     id: problemsIcon
                     visible: extras.flags & ResourceTree.ResourceExtraStatusFlag.buggy
                     source: "image://svg/skin/tree/locked.svg"
+                    sourceSize: Qt.size(20, 20)
                 }
 
                 Image
                 {
                     id: recordingIcon
+
+                    sourceSize: Qt.size(20, 20)
 
                     source:
                     {

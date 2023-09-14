@@ -44,11 +44,11 @@ QPixmap loadSvgImageUncached(const QString& sourcePath,
         return {};
     }
 
-    const auto physicalSize = desiredPhysicalSize.isValid()
-        ? desiredPhysicalSize
-        : renderer.defaultSize() * devicePixelRatio;
+    const auto physicalSize = desiredPhysicalSize.isEmpty()
+        ? renderer.defaultSize() * devicePixelRatio
+        : desiredPhysicalSize;
 
-    if (!NX_ASSERT(physicalSize.isValid(),
+    if (!NX_ASSERT(!physicalSize.isEmpty(),
         "Neither explicit nor default size is available for svg image \"%1\"", sourcePath))
     {
         return {};
@@ -56,8 +56,11 @@ QPixmap loadSvgImageUncached(const QString& sourcePath,
 
     QPixmap result(physicalSize);
     result.fill(Qt::transparent);
-    QPainter p(&result);
+
+    QPainter p;
+    NX_ASSERT(p.begin(&result));
     renderer.render(&p);
+    NX_ASSERT(p.end());
 
     result.setDevicePixelRatio(devicePixelRatio);
     return result;
