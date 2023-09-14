@@ -7,6 +7,7 @@
 
 #include <nx/vms/client/core/skin/svg_loader.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::core {
 
@@ -33,6 +34,9 @@ QPixmap SvgImageProvider::requestPixmap(const QString& id, QSize* size, const QS
     QMap<QString /*source class name*/, QString /*target color name*/> customization;
     for (const auto& [className, colorName]: QUrlQuery(sourceUrl.query()).queryItems())
         customization[className] = colorName;
+
+    if (requestedSize.isEmpty())
+        NX_INFO(this, "Requested an SVG image with default size: \"%1\"", sourcePath);
 
     const auto result = loadSvgImage(sourcePath, customization, requestedSize);
     if (size)
