@@ -42,6 +42,7 @@ using namespace nx::vms::applauncher::api;
 namespace {
 
 const nx::utils::SoftwareVersion kSignaturesAppearedVersion(4, 2);
+const nx::utils::SoftwareVersion kSignaturesEmbeddedIntoZipVersion(6, 0);
 
 // Time that is given to process to exit. After that, applauncher (if present) will try to
 // terminate it.
@@ -185,32 +186,58 @@ void ClientUpdateTool::verifyUpdateFile()
     m_verificationResult = std::async(std::launch::async,
         [this]()
         {
-            auto result = common::FileSignature::Result::failed;
+            const auto guard = nx::utils::makeScopeGuard(
+                [this]()
+                {
+                    QMetaObject::invokeMethod(
+                        this, &ClientUpdateTool::atVerificationFinished, Qt::QueuedConnection);
+                });
 
             if (ini().skipUpdateFilesVerification)
-            {
-                result = common::FileSignature::Result::ok;
-            }
-            else
-            {
-                const QDir keysDir(":/update_verification_keys");
-                for (const QString& file: keysDir.entryList({"*.pem"}, QDir::Files, QDir::Name))
-                {
-                    const QString& fileName = keysDir.absoluteFilePath(file);
-                    const QByteArray& key = common::FileSignature::readKey(fileName);
-                    if (key.isEmpty())
-                        NX_WARNING(this, "Cannot load key from %1", fileName);
+                return common::FileSignature::Result::ok;
 
+            const auto signature =
+                common::FileSignature::readSignatureFromZipFileComment(m_updateFile);
+            if (!signature)
+            {
+                NX_WARNING(this, "Cannot read comment of ZIP file %1", m_updateFile);
+                return common::FileSignature::Result::ioError;
+            }
+
+            if (signature->isEmpty() && m_updateVersion >= kSignaturesEmbeddedIntoZipVersion)
+            {
+                NX_WARNING(this, "Update file %1 does not contain a signature", m_updateFile);
+                return common::FileSignature::Result::failed;
+            }
+
+            const QDir keysDir(":/update_verification_keys");
+
+            auto result = common::FileSignature::Result::failed;
+
+            for (const QString& file: keysDir.entryList({"*.pem"}, QDir::Files, QDir::Name))
+            {
+                const QString& fileName = keysDir.absoluteFilePath(file);
+                const QByteArray& key = common::FileSignature::readKey(fileName);
+                if (key.isEmpty())
+                {
+                    NX_WARNING(this, "Cannot load key from %1", fileName);
+                    continue;
+                }
+
+                if (signature)
+                {
+                    result = common::FileSignature::verifyZipFile(m_updateFile, key, *signature);
+                }
+                else
+                {
+                    // We need to check the old-style signature for compatibility mode functioning.
                     result = common::FileSignature::verify(
                         m_updateFile, key, m_clientPackage.signature);
-
-                    if (result == common::FileSignature::Result::ok)
-                        break;
                 }
-            }
 
-            QMetaObject::invokeMethod(
-                this, &ClientUpdateTool::atVerificationFinished, Qt::QueuedConnection);
+                if (result == common::FileSignature::Result::ok)
+                    break;
+            }
 
             return result;
         });
