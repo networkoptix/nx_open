@@ -47,7 +47,7 @@ struct NotDefinedApiData
  *     false, //< The transaction is not persistent (does not save anything to the database).
  *     false, //< The transaction is not system (handled in a common way).
  *
- *     // Calculates hash for a persistent transaction. MUST yield the same result for corresponing
+ *     // Calculates hash for a persistent transaction. MUST yield the same result for corresponding
  *     // setXXX and removeXXX transactions. Actual for persistent transactions only.
  *     InvalidGetHashHelper(),
  *
@@ -756,6 +756,19 @@ APPLY(510, saveUsers, nx::vms::api::UserDataList, \
     FilterListByAccess<ReadResourceAccess>(), /*< filter read func */ \
     ReadListAccessOut<ReadResourceAccess>(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
+/**%apidoc */ \
+APPLY(511, removeUserGroups, nx::vms::api::IdDataList, \
+    true, /*< isPersistent */ \
+    false, /*< isSystem */ \
+    true, /*< isRemoveOperation */ \
+    InvalidGetHashHelper(), /*< getHash */ \
+    UserNotificationManagerHelper(), /*< trigger notification */ \
+    nullptr, /*< save permission checker */ \
+    InvalidAccess(), /*< read permission checker */ \
+    InvalidFilterFunc(), /*< filter read func */ \
+    ReadListAccessOut<AllowForAllAccess>(), /*< check remote peer rights for outgoing transaction */ \
+    RegularTransactionType()) /*< regular transaction type */ \
+/**%apidoc */ \
 APPLY(600, getLayouts, nx::vms::api::LayoutDataList, \
     false, /*< isPersistent */ \
     false, /*< isSystem */ \
@@ -1658,7 +1671,7 @@ namespace ApiCommand
 
     /** Whether the transaction should be written to the database. */
     bool isPersistent(Value value);
-}
+}  // namespace ApiCommand
 
 NX_REFLECTION_ENUM_CLASS(TransactionType,
     Unknown = -1,
@@ -1685,7 +1698,7 @@ struct TransactionPersistentInfo
 {
     using TimestampType = nx::vms::api::Timestamp;
 
-    TransactionPersistentInfo(): sequence(0), timestamp(TimestampType::fromInteger(0)) {}
+    TransactionPersistentInfo(): timestamp(TimestampType::fromInteger(0)) {}
     bool isNull() const { return dbID.isNull(); }
 
     QnUuid dbID;
@@ -1721,16 +1734,16 @@ struct QnAbstractTransaction
     {
     }
 
-    QnAbstractTransaction(QnUuid _peerID):
+    explicit QnAbstractTransaction(QnUuid _peerID):
         command(ApiCommand::NotDefined),
-        peerID(std::move(_peerID)),
+        peerID(_peerID),
         transactionType(TransactionType::Regular)
     {
     }
 
     QnAbstractTransaction(ApiCommand::Value value, QnUuid _peerID):
         command(value),
-        peerID(std::move(_peerID)),
+        peerID(_peerID),
         transactionType(TransactionType::Regular)
     {
     }
@@ -1776,7 +1789,7 @@ public:
 
     QnTransaction(): QnAbstractTransaction() {}
     QnTransaction(QnUuid _peerID):
-        QnAbstractTransaction(std::move(_peerID))
+        QnAbstractTransaction(_peerID)
     {
     }
 
@@ -1790,13 +1803,13 @@ public:
         QnUuid _peerID,
         const T& params = T())
         :
-        QnAbstractTransaction(command, std::move(_peerID)),
+        QnAbstractTransaction(command, _peerID),
         params(params)
     {
     }
 
     template<typename U>
-    QnTransaction(const QnTransaction<U>& /*otherTran*/)
+    explicit QnTransaction(const QnTransaction<U>& /*otherTran*/)
     {
         NX_ASSERT(0, "Constructing from transaction with another Params type is disallowed");
     }
@@ -1867,8 +1880,8 @@ struct ApiTransactionData
     QnAbstractTransaction tran;
     int dataSize = 0;
 
-    ApiTransactionData() {}
-    ApiTransactionData(const QnUuid& peerGuid): tran(peerGuid) {}
+    ApiTransactionData() = default;
+    explicit ApiTransactionData(const QnUuid& peerGuid): tran(peerGuid) {}
 
     ApiTransactionData(const ApiTransactionData&) = default;
     ApiTransactionData& operator=(const ApiTransactionData&) = default;

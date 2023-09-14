@@ -10,7 +10,7 @@ namespace ec2 {
 class QnUserNotificationManager: public AbstractUserNotificationManager
 {
 public:
-    QnUserNotificationManager();
+    QnUserNotificationManager() = default;
 
     void triggerNotification(
         const QnTransaction<nx::vms::api::UserData>& tran,
@@ -20,6 +20,9 @@ public:
         NotificationSource source);
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
+        NotificationSource source);
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::IdDataList>& tran,
         NotificationSource source);
     void triggerNotification(
         const QnTransaction<nx::vms::api::UserGroupData>& tran,

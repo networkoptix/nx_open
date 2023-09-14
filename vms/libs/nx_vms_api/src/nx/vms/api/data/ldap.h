@@ -24,6 +24,9 @@ constexpr const int kLdapDefaultPort{389};
 const std::string kLdapsScheme{"ldaps"};
 constexpr const int kLdapsDefaultPort{636};
 
+const int kLdapDefaultSearchPageSize{1000};
+const std::chrono::seconds kLdapDefaultMasterSyncServerCheckInterval{10s};
+
 struct NX_VMS_API LdapSettingSearchFilter
 {
     /**%apidoc[opt]
@@ -92,7 +95,7 @@ struct NX_VMS_API LdapSettings
     std::chrono::seconds searchTimeoutS = 1min;
 
     /**%apidoc[opt] */
-    int searchPageSize = 1000;
+    int searchPageSize = kLdapDefaultSearchPageSize;
 
     /**%apidoc[opt] LDAP users and groups are collected using all these filters. */
     std::vector<LdapSettingSearchFilter> filters;
@@ -124,7 +127,7 @@ struct NX_VMS_API LdapSettings
     /**%apidoc[opt]
      * %example 10
      */
-    std::chrono::seconds masterSyncServerCheckIntervalS = 10s;
+    std::chrono::seconds masterSyncServerCheckIntervalS = kLdapDefaultMasterSyncServerCheckInterval;
 
     /**%apidoc[opt]
      * If `true` new LDAP users will be imported with enabled HTTP Digest.
