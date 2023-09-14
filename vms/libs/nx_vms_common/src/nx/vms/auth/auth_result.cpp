@@ -33,7 +33,7 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value)
 
         case Auth_WrongDigest:
         case Auth_WrongPassword:
-            return tr("Wrong password.");
+            return tr("Wrong password");
 
         case Auth_PasswordExpired:
             return tr("The password is expired. Please contact your system administrator.");
