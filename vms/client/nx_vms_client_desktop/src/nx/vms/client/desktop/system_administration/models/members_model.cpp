@@ -592,7 +592,7 @@ bool MembersModel::isAllowed(const QnUuid& parentId, const QnUuid& childId) cons
         return false;
 
     // Predefined group cannot be put into another group.
-    if (MembersCache::isPredefined(childId))
+    if (PredefinedUserGroups::contains(childId))
         return false;
 
     auto parentInfo = m_cache->info(parentId);
@@ -750,7 +750,7 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
             return !m_cache->info(id).isGroup;
 
         case IsPredefined:
-            return MembersCache::isPredefined(id);
+            return PredefinedUserGroups::contains(id);
 
         case OffsetRole:
             return 0;
@@ -764,7 +764,7 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
                 : UserSettingsGlobal::kUsersSection;
 
         case GroupSectionRole:
-            return MembersCache::isPredefined(id)
+            return PredefinedUserGroups::contains(id)
                 ? UserSettingsGlobal::kBuiltInGroupsSection
                 : UserSettingsGlobal::kCustomGroupsSection;
 
