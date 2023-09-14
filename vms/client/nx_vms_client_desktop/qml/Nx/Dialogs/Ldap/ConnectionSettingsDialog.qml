@@ -153,7 +153,7 @@ Dialog
                 {
                     return text
                         ? ""
-                        : qsTr("Login DN cannot be empty.")
+                        : qsTr("Login DN cannot be empty")
                 }
 
                 onFocusChanged:
@@ -185,7 +185,7 @@ Dialog
                 {
                     return passwordTextField.text || passwordTextField.showFakePassword
                         ? ""
-                        : qsTr("Password cannot be empty.")
+                        : qsTr("Password cannot be empty")
                 }
 
                 onFocusChanged:

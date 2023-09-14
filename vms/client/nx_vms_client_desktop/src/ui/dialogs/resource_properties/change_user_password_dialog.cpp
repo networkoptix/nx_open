@@ -28,7 +28,7 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setValidator(defaultConfirmationValidator(
         [this]() { return ui->newPasswordInputField->text(); },
-        tr("Passwords do not match.")));
+        tr("Passwords do not match")));
 
     ui->currentPasswordInputField->setTitle(tr("Current Password"));
     ui->currentPasswordInputField->setValidator(
@@ -39,10 +39,10 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
 
             if (text.isEmpty())
                 return ValidationResult(
-                    tr("To modify your password please enter the existing one."));
+                    tr("To modify your password please enter the existing one"));
 
             if (!context()->user()->getHash().checkPassword(text))
-                return ValidationResult(tr("Invalid current password."));
+                return ValidationResult(tr("Invalid current password"));
 
             return ValidationResult::kValid;
         });
