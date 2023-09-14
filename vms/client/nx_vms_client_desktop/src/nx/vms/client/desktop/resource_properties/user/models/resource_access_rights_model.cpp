@@ -288,6 +288,11 @@ void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights
 
     const auto toggledRight = d->accessRightList[index];
 
+    if (d->resource)
+        NX_VERBOSE(this, "Toggle request for `%1`, for %2", toggledRight, d->resource);
+    else
+        NX_VERBOSE(this, "Toggle request for `%1`, for %2", toggledRight, id);
+
     const bool isGroup = !d->resource;
     const auto outerGroupId = AccessSubjectEditingContext::specialResourceGroupFor(d->resource);
     const bool hasOuterGroup = !outerGroupId.isNull();
@@ -311,6 +316,8 @@ void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights
         ? relevantAccessRights(groupId())
         : relevantAccessRights(outerGroupId);
 
+    NX_VERBOSE(this, "Relevant access rights: `%1`", relevantRights);
+
     if (!NX_ASSERT(relevantRights.testFlag(toggledRight)))
         return;
 
@@ -322,6 +329,9 @@ void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights
             : AccessSubjectEditingContext::dependentAccessRights(toggledRight));
     }
 
+    NX_VERBOSE(this, "Access rights to toggle %1: `%2`", itemWillBeChecked ? "on" : "off",
+        toggledMask);
+
     if (isGroup)
     {
         // If we're toggling a group on, we must explicitly toggle all its children off.
@@ -330,6 +340,9 @@ void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights
         auto mask = itemWasChecked
             ? (toggledMask & itemAccessRights)
             : toggledMask;
+
+        NX_VERBOSE(this, "Toggling %1 `%2` for group's children", itemWasChecked ? "on" : "off",
+            mask);
 
         for (const auto& itemId: d->getGroupContents(id))
             modifyAccessRightMap(accessMap, itemId, mask, itemWasChecked);
@@ -340,13 +353,19 @@ void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights
         // If we're toggling off an item that was implicitly toggled on by its group,
         // we must toggle the group off, and explicitly toggle all its children on.
 
+        NX_VERBOSE(this,
+            "`%1` was toggled on for the outer group %2; toggling it on for all its children",
+            toggledMask, outerGroupId);
+
         for (const auto& itemId: d->getGroupContents(outerGroupId))
             modifyAccessRightMap(accessMap, itemId, toggledMask, true);
 
+        NX_VERBOSE(this, "Toggling off `%1` for the outer group %2", toggledMask, outerGroupId);
         modifyAccessRightMap(accessMap, outerGroupId, toggledMask, false);
     }
 
     // Toggle the item.
+    NX_VERBOSE(this, "Toggling %1 `%2` for %3", itemWillBeChecked ? "on" : "off", toggledMask, id);
     modifyAccessRightMap(accessMap, id, toggledMask, itemWillBeChecked);
     d->context->setOwnResourceAccessMap(accessMap);
 }
