@@ -96,6 +96,7 @@ SliderToolTip
             id: leftArrow
 
             source: "image://svg/skin/timeline_tooltip/arrow_left.svg"
+            sourceSize: Qt.size(20, 20)
             visible: timeMarker.mode === Timeline.TimeMarkerMode.leftmost
             x: 4
             y: row.y + row.height / 2 - height / 2
@@ -106,6 +107,7 @@ SliderToolTip
             id: rightArrow
 
             source: "image://svg/skin/timeline_tooltip/arrow_right.svg"
+            sourceSize: Qt.size(20, 20)
             visible: timeMarker.mode === Timeline.TimeMarkerMode.rightmost
             x: content.width - width - 4
             y: row.y + row.height / 2 - height / 2

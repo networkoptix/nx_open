@@ -95,6 +95,8 @@ FocusScope
                 {
                     id: recordingIcon
 
+                    sourceSize: Qt.size(20, 20)
+
                     source:
                     {
                         if (extras.flags & ResourceTree.ResourceExtraStatusFlag.recording)
