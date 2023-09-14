@@ -50,7 +50,7 @@ nx::utils::Url mainServerUrl(const QSet<QString>& remoteAddresses,
 
     auto itr = std::min_element(addresses.cbegin(), addresses.cend(),
         [](const auto& l, const auto& r) { return l.second < r.second; });
-        
+
     return itr->first;
 }
 

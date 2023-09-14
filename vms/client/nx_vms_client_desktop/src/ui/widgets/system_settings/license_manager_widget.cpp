@@ -716,7 +716,7 @@ void LicenseManagerWidget::handleWidgetStateChange()
             this
         );
     }
-    
+
 }
 
 } // namespace nx::vms::client::desktop

@@ -141,7 +141,7 @@ void parseParameters(const nx::utils::Url& url, SystemUri* uri)
     {
         uri->userAuthType = SystemUri::UserAuthType::local;
     }
-    
+
     if (!authKey.isEmpty())
     {
         if (authKey.toStdString().starts_with(nx::vms::api::LoginSession::kTokenPrefix)
@@ -219,7 +219,7 @@ bool hasValidAuth(const SystemUri& uri)
 bool userAuthTypeMatchCredentials(const SystemUri& uri)
 {
     using UserAuthType = SystemUri::UserAuthType;
-    
+
     const bool hasValidAuth = ::hasValidAuth(uri);
     const auto authType = uri.userAuthType;
     const bool isValidCloudAuth =
@@ -448,7 +448,7 @@ nx::utils::Url SystemUri::toUrl() const
         if (userAuthType == SystemUri::UserAuthType::temporary)
             query.addQueryItem(kTemporaryUserToken, authKey);
         else
-            query.addQueryItem(kAuthKey, authKey);  
+            query.addQueryItem(kAuthKey, authKey);
     }
 
     if (!authCode.isEmpty())
