@@ -2,8 +2,6 @@
 
 #include "transaction_descriptor.h"
 
-#include <iostream>
-
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCryptographicHash>
 
@@ -15,7 +13,6 @@
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
@@ -29,7 +26,6 @@
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
-#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -1711,7 +1707,7 @@ struct SaveUserRoleAccess
         QSet<QnUuid> parentIds = nx::utils::toQSet(param.parentGroupIds);
         parentIds += systemContext->accessSubjectHierarchy()->recursiveParents(parentIds);
 
-        if (parentIds.contains(param.id))
+        if (parentIds.contains(param.id) && param.type != nx::vms::api::UserType::ldap)
         {
             const auto cycledGroups = systemContext->accessSubjectHierarchy()->directMembers(
                 param.id).intersect(parentIds);
