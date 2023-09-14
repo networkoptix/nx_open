@@ -252,10 +252,10 @@ Attribute* AttributeResolver::tryToDeduceTypeFromSubtype(
     const AbstractAttribute* baseAttribute)
 {
     const QString& subtypeId = inOutAttributeDescription->subtype;
-    
+
     const EnumType* enumType = m_context.internalState->getTypeById<EnumType>(subtypeId);
     const ColorType* colorType = m_context.internalState->getTypeById<ColorType>(subtypeId);
-    
+
     if (enumType && colorType)
     {
         m_errorHandler->handleError(
