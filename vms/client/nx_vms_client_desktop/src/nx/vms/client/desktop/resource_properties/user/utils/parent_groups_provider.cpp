@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
 
 namespace nx::vms::client::desktop {
 
@@ -123,7 +124,7 @@ QVariant ParentGroupsProvider::data(const QModelIndex& index, int role) const
         }
 
         case MembersModel::IsPredefined:
-            return MembersCache::isPredefined(id);
+            return nx::vms::common::PredefinedUserGroups::contains(id);
 
         case MembersModel::CanEditMembers:
             return m_membersModel->canEditMembers(id);

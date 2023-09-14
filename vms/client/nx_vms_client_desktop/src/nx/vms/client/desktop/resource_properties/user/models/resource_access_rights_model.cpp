@@ -14,9 +14,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/format.h>
@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <nx/vms/client/desktop/system_administration/models/members_sort.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
@@ -83,6 +84,21 @@ int providerPriority(ResourceAccessInfo::ProvidedVia providerType)
     static const int kLowestPriority = -1;
     return kPriorityByProvider.value(providerType, /*defaultValue*/ kLowestPriority);
 }
+
+class ComparableGroup: public ComparableMember<ComparableGroup>
+{
+    const nx::vms::api::UserGroupData& group;
+
+public:
+    ComparableGroup(const nx::vms::api::UserGroupData& group): group(group)
+    {
+    }
+
+    QnUuid id() const { return group.id; }
+    bool isGroup() const { return true; }
+    nx::vms::api::UserType userType() const { return group.type; }
+    QString name() const { return group.name; }
+};
 
 } // namespace
 
@@ -643,36 +659,9 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     collator.setNumericMode(true);
 
     std::sort(groupsData.begin(), groupsData.end(),
-        [&collator](const auto& left, const auto& right)
+        [](const auto& left, const auto& right)
         {
-            // Predefined groups go first.
-            const auto predefinedLeft = PredefinedUserGroups::contains(left.id);
-            const auto predefinedRight = PredefinedUserGroups::contains(right.id);
-            if (predefinedLeft != predefinedRight)
-                return predefinedLeft;
-            if (predefinedLeft)
-                return left.id < right.id;
-
-            // Sort according to type: local, ldap, cloud.
-            if (left.type != right.type)
-                return left.type < right.type;
-
-            NX_ASSERT(left.id != right.id, "Duplicated group %1 (%2)", left.id, left.name);
-
-            // "LDAP Default" goes in front of all LDAP groups.
-            if (left.id == nx::vms::api::kDefaultLdapGroupId
-                || right.id == nx::vms::api::kDefaultLdapGroupId)
-            {
-                return left.id == nx::vms::api::kDefaultLdapGroupId
-                    && right.id != nx::vms::api::kDefaultLdapGroupId;
-            }
-
-            // Sort identical names by UUID.
-            if (left.name == right.name)
-                return left.id < right.id;
-
-            // Case insensitive numeric-aware search.
-            return collator(left.name, right.name);
+            return ComparableGroup(left) < ComparableGroup(right);
         });
 
     for (const auto& group: groupsData)
