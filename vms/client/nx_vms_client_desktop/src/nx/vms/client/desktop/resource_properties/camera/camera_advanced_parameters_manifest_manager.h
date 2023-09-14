@@ -6,6 +6,7 @@
 
 #include <QtCore/QObject>
 
+#include <api/server_rest_connection_fwd.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
@@ -18,8 +19,7 @@ namespace nx::vms::client::desktop {
  * depend on server, so can be loaded once per connection session. Manager loads these manifests on
  * request and notifies when loading is complete.
  */
-class CameraAdvancedParametersManifestManager: public QObject,
-    public core::RemoteConnectionAware
+class CameraAdvancedParametersManifestManager: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -35,12 +35,15 @@ public:
      * Request to load manifest. When manifest is successfully loaded, corresponding signal will be
      * emitted. In case of failure nothing occurs.
      */
-    void loadManifestAsync(const QnVirtualCameraResourcePtr& camera);
+    rest::Handle loadManifestAsync(const QnVirtualCameraResourcePtr& camera);
 
 signals:
     void manifestLoaded(
+        rest::Handle handle,
         const QnVirtualCameraResourcePtr& camera,
         const QnCameraAdvancedParams& manifest);
+
+    void manifestLoadingFailed(rest::Handle handle, const QnVirtualCameraResourcePtr& camera);
 
 private:
     struct Private;
