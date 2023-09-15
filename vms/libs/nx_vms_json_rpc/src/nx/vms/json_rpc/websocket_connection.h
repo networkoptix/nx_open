@@ -11,12 +11,8 @@ namespace nx::network::websocket { class WebSocket; }
 
 namespace nx::vms::json_rpc {
 
-namespace detail {
-
 class IncomingProcessor;
-class OutgoingProcessor;
-
-} // namespace detail
+namespace detail { class OutgoingProcessor; }
 
 class NX_VMS_JSON_RPC_API WebSocketConnection: public nx::network::aio::BasicPollable
 {
@@ -51,7 +47,7 @@ private:
 
 private:
     OnDone m_onDone;
-    std::unique_ptr<detail::IncomingProcessor> m_incomingProcessor;
+    std::unique_ptr<IncomingProcessor> m_incomingProcessor;
     std::unique_ptr<detail::OutgoingProcessor> m_outgoingProcessor;
     std::queue<QJsonValue> m_queuedRequests;
     std::unique_ptr<nx::network::websocket::WebSocket> m_socket;

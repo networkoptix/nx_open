@@ -11,25 +11,16 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/vms/api/data/json_rpc.h>
 
-namespace nx::vms::json_rpc { class WebSocketConnection; }
+namespace nx::vms::json_rpc {
 
-namespace nx::vms::json_rpc::detail {
-
-/*
- * Class for internal usage by WebSocketConnection.
- */
-class IncomingProcessor
+class NX_VMS_JSON_RPC_API IncomingProcessor
 {
 public:
     using ResponseHandler = nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)>;
-    using RequestHandler = nx::utils::MoveOnlyFunc<
-        void(nx::vms::api::JsonRpcRequest, ResponseHandler, WebSocketConnection*)>;
+    using RequestHandler =
+        nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcRequest, ResponseHandler)>;
 
-    IncomingProcessor(RequestHandler handler, WebSocketConnection* owner):
-        m_handler(std::move(handler)), m_owner(owner)
-    {
-    }
-
+    IncomingProcessor(RequestHandler handler = {}): m_handler(std::move(handler)) {}
     void processRequest(const QJsonValue& data, nx::utils::MoveOnlyFunc<void(QJsonValue)> handler);
 
 private:
@@ -61,7 +52,6 @@ private:
 
 private:
     RequestHandler m_handler;
-    WebSocketConnection* const m_owner;
     std::unordered_map<BatchRequest*, std::unique_ptr<BatchRequest>> m_batchRequests;
     std::unordered_map<Request*, std::unique_ptr<Request>> m_requests;
 };

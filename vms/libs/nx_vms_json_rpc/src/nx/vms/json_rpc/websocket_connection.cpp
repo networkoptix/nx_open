@@ -5,7 +5,7 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/websocket/websocket.h>
 
-#include "detail/incoming_processor.h"
+#include "incoming_processor.h"
 #include "detail/outgoing_processor.h"
 
 namespace nx::vms::json_rpc {
@@ -45,12 +45,33 @@ static bool isResponse(const QJsonValue& value)
 WebSocketConnection::WebSocketConnection(
     std::unique_ptr<nx::network::websocket::WebSocket> socket,
     OnDone onDone,
-    RequestHandler handler)
+    RequestHandler requestHandler)
     :
     m_onDone(std::move(onDone)),
     m_socket(std::move(socket))
 {
-    m_incomingProcessor = std::make_unique<IncomingProcessor>(std::move(handler), this);
+    if (requestHandler)
+    {
+        m_incomingProcessor = std::make_unique<IncomingProcessor>(
+            [this, requestHandler = std::move(requestHandler)](auto request, auto responseHandler)
+            {
+                requestHandler(
+                    std::move(request),
+                    [this, handler = std::move(responseHandler)](auto response) mutable
+                    {
+                        post(
+                            [response = std::move(response), handler = std::move(handler)]() mutable
+                            {
+                                handler(std::move(response));
+                            });
+                    },
+                    this);
+            });
+    }
+    else
+    {
+        m_incomingProcessor = std::make_unique<IncomingProcessor>();
+    }
     m_outgoingProcessor =
         std::make_unique<OutgoingProcessor>([this](auto value) { send(std::move(value)); });
     base_type::bindToAioThread(m_socket->getAioThread());
