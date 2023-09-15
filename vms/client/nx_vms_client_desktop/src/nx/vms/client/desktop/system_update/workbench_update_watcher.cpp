@@ -61,7 +61,7 @@ struct WorkbenchUpdateWatcher::Private
 
 WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
     QObject(parent),
-    QnWorkbenchContextAware(parent),
+    QnSessionAwareDelegate(parent),
     m_updateStateTimer(this),
     m_checkLatestUpdateTimer(this),
     m_notifiedVersion(),
@@ -96,27 +96,6 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
         : kCheckUpdatePeriod;
 
     m_checkLatestUpdateTimer.setInterval(checkInterval);
-
-    connect(context(), &QnWorkbenchContext::userChanged, this,
-        [this](const QnUserResourcePtr &user)
-        {
-            m_userLoggedIn = user != nullptr;
-            syncState();
-            if (m_private && m_private->serverUpdateTool)
-            {
-                if (m_userLoggedIn)
-                {
-                    auto systemId = systemSettings()->localSystemId();
-                    if (systemId.isNull())
-                        systemId = systemContext()->localSystemId();
-                    m_private->serverUpdateTool->onConnectToSystem(systemId);
-                }
-                else
-                {
-                    m_private->serverUpdateTool->onDisconnectFromSystem();
-                }
-            }
-        });
 
     connect(m_notificationsManager,
         &workbench::LocalNotificationsManager::cancelRequested,
@@ -189,6 +168,25 @@ std::future<UpdateContents> WorkbenchUpdateWatcher::takeUpdateCheck()
 {
     NX_ASSERT(m_private);
     return std::move(m_private->updateCheck);
+}
+
+void WorkbenchUpdateWatcher::forcedUpdate()
+{
+    if (!m_private->serverUpdateTool)
+        return;
+
+    auto systemId = systemSettings()->localSystemId();
+    if (systemId.isNull())
+        systemId = systemContext()->localSystemId();
+    m_private->serverUpdateTool->onConnectToSystem(systemId);
+}
+
+bool WorkbenchUpdateWatcher::tryClose(bool /*force*/)
+{
+    if (m_private->serverUpdateTool)
+        m_private->serverUpdateTool->onDisconnectFromSystem();
+
+    return true;
 }
 
 void WorkbenchUpdateWatcher::atStartCheckUpdate()
