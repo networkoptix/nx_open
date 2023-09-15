@@ -136,6 +136,7 @@ BackupBandwidthSettingsWidget::BackupBandwidthSettingsWidget(QWidget* parent):
     m_scheduleCellPainter(new BackupBandwidthScheduleCellPainter())
 {
     ui->setupUi(this);
+    ui->messageBar->init({.level = BarDescription::BarLevel::Info, .isClosable = false});
 
     for (const auto brushlabel: {ui->unlimitedLabel, ui->scheduledLimitLabel, ui->noBackupLabel})
         setFontWeight(brushlabel, QFont::DemiBold);
