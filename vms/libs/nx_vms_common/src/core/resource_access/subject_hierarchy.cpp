@@ -267,9 +267,9 @@ bool SubjectHierarchy::addOrUpdate(const QnUuid& subject, const QSet<QnUuid>& pa
     const bool existing = d->exists(subject);
 
     if (existing)
-        NX_DEBUG(this, "Setting for %1 the following parents: %2", subject, parents);
+        NX_VERBOSE(this, "Setting for %1 the following parents: %2", subject, parents);
     else
-        NX_DEBUG(this, "Adding subject %1 with the following parents: %2", subject, parents);
+        NX_VERBOSE(this, "Adding subject %1 with the following parents: %2", subject, parents);
 
     auto& currentParents = d->directParents[subject];
 
