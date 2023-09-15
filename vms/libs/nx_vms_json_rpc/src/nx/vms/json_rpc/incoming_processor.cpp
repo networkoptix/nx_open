@@ -3,9 +3,8 @@
 #include "incoming_processor.h"
 
 #include <nx/fusion/serialization/json_functions.h>
-#include <nx/vms/json_rpc/websocket_connection.h>
 
-namespace nx::vms::json_rpc::detail {
+namespace nx::vms::json_rpc {
 
 using Error = nx::vms::api::JsonRpcError::Code;
 
@@ -87,14 +86,9 @@ void IncomingProcessor::processRequest(
         m_handler(std::move(requestPtr->jsonRpcRequest),
             [this, request = requestPtr, handler = std::move(handler)](auto response) mutable
             {
-                m_owner->post(
-                    [this, request, handler = std::move(handler), response = std::move(response)]() mutable
-                    {
-                        NX_ASSERT(m_requests.erase(request), "Failed to find request %1", request);
-                        sendResponse(std::move(response), std::move(handler));
-                    });
-            },
-            m_owner);
+                NX_ASSERT(m_requests.erase(request), "Failed to find request %1", request);
+                sendResponse(std::move(response), std::move(handler));
+            });
     }
     catch (api::JsonRpcResponse e)
     {
@@ -107,6 +101,7 @@ void IncomingProcessor::processBatchRequest(
 {
     std::vector<nx::vms::api::JsonRpcResponse> responses;
     std::unordered_map<Request*, std::unique_ptr<Request>> requests;
+    std::vector<Request*> requestPtrs;
     for (const auto& item: list)
     {
         try
@@ -118,6 +113,7 @@ void IncomingProcessor::processBatchRequest(
                 auto request = std::make_unique<Request>(std::move(jsonRpcRequest));
                 auto requestPtr = request.get();
                 requests.emplace(requestPtr, std::move(request));
+                requestPtrs.push_back(requestPtr);
             }
             else
             {
@@ -156,50 +152,42 @@ void IncomingProcessor::processBatchRequest(
     batchRequest->handler = std::move(handler);
     auto batchRequestPtr = batchRequest.get();
     m_batchRequests.emplace(batchRequestPtr, std::move(batchRequest));
-    for (const auto& [requestPtr, _]: batchRequest->requests)
+    for (const auto requestPtr: requestPtrs)
     {
-        NX_DEBUG(this, "Start request %1 in batch %2", requestPtr, batchRequestPtr);
+        NX_DEBUG(this, "Start %1 in %2", requestPtr, batchRequestPtr);
         m_handler(std::move(requestPtr->jsonRpcRequest),
             [this, batchRequest = batchRequestPtr, request = requestPtr](auto response)
             {
-                m_owner->post(
-                    [this, batchRequest, request, response = std::move(response)]() mutable
-                    {
-                        onBatchResponse(batchRequest, request, std::move(response));
-                    });
-            },
-            m_owner);
+                onBatchResponse(batchRequest, request, std::move(response));
+            });
     }
 }
 
 void IncomingProcessor::onBatchResponse(
     BatchRequest* batchRequest, Request* request, api::JsonRpcResponse response)
 {
-    NX_DEBUG(this, "Received response %1 for %2 request in batch %3",
+    NX_DEBUG(this, "Received response %1 for %2 in %3",
         response.result
             ? "id " + QJson::serialized(response.id)
             : "error " + QJson::serialized(response),
         request, batchRequest);
 
     auto it = m_batchRequests.find(batchRequest);
-    if (!NX_ASSERT(it != m_batchRequests.end(),
-        "Failed to find batch %1 for %2 request", batchRequest, request))
-    {
+    if (!NX_ASSERT(it != m_batchRequests.end(), "Failed to find %1 for %2", batchRequest, request))
         return;
-    }
 
     if (!std::holds_alternative<std::nullptr_t>(response.id) || response.error)
         it->second->responses.push_back(std::move(response));
 
-    NX_ASSERT(it->second->requests.erase(request),
-        "Failed to find request %1 in batch %2", request, batchRequest);
+    NX_ASSERT(
+        it->second->requests.erase(request), "Failed to find %1 in %2", request, batchRequest);
     if (it->second->requests.empty())
     {
         auto responses = std::move(it->second->responses);
         auto handler = std::move(it->second->handler);
         m_batchRequests.erase(it);
 
-        NX_DEBUG(this, "End of batch request %1", batchRequest);
+        NX_DEBUG(this, "End of %1", batchRequest);
         QJsonValue serialized;
         QJson::serialize(responses, &serialized);
         handler(std::move(serialized));
@@ -220,4 +208,4 @@ void IncomingProcessor::sendResponse(nx::vms::api::JsonRpcResponse jsonRpcRespon
     handler(serialized);
 }
 
-} // namespace nx::vms::json_rpc::detail
+} // namespace nx::vms::json_rpc
