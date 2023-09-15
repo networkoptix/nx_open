@@ -394,10 +394,7 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     // The only instance of UserAuthDebugInfoWatcher is created to be owned by the context.
     context()->instance<UserAuthDebugInfoWatcher>();
 
-    auto temporeryUserExpirationWatcher =
-        new TemporaryUserExpirationWatcher(
-            context()->instance<workbench::LocalNotificationsManager>(),
-            this);
+    new TemporaryUserExpirationWatcher(this);
 }
 
 ConnectActionsHandler::~ConnectActionsHandler()
