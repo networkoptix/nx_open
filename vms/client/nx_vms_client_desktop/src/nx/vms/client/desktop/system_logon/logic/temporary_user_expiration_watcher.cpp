@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
+#include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 
 using namespace std::chrono_literals;
@@ -40,11 +41,12 @@ QString durationToString(const std::chrono::seconds duration,
 }
 } // namespace
 
-TemporaryUserExpirationWatcher::TemporaryUserExpirationWatcher(
-    QPointer<workbench::LocalNotificationsManager> notificationManager, QObject* parent):
-    m_notificationManager(notificationManager)
+TemporaryUserExpirationWatcher::TemporaryUserExpirationWatcher(QObject* parent):
+    base_type(parent),
+    QnWorkbenchContextAware(parent)
 {
-    connect(appContext()->currentSystemContext()->userWatcher(),
+    m_notificationManager = context()->instance<workbench::LocalNotificationsManager>();
+    connect(systemContext()->userWatcher(),
         &nx::vms::client::core::UserWatcher::userChanged,
         this,
         &TemporaryUserExpirationWatcher::createNotification);
@@ -63,12 +65,17 @@ TemporaryUserExpirationWatcher::TemporaryUserExpirationWatcher(
             m_notification = std::nullopt;
         });
 
+    connect(systemContext()->serverTimeWatcher(),
+        &core::ServerTimeWatcher::displayOffsetsChanged,
+        this,
+        &TemporaryUserExpirationWatcher::updateNotification);
+
     m_timer.setInterval(kTimerInterval);
 }
 
 void TemporaryUserExpirationWatcher::createNotification()
 {
-    const auto currentUser = appContext()->currentSystemContext()->userWatcher()->user();
+    const auto currentUser = systemContext()->userWatcher()->user();
     if (currentUser && currentUser->isTemporary())
     {
         m_timer.start();
@@ -86,7 +93,7 @@ void TemporaryUserExpirationWatcher::createNotification()
 
 void TemporaryUserExpirationWatcher::updateNotification()
 {
-    const auto currentUser = appContext()->currentSystemContext()->userWatcher()->user();
+    const auto currentUser = systemContext()->userWatcher()->user();
     if (!currentUser || !currentUser->isTemporary())
         return;
 
@@ -103,8 +110,7 @@ void TemporaryUserExpirationWatcher::updateNotification()
 
     if (const auto years = duration_cast<std::chrono::years>(timeLeft); years >= kOneYear)
     {
-        // TODO: #sivanov Actualize used system context.
-        const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
+        const auto timeWatcher = systemContext()->serverTimeWatcher();
         timeStr = nx::vms::time::toString(timeWatcher->displayTime(expirationTimestampMs).date());
         notificationText =
             tr("Your access to the System expires %1", /*comment*/ "%1 is a date").arg(timeStr);

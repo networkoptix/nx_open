@@ -11,6 +11,7 @@
 #include <QtCore/QTimer>
 
 #include <nx/utils/uuid.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop::workbench {
 class LocalNotificationsManager;
@@ -18,13 +19,13 @@ class LocalNotificationsManager;
 
 namespace nx::vms::client::desktop {
 
-class TemporaryUserExpirationWatcher: public QObject
+class TemporaryUserExpirationWatcher: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
+    using base_type = QObject;
 
 public:
-    TemporaryUserExpirationWatcher(
-        QPointer<workbench::LocalNotificationsManager> notificationManager, QObject* parent);
+    explicit TemporaryUserExpirationWatcher(QObject* parent);
 
 private:
     void createNotification();
