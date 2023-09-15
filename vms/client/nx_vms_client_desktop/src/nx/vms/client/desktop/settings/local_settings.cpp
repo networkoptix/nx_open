@@ -47,7 +47,7 @@ QString getDefaultMediaFolder()
     if (locations.isEmpty())
         return {};
 
-    return locations.first() + "/" + nx::branding::mediaFolderName();
+    return QDir::toNativeSeparators(locations.first() + "/" + nx::branding::mediaFolderName());
 }
 
 void migratePopupSystemHealthFrom5_1(LocalSettings* settings, QSettings* oldSettings)
@@ -102,6 +102,24 @@ void migratePopupSystemHealthFrom5_1(LocalSettings* settings, QSettings* oldSett
     }
 
     settings->popupSystemHealth = result;
+}
+
+void migrateMediaFoldersFrom5_1(LocalSettings* settings, QSettings* oldSettings)
+{
+    if (settings->mediaFolders.exists())
+        return;
+
+    if (!oldSettings->contains("mediaFolders"))
+        return;
+
+    const auto mediaFolders = oldSettings->value("mediaFolders").toStringList();
+
+    QStringList mediaFoldersWithNativeSeparators;
+
+    for (const auto& mediaFolder: mediaFolders)
+        mediaFoldersWithNativeSeparators.append(QDir::toNativeSeparators(mediaFolder));
+
+    settings->mediaFolders = mediaFoldersWithNativeSeparators;
 }
 
 void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
@@ -170,7 +188,6 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateValue(settings->lastExportDir, "export/previousDir");
     migrateValue(settings->lastRecordingDir, "videoRecording/previousDir");
     migrateValue(settings->backgroundsFolder);
-    migrateValue(settings->mediaFolders);
     migrateValue(settings->allowMtDecoding);
     migrateValue(settings->forceMtDecoding);
     migrateValue(settings->browseLogsButtonVisible, "isBrowseLogsVisible");
@@ -182,6 +199,7 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateSerializedValue(settings->webPageIcons);
 
     migratePopupSystemHealthFrom5_1(settings, oldSettings);
+    migrateMediaFoldersFrom5_1(settings, oldSettings);
 }
 
 void migrateMediaFoldersFrom4_3(LocalSettings* settings, QSettings* oldSettings)
@@ -199,7 +217,12 @@ void migrateMediaFoldersFrom4_3(LocalSettings* settings, QSettings* oldSettings)
     if (!auxMediaRoot.isNull())
         mediaFolders += auxMediaRoot.toStringList();
 
-    settings->mediaFolders = mediaFolders;
+    QStringList mediaFoldersWithNativeSeparators;
+
+    for (const auto& mediaFolder: mediaFolders)
+        mediaFoldersWithNativeSeparators.append(QDir::toNativeSeparators(mediaFolder));
+
+    settings->mediaFolders = mediaFoldersWithNativeSeparators;
 }
 
 void migrateLastUsedConnectionFrom4_2(LocalSettings* settings, QSettings* oldSettings)
