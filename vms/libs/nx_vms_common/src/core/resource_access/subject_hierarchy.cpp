@@ -205,8 +205,11 @@ void SubjectHierarchy::Private::findCycledGroupSetRecurse(
             cycledGroupSet.insert(id1);
         } while (id1 != id);
 
-        if (cycledGroupSet.size() > 1)
+        if (cycledGroupSet.size() > 1
+            || (cycledGroupSet.size() == 1 && directParents.value(id).contains(id)))
+        {
             context.cycledGroupSets.append(cycledGroupSet);
+        }
     }
 }
 
