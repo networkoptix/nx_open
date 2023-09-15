@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/reflect/instrument.h>
+#include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 
@@ -12,6 +13,7 @@ struct LocalConnectionData
 {
     QString systemName;
     QList<nx::utils::Url> urls;
+    nx::utils::SoftwareVersion version;
 
     bool operator==(const LocalConnectionData&) const = default;
 };

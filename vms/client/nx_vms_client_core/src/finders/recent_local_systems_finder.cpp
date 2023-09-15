@@ -3,6 +3,7 @@
 #include "recent_local_systems_finder.h"
 
 #include <network/local_system_description.h>
+#include <nx/build_info.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -28,6 +29,11 @@ QnRecentLocalSystemsFinder::QnRecentLocalSystemsFinder(QObject* parent): base_ty
 
 void QnRecentLocalSystemsFinder::updateSystems()
 {
+    // Connection version is stored in settings starting from 6.0. Actually this version should be
+    // fixed during the settings migration, but if user run 6.0 at least once before this change is
+    // implemented, assert will be raised. So introducing sane default value here.
+    static constexpr nx::utils::SoftwareVersion kSystemVersionWasNotStored{5, 1, 0, 0};
+
     SystemsHash newSystems;
     const auto connections = appContext()->coreSettings()->recentLocalConnections();
     for (const auto& [id, connection]: connections.asKeyValueRange())
@@ -50,11 +56,17 @@ void QnRecentLocalSystemsFinder::updateSystems()
         static const int kVeryFarPriority = 100000;
 
         nx::vms::api::ModuleInformationWithAddresses fakeServerInfo;
-        fakeServerInfo.id = QnUuid::createUuid();   // It SHOULD be new unique id
+        fakeServerInfo.id = QnUuid::createUuid();   //< It should be new unique id.
         fakeServerInfo.systemName = connection.systemName;
         fakeServerInfo.realm = QString::fromStdString(nx::network::AppInfo::realm());
         fakeServerInfo.cloudHost =
             QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
+
+        // If version is not stored, default it to the current version.
+        fakeServerInfo.version = !connection.version.isNull()
+            ? connection.version
+            : kSystemVersionWasNotStored;
+
         const auto searchAddresses = appContext()->coreSettings()->searchAddresses();
         const auto it = searchAddresses.find(id);
         if (it != searchAddresses.end())

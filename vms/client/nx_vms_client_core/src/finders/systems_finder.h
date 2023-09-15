@@ -32,7 +32,6 @@ public: //overrides
 private:
     void onBaseSystemDiscovered(const QnSystemDescriptionPtr& system, int priority);
     void onSystemLost(const QString& systemId, int priority);
-    void updateRecentConnections(const QnUuid& localSystemId, const QString& name);
 
 private:
     using SystemsFinderList = QMap<QnAbstractSystemsFinder*, nx::utils::ScopedConnectionsPtr>;
