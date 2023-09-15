@@ -81,6 +81,7 @@ struct NX_VMS_COMMON_API Content
     nx::String body;
 
     std::optional<QJsonValue> parse() const;
+    QJsonValue parseOrThrow() const;
 };
 
 } // namespace nx::network::rest
