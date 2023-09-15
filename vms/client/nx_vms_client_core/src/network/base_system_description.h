@@ -94,25 +94,17 @@ public:
     virtual nx::utils::SoftwareVersion version() const = 0;
 
 signals:
-    void isCloudSystemChanged();
-
-    void system2faEnabledChanged();
-
-    void ownerChanged();
-
-    void systemNameChanged();
-
     void serverAdded(const QnUuid& serverId);
-
+    void serverChanged(const QnUuid& serverId, QnServerFields flags);
     void serverRemoved(const QnUuid& serverId);
 
+    void isCloudSystemChanged();
+    void system2faEnabledChanged();
+    void ownerChanged();
+    void systemNameChanged();
     void onlineStateChanged();
-
     void reachableStateChanged();
-
     void newSystemStateChanged();
-
-    void serverChanged(const QnUuid& serverId, QnServerFields flags);
-
     void oauthSupportedChanged();
+    void versionChanged();
 };

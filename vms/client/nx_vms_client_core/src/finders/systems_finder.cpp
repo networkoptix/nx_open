@@ -153,28 +153,32 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
     m_systemToLocalId[system->id()] = system->localId();
 
     const AggregatorPtr target(new QnSystemDescriptionAggregator(priority, system));
+
+    auto updateRecordInRecentConnections =
+        [this, target]
+        {
+            auto connections = appContext()->coreSettings()->recentLocalConnections();
+            auto it = connections.find(target->localId());
+            if (it == connections.end())
+                return;
+
+            if (it->systemName == target->name() && it->version == target->version())
+                return;
+
+            it->systemName = target->name();
+            it->version = target->version();
+
+            appContext()->coreSettings()->recentLocalConnections = connections;
+        };
+
     m_systems.insert(target->localId(), target);
     connect(target.get(), &QnBaseSystemDescription::systemNameChanged, this,
-        [this, target]() { updateRecentConnections(target->localId(), target->name()); });
+        updateRecordInRecentConnections);
+    connect(target.get(), &QnBaseSystemDescription::versionChanged, this,
+        updateRecordInRecentConnections);
+    updateRecordInRecentConnections();
 
-    updateRecentConnections(target->localId(), target->name());
     emit systemDiscovered(target.dynamicCast<QnBaseSystemDescription>());
-}
-
-void QnSystemsFinder::updateRecentConnections(const QnUuid& localSystemId, const QString& name)
-{
-    auto connections = appContext()->coreSettings()->recentLocalConnections();
-
-    auto it = connections.find(localSystemId);
-    if (it == connections.end())
-        return;
-
-    if (it->systemName == name)
-        return;
-
-    it->systemName = name;
-
-    appContext()->coreSettings()->recentLocalConnections = connections;
 }
 
 void QnSystemsFinder::onSystemLost(const QString& systemId, int priority)
