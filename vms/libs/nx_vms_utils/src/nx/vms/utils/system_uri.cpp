@@ -16,6 +16,7 @@ using namespace nx::vms::utils;
 namespace {
 
 const QString kAuthKey = "auth";
+const QString kTemporaryUserToken = "tmp_token";
 const QString kAuthCodeKey = "code";
 const QString kReferralSourceKey = "from";
 const QString kReferralContextKey = "context";
@@ -129,11 +130,22 @@ void parseParameters(const nx::utils::Url& url, SystemUri* uri)
     for (const auto [key, value]: query.queryItems(QUrl::FullyDecoded))
         parameters.insert(key.toLower(), value);
 
-    const QString authKey = parameters.take(kAuthKey);
+    QString authKey = parameters.take(kAuthKey);
+    if (authKey.isEmpty())
+    {
+        authKey = parameters.take(kTemporaryUserToken);
+        if (!authKey.isEmpty())
+            uri->userAuthType = SystemUri::UserAuthType::temporary;
+    }
+    else
+    {
+        uri->userAuthType = SystemUri::UserAuthType::local;
+    }
+    
     if (!authKey.isEmpty())
     {
         if (authKey.toStdString().starts_with(nx::vms::api::LoginSession::kTokenPrefix)
-            || authKey.toStdString().starts_with(nx::vms::api::TemporaryToken::kPrefix))
+            || uri->userAuthType == SystemUri::UserAuthType::temporary)
         {
             uri->credentials = nx::network::http::BearerAuthToken(authKey.toStdString());
         }
@@ -154,6 +166,8 @@ void parseParameters(const nx::utils::Url& url, SystemUri* uri)
     }
 
     uri->authCode = parameters.take(kAuthCodeKey);
+    if (!uri->authCode.isEmpty())
+        uri->userAuthType = SystemUri::UserAuthType::cloud;
 
     const auto resourceIdParameters = parameters.take(kResourceIdsKey);
     uri->resourceIds = resourceIdsFromString(resourceIdParameters);
@@ -199,6 +213,21 @@ bool hasValidAuth(const SystemUri& uri)
     return false;
 }
 
+bool userAuthTypeMatchCredentials(const SystemUri& uri)
+{
+    using UserAuthType = SystemUri::UserAuthType;
+    
+    const bool hasValidAuth = ::hasValidAuth(uri);
+    const auto authType = uri.userAuthType;
+    const bool isValidCloudAuth =
+        !uri.authCode.isEmpty() && authType == UserAuthType::cloud && !hasValidAuth;
+    const bool isValidLocalAuth = hasValidAuth && uri.authCode.isEmpty()
+        && (authType == UserAuthType::local || authType == UserAuthType::temporary);
+    const bool authIsNotPresent =
+        !hasValidAuth && uri.authCode.isEmpty() && authType == UserAuthType::none;
+    return isValidLocalAuth || isValidCloudAuth || authIsNotPresent;
+}
+
 QString encodePasswordCredentials(const nx::network::http::Credentials& credentials)
 {
     return QString(
@@ -227,8 +256,6 @@ void parse(const nx::utils::Url& url, SystemUri* uri)
 
     // Parse protocol. Check if it's supported by direct links.
     uri->protocol = protocolToString.key(url.scheme().toLower(), SystemUri::Protocol::Native);
-    if (uri->protocol != SystemUri::Protocol::Native)
-        isDirectLink = false;
 
     // Parse address.
     auto address = url.displayAddress();
@@ -319,14 +346,13 @@ bool SystemUri::isValid() const
     }
     else
     {
-        // Universal links cannot be handled for the direct uri, only native protocol is supported.
-        if (protocol != SystemUri::Protocol::Native)
-            return false;
-
         // Direct links are starting with system address.
         if (systemAddress.isEmpty())
             return false;
     }
+
+    if (!userAuthTypeMatchCredentials(*this))
+        return false;
 
     const bool hasSystemAddress = !systemAddress.isEmpty();
     const bool hasValidAuth = ::hasValidAuth(*this);
@@ -412,7 +438,12 @@ nx::utils::Url SystemUri::toUrl() const
 
     const QString authKey = this->authKey();
     if (!authKey.isEmpty())
-        query.addQueryItem(kAuthKey, authKey);
+    {
+        if (userAuthType == SystemUri::UserAuthType::temporary)
+            query.addQueryItem(kTemporaryUserToken, authKey);
+        else
+            query.addQueryItem(kAuthKey, authKey);  
+    }
 
     if (!authCode.isEmpty())
         query.addQueryItem(kAuthCodeKey, authCode);
@@ -466,4 +497,10 @@ QString SystemUri::toString(SystemUri::ReferralSource value)
 QString SystemUri::toString(SystemUri::ReferralContext value)
 {
     return referralContextToString[value];
+}
+
+SystemUri SystemUri::fromTemporaryUserLink(QString link)
+{
+    // Temporary user's link for web admin support contains an authorization token in the fragment
+    return SystemUri(link.remove('#'));
 }

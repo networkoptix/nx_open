@@ -76,6 +76,15 @@ public:
         CloudMenu,          /**< Cloud context menu. */
     };
 
+    /** If the link requires authorization then we need to know the type of authorization. */
+    enum class UserAuthType
+    {
+        none,
+        cloud,
+        local,
+        temporary,
+    };
+    
     struct Referral
     {
         ReferralSource source = ReferralSource::None;
@@ -85,6 +94,7 @@ public:
 
     Scope scope = Scope::generic;
     Protocol protocol = Protocol::Http;
+    UserAuthType userAuthType = UserAuthType::none;
 
     /** Cloud host for Generic-scope urls. */
     QString cloudHost;
@@ -125,6 +135,7 @@ public:
     static QString toString(SystemAction value);
     static QString toString(ReferralSource value);
     static QString toString(ReferralContext value);
+    static SystemUri fromTemporaryUserLink(QString link);
 
     bool operator==(const SystemUri& other) const = default;
 };
