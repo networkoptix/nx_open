@@ -223,29 +223,17 @@ ConnectionInfo LoginDialog::connectionInfo() const
 
         return {address, credentials};
     }
-    else
+    else if (isLinkTab())
     {
-        const auto url = nx::utils::Url::fromUserInput(ui->linkLineEdit->text());
+        const auto uri = nx::vms::utils::SystemUri::fromTemporaryUserLink(ui->linkLineEdit->text());
 
-        if (!url.isValid())
+        if (!uri.isValid())
             return {};
 
-        QString authToken;
-        if (url.hasFragment())
-        {
-            const QString fragment = url.fragment();
-            const QUrlQuery query{fragment.mid(fragment.indexOf("?") + 1)};
-            authToken = query.queryItemValue("token");
-        }
-        else
-        {
-            const QUrlQuery query{url.toQUrl()};
-            authToken = query.queryItemValue("auth");
-        }
-
-        nx::network::SocketAddress address(url.host(), url.port());
-        return {address, nx::network::http::BearerAuthToken{authToken.toStdString()}};
+        return {uri.systemAddress.toStdString(), uri.credentials};
     }
+
+    return {};
 }
 
 bool LoginDialog::isValid() const
@@ -352,6 +340,11 @@ void LoginDialog::sendTestConnectionRequest()
 bool LoginDialog::isCredentialsTab() const
 {
     return ui->tabWidget->currentWidget() == ui->credentialsTab;
+}
+
+bool LoginDialog::isLinkTab() const
+{
+    return ui->tabWidget->currentWidget() == ui->linkTab;
 }
 
 void LoginDialog::accept()

@@ -40,6 +40,7 @@ private:
     void sendTestConnectionRequest();
 
     bool isCredentialsTab() const;
+    bool isLinkTab() const;
 
     void updateAcceptibility();
     void updateFocus();
