@@ -240,7 +240,7 @@ void QnGeneralPreferencesWidget::setMediaFolders(const QStringList& value)
 {
     ui->mediaFoldersList->clear();
     for (const auto &item : value)
-        ui->mediaFoldersList->addItem(QDir::toNativeSeparators(item));
+        ui->mediaFoldersList->addItem(item);
 }
 
 quint64 QnGeneralPreferencesWidget::userIdleTimeoutMs() const
