@@ -52,7 +52,7 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
             {
                 if (auto mediaResource = resource.dynamicCast<QnMediaResource>())
                 {
-                    NX_DEBUG(this, "Removing loader %1", resource);
+                    NX_VERBOSE(this, "Removing loader %1", resource);
                     d->loaderByResource.remove(mediaResource);
                 }
             }
