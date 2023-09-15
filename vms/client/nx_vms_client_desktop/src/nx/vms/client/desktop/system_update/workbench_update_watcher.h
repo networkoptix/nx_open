@@ -11,6 +11,7 @@
 #include <nx/utils/url.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 class QTimer;
 
@@ -21,7 +22,9 @@ namespace workbench { class LocalNotificationsManager; }
 struct UpdateContents;
 class ServerUpdateTool;
 
-class WorkbenchUpdateWatcher: public QObject, public QnWorkbenchContextAware
+class WorkbenchUpdateWatcher:
+    public QObject,
+    public QnSessionAwareDelegate
 {
     Q_OBJECT
 
@@ -33,6 +36,9 @@ public:
     const UpdateContents& getUpdateContents() const;
     ServerUpdateTool* getServerUpdateTool();
     std::future<UpdateContents> takeUpdateCheck();
+
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
 
 private:
     void notifyUserAboutWorkbenchUpdate(
