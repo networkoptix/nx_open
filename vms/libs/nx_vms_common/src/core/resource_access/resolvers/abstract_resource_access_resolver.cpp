@@ -98,7 +98,7 @@ void AbstractResourceAccessResolver::notifyAccessChanged(const QSet<QnUuid>& sub
 {
     if (const auto ids = subjectIds & notifier()->watchedSubjectIds(); !ids.empty())
     {
-        NX_DEBUG(this, "Notifying about a change of %1 watched subjects: %2", ids.size(), ids);
+        NX_VERBOSE(this, "Notifying about a change of %1 watched subjects: %2", ids.size(), ids);
         emit notifier()->resourceAccessChanged(ids);
     }
 }
