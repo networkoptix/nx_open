@@ -14,6 +14,7 @@
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/time/formatter.h>
+#include <utils/common/synctime.h>
 
 namespace nx::vms::client::core {
 
@@ -326,6 +327,12 @@ QString NxGlobalsObject::highlightMatch(
 QString NxGlobalsObject::toHtmlEscaped(const QString& text) const
 {
     return common::html::toHtmlEscaped(text);
+}
+
+qint64 NxGlobalsObject::syncTimeCurrentTimePointMs() const
+{
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(qnSyncTime->currentTimePoint()).count();
 }
 
 } // namespace nx::vms::client::core

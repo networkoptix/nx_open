@@ -593,17 +593,22 @@ Item
                         {
                             id: linkDates
 
-                            property date currentDate: new Date()
+                            property var currentServerTimePointMs:
+                                NxGlobals.syncTimeCurrentTimePointMs()
                             readonly property bool expired: expiresInMs <= 0
                             readonly property var expiresInMs:
-                                expirationDate.getTime() - currentDate.getTime()
+                                expirationDate.getTime() - currentServerTimePointMs
 
                             Timer
                             {
                                 interval: 1000
                                 running: control.userType == UserSettingsGlobal.TemporaryUser
                                 repeat: true
-                                onTriggered: linkDates.currentDate = new Date()
+                                onTriggered:
+                                {
+                                    linkDates.currentServerTimePointMs =
+                                        NxGlobals.syncTimeCurrentTimePointMs()
+                                }
                             }
                         }
 
