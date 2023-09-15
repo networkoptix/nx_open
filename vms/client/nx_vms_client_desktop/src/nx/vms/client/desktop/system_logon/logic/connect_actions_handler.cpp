@@ -762,7 +762,11 @@ void ConnectActionsHandler::storeConnectionRecord(
         builder.setEndpoint(connectionInfo.address);
 
         // Stores connection if it is local.
-        appContext()->coreSettings()->storeRecentConnection(localId, info.systemName, builder.toUrl());
+        appContext()->coreSettings()->storeRecentConnection(
+            localId,
+            info.systemName,
+            info.version,
+            builder.toUrl());
     }
 }
 

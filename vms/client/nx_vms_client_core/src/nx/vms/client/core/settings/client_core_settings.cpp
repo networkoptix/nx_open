@@ -16,7 +16,7 @@
 #include <nx/utils/system_utils.h>
 
 #if defined(USE_QT_KEYCHAIN)
-#include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
+    #include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
 #endif
 
 using namespace std::chrono;
@@ -171,7 +171,10 @@ void Settings::setPreferredCloudServer(const QString& systemId, const QnUuid& se
 }
 
 void Settings::storeRecentConnection(
-    const QnUuid& localSystemId, const QString& systemName, const nx::utils::Url& url)
+    const QnUuid& localSystemId,
+    const QString& systemName,
+    const nx::utils::SoftwareVersion& version,
+    const nx::utils::Url& url)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "Storing recent system connection id: %1, url: %2",
         localSystemId, url);
@@ -182,6 +185,7 @@ void Settings::storeRecentConnection(
 
     auto& data = connections[localSystemId];
     data.systemName = systemName;
+    data.version = version;
     data.urls.removeOne(cleanUrl);
     data.urls.prepend(cleanUrl);
 
@@ -305,6 +309,7 @@ void Settings::migrateSystemAuthenticationDataFrom_v42(Settings* oldSettings)
 
 void Settings::migrateWelcomeScreenSettingsFrom_v51(Settings* oldSettings)
 {
+    static constexpr nx::utils::SoftwareVersion k51Version{5, 1, 0, 0};
     using namespace utils::property_storage;
 
     const QString kClientCorePrefix = "client_core/";
@@ -327,6 +332,10 @@ void Settings::migrateWelcomeScreenSettingsFrom_v51(Settings* oldSettings)
         if (QJson::deserialize(oldQSettings->value(
             kClientCorePrefix + recentLocalConnections.name).toString(), &value))
         {
+            // When migrating, assume all systems were still 5.1.
+            for (auto it = value.begin(); it != value.end(); ++it)
+                it->version = k51Version;
+
             recentLocalConnections = value;
         }
     }

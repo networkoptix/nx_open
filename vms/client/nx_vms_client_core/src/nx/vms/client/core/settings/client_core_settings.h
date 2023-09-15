@@ -111,6 +111,7 @@ public:
     void storeRecentConnection(
         const QnUuid& localSystemId,
         const QString& systemName,
+        const nx::utils::SoftwareVersion& version,
         const nx::utils::Url& url);
 
     void removeRecentConnection(const QnUuid& localSystemId);

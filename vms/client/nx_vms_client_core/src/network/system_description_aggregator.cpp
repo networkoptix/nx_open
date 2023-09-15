@@ -1,6 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "system_description_aggregator.h"
 
 #include <nx/network/address_resolver.h>
@@ -116,6 +115,8 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         this, &QnSystemDescriptionAggregator::handleServerChanged);
     connect(system.get(), &QnBaseSystemDescription::systemNameChanged, this,
         [this, system]() { onSystemNameChanged(system); });
+    connect(system.get(), &QnBaseSystemDescription::versionChanged, this,
+        &QnSystemDescriptionAggregator::versionChanged);
 
     connect(system.get(), &QnBaseSystemDescription::onlineStateChanged,
         this, &QnSystemDescriptionAggregator::onOnlineStateChanged);
@@ -139,6 +140,7 @@ void QnSystemDescriptionAggregator::emitSystemChanged()
     emit reachableStateChanged();
     emit newSystemStateChanged();
     emit system2faEnabledChanged();
+    emit versionChanged();
 }
 
 void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,

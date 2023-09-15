@@ -52,7 +52,9 @@ QSet<nx::utils::Url> formAdditionalUrlsSet(
 
 } // namespace
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// HostsModel
+
 class QnSystemHostsModel::HostsModel: public QAbstractListModel
 {
     using base_type = QAbstractListModel;
@@ -435,7 +437,8 @@ QHash<int, QByteArray> QnSystemHostsModel::HostsModel::roleNames() const
     return names;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// QnSystemHostsModel
 
 QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
     base_type(parent)
@@ -524,7 +527,14 @@ QString QnSystemHostsModel::getRequiredSystemVersion(int hostIndex) const
             return "";
 
         if (QnSystemDescriptionPtr system = qnSystemsFinder->getSystem(hostsModel()->systemId()))
-            return system->getServer(index.data(ServerIdRole).toUuid()).version.toString();
+        {
+            auto serverInfo = system->getServer(index.data(ServerIdRole).toUuid());
+            if (NX_ASSERT(!serverInfo.version.isNull()))
+                return serverInfo.version.toString();
+
+            if (NX_ASSERT(!system->version().isNull()))
+                return system->version().toString();
+        }
     }
 
     return "";
