@@ -1089,10 +1089,15 @@ void UserSettingsDialog::refreshToken(const QString& password)
                         credentials,
                         tokenExpirationTime);
 
+                    using namespace nx::vms::client::core;
+
                     const auto localSystemId = connection()->moduleInformation().localSystemId;
-                    nx::vms::client::core::CredentialsManager::storeCredentials(
-                        localSystemId,
-                        credentials);
+                    const auto savedCredentials = CredentialsManager::credentials(
+                        localSystemId, credentials.username);
+                    const bool passwordIsAlreadySaved =
+                        savedCredentials && !savedCredentials->authToken.empty();
+                    if (passwordIsAlreadySaved)
+                        CredentialsManager::storeCredentials(localSystemId, credentials);
                 }
             }
             else
