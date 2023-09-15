@@ -22,7 +22,7 @@ void migrateValue(QSettings* oldSettings, Property<T>& property, const QString& 
 }
 
 template<typename T>
-void migrateJsonValue(
+void migrateSerializedValue(
     QSettings* oldSettings, Property<T>& property, const QString& customName = {})
 {
     if (property.exists())
