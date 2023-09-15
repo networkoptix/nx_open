@@ -90,6 +90,11 @@ public:
         const QString& text, const QRegularExpression& rx, const QColor& color) const;
 
     Q_INVOKABLE QString toHtmlEscaped(const QString& text) const;
+
+    /**
+     * Returns qnSyncTime->currentTimePoint() but in milliseconds for easier usage with JS Date.
+     */
+    Q_INVOKABLE qint64 syncTimeCurrentTimePointMs() const;
 };
 
 } // namespace nx::vms::client::core
