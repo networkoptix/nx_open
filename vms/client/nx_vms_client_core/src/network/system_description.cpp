@@ -103,11 +103,14 @@ QnSystemDescription::ServersList QnSystemDescription::servers() const
     return result;
 }
 
-void QnSystemDescription::addServer(const nx::vms::api::ModuleInformationWithAddresses& serverInfo,
-    int priority, bool online)
+void QnSystemDescription::addServer(
+    const nx::vms::api::ModuleInformationWithAddresses& serverInfo,
+    int priority,
+    bool online)
 {
     NX_DEBUG(this, nx::format("Cloud system <%1>, server <%2>(%3): adding server information"),
         id(), serverInfo.id, online ? "online" : "offline");
+    NX_ASSERT(!serverInfo.version.isNull(), "Server %1 has null version", serverInfo.id);
 
     const bool containsServer = m_servers.contains(serverInfo.id);
     NX_ASSERT(!containsServer, "System contains specified server");
@@ -124,11 +127,16 @@ void QnSystemDescription::addServer(const nx::vms::api::ModuleInformationWithAdd
     if (online && !isReachableServer(serverInfo.id))
         handleReachableServerAdded(serverInfo.id);
 
+    const auto systemVersion = version();
+
     m_prioritized.insertMulti(priority, serverInfo.id);
     m_servers.insert(serverInfo.id, serverInfo);
     m_serverTimestamps[serverInfo.id].restart();
     setName(serverInfo.systemName);
     emit serverAdded(serverInfo.id);
+
+    if (serverInfo.version > systemVersion)
+        emit versionChanged();
 }
 
 bool QnSystemDescription::containsServer(const QnUuid& serverId) const
@@ -149,7 +157,9 @@ QnServerFields QnSystemDescription::updateServer(
 {
     NX_DEBUG(this, nx::format("Cloud system <%1>, server <%2>(%3): updating server information"),
         id(), serverInfo.id, online ? "online" : "offline");
+    NX_ASSERT(!serverInfo.version.isNull(), "Server %1 has null version", serverInfo.id);
 
+    const auto systemVersion = version();
     const auto it = m_servers.find(serverInfo.id);
     const bool containsServer = (it != m_servers.end());
     NX_ASSERT(containsServer,
@@ -177,6 +187,10 @@ QnServerFields QnSystemDescription::updateServer(
     m_remoteAddressesCache.remove(serverInfo.id);
     setName(serverInfo.systemName);
     emit serverChanged(serverInfo.id, changes);
+
+    // System version cannot be lowered.
+    if (changes.testFlag(QnServerField::Version) && serverInfo.version > systemVersion)
+        emit versionChanged();
 
     return changes;
 }
@@ -300,6 +314,8 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
     const bool someoneRemoved = m_servers.remove(serverId);
     if (someoneRemoved)
         emit serverRemoved(serverId);
+
+    // Do not emit version changes here as system version cannot be lowered.
 }
 
 void QnSystemDescription::setName(const QString& value)
