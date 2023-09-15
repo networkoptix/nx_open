@@ -113,11 +113,11 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
             nx::utils::property_storage::migrateValue(oldSettings, property, customName);
         };
 
-    const auto migrateJsonValue =
+    const auto migrateSerializedValue =
         [oldSettings]<typename T>(
             nx::utils::property_storage::Property<T>& property, const QString& customName = {})
         {
-            nx::utils::property_storage::migrateJsonValue(oldSettings, property, customName);
+            nx::utils::property_storage::migrateSerializedValue(oldSettings, property, customName);
         };
 
         const auto migrateEnumValue =
@@ -154,16 +154,16 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateValue(settings->muteOnAudioTransmit);
     migrateValue(settings->playAudioForAllItems);
     migrateValue(settings->userIdleTimeoutMs, "userIdleTimeoutMSecs");
-    migrateJsonValue(settings->backgroundImage);
-    migrateJsonValue(settings->lastUsedConnection);
+    migrateSerializedValue(settings->backgroundImage);
+    migrateSerializedValue(settings->lastUsedConnection);
     migrateValue(settings->lastLocalConnectionUrl);
     migrateValue(settings->autoLogin);
     migrateValue(settings->saveCredentialsAllowed);
     migrateValue(settings->stickReconnectToServer);
     migrateValue(settings->restoreUserSessionData);
-    migrateJsonValue(settings->exportMediaSettings);
-    migrateJsonValue(settings->exportLayoutSettings);
-    migrateJsonValue(settings->exportBookmarkSettings);
+    migrateSerializedValue(settings->exportMediaSettings);
+    migrateSerializedValue(settings->exportLayoutSettings);
+    migrateSerializedValue(settings->exportBookmarkSettings);
     migrateEnumValue(settings->lastExportMode);
     migrateValue(settings->lastDatabaseBackupDir);
     migrateValue(settings->lastDownloadDir);
@@ -176,10 +176,10 @@ void migrateSettingsFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     migrateValue(settings->browseLogsButtonVisible, "isBrowseLogsVisible");
     migrateValue(settings->initialLiveBufferMs);
     migrateValue(settings->maximumLiveBufferMs);
-    migrateJsonValue(settings->detectedObjectSettings);
-    migrateJsonValue(settings->authAllowedUrls);
+    migrateSerializedValue(settings->detectedObjectSettings);
+    migrateSerializedValue(settings->authAllowedUrls);
     migrateValue(settings->maxMp3FileDurationSec);
-    migrateJsonValue(settings->webPageIcons);
+    migrateSerializedValue(settings->webPageIcons);
 
     migratePopupSystemHealthFrom5_1(settings, oldSettings);
 }
@@ -223,7 +223,7 @@ void migrateLogSettings(LocalSettings* settings, QSettings* oldSettings)
     migrateValue(oldSettings, settings->maxLogFileSizeB);
     migrateValue(oldSettings, settings->maxLogVolumeSizeB);
     migrateValue(oldSettings, settings->logArchivingEnabled);
-    migrateValue(oldSettings, settings->maxLogFileTimePeriodS);
+    migrateSerializedValue(oldSettings, settings->maxLogFileTimePeriodS);
 
     // Migrate from 5.0 in a case if 5.1 version was skipped.
     migrateValue(oldSettings, settings->maxLogFileSizeB, "maxLogFileSize");
