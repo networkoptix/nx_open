@@ -213,14 +213,16 @@ struct UserSettingsDialog::Private
             serverUrl.setPort(info.port);
 
         if (!ini().nativeLinkForTemporaryUsers)
-            return nx::format("%1/#/?token=%2", serverUrl.displayAddress(), token);
+            return nx::format("https://%1/#/?tmp_token=%2", serverUrl.displayAddress(), token);
 
         using namespace nx::vms::utils;
         SystemUri uri;
         uri.scope = SystemUri::Scope::direct;
-        uri.protocol = SystemUri::Protocol::Native;
+        uri.userAuthType = SystemUri::UserAuthType::temporary;
         uri.systemAddress = serverUrl.displayAddress();
         uri.credentials.authToken.setBearerToken(token);
+        uri.protocol = SystemUri::Protocol::Native;
+
         return uri.toString();
     }
 

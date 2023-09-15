@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
+#include <nx/vms/utils/system_uri.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -186,29 +187,19 @@ void SessionRefreshDialog::refreshSession()
 
     if (context()->user()->isTemporary())
     {
-        const auto url = nx::utils::Url::fromUserInput(m_linkField->text());
 
-        if (!url.isValid())
+        const auto uri = nx::vms::utils::SystemUri::fromTemporaryUserLink(m_linkField->text());
+
+        if (!uri.isValid()
+            || uri.userAuthType != nx::vms::utils::SystemUri::UserAuthType::temporary)
         {
             m_validationResult = ValidationResult(QValidator::Invalid, tr("Invalid Link"));
             return;
         }
 
-        nx::vms::api::TemporaryLoginSessionRequest loginRequest;
-        if (url.hasFragment())
-        {
-            const QString fragment = url.fragment();
-            const QUrlQuery query{fragment.mid(fragment.indexOf("?") + 1)};
-            loginRequest.token  = query.queryItemValue("token");
-        }
-        else
-        {
-            const QUrlQuery query{url.toQUrl()};
-            loginRequest.token  = query.queryItemValue("auth");
-        }
-
-        m_address = nx::network::SocketAddress(url.host(), url.port());
-        m_token = nx::network::http::BearerAuthToken{loginRequest.token.toStdString()};
+        nx::vms::api::TemporaryLoginSessionRequest loginRequest{uri.authKey()};
+        m_address = uri.systemAddress.toStdString();
+        m_token = uri.credentials.authToken;
 
         lockUi(true);
         if (auto api = connectedServerApi(); NX_ASSERT(api, "No Server connection"))
