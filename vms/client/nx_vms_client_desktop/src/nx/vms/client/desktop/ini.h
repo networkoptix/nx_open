@@ -158,6 +158,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, emulateCloudBackupSettingsOnNonCloudStorage,
         "[Dev] Treat plain backup storage as cloud one on the systems with SaaS enabled.");
 
+    NX_INI_FLAG(false, allowToPutAnyAccessibleDeviceOnScene,
+        "[Dev] Allow to put devices on the scene without view live or view archive permission.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.

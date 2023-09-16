@@ -1571,6 +1571,16 @@ void ActionHandler::at_dropResourcesAction_triggered()
             continue;
         }
 
+        const bool showWarning = std::any_of(resources.cbegin(), resources.cend(),
+            [](const QnResourcePtr& resource)
+            {
+                return resource.objectCast<QnVirtualCameraResource>()
+                    && !ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission);
+            });
+
+        if (showWarning)
+            SceneBanner::show(tr("You do not have permissions to open camera on the layout"));
+
         if (!resources.empty())
         {
             if (parameters.widgets().isEmpty()) //< Triggered by resources tree view
