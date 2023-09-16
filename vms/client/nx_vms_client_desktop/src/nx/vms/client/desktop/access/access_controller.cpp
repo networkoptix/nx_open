@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 
@@ -191,8 +192,7 @@ Qn::Permissions AccessController::Private::permissionsForCamera(
     if (camera->hasFlags(Qn::cross_system))
         permissions &= ~Qn::GenericEditPermissions;
 
-    // In desktop client, cameras are openable on the scene if they are generally accessible.
-    if (permissions.testFlag(Qn::ReadPermission))
+    if (ini().allowToPutAnyAccessibleDeviceOnScene && permissions.testFlag(Qn::ReadPermission))
         permissions.setFlag(Qn::ViewContentPermission);
 
     return permissions;
