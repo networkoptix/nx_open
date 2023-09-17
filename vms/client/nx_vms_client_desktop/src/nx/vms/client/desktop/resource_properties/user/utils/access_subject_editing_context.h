@@ -32,7 +32,16 @@ public:
 
     /** A current subject being edited. */
     QnUuid currentSubjectId() const;
-    void setCurrentSubjectId(const QnUuid& subjectId);
+
+    enum class SubjectType
+    {
+        user,
+        group
+    };
+    Q_ENUM(SubjectType);
+
+    SubjectType currentSubjectType() const;
+    void setCurrentSubject(const QnUuid& subjectId, SubjectType type);
 
     nx::core::access::ResourceAccessMap ownResourceAccessMap() const;
 
