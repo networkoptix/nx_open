@@ -819,7 +819,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Import From Devices..."))
-        .condition(condition::isLoggedIn());
+        .condition(condition::isDeviceAccessRelevant(nx::vms::api::AccessRight::edit));
 
     factory()
         .flags(Main)
