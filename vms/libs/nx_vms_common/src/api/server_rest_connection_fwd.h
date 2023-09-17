@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 
+#include <nx/vms/api/data/json_rpc.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx::network::http { class AsyncHttpClientPtr; }
@@ -26,6 +27,7 @@ using Callback = std::function<void(bool success, Handle requestId, ResultType r
 class ServerConnection;
 using ServerConnectionPtr = std::shared_ptr<ServerConnection>;
 
+using JsonRpcBatchResultCallback = Callback<std::vector<nx::vms::api::JsonRpcResponse>>;
 using JsonResultCallback = Callback<nx::network::rest::JsonResult>;
 using UbJsonResultCallback = Callback<nx::network::rest::UbjsonResult>;
 

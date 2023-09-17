@@ -64,6 +64,7 @@ using namespace nx;
 namespace {
 
 constexpr int kMessageBodyLogSize = 50;
+constexpr auto kJsonRpcPath = "/jsonrpc";
 
 // Type helper for parsing function overloading.
 template <typename T>
@@ -192,7 +193,7 @@ rest::ErrorOrData<T> parseMessageBody(
         }
         else
         {
-            if (*success = nx::reflect::json::deserialize(messageBody.data(), &data))
+            if ((*success = nx::reflect::json::deserialize(messageBody.data(), &data)))
                 return data;
 
             NX_ASSERT(false, "Data cannot be deserialized:\n %1",
@@ -265,6 +266,26 @@ rest::ServerConnection::Result<nx::network::rest::JsonResult>::type extractJsonR
         {
             callback(success, requestId, result.deserialized<T>());
         };
+}
+
+static bool isSessionExpiredError(int code)
+{
+    return code == nx::network::rest::Result::SessionExpired
+        || code == nx::network::rest::Result::SessionRequired;
+}
+
+static bool isSessionExpiredError(const nx::vms::api::JsonRpcResponse& response)
+{
+    if (!response.error)
+        return false;
+    if (!response.error->data)
+        return false;
+
+    nx::network::rest::Result result;
+    if (!QJson::deserialize(*response.error->data, &result))
+        return false;
+
+    return isSessionExpiredError(result.error);
 }
 
 // Returns '*' on null id.
@@ -1515,6 +1536,195 @@ Handle ServerConnection::postJsonResult(
         proxyToServer);
 }
 
+using JsonRpcResultType = std::variant<
+    nx::vms::api::JsonRpcResponse,
+    std::vector<nx::vms::api::JsonRpcResponse>>;
+
+using JsonRpcRequestIdType = decltype(nx::vms::api::JsonRpcRequest::id);
+using JsonRpcResponseIdType = decltype(nx::vms::api::JsonRpcResponse::id);
+
+std::tuple<
+    std::unordered_set<JsonRpcRequestIdType>,
+    std::vector<nx::vms::api::JsonRpcResponse>>
+extractJsonRpcExpired(const rest::ErrorOrData<JsonRpcResultType>& result)
+{
+    const auto rpcResponse = std::get_if<JsonRpcResultType>(&result);
+    if (!rpcResponse)
+        return {};
+
+    const auto responseArray = std::get_if<
+        std::vector<nx::vms::api::JsonRpcResponse>>(rpcResponse);
+
+    if (!responseArray)
+        return {};
+
+    std::unordered_set<JsonRpcRequestIdType> ids;
+
+    for (const auto& response: *responseArray)
+    {
+        if (isSessionExpiredError(response))
+        {
+            if (const auto intId = std::get_if<int>(&response.id))
+                ids.insert(*intId);
+            else if (const auto strId = std::get_if<QString>(&response.id))
+                ids.insert(*strId);
+        }
+    }
+
+    return {std::move(ids), *responseArray};
+}
+
+bool mergeJsonRpcResults(
+    std::vector<nx::vms::api::JsonRpcResponse>& originalResponse,
+    const rest::ErrorOrData<JsonRpcResultType>& result)
+{
+    const auto rpcResponse = std::get_if<JsonRpcResultType>(&result);
+    if (!rpcResponse)
+    {
+        // Server could not handle the request.
+        if (const auto error = std::get_if<nx::network::rest::Result>(&result))
+        {
+            QJsonValue data;
+            QJson::serialize(error, &data);
+
+            // For all requests with expired session fill in error from single rest::Result.
+            for (auto& response: originalResponse)
+            {
+                if (isSessionExpiredError(response))
+                {
+                    response.result = {};
+                    response.error = vms::api::JsonRpcError{
+                        .code = nx::vms::api::JsonRpcError::RequestError,
+                        .data = data
+                    };
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    const auto responseArray = std::get_if<std::vector<nx::vms::api::JsonRpcResponse>>(rpcResponse);
+    if (!responseArray)
+    {
+        // This should not happen because original requests were valid. But handle it anyway.
+
+        if (const auto error = std::get_if<nx::vms::api::JsonRpcResponse>(rpcResponse))
+        {
+            // For all requests with expired session fill in error from single json-rpc response.
+            for (auto& response: originalResponse)
+            {
+                if (isSessionExpiredError(response))
+                {
+                    response.result = {};
+                    response.error = error->error;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    // Build a map for faster response replacement.
+    std::unordered_map<JsonRpcResponseIdType, const nx::vms::api::JsonRpcResponse*> idToResponse;
+
+    for (const auto& response: *responseArray)
+    {
+        if (!std::holds_alternative<std::nullptr_t>(response.id))
+            idToResponse.insert({response.id, &response});
+    }
+
+    std::vector<nx::vms::api::JsonRpcResponse> updatedResponses;
+
+    for (auto& response: originalResponse)
+    {
+        // Replace original response with the new one if it has the same id.
+        if (const auto it = idToResponse.find(response.id); it != idToResponse.end())
+            response = *it->second;
+    }
+
+    return true;
+}
+
+Handle ServerConnection::jsonRpcBatchCall(
+    nx::vms::common::SessionTokenHelperPtr helper,
+    const std::vector<nx::vms::api::JsonRpcRequest>& requests,
+    JsonRpcBatchResultCallback&& callback,
+    QThread* targetThread,
+    std::optional<Timeouts> timeouts)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::post,
+        prepareUrl(kJsonRpcPath, /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(requests));
+
+    auto internalCallback =
+        [callback = std::move(callback)](
+            bool success,
+            Handle requestId,
+            rest::ErrorOrData<JsonRpcResultType> result)
+        {
+            if (success)
+            {
+                if (const auto rpcResponse = std::get_if<JsonRpcResultType>(&result))
+                {
+                    if (const auto responseArray = std::get_if<
+                        std::vector<nx::vms::api::JsonRpcResponse>>(rpcResponse))
+                    {
+                        callback(success, requestId, *responseArray);
+                        return;
+                    }
+                }
+                NX_ASSERT(false, "jsonrpc success but response data is invalid");
+                return;
+            }
+
+            if (const auto error = std::get_if<nx::network::rest::Result>(&result))
+            {
+                nx::vms::api::JsonRpcResponse rpcError;
+
+                QJsonValue data;
+                QJson::serialize(error, &data);
+
+                rpcError.error = vms::api::JsonRpcError{
+                    .code = nx::vms::api::JsonRpcError::RequestError,
+                    .data = data
+                };
+
+                callback(success, requestId, {rpcError});
+                return;
+            }
+
+            if (const auto rpcResponse = std::get_if<JsonRpcResultType>(&result))
+            {
+                if (const auto singleResponse = std::get_if<
+                    nx::vms::api::JsonRpcResponse>(rpcResponse))
+                {
+                    callback(success, requestId, {*singleResponse});
+                }
+                return;
+            }
+
+            callback(success, requestId, {});
+        };
+
+    auto wrapper = makeSessionAwareCallbackInternal<
+        rest::ErrorOrData<JsonRpcResultType>, rest::ErrorOrData<JsonRpcResultType>>(
+            helper,
+            request,
+            std::move(internalCallback),
+            timeouts,
+            requests);
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), targetThread, timeouts)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
 Handle ServerConnection::postEmptyResult(
     const QString& action,
     const nx::network::rest::Params& params,
@@ -2428,12 +2638,27 @@ nx::network::rest::Result::Error getError(
         : nx::network::rest::Result::NoError; //< We check 'success' explicitly.
 }
 
-template<typename ResultType, typename... CallbackParameters>
+// Allows to add extra fields to context struct in template specialization.
+template <typename T>
+struct WithDataForType
+{
+};
+
+template <>
+struct WithDataForType<rest::ErrorOrData<JsonRpcResultType>>
+{
+    std::unordered_set<JsonRpcRequestIdType> expiredIds;
+    std::vector<nx::vms::api::JsonRpcResponse> originalResponse;
+    std::vector<nx::vms::api::JsonRpcRequest> requestData;
+};
+
+template<typename ResultType, typename... CallbackParameters, typename... Args>
 typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSessionAwareCallbackInternal(
     nx::vms::common::SessionTokenHelperPtr helper,
     nx::network::http::ClientPool::Request request,
     typename Result<ResultType>::type callback,
-    std::optional<nx::network::http::AsyncClient::Timeouts> timeouts)
+    std::optional<nx::network::http::AsyncClient::Timeouts> timeouts,
+    Args&&... args)
 {
     // For security reasons, some priviledged API requests can be executed only with a recently
     // issued authorization token. If the token is not fresh enough, such request will fail,
@@ -2446,7 +2671,7 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
 
     NX_ASSERT(this->thread() == qApp->thread());
 
-    struct InteractionContext
+    struct InteractionContext: public WithDataForType<ResultType>
     {
         QPointer<ServerConnection> ptr;
         nx::vms::common::SessionTokenHelperPtr helper;
@@ -2476,21 +2701,36 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
         .callback = std::move(callback)
     }};
 
+    if constexpr (std::is_same_v<ResultType, rest::ErrorOrData<JsonRpcResultType>>)
+        ctx->requestData = std::move(std::forward<Args>(args)...);
+
     return
         [ctx](bool success, Handle handle, CallbackParameters... result)
         {
             // This function is executed in the target thread of an API request callback.
             ctx->targetThread = QThread::currentThread();
 
+            bool requestNewSession = false;
+
             if (success)
             {
-                // Don't parse the error. Just pass the result to the original callback.
-                if (ctx->callback)
-                    ctx->callback(success, handle, result...);
+                if constexpr (std::is_same_v<ResultType, rest::ErrorOrData<JsonRpcResultType>>)
+                {
+                    // Some json-rpc requests may fail with SessionExpired, but it is considered
+                    // as json-rpc success. Extract ids of failed requests for resending when a new
+                    // session token is recived.
+
+                    std::tie(ctx->expiredIds, ctx->originalResponse) =
+                        extractJsonRpcExpired(std::forward<CallbackParameters>(result)...);
+                    requestNewSession = !ctx->expiredIds.empty();
+                }
             }
-            else if (const auto error = getError(result...);
-                error == nx::network::rest::Result::SessionExpired
-                || error == nx::network::rest::Result::SessionRequired)
+            else if (const auto error = getError(std::forward<CallbackParameters>(result)...))
+            {
+                requestNewSession = isSessionExpiredError(error);
+            }
+
+            if (requestNewSession)
             {
                 // Session is expired. Let's try to issue a new token and resend the request.
                 executeInThread(ctx->interactionThread,
@@ -2528,6 +2768,21 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
                                 auto fixedRequest = ctx->request;
                                 fixedRequest.credentials->authToken = *token;
 
+                                if constexpr (std::is_same_v<
+                                    ResultType,
+                                    rest::ErrorOrData<JsonRpcResultType>>)
+                                {
+                                    // Update message body to resend only failed json-rpc requests.
+                                    std::vector<nx::vms::api::JsonRpcRequest> newRequests;
+                                    for (const auto& request: ctx->requestData)
+                                    {
+                                        if (ctx->expiredIds.contains(request.id))
+                                            newRequests.emplace_back(request);
+                                    }
+                                    fixedRequest.messageBody =
+                                        nx::reflect::json::serialize(newRequests);
+                                }
+
                                 // Make an auxiliary callback that will pass the original request
                                 // handle to the caller instead of an unknown-to-the-caller resent
                                 // request handle.
@@ -2555,6 +2810,27 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
                                                     handle, originalHandle);
                                             });
 
+                                        if constexpr (std::is_same_v<
+                                            ResultType,
+                                            rest::ErrorOrData<JsonRpcResultType>>)
+                                        {
+                                            if (ctx->callback)
+                                            {
+                                                if (mergeJsonRpcResults(
+                                                    ctx->originalResponse,
+                                                    result...))
+                                                {
+                                                    // Even if the new request failed, it is still
+                                                    // considered as json-rpc success.
+                                                    const bool jsonRpcSuccess = true;
+                                                    ctx->callback(
+                                                        jsonRpcSuccess,
+                                                        originalHandle,
+                                                        ctx->originalResponse);
+                                                    return;
+                                                }
+                                            }
+                                        }
 
                                         if (ctx->callback)
                                             ctx->callback(success, originalHandle, result...);
