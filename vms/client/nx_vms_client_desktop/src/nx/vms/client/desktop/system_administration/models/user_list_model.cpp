@@ -516,22 +516,23 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
                 case UserWarningColumn:
                 {
+                    QStringList lines;
                     if (user->userType() == nx::vms::api::UserType::ldap)
                     {
                         if (!d->ldapServerOnline)
-                            return tr("LDAP server is offline. Users are not able to log in.");
+                            lines << tr("LDAP server is offline. Users are not able to log in.");
                         if (d->notFoundUsers.contains(user->getId()))
-                            return tr("User is not found in the LDAP database.");
+                            lines << tr("User is not found in the LDAP database.");
                     }
 
                     if (!d->nonUniqueNameTracker.isUnique(user->getId()))
                     {
-                        return tr("There are multiple users with the same credentials in the "
+                        lines << tr("There are multiple users with the same credentials in the "
                             "system. To avoid issues with log in it is required for all users to "
                             "have unique credentials.");
                     }
 
-                    break;
+                    return lines.join("\n");
                 }
 
                 case UserTypeColumn:
