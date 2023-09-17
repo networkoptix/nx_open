@@ -407,23 +407,25 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
 
                 case GroupWarningColumn:
                 {
+                    QStringList lines;
                     if (d->ldapServerOnline && d->notFoundGroups.contains(group.id))
-                        return tr("Group is not found in the LDAP database.");
+                        lines << tr("Group is not found in the LDAP database.");
 
                     if (!d->nonUniqueNameTracker.isUnique(group.id))
                     {
-                        return tr("There are multiple groups with this name in the system. To "
+                        lines << tr("There are multiple groups with this name in the system. To "
                             "maintain a clear and organized structure, we suggest providing "
                             "unique names for each group.");
                     }
+
                     if (d->cycledGroups.contains(group.id))
                     {
-                        return tr("Group has another group as both its parent, and as a child "
+                        lines << tr("Group has another group as both its parent, and as a child "
                             "member, or is a part of such circular reference chain. This can lead "
                             "to an incorrect calculation of permissions.");
                     }
 
-                    return {};
+                    return lines.join("\n");
                 }
 
                 case GroupTypeColumn:
