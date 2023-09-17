@@ -744,12 +744,10 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
 
     if (accessInfo.providedVia == ResourceAccessInfo::ProvidedVia::own)
     {
-        const auto currentUser = context->systemContext()->resourcePool()->
-            getResourceById<QnUserResource>(context->currentSubjectId());
-
-        descriptions << (currentUser
-            ? tr("User's custom permissions")
-            : tr("Group's custom permissions"));
+        descriptions <<
+            (context->currentSubjectType() == AccessSubjectEditingContext::SubjectType::user
+                ? tr("User's custom permissions")
+                : tr("Group's custom permissions"));
     }
     else if (auto nodeName = resourceGroupName(accessInfo.parentResourceGroupId))
     {
