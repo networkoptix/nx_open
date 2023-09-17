@@ -40,6 +40,7 @@
 #include <nx/vms/api/data/device_search.h>
 #include <nx/vms/api/data/email_settings.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/json_rpc.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/log_settings.h>
 #include <nx/vms/api/data/login.h>
@@ -823,6 +824,13 @@ public:
         Result<ErrorOrData<nx::vms::api::LookupListDataList>>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle jsonRpcBatchCall(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        const std::vector<nx::vms::api::JsonRpcRequest>& requests,
+        JsonRpcBatchResultCallback&& callback,
+        QThread* targetThread = nullptr,
+        std::optional<Timeouts> timeouts = {});
+
     /** Sends POST request with a response to be a JSON */
     Handle postJsonResult(
         const QString& action,
@@ -957,12 +965,13 @@ private:
         Result<QByteArray>::type callback,
         nx::network::http::AsyncClient::Timeouts timeouts);
 
-    template<typename ResultType, typename... CallbackParameters>
+    template<typename ResultType, typename... CallbackParameters, typename... Args>
     typename Result<ResultType>::type makeSessionAwareCallbackInternal(
         nx::vms::common::SessionTokenHelperPtr helper,
         nx::network::http::ClientPool::Request request,
         typename Result<ResultType>::type callback,
-        std::optional<nx::network::http::AsyncClient::Timeouts> timeouts);
+        std::optional<nx::network::http::AsyncClient::Timeouts> timeouts,
+        Args&&... args);
 
     template <typename ResultType>
     Handle executeRequest(
