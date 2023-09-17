@@ -11,10 +11,9 @@
 #include <api/server_rest_connection_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
+#include <nx/network/http/http_types.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
-#include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/event_fwd.h>
-#include <utils/common/id.h>
 
 struct QnMultiserverRequestData;
 
@@ -23,19 +22,17 @@ class QnCameraBookmarksManagerPrivate:
     public nx::vms::client::desktop::SystemContextAware
 {
     Q_OBJECT
-
     typedef QObject base_type;
+
 public:
     QnCameraBookmarksManagerPrivate(
         nx::vms::client::desktop::SystemContext* systemContext,
         QObject* parent = nullptr);
 
-    virtual ~QnCameraBookmarksManagerPrivate();
+    virtual ~QnCameraBookmarksManagerPrivate() override;
 
-    using UbJsonCallback = std::function<void(
-        bool success, int handle, const nx::network::rest::UbjsonResult& response)>;
-    using EmptyResponseCallback = std::function<void (bool success, int handle)>;
-    using RawResponseType = std::function<void (bool, rest::Handle, QByteArray, nx::network::http::HttpHeaders)>;
+    using RawResponseType =
+        std::function<void (bool, rest::Handle, QByteArray, const nx::network::http::HttpHeaders&)>;
 
     /* Direct API section */
 
