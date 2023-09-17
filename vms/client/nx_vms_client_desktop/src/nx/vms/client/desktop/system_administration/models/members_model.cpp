@@ -182,7 +182,11 @@ void MembersModel::readUsersAndGroups()
     if (m_subjectContext.isNull() && !m_subjectId.isNull())
     {
         m_subjectContext.reset(new AccessSubjectEditingContext(systemContext()));
-        m_subjectContext->setCurrentSubjectId(m_subjectId);
+
+        m_subjectContext->setCurrentSubject(m_subjectId, m_subjectIsUser
+            ? AccessSubjectEditingContext::SubjectType::user
+            : AccessSubjectEditingContext::SubjectType::group);
+
         emit editingContextChanged();
 
         m_cache.reset(new MembersCache());
@@ -429,7 +433,9 @@ void MembersModel::readUsersAndGroups()
     }
     else
     {
-        m_subjectContext->setCurrentSubjectId(m_subjectId);
+        m_subjectContext->setCurrentSubject(m_subjectId, m_subjectIsUser
+            ? AccessSubjectEditingContext::SubjectType::user
+            : AccessSubjectEditingContext::SubjectType::group);
     }
 
     m_subjectMembers = {};

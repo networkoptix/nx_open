@@ -82,6 +82,7 @@ public:
 
 public:
     QnUuid currentSubjectId;
+    SubjectType currentSubjectType = SubjectType::user;
     nx::vms::common::SystemContext* systemContext;
     const QPointer<SubjectHierarchy> systemSubjectHierarchy;
     const std::unique_ptr<Hierarchy> currentHierarchy;
@@ -194,7 +195,7 @@ public:
     {
         if (removed.contains(currentSubjectId))
         {
-            q->setCurrentSubjectId({});
+            q->setCurrentSubject({}, SubjectType::user);
             emit q->currentSubjectRemoved();
         }
         else
@@ -240,16 +241,27 @@ QnUuid AccessSubjectEditingContext::currentSubjectId() const
     return d->currentSubjectId;
 }
 
-void AccessSubjectEditingContext::setCurrentSubjectId(const QnUuid& value)
+AccessSubjectEditingContext::SubjectType AccessSubjectEditingContext::currentSubjectType() const
 {
-    if (d->currentSubjectId == value)
+    return d->currentSubjectType;
+}
+
+void AccessSubjectEditingContext::setCurrentSubject(
+    const QnUuid& subjectId, SubjectType subjectType)
+{
+    if (d->currentSubjectId == subjectId)
+    {
+        if (!NX_ASSERT(d->currentSubjectType == subjectType))
+            d->currentSubjectType = subjectType;
         return;
+    }
 
-    NX_DEBUG(this, "Changing current subject to %1", value);
+    NX_DEBUG(this, "Changing current subject to %1 (%2)", subjectId, subjectType);
 
-    d->currentSubjectId = value;
-    d->accessRightsManager->setCurrentSubjectId(value);
-    d->notifier->setSubjectId(value);
+    d->currentSubjectId = subjectId;
+    d->currentSubjectType = subjectType;
+    d->accessRightsManager->setCurrentSubjectId(subjectId);
+    d->notifier->setSubjectId(subjectId);
     resetRelations();
     resetAccessibleResourcesFilter();
 
