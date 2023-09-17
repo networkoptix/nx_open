@@ -1033,7 +1033,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
         if (resourceTypes.testFlags(webPagesAndIntegrations))
         {
             auto webPagesList = makeKeyList<QnResourcePtr>(
-                simpleResourceItemCreator(m_itemFactory.get()),
+                webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
                 numericOrder());
 
             webPagesList->installItemSource(
@@ -1067,7 +1067,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
             && ini().webPagesAndIntegrations)
         {
             auto integrationList = makeKeyList<QnResourcePtr>(
-                simpleResourceItemCreator(m_itemFactory.get()),
+                webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
                 numericOrder());
 
             integrationList->installItemSource(
@@ -1085,7 +1085,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
         if (resourceTypes.testFlag(ResourceTree::ResourceFilter::webPages))
         {
             auto webPagesList = makeKeyList<QnResourcePtr>(
-                simpleResourceItemCreator(m_itemFactory.get()),
+                webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
                 numericOrder());
 
             if (ini().webPagesAndIntegrations)
