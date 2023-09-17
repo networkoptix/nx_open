@@ -4,22 +4,17 @@
 
 #include <chrono>
 
-#include <QtCore/QElapsedTimer>
+#include <QtCore/QFutureWatcher>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
 #include <camera/camera_bookmarks_manager_fwd.h>
-#include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QTimer;
-class QnUuid;
 class QnBookmarkMergeHelper;
 class QnBookmarkQueriesCache;
-class QnCameraBookmarksQuery;
 class QnCameraBookmarkAggregation;
 
 namespace nx::utils { class PendingOperation; }
@@ -82,4 +77,5 @@ private:
     QnVirtualCameraResourcePtr m_currentCamera;
 
     QString m_textFilter;
+    QFutureWatcher<QnCameraBookmark>* m_filterWatcher;
 };

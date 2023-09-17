@@ -3,17 +3,13 @@
 #pragma once
 
 #include <chrono>
+#include <limits>
 
-#include <QtCore/QList>
-#include <QtCore/QStringList>
-
-#include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/bookmark_models.h>
-#include <nx/vms/api/json/value_or_array.h>
 
 #include "camera_bookmark_fwd.h"
 
@@ -97,6 +93,12 @@ struct NX_VMS_COMMON_API QnCameraBookmark
     QnCameraBookmark();
 
     bool operator==(const QnCameraBookmark& other) const = default;
+
+    QnCameraBookmark(const QnCameraBookmark&) = default;
+    QnCameraBookmark& operator=(const QnCameraBookmark&) = default;
+
+    QnCameraBookmark(QnCameraBookmark&&) noexcept = default;
+    QnCameraBookmark& operator=(QnCameraBookmark&&) noexcept = default;
 
     static QString tagsToString(
         const QnCameraBookmarkTags& tags, const QString& delimiter = QStringLiteral(", "));

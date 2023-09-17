@@ -127,7 +127,7 @@ void QnCameraBookmarksQuery::setRequestChunkSize(int value)
     m_requestChunkSize = value;
 }
 
-QnCameraBookmarkList QnCameraBookmarksQuery::cachedBookmarks() const
+const QnCameraBookmarkList& QnCameraBookmarksQuery::cachedBookmarks() const
 {
     return m_cache;
 }
