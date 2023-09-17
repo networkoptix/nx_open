@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <functional>
+#include <vector>
 
-#include <QtCore/QList>
 #include <QtCore/QSet>
-#include <QtCore/QStringList>
+#include <QtCore/QString>
+#include <QtCore/QVector>
 
 struct QnCameraBookmark;
 typedef QVector<QnCameraBookmark> QnCameraBookmarkList;

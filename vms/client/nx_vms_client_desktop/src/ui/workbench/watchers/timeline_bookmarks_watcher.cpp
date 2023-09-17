@@ -4,6 +4,7 @@
 
 #include <chrono>
 
+#include <QtConcurrent/QtConcurrentFilter>
 #include <QtCore/QTimer>
 
 #include <camera/bookmark_queries_cache.h>
@@ -13,11 +14,11 @@
 #include <core/resource/camera_resource.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/resource/bookmark_filter.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -49,12 +50,27 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
     QnWorkbenchContextAware(parent),
     m_aggregation(new QnCameraBookmarkAggregation()),
     m_mergeHelper(new QnBookmarkMergeHelper()),
-    m_queriesCache(new QnBookmarkQueriesCache())
+    m_queriesCache(new QnBookmarkQueriesCache()),
+    m_filterWatcher(new QFutureWatcher<QnCameraBookmark>(this))
 {
     connect(appContext()->unifiedResourcePool(),
         &UnifiedResourcePool::resourcesRemoved,
         this,
         &QnTimelineBookmarksWatcher::onResourcesRemoved);
+
+    connect(m_filterWatcher, &QFutureWatcher<QnCameraBookmark>::finished, this,
+        [this]()
+        {
+            auto future = m_filterWatcher->future();
+
+            if (!NX_ASSERT(future.isValid() && future.isFinished()))
+                return;
+
+            auto bookmarks = future.results();
+
+            NX_VERBOSE(this, "Updating timeline with filtered bookmarks %1", bookmarks.size());
+            m_mergeHelper->setBookmarks(bookmarks);
+        });
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnTimelineBookmarksWatcher::updateCurrentCamera);
@@ -127,6 +143,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
 
 QnTimelineBookmarksWatcher::~QnTimelineBookmarksWatcher()
 {
+    m_filterWatcher->cancel();
 }
 
 QnCameraBookmarkList QnTimelineBookmarksWatcher::bookmarksAtPosition(
@@ -203,28 +220,19 @@ void QnTimelineBookmarksWatcher::updatePermissions()
 
 void QnTimelineBookmarksWatcher::setTimelineBookmarks(const QnCameraBookmarkList& bookmarks)
 {
-    if (m_textFilter.isEmpty())
+    NX_VERBOSE(this, "Updating timeline with %1 bookmarks, filter: %2",
+        bookmarks.size(), m_textFilter);
+
+    m_filterWatcher->cancel();
+
+    if (m_textFilter.isEmpty() || bookmarks.empty())
     {
-        NX_VERBOSE(this, "Updating timeline without text filter. %1 bookmarks.",
-            bookmarks.size());
         m_mergeHelper->setBookmarks(bookmarks);
     }
     else
     {
-        QnCameraBookmarkSearchFilter filter;
-        filter.text = m_textFilter;
-
-        QnCameraBookmarkList filtered(bookmarks.size());
-        filtered.resize(std::distance(filtered.begin(),
-            std::copy_if(bookmarks.cbegin(), bookmarks.cend(), filtered.begin(),
-                [&filter](const QnCameraBookmark& bookmark)
-                {
-                    return filter.checkBookmark(bookmark);
-                })));
-
-        NX_VERBOSE(this, "Updating timeline with text filter. Pass %1 bookmarks of %2",
-            filtered.size(), bookmarks.size());
-        m_mergeHelper->setBookmarks(filtered);
+        m_filterWatcher->setFuture(
+            QtConcurrent::filtered(bookmarks, nx::vms::common::BookmarkTextFilter(m_textFilter)));
     }
 }
 

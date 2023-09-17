@@ -2,12 +2,13 @@
 
 #include "camera_bookmark.h"
 
-#include <QtCore5Compat/QLinkedList>
 #include <QtCore/QMap>
+#include <QtCore5Compat/QLinkedList>
 
 #include <core/resource/bookmark_sort.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/algorithm/merge_sorted_lists.h>
+#include <nx/vms/common/resource/bookmark_filter.h>
 #include <nx/vms/common/system_context.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
@@ -369,36 +370,7 @@ bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmar
     if (endTimeMs != milliseconds::zero() && bookmark.startTimeMs > endTimeMs)
         return false;
 
-    if (text.isEmpty())
-        return true;
-
-    for (const QString &word: text.split(QRegularExpression("[\\W]"), Qt::SkipEmptyParts))
-    {
-        bool tagFound = false;
-
-        for (const QString &tag: bookmark.tags)
-            if (tag.startsWith(word, Qt::CaseInsensitive))
-            {
-                tagFound = true;
-                break;
-            }
-
-        if (tagFound)
-            continue;
-
-        QRegularExpression wordRegExp(QString("\\b%1").arg(word),
-            QRegularExpression::CaseInsensitiveOption);
-
-        if (wordRegExp.match(bookmark.name).hasMatch() ||
-            wordRegExp.match(bookmark.description).hasMatch())
-        {
-            continue;
-        }
-
-        return false;
-    }
-
-    return true;
+    return text.isEmpty() || BookmarkTextFilter(text).match(bookmark);
 }
 
 const int QnCameraBookmarkSearchFilter::kNoLimit = std::numeric_limits<int>::max();
