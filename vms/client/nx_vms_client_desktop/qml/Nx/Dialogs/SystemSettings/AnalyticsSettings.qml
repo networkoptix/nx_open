@@ -17,6 +17,7 @@ Item
 
     property var store: null
     property var engineLicenseSummaryProvider: null
+    property var saasServiceManager: null
 
     function activateEngine(engineId) { viewModel.setCurrentEngine(engineId) }
 
@@ -35,9 +36,10 @@ Item
         function storeUpdated()
         {
             const engineId = store.getCurrentEngineId()
+            const licenseSummary = engineLicenseSummaryProvider.licenseSummary(engineId)
             viewModel.updateState(
                 store.analyticsEngines,
-                engineLicenseSummaryProvider.licenseSummary(engineId),
+                licenseSummary,
                 engineId,
                 store.settingsModel(engineId),
                 store.settingsValues(engineId),
@@ -60,7 +62,7 @@ Item
         id: menu
 
         width: 240
-        height: parent.height
+        height: parent.height - saasBanner.height
 
         viewModel: viewModel
     }
@@ -81,9 +83,10 @@ Item
         id: settings
 
         viewModel: viewModel
+        enabled: !saasBanner.visible
 
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.bottom: saasBanner.top
         anchors.left: menu.right
         anchors.right: scrollBarParent.left
         anchors.margins: 16
@@ -125,6 +128,18 @@ Item
             property: "isActive"
             value: settings.visible
         }
+    }
+
+    SaasBanner
+    {
+        id: saasBanner
+
+        saasServiceManager: analyticsSettings.saasServiceManager
+        licenseSummary: viewModel.currentEngineLicenseSummary
+        deviceSpecific: false
+
+        height: visible ? implicitHeight : 0
+        anchors.bottom: parent.bottom
     }
 
     onStoreChanged: store.setCurrentEngineId(viewModel.currentEngineId ?? NxGlobals.uuid(""))

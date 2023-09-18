@@ -21,7 +21,6 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-// #include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <utils/common/event_processors.h>
 
 using namespace nx::vms::common;
@@ -63,6 +62,9 @@ AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
         new EngineLicenseSummaryProvider{q->systemContext(), this};
     view->rootObject()->setProperty(
         "engineLicenseSummaryProvider", QVariant::fromValue(engineLicenseSummaryProvider));
+
+    view->rootObject()->setProperty(
+        "saasServiceManager", QVariant::fromValue(systemContext()->saasServiceManager()));
 
     connect(enginesWatcher.get(), &AnalyticsEnginesWatcher::engineAdded,
         this, &Private::addEngine);
