@@ -26,6 +26,10 @@ ScopeLocalSystemsFinder::ScopeLocalSystemsFinder(QObject* parent):
 
 void ScopeLocalSystemsFinder::updateSystems()
 {
+    // Connection version is not actual for the systems, which are not accessible in any way, as
+    // tile is offline and does not contain an address.
+    static constexpr nx::utils::SoftwareVersion kSystemVersionIsUnknown{5, 1, 0, 0};
+
     SystemsHash newSystems;
     const auto systemScopes = appContext()->coreSettings()->tileScopeInfo();
     for (const auto& [id, info]: systemScopes.asKeyValueRange())
@@ -41,6 +45,7 @@ void ScopeLocalSystemsFinder::updateSystems()
         fakeServerInfo.id = QnUuid::createUuid(); // It must be new unique id.
         fakeServerInfo.systemName = system->name();
         fakeServerInfo.realm = QString::fromStdString(nx::network::AppInfo::realm());
+        fakeServerInfo.version = kSystemVersionIsUnknown;
         fakeServerInfo.cloudHost =
             QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
