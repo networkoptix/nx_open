@@ -11,17 +11,12 @@
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
 #include <network/system_helpers.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_stored_file_manager.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_stored_file_manager.h>
 #include <utils/common/util.h> /* For removeDir. */
-
-namespace {
-/** Maximum allowed file size is 15 Mb, hard limit of Jaguar or S2 cameras. */
-const qint64 maximumFileSize = 15 * 1024 * 1024;
-}
 
 namespace nx::vms::client::desktop {
 
@@ -105,10 +100,6 @@ void ServerFileCache::clearLocalCache()
 bool ServerFileCache::isConnectedToServer() const
 {
     return connection().get() != nullptr;
-}
-
-qint64 ServerFileCache::maximumFileSize() {
-    return ::maximumFileSize;
 }
 
 // -------------- File List loading methods -----
@@ -214,11 +205,6 @@ void ServerFileCache::uploadFile(const QString &filename) {
     QFile file(getFullPath(filename));
     if(!file.open(QIODevice::ReadOnly)) {
         emit delayedFileUploaded(filename, OperationResult::fileSystemError);
-        return;
-    }
-
-    if(file.size() > ::maximumFileSize) {
-        emit delayedFileUploaded(filename, OperationResult::sizeLimitExceeded);
         return;
     }
 

@@ -46,16 +46,12 @@ public:
 
     static void clearLocalCache();
 
-    static qint64 maximumFileSize();
-
     enum class OperationResult {
         ok,
         disconnected,
         serverError,
         fileSystemError,
-        sizeLimitExceeded,
-        invalidOperation
-
+        invalidOperation,
     };
 
 protected:
