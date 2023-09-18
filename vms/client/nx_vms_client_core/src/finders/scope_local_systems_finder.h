@@ -4,6 +4,11 @@
 
 #include <finders/local_systems_finder.h>
 
+/**
+ * Finder creates tiles for the systems, which were added to Favorites - or hidden - but are not
+ * available anymore in any way. Tiles are displayed in the corresponding mode, so user can remove
+ * the system from the list.
+ */
 class ScopeLocalSystemsFinder: public LocalSystemsFinder
 {
     Q_OBJECT
