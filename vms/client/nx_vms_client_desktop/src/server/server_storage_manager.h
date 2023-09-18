@@ -2,20 +2,16 @@
 
 #pragma once
 
-#include <array>
-#include <optional>
-
 #include <api/model/api_model_fwd.h>
 #include <api/model/recording_stats_reply.h>
 #include <api/model/storage_status_reply.h>
-#include <common/common_globals.h>
+#include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/id_data.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/storage_space_reply.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <server/server_storage_manager_fwd.h>
 
@@ -75,7 +71,7 @@ public:
 
     int requestRecordingStatistics(const QnMediaServerResourcePtr& server,
         qint64 bitrateAnalyzePeriodMs,
-        std::function<void (bool, int, const QnRecordingStatsReply&)> callback);
+        std::function<void (bool, rest::Handle, const QnRecordingStatsReply&)> callback);
 
 signals:
     void serverProtocolsChanged(
@@ -98,11 +94,18 @@ signals:
         bool success, int handle, const nx::vms::api::StorageSpaceReply& reply);
 
 private:
+    NX_REFLECTION_ENUM_IN_CLASS(RebuildAction,
+        showProgress,
+        start,
+        cancel);
+
     void invalidateRequests();
     bool isServerValid(const QnMediaServerResourcePtr& server) const;
 
-    bool sendArchiveRebuildRequest(const QnMediaServerResourcePtr& server,
-        QnServerStoragesPool pool, Qn::RebuildAction action = Qn::RebuildAction_ShowProgress);
+    bool sendArchiveRebuildRequest(
+        const QnMediaServerResourcePtr& server,
+        QnServerStoragesPool pool,
+        RebuildAction action = RebuildAction::showProgress);
 
     void checkStoragesStatusInternal(const QnResourcePtr& resource);
 
@@ -119,8 +122,15 @@ private:
         bool suppressNotificationSignal = false);
 
 private:
-    void at_archiveRebuildReply(bool success, int handle, const nx::vms::api::StorageScanInfoFull& reply);
-    void at_storageSpaceReply(bool success, int handle, const nx::vms::api::StorageSpaceReply& reply);
+    void at_archiveRebuildReply(
+        bool success,
+        rest::Handle handle,
+        const nx::vms::api::StorageScanInfoFull& reply);
+
+    void at_storageSpaceReply(
+        bool success,
+        rest::Handle handle,
+        const nx::vms::api::StorageSpaceReply& reply);
 
 private:
     struct ServerInfo;
