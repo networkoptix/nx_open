@@ -17,6 +17,7 @@
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/storage_space_data.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
@@ -83,11 +84,11 @@ bool isActive(const QnStorageResourcePtr& storage)
 // `void someMethod(bool success, int handle, const TargetType& data)`
 template<class Class, class TargetType> auto methodCallback(
     Class* object,
-    void (Class::* method)(bool, int, const TargetType&))
+    void (Class::* method)(bool, rest::Handle, const TargetType&))
 {
     NX_ASSERT(object);
     return nx::utils::guarded(object,
-        [object, method](bool success, int handle, nx::network::rest::JsonResult jsonData) -> void
+        [object, method](bool success, rest::Handle handle, nx::network::rest::JsonResult jsonData)
         {
             if (success)
             {
@@ -102,9 +103,10 @@ template<class Class, class TargetType> auto methodCallback(
 }
 
 template <class TargetType> auto simpleCallback(
-    std::function<void (bool, int, const TargetType&)> callback)
+    std::function<void (bool, rest::Handle, const TargetType&)> callback)
 {
-    return [callback](bool success, int handle, nx::network::rest::JsonResult jsonData) -> void
+    return
+        [callback](bool success, rest::Handle handle, nx::network::rest::JsonResult jsonData)
         {
             if (success)
             {
@@ -316,7 +318,7 @@ bool QnServerStorageManager::rebuildServerStorages(
     const QnMediaServerResourcePtr& server, QnServerStoragesPool pool)
 {
     NX_VERBOSE(this, "Starting rebuild %1 of %2", (int)pool, server);
-    if (!sendArchiveRebuildRequest(server, pool, Qn::RebuildAction_Start))
+    if (!sendArchiveRebuildRequest(server, pool, RebuildAction::start))
         return false;
 
     ServerInfo& serverInfo = m_serverInfo[server];
@@ -332,7 +334,7 @@ bool QnServerStorageManager::rebuildServerStorages(
 bool QnServerStorageManager::cancelServerStoragesRebuild(
     const QnMediaServerResourcePtr& server, QnServerStoragesPool pool)
 {
-    return sendArchiveRebuildRequest(server, pool, Qn::RebuildAction_Cancel);
+    return sendArchiveRebuildRequest(server, pool, RebuildAction::cancel);
 }
 
 void QnServerStorageManager::checkStoragesStatus(const QnMediaServerResourcePtr& server)
@@ -343,6 +345,9 @@ void QnServerStorageManager::checkStoragesStatus(const QnMediaServerResourcePtr&
     updateActiveMetadataStorage(server);
 
     if (!isServerValid(server))
+        return;
+
+    if (!systemContext()->accessController()->hasPowerUserPermissions())
         return;
 
     NX_VERBOSE(this, "Check storages status on server changes");
@@ -396,19 +401,23 @@ void QnServerStorageManager::deleteStorages(const nx::vms::api::IdDataList& ids)
 }
 
 bool QnServerStorageManager::sendArchiveRebuildRequest(
-    const QnMediaServerResourcePtr& server, QnServerStoragesPool pool, Qn::RebuildAction action)
+    const QnMediaServerResourcePtr& server, QnServerStoragesPool pool, RebuildAction action)
 {
-    if (!isServerValid(server) || !connection())
+    if (!isServerValid(server))
+        return false;
+
+    const auto api = connectedServerApi();
+    if (!api)
         return false;
 
     const auto poolStr = (pool == QnServerStoragesPool::Main)
         ? QString("main")
         : QString("backup");
 
-    auto callback = nx::utils::guarded(this,
+    auto rebuildCallback = nx::utils::guarded(this,
         [this](
             bool success,
-            int handle,
+            rest::Handle handle,
             rest::ErrorOrData<nx::vms::api::StorageScanInfoFull> errorOrData)
         {
             if (success)
@@ -420,39 +429,49 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
             }
             else
             {
+                const auto error = std::get<nx::network::rest::Result>(errorOrData);
+                NX_ERROR(this, "Can't rebuld archive, error: %1, text: %2",
+                    error.error, error.errorString);
+
                 at_archiveRebuildReply(success, handle, {});
             }
         });
 
     int handle = 0;
-    if (action == Qn::RebuildAction_ShowProgress)
+    if (action == RebuildAction::showProgress)
     {
-        handle = connectedServerApi()->getArchiveRebuildProgress(
+        handle = api->getArchiveRebuildProgress(
             server->getId(),
             poolStr,
-            std::move(callback),
+            std::move(rebuildCallback),
             thread());
     }
-    else if (action == Qn::RebuildAction_Start)
+    else if (action == RebuildAction::start)
     {
-        handle = connectedServerApi()->startArchiveRebuild(
+        handle = api->startArchiveRebuild(
             server->getId(),
             poolStr,
-            std::move(callback),
+            std::move(rebuildCallback),
             thread());
     }
-    else if (action == Qn::RebuildAction_Cancel)
+    else if (action == RebuildAction::cancel)
     {
-        auto callback = nx::utils::guarded(this,
-            [this](bool success, rest::Handle handle, rest::ErrorOrEmpty /*result*/)
+        auto stopCallback = nx::utils::guarded(this,
+            [this](bool success, rest::Handle handle, rest::ErrorOrEmpty errorOrEmpty)
             {
+                if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrEmpty))
+                {
+                    NX_ERROR(this, "Can't cancel archive rebuld, error: %1, text: %2",
+                        error->error, error->errorString);
+                }
+
                 at_archiveRebuildReply(success, handle, {});
             });
 
-        handle = connectedServerApi()->stopArchiveRebuild(
+        handle = api->stopArchiveRebuild(
             server->getId(),
             poolStr,
-            std::move(callback),
+            std::move(stopCallback),
             thread());
     }
 
@@ -461,7 +480,7 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
     if (handle <= 0)
         return false;
 
-    if (action != Qn::RebuildAction_ShowProgress)
+    if (action != RebuildAction::showProgress)
         invalidateRequests();
 
     m_requests.insert(handle, RequestKey(server, pool));
@@ -469,14 +488,11 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
 }
 
 void QnServerStorageManager::at_archiveRebuildReply(
-    bool success, int handle, const nx::vms::api::StorageScanInfoFull& reply)
+    bool success, rest::Handle handle, const nx::vms::api::StorageScanInfoFull& reply)
 {
     NX_VERBOSE(this, "Received archive rebuild reply %1, success %2, %3", handle, success, reply);
     if (!m_requests.contains(handle))
         return;
-
-    if (!success)
-        NX_ERROR(this, "at_archiveRebuildReply() - request failed");
 
     const auto requestKey = m_requests.take(handle);
     NX_VERBOSE(this, "Target server %1, pool %2", requestKey.server, (int)requestKey.pool);
@@ -583,7 +599,7 @@ int QnServerStorageManager::requestStorageStatus(
 
 int QnServerStorageManager::requestRecordingStatistics(const QnMediaServerResourcePtr& server,
     qint64 bitrateAnalyzePeriodMs,
-    std::function<void (bool, int, const QnRecordingStatsReply&)> callback)
+    std::function<void (bool, rest::Handle, const QnRecordingStatsReply&)> callback)
 {
     if (!isServerValid(server) || !connection())
         return 0;
@@ -600,7 +616,7 @@ int QnServerStorageManager::requestRecordingStatistics(const QnMediaServerResour
 }
 
 void QnServerStorageManager::at_storageSpaceReply(
-    bool success, int handle, const nx::vms::api::StorageSpaceReply& reply)
+    bool success, rest::Handle handle, const nx::vms::api::StorageSpaceReply& reply)
 {
     for (const auto& spaceInfo: reply.storages)
     {
