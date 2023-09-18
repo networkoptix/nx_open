@@ -2,14 +2,13 @@
 
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls 2.15
-import QtQuick.Controls.impl 2.15
-import QtQuick.Templates 2.15 as T
+import QtQuick.Controls
+import QtQuick.Templates as T
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 import "private"
 
@@ -54,7 +53,6 @@ T.TextField
     implicitWidth: 200
     implicitHeight: 28
 
-    padding: 6
     leftPadding: 8
     rightPadding: 8
 
