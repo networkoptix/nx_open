@@ -590,7 +590,9 @@ void AsyncClient::stopWhileInAioThread()
 
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
-    NX_VERBOSE(this, "Connect to %1 completed with result %2", m_contentLocationUrl, errorCode);
+    NX_VERBOSE(this, "Connect to %1%2 completed with result %3",
+        m_contentLocationUrl, m_proxyEndpoint ? " via proxy " + m_proxyEndpoint->toString() : "",
+        errorCode);
 
     initializeMessagePipeline();
 
@@ -604,8 +606,9 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
         return;
     }
 
-    NX_DEBUG(this, "Failed to establish TCP connection to %1. %2",
-        m_contentLocationUrl, SystemError::toString(errorCode));
+    NX_DEBUG(this, "Failed to establish TCP connection to %1%2. %3",
+        m_contentLocationUrl, m_proxyEndpoint ? " via proxy " + m_proxyEndpoint->toString() : "",
+        SystemError::toString(errorCode));
 
     reportConnectionFailure(errorCode);
 }
