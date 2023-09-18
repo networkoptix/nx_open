@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/network/rest/params.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -65,21 +66,23 @@ bool checkBookmarkForQuery(const QnCameraBookmarksQueryPtr &query, const QnCamer
 }
 
 template<class ResponseType>
-std::function<void (bool, rest::Handle, QByteArray, nx::network::http::HttpHeaders)> makeUbjsonResponseWrapper(
-    std::function<void (bool, int, const ResponseType&)> internalCallback)
+QnCameraBookmarksManagerPrivate::RawResponseType makeUbjsonResponseWrapper(
+    QObject* guard,
+    std::function<void (bool, rest::Handle, ResponseType)> callback)
 {
-    return [internalCallback](bool success, rest::Handle handle, QByteArray response,
-        nx::network::http::HttpHeaders /*headers*/)
+    return
+        [internalCallback = nx::utils::AsyncHandlerExecutor(guard).bind(std::move(callback))](
+            bool success,
+            rest::Handle handle,
+            QByteArray body,
+            nx::network::http::HttpHeaders /*headers*/) mutable
         {
+            ResponseType response;
+
             if (success)
-            {
-                bool parsed = false;
-                ResponseType reply = QnUbjson::deserialized(response, ResponseType(), &parsed);
-                if (parsed)
-                    internalCallback(true, handle, reply);
-            }
-            if (!success)
-                internalCallback(success, handle, {});
+                response = QnUbjson::deserialized(body, ResponseType(), &success);
+
+            internalCallback(success, handle, std::move(response));
         };
 }
 
@@ -246,7 +249,9 @@ int QnCameraBookmarksManagerPrivate::sendGetRequest(
     QnMultiserverRequestData &request,
     RawResponseType callback)
 {
-    if (!connection())
+    const auto serverApi = connectedServerApi();
+
+    if (!serverApi)
     {
         executeDelayedParented([callback]() { callback(false, kInvalidRequestId, {}, {}); }, this);
         return kInvalidRequestId;
@@ -254,8 +259,7 @@ int QnCameraBookmarksManagerPrivate::sendGetRequest(
 
     request.format = Qn::SerializationFormat::UbjsonFormat;
 
-    auto guardedCallback = nx::utils::guarded(this, callback);
-    return connectedServerApi()->getRawResult(path, request.toParams(), guardedCallback, thread());
+    return serverApi->getRawResult(path, request.toParams(), std::move(callback));
 }
 
 int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
@@ -270,7 +274,10 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
     if (!NX_ASSERT(requestData.filter.endTimeMs.count() >= 0, "Invalid end time passed"))
         requestData.filter.endTimeMs = {};
 
-    return sendGetRequest("/ec2/bookmarks", requestData, makeUbjsonResponseWrapper(callback));
+    return sendGetRequest(
+        "/ec2/bookmarks",
+        requestData,
+        makeUbjsonResponseWrapper(this, callback));
 }
 
 int QnCameraBookmarksManagerPrivate::getBookmarkTagsAsync(
@@ -279,7 +286,11 @@ int QnCameraBookmarksManagerPrivate::getBookmarkTagsAsync(
     QnGetBookmarkTagsRequestData requestData;
     requestData.limit = maxTags;
     requestData.format = Qn::SerializationFormat::UbjsonFormat;
-    return sendGetRequest("/ec2/bookmarks/tags", requestData, makeUbjsonResponseWrapper(callback));
+
+    return sendGetRequest(
+        "/ec2/bookmarks/tags",
+        requestData,
+        makeUbjsonResponseWrapper(this, callback));
 }
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmark(

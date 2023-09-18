@@ -3,10 +3,8 @@
 #include "camera_bookmark_aggregation.h"
 
 #include <core/resource/camera_bookmark.h>
-
-#include <utils/common/scoped_timer.h>
-
 #include <nx/utils/log/assert.h>
+#include <utils/common/scoped_timer.h>
 
 QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkList &bookmarkList) {
     setBookmarkList(bookmarkList);
@@ -105,6 +103,10 @@ bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId)
 void QnCameraBookmarkAggregation::setBookmarkList(const QnCameraBookmarkList &bookmarkList)
 {
     QN_LOG_TIME(Q_FUNC_INFO);
+    const auto newSize = bookmarkList.size();
+
+    m_bookmarkList.reserve(newSize);
+    m_bookmarkIds.reserve(newSize);
 
     m_bookmarkList = bookmarkList;
     m_bookmarkIds.clear();
@@ -123,4 +125,3 @@ void QnCameraBookmarkAggregation::clear()
     m_bookmarkList.clear();
     m_bookmarkIds.clear();
 }
-
