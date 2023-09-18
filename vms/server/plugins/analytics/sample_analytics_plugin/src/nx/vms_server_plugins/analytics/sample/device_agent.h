@@ -21,8 +21,8 @@ public:
 protected:
     virtual std::string manifestString() const override;
 
-    virtual bool pushUncompressedVideoFrame(
-        const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;
+    virtual bool pushCompressedVideoFrame(
+        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
 
     virtual bool pullMetadataPackets(
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
