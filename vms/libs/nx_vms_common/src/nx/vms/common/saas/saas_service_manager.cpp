@@ -152,6 +152,18 @@ std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloud
     return purchasedServices<SaasCloudStorageParameters>(SaasService::kCloudRecordingType);
 }
 
+bool ServiceManager::saasActive() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return m_data.state == nx::vms::api::SaasState::active;
+}
+
+bool ServiceManager::saasSuspended() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return m_data.state == nx::vms::api::SaasState::suspend;
+}
+
 bool ServiceManager::saasSuspendedOrShutDown() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);

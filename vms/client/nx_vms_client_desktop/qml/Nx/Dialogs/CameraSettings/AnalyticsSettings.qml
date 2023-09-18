@@ -21,6 +21,7 @@ Item
     property var store: null
     property var backend: null
     property var engineLicenseSummaryProvider: null
+    property var saasServiceManager: null
 
     property bool loading: false
     property bool supportsDualStreaming: false
@@ -50,11 +51,12 @@ Item
 
             const currentEngineId = store.currentAnalyticsEngineId()
             const userEnabledAnalyticsEngines = store.userEnabledAnalyticsEngines()
+            const licenseSummary = engineLicenseSummaryProvider.licenseSummary(
+                currentEngineId, resourceId, userEnabledAnalyticsEngines)
             viewModel.enabledEngines = userEnabledAnalyticsEngines
             viewModel.updateState(
                 store.analyticsEngines(),
-                engineLicenseSummaryProvider.licenseSummary(
-                    currentEngineId, resourceId, userEnabledAnalyticsEngines),
+                licenseSummary,
                 currentEngineId,
                 store.deviceAgentSettingsModel(currentEngineId),
                 store.deviceAgentSettingsValues(currentEngineId),
@@ -67,7 +69,8 @@ Item
                     store.analyticsStreamIndex(currentEngineId)
             }
 
-            banner.visible = !store.recordingEnabled() && viewModel.enabledEngines.length !== 0
+            recordingNotEnabledBanner.visible =
+                !store.recordingEnabled() && viewModel.enabledEngines.length !== 0
         }
     }
 
@@ -94,7 +97,7 @@ Item
         id: navigationMenu
 
         width: 240
-        height: parent.height - banner.height
+        height: parent.height - banners.height
 
         viewModel: viewModel
     }
@@ -104,11 +107,12 @@ Item
         id: analyticsSettingsView
 
         viewModel: viewModel
+        enabled: !saasBanner.visible
 
         x: navigationMenu.width + 16
         y: 16
         width: parent.width - x - 24
-        height: parent.height - 16 - banner.height
+        height: parent.height - 16 - banners.height
 
         settingsView
         {
@@ -179,18 +183,32 @@ Item
     {
         id: scrollBarsParent
         width: parent.width
-        height: banner.y
+        height: banners.y
     }
 
-    Banner
+    Column
     {
-        id: banner
-
-        height: visible ? implicitHeight : 0
-        visible: false
+        id: banners
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.bottom: parent.bottom
-        text: qsTr("Camera analytics will work only when camera is being viewed."
-            + " Enable recording to make it work all the time.")
+        spacing: 8
+
+        SaasBanner
+        {
+            id: saasBanner
+            saasServiceManager: analyticsSettings.saasServiceManager
+            licenseSummary: viewModel.currentEngineLicenseSummary
+            deviceSpecific: true
+        }
+
+        Banner
+        {
+            id: recordingNotEnabledBanner
+            visible: false
+            text: qsTr("Camera analytics will work only when camera is being viewed."
+                + " Enable recording to make it work all the time.")
+        }
     }
 
     function setEngineEnabled(engineId, enabled)

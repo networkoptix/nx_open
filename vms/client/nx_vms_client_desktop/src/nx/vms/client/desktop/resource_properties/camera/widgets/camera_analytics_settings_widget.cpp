@@ -8,6 +8,8 @@
 #include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <utils/common/event_processors.h>
 
 #include "../flux/camera_settings_dialog_store.h"
@@ -49,6 +51,9 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
         new EngineLicenseSummaryProvider{systemContext(), this};
     rootObject()->setProperty(
         "engineLicenseSummaryProvider", QVariant::fromValue(engineLicenseSummaryProvider));
+
+    rootObject()->setProperty(
+        "saasServiceManager", QVariant::fromValue(systemContext()->saasServiceManager()));
 
     setHelpTopic(this, HelpTopic::Id::PluginsAndAnalytics);
 }
