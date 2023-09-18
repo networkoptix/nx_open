@@ -2772,17 +2772,6 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
             if (!checkCondition())
                 return;
 
-            if (status == ServerFileCache::OperationResult::sizeLimitExceeded)
-            {
-                // TODO: #sivanov #vkutin Refactor to use HumanReadable helper class.
-                // Important: maximumFileSize() is hardcoded in 1024-base.
-                const auto maxFileSize = ServerFileCache::maximumFileSize() / (1024 * 1024);
-                QnMessageBox::warning(mainWindowWidget(),
-                    tr("Image too big"),
-                    tr("Maximum size is %1 MB.").arg(maxFileSize));
-                return;
-            }
-
             if (status != ServerFileCache::OperationResult::ok)
             {
                 QnMessageBox::critical(mainWindowWidget(), tr("Failed to upload image"));
