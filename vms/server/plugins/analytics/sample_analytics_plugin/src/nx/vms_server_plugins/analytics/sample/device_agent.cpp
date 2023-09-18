@@ -61,16 +61,17 @@ std::string DeviceAgent::manifestString() const
 }
 
 /**
- * Called when the Server sends a new uncompressed frame from a camera.
+ * Called when the Server sends a new compressed frame from a camera.
  */
-bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
     ++m_frameIndex;
     m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
 
-    auto eventMetadataPacket = generateEventMetadataPacket();
-    if (eventMetadataPacket)
+    // Generate an Event on every kTrackFrameCount'th frame.
+    if (m_frameIndex % kTrackFrameCount == 0)
     {
+        auto eventMetadataPacket = generateEventMetadataPacket();
         // Send generated metadata packet to the Server.
         pushMetadataPacket(eventMetadataPacket.releasePtr());
     }
@@ -106,10 +107,6 @@ void DeviceAgent::doSetNeededMetadataTypes(
 
 Ptr<IMetadataPacket> DeviceAgent::generateEventMetadataPacket()
 {
-    // Generate event every kTrackFrameCount'th frame.
-    if (m_frameIndex % kTrackFrameCount != 0)
-        return nullptr;
-
     // EventMetadataPacket contains arbitrary number of EventMetadata.
     const auto eventMetadataPacket = makePtr<EventMetadataPacket>();
     // Bind event metadata packet to the last video frame using a timestamp.
