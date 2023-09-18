@@ -7,11 +7,9 @@
 #include <QtWidgets/QApplication>
 
 #include <core/resource/camera_bookmark.h>
-
-#include <ui/processors/hover_processor.h>
 #include <nx/vms/client/desktop/workbench/timeline/bookmark_tooltip.h>
 #include <ui/help/help_topics.h>
-
+#include <ui/processors/hover_processor.h>
 #include <utils/common/delayed.h>
 
 namespace
@@ -315,13 +313,6 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
 
     m_bookmarks = bookmarks;
 
-    enum { kMaxBookmarksCount = 3 };
-
-    const int bookmarksCount = std::min<int>(m_bookmarks.size(), kMaxBookmarksCount);
-    const int bookmarksLeft = m_bookmarks.size() - bookmarksCount;
-    const auto& trimmedBookmarks = (bookmarksLeft
-        ? m_bookmarks.mid(0, kMaxBookmarksCount) : m_bookmarks);
-
     if (m_bookmarkTooltip)
     {
         if (m_timelineHoverProcessor)
@@ -332,7 +323,7 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
     }
     m_bookmarkTooltip.clear();
 
-    if (!trimmedBookmarks.empty())
+    if (!m_bookmarks.empty())
     {
         if (!m_bookmarkTooltip)
         {

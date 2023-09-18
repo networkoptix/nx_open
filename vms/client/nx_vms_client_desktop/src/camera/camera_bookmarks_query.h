@@ -135,7 +135,7 @@ public:
     /**
      * Get locally cached bookmarks.
      */
-    QnCameraBookmarkList cachedBookmarks() const;
+    const QnCameraBookmarkList& cachedBookmarks() const;
 
     void setCachedBookmarks(QnCameraBookmarkList value);
 
