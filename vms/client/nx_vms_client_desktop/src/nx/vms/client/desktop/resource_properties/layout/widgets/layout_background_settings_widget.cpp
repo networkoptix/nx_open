@@ -383,14 +383,6 @@ void LayoutBackgroundSettingsWidget::selectFile()
         return;
     }
 
-    if (fileInfo.size() > ServerFileCache::maximumFileSize())
-    {
-        m_store->setBackgroundImageError(
-            tr("Picture is too big. Maximum size is %1 MB")
-            .arg(ServerFileCache::maximumFileSize() / (1024 * 1024)));
-        return;
-    }
-
     //// Check if we were disconnected (server shut down) while the dialog was open.
     //if (!d->layout->isFile() && !context()->user())
     //    return;
