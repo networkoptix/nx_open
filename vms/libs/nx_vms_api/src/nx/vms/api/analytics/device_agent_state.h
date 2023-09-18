@@ -19,6 +19,7 @@ struct NX_VMS_API DeviceAgentState
 
     DeviceAgentState() = default;
     DeviceAgentState(const QnUuid& id): id(id) {}
+    bool operator==(const DeviceAgentState& other) const = default;
 
     QnUuid getId() const { return id; }
 };
