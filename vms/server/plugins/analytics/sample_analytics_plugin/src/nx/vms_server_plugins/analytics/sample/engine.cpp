@@ -42,14 +42,16 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
  */
 std::string Engine::manifestString() const
 {
-    // Ask the Server to supply uncompressed video frames in YUV420 format (see
-    // https://en.wikipedia.org/wiki/YUV).
+    // Ask the Server to supply compressed video frames. In case the uncompressed frame is
+    // required, "needUncompressedVideoFrames_yuv420" capability can be used to supply
+    // uncompressed video frames in YUV420 format (see https://en.wikipedia.org/wiki/YUV).
     //
-    // Note that this format is used internally by the Server, therefore requires minimum
-    // resources for decoding, thus it is the recommended format.
+    // Note that YUV420 format is used internally by the Server, therefore requires minimum
+    // resources for decoding, thus it is the recommended format, in case the uncompressed frame
+    // is needed.
     return /*suppress newline*/ 1 + (const char*) R"json(
 {
-    "capabilities": "needUncompressedVideoFrames_yuv420"
+    "capabilities": ""
 }
 )json";
 }
