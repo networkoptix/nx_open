@@ -6,24 +6,39 @@
  * Some c++20 features missing in Clang are defined here
  */
 
-#define kClangMissingCpp20SupportVersion 15
-#if defined(__clang__) && (__clang_major__ < kClangMissingCpp20SupportVersion)
+#if defined(__clang__)
 
-#if defined(_LIBCPP_COMPILER_CLANG_BASED) || \
-    defined(__ANDROID_MIN_SDK_VERSION__) && __ANDROID_MIN_SDK_VERSION__ <= 21
+    #if __clang_major__ < 15
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_STRING 1
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_CHRONO 1
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_OPTIONAL 1
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_MAP 1
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_MULTIMAP 1
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_VECTOR 1
+    #else
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_CHRONO 1
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_OPTIONAL 1
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_MAP 1
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_MULTIMAP 1
+        #define CLANG_MISSING_FEATURE_3WAY_COMPARE_VECTOR 1
+    #endif
 
-    #include <algorithm>
-    #include <chrono>
-    #include <concepts>
-    #include <compare>
-    #include <cstring>
-    #include <map>
-    #include <optional>
-    #include <string>
-    #include <type_traits>
+    #if defined(_LIBCPP_COMPILER_CLANG_BASED) \
+        || defined(__ANDROID_MIN_SDK_VERSION__) && __ANDROID_MIN_SDK_VERSION__ <= 21
+
+        #include <algorithm>
+        #include <chrono>
+        #include <compare>
+        #include <concepts>
+        #include <cstring>
+        #include <map>
+        #include <optional>
+        #include <string>
+        #include <type_traits>
 
 namespace std {
 
+#if CLANG_MISSING_FEATURE_3WAY_COMPARE_STRING
 template<typename CharT, typename Traits, typename Alloc>
 inline std::strong_ordering operator<=>(const basic_string<CharT, Traits, Alloc>& lhs,
     const basic_string<CharT, Traits, Alloc>& rhs) noexcept
@@ -35,7 +50,9 @@ inline std::strong_ordering operator<=>(const basic_string<CharT, Traits, Alloc>
         return std::strong_ordering::greater;
     return std::strong_ordering::equal;
 }
+#endif // CLANG_MISSING_FEATURE_3WAY_COMPARE_STRING
 
+#if CLANG_MISSING_FEATURE_3WAY_COMPARE_CHRONO
 namespace chrono {
 
 template<typename Rep1, typename Period1, typename Rep2, typename Period2>
@@ -56,7 +73,9 @@ constexpr auto operator<=>(
 }
 
 } // namespace chrono
+#endif // CLANG_MISSING_FEATURE_3WAY_COMPARE_CHRONO
 
+#if CLANG_MISSING_FEATURE_3WAY_COMPARE_OPTIONAL
 template <typename Tp, typename = decltype(std::declval<Tp>() <=> std::declval<Tp>())>
 constexpr auto operator<=>(
     const optional<Tp>& x,
@@ -72,6 +91,7 @@ constexpr auto operator<=>(
 {
     return bool(x) ? *x <=> v : strong_ordering::less;
 }
+#endif // CLANG_MISSING_FEATURE_3WAY_COMPARE_OPTIONAL
 
 } // namespace std
 
@@ -102,6 +122,9 @@ constexpr auto lexicographical_compare_three_way(I1 f1, I1 l1, I2 f2, I2 l2, Cmp
                      : std::strong_ordering::equal;
 }
 
+#if CLANG_MISSING_FEATURE_3WAY_COMPARE_VECTOR || \
+    CLANG_MISSING_FEATURE_3WAY_COMPARE_MULTIMAP || \
+    CLANG_MISSING_FEATURE_3WAY_COMPARE_MAP
 namespace detail {
 
 template<typename Tp, typename Up>
@@ -235,7 +258,9 @@ struct compare_three_way
 
     using is_transparent = void;
 };
+#endif
 
+#if CLANG_MISSING_FEATURE_3WAY_COMPARE_MAP
 template<typename Key, typename Tp, typename Compare, typename Alloc>
 constexpr detail::synth3way_t<pair<const Key, Tp>> operator<=>(
     const std::map<Key, Tp, Compare, Alloc>& x, const std::map<Key, Tp, Compare, Alloc>& y)
@@ -245,7 +270,9 @@ constexpr detail::synth3way_t<pair<const Key, Tp>> operator<=>(
         y.begin(), y.end(),
         detail::synth3way);
 }
+#endif // CLANG_MISSING_FEATURE_3WAY_COMPARE_MAP
 
+#if CLANG_MISSING_FEATURE_3WAY_COMPARE_MULTIMAP
 template<typename Key, typename Tp, typename Compare, typename Alloc>
 constexpr detail::synth3way_t<pair<const Key, Tp>> operator<=>(
     const std::multimap<Key, Tp, Compare, Alloc>& x, const std::multimap<Key, Tp, Compare, Alloc>& y)
@@ -255,7 +282,9 @@ constexpr detail::synth3way_t<pair<const Key, Tp>> operator<=>(
         y.begin(), y.end(),
         detail::synth3way);
 }
+#endif // CLANG_MISSING_FEATURE_3WAY_COMPARE_MULTIMAP
 
+#if CLANG_MISSING_FEATURE_3WAY_COMPARE_VECTOR
 template<typename Tp, typename Alloc>
 inline detail::synth3way_t<Tp> operator<=>(
     const vector<Tp, Alloc>& x,
@@ -268,6 +297,7 @@ inline detail::synth3way_t<Tp> operator<=>(
         y.end(),
         detail::synth3way);
 }
+#endif // CLANG_MISSING_FEATURE_3WAY_COMPARE_VECTOR
 
 } // namespace std
 
