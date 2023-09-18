@@ -339,51 +339,7 @@ namespace Qn {
         LC_Count
     )
 
-
-
     using FailoverPriority = nx::vms::api::FailoverPriority;
-
-    // TODO: #muskov move to api/model or even to common_globals.
-    //
-    // Check serialization/deserialization in QnMediaServerConnection::doRebuildArchiveAsync
-    // and in handler.
-    //
-    // And name them sanely =)
-    enum RebuildAction
-    {
-        RebuildAction_ShowProgress,
-        RebuildAction_Start,
-        RebuildAction_Cancel
-    };
-
-    template<typename Visitor>
-    constexpr auto nxReflectVisitAllEnumItems(RebuildAction*, Visitor&& visitor)
-    {
-        using Item = nx::reflect::enumeration::Item<RebuildAction>;
-        return visitor(
-            Item{RebuildAction_ShowProgress, ""},
-            Item{RebuildAction_Start, "start"},
-            Item{RebuildAction_Cancel, "stop"}
-        );
-    }
-
-    enum BackupAction
-    {
-        BackupAction_ShowProgress,
-        BackupAction_Start,
-        BackupAction_Cancel
-    };
-
-    template<typename Visitor>
-    constexpr auto nxReflectVisitAllEnumItems(BackupAction*, Visitor&& visitor)
-    {
-        using Item = nx::reflect::enumeration::Item<BackupAction>;
-        return visitor(
-            Item{BackupAction_ShowProgress, ""},
-            Item{BackupAction_Start, "start"},
-            Item{BackupAction_Cancel, "stop"}
-        );
-    }
 
     enum StorageInitResult
     {
