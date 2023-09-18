@@ -325,6 +325,7 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
     switch (error.code)
     {
         case RemoteConnectionErrorCode::sessionExpired:
+        case RemoteConnectionErrorCode::temporaryTokenExpired:
         case RemoteConnectionErrorCode::cloudSessionExpired:
         case RemoteConnectionErrorCode::ldapInitializationInProgress:
             title = getShortErrorDescriptionText();
