@@ -11,9 +11,10 @@ template <typename Value>
 class ValueLocker
 {
 public:
-    ValueLocker(nx::Mutex* mutex, Value* value): m_mutex(mutex), m_value(value)
+    ValueLocker(nx::Mutex* mutex = nullptr, Value* value = nullptr): m_mutex(mutex), m_value(value)
     {
-        m_mutex->lock();
+        if (m_mutex)
+            m_mutex->lock();
     }
 
     ValueLocker(ValueLocker&& other) { *this = std::move(other); }
