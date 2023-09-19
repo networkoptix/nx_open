@@ -576,6 +576,7 @@ void CloudStatusWatcher::Private::issueAccessToken()
         return;
 
     IssueTokenRequest request;
+    request.client_id = CloudConnectionFactory::clientId();
     if (!m_authData.refreshToken.empty())
     {
         request.grant_type = GrantType::refresh_token;
