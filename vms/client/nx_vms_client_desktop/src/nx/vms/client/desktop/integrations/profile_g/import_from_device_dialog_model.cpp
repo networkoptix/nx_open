@@ -82,7 +82,7 @@ public:
     QString getImportedUpToText(const QModelIndex& index) const;
     QString getStatusText(const QModelIndex& index) const;
     QString getTooltipText(const QModelIndex& index) const;
-    QColor getRowColor(const QModelIndex& index) const;
+    QColor getCellColor(const QModelIndex& index) const;
 };
 
 ImportFromDeviceDialogModel::Private::Private(ImportFromDeviceDialogModel* parent):
@@ -184,7 +184,7 @@ QString ImportFromDeviceDialogModel::Private::getTooltipText(const QModelIndex& 
     return {};
 }
 
-QColor ImportFromDeviceDialogModel::Private::getRowColor(const QModelIndex& index) const
+QColor ImportFromDeviceDialogModel::Private::getCellColor(const QModelIndex& index) const
 {
     State state = State::disabled;
 
@@ -196,11 +196,19 @@ QColor ImportFromDeviceDialogModel::Private::getRowColor(const QModelIndex& inde
     {
         case State::allImported:
         case State::inProgress:
+        {
             return colorTheme()->color("light10");
+        }
         case State::disabled:
+        {
             return colorTheme()->color("dark17");
+        }
         case State::error:
-            return colorTheme()->color("red_core");
+        {
+            return index.column() == StatusColumn
+                ? colorTheme()->color("red_core")
+                : colorTheme()->color("light10");
+        }
     }
 
     NX_ASSERT(false, "Unexpected state");
@@ -298,7 +306,7 @@ QVariant ImportFromDeviceDialogModel::data(const QModelIndex& index, int role) c
         }
         case Qt::ForegroundRole:
         {
-            return d->getRowColor(index);
+            return d->getCellColor(index);
         }
         case Qt::ToolTipRole:
         {
