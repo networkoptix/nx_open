@@ -77,6 +77,11 @@ T.TextField
     implicitWidth: 200
     implicitHeight: 28
 
+    // baselineOffset of the TextField is properly calculated only when width and height properties
+    // have some default bindings (QQuickTextInputPrivate::updateBaselineOffset).
+    width: implicitWidth
+    height: implicitHeight
+
     leftPadding: 8
     rightPadding: 8
 
