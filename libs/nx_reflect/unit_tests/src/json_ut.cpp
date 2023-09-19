@@ -718,6 +718,13 @@ struct S
 
 NX_REFLECTION_INSTRUMENT(S, (str)(map)(vec)(b)(foo))
 
+struct V
+{
+    std::variant<std::string, std::nullptr_t> field = "value";
+};
+
+NX_REFLECTION_INSTRUMENT(V, (field))
+
 TEST_F(Json, errors_skipped_if_requested_str_err)
 {
     const S expectedValue{std::string(), {{"a", 1}, {"b", 2}}, {true, false}, false, {1, false}};
@@ -792,6 +799,16 @@ TEST_F(Json, simple_type_as_json)
 {
     testSerialization("\"qweasd123\"", std::string("qweasd123"));
     testSerialization("123", 123);
+    testSerialization("null", nullptr);
+}
+
+TEST_F(Json, null_overwrites_value)
+{
+    V value;
+    const auto result = nx::reflect::json::deserialize(
+        R"({"field": null})", &value);
+    EXPECT_TRUE(result.success);
+    EXPECT_TRUE(std::holds_alternative<std::nullptr_t>(value.field));
 }
 
 //-------------------------------------------------------------------------------------------------
