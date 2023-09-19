@@ -70,6 +70,12 @@ qint64 QnSyncTime::currentMSecsSinceEpoch() const
     return value().count();
 }
 
+void QnSyncTime::resync()
+{
+    if (d->timeSyncManager)
+        d->timeSyncManager->resync();
+}
+
 void QnSyncTime::setTimeSyncManager(nx::vms::common::AbstractTimeSyncManagerPtr timeSyncManager)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
