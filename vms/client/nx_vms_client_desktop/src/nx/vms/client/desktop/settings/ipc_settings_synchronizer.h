@@ -7,6 +7,7 @@ namespace nx::vms::client::desktop {
 class LocalSettings;
 class SharedMemoryManager;
 class ShowOnceSettings;
+class MessageBarSettings;
 
 /**
  * Syncronizes local client settings between running client instances using provided IPC.
@@ -17,6 +18,7 @@ public:
     static void setup(
         LocalSettings* localSettings,
         ShowOnceSettings* showOnceSettings,
+        MessageBarSettings* messageBarSettings,
         SharedMemoryManager* sharedMemoryManager);
 };
 

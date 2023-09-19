@@ -34,6 +34,7 @@ class RunningInstancesManager;
 class ScreenRecordingSettings;
 class SharedMemoryManager;
 class ShowOnceSettings;
+class MessageBarSettings;
 class SystemContext;
 class UnifiedResourcePool;
 class UploadManager;
@@ -168,6 +169,7 @@ public:
     ScreenRecordingSettings* screenRecordingSettings() const;
 
     ShowOnceSettings* showOnceSettings() const;
+    MessageBarSettings* messageBarSettings() const;
 
     /**
      * Map of analytics objects colors by object type. Persistently stored on a PC.
