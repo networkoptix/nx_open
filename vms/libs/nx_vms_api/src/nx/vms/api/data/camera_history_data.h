@@ -63,4 +63,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraHistoryData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

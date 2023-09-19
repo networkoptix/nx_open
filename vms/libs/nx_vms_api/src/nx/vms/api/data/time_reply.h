@@ -56,4 +56,3 @@ struct NX_VMS_API ServerTimeReply : public TimeReplyCore
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ServerTimeReply)
 
 } // namespace nx::vms::api
-

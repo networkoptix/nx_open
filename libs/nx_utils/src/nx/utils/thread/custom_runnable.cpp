@@ -16,4 +16,3 @@ void CustomRunnable::run()
 }
 
 } // namespace nx::utils::thread
-

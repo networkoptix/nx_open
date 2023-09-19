@@ -133,4 +133,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserData)
 NX_REFLECTION_INSTRUMENT(UserData, UserData_Fields)
 
 } // namespace nx::vms::api
-

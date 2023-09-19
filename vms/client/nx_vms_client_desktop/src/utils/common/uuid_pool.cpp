@@ -74,4 +74,3 @@ bool QnUuidPool::belongsToPool(const QnUuid &id) const {
 
     return std::equal(uuid.data4, uuid.data4 + sizeof(uuid.data4), m_baseid.data4);
 }
-

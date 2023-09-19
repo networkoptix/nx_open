@@ -145,4 +145,3 @@ void QnSplashItem::tick(int deltaMSecs) {
             qnDeleteLater(this);
     }
 }
-

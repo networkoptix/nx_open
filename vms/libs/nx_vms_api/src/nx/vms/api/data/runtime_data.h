@@ -82,4 +82,3 @@ struct NX_VMS_API RuntimeData
 NX_VMS_API_DECLARE_STRUCT_EX(RuntimeData, (ubjson)(json)(xml))
 
 } // namespace nx::vms::api
-

@@ -37,5 +37,3 @@ FigurePtr Polygon::clone() const
 }
 
 } // namespace nx::vms::client::desktop::figure
-
-

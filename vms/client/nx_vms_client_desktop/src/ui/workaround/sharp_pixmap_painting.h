@@ -40,4 +40,3 @@ void paintPixmapSharp(
     const QPixmap& pixmap,
     const QRectF& rect,
     const QRect& sourceRect = QRect());
-

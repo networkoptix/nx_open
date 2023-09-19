@@ -136,4 +136,3 @@ private:
 };
 
 } // namespace nx::vms::client::core
-

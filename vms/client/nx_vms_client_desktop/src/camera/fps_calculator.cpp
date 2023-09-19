@@ -44,4 +44,3 @@ int calculateMaxFps(
 }
 
 } //namespace Qn
-

@@ -172,4 +172,3 @@ void FfmpegImageProvider::load(bool sync)
 }
 
 } // namespace nx::vms::client::desktop
-

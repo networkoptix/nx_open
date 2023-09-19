@@ -116,4 +116,3 @@ inline bool shouldMessageBeCompressed(
 }
 
 } // namespace nx::network::websocket
-

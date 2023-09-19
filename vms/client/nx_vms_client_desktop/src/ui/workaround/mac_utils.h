@@ -22,4 +22,3 @@ void mac_stopFileAccess();
 bool mac_isSandboxed();
 
 void setHidesOnDeactivate(WId windowId, bool value);
-

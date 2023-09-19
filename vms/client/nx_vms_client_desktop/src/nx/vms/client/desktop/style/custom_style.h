@@ -75,4 +75,3 @@ void fadeWidget(
     qreal fadeSpeed /* opacity units per second */ = 1.0,
     std::function<void()> finishHandler = std::function<void()>(),
     int animationFps = 30);
-

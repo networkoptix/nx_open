@@ -362,4 +362,3 @@ QString QnIOPortsViewModel::actionToString(Action action)
 
     return QString();
 }
-

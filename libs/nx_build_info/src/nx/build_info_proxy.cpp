@@ -14,4 +14,3 @@ QString QmlProxy::vmsVersion()
 }
 
 } // namespace nx::build_info
-

@@ -19,4 +19,3 @@ struct NX_VMS_API UserDataEx: UserData
 NX_VMS_API_DECLARE_STRUCT(UserDataEx)
 
 } // namespace nx::vms::api
-

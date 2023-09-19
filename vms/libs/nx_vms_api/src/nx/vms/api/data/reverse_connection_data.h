@@ -22,4 +22,3 @@ NX_VMS_API_DECLARE_STRUCT(ReverseConnectionData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

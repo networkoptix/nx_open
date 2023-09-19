@@ -36,4 +36,3 @@ QJsonArray toJsonArray(const Data& data)
 }
 
 } // namespace nx::vms::client::desktop::jsapi::detail
-

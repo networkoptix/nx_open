@@ -39,4 +39,3 @@ private:
     nx::vms::api::DiscoveredServerData m_serverData;
     QAuthenticator m_authenticator;
 };
-

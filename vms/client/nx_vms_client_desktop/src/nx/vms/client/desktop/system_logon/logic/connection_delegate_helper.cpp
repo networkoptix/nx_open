@@ -57,4 +57,3 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
 }
 
 } // namespace nx::vms::client::desktop
-

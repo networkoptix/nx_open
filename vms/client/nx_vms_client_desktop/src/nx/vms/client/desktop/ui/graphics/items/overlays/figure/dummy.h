@@ -22,4 +22,3 @@ private:
 };
 
 } // namespace nx::vms::client::desktop::figure
-

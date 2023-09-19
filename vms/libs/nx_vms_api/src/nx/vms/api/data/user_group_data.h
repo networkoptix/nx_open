@@ -82,4 +82,3 @@ NX_VMS_API extern const std::set<QnUuid> kAllPowerUserGroupIds;
 NX_VMS_API extern const QnUuid kDefaultLdapGroupId;
 
 } // namespace nx::vms::api
-

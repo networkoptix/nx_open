@@ -53,4 +53,3 @@ protected:
     QnMultiserverRequestData(const QnMultiserverRequestData& src) = default;
     QnMultiserverRequestData(QnMultiserverRequestData&& src) = default;
 };
-

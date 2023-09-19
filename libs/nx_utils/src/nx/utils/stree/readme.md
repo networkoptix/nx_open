@@ -70,4 +70,3 @@ The example found above is represented in the code as follows:
     assert(outAttrs.get<int>("r") == 0);
     assert(outAttrs.get<int>("g") == 0);
     assert(outAttrs.get<int>("b") == 0);
-

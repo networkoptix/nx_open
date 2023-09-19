@@ -45,4 +45,3 @@ NX_VMS_API_DECLARE_STRUCT(UpdateInstallData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

@@ -137,4 +137,3 @@ bool QnGLCheckerInstrument::eventFilter(QObject* watched, QEvent* event)
 
     return result;
 }
-

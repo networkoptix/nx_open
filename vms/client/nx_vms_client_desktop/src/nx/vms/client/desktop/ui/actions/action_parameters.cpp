@@ -198,4 +198,3 @@ QString Parameters::toString() const
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop
-

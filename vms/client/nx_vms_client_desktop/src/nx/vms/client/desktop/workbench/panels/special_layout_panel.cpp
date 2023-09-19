@@ -193,4 +193,3 @@ void SpecialLayoutPanel::stopAnimations()
 } // namespace workbench
 } // namespace ui
 } // namespace nx::vms::client::desktop
-

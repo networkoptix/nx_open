@@ -218,7 +218,3 @@ QVariant QnGridItem::itemChange(GraphicsItemChange change, const QVariant& value
 
     return base_type::itemChange(change, value);
 }
-
-
-
-

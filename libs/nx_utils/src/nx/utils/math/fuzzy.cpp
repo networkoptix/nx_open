@@ -68,5 +68,3 @@ bool qFuzzyContains(const QRectF &rect, const QPointF &point)
         qFuzzyBetween(rect.left(), point.x(), rect.right()) &&
         qFuzzyBetween(rect.top(), point.y(), rect.bottom());
 }
-
-

@@ -51,4 +51,3 @@ bool QnResourceSelectionDialogDelegate::isMultiChoiceAllowed() const
 {
     return true;
 }
-

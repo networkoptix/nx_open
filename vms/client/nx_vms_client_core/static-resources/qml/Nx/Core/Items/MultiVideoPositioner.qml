@@ -36,4 +36,3 @@ VideoPositioner
 
     MultiVideoOutput { id: video }
 }
-

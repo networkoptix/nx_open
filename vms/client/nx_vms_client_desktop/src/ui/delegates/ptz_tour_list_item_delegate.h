@@ -20,4 +20,3 @@ protected:
 };
 
 #endif // PTZ_TOUR_LIST_ITEM_DELEGATE_H
-

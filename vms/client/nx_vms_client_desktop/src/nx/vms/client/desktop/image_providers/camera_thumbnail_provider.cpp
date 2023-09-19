@@ -251,4 +251,3 @@ qint64 CameraThumbnailProvider::timestampUs() const
 }
 
 } // namespace nx::vms::client::desktop
-

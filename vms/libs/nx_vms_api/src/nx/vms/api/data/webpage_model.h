@@ -45,4 +45,3 @@ struct NX_VMS_API WebPageModel: ResourceWithParameters
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(WebPageModel, (json))
 
 } // namespace nx::vms::api
-

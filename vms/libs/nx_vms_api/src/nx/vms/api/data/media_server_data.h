@@ -260,4 +260,3 @@ struct StorageFilter: IdData
 QN_FUSION_DECLARE_FUNCTIONS(StorageFilter, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 } // namespace nx::vms::api
-

@@ -356,4 +356,3 @@ QIcon QnResourceListModel::resourceIcon(const QnResourcePtr& resource) const
 
     return qnResIconCache->icon(qnResIconCache->key(resource) | addionalKey);
 }
-

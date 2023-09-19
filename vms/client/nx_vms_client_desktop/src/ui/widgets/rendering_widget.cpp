@@ -228,4 +228,3 @@ void QnRenderingWidget::paintGL()
             1.0);
     }
 }
-

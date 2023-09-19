@@ -197,4 +197,3 @@ bool TwoWayAudioCameraButtonController::setButtonActionState(
 }
 
 } // namespace nx::vms::client::core
-

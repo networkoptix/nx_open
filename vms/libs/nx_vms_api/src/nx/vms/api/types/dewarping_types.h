@@ -55,4 +55,3 @@ Q_ENUM_NS(ViewProjection)
 NX_VMS_API std::ostream& operator<<(std::ostream& os, ViewProjection value);
 
 } // namespace nx::vms::api::dewarping
-

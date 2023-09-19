@@ -75,4 +75,3 @@ endif()
 message(STATUS "Found python executable: '${PYTHON_EXECUTABLE}'.")
 
 set(ENV{PYTHONDONTWRITEBYTECODE} True)
-

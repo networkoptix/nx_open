@@ -124,4 +124,3 @@ Consist of several fields (all except caption are optional):
 - image preview
 - footer text
 - action button
-

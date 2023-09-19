@@ -44,4 +44,3 @@ QGraphicsWidget* SpecialLayout::panelWidget() const
 } // namespace workbench
 } // namespace ui
 } // namespace nx::vms::client::desktop
-

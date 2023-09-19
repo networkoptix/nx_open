@@ -230,4 +230,3 @@ TEST(UbJsonTest, customStructVectorAncestorFromDescendant)
         ASSERT_DOUBLE_EQ(result[i].doubleData, testStructures[i].doubleData);
     }
 }
-

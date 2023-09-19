@@ -26,4 +26,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(KeyValueData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

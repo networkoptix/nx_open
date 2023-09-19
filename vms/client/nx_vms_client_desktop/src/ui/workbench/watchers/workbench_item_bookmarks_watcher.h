@@ -35,4 +35,3 @@ private:
     QnVirtualCameraResourceSet m_cameraFilter; //< If empty, any is allowed.
     QString m_textFilter;
 };
-

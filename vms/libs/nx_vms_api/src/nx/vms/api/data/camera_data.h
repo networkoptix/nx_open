@@ -72,4 +72,3 @@ struct NX_VMS_API CameraData: ResourceData
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraData)
 
 } // namespace nx::vms::api
-

@@ -146,4 +146,3 @@ void LayoutPreviewPainter::at_updateThumbnailImage(const QImage& image)
 
 } // namespace ui
 } // namespace nx::vms::client::desktop
-

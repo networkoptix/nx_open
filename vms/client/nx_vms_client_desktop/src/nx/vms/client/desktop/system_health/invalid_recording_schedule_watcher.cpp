@@ -136,4 +136,3 @@ QnVirtualCameraResourceSet InvalidRecordingScheduleWatcher::camerasWithInvalidSc
 }
 
 } // namespace nx::vms::client::desktop
-

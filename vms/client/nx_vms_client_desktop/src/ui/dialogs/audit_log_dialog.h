@@ -125,4 +125,3 @@ private:
     QnAuditItemDelegate* m_itemDelegate;
     int m_descriptionColumnIndex;
 };
-

@@ -159,4 +159,3 @@ void FixedArSelectionItem::setGeometry(const QPointF &origin, const QPointF &cor
     setRect(rect);
     setSidePoints(sidePoints);
 }
-

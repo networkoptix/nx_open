@@ -191,4 +191,3 @@ void NodeViewStatePatch::appendPatchSteps(const NodeViewStatePatch& patch)
 }
 
 } // namespace nx::vms::client::desktop
-

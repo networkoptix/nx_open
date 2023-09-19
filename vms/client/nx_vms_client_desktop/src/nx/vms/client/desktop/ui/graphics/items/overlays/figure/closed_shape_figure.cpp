@@ -31,4 +31,3 @@ ClosedShapeFigure::ClosedShapeFigure(
 }
 
 } // namespace nx::vms::client::desktop::figure
-

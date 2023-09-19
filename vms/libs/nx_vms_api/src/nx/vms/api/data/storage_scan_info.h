@@ -38,4 +38,3 @@ using StorageScanInfoFull = Map<QString, StorageScanInfo>;
 using StorageScanInfoFullMap = Map<QnUuid, StorageScanInfoFull>;
 
 } // namespace nx::vms::api
-

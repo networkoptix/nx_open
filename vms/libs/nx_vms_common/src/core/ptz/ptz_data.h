@@ -42,4 +42,3 @@ struct QnPtzData
 };
 #define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)\
     (logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)
-

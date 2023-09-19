@@ -75,4 +75,3 @@ using CameraButtons = std::vector<CameraButton>;
 using OptionalCameraButton = std::optional<CameraButton>;
 
 } // namespace nx::vms::client::core
-

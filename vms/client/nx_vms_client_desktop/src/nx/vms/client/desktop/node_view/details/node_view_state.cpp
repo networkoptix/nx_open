@@ -22,4 +22,3 @@ NodePtr NodeViewState::nodeByPath(const ViewNodePath& path) const
 } // namespace details
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

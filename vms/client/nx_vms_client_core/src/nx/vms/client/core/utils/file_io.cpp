@@ -35,4 +35,3 @@ QString FileIO::readAll(const QString& fileName) const
 }
 
 } // namespace nx::vms::client::core
-

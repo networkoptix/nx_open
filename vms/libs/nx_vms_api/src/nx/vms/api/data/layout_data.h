@@ -204,4 +204,3 @@ QN_FUSION_DECLARE_FUNCTIONS(LayoutItemModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(LayoutItemModel, LayoutItemModel_Fields)
 
 } // namespace nx::vms::api
-

@@ -70,4 +70,3 @@ QUrl WatermarkImageProvider::makeWatermarkSourceUrl(
 }
 
 } // nx::vms::client::core
-
