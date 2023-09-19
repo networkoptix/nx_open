@@ -36,6 +36,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
+#include <nx/vms/client/desktop/system_administration/models/user_property_tracker.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/force_secure_auth_dialog.h>
@@ -189,8 +190,7 @@ class UserListWidget::Private: public QObject
 {
     UserListWidget* const q;
     nx::utils::ImplPtr<Ui::UserListWidget> ui{new Ui::UserListWidget()};
-    QSet<QnUserResourcePtr> m_visibleSelected;
-    QSet<QnUserResourcePtr> m_visibleDisabled;
+    UserPropertyTracker m_visibleUsers;
 
 public:
     UserListModel* const usersModel{new UserListModel(q)};
@@ -253,13 +253,11 @@ private:
     bool canChangeAuthentication(const QSet<QnUserResourcePtr>& users) const;
 
     QnUserResourceList visibleUsers() const;
-    QnUserResourceList visibleSelectedUsers() const;
 
     int getLdapUserCount() const;
 
-    void visibleAdded(int first, int last);
+    void visibleAddedOrUpdated(int first, int last);
     void visibleAboutToBeRemoved(int first, int last);
-    void visibleModified(int first, int last);
 };
 
 UserListWidget::UserListWidget(QWidget* parent):
@@ -368,7 +366,7 @@ void UserListWidget::filterDigestUsers()
 // -----------------------------------------------------------------------------------------------
 // UserListWidget::Private
 
-UserListWidget::Private::Private(UserListWidget* q): q(q)
+UserListWidget::Private::Private(UserListWidget* q): q(q), m_visibleUsers(q->systemContext())
 {
     sortModel->setDynamicSortFilter(true);
     sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -379,7 +377,7 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
     connect(sortModel, &QAbstractItemModel::rowsInserted, this,
         [this](const QModelIndex&, int first, int last)
         {
-            visibleAdded(first, last);
+            visibleAddedOrUpdated(first, last);
             modelUpdated();
         });
 
@@ -394,7 +392,7 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
     connect(sortModel, &QAbstractItemModel::dataChanged, this,
         [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>&)
         {
-            visibleModified(topLeft.row(), bottomRight.row());
+            visibleAddedOrUpdated(topLeft.row(), bottomRight.row());
             modelUpdated();
         });
 
@@ -404,10 +402,9 @@ UserListWidget::Private::Private(UserListWidget* q): q(q)
             hasChanges = false;
             emit this->q->hasChangesChanged();
 
-            m_visibleSelected.clear();
-            m_visibleDisabled.clear();
+            m_visibleUsers.clear();
             if (sortModel->rowCount() > 0)
-                visibleAdded(0, sortModel->rowCount() - 1);
+                visibleAddedOrUpdated(0, sortModel->rowCount() - 1);
 
             modelUpdated();
         });
@@ -599,8 +596,7 @@ void UserListWidget::Private::setupUi()
     connect(ui->deleteUserAction, &QAction::triggered, this,
         [this]()
         {
-            const auto selected = visibleSelectedUsers();
-            if (!selected.isEmpty())
+            if (m_visibleUsers.selectedDeletable().size() > 0)
             {
                 deleteSelected();
                 return;
@@ -727,23 +723,19 @@ void UserListWidget::Private::updateSelection()
 {
     Qt::CheckState selectionState = Qt::Unchecked;
 
-    const bool hasSelection = !m_visibleSelected.isEmpty();
-    if (hasSelection)
+    if (!m_visibleUsers.selected().empty())
     {
-        selectionState =
-            (m_visibleSelected.size() + m_visibleDisabled.size()) == sortModel->rowCount()
-                ? Qt::Checked
-                : Qt::PartiallyChecked;
+        const auto selectedOrDisabledCount =
+            m_visibleUsers.selected().size() + m_visibleUsers.disabledCount();
+        selectionState = selectedOrDisabledCount == sortModel->rowCount()
+            ? Qt::Checked
+            : Qt::PartiallyChecked;
     }
 
-    const auto canDelete = this->canDelete(m_visibleSelected);
-    const auto canEdit = canEnableDisable(m_visibleSelected)
-        || canChangeAuthentication(m_visibleSelected);
+    deleteButton->setVisible(!m_visibleUsers.selectedDeletable().isEmpty());
+    editButton->setVisible(!m_visibleUsers.selectedEditable().isEmpty());
 
-    deleteButton->setVisible(canDelete);
-    editButton->setVisible(canEdit);
-
-    selectionControls->setDisplayed(canDelete || canEdit);
+    selectionControls->setDisplayed(m_visibleUsers.hasSelectedModifiable());
     header->setCheckState(selectionState);
 
     emit q->selectionUpdated();
@@ -814,9 +806,8 @@ void UserListWidget::Private::deleteUsers(const QnUserResourceList& usersToDelet
 
 void UserListWidget::Private::deleteSelected()
 {
-    const auto usersToDelete = visibleSelectedUsers().filtered(
-        [this](const QnUserResourcePtr& user) { return usersModel->canDelete(user); });
-    deleteUsers(usersToDelete);
+    const auto usersToDelete = m_visibleUsers.selectedDeletable();
+    deleteUsers({usersToDelete.begin(), usersToDelete.end()});
 }
 
 void UserListWidget::Private::deleteNotFoundLdapUsers()
@@ -828,12 +819,7 @@ void UserListWidget::Private::editSelected()
 {
     const auto getSelectedUsers = [this]() -> std::tuple<QSet<QnUserResourcePtr>, QVariantMap>
     {
-        const auto usersToEdit = nx::utils::toQSet(visibleSelectedUsers().filtered(
-            [this](const QnUserResourcePtr& user)
-            {
-                return usersModel->canEnableDisable(user)
-                    || usersModel->canChangeAuthentication(user);
-            }));
+        const auto usersToEdit = m_visibleUsers.selectedEditable();
 
         return {usersToEdit, QVariantMap{
             {"usersCount", usersToEdit.size()},
@@ -956,24 +942,22 @@ QnUserResourceList UserListWidget::Private::visibleUsers() const
     return result;
 }
 
-void UserListWidget::Private::visibleAdded(int first, int last)
+void UserListWidget::Private::visibleAddedOrUpdated(int first, int last)
 {
     for (int row = first; row <= last; ++row)
     {
         const QModelIndex index = sortModel->index(row, UserListModel::CheckBoxColumn);
         const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
-        const bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
-        if (!checked)
-        {
-            if (index.data(Qn::DisabledRole).toBool())
-                m_visibleDisabled.insert(user);
-
-            continue;
-        }
-
-        if (user)
-            m_visibleSelected.insert(user);
+        m_visibleUsers.addOrUpdate(
+            user,
+            {
+                .selected = index.data(Qt::CheckStateRole).toInt() == Qt::Checked,
+                .disabled = index.data(Qn::DisabledRole).toBool(),
+                .editable = usersModel->canEnableDisable(user)
+                    || usersModel->canChangeAuthentication(user),
+                .deletable = usersModel->canDelete(user)
+            });
     }
 }
 
@@ -984,42 +968,8 @@ void UserListWidget::Private::visibleAboutToBeRemoved(int first, int last)
         const QModelIndex index = sortModel->index(row, UserListModel::CheckBoxColumn);
         const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
-        m_visibleSelected.remove(user);
-        m_visibleDisabled.remove(user);
+        m_visibleUsers.remove(user);
     }
-}
-
-void UserListWidget::Private::visibleModified(int first, int last)
-{
-    for (int row = first; row <= last; ++row)
-    {
-        const QModelIndex index = sortModel->index(row, UserListModel::CheckBoxColumn);
-        const auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
-
-        const bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
-
-        if (!checked)
-        {
-            m_visibleSelected.remove(user);
-            if (index.data(Qn::DisabledRole).toBool())
-                m_visibleDisabled.insert(user);
-            else
-                m_visibleDisabled.remove(user);
-        }
-        else
-        {
-            m_visibleSelected.insert(user);
-            m_visibleDisabled.remove(user);
-        }
-    }
-}
-
-QnUserResourceList UserListWidget::Private::visibleSelectedUsers() const
-{
-    QnUserResourceList result;
-    for (const auto& user: m_visibleSelected)
-        result << user;
-    return result;
 }
 
 int UserListWidget::Private::getLdapUserCount() const
