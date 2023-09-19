@@ -28,8 +28,6 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::vms::client::core;
 
-static const QString kDesktopClientId = "desktopclient";
-
 OauthLoginDialogPrivate::OauthLoginDialogPrivate(
     OauthLoginDialog* parent,
     OauthClientType clientType,
@@ -44,8 +42,7 @@ OauthLoginDialogPrivate::OauthLoginDialogPrivate(
     m_oauthClient(new OauthClient(
         clientType,
         OauthViewType::desktop,
-        cloudSystem,
-        kDesktopClientId))
+        cloudSystem))
 {
     m_oauthClient->setLocale(qnRuntime->locale());
 

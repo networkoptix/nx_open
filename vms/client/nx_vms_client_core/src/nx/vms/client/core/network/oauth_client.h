@@ -36,7 +36,6 @@ public:
      * @param viewType Type of the visual representation - whether it is mobile or desktop view.
      * @param user Optional user name to be used for authorization process
      * @param cloudSystem Optional cloud system id to define the scope of the token.
-     * @param clientId Reserved for the future use.
      * @param refreshTokenLifetime Lifetime of the refresh token.
      * @param parent Parent object.
      */
@@ -44,7 +43,6 @@ public:
         OauthClientType clientType,
         OauthViewType viewType,
         const QString& cloudSystem = {},
-        const QString& clientId = {},
         const std::chrono::seconds& refreshTokenLifetime = {},
         QObject* parent = nullptr);
 
