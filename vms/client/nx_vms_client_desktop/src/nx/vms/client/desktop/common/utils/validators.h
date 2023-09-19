@@ -32,6 +32,7 @@ TextValidateFunction defaultEmailValidator(bool allowEmpty = true);
 TextValidateFunction defaultNonEmptyValidator(const QString& errorMessage);
 TextValidateFunction defaultPasswordValidator(bool allowEmpty,
     const QString& emptyPasswordMessage = QString());
+TextValidateFunction extendedPasswordValidator();
 TextValidateFunction defaultConfirmationValidator(TextAccessorFunction primaryText,
     const QString& errorMessage);
 
