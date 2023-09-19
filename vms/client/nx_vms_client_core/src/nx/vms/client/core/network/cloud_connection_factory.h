@@ -15,6 +15,11 @@ public:
 
     std::unique_ptr<nx::cloud::db::api::Connection> createConnection() const;
 
+    /**
+     * Application id, according to the https://datatracker.ietf.org/doc/html/rfc6749#section-2.3.1
+     */
+    static std::string clientId();
+
 private:
     /* Factory must exist all the time we are using the connection. */
     std::unique_ptr<

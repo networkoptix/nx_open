@@ -27,7 +27,7 @@ struct OauthClient::Private: public QObject
     const OauthClientType clientType = OauthClientType::undefined;
     const OauthViewType viewType = OauthViewType::desktop;
     const QString cloudSystem;
-    const QString clientId;
+    const std::string clientId = CloudConnectionFactory::clientId();
     QString locale;
     CloudAuthData authData;
     std::unique_ptr<Connection> m_connection;
@@ -37,8 +37,7 @@ struct OauthClient::Private: public QObject
         OauthClient* q,
         OauthClientType clientType,
         OauthViewType viewType,
-        const QString& cloudSystem,
-        const QString& clientId);
+        const QString& cloudSystem);
 
     void issueAccessToken();
     std::string email() const;
@@ -48,14 +47,12 @@ OauthClient::Private::Private(
     OauthClient* q,
     OauthClientType clientType,
     OauthViewType viewType,
-    const QString& cloudSystem,
-    const QString& clientId)
+    const QString& cloudSystem)
     :
     q(q),
     clientType(clientType),
     viewType(viewType),
     cloudSystem(cloudSystem),
-    clientId(clientId),
     m_cloudConnectionFactory(std::make_unique<core::CloudConnectionFactory>())
 {
 }
@@ -92,6 +89,7 @@ void OauthClient::Private::issueAccessToken()
         });
 
     IssueTokenRequest request;
+    request.client_id = CloudConnectionFactory::clientId();
     request.grant_type = GrantType::authorizationCode;
     request.code = authData.authorizationCode;
     if (!cloudSystem.isEmpty())
@@ -126,7 +124,7 @@ void OauthClient::registerQmlType()
 
 OauthClient::OauthClient(QObject* parent):
     OauthClient(OauthClientType::undefined, OauthViewType::desktop,
-        /*cloudSystem*/ {}, /*clienId*/ {}, parent)
+        /*cloudSystem*/ {}, parent)
 {
 }
 
@@ -134,11 +132,10 @@ OauthClient::OauthClient(
     OauthClientType clientType,
     OauthViewType viewType,
     const QString& cloudSystem,
-    const QString& clientId,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, clientType, viewType, cloudSystem, clientId))
+    d(new Private(this, clientType, viewType, cloudSystem))
 {
 }
 
@@ -161,7 +158,7 @@ QUrl OauthClient::url() const
         .addQueryItem("view_type", nx::reflect::toString(d->viewType))
         .addQueryItem("redirect_url", "redirect-oauth");
 
-    if (!d->clientId.isEmpty())
+    if (!d->clientId.empty())
         builder.addQueryItem("client_id", d->clientId);
 
     if (d->authData.empty()) //< Request auth code.

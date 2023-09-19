@@ -614,6 +614,7 @@ void QnCloudStatusWatcherPrivate::issueAccessToken()
         return;
 
     api::IssueTokenRequest request;
+    request.client_id = CloudConnectionFactory::clientId();
     if (!m_authData.refreshToken.empty())
     {
         request.grant_type = api::GrantType::refreshToken;
