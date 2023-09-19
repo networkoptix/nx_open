@@ -21,6 +21,7 @@ struct CommonMessageBar::Private
     QPushButton* const closeButton{
         new QPushButton(qnSkin->icon("banners/close.svg"), QString(), q)};
     QPushButton* icon{new QPushButton(QIcon(), QString(), q)};
+    BarDescription::PropertyPointer isEnabledProperty;
 };
 
 CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& description):
@@ -47,6 +48,8 @@ CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& descri
 
     connect(d->closeButton, &QPushButton::clicked, this, &CommonMessageBar::closeClicked);
     connect(d->closeButton, &QPushButton::clicked, this, &CommonMessageBar::hide);
+    connect(
+        d->closeButton, &QPushButton::clicked, this, &CommonMessageBar::hideInFuture);
 
     init(description);
 }
@@ -67,12 +70,26 @@ void CommonMessageBar::setText(const QString& text)
         return;
 
     d->label->setText(text);
-    setDisplayed(!text.isEmpty());
+
+    updateVisibility();
+}
+
+void CommonMessageBar::updateVisibility()
+{
+    const bool isHidden =
+        d->label->text().isEmpty() || (d->isEnabledProperty && !d->isEnabledProperty->value());
+    setDisplayed(!isHidden);
+}
+
+void CommonMessageBar::hideInFuture()
+{
+    if (d->isEnabledProperty)
+        d->isEnabledProperty->setValue(false);
 }
 
 void CommonMessageBar::init(const BarDescription& barDescription)
 {
-    d->closeButton->setVisible(barDescription.isClosable);
+    d->closeButton->setVisible(barDescription.isClosable || !barDescription.isEnabledProperty.isNull());
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light4"));
 
     QString backgroundColor;
@@ -101,6 +118,8 @@ void CommonMessageBar::init(const BarDescription& barDescription)
     setPaletteColor(this, QPalette::Dark, core::colorTheme()->color(frameColor));
     d->icon->setIcon(icon);
 
+    d->isEnabledProperty = barDescription.isEnabledProperty;
+
     setText(barDescription.text);
 
     if (barDescription.isMultiLine)
@@ -116,6 +135,8 @@ void CommonMessageBar::init(const BarDescription& barDescription)
     {
         verticalLayout()->addLayout(row);
     }
+
+    updateVisibility();
 }
 
 } // namespace nx::vms::client::desktop

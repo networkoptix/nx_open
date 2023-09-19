@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_painter.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/common/palette.h>
@@ -67,6 +68,12 @@ CameraScheduleWidget::CameraScheduleWidget(
 {
     setupUi();
     NX_ASSERT(store && licenseUsageProvider);
+
+    ui->recordingAlertBar->init({
+        .level = BarDescription::BarLevel::Warning,
+        .isEnabledProperty = &messageBarSettings()->recordingWarning,
+    });
+    ui->hintBar->init({.level = BarDescription::BarLevel::Info});
 
     auto licenseUsageTextDisplay = new ProvidedTextDisplay(m_licenseUsageProvider, this);
     licenseUsageTextDisplay->setDisplayingWidget(ui->licenseUsageLabel);

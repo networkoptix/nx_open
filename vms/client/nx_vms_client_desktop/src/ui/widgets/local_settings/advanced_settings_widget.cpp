@@ -29,6 +29,7 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -426,6 +427,7 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
 void QnAdvancedSettingsWidget::at_resetAllWarningsButton_clicked()
 {
     showOnceSettings()->reset();
+    messageBarSettings()->reset();
 }
 
 bool QnAdvancedSettingsWidget::isAudioDownmixed() const
