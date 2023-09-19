@@ -151,7 +151,6 @@ CSndUList::CSndUList(
     std::condition_variable* windowCond)
     :
     m_iArrayLength(4096),
-    m_iLastEntry(-1),
     m_pWindowLock(windowLock),
     m_pWindowCond(windowCond),
     m_timer(timer)
@@ -207,7 +206,7 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
 
     auto n = m_nodeHeap[0];
 
-    // no pop until the next schedulled time
+    // no pop until the next scheduled time
     auto ts = CTimer::getTime();
     if (ts < n->timestamp)
         return -1;
@@ -385,7 +384,7 @@ void CSndQueue::worker()
                 if (m_cond.wait_for(
                         lock,
                         ts - currtime,
-                        [this]() { return !m_sendTasks.empty(); }))
+                        [this]() { return m_bClosing || !m_sendTasks.empty(); }))
                 {
                     // m_sendTasks is not empty.
                     continue;

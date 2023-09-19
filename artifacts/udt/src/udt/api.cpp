@@ -1063,10 +1063,11 @@ void CUDTUnited::checkBrokenSockets()
     for (auto k = tbc.begin(); k != tbc.end(); ++k)
         m_Sockets.erase(*k);
 
-    std::vector<std::shared_ptr<Multiplexer>> multiplexersToRemove;
     // remove those timed out sockets
     for (auto l = tbr.begin(); l != tbr.end(); ++l)
-        removeSocket(cg, *l, &multiplexersToRemove);
+        removeSocket(cg, *l);
+
+    std::vector<std::shared_ptr<Multiplexer>> multiplexersToRemove = selectMultiplexersToRemove();
 
     cg.unlock();
 
@@ -1077,8 +1078,7 @@ void CUDTUnited::checkBrokenSockets()
 
 void CUDTUnited::removeSocket(
     const std::unique_lock<std::mutex>& lock,
-    const UDTSOCKET u,
-    std::vector<std::shared_ptr<Multiplexer>>* const multiplexersToRemove)
+    const UDTSOCKET u)
 {
     auto i = m_ClosedSockets.find(u);
 
@@ -1117,13 +1117,30 @@ void CUDTUnited::removeSocket(
         //something is wrong!!!
         return;
     }
+}
 
-    m->second->refCount--;
-    if (0 == m->second->refCount)
+std::vector<std::shared_ptr<Multiplexer>> CUDTUnited::selectMultiplexersToRemove()
+{
+    std::vector<std::shared_ptr<Multiplexer>> result;
+
+    for (auto it = m_multiplexers.begin(); it != m_multiplexers.end();)
     {
-        multiplexersToRemove->push_back(m->second);
-        m_multiplexers.erase(m);
+        auto& multiplexer = it->second;
+
+        // Note: this code relies on the fact that std::weak_ptr<Multiplexer> is not used anywhere.
+        // This weakness will be addressed in a future version.
+        if (multiplexer.use_count() == 1)
+        {
+            result.push_back(multiplexer);
+            it = m_multiplexers.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
     }
+
+    return result;
 }
 
 void CUDTUnited::setError(Error e)
@@ -1189,10 +1206,9 @@ Result<> CUDTUnited::updateMux(
             if ((multiplexer->ipVersion == s->m_pUDT->ipVersion()) &&
                 (multiplexer->maximumSegmentSize == s->m_pUDT->mss()) && multiplexer->reusable)
             {
-                if (multiplexer->udpPort == port)
+                if (multiplexer->udpPort() == port)
                 {
                     // reuse the existing multiplexer
-                    ++multiplexer->refCount;
                     s->m_pUDT->setMultiplexer(multiplexer);
                     s->m_multiplexerId = multiplexer->id;
                     return success();
@@ -1209,8 +1225,6 @@ Result<> CUDTUnited::updateMux(
         s->m_pUDT->reuseAddr(),
         s->m_SocketId);
 
-    ++multiplexer->refCount;
-
     multiplexer->channel().setSndBufSize(s->m_pUDT->udpSndBufSize());
     multiplexer->channel().setRcvBufSize(s->m_pUDT->udpRcvBufSize());
 
@@ -1222,9 +1236,6 @@ Result<> CUDTUnited::updateMux(
         multiplexer->channel().shutdown();
         return result;
     }
-
-    const auto sa = multiplexer->channel().getSockAddr();
-    multiplexer->udpPort = sa.port();
 
     m_multiplexers[multiplexer->id] = multiplexer;
 
@@ -1257,10 +1268,9 @@ Result<> CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
     for (auto i = m_multiplexers.begin(); i != m_multiplexers.end(); ++i)
     {
         auto& multiplexer = i->second;
-        if (multiplexer->udpPort == port)
+        if (multiplexer->udpPort() == port)
         {
             // reuse the existing multiplexer
-            ++multiplexer->refCount;
             s->m_pUDT->setMultiplexer(multiplexer);
             s->m_multiplexerId = multiplexer->id;
             return success();
