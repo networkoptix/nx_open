@@ -49,6 +49,8 @@ public:
             writeInt(static_cast<std::int64_t>(val));
         else if constexpr (std::is_floating_point_v<T>)
             writeFloat(static_cast<double>(val));
+        else if constexpr (std::is_same_v<T, std::nullptr_t>)
+            writeNull();
         else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             writeString(val);
         else
@@ -227,6 +229,10 @@ void serialize(
         ctx->composer.writeValue(val);
     }
     else if constexpr (std::is_integral_v<Value> || std::is_floating_point_v<Value>)
+    {
+        ctx->composer.writeValue(val);
+    }
+    else if constexpr (std::is_same_v<Value, std::nullptr_t>)
     {
         ctx->composer.writeValue(val);
     }
