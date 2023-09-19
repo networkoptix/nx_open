@@ -75,7 +75,7 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
         });
 
     connect(manager, &nx::vms::common::UserGroupManager::reset, this,
-        [this]()
+        [this, manager]()
         {
             const auto groupsCopy = m_nonEditableGroups.keys();
             for (const auto& id: groupsCopy)
@@ -83,7 +83,11 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
                 if (!nx::vms::common::PredefinedUserGroups::contains(id))
                     removeGroup(id);
             }
-        });
+
+            for (const auto& group: manager->groups())
+                addOrUpdateGroup(group);
+        },
+        Qt::QueuedConnection); //< When using direct connection users are not loaded yet.
 
     for (const auto& group: manager->groups())
         addOrUpdateGroup(group);
