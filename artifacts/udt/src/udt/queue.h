@@ -138,7 +138,7 @@ private:
     // physical length of the array
     int m_iArrayLength = 0;
     // position of last entry on the heap array
-    int m_iLastEntry = 0;
+    int m_iLastEntry = -1;
 
     mutable std::mutex m_mutex;
 
@@ -239,7 +239,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class CSndQueue
+class UDT_API CSndQueue
 {
 public:
     CSndQueue(AbstractUdpChannel* c, CTimer* t);
