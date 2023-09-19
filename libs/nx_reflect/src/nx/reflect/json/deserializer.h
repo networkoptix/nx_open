@@ -49,7 +49,10 @@ template<typename T>
 struct IsBuiltInJsonValueType
 {
     static constexpr bool value =
-        std::is_integral_v<T> | std::is_floating_point_v<T> | std::is_same_v<T, std::string>;
+        std::is_integral_v<T> |
+        std::is_floating_point_v<T> |
+        std::is_same_v<T, std::string>|
+        std::is_same_v<T, std::nullptr_t>;
 };
 
 template<typename... U> inline constexpr bool IsBuiltInJsonTypeV =
@@ -350,6 +353,16 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
         return {
             false,
             "Either a number or a string is expected for an integral value",
+            getStringRepresentation(ctx.value)};
+    }
+    else if constexpr (std::is_same_v<T, std::nullptr_t>)
+    {
+        *data = std::nullptr_t();
+        if (ctx.value.IsNull())
+            return DeserializationResult(true);
+        return {
+            false,
+            "A null value is expected",
             getStringRepresentation(ctx.value)};
     }
     else if constexpr (IsInstrumentedEnumV<T>)
