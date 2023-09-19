@@ -29,15 +29,14 @@ public:
     CSndQueue& sendQueue();
     CRcvQueue& recvQueue();
 
+    /** @return local UDP port the multiplexer uses. */
+    int udpPort() const;
+
     const int ipVersion;
     const int maximumSegmentSize;
     // if this one can be shared with others
     const bool reusable;
     const int id;
-
-    int udpPort = 0;
-    // number of UDT instances that are associated with this multiplexer
-    int refCount = 0;
 
 private:
     std::unique_ptr<AbstractUdpChannel> m_udpChannel;

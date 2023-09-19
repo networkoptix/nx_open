@@ -243,8 +243,9 @@ private:
 
     void removeSocket(
         const std::unique_lock<std::mutex>& lock,
-        const UDTSOCKET u,
-        std::vector<std::shared_ptr<Multiplexer>>* const multiplexersToRemove);
+        const UDTSOCKET u);
+
+    std::vector<std::shared_ptr<Multiplexer>> selectMultiplexersToRemove();
 
 private:
     using HandshakeKey = std::tuple<UDTSOCKET /*id*/, int32_t /*ISN*/>;

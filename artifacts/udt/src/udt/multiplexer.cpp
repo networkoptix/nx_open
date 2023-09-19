@@ -60,3 +60,8 @@ CRcvQueue& Multiplexer::recvQueue()
 {
     return *m_recvQueue;
 }
+
+int Multiplexer::udpPort() const
+{
+    return m_udpChannel->getSockAddr().port();
+}
