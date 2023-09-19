@@ -59,7 +59,7 @@ Q_INVOKABLE QUrl UserSettingsGlobal::accountManagementUrl() const
 
 QString UserSettingsGlobal::validatePassword(const QString& password)
 {
-    auto validateFunction = defaultPasswordValidator(/*allowEmpty*/ false);
+    auto validateFunction = extendedPasswordValidator();
     const auto result = validateFunction(password);
     return result.state != QValidator::Acceptable ? result.errorMessage : "";
 }

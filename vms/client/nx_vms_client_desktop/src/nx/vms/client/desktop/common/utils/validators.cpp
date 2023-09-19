@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <nx/vms/client/desktop/common/utils/password_information.h>
 #include <utils/email/email.h>
 
 class QnValidatorStrings
@@ -85,6 +86,18 @@ TextValidateFunction defaultPasswordValidator(bool allowEmpty, const QString& em
             }
 
             return ValidationResult::kValid;
+        };
+}
+
+TextValidateFunction extendedPasswordValidator()
+{
+    return
+        [](const QString& password)
+        {
+            PasswordInformation info(password, nx::utils::passwordStrength);
+            return info.acceptance() == nx::utils::PasswordAcceptance::Good
+                ? ValidationResult()
+                : ValidationResult(info.hint());
         };
 }
 
