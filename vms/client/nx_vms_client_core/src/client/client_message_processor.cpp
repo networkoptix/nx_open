@@ -238,5 +238,5 @@ void QnClientMessageProcessor::onGotInitialNotification(const nx::vms::api::Full
     NX_ASSERT(currentServer);
 
     /* Get server time as soon as we setup connection. */
-    qnSyncTime->currentMSecsSinceEpoch();
+    qnSyncTime->resync();
 }
