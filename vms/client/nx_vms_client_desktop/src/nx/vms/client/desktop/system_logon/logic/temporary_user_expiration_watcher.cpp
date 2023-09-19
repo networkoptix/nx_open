@@ -24,7 +24,6 @@ namespace nx::vms::client::desktop {
 namespace {
 constexpr auto kTimerInterval = 1min;
 constexpr auto kImportantNotificationTime = 1h;
-constexpr auto kOneYear = std::chrono::years(1);
 constexpr auto kOneMonth = std::chrono::months(1);
 
 QString durationToString(const std::chrono::seconds duration,
@@ -33,8 +32,7 @@ QString durationToString(const std::chrono::seconds duration,
 {
     using namespace nx::vms::text;
     return HumanReadable::timeSpan(duration,
-        HumanReadable::Months | HumanReadable::Days | HumanReadable::Hours
-            | HumanReadable::Minutes,
+        HumanReadable::Days | HumanReadable::Hours | HumanReadable::Minutes,
         HumanReadable::SuffixFormat::Full,
         separator,
         suppressSecondUnitLimit);
@@ -108,16 +106,12 @@ void TemporaryUserExpirationWatcher::updateNotification()
     auto timeStr = durationToString(timeLeft, separator);
     QString notificationText;
 
-    if (const auto years = duration_cast<std::chrono::years>(timeLeft); years >= kOneYear)
+    if (const auto months = duration_cast<std::chrono::months>(timeLeft); months >= kOneMonth)
     {
         const auto timeWatcher = systemContext()->serverTimeWatcher();
         timeStr = nx::vms::time::toString(timeWatcher->displayTime(expirationTimestampMs).date());
         notificationText =
             tr("Your access to the System expires %1", /*comment*/ "%1 is a date").arg(timeStr);
-    }
-    else if (const auto months = duration_cast<std::chrono::months>(timeLeft); months >= kOneMonth)
-    {
-        timeStr = durationToString(timeLeft, separator, HumanReadable::kNoSuppressSecondUnit);
     }
     else if (const auto minutes = duration_cast<std::chrono::minutes>(timeLeft); minutes < 1min)
     {
