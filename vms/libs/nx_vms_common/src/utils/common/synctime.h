@@ -53,6 +53,9 @@ public:
     std::chrono::microseconds currentTimePoint() const;
     QDateTime currentDateTime() const;
 
+    /** Forced re-synchronization. */
+    void resync();
+
 signals:
     /**
      * Emitted whenever time on Server changes. Deprecated. Use AbstractTimeSyncManager instead.

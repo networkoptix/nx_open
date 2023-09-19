@@ -29,6 +29,7 @@ TimeSyncManager::~TimeSyncManager()
 void TimeSyncManager::resync()
 {
     m_lastSyncTimeInterval.invalidate();
+    updateTime();
 }
 
 void TimeSyncManager::updateTime()
