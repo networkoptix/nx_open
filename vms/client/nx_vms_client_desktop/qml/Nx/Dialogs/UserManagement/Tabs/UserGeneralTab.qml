@@ -490,9 +490,7 @@ Item
 
                                 width: parent.width
 
-                                //: Date and time when access expires,
-                                //: for example: 14.05.2023, 10:23 (in 10 days)
-                                text: (control.self || "") && qsTr(`%1 (in %2)`)
+                                text: (control.self || "") && "%1%2"
                                     .arg(linkDates.expirationDateText)
                                     .arg(control.self.durationFormat(linkDates.expiresInMs))
 

@@ -51,6 +51,7 @@
 #include <nx/vms/common/resource/server_host_priority.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/text/human_readable.h>
+#include <nx/vms/time/formatter.h>
 #include <nx/vms/utils/system_uri.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
@@ -803,24 +804,22 @@ QString UserSettingsDialog::durationFormat(qint64 ms) const
         return {};
 
     constexpr auto kOneMonth = months(1);
-    static const QString separator =
-        QString(" %1 ").arg(tr("and", /*comment*/ "Example: 1 month and 2 days"));
-
-    int suppressSecondUnitLimit = text::HumanReadable::kAlwaysSuppressSecondUnit;
-
     auto duration = std::chrono::milliseconds(ms);
 
     if (const auto months = duration_cast<std::chrono::months>(duration); months >= kOneMonth)
-        suppressSecondUnitLimit = HumanReadable::kNoSuppressSecondUnit;
+        return {};
     else if (const auto minutes = duration_cast<std::chrono::minutes>(duration); minutes < 1min)
         duration = 1min;
 
-    return HumanReadable::timeSpan(
-        duration_cast<std::chrono::milliseconds>(duration),
-        HumanReadable::Months | HumanReadable::Days | HumanReadable::Hours | HumanReadable::Minutes,
-        text::HumanReadable::SuffixFormat::Full,
-        separator,
-        suppressSecondUnitLimit);
+    static const QString separator =
+        QString(" %1 ").arg(tr("and", /*comment*/ "Example: 1 month and 2 days"));
+
+    return QString(" (%1)").arg(tr("in %1",/*comment*/ "%1 is a duration")
+        .arg(HumanReadable::timeSpan(duration_cast<std::chrono::milliseconds>(duration),
+            HumanReadable::Days | HumanReadable::Hours | HumanReadable::Minutes,
+            text::HumanReadable::SuffixFormat::Full,
+            separator,
+            text::HumanReadable::kAlwaysSuppressSecondUnit)));
 }
 
 UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr& user)
