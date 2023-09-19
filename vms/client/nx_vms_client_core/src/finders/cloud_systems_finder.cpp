@@ -76,6 +76,12 @@ nx::vms::api::ModuleInformationWithAddresses createInitialServer(const QnCloudSy
     result.version = nx::utils::SoftwareVersion(system.version);
 
     const auto localVersion = nx::utils::SoftwareVersion(nx::build_info::vmsVersion());
+
+    // When the system is just attached to the cloud, we can receive system info before its actual
+    // version is known. In this case expect system version to be the same as client's.
+    if (result.version.isNull())
+        result.version = localVersion;
+
     const bool sameVersion = (result.version.major == localVersion.major)
         && (result.version.minor == localVersion.minor);
 
