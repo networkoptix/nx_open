@@ -19,8 +19,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/ini.h>
-#include <nx/vms/client/core/network/certificate_verifier.h>
-#include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
@@ -29,6 +27,9 @@
 #include <utils/common/synctime.h>
 #include <watchers/cloud_status_watcher.h>
 
+#include "certificate_verifier.h"
+#include "cloud_connection_factory.h"
+#include "credentials_manager.h"
 #include "network_module.h"
 #include "remote_connection.h"
 #include "remote_connection_factory.h"
@@ -521,6 +522,7 @@ void RemoteSession::onCloudSessionTokenExpiring()
         return;
 
     IssueTokenRequest request;
+    request.client_id = CloudConnectionFactory::clientId();
     request.grant_type = GrantType::refreshToken;
     request.scope =
         nx::format("cloudSystemId=%1", connection->moduleInformation().cloudSystemId).toStdString();

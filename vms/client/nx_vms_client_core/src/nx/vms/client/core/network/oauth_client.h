@@ -36,14 +36,12 @@ public:
      * @param viewType Type of the visual representation - whether it is mobile or desktop view.
      * @param user Optional user name to be used for authorization process
      * @param cloudSystem Optional cloud system id to define the scope of the token.
-     * @param clientId Reserved for the future use.
      * @param parent Parent object.
      */
     OauthClient(
         OauthClientType clientType,
         OauthViewType viewType,
         const QString& cloudSystem = QString(),
-        const QString& clientId = QString(),
         QObject* parent = nullptr);
 
     virtual ~OauthClient() override;
