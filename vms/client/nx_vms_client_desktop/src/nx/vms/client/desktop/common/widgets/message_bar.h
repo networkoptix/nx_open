@@ -2,10 +2,12 @@
 
 #pragma once
 
+#include <QtCore/QPointer>
 #include <QtCore/QString>
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/property_storage/storage.h>
 
 #include "control_bars.h"
 
@@ -15,6 +17,7 @@ namespace nx::vms::client::desktop {
 
 struct BarDescription
 {
+    using PropertyPointer = QPointer<nx::utils::property_storage::Property<bool>>;
     enum class BarLevel
     {
         Info,
@@ -25,7 +28,8 @@ struct BarDescription
     QString text;
     BarLevel level = BarLevel::Info;
     bool isMultiLine = false;
-    bool isClosable = true;
+    bool isClosable = false;
+    PropertyPointer isEnabledProperty;
     std::vector<QHBoxLayout*> additionalRows; //<= Additional rows under the label.
 };
 
@@ -53,6 +57,8 @@ public:
     void setText(const QString& text);
 
     void init(const BarDescription& barDescription);
+    void updateVisibility();
+    void hideInFuture();
 
 signals:
     void closeClicked();

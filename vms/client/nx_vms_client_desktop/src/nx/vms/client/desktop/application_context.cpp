@@ -55,6 +55,7 @@
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/ipc_settings_synchronizer.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/client_process_runner.h>
@@ -281,6 +282,7 @@ struct ApplicationContext::Private
         objectDisplaySettings = std::make_unique<ObjectDisplaySettings>();
         screenRecordingSettings = std::make_unique<ScreenRecordingSettings>();
         showOnceSettings = std::make_unique<ShowOnceSettings>();
+        messageBarSettings = std::make_unique<MessageBarSettings>();
     }
 
     void initializeStateModules()
@@ -319,6 +321,7 @@ struct ApplicationContext::Private
         IpcSettingsSynchronizer::setup(
             localSettings.get(),
             showOnceSettings.get(),
+            messageBarSettings.get(),
             sharedMemoryManager.get());
     }
 
@@ -544,6 +547,7 @@ struct ApplicationContext::Private
     std::unique_ptr<ObjectDisplaySettings> objectDisplaySettings;
     std::unique_ptr<ScreenRecordingSettings> screenRecordingSettings;
     std::unique_ptr<ShowOnceSettings> showOnceSettings;
+    std::unique_ptr<MessageBarSettings> messageBarSettings;
 
     // State modules.
     std::unique_ptr<ClientStateHandler> clientStateHandler;
@@ -809,6 +813,11 @@ ScreenRecordingSettings* ApplicationContext::screenRecordingSettings() const
 ShowOnceSettings* ApplicationContext::showOnceSettings() const
 {
     return d->showOnceSettings.get();
+}
+
+MessageBarSettings* ApplicationContext::messageBarSettings() const
+{
+    return d->messageBarSettings.get();
 }
 
 ObjectDisplaySettings* ApplicationContext::objectDisplaySettings() const

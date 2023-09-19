@@ -268,19 +268,14 @@
     </widget>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::MessageBar" name="hintBar" native="true"/>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="hintBar" native="true"/>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="recordingAlertBar" native="true"/>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="recordingAlertBar" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>nx::vms::client::desktop::AlertBar</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
-  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::ArchiveLengthWidget</class>
    <extends>QWidget</extends>
@@ -306,15 +301,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::MessageBar</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>nx::vms::client::desktop::CheckBox</class>
    <extends>QCheckBox</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/check_box.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::CommonMessageBar</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

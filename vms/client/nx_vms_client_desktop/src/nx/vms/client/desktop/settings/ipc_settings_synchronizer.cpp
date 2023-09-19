@@ -6,6 +6,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 
@@ -14,10 +15,12 @@ namespace nx::vms::client::desktop {
 void IpcSettingsSynchronizer::setup(
     LocalSettings* localSettings,
     ShowOnceSettings* showOnceSettings,
+    MessageBarSettings* messageBarSettings,
     SharedMemoryManager* sharedMemoryManager)
 {
     NX_CRITICAL(localSettings);
     NX_CRITICAL(showOnceSettings);
+    NX_CRITICAL(messageBarSettings);
     NX_CRITICAL(sharedMemoryManager);
 
     QObject::connect(sharedMemoryManager, &SharedMemoryManager::clientCommandRequested,
@@ -36,9 +39,19 @@ void IpcSettingsSynchronizer::setup(
                 showOnceSettings->reload();
         });
 
+    QObject::connect(sharedMemoryManager, &SharedMemoryManager::clientCommandRequested,
+        messageBarSettings,
+        [messageBarSettings](SharedMemoryData::Command command)
+        {
+            if (command == SharedMemoryData::Command::reloadSettings)
+                messageBarSettings->reload();
+        });
+
     QObject::connect(localSettings, &LocalSettings::changed,
         sharedMemoryManager, &SharedMemoryManager::requestSettingsReload);
     QObject::connect(showOnceSettings, &ShowOnceSettings::changed,
+        sharedMemoryManager, &SharedMemoryManager::requestSettingsReload);
+    QObject::connect(showOnceSettings, &MessageBarSettings::changed,
         sharedMemoryManager, &SharedMemoryManager::requestSettingsReload);
 }
 
