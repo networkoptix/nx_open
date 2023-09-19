@@ -32,4 +32,3 @@ QString cf::QnCFUrl::toString(const CFURLRef ref)
 
     return cf::QnCFString::makeOwned(CFURLGetString(ref)).toString();
 }
-

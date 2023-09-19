@@ -101,4 +101,3 @@ private:
 
 
 #endif // QN_SCENE_EVENT_FILTER_H
-

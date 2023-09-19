@@ -63,4 +63,3 @@ private:
     QnPtzTour m_activeTour;
     QnTourPtzExecutor* m_executor;
 };
-

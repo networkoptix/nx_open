@@ -104,4 +104,3 @@ void DragInstrument::finishDrag(DragInfo *) {
 void DragInstrument::finishDragProcess(DragInfo *info) {
     emit dragProcessFinished(info->view());
 }
-

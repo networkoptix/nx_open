@@ -136,4 +136,3 @@ QSize QnFramedLabel::frameSize() const
 {
     return QSize(lineWidth() * 2, lineWidth() * 2);
 }
-

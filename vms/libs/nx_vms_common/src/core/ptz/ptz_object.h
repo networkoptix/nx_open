@@ -28,4 +28,3 @@ struct QnPtzObject
     bool operator==(const QnPtzObject& other) const = default;
 };
 #define QnPtzObject_Fields (type)(id)
-

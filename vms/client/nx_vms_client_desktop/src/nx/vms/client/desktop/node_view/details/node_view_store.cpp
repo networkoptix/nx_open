@@ -61,4 +61,3 @@ void NodeViewStore::applyPatch(const NodeViewStatePatch& patch)
 } // namespace details
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

@@ -259,4 +259,3 @@ void PoeController::cancelRequest()
 }
 
 } // namespace nx::vms::client::desktop
-

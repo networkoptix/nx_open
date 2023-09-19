@@ -41,4 +41,3 @@ private:
     QnConnectionState m_state;
     QMultiMap<QnConnectionState, QnConnectionState> m_allowedTransactions;
 };
-

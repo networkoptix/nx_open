@@ -18,4 +18,3 @@ QnEmptyBusinessEventWidget::QnEmptyBusinessEventWidget(
 QnEmptyBusinessEventWidget::~QnEmptyBusinessEventWidget()
 {
 }
-

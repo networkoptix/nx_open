@@ -19,4 +19,3 @@ NX_VMS_API_DECLARE_STRUCT(LicenseOverflowData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

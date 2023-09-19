@@ -142,4 +142,3 @@ void AnimationsControlDialog::registerAction()
 }
 
 } // namespace nx::vms::client::desktop
-

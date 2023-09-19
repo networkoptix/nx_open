@@ -69,4 +69,3 @@ NX_VMS_API_DECLARE_STRUCT(ResetEventRulesData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

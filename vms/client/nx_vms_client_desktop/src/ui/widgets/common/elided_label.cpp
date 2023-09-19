@@ -58,4 +58,3 @@ void QnElidedLabel::paintEvent(QPaintEvent *event) {
         style->drawItemText(&painter, cr, flags, opt.palette, isEnabled(), actualText, foregroundRole());
     }
 }
-

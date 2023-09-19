@@ -41,4 +41,3 @@ bool IoPortsSortModel::lessThan(const QModelIndex& left, const QModelIndex& righ
 }
 
 } // namespace nx::vms::client::core
-

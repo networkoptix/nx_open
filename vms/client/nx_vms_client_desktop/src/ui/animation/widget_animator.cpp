@@ -110,4 +110,3 @@ void WidgetAnimator::setEasingCurve(const QEasingCurve& easingCurve)
 {
     m_geometryAnimator->setEasingCurve(easingCurve);
 }
-

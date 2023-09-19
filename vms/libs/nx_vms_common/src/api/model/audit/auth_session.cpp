@@ -118,4 +118,3 @@ void deserialize_field(const QVariant &value, QnAuthSession *target)
     deserialize_field(value, &tmp);
     target->fromString(tmp);
 }
-

@@ -1075,5 +1075,3 @@ void ZoomWindowInstrument::at_resizingFinished(
 {
     m_windowTarget.clear();
 }
-
-

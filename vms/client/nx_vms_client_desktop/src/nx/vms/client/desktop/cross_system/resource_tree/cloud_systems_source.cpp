@@ -74,4 +74,3 @@ CloudSystemsSource::CloudSystemsSource()
 
 } // namespace entity_resource_tree
 } // namespace nx::vms::client::desktop
-

@@ -60,4 +60,3 @@ qint64 QnTimeDurationMetric::duration() const
         ? m_counter.elapsed() : 0);
     return m_activeStateDurationMs + countedMs;
 }
-

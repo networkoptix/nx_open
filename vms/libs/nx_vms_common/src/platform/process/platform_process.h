@@ -44,4 +44,3 @@ public:
 };
 
 #endif // QN_PLATFORM_PROCESS_H
-

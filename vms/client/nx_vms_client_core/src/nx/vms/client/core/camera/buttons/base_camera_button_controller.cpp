@@ -264,4 +264,3 @@ bool BaseCameraButtonController::setButtonActionState(
 }
 
 } // namespace nx::vms::client::core
-

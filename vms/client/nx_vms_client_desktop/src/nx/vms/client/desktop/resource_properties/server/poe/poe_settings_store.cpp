@@ -140,4 +140,3 @@ void PoeSettingsStore::applyUserChanges()
 }
 
 } // namespace nx::vms::client::desktop
-

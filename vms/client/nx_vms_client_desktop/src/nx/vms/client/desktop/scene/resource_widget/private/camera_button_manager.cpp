@@ -459,4 +459,3 @@ QnScrollableItemsWidget* CameraButtonManager::objectTrackingContainer() const
 }
 
 } // namespace nx::vms::client::desktop
-

@@ -76,4 +76,3 @@ private:
 
 } // namespace edge
 } // namespace nx::core::resource
-

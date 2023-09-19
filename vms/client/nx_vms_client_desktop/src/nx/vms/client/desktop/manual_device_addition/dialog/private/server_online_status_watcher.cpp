@@ -48,4 +48,3 @@ bool ServerOnlineStatusWatcher::isOnline() const
 }
 
 } // namespace nx::vms::client::desktop
-

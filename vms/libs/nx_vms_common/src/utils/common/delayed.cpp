@@ -114,4 +114,3 @@ void executeInThread(QThread* thread, Callback callback)
     else
         executeDelayedImpl(callback, 0, thread, nullptr);
 }
-

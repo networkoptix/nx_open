@@ -75,4 +75,3 @@ private:
 };
 
 } // namespace nx::utils::algorithm
-

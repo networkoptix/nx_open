@@ -80,4 +80,3 @@ void QnExitFullscreenActionWidget::openLayoutSelectionDialog()
 
     updateLayoutButton();
 }
-

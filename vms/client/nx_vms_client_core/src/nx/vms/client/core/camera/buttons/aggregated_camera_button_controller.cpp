@@ -204,4 +204,3 @@ bool AggregatedCameraButtonController::actionIsActive(const QnUuid& buttonId) co
 }
 
 } // namespace nx::vms::client::core
-

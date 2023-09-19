@@ -177,4 +177,3 @@ QRectF linearCombine(qreal a, const QRectF &x, qreal b, const QRectF &y) {
         linearCombine(a, x.size(),      b, y.size())
     );
 }
-

@@ -134,4 +134,3 @@ bool QnCheckedButton::event(QEvent *event) {
 
     return base_type::event(event);
 }
-

@@ -255,4 +255,3 @@ GLint QnGlFunctions::estimatedInteger(GLenum target)
 
     return StaticOpenGLInfo::instance().maxTextureSize();
 }
-

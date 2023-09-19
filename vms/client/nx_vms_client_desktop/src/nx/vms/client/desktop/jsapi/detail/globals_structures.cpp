@@ -31,4 +31,3 @@ Error Error::invalidArguments(const QString& description)
 }
 
 } // namespace nx::vms::client::desktop::jsapi
-

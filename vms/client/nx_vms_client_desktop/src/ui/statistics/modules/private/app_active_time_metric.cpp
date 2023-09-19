@@ -29,4 +29,3 @@ bool AppActiveTimeMetric::eventFilter(QObject *watched, QEvent *event)
     setCounterActive(isActiveApplicationEvent);
     return false;
 }
-

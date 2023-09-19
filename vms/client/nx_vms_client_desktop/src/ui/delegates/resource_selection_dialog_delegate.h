@@ -45,4 +45,3 @@ protected:
     QnResourcePtr getResource(const QnUuid& resource) const;
     QnResourceList getResources(const QSet<QnUuid>& resources) const;
 };
-

@@ -146,4 +146,3 @@ int AnimatorGroup::estimatedDuration() const
 
     return result;
 }
-

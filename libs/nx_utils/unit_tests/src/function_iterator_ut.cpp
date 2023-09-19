@@ -22,4 +22,3 @@ TEST(FunctionIterator, Simple)
 } // namespace test
 } // namespace utils
 } // namespace nx
-

@@ -72,5 +72,3 @@ void QnGenericNotifier::timerEvent(QTimerEvent *event) {
         base_type::timerEvent(event);
     }
 }
-
-

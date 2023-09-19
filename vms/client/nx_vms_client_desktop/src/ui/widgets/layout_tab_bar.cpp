@@ -546,4 +546,3 @@ void QnLayoutTabBar::at_currentChanged(int index)
 
     checkInvariants();
 }
-

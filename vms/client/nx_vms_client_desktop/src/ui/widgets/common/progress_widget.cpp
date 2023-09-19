@@ -33,5 +33,3 @@ void QnProgressWidget::setText(const QString &text) {
     m_text->setText(text);
     m_text->setVisible(!text.isEmpty());
 }
-
-

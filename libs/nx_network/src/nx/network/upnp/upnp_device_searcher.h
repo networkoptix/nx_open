@@ -185,4 +185,3 @@ private slots:
 };
 
 } // namespace nx::network::upnp
-

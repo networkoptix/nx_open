@@ -21,4 +21,3 @@ QString QnCFDictionary::getStringValue(const QString& key) const
 }
 
 } // namespace cf
-

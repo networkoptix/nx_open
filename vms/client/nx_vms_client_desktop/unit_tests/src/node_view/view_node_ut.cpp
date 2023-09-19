@@ -209,4 +209,3 @@ TEST(ViewNodeTest, node_test)
     ASSERT_TRUE(root->indexOf(firstChild) == -1);
     ASSERT_TRUE(root->indexOf(secondChild) == -1);
 }
-

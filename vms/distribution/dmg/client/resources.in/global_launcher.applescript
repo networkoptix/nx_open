@@ -70,4 +70,3 @@ on debugLog(logText)
     do shell script "echo " & getQuoted(logText) & ">>" & getQuoted(logFileName)
     display alert logText
 end debugLog
-

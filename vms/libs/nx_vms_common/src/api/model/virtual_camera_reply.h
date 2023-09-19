@@ -12,4 +12,3 @@ struct QnVirtualCameraReply
 #define QnVirtualCameraReply_Fields (id)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnVirtualCameraReply, (json)(ubjson), NX_VMS_COMMON_API)
-

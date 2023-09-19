@@ -9,4 +9,3 @@ QnAbstractSystemsFinder::QnAbstractSystemsFinder(QObject *parent):
 
 QnAbstractSystemsFinder::~QnAbstractSystemsFinder()
 {}
-

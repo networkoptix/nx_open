@@ -79,4 +79,3 @@ QN_FUSION_DECLARE_FUNCTIONS(
 } // namespace api
 } // namespace vms
 } // namespace nx
-

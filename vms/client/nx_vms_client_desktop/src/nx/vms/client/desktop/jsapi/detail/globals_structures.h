@@ -25,4 +25,3 @@ struct Error
 NX_REFLECTION_INSTRUMENT(Error, (code)(description))
 
 } // namespace nx::vms::client::desktop::jsapi
-

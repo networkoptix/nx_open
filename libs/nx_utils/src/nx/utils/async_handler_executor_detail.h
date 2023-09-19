@@ -45,4 +45,3 @@ signals:
 } // namespace async_handler_executor_detail
 
 } // namespace nx::utils
-

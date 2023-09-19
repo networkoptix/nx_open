@@ -160,5 +160,3 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
 
     return transformStatsToModelData(filteredStats, server, resourcePool);  //< Return model adapted as is.
 }
-
-

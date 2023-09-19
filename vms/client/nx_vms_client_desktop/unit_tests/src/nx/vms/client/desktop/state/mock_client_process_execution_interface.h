@@ -85,4 +85,3 @@ private:
 
 } // namespace test
 } // namespace nx::vms::client::desktop
-

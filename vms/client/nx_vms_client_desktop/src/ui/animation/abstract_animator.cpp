@@ -158,4 +158,3 @@ void AbstractAnimator::updateState(State newState) {
         break;
     };
 }
-

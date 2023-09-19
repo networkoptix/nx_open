@@ -56,4 +56,3 @@ bool operator==(const ViewNodePath& left, const ViewNodePath& right)
 } // namespace details
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

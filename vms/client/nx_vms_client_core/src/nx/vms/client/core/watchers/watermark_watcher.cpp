@@ -161,4 +161,3 @@ void WatermarkWatcher::updateWatermarkImageUrlSize(
 }
 
 } // nx::vms::client::core
-

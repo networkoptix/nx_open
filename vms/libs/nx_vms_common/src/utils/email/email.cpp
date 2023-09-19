@@ -195,4 +195,3 @@ void QnEmailAddress::initSmtpPresets() const
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnEmailSmtpServerPreset, (json), QnEmailSmtpServerPreset_Fields)
-
