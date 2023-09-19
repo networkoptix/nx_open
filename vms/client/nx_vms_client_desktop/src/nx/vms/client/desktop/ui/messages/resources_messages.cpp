@@ -117,7 +117,12 @@ bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayou
 
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
-    messageBox.setText(tr("Delete %n layouts?", "", sharedLayouts.size() + personalLayouts.size()));
+
+    const int layoutsCount = sharedLayouts.size() + personalLayouts.size();
+    QString text = layoutsCount == 1
+        ? tr("Delete layout?")
+        : tr("Delete %n layouts?", "", layoutsCount);
+    messageBox.setText(text);
 
     if (!sharedLayouts.empty())
     {
@@ -130,10 +135,10 @@ bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayou
         }
         else
         {
-            messageBox.setInformativeText(
-                tr("%n layouts are shared with other users, so they will be deleted for their accounts as well.",
-                    "",
-                    sharedLayouts.size()));
+            messageBox.setInformativeText(tr("%n layouts are shared with other users, so they will"
+                " be deleted for their accounts as well.",
+                "Numerical form depends on layouts count",
+                sharedLayouts.size()));
         }
     }
 
