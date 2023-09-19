@@ -329,7 +329,7 @@ Cloud Account&gt;</string>
           <number>16</number>
          </property>
          <item>
-          <widget class="QPushButton" name="unlinkButton">
+          <widget class="nx::vms::client::desktop::BusyIndicatorButton" name="unlinkButton">
            <property name="text">
             <string notr="true">&lt;Break the link&gt;</string>
            </property>
@@ -382,6 +382,11 @@ Cloud Account&gt;</string>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::BusyIndicatorButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/busy_indicator_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
