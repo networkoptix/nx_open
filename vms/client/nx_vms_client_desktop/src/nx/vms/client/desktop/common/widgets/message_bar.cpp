@@ -35,6 +35,8 @@ CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& descri
     d->label->label()->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     d->label->setText(QString());
 
+    connect(d->label, &QnWordWrappedLabel::linkActivated, this, &CommonMessageBar::linkActivated);
+
     horizontalLayout()->addWidget(d->closeButton, 0, Qt::AlignTop);
     d->closeButton->setFlat(true);
     d->closeButton->setFixedSize(20, 20);
@@ -62,6 +64,11 @@ CommonMessageBar::~CommonMessageBar()
 QString CommonMessageBar::text() const
 {
     return d->label->text();
+}
+
+void CommonMessageBar::setOpenExternalLinks(bool open)
+{
+    d->label->setOpenExternalLinks(open);
 }
 
 void CommonMessageBar::setText(const QString& text)
@@ -117,6 +124,8 @@ void CommonMessageBar::init(const BarDescription& barDescription)
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color(backgroundColor));
     setPaletteColor(this, QPalette::Dark, core::colorTheme()->color(frameColor));
     d->icon->setIcon(icon);
+
+    setOpenExternalLinks(barDescription.isOpenExternalLinks);
 
     d->isEnabledProperty = barDescription.isEnabledProperty;
 

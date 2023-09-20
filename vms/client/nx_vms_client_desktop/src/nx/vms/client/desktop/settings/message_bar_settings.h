@@ -14,6 +14,7 @@ public:
     void reload();
     void reset();
 
+    Property<bool> httpsOnlyBarInfo{this, "httpsOnlyBarInfo", true};
     Property<bool> recordingWarning{this, "recordingWarning", true};
     Property<bool> advancedSettingsAlert{this, "advancedSettingsAlert", true};
     Property<bool> highResolutionInfo{this, "highResolutionInfo", true};
