@@ -552,9 +552,8 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
                     if (!d->nonUniqueNameTracker.isUnique(user->getId()))
                     {
-                        lines << tr("There are multiple users with the same credentials in the "
-                            "system. To avoid issues with log in it is required for all users to "
-                            "have unique credentials.");
+                        lines << tr("There is already a user with the same login in the system. "
+                            "To avoid issues it is required for all users to have a unique login.");
                     }
 
                     return lines.join("\n");
