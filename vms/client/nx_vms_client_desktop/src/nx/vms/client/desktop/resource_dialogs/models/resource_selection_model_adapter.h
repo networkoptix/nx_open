@@ -17,7 +17,12 @@ class ResourceSelectionModelAdapter: public ScopedModelOperations<FilterProxyMod
 {
     Q_OBJECT
     Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
+    using base_type = ScopedModelOperations<FilterProxyModel>;
 
+public:
+    using IsIndexAccepted = std::function<bool(const QModelIndex& sourceIndex)>;
+
+private:
     Q_PROPERTY(nx::vms::client::desktop::SystemContext* context
         READ context WRITE setContext NOTIFY contextChanged)
     Q_PROPERTY(nx::vms::client::desktop::ResourceTree::ResourceFilters resourceTypes
@@ -25,15 +30,13 @@ class ResourceSelectionModelAdapter: public ScopedModelOperations<FilterProxyMod
     Q_PROPERTY(nx::vms::client::desktop::ResourceTree::ResourceSelection selectionMode
         READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QString filterText READ filterText WRITE setFilterText NOTIFY filterTextChanged)
-    Q_PROPERTY(nx::vms::common::ResourceFilter resourceFilter READ resourceFilter
-        WRITE setResourceFilter NOTIFY resourceFilterChanged)
+    Q_PROPERTY(IsIndexAccepted externalFilter READ externalFilter WRITE setExternalFilter
+        NOTIFY externalFilterChanged)
     Q_PROPERTY(bool extraInfoRequired READ isExtraInfoRequired NOTIFY extraInfoRequiredChanged)
     Q_PROPERTY(TopLevelNodesPolicy topLevelNodesPolicy READ topLevelNodesPolicy
         WRITE setTopLevelNodesPolicy NOTIFY topLevelNodesPolicyChanged)
     Q_PROPERTY(bool webPagesAndIntegrationsCombined READ webPagesAndIntegrationsCombined
         WRITE setWebPagesAndIntegrationsCombined NOTIFY webPagesAndIntegrationsCombinedChanged)
-
-    using base_type = ScopedModelOperations<FilterProxyModel>;
 
 public:
     enum class TopLevelNodesPolicy
@@ -59,8 +62,8 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
-    nx::vms::common::ResourceFilter resourceFilter() const;
-    void setResourceFilter(nx::vms::common::ResourceFilter value);
+    IsIndexAccepted externalFilter() const;
+    void setExternalFilter(IsIndexAccepted value);
 
     TopLevelNodesPolicy topLevelNodesPolicy() const;
     void setTopLevelNodesPolicy(TopLevelNodesPolicy value);
@@ -88,7 +91,7 @@ public:
 signals:
     void contextChanged();
     void filterTextChanged();
-    void resourceFilterChanged();
+    void externalFilterChanged();
     void resourceTypesChanged();
     void topLevelNodesPolicyChanged();
     void webPagesAndIntegrationsCombinedChanged();

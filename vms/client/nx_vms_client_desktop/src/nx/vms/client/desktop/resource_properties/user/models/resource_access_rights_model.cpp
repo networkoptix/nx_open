@@ -217,24 +217,7 @@ void ResourceAccessRightsModel::setResource(QnResource* value)
 
 QnUuid ResourceAccessRightsModel::groupId() const
 {
-    switch (d->nodeType)
-    {
-        case ResourceTree::NodeType::camerasAndDevices:
-            return nx::vms::api::kAllDevicesGroupId;
-
-        case ResourceTree::NodeType::videoWalls:
-            return nx::vms::api::kAllVideoWallsGroupId;
-
-        case ResourceTree::NodeType::integrations:
-        case ResourceTree::NodeType::webPages:
-            return nx::vms::api::kAllWebPagesGroupId;
-
-        case ResourceTree::NodeType::servers:
-            return nx::vms::api::kAllServersGroupId;
-
-        default:
-            return QnUuid();
-    }
+    return AccessSubjectEditingContext::resourceGroupId(d->nodeType);
 }
 
 ResourceTree::NodeType ResourceAccessRightsModel::nodeType() const

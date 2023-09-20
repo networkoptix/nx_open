@@ -21,6 +21,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/common/system_context.h>
 
 #include "proxy_access_rights_manager.h"
@@ -90,7 +91,7 @@ public:
     const std::unique_ptr<AccessRightsResolver> accessRightsResolver;
     const std::unique_ptr<AccessRightsResolver::Notifier> notifier;
     bool hierarchyChanged = false;
-    mutable QSet<QnResourcePtr> currentlyAccessibleResourceCache; //< For filter by permissions.
+    mutable QSet<QnUuid> currentlyAccessibleIdsCache; //< For filter by permissions.
 
 public:
     explicit Private(
@@ -114,14 +115,14 @@ public:
             [this]()
             {
                 emit this->q->resourceAccessChanged();
-                emit this->q->accessibleResourcesFilterChanged();
+                emit this->q->accessibleByPermissionsFilterChanged();
             });
 
         connect(accessRightsResolver.get(), &AccessRightsResolver::resourceAccessReset,
             [this]()
             {
                 emit this->q->resourceAccessChanged();
-                this->q->resetAccessibleResourcesFilter();
+                this->q->resetAccessibleByPermissionsFilter();
             });
 
         connect(systemSubjectHierarchy, &SubjectHierarchy::reset,
@@ -263,7 +264,7 @@ void AccessSubjectEditingContext::setCurrentSubject(
     d->accessRightsManager->setCurrentSubjectId(subjectId);
     d->notifier->setSubjectId(subjectId);
     resetRelations();
-    resetAccessibleResourcesFilter();
+    resetAccessibleByPermissionsFilter();
 
     emit subjectChanged();
     emit resourceAccessChanged();
@@ -332,6 +333,13 @@ AccessRights AccessSubjectEditingContext::accessRights(const QnResourcePtr& reso
         : d->accessRightsResolver->accessRights(d->currentSubjectId, resource->toSharedPointer());
 }
 
+AccessRights AccessSubjectEditingContext::accessRights(const QnUuid& resourceGroupId) const
+{
+    return d->currentSubjectId.isNull()
+        ? AccessRights{}
+        : d->accessRightsResolver->accessRights(d->currentSubjectId, resourceGroupId);
+}
+
 ResourceAccessDetails AccessSubjectEditingContext::accessDetails(
     const QnResourcePtr& resource, AccessRight accessRight) const
 {
@@ -356,28 +364,49 @@ QList<QnUuid> AccessSubjectEditingContext::resourceGroupAccessProviders(
     return result;
 }
 
-nx::vms::common::ResourceFilter AccessSubjectEditingContext::accessibleResourcesFilter() const
+AccessSubjectEditingContext::IsIndexAccepted
+    AccessSubjectEditingContext::accessibleByPermissionsFilter() const
 {
-    const auto resourceFilter =
-        [this, guard = QPointer(d.get())](const QnResourcePtr& resource) -> bool
+    const auto filter =
+        [this, guard = QPointer(d.get())](const QModelIndex& sourceIndex) -> bool
         {
-            if (!guard || !resource)
+            if (!guard || !sourceIndex.isValid())
                 return false;
 
-            if (!d->currentlyAccessibleResourceCache.contains(resource) && !accessRights(resource))
+            const auto resource = sourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+            const QnUuid id =
+                [&]() -> QnUuid
+                {
+                    if (resource)
+                        return resource->getId();
+
+                    const auto nodeType =
+                        sourceIndex.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+
+                    return resourceGroupId(nodeType);
+                }();
+
+            if (id.isNull())
                 return false;
 
-            d->currentlyAccessibleResourceCache.insert(resource);
+            if (d->currentlyAccessibleIdsCache.contains(id))
+                return true;
+
+            const auto possessedRights = resource ? accessRights(resource) : accessRights(id);
+            if (!possessedRights)
+                return false;
+
+            d->currentlyAccessibleIdsCache.insert(id);
             return true;
-        };
+    };
 
-    return resourceFilter;
+    return filter;
 }
 
-void AccessSubjectEditingContext::resetAccessibleResourcesFilter()
+void AccessSubjectEditingContext::resetAccessibleByPermissionsFilter()
 {
-    d->currentlyAccessibleResourceCache.clear();
-    emit accessibleResourcesFilterChanged();
+    d->currentlyAccessibleIdsCache.clear();
+    emit accessibleByPermissionsFilterChanged();
 }
 
 AccessRights AccessSubjectEditingContext::availableAccessRights() const
@@ -429,7 +458,7 @@ void AccessSubjectEditingContext::revert()
 {
     resetOwnResourceAccessMap();
     resetRelations();
-    resetAccessibleResourcesFilter();
+    resetAccessibleByPermissionsFilter();
 }
 
 QnUuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePtr& resource)
@@ -564,6 +593,28 @@ bool AccessSubjectEditingContext::isDependingOn(int /*AccessRight*/ what, Access
 bool AccessSubjectEditingContext::isRequiredFor(int /*AccessRight*/ what, AccessRights for_)
 {
     return dependentAccessRights(static_cast<AccessRight>(what)).testAnyFlags(for_);
+}
+
+QnUuid AccessSubjectEditingContext::resourceGroupId(ResourceTree::NodeType nodeType)
+{
+    switch (nodeType)
+    {
+        case ResourceTree::NodeType::camerasAndDevices:
+            return nx::vms::api::kAllDevicesGroupId;
+
+        case ResourceTree::NodeType::videoWalls:
+            return nx::vms::api::kAllVideoWallsGroupId;
+
+        case ResourceTree::NodeType::integrations:
+        case ResourceTree::NodeType::webPages:
+            return nx::vms::api::kAllWebPagesGroupId;
+
+        case ResourceTree::NodeType::servers:
+            return nx::vms::api::kAllServersGroupId;
+
+        default:
+            return QnUuid();
+    }
 }
 
 } // namespace nx::vms::client::desktop
