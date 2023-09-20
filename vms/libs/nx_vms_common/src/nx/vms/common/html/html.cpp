@@ -269,24 +269,65 @@ QString link(const QString& text, const nx::utils::Url& url)
 
 QString toHtmlEscaped(const QString& text)
 {
+    static const QString kLt("&lt;");
+    static const QString kGt("&gt;");
+    static const QString kAmp("&amp;");
+    static const QString kQuot("&quot;");
+    static const QString kNbsp("&nbsp;");
+
+    static auto indexOfAny =
+        [](const QStringView& s, int pos, const QString** replacement)
+        {
+            const auto view = s.mid(pos);
+            for (const QChar& c: view)
+            {
+                switch (c.unicode())
+                {
+                    case '<':
+                        *replacement = &kLt;
+                        return pos;
+                    case '>':
+                        *replacement = &kGt;
+                        return pos;
+                    case '&':
+                        *replacement = &kAmp;
+                        return pos;
+                    case '"':
+                        *replacement = &kQuot;
+                        return pos;
+                    case ' ':
+                        *replacement = &kNbsp;
+                        return pos;
+                }
+                ++pos;
+            }
+
+            replacement = nullptr;
+            return -1;
+        };
+
+    const QString* replacement = nullptr;
+
+    int pos = 0;
+    int nextPos = indexOfAny(text, pos, &replacement);
+    if (nextPos == -1)
+        return text;
+
     QString result;
-    const int len = text.length();
-    result.reserve(int(len * 1.1));
-    for (int i = 0; i < len; ++i)
+
+    result.reserve(static_cast<qsizetype>(text.length() * 1.1));
+
+    do
     {
-        if (text.at(i) == QLatin1Char('<'))
-            result.append(QLatin1String("&lt;"));
-        else if (text.at(i) == QLatin1Char('>'))
-            result.append(QLatin1String("&gt;"));
-        else if (text.at(i) == QLatin1Char('&'))
-            result.append(QLatin1String("&amp;"));
-        else if (text.at(i) == QLatin1Char('"'))
-            result.append(QLatin1String("&quot;"));
-        else if (text.at(i) == QLatin1Char(' '))
-            result.append(QLatin1String("&nbsp;"));
-        else
-            result.append(text.at(i));
-    }
+        result += QStringView(text).mid(pos, nextPos - pos);
+        result += *replacement;
+        pos = nextPos + 1;
+        nextPos = indexOfAny(text, pos, &replacement);
+    } while (nextPos != -1);
+
+    if (pos < text.length())
+        result.append(QStringView(text).mid(pos));
+
     result.squeeze();
     return result;
 }
@@ -296,6 +337,9 @@ QString highlightMatch(const QString& text, const QRegularExpression& rx, const 
     QString result;
     if (!text.isEmpty())
     {
+        if (!rx.isValid() || rx.pattern().isEmpty())
+            return toHtmlEscaped(text);
+
         const QString fontBegin = QString("<font color=\"%1\">").arg(color.name());
         static const QString fontEnd = "</font>";
         int pos = 0;
@@ -327,4 +371,3 @@ QString noWrap(const QString& text)
 
 } // namespace html
 } // namespace nx::vms::common
-
