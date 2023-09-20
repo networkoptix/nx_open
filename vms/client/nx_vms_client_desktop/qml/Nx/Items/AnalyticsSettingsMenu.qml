@@ -46,7 +46,11 @@ NavigationMenu
     {
         id: plugins
 
-        property var engines: viewModel.engines.filter(engine => engine.type === "sdk")
+        property var engines: LocalSettings.iniConfigValue("enableMetadataApi")
+            ? viewModel.engines.filter(engine => engine.type === "sdk")
+            : viewModel.engines
+
+        mainItemVisible: LocalSettings.iniConfigValue("enableMetadataApi")
 
         text: qsTr("Plugins")
         font.weight: Font.Medium
@@ -57,6 +61,7 @@ NavigationMenu
             navigationMenu: menu
             engines: plugins.engines
             enabledEngines: viewModel.enabledEngines
+            level: plugins.mainItemVisible ? 1 : 0
         }
 
         onClicked:

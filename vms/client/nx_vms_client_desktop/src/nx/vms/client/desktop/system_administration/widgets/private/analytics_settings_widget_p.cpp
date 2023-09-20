@@ -92,7 +92,8 @@ void AnalyticsSettingsWidget::Private::updateEngines()
     if (!view->rootObject())
         return;
 
-    engines.clear();
+    if (!engines.empty())
+        return;
 
     for (const auto& info: enginesWatcher->engineInfos())
     {
@@ -127,12 +128,11 @@ void AnalyticsSettingsWidget::Private::setSettingsValues(
     const QJsonObject& parameters)
 {
     settingsValuesByEngineId.insert(engineId, SettingsValues{values, true});
-    hasChanges = true;
 
     if (!activeElement.isEmpty())
         activeElementChanged(currentEngineId, activeElement, parameters);
 
-    emit q->hasChangesChanged();
+    updateHasChanges();
 }
 
 QJsonObject AnalyticsSettingsWidget::Private::settingsModel(const QnUuid& engineId)
@@ -199,6 +199,7 @@ void AnalyticsSettingsWidget::Private::resetSettings(
         emit currentSettingsStateChanged();
 
     setErrors(engineId, errors);
+    updateHasChanges();
 }
 
 void AnalyticsSettingsWidget::Private::updateEngine(const QnUuid& engineId)
@@ -403,6 +404,14 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
     pendingApplyRequests.append(handle);
 
     setLoading(!pendingApplyRequests.isEmpty());
+}
+
+void AnalyticsSettingsWidget::Private::updateHasChanges()
+{
+    hasChanges = std::any_of(settingsValuesByEngineId.begin(), settingsValuesByEngineId.end(),
+        [](const SettingsValues& values) { return values.changed; });
+
+    emit q->hasChangesChanged();
 }
 
 ApiIntegrationRequestsModel*

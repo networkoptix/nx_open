@@ -13,6 +13,7 @@ Column
     property var engines: null
     property var enabledEngines
     required property NavigationMenu navigationMenu
+    property int level: 1
 
     Repeater
     {
@@ -42,7 +43,7 @@ Column
                     id: menuItem
 
                     width: parent.width
-                    level: 1
+                    level: root.level
 
                     active:
                     {
@@ -63,24 +64,6 @@ Column
                     settingsModel: container.settingsModel
                     selected: container.isSelected
                     text: modelData.name || "" //< Engine name.
-                }
-
-                Rectangle
-                {
-                    id: separator
-
-                    width: parent.width
-                    height: 1
-                    color: ColorTheme.colors.dark7
-
-                    Rectangle
-                    {
-                        y: 1
-                        z: 1
-                        width: parent.width
-                        height: 1
-                        color: ColorTheme.colors.dark9
-                    }
                 }
             }
         }
