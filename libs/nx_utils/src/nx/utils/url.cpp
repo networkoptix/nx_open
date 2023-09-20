@@ -1,15 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "url.h"
+
 #include <cctype>
 
-#include <QtNetwork/QHostAddress>
 #include <QtCore/QJsonValue>
+#include <QtCore/QStringView>
 #include <QtCore/QUrlQuery>
+#include <QtNetwork/QHostAddress>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/nx_utils_ini.h>
-
-#include "url.h"
 
 namespace nx::utils {
 
@@ -537,6 +538,16 @@ QString hidePassword(nx::utils::Url url)
     }
 
     return url.toString();
+}
+
+bool webPageHostsEqual(const nx::utils::Url& left, const nx::utils::Url& right)
+{
+    static const QString kPrefix = "www.";
+    const QStringView leftHost{left.host()};
+    const QStringView rightHost{right.host()};
+
+    return leftHost.sliced(leftHost.startsWith(kPrefix) ? kPrefix.length() : 0)
+        == rightHost.sliced(rightHost.startsWith(kPrefix) ? kPrefix.length() : 0);
 }
 
 } // namespace url
