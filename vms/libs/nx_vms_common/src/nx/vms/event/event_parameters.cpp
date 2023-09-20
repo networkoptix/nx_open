@@ -54,6 +54,10 @@ QnUuid EventParameters::getParamsHash() const
             paramKey += '_' + QByteArray::number(int(reasonCode));
             break;
 
+        case EventType::ldapSyncIssueEvent:
+            paramKey += '_' + QByteArray::number(int(reasonCode));
+            break;
+
         default:
             break;
     }

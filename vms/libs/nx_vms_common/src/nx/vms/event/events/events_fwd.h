@@ -62,6 +62,9 @@ using FanErrorEventPtr = QSharedPointer<FanErrorEvent>;
 class ServerCertificateError;
 using ServerCertificateErrorPtr = QSharedPointer<ServerCertificateError>;
 
+class LdapSyncIssueEvent;
+using LdapSyncIssueEventPtr = QSharedPointer<LdapSyncIssueEvent>;
+
 } // namespace event
 } // namespace vms
 } // namespace nx

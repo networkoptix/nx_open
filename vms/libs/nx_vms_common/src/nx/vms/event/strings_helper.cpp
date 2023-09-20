@@ -25,6 +25,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/id.h>
@@ -165,6 +166,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case EventType::serverFailureEvent:     return tr("Server Failure");
         case EventType::serverConflictEvent:    return tr("Server Conflict");
         case EventType::serverStartEvent:       return tr("Server Started");
+        case EventType::ldapSyncIssueEvent:     return tr("LDAP Sync Issue");
         case EventType::licenseIssueEvent:      return tr("License Issue");
         case EventType::backupFinishedEvent:    return tr("Archive Backup Finished");
         case EventType::analyticsSdkEvent:      return tr("Analytics Event");
@@ -253,6 +255,9 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
 
         case EventType::serverStartEvent:
             return tr("Server \"%1\" Started").arg(resourceName);
+
+        case EventType::ldapSyncIssueEvent:
+            return tr("LDAP Sync Issue");
 
         case EventType::licenseIssueEvent:
             return tr("Server \"%1\" has a license problem").arg(resourceName);
@@ -508,8 +513,13 @@ QStringList StringsHelper::eventDetails(
 
             break;
         }
+
         case EventType::softwareTriggerEvent:
             result << tr("Trigger: %1").arg(getSoftwareTriggerName(params));
+            break;
+
+        case EventType::ldapSyncIssueEvent:
+            result << ldapSyncIssueText(params);
             break;
 
         default:
@@ -1080,6 +1090,60 @@ QString StringsHelper::backupTimeText(const QDateTime& time)
     return tr("Data is backed up to %1").arg(nx::vms::time::toString(time));
 }
 
+QString StringsHelper::ldapSyncIssueReason(
+    EventReason reasonCode,
+    std::optional<std::chrono::seconds> syncInterval)
+{
+    switch (reasonCode)
+    {
+        case EventReason::failedToConnectToLdap:
+            return tr("Failed to connect to LDAP");
+
+        case EventReason::failedToCompleteSyncWithLdap:
+            return syncInterval
+                ? tr("Failed to complete sync within a %1 timeout").arg(
+                    text::HumanReadable::timeSpan(*syncInterval))
+                : tr("Failed to complete sync within a given timeout");
+
+        case EventReason::noLdapUsersAfterSync:
+            return tr("There are zero LDAP users in VMS after sync");
+
+        case EventReason::someUsersNotFoundInLdap:
+            return tr("Some LDAP users were not found in LDAP");
+
+        default:
+            NX_ASSERT(false);
+            return {};
+    }
+}
+
+QString StringsHelper::ldapSyncIssueText(const EventParameters& params)
+{
+    bool isAggregatedEvent = LdapSyncIssueEvent::isAggregatedEvent(params);
+    auto reasons = LdapSyncIssueEvent::decodeReasons(params);
+
+    if (reasons.size() == 1 && reasons.begin()->second == 1)
+        isAggregatedEvent = false;
+
+    auto syncInterval = LdapSyncIssueEvent::syncInterval(params);
+
+    if (isAggregatedEvent)
+    {
+        QStringList result;
+
+        for (auto [reason, count]: reasons)
+        {
+            result += tr("%1 (%n times)",
+                "%1 is description of event. Will be replaced in runtime", count).arg(
+                    ldapSyncIssueReason(reason, syncInterval));
+        }
+
+        return result.join(", ");
+    }
+
+    return ldapSyncIssueReason(params.reasonCode, syncInterval);
+}
+
 QString StringsHelper::notificationCaption(
     const EventParameters& parameters,
     const QnVirtualCameraResourcePtr& camera,
@@ -1151,6 +1215,9 @@ QString StringsHelper::notificationDescription(const EventParameters& parameters
                 .arg(poeConsumption())
                 .arg(consumptionString);
         }
+
+        case EventType::ldapSyncIssueEvent:
+            return ldapSyncIssueText(parameters);
 
         default:
             return QString();

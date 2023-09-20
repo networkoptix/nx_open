@@ -27,6 +27,7 @@ EventSubtype eventSubtype(nx::vms::api::EventType event)
         case EventType::cameraIpConflictEvent:
         case EventType::serverFailureEvent:
         case EventType::serverConflictEvent:
+        case EventType::ldapSyncIssueEvent:
         case EventType::licenseIssueEvent:
         case EventType::poeOverBudgetEvent:
         case EventType::fanErrorEvent:

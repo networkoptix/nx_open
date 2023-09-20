@@ -502,7 +502,11 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             if (!vms::event::hasToggleState(eventType, action.eventParams, systemContext()))
             {
                 int count = action.aggregationCount;
-                if (count > 1)
+
+                // For Ldap Sync Issue events we print detailed (aggregated by subtypes) data that
+                // already contains the number of event occurances in the event description. For
+                // all other event types we add aggregation count to the result, if necessary.
+                if (count > 1 && eventType != EventType::ldapSyncIssueEvent)
                 {
                     QString countString;
                     if (isAggregationDoneByCameras(action))
