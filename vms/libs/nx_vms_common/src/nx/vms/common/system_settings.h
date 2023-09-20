@@ -63,6 +63,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(remoteSessionTimeoutS);
     DECLARE_SETTING_NAME(remoteSessionUpdateS);
     DECLARE_SETTING_NAME(resourceFileUri);
+    DECLARE_SETTING_NAME(securityForPowerUsers);
     DECLARE_SETTING_NAME(sessionLimitS);
     DECLARE_SETTING_NAME(sessionsLimit);
     DECLARE_SETTING_NAME(sessionsLimitPerUser);
@@ -97,7 +98,7 @@ struct SystemSettingNames
         cloudAuthKey,
     };
 
-    static const inline std::set<QString> kOwnerOnlyNames = {
+    static const inline std::set<QString> kSecurityNames = {
         disabledVendors,
         insecureDeprecatedApiEnabled,
         licenseServer,
@@ -105,6 +106,7 @@ struct SystemSettingNames
         remoteSessionTimeoutS,
         remoteSessionUpdateS,
         resourceFileUri,
+        securityForPowerUsers,
         sessionLimitS,
         sessionsLimit,
         sessionsLimitPerUser,
@@ -202,6 +204,9 @@ public:
 
     bool useHttpsOnlyCameras() const;
     void setUseHttpsOnlyCameras(bool value);
+
+    bool securityForPowerUsers() const;
+    void setSecurityForPowerUsers(bool value = true);
 
     bool isInsecureDeprecatedApiEnabled() const;
     void enableInsecureDeprecatedApi(bool value = true);
@@ -680,6 +685,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_supportedOriginsAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_frameOptionsHeaderAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_useHttpsOnlyCamerasAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_securityForPowerUsersAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_exposeServerEndpointsAdaptor = nullptr;
