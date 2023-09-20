@@ -373,10 +373,8 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
                 state.groupId,
                 Qn::WriteNamePermission);
 
-        state.descriptionEditable = !state.isLdap
-            && systemContext()->accessController()->hasPermissions(
-                state.groupId,
-                Qn::SavePermission);
+        state.descriptionEditable = systemContext()->accessController()->hasPermissions(
+            state.groupId, Qn::SavePermission);
 
         state.isPredefined = groupData->attributes.testFlag(nx::vms::api::UserAttribute::readonly);
 
