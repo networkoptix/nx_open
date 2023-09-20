@@ -77,6 +77,8 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->alertBar->init({.level = BarDescription::BarLevel::Warning,
+        .isEnabledProperty = &messageBarSettings()->advancedSettingsAlert});
     ui->dialogContentsLayout->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
     ui->dialogContentsLayout->setSpacing(nx::style::Metrics::kDefaultLayoutSpacing.height());
 
