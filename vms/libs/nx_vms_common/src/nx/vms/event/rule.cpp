@@ -288,7 +288,8 @@ RuleList Rule::getDefaultRules()
         << getSystemRules()
         << getRulesUpd43()
         << getPluginDiagnosticEventUpdateRules()
-        << getServerCertificateErrorRules();
+        << getServerCertificateErrorRules()
+        << getLdapSyncIssueRules();
 
     std::set<QnUuid> ruleIds;
     for (const auto& rule: result)
@@ -409,6 +410,25 @@ RuleList Rule::getServerCertificateErrorRules()
             /*isSystem*/ true,
             ActionType::diagnosticsAction,
             EventType::serverCertificateError)),
+    };
+}
+
+RuleList Rule::getLdapSyncIssueRules()
+{
+    return {
+        RulePtr(new Rule(
+            /*internalId*/ 10027,
+            /*aggregationPeriod*/ 6 * 3600,
+            /*isSystem*/ false,
+            ActionType::sendMailAction,
+            EventType::ldapSyncIssueEvent,
+            {api::kAdministratorsGroupId})),
+        RulePtr(new Rule(
+            /*internalId*/ 900027,
+            /*aggregationPeriod*/ 30,
+            /*isSystem*/ true,
+            ActionType::diagnosticsAction,
+            EventType::ldapSyncIssueEvent)),
     };
 }
 

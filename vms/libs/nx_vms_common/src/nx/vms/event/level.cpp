@@ -39,6 +39,7 @@ Level levelOf(const EventParameters& params)
             return Level::common;
 
         // Yellow notifications.
+        case EventType::ldapSyncIssueEvent:
         case EventType::networkIssueEvent:
         case EventType::cameraIpConflictEvent:
         case EventType::serverConflictEvent:
