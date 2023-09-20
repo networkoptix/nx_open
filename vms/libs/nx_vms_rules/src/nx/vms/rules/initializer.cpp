@@ -30,6 +30,7 @@ void Initializer::registerEvents() const
     registerEvent<DebugEvent>();
     registerEvent<FanErrorEvent>();
     registerEvent<GenericEvent>();
+    registerEvent<LdapSyncIssueEvent>();
     registerEvent<LicenseIssueEvent>();
     registerEvent<MotionEvent>();
     registerEvent<NetworkIssueEvent>();

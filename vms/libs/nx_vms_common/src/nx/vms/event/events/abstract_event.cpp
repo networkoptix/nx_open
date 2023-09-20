@@ -41,6 +41,7 @@ static const QList<EventType> kAllEvents{
     EventType::serverFailureEvent,
     EventType::serverConflictEvent,
     EventType::serverStartEvent,
+    EventType::ldapSyncIssueEvent,
     EventType::licenseIssueEvent,
     EventType::backupFinishedEvent,
     EventType::poeOverBudgetEvent,
@@ -89,6 +90,7 @@ EventType parentEvent(EventType eventType)
         case EventType::serverFailureEvent:
         case EventType::serverConflictEvent:
         case EventType::serverStartEvent:
+        case EventType::ldapSyncIssueEvent:
         case EventType::licenseIssueEvent:
         case EventType::backupFinishedEvent:
         case EventType::poeOverBudgetEvent:
@@ -123,6 +125,7 @@ QList<EventType> childEvents(EventType eventType)
                 EventType::serverFailureEvent,
                 EventType::serverConflictEvent,
                 EventType::serverStartEvent,
+                EventType::ldapSyncIssueEvent,
                 EventType::licenseIssueEvent,
                 EventType::backupFinishedEvent,
                 EventType::poeOverBudgetEvent,

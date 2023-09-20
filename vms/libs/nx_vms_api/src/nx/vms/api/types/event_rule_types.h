@@ -39,10 +39,16 @@ NX_REFLECTION_ENUM_CLASS(EventReason,
     // License Issue event
     licenseRemoved = 10,
 
+    // LDAP Sync Issue event
+    failedToConnectToLdap = 25,
+    failedToCompleteSyncWithLdap = 26,
+    noLdapUsersAfterSync = 27,
+    someUsersNotFoundInLdap = 28,
+
     // Backup Finished event & Storage Failure event
     backupFailedSourceFileError = 13
 
-    // Last number is 24, see networkRtpStreamError. Some numbers are 1000+.
+    // Last number is 28, see someUsersNotFoundInLdap. Some numbers are 1000+.
 )
 
 enum class EventState
@@ -122,6 +128,9 @@ NX_REFLECTION_ENUM(EventType,
 
     /** A Server handshake certificate mismatched the certificate saved in the System DB. */
     serverCertificateError = 18,
+
+    /** LDAP sync issue. */
+    ldapSyncIssueEvent = 19,
 
     /** System health message. */
     systemHealthEvent = 500,
