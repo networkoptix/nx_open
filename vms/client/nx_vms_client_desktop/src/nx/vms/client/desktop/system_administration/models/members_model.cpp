@@ -76,6 +76,8 @@ void MembersModel::loadModelData()
     m_cache->sorted(m_subjectId); //< Force storage to report changes for current subject.
     endResetModel();
 
+    checkCycles();
+
     emit customGroupCountChanged();
 
     emit parentGroupsChanged();
@@ -165,7 +167,10 @@ void MembersModel::checkCycles()
     // Notify about groups that (maybe no longer) cause cycles.
     const auto modifiedGroups = m_groupsWithCycles + groupsWithCycles;
 
+    const bool cycledChanged = m_groupsWithCycles.isEmpty() != groupsWithCycles.isEmpty();
     m_groupsWithCycles = groupsWithCycles;
+    if (cycledChanged)
+        emit cycledGroupChanged();
 
     for (const auto& id: modifiedGroups)
     {
@@ -428,6 +433,7 @@ void MembersModel::readUsersAndGroups()
         emit groupsChanged();
         emit globalPermissionsChanged();
         emit sharedResourcesChanged();
+        emit cycledGroupChanged();
 
         return;
     }
@@ -544,6 +550,11 @@ void MembersModel::removeParent(const QnUuid& groupId)
     auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
     parents.remove(groupId);
     m_subjectContext->setRelations(parents, members);
+}
+
+bool MembersModel::isCycledGroup() const
+{
+    return !m_groupsWithCycles.isEmpty();
 }
 
 void MembersModel::addMember(const QnUuid& memberId)
