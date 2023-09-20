@@ -67,6 +67,7 @@ public:
 
     QSet<QnUuid> notFoundUsers() const;
     QSet<QnUuid> nonUniqueUsers() const;
+    qsizetype ldapUserCount() const;
 
 signals:
     void notFoundUsersChanged();
