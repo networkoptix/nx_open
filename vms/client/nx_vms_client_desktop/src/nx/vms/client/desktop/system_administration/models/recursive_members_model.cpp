@@ -47,9 +47,9 @@ QVariant RecursiveMembersModel::getMemberData(int offset, const QnUuid& id, int 
         case IdRole:
             return QVariant::fromValue(id);
         case IsLdap:
-            return m_cache->info(id).isLdap;
+            return m_cache->info(id).userType == api::UserType::ldap;
         case IsTemporary:
-            return m_cache->info(id).isTemporary;
+            return m_cache->info(id).userType == api::UserType::temporaryLocal;
     }
     return {};
 }
