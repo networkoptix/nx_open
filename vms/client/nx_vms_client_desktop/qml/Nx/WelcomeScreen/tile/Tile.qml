@@ -38,6 +38,9 @@ Button
     readonly property bool systemRequires2FaEnabledForUser:
         model.isCloudSystem && model.is2FaEnabledForSystem  && !context.is2FaEnabledForUser
 
+    readonly property bool saasSuspended: model.isSaasSuspended
+    readonly property bool saasShutDown: model.isSaasShutDown
+
     property var visibilityMenuModel: null
     property bool hideActionEnabled: false
     property bool shiftPressed: false

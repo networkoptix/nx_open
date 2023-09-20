@@ -126,6 +126,12 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         this, &QnBaseSystemDescription::oauthSupportedChanged);
     connect(system.get(), &QnBaseSystemDescription::system2faEnabledChanged,
         this, &QnBaseSystemDescription::system2faEnabledChanged);
+    connect(system.get(), &QnBaseSystemDescription::saasStateChanged, this,
+        [this]
+        {
+            if (m_systems.first() == sender())
+                emit saasStateChanged();
+        });
 
     updateServers();
     emitSystemChanged();
@@ -141,6 +147,7 @@ void QnSystemDescriptionAggregator::emitSystemChanged()
     emit newSystemStateChanged();
     emit system2faEnabledChanged();
     emit versionChanged();
+    emit saasStateChanged();
 }
 
 void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,
@@ -253,6 +260,13 @@ QString QnSystemDescriptionAggregator::ownerFullName() const
 QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() const
 {
     return m_servers;
+}
+
+nx::vms::api::SaasState QnSystemDescriptionAggregator::saasState() const
+{
+    return isEmptyAggregator()
+        ? nx::vms::api::SaasState::uninitialized
+        : m_systems.first()->saasState();
 }
 
 bool QnSystemDescriptionAggregator::isReachableServer(const QnUuid& serverId) const

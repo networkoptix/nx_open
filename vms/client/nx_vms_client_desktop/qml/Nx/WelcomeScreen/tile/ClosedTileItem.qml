@@ -153,6 +153,24 @@ Item
 
         Nx.Tag
         {
+            color: ColorTheme.colors.yellow_core
+
+            text: qsTr("Suspended")
+
+            visible: tile.saasSuspended && tile.online && !tile.incompatible
+        }
+
+        Nx.Tag
+        {
+            color: ColorTheme.colors.red_core
+
+            text: qsTr("Shut Down")
+
+            visible: tile.saasShutDown && tile.online && !tile.incompatible
+        }
+
+        Nx.Tag
+        {
             color: ColorTheme.colors.dark12
 
             text: qsTr("Unreachable")
