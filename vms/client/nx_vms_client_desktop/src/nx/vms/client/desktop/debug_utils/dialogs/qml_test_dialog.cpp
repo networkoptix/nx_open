@@ -12,6 +12,7 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QCompleter>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -122,6 +123,7 @@ QmlTestDialog::QmlTestDialog(QWidget* parent):
     d->editBox->setEditable(true);
     d->editBox->setInsertPolicy(QComboBox::InsertAtTop);
     d->editBox->setMaxCount(16);
+    d->editBox->completer()->setCaseSensitivity(Qt::CaseSensitive);
     d->loadButton->setEnabled(false);
     d->setPropertyButton->setEnabled(false);
 
@@ -136,7 +138,7 @@ QmlTestDialog::QmlTestDialog(QWidget* parent):
         {
             d->qmlWidget->setSource({});
             d->qmlWidget->engine()->clearComponentCache();
-            d->qmlWidget->setSource(d->editBox->currentText().trimmed());
+            d->qmlWidget->setSource(QUrl::fromUserInput(d->editBox->currentText().trimmed()));
             d->saveHistory();
         });
 
