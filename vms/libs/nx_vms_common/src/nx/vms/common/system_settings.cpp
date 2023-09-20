@@ -70,8 +70,8 @@ SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
             adapter->markReadOnly();
         if (Names::kWriteOnlyNames.contains(adapter->key()))
             adapter->markWriteOnly();
-        if (Names::kOwnerOnlyNames.contains(adapter->key()))
-            adapter->markOwnerOnly();
+        if (Names::kSecurityNames.contains(adapter->key()))
+            adapter->markSecurity();
         if (Names::kHiddenNames.contains(adapter->key()))
         {
             adapter->markReadOnly();
@@ -654,9 +654,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_useHttpsOnlyCamerasAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for cameras"); });
 
+    m_securityForPowerUsersAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        Names::securityForPowerUsers, false, this,
+        [] { return tr("Allow Power User editing Security Settings"); });
+
     m_insecureDeprecatedApiEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::insecureDeprecatedApiEnabled, false, this,
-        [] { return tr("Enable deprecated API functions (unsecure)"); });
+        [] { return tr("Enable deprecated API functions (insecure)"); });
 
     m_insecureDeprecatedApiInUseEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::insecureDeprecatedApiInUseEnabled, false, this,
@@ -1010,6 +1014,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_videoTrafficEncryptionForcedAdaptor
         << m_exposeDeviceCredentialsAdaptor
         << m_useHttpsOnlyCamerasAdaptor
+        << m_securityForPowerUsersAdaptor
         << m_insecureDeprecatedApiEnabledAdaptor
         << m_insecureDeprecatedApiInUseEnabledAdaptor
         << m_eventLogPeriodDaysAdaptor
@@ -2139,6 +2144,16 @@ bool SystemSettings::useHttpsOnlyCameras() const
 void SystemSettings::setUseHttpsOnlyCameras(bool value)
 {
     m_useHttpsOnlyCamerasAdaptor->setValue(value);
+}
+
+bool SystemSettings::securityForPowerUsers() const
+{
+    return m_securityForPowerUsersAdaptor->value();
+}
+
+void SystemSettings::setSecurityForPowerUsers(bool value)
+{
+    m_securityForPowerUsersAdaptor->setValue(value);
 }
 
 bool SystemSettings::isInsecureDeprecatedApiEnabled() const
