@@ -254,8 +254,6 @@ private:
 
     QnUserResourceList visibleUsers() const;
 
-    int getLdapUserCount() const;
-
     void visibleAddedOrUpdated(int first, int last);
     void visibleAboutToBeRemoved(int first, int last);
 };
@@ -694,13 +692,14 @@ void UserListWidget::Private::updateBanners()
     deleteNotFoundUsersButton->setText(
         tr("Delete %n users", "", usersModel->notFoundUsers().size()));
     ldapServerOfflineWarning->setText(
-        tr("LDAP server is offline. %n users are not able to log in.", "", getLdapUserCount()));
+        tr("LDAP server is offline. %n users are not able to log in.", "",
+            usersModel->ldapUserCount()));
 
     ldapServerOfflineWarning->setVisible(!hideLdapServerOfflineWarning
         && (q->systemContext()->ldapStatusWatcher()->status()
             && q->systemContext()->ldapStatusWatcher()->status()->state
                 != api::LdapStatus::State::online)
-        && getLdapUserCount() > 0);
+        && usersModel->ldapUserCount() > 0);
 
     notFoundUsersWarning->setVisible(!hideNotFoundUsersWarning
         && !ldapServerOfflineWarning->isVisible()
@@ -970,14 +969,6 @@ void UserListWidget::Private::visibleAboutToBeRemoved(int first, int last)
 
         m_visibleUsers.remove(user);
     }
-}
-
-int UserListWidget::Private::getLdapUserCount() const
-{
-    const auto ldapUsers = q->systemContext()->resourcePool()->getResources<QnUserResource>(
-        [](const auto& user) { return user->isLdap(); });
-
-    return ldapUsers.size();
 }
 
 bool UserListWidget::Private::canDelete(const QSet<QnUserResourcePtr>& users) const
