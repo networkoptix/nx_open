@@ -17,6 +17,8 @@ TextFieldWithWarning
     property var validateFunc: (text) => ""
     readonly property bool valid: !warningText
 
+    property var fixupFunc: (text) => text
+
     warningText: ""
 
     textField.onTextChanged: warningState = false
@@ -24,7 +26,9 @@ TextFieldWithWarning
 
     function validate()
     {
-        warningText =  control.validateFunc ? control.validateFunc(text) : ""
+        if (control.fixupFunc)
+            text = control.fixupFunc(text)
+        warningText = control.validateFunc ? control.validateFunc(text) : ""
         warningState = !!warningText
         return !warningState
     }
