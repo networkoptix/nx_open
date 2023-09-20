@@ -15,6 +15,7 @@ public:
     void reset();
 
     Property<bool> recordingWarning{this, "recordingWarning", true};
+    Property<bool> advancedSettingsAlert{this, "advancedSettingsAlert", true};
 };
 
 MessageBarSettings* messageBarSettings();
