@@ -42,6 +42,9 @@ public:
         IsCloudOauthSupportedRoleId,
         Is2FaEnabledForSystem,
 
+        IsSaasSuspended,
+        IsSaasShutDown,
+
         RolesCount
     };
 

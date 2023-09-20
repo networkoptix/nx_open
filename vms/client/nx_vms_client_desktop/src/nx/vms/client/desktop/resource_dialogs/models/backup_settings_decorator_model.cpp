@@ -12,6 +12,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
+#include <nx/utils/scoped_change_notifier.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/settings/system_settings_manager.h>
@@ -29,42 +30,6 @@
 #include <nx/vms/common/system_settings.h>
 
 namespace {
-
-/**
- * Scoped guard that calls the given callback at the end of a scope if value returned by the
- * provided function wrapper at the scope begin differs to the one returned at the end of a scope.
- */
-template <typename ValueType>
-class [[nodiscard]] ScopedChangeNotifier
-{
-public:
-    using ValueGetter = std::function<ValueType()>;
-    using NotificationCallback = std::function<void()>;
-
-    ScopedChangeNotifier(
-        const ValueGetter& valueGetter,
-        const NotificationCallback& notificationCallback)
-        :
-        m_valueGetter(valueGetter),
-        m_notificationCallback(notificationCallback),
-        m_initialValue(m_valueGetter())
-    {
-    }
-
-    ScopedChangeNotifier() = delete;
-    ScopedChangeNotifier(const ScopedChangeNotifier&) = delete;
-    ScopedChangeNotifier& operator=(const ScopedChangeNotifier&) = delete;
-    ~ScopedChangeNotifier()
-    {
-        if (m_initialValue != m_valueGetter())
-            m_notificationCallback();
-    }
-
-private:
-    const ValueGetter m_valueGetter;
-    const NotificationCallback m_notificationCallback;
-    const ValueType m_initialValue;
-};
 
 /**
  * Scoped guard that accumulates sequence of single row 'dataChanged' notifications that should be
@@ -127,18 +92,18 @@ int cameraMaxResolutionMegaPixels(const QnVirtualCameraResourcePtr& camera)
     return camera->cameraMediaCapability().maxResolution.megaPixels();
 }
 
-ScopedChangeNotifier<bool> makeHasChangesNotifier(
+nx::utils::ScopedChangeNotifier<bool> makeHasChangesNotifier(
     nx::vms::client::desktop::BackupSettingsDecoratorModel* decoratorModel)
 {
-    return ScopedChangeNotifier<bool>(
+    return nx::utils::ScopedChangeNotifier<bool>(
         [decoratorModel]{ return decoratorModel->hasChanges(); },
         [decoratorModel]{ emit decoratorModel->hasChangesChanged(); });
 }
 
-ScopedChangeNotifier<nx::vms::api::BackupSettings> makeGlobalBackupSettingsChangesNotifier(
+nx::utils::ScopedChangeNotifier<nx::vms::api::BackupSettings> makeGlobalBackupSettingsChangesNotifier(
     nx::vms::client::desktop::BackupSettingsDecoratorModel* decoratorModel)
 {
-    return ScopedChangeNotifier<nx::vms::api::BackupSettings>(
+    return nx::utils::ScopedChangeNotifier<nx::vms::api::BackupSettings>(
         [decoratorModel]{ return decoratorModel->globalBackupSettings(); },
         [decoratorModel]{ emit decoratorModel->globalBackupSettingsChanged(); });
 }
