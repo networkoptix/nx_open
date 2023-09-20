@@ -602,7 +602,8 @@ bool MembersModel::isAllowed(const QnUuid& parentId, const QnUuid& childId) cons
     if (parentInfo.name.isEmpty() && parentId == m_subjectId)
     {
         parentInfo.isGroup = !m_subjectIsUser;
-        parentInfo.isTemporary = m_temporary;
+        if (m_temporary)
+            parentInfo.userType = api::UserType::temporaryLocal;
     }
 
     // Unable to add users to users.
@@ -610,7 +611,7 @@ bool MembersModel::isAllowed(const QnUuid& parentId, const QnUuid& childId) cons
         return false;
 
     // LDAP group membership should be managed via LDAP.
-    if (parentInfo.isLdap)
+    if (parentInfo.userType == api::UserType::ldap)
         return false;
 
     auto childInfo = m_cache->info(childId);
@@ -620,7 +621,8 @@ bool MembersModel::isAllowed(const QnUuid& parentId, const QnUuid& childId) cons
     if (childInfoFromProperties)
     {
         childInfo.isGroup = !m_subjectIsUser;
-        childInfo.isTemporary = m_temporary;
+        if (m_temporary)
+            childInfo.userType = api::UserType::temporaryLocal;
     }
 
     // Temporary users can not get PowerUsers (or higher) permissions.
@@ -628,7 +630,7 @@ bool MembersModel::isAllowed(const QnUuid& parentId, const QnUuid& childId) cons
         || m_subjectContext->subjectHierarchy()->isRecursiveMember(parentId, kRestrictedForTemp))
     {
         // Deny if child is a temporary user.
-        if (childInfo.isTemporary)
+        if (childInfo.userType == api::UserType::temporaryLocal)
             return false;
 
         // Deny if any child subgroup contains a temporary user.
@@ -769,25 +771,29 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
                 : UserSettingsGlobal::kCustomGroupsSection;
 
         case IsLdap:
-            return m_cache->info(id).isLdap;
+            return m_cache->info(id).userType == api::UserType::ldap;
 
         case IsTemporary:
-            return m_cache->info(id).isTemporary;
+            return m_cache->info(id).userType == api::UserType::temporaryLocal;
 
         case Cycle:
             return m_groupsWithCycles.contains(id);
 
         case CanEditParents:
-            return !(m_cache->info(m_subjectId).isLdap && m_cache->info(id).isLdap)
+        {
+            const bool bothAreLdap = m_cache->info(m_subjectId).userType == api::UserType::ldap
+                && m_cache->info(id).userType == api::UserType::ldap;
+            return !bothAreLdap
                 && systemContext()->accessController()->hasPermissions(
                     id,
                     Qn::WriteAccessRightsPermission);
+        }
 
         case CanEditMembers:
             return canEditMembers(id);
 
         case UserType:
-            return m_cache->info(id).userType;
+            return (UserSettingsGlobal::UserType) m_cache->info(id).userType;
 
         default:
             return {};
@@ -800,7 +806,7 @@ bool MembersModel::canEditMembers(const QnUuid& id) const
         systemContext()->accessController());
 
     return m_cache
-        && !m_cache->info(id).isLdap
+        && m_cache->info(id).userType != api::UserType::ldap
         && NX_ASSERT(accessController)
         && accessController->canCreateUser(
             /*targetPermissions*/ {},

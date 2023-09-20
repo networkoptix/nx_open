@@ -32,9 +32,7 @@ public:
         QString name;
         QString description;
         bool isGroup = false;
-        bool isLdap = false;
-        bool isTemporary = false;
-        UserSettingsGlobal::UserType userType = UserSettingsGlobal::LocalUser;
+        api::UserType userType = api::UserType::local;
     };
 
     struct Stats
