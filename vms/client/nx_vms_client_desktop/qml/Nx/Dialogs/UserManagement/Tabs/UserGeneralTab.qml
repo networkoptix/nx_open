@@ -317,6 +317,10 @@ Item
                             id: userEmailTextField
                             width: parent.width
                             readOnly: !(control.emailEditable && control.enabled)
+
+                            fixupFunc:
+                                (text) => (control.self ? control.self.extractEmail(text) : text)
+
                             validateFunc: (text) =>
                             {
                                 return control.self && enabled
@@ -644,9 +648,9 @@ Item
                                     copied ? "image://svg/skin/user_settings/copied.svg" : ""
                                 icon.width: 20
                                 icon.height: 20
-                                Layout.preferredWidth: 
+                                Layout.preferredWidth:
                                 {
-                                    const copyLinkWidth = leftPaddingOnlyText 
+                                    const copyLinkWidth = leftPaddingOnlyText
                                         + fontMetrics.advanceWidth(copyLinkText) + rightPadding
                                     const copiedWidth = leftPaddingWithIcon + icon.width + 4
                                         + fontMetrics.advanceWidth(copiedText) + rightPadding
@@ -667,7 +671,7 @@ Item
                                     onTriggered: copyLinkButton.copied = false
                                 }
 
-                                onClicked: 
+                                onClicked:
                                 {
                                     control.self.onCopyLink()
                                     copied = true
