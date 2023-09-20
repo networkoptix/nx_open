@@ -29,6 +29,7 @@ struct BarDescription
     BarLevel level = BarLevel::Info;
     bool isMultiLine = false;
     bool isClosable = false;
+    bool isOpenExternalLinks = true;
     PropertyPointer isEnabledProperty;
     std::vector<QHBoxLayout*> additionalRows; //<= Additional rows under the label.
 };
@@ -60,8 +61,13 @@ public:
     void updateVisibility();
     void hideInFuture();
 
+    /** Enabled by default. */
+    void setOpenExternalLinks(bool open);
+
 signals:
     void closeClicked();
+    /** Emitted only when `setOpenExternalLinks` is disabled. */
+    void linkActivated(const QString& link);
 
 private:
     struct Private;
