@@ -56,6 +56,8 @@ GraphicsWebEngineView::GraphicsWebEngineView(const QnResourcePtr &resource, QGra
     m_controller->load(resource);
 
     connect(m_controller.data(), &WebViewController::urlChanged,
+        this, &GraphicsWebEngineView::urlChanged);
+    connect(m_controller.data(), &WebViewController::urlChanged,
         this, &GraphicsWebEngineView::updateCanGoBack);
     connect(m_controller.data(), &WebViewController::loadingStatusChanged,
         this, &GraphicsWebEngineView::setViewStatus);

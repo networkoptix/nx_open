@@ -54,14 +54,11 @@ public slots:
 
 signals:
     void loadStarted();
-
     void statusChanged();
-
     void canGoBackChanged();
-
     void loadProgress(int progress);
-
     void loadFinished(bool ok);
+    void urlChanged();
 
 protected:
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent* event) override;
