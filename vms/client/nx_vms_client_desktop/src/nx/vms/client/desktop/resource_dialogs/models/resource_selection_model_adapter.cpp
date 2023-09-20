@@ -35,7 +35,7 @@ struct ResourceSelectionModelAdapter::Private
     ResourceTree::ResourceFilters resourceTypes;
     ResourceTree::ResourceSelection selectionMode = ResourceTree::ResourceSelection::multiple;
     QString filterText;
-    nx::vms::common::ResourceFilter resourceFilter;
+    IsIndexAccepted externalFilter;
     TopLevelNodesPolicy topLevelNodesPolicy = TopLevelNodesPolicy::hideEmpty;
     bool webPagesAndIntegrationsCombined = false;
 
@@ -91,7 +91,7 @@ struct ResourceSelectionModelAdapter::Private
         if (!NX_ASSERT(sourceModel))
             return false;
 
-        if (filterText.isEmpty() && !resourceFilter)
+        if (filterText.isEmpty() && !externalFilter)
             return true;
 
         const auto sourceIndex = sourceModel->index(sourceRow, 0, sourceParent);
@@ -103,12 +103,8 @@ struct ResourceSelectionModelAdapter::Private
                 return true;
         }
 
-        if (resourceFilter)
-        {
-            const auto resource = sourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
-            if (resource && !resourceFilter(resource))
-                return false;
-        }
+        if (externalFilter && !externalFilter(sourceIndex))
+            return false;
 
         const auto text = sourceModel->data(sourceIndex, Qt::DisplayRole).toString();
         return text.contains(filterText, Qt::CaseInsensitive);
@@ -219,15 +215,15 @@ void ResourceSelectionModelAdapter::setFilterText(const QString& value)
     invalidateFilter();
 }
 
-nx::vms::common::ResourceFilter ResourceSelectionModelAdapter::resourceFilter() const
+ResourceSelectionModelAdapter::IsIndexAccepted ResourceSelectionModelAdapter::externalFilter() const
 {
-    return d->resourceFilter;
+    return d->externalFilter;
 }
 
-void ResourceSelectionModelAdapter::setResourceFilter(nx::vms::common::ResourceFilter value)
+void ResourceSelectionModelAdapter::setExternalFilter(IsIndexAccepted value)
 {
-    d->resourceFilter = std::move(value);
-    emit resourceFilterChanged();
+    d->externalFilter = std::move(value);
+    emit externalFilterChanged();
 
     invalidateFilter();
 }
@@ -356,7 +352,7 @@ void ResourceSelectionModelAdapter::registerQmlType()
 {
     qmlRegisterType<ResourceSelectionModelAdapter>(
         "nx.vms.client.desktop", 1, 0, "ResourceSelectionModel");
-    qRegisterMetaType<IsRowAccepted>();
+    qRegisterMetaType<IsIndexAccepted>();
     qRegisterMetaType<QSet<nx::vms::client::desktop::ResourceTree::NodeType>>();
 }
 

@@ -8,9 +8,12 @@
 #include <core/resource_access/resource_access_details.h>
 #include <core/resource_access/resource_access_map.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_model_adapter.h>
 
 namespace nx::vms::common { class SystemContext; }
 namespace nx::core::access { class SubjectHierarchy; }
+
+namespace nx::vms::client::desktop::ResourceTree { enum class NodeType; }
 
 namespace nx::vms::client::desktop {
 
@@ -18,9 +21,10 @@ class AccessSubjectEditingContext: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
+    using IsIndexAccepted = ResourceSelectionModelAdapter::IsIndexAccepted;
 
-    Q_PROPERTY(nx::vms::common::ResourceFilter accessibleResourcesFilter
-        READ accessibleResourcesFilter NOTIFY accessibleResourcesFilterChanged)
+    Q_PROPERTY(IsIndexAccepted accessibleByPermissionsFilter
+        READ accessibleByPermissionsFilter NOTIFY accessibleByPermissionsFilterChanged)
 
 public:
     explicit AccessSubjectEditingContext(
@@ -54,8 +58,11 @@ public:
     /** Reverts current subject access rights editing. */
     void resetOwnResourceAccessMap();
 
-    /** Returns full resolved access rights for a specified resource. */
+    /** Returns fully resolved access rights for a specified resource. */
     Q_INVOKABLE nx::vms::api::AccessRights accessRights(const QnResourcePtr& resource) const;
+
+    /** Returns fully resolved access rights for a specified resource group. */
+    Q_INVOKABLE nx::vms::api::AccessRights accessRights(const QnUuid& resourceGroupId) const;
 
     /**
      * Returns all ways in which the specified subject gains specified access right to
@@ -74,11 +81,11 @@ public:
         nx::vms::api::AccessRight accessRight) const;
 
     /**
-     * Returns resource filter that accepts resources for which the current subject has had
-     * any access rights since resetAccessibleResourcesFilter() was called.
+     * Returns resource filter that accepts model indexes containing rows for which the current
+     * subject has had any access rights since resetAccessibleByPermissionsFilter() was called.
      */
-    nx::vms::common::ResourceFilter accessibleResourcesFilter() const;
-    Q_INVOKABLE void resetAccessibleResourcesFilter();
+    IsIndexAccepted accessibleByPermissionsFilter() const;
+    Q_INVOKABLE void resetAccessibleByPermissionsFilter();
 
     /** Edit current subject relations with other subjects. */
     void setRelations(const QSet<QnUuid>& parents, const QSet<QnUuid>& members);
@@ -122,13 +129,15 @@ public:
     static Q_INVOKABLE bool isDependingOn(int /*AccessRight*/ what, nx::vms::api::AccessRights on);
     static Q_INVOKABLE bool isRequiredFor(int /*AccessRight*/ what, nx::vms::api::AccessRights for_);
 
+    static QnUuid resourceGroupId(ResourceTree::NodeType nodeType);
+
 signals:
     void subjectChanged();
     void hierarchyChanged();
     void currentSubjectRemoved();
     void resourceAccessChanged();
     void resourceGroupsChanged(const QSet<QnUuid>& resourceGroupIds);
-    void accessibleResourcesFilterChanged();
+    void accessibleByPermissionsFilterChanged();
 
 private:
     class Private;

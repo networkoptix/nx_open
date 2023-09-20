@@ -149,8 +149,8 @@ Item
         Binding
         {
             target: tree.model
-            property: "resourceFilter"
-            value: control.editingContext && control.editingContext.accessibleResourcesFilter
+            property: "externalFilter"
+            value: control.editingContext && control.editingContext.accessibleByPermissionsFilter
             when: control.editingContext && filterButton.withPermissionsOnly
         }
 
@@ -383,7 +383,7 @@ Item
         onWithPermissionsOnlyChanged:
         {
             if (editingContext)
-                editingContext.resetAccessibleResourcesFilter()
+                editingContext.resetAccessibleByPermissionsFilter()
         }
     }
 
