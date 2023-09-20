@@ -92,7 +92,10 @@ QnWebResourceWidget::QnWebResourceWidget(
             updateStatusOverlay(true);
         };
 
-    connect(m_webEngineView.get(), &GraphicsWebEngineView::statusChanged, this, updateStatusesHandler);
+    connect(m_webEngineView.get(), &GraphicsWebEngineView::urlChanged,
+        this, &QnWebResourceWidget::updateDetailsText);
+    connect(m_webEngineView.get(), &GraphicsWebEngineView::statusChanged,
+        this, updateStatusesHandler);
     connect(m_webEngineView.get(), &GraphicsWebEngineView::loadFinished, this,
         [this](bool ok)
         {
