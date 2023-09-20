@@ -28,6 +28,9 @@ private:
     Property<int> screenProperty{this, "screen"};
     Property<QRect> screenGeometry{this, "screenGeometry"};
 
+    /** Flag whether settings were successfully migrated from the 5.1 settings format. */
+    Property<bool> migrationDone{this, "migrationDone"};
+
     void migrateFrom_v51();
 };
 
