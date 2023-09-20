@@ -199,6 +199,12 @@ TEST(Url, hidePassword_debug)
         "/api/storageStatus?path=smb%3A%2F%2FTestUser%3ATestPassword%40192.168.1.40%2Fsh1");
 }
 
+TEST(Url, webPageHostsEqual)
+{
+    EXPECT_TRUE(url::webPageHostsEqual("https://www.example.org/", "https://example.org/"));
+    EXPECT_FALSE(url::webPageHostsEqual("https://www.example.com/", "https://ftp.example.com/"));
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx
