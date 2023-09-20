@@ -20,6 +20,7 @@ static const std::pair<EventType, QString> eventTypes[] = {
     {EventType::cameraDisconnectEvent, QStringLiteral("nx.events.deviceDisconnected")},
     {EventType::cameraIpConflictEvent, QStringLiteral("nx.events.deviceIpConflict")},
     {EventType::fanErrorEvent, QStringLiteral("nx.events.fanError")},
+    {EventType::ldapSyncIssueEvent, QStringLiteral("nx.events.ldapIssue")},
     {EventType::licenseIssueEvent, QStringLiteral("nx.events.licenseIssue")},
     {EventType::networkIssueEvent, QStringLiteral("nx.events.networkIssue")},
     {EventType::poeOverBudgetEvent, QStringLiteral("nx.events.poeOverBudget")},

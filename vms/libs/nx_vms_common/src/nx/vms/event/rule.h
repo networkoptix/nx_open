@@ -77,6 +77,7 @@ public:
     static RuleList getRulesUpd43();
     static RuleList getPluginDiagnosticEventUpdateRules();
     static RuleList getServerCertificateErrorRules();
+    static RuleList getLdapSyncIssueRules();
 
     /**
      * Some guids in getSystemRules() didn't match to the original SQL script. It is fixed already,

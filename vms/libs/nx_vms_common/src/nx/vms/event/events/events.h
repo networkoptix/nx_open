@@ -11,6 +11,7 @@
 #include "fan_error_event.h"
 #include "instant_event.h"
 #include "ip_conflict_event.h"
+#include "ldap_sync_issue_event.h"
 #include "license_issue_event.h"
 #include "motion_event.h"
 #include "network_issue_event.h"

@@ -4,6 +4,7 @@
 
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/actions/actions.h>
+#include <nx/vms/event/events/ldap_sync_issue_event.h>
 #include <nx/vms/event/rule.h>
 
 using namespace nx::vms::common;
@@ -51,6 +52,9 @@ AbstractActionPtr ActionFactory::instantiateAction(
         return result;
 
     result->setAggregationCount(aggregationInfo.totalCount());
+
+    if (event->getEventType() == EventType::ldapSyncIssueEvent)
+        LdapSyncIssueEvent::encodeReasons(aggregationInfo, result->getRuntimeParams());
 
     if (auto sendMailAction = result.dynamicCast<class SendMailAction>())
         sendMailAction->setAggregationInfo(aggregationInfo);

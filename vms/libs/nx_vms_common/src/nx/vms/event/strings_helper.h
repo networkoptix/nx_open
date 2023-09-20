@@ -126,6 +126,11 @@ public:
     static QString backupResultText(const EventParameters& params);
     static QString backupTimeText(const QDateTime& time);
 
+    static QString ldapSyncIssueReason(
+        EventReason reasonCode,
+        std::optional<std::chrono::seconds> syncInterval);
+    static QString ldapSyncIssueText(const EventParameters& params);
+
     QString getAnalyticsSdkEventName(const EventParameters& params,
         const QString& locale = QString()) const;
     QString getAnalyticsSdkObjectName(const EventParameters& params,
