@@ -24,6 +24,7 @@ Column
     property alias collapsed: menuContent.collapsed
     property int level: 0
     property bool collapsible: content.implicitHeight > 0
+    property bool mainItemVisible: true
 
     signal clicked()
 
@@ -34,6 +35,7 @@ Column
         itemId: control.itemId
         width: control.width
         level: control.level
+        visible: mainItemVisible
 
         onClicked:
         {

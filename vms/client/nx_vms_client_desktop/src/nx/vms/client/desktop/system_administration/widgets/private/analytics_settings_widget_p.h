@@ -65,6 +65,8 @@ public:
 
     void applySettingsValues();
 
+    void updateHasChanges();
+
     Q_INVOKABLE ApiIntegrationRequestsModel* makeApiIntegrationRequestsModel() const;
 
 public:
