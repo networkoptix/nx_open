@@ -28,7 +28,7 @@ public:
 
     QnUuid id() const { return infoId; }
     bool isGroup() const { return info.isGroup; }
-    nx::vms::api::UserType userType() const { return (nx::vms::api::UserType) info.userType; }
+    nx::vms::api::UserType userType() const { return info.userType; }
     QString name() const { return info.name; }
 };
 
@@ -57,7 +57,7 @@ MembersCache::Info MembersCache::infoFromContext(
             .name = group->name,
             .description = group->description,
             .isGroup = true,
-            .isLdap = (group->type == nx::vms::api::UserType::ldap)};
+            .userType = group->type};
     }
 
     if (const auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(id))
@@ -66,9 +66,7 @@ MembersCache::Info MembersCache::infoFromContext(
             .name = user->getName(),
             .description = user->fullName(),
             .isGroup = false,
-            .isLdap = user->isLdap(),
-            .isTemporary = user->isTemporary(),
-            .userType = (UserSettingsGlobal::UserType)user->userType()};
+            .userType = user->userType()};
     }
 
     return {};
@@ -102,7 +100,7 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
         m_info.insert(id, infoFromContext(systemContext, id));
         members.users << id;
 
-        if (m_info[id].isTemporary)
+        if (m_info[id].userType == api::UserType::temporaryLocal)
         {
             for (const auto& groupId: m_subjectContext->subjectHierarchy()->directParents(id))
                 addTmpUser(groupId, id);
@@ -187,7 +185,7 @@ void MembersCache::modify(
                 idList.removeAt(i);
                 emit endRemove(i, id, groupId);
 
-                if (!idInfo.isGroup && idInfo.isTemporary)
+                if (!idInfo.isGroup && idInfo.userType == api::UserType::temporaryLocal)
                     addTmpUser(groupId, id);
             }
         };
@@ -206,7 +204,7 @@ void MembersCache::modify(
                 idList.insert(i, id);
                 emit endInsert(i, id, groupId);
 
-                if (!idInfo.isGroup && idInfo.isTemporary)
+                if (!idInfo.isGroup && idInfo.userType == api::UserType::temporaryLocal)
                     removeTmpUser(groupId, id);
             }
         };
