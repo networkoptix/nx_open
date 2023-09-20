@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/resource_views/views/fake_resource_list_view.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -70,6 +71,12 @@ DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     m_sortModel(new SortModel(this))
 {
     ui->setupUi(this);
+
+
+    ui->httpsOnlyBar->init({.level = BarDescription::BarLevel::Info,
+        .isOpenExternalLinks = false,
+        .isEnabledProperty = &messageBarSettings()->httpsOnlyBarInfo});
+    ui->serverOfflineAlertBar->init({.level = BarDescription::BarLevel::Error});
 
     initializeControls();
 
@@ -249,9 +256,8 @@ void DeviceAdditionDialog::initializeControls()
         tr("Searching for devices on the network is restricted to cameras that"
            " support HTTPS connections. This can be changed in %1 settings.")
             .arg(nx::vms::common::html::localLink(tr("System Administration"))));
-    ui->httpsOnlyBar->setOpenExternalLinks(false);
     ui->httpsOnlyBar->setVisible(false);
-    connect(ui->httpsOnlyBar, &MessageBar::linkActivated,
+    connect(ui->httpsOnlyBar, &CommonMessageBar::linkActivated,
         [this]()
         {
             menu()->trigger(ui::action::SystemAdministrationAction,
