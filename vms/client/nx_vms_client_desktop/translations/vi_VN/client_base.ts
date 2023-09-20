@@ -1115,15 +1115,15 @@
     </message>
     <message>
       <source>Any device issue</source>
-      <translation>Bất kỳ sự cố thiết bị</translation>
+      <translation>Bất kỳ sự cố thiết bị nào</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation>Bất kỳ vấn đề camera</translation>
+      <translation>Bất kỳ vấn đề camera nào</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation>Bất kỳ sự kiện máy chủ</translation>
+      <translation>Bất kỳ sự kiện máy chủ nào</translation>
     </message>
     <message>
       <source>Device issues</source>
@@ -1135,7 +1135,7 @@
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation>Bất kỳ sự kiện phân tích</translation>
+      <translation>Bất kỳ sự kiện phân tích nào</translation>
     </message>
   </context>
   <context>
@@ -1155,7 +1155,7 @@
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation>Chèn vào file hình ảnh</translation>
+      <translation>Xen kẽ video âm thanh</translation>
     </message>
     <message>
       <source>Matroska</source>
@@ -1167,7 +1167,7 @@
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation>%1 Tập tin hình ảnh</translation>
+      <translation>%1 tệp đa phương tiện</translation>
     </message>
     <message>
       <source>Executable %1 Media File</source>
@@ -2917,7 +2917,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>Vui lòng kiểm tra kết nối internet của bạn và thử lại.</translation>
+      <translation>Lỗi mạng. Vui lòng kiểm tra kết nối internet của bạn và thử lại.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
@@ -3158,7 +3158,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation>Lưu bản sao lưu cơ sở dữ liệu</translation>
+      <translation>Lưu bản sao cơ sở dữ liệu</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -3166,11 +3166,11 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation>Tạo</translation>
+      <translation>Tạo mới</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation>Khôi phục từ Sao lưu cơ sở dữ liệu</translation>
+      <translation>Khôi phục từ bản sao lưu cơ sở dữ liệu</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
@@ -3178,7 +3178,7 @@ to %1</source>
     </message>
     <message>
       <source>Restore</source>
-      <translation>Khôi phục dữ liệu</translation>
+      <translation>Khôi phục</translation>
     </message>
     <message>
       <source>Restore database?</source>
@@ -3326,7 +3326,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Chế độ Ghi âm Panic sẽ chuyển cài đặt ghi hình cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
+      <translation>Chế độ Ghi hoảng loạn sẽ chuyển cài đặt ghi cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
     </message>
   </context>
   <context>
@@ -6333,7 +6333,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation>Không tìm thấy tệp video trong thư mục đã chọn</translation>
+      <translation>Không có tệp mới để tải lên trong thư mục đã chọn</translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
@@ -6344,20 +6344,20 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>Không còn nhiều không gian trống trên bộ nhớ máy chủ. Một số cảnh quay cũ có thể bị xóa để giải phóng không gian. Lưu ý rằng nếu tệp tin đã chọn xuất hiện lâu nhất trên máy chủ, chúng sẽ bị xóa ngay sau khi được tải lên.</numerusform>
+        <numerusform>Không còn nhiều dung lượng trống trên bộ nhớ máy chủ. Một số cảnh quay cũ có thể bị xóa để giải phóng dung lượng. Lưu ý rằng nếu các tệp được chọn là tệp cũ nhất trên máy chủ, chúng sẽ bị xóa ngay sau khi được tải lên.</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>Để ngăn chặn điều này bạn có thể thêm bộ nhớ bổ sung. Bạn cũng có thể kiểm soát cảnh quay nào sẽ bị xóa đầu tiên bằng cách thay đổi kho lưu giữ thời gian trong cài đặt máy ảnh.</translation>
+      <translation>Để ngăn chặn điều này, bạn có thể thêm dung lượng lưu trữ bổ sung. Bạn cũng có thể kiểm soát cảnh quay nào sẽ bị xóa trước bằng cách thay đổi thời gian lưu trữ trong cài đặt camera.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation>Upload mọi cách?</translation>
+      <translation>Vẫn tải lên?</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>Người dùng &quot;%1&quot; hiện đang tải lên cảnh quay cho camera này.</translation>
+      <translation>Không thể bắt đầu tải lên vì người dùng &quot;%1&quot; hiện đang tải cảnh quay lên camera này.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
@@ -6373,7 +6373,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation>Tải lên đoạn phim</translation>
+      <translation>Đang tải lên cảnh quay</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
@@ -6393,12 +6393,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
+      <translation>%1 bao gồm khoảng thời gian mà video đã được tải lên.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
+      <translation>%1 bao gồm khoảng thời gian video được tải lên.</translation>
     </message>
   </context>
   <context>
@@ -6585,7 +6585,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Merge</source>
-      <translation>Gộp lại</translation>
+      <translation>Hợp nhất</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
@@ -6966,7 +6966,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation>camera bị xóa</translation>
+      <translation>camera đã bị xóa</translation>
     </message>
     <message>
       <source>Unknown track</source>
@@ -7986,7 +7986,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>Video Wall bị xóa trên máy chủ và sẽ bị đóng.</translation>
+      <translation>Tường Video bị xóa trên máy chủ và sẽ bị đóng.</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
@@ -7998,7 +7998,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation>Không thể kết nối với máy chủ được chọn</translation>
+      <translation>Không thể kết nối với máy chủ đã chọn</translation>
     </message>
     <message>
       <source>Re-authentication required</source>
@@ -8056,7 +8056,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation>Lỗi bên trong. Vui lòng thử lại sau.</translation>
+      <translation>Lỗi nội bộ. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>None of your Servers has connection to %1.</source>
@@ -8094,7 +8094,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Merge</source>
       <comment>Merge Server to the current System (dialog button text)</comment>
-      <translation>Gộp lại</translation>
+      <translation>Hợp nhất</translation>
     </message>
   </context>
   <context>
@@ -8154,15 +8154,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation>Camera này yêu cầu mật khẩu được thiết lập.</translation>
+      <translation>Camera này yêu cầu phải thiết lập mật khẩu.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation>Một số camera được chọn yêu cầu mật khẩu để được thiết lập.</translation>
+      <translation>Một số camera được chọn yêu cầu phải thiết lập mật khẩu.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation>Yêu cầu quản trị viên hệ thống của bạn làm điều đó.</translation>
+      <translation>Yêu cầu quản trị viên hệ thống thực hiện việc đó.</translation>
     </message>
     <message>
       <source>Set Password</source>
@@ -8181,7 +8181,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation>IP / Tên máy chủ / RTSP / UDP</translation>
+      <translation>IP / Hostname / Liên kết RTSP / Liên kết UDP</translation>
     </message>
     <message>
       <source>Examples:</source>
@@ -8231,7 +8231,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Searching...</source>
-      <translation>Đang tìm...</translation>
+      <translation>Đang tìm kiếm...</translation>
     </message>
     <message>
       <source>No devices found</source>
@@ -8289,7 +8289,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation>Để sử dụng phần mềm, bạn phải đồng ý với thỏa thuận cấp phép người dùng cuối</translation>
+      <translation>Để sử dụng phần mềm, bạn phải đồng ý với thỏa thuận cấp phép dành cho người dùng cuối</translation>
     </message>
   </context>
   <context>
@@ -8302,7 +8302,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -8368,15 +8368,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>Định dạng đã chọn không được hỗ trợ bởi thư viện FFMPEG.</translation>
+      <translation>Định dạng đã chọn không được thư viện FFMPEG hỗ trợ.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation>Thư viện FFMPEG.</translation>
+      <translation>Lỗi thư viện FFMPEG.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>Video hay mã hóa âm thanh không thể tương thích với các định dạng đã chọn.</translation>
+      <translation>Codec video hoặc âm thanh không tương thích với định dạng đã chọn.</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -8889,7 +8889,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation>Dữ liệu đang tải...</translation>
+      <translation>Đang tải tệp xuống...</translation>
     </message>
     <message>
       <source>Pending download...</source>
@@ -8937,7 +8937,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Apply</source>
-      <translation>ứng dụng</translation>
+      <translation>Áp dụng</translation>
     </message>
   </context>
   <context>
