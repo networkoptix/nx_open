@@ -57,6 +57,8 @@ public:
 
     virtual bool isNewSystem() const = 0;
 
+    virtual nx::vms::api::SaasState saasState() const = 0;
+
     typedef QList<nx::vms::api::ModuleInformationWithAddresses> ServersList;
     virtual ServersList servers() const = 0;
 
@@ -107,4 +109,5 @@ signals:
     void newSystemStateChanged();
     void oauthSupportedChanged();
     void versionChanged();
+    void saasStateChanged();
 };

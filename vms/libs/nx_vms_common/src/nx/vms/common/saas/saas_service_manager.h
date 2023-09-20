@@ -38,7 +38,7 @@ public:
      * @return Detailed structure describing whole aspects of SaaS licensing state of the system.
      */
     nx::vms::api::SaasData data() const;
-    
+
     /**
      * @return SaaS services available to the system from Channel Partners, indexed by
      *     the service ID.
@@ -73,16 +73,16 @@ public:
     std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> cloudStorageData() const;
 
     /**
-     * @return Whether Saas is in suspended or shutdown state. It doesn't matter if shutdown state
-     * was received from license server or set due lost connection to a licence server.
+     * @return Whether SaaS is in suspended or shutdown state. It doesn't matter if shutdown state
+     * was received from license server or set due lost connection to a license server.
      */
     bool saasSuspendedOrShutDown() const;
 
     static bool saasSuspendedOrShutDown(nx::vms::api::SaasState state);
 
     /**
-     * @return Whether Saas is in shutdown state. It doesn't matter if shutdown state
-     * was received from license server or set due lost connection to a licence server.
+     * @return Whether SaaS is in shutdown state. It doesn't matter if shutdown state
+     * was received from license server or set due lost connection to a license server.
      */
     bool saasShutDown() const;
 
@@ -103,8 +103,9 @@ public:
     // have any sense on the client side.
     void setEnabled(bool value);
     bool isEnabled() const;
-    
+
 signals:
+    void saasStateChanged();
     void dataChanged();
 
 private:

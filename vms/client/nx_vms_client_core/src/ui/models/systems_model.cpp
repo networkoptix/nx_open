@@ -44,7 +44,9 @@ namespace
         {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"},
         {QnSystemsModel::VisibilityScopeRoleId, "visibilityScope"},
         {QnSystemsModel::IsCloudOauthSupportedRoleId, "isOauthSupported"},
-        {QnSystemsModel::Is2FaEnabledForSystem, "is2FaEnabledForSystem"}
+        {QnSystemsModel::Is2FaEnabledForSystem, "is2FaEnabledForSystem"},
+        {QnSystemsModel::IsSaasSuspended, "isSaasSuspended"},
+        {QnSystemsModel::IsSaasShutDown, "isSaasShutDown"}
     };
 }
 
@@ -268,6 +270,11 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return system->isOauthSupported();
         case Is2FaEnabledForSystem:
             return system->is2FaEnabled();
+        case IsSaasSuspended:
+            return system->saasState() == nx::vms::api::SaasState::suspend;
+        case IsSaasShutDown:
+            return system->saasState() == nx::vms::api::SaasState::shutdown
+                || system->saasState() == nx::vms::api::SaasState::autoShutdown;
 
         default:
             return QVariant();
@@ -437,6 +444,14 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
                     << QnSystemsModel::IsCloudSystemRoleId
                     << QnSystemsModel::OwnerDescriptionRoleId;
                 emitDataChanged(systemDescription, roles);
+            });
+
+    data->connections
+        << connect(systemDescription.get(), &QnBaseSystemDescription::saasStateChanged, this,
+            [this, systemDescription]()
+            {
+                emitDataChanged(systemDescription,
+                {QnSystemsModel::IsSaasSuspended, QnSystemsModel::IsSaasShutDown});
             });
 
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
