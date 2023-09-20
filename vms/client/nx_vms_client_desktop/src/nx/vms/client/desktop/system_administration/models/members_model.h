@@ -90,6 +90,7 @@ class NX_VMS_CLIENT_DESKTOP_API MembersModel: public QAbstractListModel, public 
         READ editingContext
         NOTIFY editingContextChanged)
     Q_PROPERTY(MembersCache* membersCache READ membersCache NOTIFY membersCacheChanged)
+    Q_PROPERTY(bool cycledGroup READ isCycledGroup NOTIFY cycledGroupChanged)
 
 public:
     enum Roles
@@ -162,6 +163,8 @@ public:
 
     Q_INVOKABLE void removeParent(const QnUuid& groupId);
 
+    bool isCycledGroup() const;
+
 signals:
     void groupIdChanged();
     void userIdChanged();
@@ -174,6 +177,7 @@ signals:
     void customGroupCountChanged();
     void membersCacheChanged();
     void temporaryChanged();
+    void cycledGroupChanged();
 
 private:
     void loadModelData();

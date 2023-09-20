@@ -223,9 +223,8 @@ public:
 
     CommonMessageBar* const nonUniqueGroupsWarning{
         new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
-
-    bool hideNotFoundGroupsWarning = false;
-    bool hideNonUniqueGroupsWarning = false;
+    CommonMessageBar* const cycledGroupsWarning{
+        new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
 
     ControlBar* const selectionControls{new ControlBar(q)};
 
@@ -311,8 +310,6 @@ void UserGroupsWidget::loadDataToUi()
 
 void UserGroupsWidget::resetWarnings()
 {
-    d->hideNotFoundGroupsWarning = false;
-    d->hideNonUniqueGroupsWarning = false;
     d->updateBanners();
 }
 
@@ -378,6 +375,7 @@ void UserGroupsWidget::Private::setupUi()
     alertsLayout->addWidget(selectionControls);
     alertsLayout->addWidget(notFoundGroupsWarning);
     alertsLayout->addWidget(nonUniqueGroupsWarning);
+    alertsLayout->addWidget(cycledGroupsWarning);
     q->layout()->addItem(alertsLayout);
 
     const auto hoverTracker = new ItemViewHoverTracker(ui->groupsTable);
@@ -476,6 +474,10 @@ void UserGroupsWidget::Private::setupUi()
     nonUniqueGroupsWarning->setText(tr(
         "Multiple groups share the same name, which can lead to confusion. To maintain a clear "
             "and organized structure, we suggest providing unique names for each group."));
+    cycledGroupsWarning->setText(tr(
+        "Some groups have each other as both their parent and child members, or are part of such "
+            "a circular reference chain. This can lead to incorrect calculations of "
+            "permissions."));
 
     notFoundGroupsWarning->addButton(deleteNotFoundGroupsButton);
     connect(deleteNotFoundGroupsButton, &QPushButton::clicked, this,
@@ -552,6 +554,8 @@ void UserGroupsWidget::Private::setupUi()
         &Private::updateBanners);
     connect(groupsModel, &UserGroupListModel::nonUniqueGroupsChanged, this,
         &Private::updateBanners);
+    connect(groupsModel, &UserGroupListModel::cycledGroupsChanged, this,
+        &Private::updateBanners);
 
     handleSelectionChanged();
     updateBanners();
@@ -617,11 +621,10 @@ void UserGroupsWidget::Private::updateBanners()
     deleteNotFoundGroupsButton->setText(
         tr("Delete %n groups", "", groupsModel->notFoundGroups().size()));
 
-    notFoundGroupsWarning->setVisible(!hideNotFoundGroupsWarning
-        && q->systemContext()->ldapStatusWatcher()->isOnline()
+    notFoundGroupsWarning->setVisible(q->systemContext()->ldapStatusWatcher()->isOnline()
         && !groupsModel->notFoundGroups().isEmpty());
-    nonUniqueGroupsWarning->setVisible(!hideNonUniqueGroupsWarning
-        && !groupsModel->nonUniqueGroups().isEmpty());
+    nonUniqueGroupsWarning->setVisible(!groupsModel->nonUniqueGroups().isEmpty());
+    cycledGroupsWarning->setVisible(!groupsModel->cycledGroups().isEmpty());
 }
 
 void UserGroupsWidget::Private::handleSelectionChanged()
