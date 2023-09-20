@@ -142,6 +142,7 @@ public:
     NonUniqueNameTracker nonUniqueNameTracker;
 
     bool ldapServerOnline = true;
+    qsizetype m_ldapUserCount = 0;
 
     Private(UserListModel* q):
         SystemContextAware(q->systemContext()),
@@ -346,6 +347,9 @@ void UserListModel::Private::addUser(const QnUserResourcePtr& user)
     if (users.contains(user))
         return;
 
+    if (user->isLdap())
+        ++m_ldapUserCount;
+
     const auto row = users.index_of(users.lower_bound(user));
 
     model->beginInsertRows(QModelIndex(), row, row);
@@ -360,6 +364,9 @@ void UserListModel::Private::removeUser(const QnUserResourcePtr& user)
     const auto it = users.find(user);
     if (it == users.end())
         return;
+
+    if (user->isLdap())
+        --m_ldapUserCount;
 
     const auto row = users.index_of(it);
     model->beginRemoveRows(QModelIndex(), row, row);
@@ -877,6 +884,11 @@ QSet<QnUuid> UserListModel::notFoundUsers() const
 QSet<QnUuid> UserListModel::nonUniqueUsers() const
 {
     return d->nonUniqueNameTracker.nonUniqueNameIds();
+}
+
+qsizetype UserListModel::ldapUserCount() const
+{
+    return d->m_ldapUserCount;
 }
 
 SortedUserListModel::SortedUserListModel(QObject* parent): base_type(parent)
