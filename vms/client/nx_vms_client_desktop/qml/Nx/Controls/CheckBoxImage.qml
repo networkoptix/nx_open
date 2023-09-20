@@ -2,28 +2,33 @@
 
 import QtQml
 
-import Nx
 import Nx.Core
+
+import "private"
 
 IconImage
 {
     property int checkState: Qt.Unchecked
     property bool hovered: false
+    property bool pressed: false
     property bool enabled: true
 
+    readonly property ButtonColors colors: ButtonColors { normal: ColorTheme.colors.light10 }
+    readonly property ButtonColors checkedColors: ButtonColors { normal: ColorTheme.colors.light4 }
+
     opacity: enabled ? 1.0 : 0.3
-    baselineOffset: 15
+    baselineOffset: 14
     sourceSize: Qt.size(20, 20)
 
     color:
     {
-        const baseColor = checkState === Qt.Unchecked
-            ? ColorTheme.colors.light10
-            : ColorTheme.colors.light4
+        const baseColors = (checkState === Qt.Unchecked) ? colors : checkedColors
+        if (!enabled)
+            return baseColors.normal
 
-        return hovered && enabled
-            ? ColorTheme.lighter(baseColor, 2)
-            : baseColor
+        return pressed
+            ? baseColors.pressed
+            : (hovered ? baseColors.hovered : baseColors.normal)
     }
 
     source:

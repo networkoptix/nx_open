@@ -1,13 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.11
-import QtQuick.Controls 2.0
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
 
-import nx.client.desktop 1.0
+import nx.client.desktop
 
 CheckBox
 {
@@ -17,9 +16,15 @@ CheckBox
     property alias middleSpacing: middleContainer.rightPadding //< Between middleItem and text.
     property alias textFormat: controlText.textFormat
     property alias wrapMode: controlText.wrapMode
+    property alias elide: controlText.elide
+
+    property alias colors: checkIndicator.colors
+    property alias checkedColors: checkIndicator.checkedColors
+
+    readonly property alias currentColor: checkIndicator.color
 
     padding: 0
-    topPadding: 0
+    topPadding: 1
     bottomPadding: 0
     leftPadding: 20
     rightPadding: 0
@@ -27,48 +32,94 @@ CheckBox
     font.pixelSize: 13
     font.weight: Font.Normal
 
-    baselineOffset: controlText.baselineOffset + topPadding
+    // Allows to baseline-align other text-based items with the check box.
+    // Should be used as read-only.
+    baselineOffset: topPadding + firstTextLinePositioner.y + fontMetrics.ascent
 
-    indicator: CheckBoxImage
+    indicator: Item
     {
-        id: checkIndicator
+        id: indicatorHolder
 
-        anchors.baseline: control.baseline
-        checkState: control.checkState
-        enabled: control.enabled
-        hovered: control.hovered
+        width: checkIndicator.width
+        height: Math.max(checkIndicator.height, firstTextLinePositioner.height)
+        y: control.topPadding
+
+        CheckBoxImage
+        {
+            id: checkIndicator
+
+            anchors.verticalCenter: indicatorHolder.verticalCenter
+
+            checkState: control.checkState
+            enabled: control.enabled
+            pressed: control.pressed
+            hovered: control.hovered
+        }
+
+        Item
+        {
+            id: firstTextLinePositioner
+
+            height: fontMetrics.height
+            anchors.verticalCenter: indicatorHolder.verticalCenter
+
+            FontMetrics
+            {
+                id: fontMetrics
+                font: control.font
+            }
+        }
     }
 
-    contentItem: RowLayout
+    contentItem: Item
     {
+        id: content
+
+        implicitHeight:
+        {
+            return Math.max(indicatorHolder.height,
+                controlText.relevant ? (controlText.y + controlText.implicitHeight) : 0)
+        }
+
+        implicitWidth:
+        {
+            return controlText.relevant
+                ? (controlText.x + controlText.implicitWidth)
+                : controlText.x
+        }
+
         Row
         {
             id: middleContainer
 
-            Layout.alignment: Qt.AlignTop
+            readonly property bool relevant: children.length > 0
 
-            height: parent.height
             rightPadding: 2
-            visible: children.length > 0
+            height: indicatorHolder.height
+            visible: relevant
+
+            // Allows to baseline-align possible text-based middle items.
+            baselineOffset: control.baselineOffset - control.topPadding
         }
 
         Text
         {
             id: controlText
 
-            Layout.alignment: Qt.AlignTop
-            Layout.fillWidth: true
+            readonly property bool relevant: !!text
+
+            x: middleContainer.relevant ? middleContainer.width : 0
+            y: firstTextLinePositioner.y
+            width: parent.width - x
 
             leftPadding: 2
             rightPadding: 2
-            verticalAlignment: Text.AlignVCenter
             elide: Qt.ElideRight
             font: control.font
             text: control.text
             opacity: checkIndicator.opacity
-            color: checkIndicator.color
-
-            visible: text
+            color: control.currentColor
+            visible: relevant
         }
     }
 

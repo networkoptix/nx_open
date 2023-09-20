@@ -65,17 +65,24 @@ Button
         {
             id: checkboxComponent
 
-            CheckBox
+            Item
             {
-                id: checkBox
+                implicitWidth: checkBox.implicitWidth
+                implicitHeight: checkBox.implicitHeight
 
-                font: control.font
-
-                checkState: control._inputCheckState
-                onCheckStateChanged:
+                CheckBox
                 {
-                    if (checkState !== control._inputCheckState)
-                        control.checkStateChanged(checkState)
+                    id: checkBox
+
+                    font: control.font
+                    checkState: control._inputCheckState
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    onCheckStateChanged:
+                    {
+                        if (checkState !== control._inputCheckState)
+                            control.checkStateChanged(checkState)
+                    }
                 }
             }
         }

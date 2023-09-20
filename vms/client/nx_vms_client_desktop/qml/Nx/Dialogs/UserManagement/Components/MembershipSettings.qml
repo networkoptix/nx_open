@@ -6,8 +6,6 @@ import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Shapes
 
-import Qt5Compat.GraphicalEffects
-
 import Nx
 import Nx.Core
 import Nx.Controls
@@ -86,9 +84,11 @@ Item
         property bool cycle: false
 
         readonly property bool selected: groupMouseArea.containsMouse || groupCheckbox.checked
+
         readonly property color selectedColor: selected
             ? ColorTheme.colors.light4
             : ColorTheme.colors.light10
+
         readonly property color descriptionColor: selected
             ? ColorTheme.colors.light10
             : ColorTheme.colors.light16
@@ -97,86 +97,53 @@ Item
 
         color: groupMouseArea.containsMouse ? ColorTheme.colors.dark12 : "transparent"
 
-        RowLayout
+        CheckBox
         {
+            id: groupCheckbox
+
             spacing: 0
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
             anchors.right: parent.right
 
-            Item
+            enabled: control.enabledProperty ? model[control.enabledProperty] : true
+            checked: model[control.editableProperty]
+
+            middleItem: IconImage
             {
-                width: groupCheckbox.width
-                height: groupCheckbox.height
+                id: groupImage
 
-                CheckBox
-                {
-                    id: groupCheckbox
+                width: 20
+                height: 20
 
-                    checked: model[control.editableProperty]
+                source: iconPath(model)
+                sourceSize: Qt.size(width, height)
 
-                    enabled: control.enabledProperty ? model[control.enabledProperty] : true
-
-                    baselineOffset: checkboxText.baselineOffset + checkboxText.y
-                }
-
-                // Setting 'hovered' property of groupCheckbox leads to QML crash.
-                ColorOverlay
-                {
-                    anchors.fill: groupCheckbox
-                    source: groupCheckbox
-                    color: checkableItem.selectedColor
-                }
+                color: checkableItem.selectedColor
             }
 
-            Item
+            font: Qt.font({pixelSize: 12, weight: Font.Normal})
+
+            colors.normal: checkableItem.cycle
+                ? ColorTheme.colors.red_core
+                : checkableItem.selectedColor
+
+            textFormat: Text.StyledText
+            middleSpacing: 0
+            text:
             {
-                Layout.alignment: Qt.AlignVCenter
-
-                width: groupImage.width
-                height: groupImage.height
-
-                IconImage
+                const result = highlightMatchingText(checkableItem.text)
+                if (control.currentSearchRegExp
+                    || !control.showDescription
+                    || !checkableItem.description)
                 {
-                    id: groupImage
-
-                    width: 20
-                    height: 20
-
-                    source: iconPath(model)
-                    sourceSize: Qt.size(width, height)
-                    color: checkableItem.selectedColor
+                    return result
                 }
-            }
 
-            Text
-            {
-                id: checkboxText
-
-                Layout.alignment: Qt.AlignVCenter
-                Layout.fillWidth: true
-                Layout.leftMargin: 2
-
-                font: Qt.font({pixelSize: 12, weight: Font.Normal})
-                color: checkableItem.cycle ? ColorTheme.colors.red_core : checkableItem.selectedColor
-                elide: Text.ElideRight
-
-                textFormat: Text.StyledText
-                text:
-                {
-                    const result = highlightMatchingText(checkableItem.text)
-                    if (control.currentSearchRegExp
-                        || !control.showDescription
-                        || !checkableItem.description)
-                    {
-                        return result
-                    }
-
-                    const description = NxGlobals.toHtmlEscaped(checkableItem.description)
-                    return `${result}<font color="${checkableItem.descriptionColor}">`
-                        + ` - ${description}</font>`
-                }
+                const description = NxGlobals.toHtmlEscaped(checkableItem.description)
+                return `${result}<font color="${checkableItem.descriptionColor}">`
+                    + ` - ${description}</font>`
             }
         }
 
@@ -185,22 +152,24 @@ Item
         MouseArea
         {
             id: groupMouseArea
+
             anchors.fill: parent
             hoverEnabled: true
+
             onClicked:
-            {
                 model[control.editableProperty] = !model[control.editableProperty]
-            }
         }
     }
 
     Item
     {
         id: editablePanel
+
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.leftMargin: 16
+
         width: 0.4 * parent.width
         clip: true
         visible: control.editable
@@ -248,6 +217,7 @@ Item
 
             section.property: control.checkSectionProperty
             section.criteria: ViewSection.FullString
+
             section.delegate: SectionHeader
             {
                 text: section
@@ -281,6 +251,7 @@ Item
     Rectangle
     {
         id: summaryPanel
+
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.right: parent.right
@@ -304,8 +275,10 @@ Item
         ListView
         {
             id: selectedGroupsListView
+
             anchors.fill: parent
             anchors.leftMargin: 16
+
             visible: count > 0
             clip: true
             hoverHighlightColor: "transparent"
