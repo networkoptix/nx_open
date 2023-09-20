@@ -236,6 +236,11 @@ NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme
  */
 NX_UTILS_API QString hidePassword(nx::utils::Url url);
 
+/**
+ * Compares web page hosts omitting the default "www" subdomain.
+ */
+NX_UTILS_API bool webPageHostsEqual(const nx::utils::Url& left, const nx::utils::Url& right);
+
 } // namespace url
 
 /**
