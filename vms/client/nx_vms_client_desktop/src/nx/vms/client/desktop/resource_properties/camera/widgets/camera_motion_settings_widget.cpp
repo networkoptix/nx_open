@@ -19,6 +19,7 @@
 #include <nx/vms/client/desktop/common/widgets/selectable_button.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
@@ -52,9 +53,19 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     m_motionWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this))
 {
     ui->setupUi(this);
+
+    ui->highResolutionInfoBar->init({.level = BarDescription::BarLevel::Info,
+        .isEnabledProperty = &messageBarSettings()->highResolutionInfo});
+    ui->motionHintBar->init({.level = BarDescription::BarLevel::Info});
+    ui->motionImplicitlyDisabledAlertBar->init({.level = BarDescription::BarLevel::Warning,
+        .isEnabledProperty = &messageBarSettings()->motionImplicitlyDisabledAlert});
+    ui->recordingAlertBar->init({.level = BarDescription::BarLevel::Warning,
+        .isEnabledProperty = &messageBarSettings()->motionRecordingAlert});
+    ui->regionsErrorBar->init({.level = BarDescription::BarLevel::Error});
+
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
-    ui->highResolutionAlertBar->setRetainSpaceWhenNotDisplayed(true);
+    ui->highResolutionInfoBar->setRetainSpaceWhenNotDisplayed(true);
 
     const QList<QColor> sensitivityColors = core::colorTheme()->colors("camera.sensitivityColors");
 
@@ -254,11 +265,11 @@ void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& sta
         : tr("Motion detection will work only when camera is being viewed. "
             "Enable recording to make it work all the time."));
 
-    ui->highResolutionAlertBar->setText(MotionStreamAlerts::resolutionAlert(streamAlert));
+    ui->highResolutionInfoBar->setText(MotionStreamAlerts::resolutionAlert(streamAlert));
     ui->motionImplicitlyDisabledAlertBar->setText(MotionStreamAlerts::implicitlyDisabledAlert(
         streamAlert));
 
-    ui->regionsAlertBar->setText(
+    ui->regionsErrorBar->setText(
         [&state]() -> QString
         {
             if (!state.motionAlert)
@@ -303,11 +314,11 @@ void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& sta
             return {};
         }());
 
-    ui->highResolutionAlertBar->setRetainSpaceWhenNotDisplayed(
+    ui->highResolutionInfoBar->setRetainSpaceWhenNotDisplayed(
         ui->motionHintBar->text().isEmpty() &&
         ui->recordingAlertBar->text().isEmpty() &&
         ui->motionImplicitlyDisabledAlertBar->text().isEmpty() &&
-        ui->regionsAlertBar->text().isEmpty());
+        ui->regionsErrorBar->text().isEmpty());
 }
 
 void CameraMotionSettingsWidget::showEvent(QShowEvent* event)

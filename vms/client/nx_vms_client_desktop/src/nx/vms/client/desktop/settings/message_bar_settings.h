@@ -16,6 +16,9 @@ public:
 
     Property<bool> recordingWarning{this, "recordingWarning", true};
     Property<bool> advancedSettingsAlert{this, "advancedSettingsAlert", true};
+    Property<bool> highResolutionInfo{this, "highResolutionInfo", true};
+    Property<bool> motionImplicitlyDisabledAlert{this, "motionImplicitlyDisabledAlert", true};
+    Property<bool> motionRecordingAlert{this, "motionRecordingAlert", true};
 };
 
 MessageBarSettings* messageBarSettings();
