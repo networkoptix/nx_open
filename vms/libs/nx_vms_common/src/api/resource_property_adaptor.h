@@ -154,11 +154,11 @@ public:
     bool isReadOnly() const { return m_isReadOnly; }
     bool isWriteOnly() const { return m_isWriteOnly; }
     bool isHidden() const { return isReadOnly() && isWriteOnly(); }
-    bool isOwnerOnly() const { return m_isOwnerOnly; }
+    bool isSecurity() const { return m_isSecurity; }
 
     void markReadOnly() { m_isReadOnly = true; }
     void markWriteOnly() { m_isWriteOnly = true; }
-    void markOwnerOnly() { m_isOwnerOnly = true; }
+    void markSecurity() { m_isSecurity = true; }
 
 signals:
     void valueChanged();
@@ -196,7 +196,7 @@ private:
 
     bool m_isReadOnly = false;
     bool m_isWriteOnly = false;
-    bool m_isOwnerOnly = false;
+    bool m_isSecurity = false;
 };
 
 template<class T>
@@ -253,7 +253,7 @@ public:
             QJson::serialize(context, value(), &result);
         else
             QJson::serialize(value(), &result);
-        
+
         return result;
     }
 

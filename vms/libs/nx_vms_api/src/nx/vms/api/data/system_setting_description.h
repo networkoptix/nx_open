@@ -27,9 +27,17 @@ struct NX_VMS_API SystemSettingDescription
 
     bool isReadOnly = false;
     bool isWriteOnly = false;
+
+    /**
+     * Can only be modified by Administrators by default. Power Users require `securityForPowerUsers`
+     * System Setting to be enabled in order to modify these.
+     */
+    bool isSecurity = false;
+
+    /** Can only be modified by Administrators. This value depends on `securityForPowerUsers`. */
     bool isOwnerOnly = false;
 };
-#define SystemSettingDescription_Fields (label)(type)(isReadOnly)(isWriteOnly)(isOwnerOnly)
+#define SystemSettingDescription_Fields (label)(type)(isReadOnly)(isWriteOnly)(isSecurity)(isOwnerOnly)
 QN_FUSION_DECLARE_FUNCTIONS(SystemSettingDescription, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(SystemSettingDescription, SystemSettingDescription_Fields)
 
