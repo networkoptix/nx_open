@@ -4,6 +4,7 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
+#include <QtCore/QDir>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/property_storage/qsettings_migration_utils.h>
@@ -15,7 +16,11 @@ using namespace screen_recording;
 
 ScreenRecordingSettings::ScreenRecordingSettings()
 {
+    load();
     migrateFrom_v51();
+
+    if (recordingFolder().isEmpty())
+        recordingFolder = QDir::tempPath();
 }
 
 int ScreenRecordingSettings::screen() const
@@ -51,6 +56,9 @@ void ScreenRecordingSettings::setScreen(int screen)
 
 void ScreenRecordingSettings::migrateFrom_v51()
 {
+    if (migrationDone())
+        return;
+
     using namespace nx::utils::property_storage;
 
     const QString kPrefix = "videoRecording/";
@@ -71,6 +79,8 @@ void ScreenRecordingSettings::migrateFrom_v51()
     migrateValue(oldSettings.get(), screenProperty);
     migrateValue(oldSettings.get(), screenGeometry, "screenResolution");
     migrateValue(oldSettings.get(), recordingFolder, kPrefix + recordingFolder.name);
+
+    migrationDone = true;
 }
 
 ScreenRecordingSettings* screenRecordingSettings()
