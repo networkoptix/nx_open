@@ -37,7 +37,6 @@ void AnalyticsSettingsWidget::loadDataToUi()
 void AnalyticsSettingsWidget::applyChanges()
 {
     d->applySettingsValues();
-    discardChanges();
 }
 
 void AnalyticsSettingsWidget::discardChanges()
