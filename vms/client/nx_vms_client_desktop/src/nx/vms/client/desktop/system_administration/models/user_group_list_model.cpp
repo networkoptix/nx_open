@@ -297,9 +297,14 @@ struct UserGroupListModel::Private
                 ->findCycledGroupSetsForSpecificGroups(groupsToCheck);
         }
 
+        const auto oldCycledGroups = cycledGroups;
+
         cycledGroups.clear();
         for (const QSet<QnUuid>& cycledGroupSet: cycledGroupSets)
             cycledGroups.unite(cycledGroupSet);
+
+        if (oldCycledGroups != cycledGroups)
+            emit q->cycledGroupsChanged();
     }
 
     void markGroupNotFound(const QnUuid& groupId, bool notFound = true)
@@ -650,6 +655,11 @@ QSet<QnUuid> UserGroupListModel::notFoundGroups() const
 QSet<QnUuid> UserGroupListModel::nonUniqueGroups() const
 {
     return d->nonUniqueNameTracker.nonUniqueNameIds();
+}
+
+QSet<QnUuid> UserGroupListModel::cycledGroups() const
+{
+    return d->cycledGroups;
 }
 
 void UserGroupListModel::setChecked(const QnUuid& groupId, bool checked)

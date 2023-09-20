@@ -212,10 +212,6 @@ public:
     CommonMessageBar* const nonUniqueUsersWarning{
         new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
 
-    bool hideNotFoundUsersWarning = false;
-    bool hideLdapServerOfflineWarning = false;
-    bool hideNonUniqueUsersWarning = false;
-
     ControlBar* const selectionControls{new ControlBar(q)};
 
     QPushButton* const deleteButton{new QPushButton(
@@ -305,9 +301,6 @@ bool UserListWidget::hasChanges() const
 
 void UserListWidget::resetWarnings()
 {
-    d->hideLdapServerOfflineWarning = false;
-    d->hideNotFoundUsersWarning = false;
-    d->hideNonUniqueUsersWarning = false;
     d->updateBanners();
 }
 
@@ -640,17 +633,15 @@ void UserListWidget::Private::updateBanners()
         tr("LDAP server is offline. %n users are not able to log in.", "",
             usersModel->ldapUserCount()));
 
-    ldapServerOfflineWarning->setVisible(!hideLdapServerOfflineWarning
-        && (q->systemContext()->ldapStatusWatcher()->status()
+    ldapServerOfflineWarning->setVisible(
+        (q->systemContext()->ldapStatusWatcher()->status()
             && q->systemContext()->ldapStatusWatcher()->status()->state
                 != api::LdapStatus::State::online)
         && usersModel->ldapUserCount() > 0);
 
-    notFoundUsersWarning->setVisible(!hideNotFoundUsersWarning
-        && !ldapServerOfflineWarning->isVisible()
+    notFoundUsersWarning->setVisible(!ldapServerOfflineWarning->isVisible()
         && !usersModel->notFoundUsers().isEmpty());
-    nonUniqueUsersWarning->setVisible(!hideNonUniqueUsersWarning
-        && !usersModel->nonUniqueUsers().isEmpty());
+    nonUniqueUsersWarning->setVisible(!usersModel->nonUniqueUsers().isEmpty());
 }
 
 void UserListWidget::Private::setMassEditInProgress(bool inProgress)

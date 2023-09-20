@@ -32,6 +32,7 @@ Item
     property int groupCount: 0
     property bool deleteAvailable: true
     property bool continuousSync: true
+    property bool cycledGroup: false
     property var editingContext
     property bool nameIsUnique: true
 
@@ -201,8 +202,8 @@ Item
             visible: control.isLdap && !control.continuousSync && !closed
             Layout.fillWidth: true
 
-            text: qsTr("When Continuous Sync is disabled, groups do not synchronize automatically. "
-                + "To update this group, initiate a manual sync.")
+            text: qsTr("When Continuous Sync is disabled, groups do not synchronize "
+                + " automatically. To update this group, initiate a manual sync.")
         }
 
         DialogBanner
@@ -213,8 +214,21 @@ Item
             watchToReopen: control.groupId
             Layout.fillWidth: true
 
-            text: qsTr("Another group with the same name exists in the system."+
-                " It is recommended to assign unique names to the groups.")
+            text: qsTr("Another group with the same name exists in the system. "
+                + "It is recommended to assign unique names to the groups.")
+        }
+
+        DialogBanner
+        {
+            style: DialogBanner.Style.Error
+            visible: control.cycledGroup && !closed
+            closeable: true
+            watchToReopen: control.groupId
+            Layout.fillWidth: true
+
+            text: qsTr("The group has another group as both its parent, and as a child member, or "
+                + "is a part of such a circular reference chain. Resolve this chain to prevent "
+                + "incorrect calculation of permissions.")
         }
     }
 }
