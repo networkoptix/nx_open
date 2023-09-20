@@ -34,6 +34,8 @@ public: // overrides
 
     ServersList servers() const override;
 
+    nx::vms::api::SaasState saasState() const override;
+
     bool isReachableServer(const QnUuid& serverId) const override;
 
     bool containsServer(const QnUuid& serverId) const override;

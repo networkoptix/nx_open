@@ -9,6 +9,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scoped_change_notifier.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
@@ -103,6 +104,15 @@ QnSystemDescription::ServersList QnSystemDescription::servers() const
     return result;
 }
 
+nx::vms::api::SaasState QnSystemDescription::saasState() const
+{
+    const auto systemServers = servers();
+    if (systemServers.empty())
+        return nx::vms::api::SaasState::uninitialized;
+
+    return systemServers.first().saasState;
+}
+
 void QnSystemDescription::addServer(
     const nx::vms::api::ModuleInformationWithAddresses& serverInfo,
     int priority,
@@ -123,6 +133,10 @@ void QnSystemDescription::addServer(
         updateServer(serverInfo);
         return;
     }
+
+    nx::utils::ScopedChangeNotifier<nx::vms::api::SaasState> saasStateChangeNotifier(
+        [this]{ return saasState(); },
+        [this]{ emit saasStateChanged(); });
 
     if (online && !isReachableServer(serverInfo.id))
         handleReachableServerAdded(serverInfo.id);
@@ -173,6 +187,10 @@ QnServerFields QnSystemDescription::updateServer(
         addServer(serverInfo, kDefaultPriority, online);
         return QnServerField::NoField;
     }
+
+    nx::utils::ScopedChangeNotifier<nx::vms::api::SaasState> saasStateChangeNotifier(
+        [this]{ return saasState(); },
+        [this]{ emit saasStateChanged(); });
 
     if (online && !isReachableServer(serverInfo.id))
         handleReachableServerAdded(serverInfo.id);
@@ -301,6 +319,10 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
         "System does not contain specified server");
     if (!containsServer)
         return;
+
+    nx::utils::ScopedChangeNotifier<nx::vms::api::SaasState> saasStateChangeNotifier(
+        [this]{ return saasState(); },
+        [this]{ emit saasStateChanged(); });
 
     handleServerRemoved(serverId);
     const auto priorityPred = [serverId](const QnUuid& id) { return (serverId == id); };

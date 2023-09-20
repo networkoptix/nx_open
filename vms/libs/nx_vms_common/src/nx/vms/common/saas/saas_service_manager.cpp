@@ -204,16 +204,21 @@ nx::vms::api::ServiceTypeStatus ServiceManager::serviceStatus(const QString& ser
 
 void ServiceManager::setData(const nx::vms::api::SaasData& data)
 {
+    bool stateChanged = false;
     {
         NX_MUTEX_LOCKER mutexLocker(&m_mutex);
         if (m_data == data)
             return;
+
+        stateChanged = m_data.state != data.state;
 
         m_data = data;
         updateLocalRecordingLicenseV1Unsafe();
     }
 
     emit dataChanged();
+    if (stateChanged)
+        emit saasStateChanged();
 }
 
 void ServiceManager::setServices(const std::vector<nx::vms::api::SaasService>& services)
