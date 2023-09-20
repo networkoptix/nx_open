@@ -565,7 +565,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -837,7 +837,7 @@
     <name>GroupGeneralTab</name>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
     <message>
       <source>Info</source>
@@ -1493,21 +1493,21 @@
     </message>
     <message>
       <source>Server is offline</source>
-      <translation>Máy chủ đang ẩn</translation>
+      <translation>Máy chủ đang ngoại tuyến</translation>
     </message>
   </context>
   <context>
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
   </context>
   <context>
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation>Lỗi đa giác. Xóa phần sai để tiếp tục.</translation>
+      <translation>Đa giác không hợp lệ. Loại bỏ các nút giao nhau để tiếp tục.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
@@ -1522,7 +1522,7 @@
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation>
-        <numerusform>Số điểm tối đa đã đạt được (%n điểm).</numerusform>
+        <numerusform>Đã đạt số điểm tối đa (%n điểm).</numerusform>
       </translation>
     </message>
   </context>
@@ -1530,7 +1530,7 @@
     <name>Preview</name>
     <message>
       <source>NO DATA</source>
-      <translation>Không có sẵn</translation>
+      <translation>KHÔNG CÓ DỮ LIỆU</translation>
     </message>
   </context>
   <context>
@@ -1545,7 +1545,7 @@
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation>Hiển thị trên Layout</translation>
+      <translation>Hiển thị trên Bố cục</translation>
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
@@ -1556,7 +1556,7 @@
     <name>PromoPageButtons</name>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Next</source>
@@ -2212,7 +2212,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
     <message>
       <source>Info</source>
@@ -2282,7 +2282,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
     <message>
       <source>No Entries</source>

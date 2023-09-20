@@ -89,15 +89,15 @@
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation>Kết nối với máy chủ này từ trình duyệt web hoặc máy tính để bàn để cài đặt</translation>
+      <translation>Kết nối với máy chủ này từ trình duyệt web hoặc thông qua máy khách để thiết lập máy chủ</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation>Kết nối LDAP Server time out</translation>
+      <translation>Đã hết thời gian kết nối Máy chủ LDAP</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation>Kết nối LDAP Server time out.</translation>
+      <translation>Đã hết thời gian kết nối Máy chủ LDAP.</translation>
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
@@ -125,11 +125,11 @@
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation>Lỗi bên trong. Vui lòng thử lại sau.</translation>
+      <translation>Lỗi nội bộ. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
-      <translation>Nếu lỗi này vẫn còn, xin vui lòng liên hệ với quản trị viên hệ thống của bạn.</translation>
+      <translation>Nếu lỗi này vẫn tiếp diễn, vui lòng liên hệ với quản trị viên hệ thống của bạn.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
@@ -210,7 +210,7 @@
     </message>
     <message>
       <source>help article</source>
-      <translation>bài báo trợ giúp</translation>
+      <translation>bài viết trợ giúp</translation>
     </message>
     <message>
       <source>Read this %1 to learn more about certificate validation.</source>

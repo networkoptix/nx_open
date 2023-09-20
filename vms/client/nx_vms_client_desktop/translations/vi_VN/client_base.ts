@@ -1114,11 +1114,11 @@
     </message>
     <message>
       <source>Event Starts</source>
-      <translation type="unfinished">Event Starts</translation>
+      <translation>Sự kiện bắt đầu</translation>
     </message>
     <message>
       <source>Event Stops</source>
-      <translation type="unfinished">Event Stops</translation>
+      <translation>Sự kiện kết thúc</translation>
     </message>
   </context>
   <context>
@@ -1137,7 +1137,7 @@
     </message>
     <message>
       <source>Rewind for</source>
-      <translation type="unfinished">Rewind for</translation>
+      <translation>Tua lại cho</translation>
     </message>
   </context>
   <context>
@@ -1179,15 +1179,15 @@
     </message>
     <message>
       <source>Any device issue</source>
-      <translation>Bất kỳ sự cố thiết bị</translation>
+      <translation>Bất kỳ sự cố thiết bị nào</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation>Bất kỳ vấn đề camera</translation>
+      <translation>Bất kỳ vấn đề camera nào</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation>Bất kỳ sự kiện máy chủ</translation>
+      <translation>Bất kỳ sự kiện máy chủ nào</translation>
     </message>
     <message>
       <source>Device issues</source>
@@ -1199,7 +1199,7 @@
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation>Bất kỳ sự kiện phân tích</translation>
+      <translation>Bất kỳ sự kiện phân tích nào</translation>
     </message>
   </context>
   <context>
@@ -1219,7 +1219,7 @@
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation>Chèn vào file hình ảnh</translation>
+      <translation>Xen kẽ video âm thanh</translation>
     </message>
     <message>
       <source>Matroska</source>
@@ -1231,7 +1231,7 @@
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation>%1 Tập tin hình ảnh</translation>
+      <translation>%1 tệp đa phương tiện</translation>
     </message>
     <message>
       <source>Executable %1 Media File</source>
@@ -1295,8 +1295,8 @@
     </message>
     <message numerus="yes">
       <source>Delete %n group(s)?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n group(s)?</numerusform>
+      <translation>
+        <numerusform>Xóa %n nhóm?</numerusform>
       </translation>
     </message>
   </context>
@@ -1620,15 +1620,15 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Cannot reach the server</source>
-      <translation type="unfinished">Cannot reach the server</translation>
+      <translation>Không thể truy cập máy chủ</translation>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
-      <translation type="unfinished">Username or Password are incorrect</translation>
+      <translation>Tên đăng nhập hoặc Mật khẩu không chính xác</translation>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>không an toàn</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
@@ -2983,7 +2983,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>Vui lòng kiểm tra kết nối internet của bạn và thử lại.</translation>
+      <translation>Lỗi mạng. Vui lòng kiểm tra kết nối internet của bạn và thử lại.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
@@ -3143,7 +3143,7 @@ to %1</source>
     </message>
     <message>
       <source>Log In...</source>
-      <translation type="unfinished">Log In...</translation>
+      <translation>Đăng nhập...</translation>
     </message>
   </context>
   <context>
@@ -3228,7 +3228,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation>Lưu bản sao lưu cơ sở dữ liệu</translation>
+      <translation>Lưu bản sao cơ sở dữ liệu</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -3236,11 +3236,11 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation>Tạo</translation>
+      <translation>Tạo mới</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation>Khôi phục từ Sao lưu cơ sở dữ liệu</translation>
+      <translation>Khôi phục từ bản sao lưu cơ sở dữ liệu</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
@@ -3248,7 +3248,7 @@ to %1</source>
     </message>
     <message>
       <source>Restore</source>
-      <translation>Khôi phục dữ liệu</translation>
+      <translation>Khôi phục</translation>
     </message>
     <message>
       <source>Restore database?</source>
@@ -3267,7 +3267,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Chế độ Ghi âm Panic sẽ chuyển cài đặt ghi hình cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
+      <translation>Chế độ Ghi hoảng loạn sẽ chuyển cài đặt ghi cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
     </message>
   </context>
   <context>
@@ -3763,7 +3763,7 @@ to %1</source>
     </message>
     <message>
       <source>Not verified</source>
-      <translation type="unfinished">Not verified</translation>
+      <translation>Chưa xác thực</translation>
     </message>
   </context>
   <context>
@@ -3834,7 +3834,7 @@ to %1</source>
     </message>
     <message>
       <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
+      <translation>Cài đặt ở chế độ chỉ đọc. Xin vui lòng liên hệ với quản trị hệ thống của bạn. Tất cả thay đổi sẽ bị mất sau khi thoát chương trình.</translation>
     </message>
   </context>
   <context>
@@ -3963,7 +3963,7 @@ to %1</source>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
   </context>
   <context>
@@ -4348,18 +4348,18 @@ to %1</source>
     <message>
       <source>User group %1 has no %2 permission</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation type="unfinished">User group %1 has no %2 permission</translation>
+      <translation>Nhóm người dùng %1 không có quyền %2</translation>
     </message>
     <message>
       <source>Selected user groups have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected user groups have no %1 permission</translation>
+      <translation>Các nhóm người dùng đã chọn không có quyền %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected user groups have no %2 permission</source>
       <comment>%1 is number of selected user groups, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+      <translation>
+        <numerusform>%n trong số %1 nhóm người dùng đã chọn không có quyền %2</numerusform>
       </translation>
     </message>
   </context>
@@ -4512,11 +4512,11 @@ to %1</source>
     <name>QnSelectLayoutsButton</name>
     <message>
       <source>Any Layout</source>
-      <translation type="unfinished">Any Layout</translation>
+      <translation>Bất kỳ bố cục nào</translation>
     </message>
     <message>
       <source>All Layouts</source>
-      <translation type="unfinished">All Layouts</translation>
+      <translation>Tất cả bố cục</translation>
     </message>
     <message>
       <source>Select Layouts...</source>
@@ -5431,7 +5431,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Custom access rights</source>
-      <translation type="unfinished">Custom access rights</translation>
+      <translation>Tùy chỉnh Quyền truy cập</translation>
     </message>
   </context>
   <context>
@@ -5520,11 +5520,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Mở tích hợp này?</translation>
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Tích hợp</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -5536,18 +5536,18 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>Bạn cố gắng mở
 %1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+nhưng tích hợp này đưa ra chứng chỉ xác thực không đáng tin cậy.
+Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu được rủi ro, bạn có thể mở.</translation>
     </message>
     <message>
       <source>Integration settings...</source>
-      <translation type="unfinished">Integration settings...</translation>
+      <translation>Cài đặt tích hợp...</translation>
     </message>
     <message>
       <source>Web Page settings...</source>
-      <translation type="unfinished">Web Page settings...</translation>
+      <translation>Cài đặt trang Web...</translation>
     </message>
   </context>
   <context>
@@ -5876,7 +5876,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation>Không tìm thấy tệp video trong thư mục đã chọn</translation>
+      <translation>Không có tệp mới để tải lên trong thư mục đã chọn</translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
@@ -5887,20 +5887,20 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>Không còn nhiều không gian trống trên bộ nhớ máy chủ. Một số cảnh quay cũ có thể bị xóa để giải phóng không gian. Lưu ý rằng nếu tệp tin đã chọn xuất hiện lâu nhất trên máy chủ, chúng sẽ bị xóa ngay sau khi được tải lên.</numerusform>
+        <numerusform>Không còn nhiều dung lượng trống trên bộ nhớ máy chủ. Một số cảnh quay cũ có thể bị xóa để giải phóng dung lượng. Lưu ý rằng nếu các tệp được chọn là tệp cũ nhất trên máy chủ, chúng sẽ bị xóa ngay sau khi được tải lên.</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>Để ngăn chặn điều này bạn có thể thêm bộ nhớ bổ sung. Bạn cũng có thể kiểm soát cảnh quay nào sẽ bị xóa đầu tiên bằng cách thay đổi kho lưu giữ thời gian trong cài đặt máy ảnh.</translation>
+      <translation>Để ngăn chặn điều này, bạn có thể thêm dung lượng lưu trữ bổ sung. Bạn cũng có thể kiểm soát cảnh quay nào sẽ bị xóa trước bằng cách thay đổi thời gian lưu trữ trong cài đặt camera.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation>Upload mọi cách?</translation>
+      <translation>Vẫn tải lên?</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>Người dùng &quot;%1&quot; hiện đang tải lên cảnh quay cho camera này.</translation>
+      <translation>Không thể bắt đầu tải lên vì người dùng &quot;%1&quot; hiện đang tải cảnh quay lên camera này.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
@@ -5916,7 +5916,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation>Tải lên đoạn phim</translation>
+      <translation>Đang tải lên cảnh quay</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
@@ -5936,12 +5936,12 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
+      <translation>%1 bao gồm khoảng thời gian mà video đã được tải lên.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
+      <translation>%1 bao gồm khoảng thời gian video được tải lên.</translation>
     </message>
   </context>
   <context>
@@ -6078,7 +6078,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Merge</source>
-      <translation>Gộp lại</translation>
+      <translation>Hợp nhất</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
@@ -6136,21 +6136,21 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message numerus="yes">
       <source>Delete %n layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n layouts?</numerusform>
+      <translation>
+        <numerusform>Xóa bố cục %n?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>Những bố cục này được chia sẻ với những người dùng khác nên chúng cũng sẽ bị xóa trong tài khoản của họ.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>%n bố cục được chia sẻ với những người dùng khác nên chúng cũng sẽ bị xóa trong tài khoản của họ.</numerusform>
       </translation>
     </message>
     <message>
@@ -6159,8 +6159,8 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
-      <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
+      <translation>
+        <numerusform>%n mục chưa bị xóa.</numerusform>
       </translation>
     </message>
   </context>
@@ -6186,8 +6186,8 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
+      <translation>
+        <numerusform>Máy chủ nguồn và %n máy chủ</numerusform>
       </translation>
     </message>
   </context>
@@ -6379,7 +6379,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Group</source>
-      <translation type="unfinished">Group</translation>
+      <translation>Nhóm</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -6389,13 +6389,13 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n nhóm</numerusform>
       </translation>
     </message>
     <message>
       <source>All Power Users</source>
-      <translation type="unfinished">All Power Users</translation>
+      <translation>Tất cả người dùng cấp cao</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6443,7 +6443,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
-      <translation type="unfinished">Reset all rules to defaults?</translation>
+      <translation>Đặt lại tất cả các quy tắc về mặc định?</translation>
     </message>
   </context>
   <context>
@@ -6546,23 +6546,23 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>Has access to a resource, can view live footage from a camera</source>
-      <translation type="unfinished">Has access to a resource, can view live footage from a camera</translation>
+      <translation>Có quyền truy cập vào tài nguyên, có thể xem cảnh quay trực tiếp từ camera</translation>
     </message>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Xem lưu trữ</translation>
     </message>
     <message>
       <source>Can view archive footage</source>
-      <translation type="unfinished">Can view archive footage</translation>
+      <translation>Có thể xem cảnh quay lưu trữ</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Xuất lưu trữ</translation>
     </message>
     <message>
       <source>Can export parts of archive</source>
-      <translation type="unfinished">Can export parts of archive</translation>
+      <translation>Có thể xuất các phần của bộ lưu trữ</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
@@ -6586,19 +6586,19 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</source>
-      <translation type="unfinished">Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</translation>
+      <translation>Có thể thay đổi trạng thái PTZ của camera, sử dụng Nút kích hoạt mềm, Âm thanh 2 chiều và nút I/O</translation>
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Chỉnh sửa cài đặt</translation>
     </message>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Xem trực tiếp</translation>
     </message>
     <message>
       <source>Can edit device settings and video wall layouts</source>
-      <translation type="unfinished">Can edit device settings and video wall layouts</translation>
+      <translation>Có thể chỉnh sửa cài đặt thiết bị và bố cục tường video</translation>
     </message>
   </context>
   <context>
@@ -6630,7 +6630,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation>camera bị xóa</translation>
+      <translation>camera đã bị xóa</translation>
     </message>
     <message>
       <source>Unknown track</source>
@@ -7075,22 +7075,22 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+      <translation>Chỉ những khoảng thời gian ngoại tuyến của camera hoặc máy chủ sau lần đầu tiên thêm vào hệ thống mới được nhập tự động.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
     <message>
       <source>Open Camera</source>
-      <translation type="unfinished">Open Camera</translation>
+      <translation>Mở camera</translation>
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation type="unfinished">Open Camera in new Tab</translation>
+      <translation>Mở Camera trong Tab mới</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation type="unfinished">Open Camera in place</translation>
+      <translation>Mở Camera tại chỗ</translation>
     </message>
   </context>
   <context>
@@ -7105,11 +7105,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Chỉ điểm</translation>
     </message>
     <message>
       <source>Place Hotspot</source>
-      <translation type="unfinished">Place Hotspot</translation>
+      <translation>Đặt điểm Hotspot</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -7120,7 +7120,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
     <message>
       <source>Camera does not exist</source>
-      <translation type="unfinished">Camera does not exist</translation>
+      <translation>Camera không tồn tại</translation>
     </message>
     <message>
       <source>Select Camera</source>
@@ -7132,7 +7132,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>#</source>
-      <translation type="unfinished">#</translation>
+      <translation>#</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -7140,11 +7140,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Màu sắc</translation>
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Chỉ điểm</translation>
     </message>
   </context>
   <context>
@@ -7733,7 +7733,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>Video Wall bị xóa trên máy chủ và sẽ bị đóng.</translation>
+      <translation>Tường Video bị xóa trên máy chủ và sẽ bị đóng.</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
@@ -7745,7 +7745,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation>Không thể kết nối với máy chủ được chọn</translation>
+      <translation>Không thể kết nối với máy chủ đã chọn</translation>
     </message>
     <message>
       <source>Re-authentication required</source>
@@ -7803,7 +7803,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation>Lỗi bên trong. Vui lòng thử lại sau.</translation>
+      <translation>Lỗi nội bộ. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>None of your Servers has connection to %1.</source>
@@ -7841,7 +7841,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Merge</source>
       <comment>Merge Server to the current System (dialog button text)</comment>
-      <translation>Gộp lại</translation>
+      <translation>Hợp nhất</translation>
     </message>
   </context>
   <context>
@@ -7936,15 +7936,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation>Camera này yêu cầu mật khẩu được thiết lập.</translation>
+      <translation>Camera này yêu cầu phải thiết lập mật khẩu.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation>Một số camera được chọn yêu cầu mật khẩu để được thiết lập.</translation>
+      <translation>Một số camera được chọn yêu cầu phải thiết lập mật khẩu.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
-      <translation>Yêu cầu quản trị viên hệ thống của bạn làm điều đó.</translation>
+      <translation>Yêu cầu quản trị viên hệ thống thực hiện việc đó.</translation>
     </message>
     <message>
       <source>Set Password</source>
@@ -7998,7 +7998,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation>IP / Tên máy chủ / RTSP / UDP</translation>
+      <translation>IP / Hostname / Liên kết RTSP / Liên kết UDP</translation>
     </message>
     <message>
       <source>Examples:</source>
@@ -8048,7 +8048,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Searching...</source>
-      <translation>Đang tìm...</translation>
+      <translation>Đang tìm kiếm...</translation>
     </message>
     <message>
       <source>No devices found</source>
@@ -8106,7 +8106,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation>Để sử dụng phần mềm, bạn phải đồng ý với thỏa thuận cấp phép người dùng cuối</translation>
+      <translation>Để sử dụng phần mềm, bạn phải đồng ý với thỏa thuận cấp phép dành cho người dùng cuối</translation>
     </message>
   </context>
   <context>
@@ -8199,7 +8199,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -8265,15 +8265,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>Định dạng đã chọn không được hỗ trợ bởi thư viện FFMPEG.</translation>
+      <translation>Định dạng đã chọn không được thư viện FFMPEG hỗ trợ.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation>Thư viện FFMPEG.</translation>
+      <translation>Lỗi thư viện FFMPEG.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>Video hay mã hóa âm thanh không thể tương thích với các định dạng đã chọn.</translation>
+      <translation>Codec video hoặc âm thanh không tương thích với định dạng đã chọn.</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -8783,7 +8783,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Apply</source>
-      <translation>ứng dụng</translation>
+      <translation>Áp dụng</translation>
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
@@ -8981,7 +8981,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation>Dữ liệu đang tải...</translation>
+      <translation>Đang tải tệp xuống...</translation>
     </message>
     <message>
       <source>Pending download...</source>
@@ -9029,7 +9029,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Apply</source>
-      <translation>ứng dụng</translation>
+      <translation>Áp dụng</translation>
     </message>
   </context>
   <context>
@@ -11341,7 +11341,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation>Bất kỳ sự kiện phân tích</translation>
+      <translation>Bất kỳ sự kiện phân tích nào</translation>
     </message>
     <message>
       <source>No events</source>
