@@ -114,6 +114,7 @@ DialogWithState
                 groupCount: membersModel.groups.length
                 deleteAvailable: !dialog.isSaving && dialog.deleteAvailable
                 continuousSync: dialog.continuousSync
+                cycledGroup: membersModel.cycledGroup
                 editingContext: membersModel.editingContext
                 model: membersModel
                 parentGroupsEditable: dialog.parentGroupsEditable

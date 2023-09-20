@@ -58,6 +58,7 @@ public:
 
     QSet<QnUuid> notFoundGroups() const;
     QSet<QnUuid> nonUniqueGroups() const;
+    QSet<QnUuid> cycledGroups() const;
 
     void reset(const UserGroupDataList& groups);
     bool addOrUpdateGroup(const UserGroupData& group);
@@ -68,6 +69,7 @@ public:
 signals:
     void notFoundGroupsChanged();
     void nonUniqueGroupsChanged();
+    void cycledGroupsChanged();
 
 private:
     struct Private;
