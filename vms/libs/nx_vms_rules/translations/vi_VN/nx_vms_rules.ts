@@ -32,7 +32,7 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation>%1 đến %2</translation>
+      <translation>%1 tại %2</translation>
     </message>
     <message>
       <source>Begin When</source>
@@ -68,7 +68,7 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation>Phát hiện phân tích Đối tượng</translation>
+      <translation>Phân tích phát hiện đối tượng</translation>
     </message>
     <message>
       <source>Occurs At</source>
@@ -155,11 +155,11 @@
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>%1 vào</translation>
+      <translation>Đầu vào %1</translation>
     </message>
     <message>
       <source>State</source>
-      <translation>Tiểu bang</translation>
+      <translation>Trạng thái</translation>
     </message>
     <message>
       <source>Input Signal on Device</source>
@@ -182,7 +182,7 @@
     </message>
     <message>
       <source>Action</source>
-      <translation>Hoạt động</translation>
+      <translation>Hành động</translation>
     </message>
     <message>
       <source>Value</source>
@@ -197,11 +197,11 @@
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation>Máy ảnh đã được ngắt kết nối</translation>
+      <translation>Camera bị ngắt kết nối</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation>I / O Module đã bị ngắt kết nối</translation>
+      <translation>Mô-đun I/O bị ngắt kết nối</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
@@ -209,11 +209,11 @@
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>Máy ảnh %1 đã được ngắt kết nối</translation>
+      <translation>Camera %1 đã bị ngắt kết nối</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>I / O Module %1 đã bị ngắt kết nối</translation>
+      <translation>Mô-đun I/O %1 đã bị ngắt kết nối</translation>
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
@@ -236,7 +236,7 @@
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation>Mâu thuẫn Địa chỉ: %1</translation>
+      <translation>Xung đột địa chỉ: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
@@ -245,7 +245,7 @@
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Thiết bị IP xung đột tại %1</translation>
+      <translation>Xung đột IP thiết bị tại %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
@@ -323,7 +323,7 @@
     <name>nx::vms::rules::EnterFullscreenAction</name>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <source>On Layout</source>
@@ -620,7 +620,7 @@
     <name>nx::vms::rules::PlaySoundAction</name>
     <message>
       <source>Volume</source>
-      <translation>Thể tích</translation>
+      <translation>Âm lượng</translation>
     </message>
     <message>
       <source>Play Sound</source>
@@ -752,7 +752,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation>Thể tích</translation>
+      <translation>Âm lượng</translation>
     </message>
     <message>
       <source>Repeat Sound</source>
@@ -922,7 +922,7 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation>Thể tích</translation>
+      <translation>Âm lượng</translation>
     </message>
     <message>
       <source>Text</source>
@@ -1062,7 +1062,7 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>Lần đầu xuất hiện: %1 trong %2 ( %n xuất hiện thứ hai)</numerusform>
+        <numerusform>Lần xuất hiện đầu tiên: %1 trên %2 ( tổng cộng%n lần)</numerusform>
       </translation>
     </message>
     <message>

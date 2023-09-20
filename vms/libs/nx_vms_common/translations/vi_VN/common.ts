@@ -1226,11 +1226,11 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation>Thời gian kiểm tra thay đổi thời gian của hệ điều hành</translation>
+      <translation>Chu kỳ kiểm tra thay đổi thời gian của hệ điều hành</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation>Đồng bộ hóa khoảng thời gian đồng bộ hóa cho các yêu cầu mạng</translation>
+      <translation>Thống nhất khoảng thời gian đồng bộ hóa cho các yêu cầu mạng</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
@@ -1287,7 +1287,7 @@
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation>Gửi email văn bản đơn giản</translation>
+      <translation>Gửi email văn bản thuần túy</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
@@ -1295,7 +1295,7 @@
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation>Kích hoạt tính năng dấu vết kiểm toán</translation>
+      <translation>Kích hoạt báo cáo hành vi người dùng</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1303,7 +1303,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation>Thời gian đăng nhập sự kiện (ngày)</translation>
+      <translation>Khoảng thời gian nhật ký sự kiện (ngày)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1427,7 +1427,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation>Codec video mặc định</translation>
+      <translation>Bộ giải mã video mặc định</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1439,7 +1439,7 @@
     </message>
     <message>
       <source>License server</source>
-      <translation>Giấy phép máy chủ</translation>
+      <translation>Máy chủ cấp giấy phép</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
@@ -2262,15 +2262,15 @@
     </message>
     <message>
       <source>Also show source camera</source>
-      <translation>Cũng hiển thị camera nguồn</translation>
+      <translation>Đồng thời hiển thị camera nguồn</translation>
     </message>
     <message>
       <source>Source camera</source>
-      <translation>Máy ảnh nguồn</translation>
+      <translation>Camera nguồn</translation>
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation>Cũng hiển thị trên máy ảnh nguồn</translation>
+      <translation>Đồng thời hiển thị trên camera nguồn</translation>
     </message>
     <message>
       <source>Also set on source camera</source>
