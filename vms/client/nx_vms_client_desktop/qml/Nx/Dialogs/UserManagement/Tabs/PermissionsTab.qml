@@ -468,11 +468,15 @@ Item
         {
             anchors.verticalCenter: parent.verticalCenter
 
-            toolTipText: qsTr("Resources table gives you an overview of user's or group "
-                + "permissions and allows you to assign permissions for specific resources."
-                + "Click on the cells to select and unselect them. Use drag&drop and "
-                + "Shift+drag&drop for batch edit. If you select a permission that depends on "
-                + "another permission both permissions will be granted automatically.")
+            toolTipText:
+                qsTr("Resources table gives you an overview of user or group permissions and "
+                    + "allows you to assign permissions for specific resources.")
+                + "<br>"
+                + qsTr("Click on the cells to select and unselect them. Use drag&drop and "
+                    + "Shift+drag&drop for batch edit.")
+                + "<br>"
+                + qsTr("If you select a permission that depends on another permission both "
+                    + "permissions will be granted automatically.")
         }
     }
 
