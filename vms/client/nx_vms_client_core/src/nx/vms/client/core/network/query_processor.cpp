@@ -36,7 +36,7 @@ struct QueryProcessor::Private
     std::unique_ptr<nx::network::http::AsyncClient> makeHttpClient() const
     {
         auto httpClient = std::make_unique<nx::network::http::AsyncClient>(
-            certificateVerifier->makeAdapterFunc(serverId));
+            certificateVerifier->makeAdapterFunc(serverId, address));
         NetworkManager::setDefaultTimeouts(httpClient.get());
 
         // This header is used by the server to identify the client login session for audit.
@@ -131,7 +131,7 @@ void QueryProcessor::updateCredentials(nx::network::http::Credentials value)
 
 nx::network::ssl::AdapterFunc QueryProcessor::adapterFunc(const QnUuid& serverId) const
 {
-    return d->certificateVerifier->makeAdapterFunc(serverId);
+    return d->certificateVerifier->makeAdapterFunc(serverId, d->address);
 }
 
 Qn::SerializationFormat QueryProcessor::serializationFormat() const
