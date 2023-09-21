@@ -3087,7 +3087,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
         // No other requests to this proxy, so we have to get nonce by ourselves.
         auto reply = new QnAsyncHttpClientReply(
             nx::network::http::AsyncHttpClient::create(
-                systemContext->certificateVerifier()->makeAdapterFunc(server->getId())),
+                systemContext->certificateVerifier()->makeAdapterFunc(server->getId(), proxyUrl)),
             this);
         connect(
             reply, &QnAsyncHttpClientReply::finished,
