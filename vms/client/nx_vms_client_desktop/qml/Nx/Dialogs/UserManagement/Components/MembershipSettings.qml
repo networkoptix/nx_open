@@ -120,7 +120,11 @@ Item
                 source: iconPath(model)
                 sourceSize: Qt.size(width, height)
 
-                color: checkableItem.selectedColor
+                opacity: groupCheckbox.enabled ? 1.0 : 0.3
+
+                color: groupCheckbox.enabled
+                    ? checkableItem.selectedColor
+                    : ColorTheme.colors.light10
             }
 
             font: Qt.font({pixelSize: 12, weight: Font.Normal})
