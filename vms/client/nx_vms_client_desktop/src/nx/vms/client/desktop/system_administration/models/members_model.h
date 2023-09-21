@@ -106,7 +106,7 @@ public:
         IsLdap,
         IsTemporary,
         MemberSectionRole, //< IsUserRole ? "U" : "G"
-        GroupSectionRole, // Built-in? "B" : "C"
+        GroupSectionRole, // Built-in "B", Custom "C" or LDAP "L"
         Cycle,
         CanEditParents,
         CanEditMembers,
