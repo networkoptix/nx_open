@@ -340,10 +340,11 @@ void DesktopCameraConnection::run()
         const auto serverId = server->getId();
         const auto serverVersion = server->getVersion();
         auto url = server->getApiUrl();
+        url.setPath("/desktop_camera");
         server.reset();
 
         auto newClient = std::make_unique<nx::network::http::HttpClient>(
-            connection->certificateCache()->makeAdapterFunc(serverId));
+            connection->certificateCache()->makeAdapterFunc(serverId, url));
 
         newClient->addAdditionalHeader("user-name", d->credentials.username);
         const auto uniqueId = DesktopResource::calculateUniqueId(
@@ -355,8 +356,6 @@ void DesktopCameraConnection::run()
         newClient->setCredentials(d->credentials);
 
         setupNetwork(std::move(newClient), {}, serverVersion);
-
-        url.setPath("/desktop_camera");
 
         if (!d->httpClient->doGet(url))
         {

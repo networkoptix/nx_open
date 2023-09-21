@@ -124,7 +124,7 @@ QnUuid MergeSystemsTool::pingSystem(
 
     m_requestManager->getTargetInfo(
         ctx.proxy,
-        m_certificateVerifier->makeAdapterFunc(ctx.proxy->getId()),
+        m_certificateVerifier->makeAdapterFunc(ctx.proxy->getId(), ctx.proxy->getApiUrl()),
         ctx.target,
         nx::network::ssl::makeAdapterFunc(std::move(certificateSaveFunc)),
         nx::utils::guarded(this, std::move(onTargetInfo)));
@@ -163,7 +163,7 @@ bool MergeSystemsTool::mergeSystem(
 
     m_requestManager->mergeSystem(
         ctx->proxy,
-        m_certificateVerifier->makeAdapterFunc(ctx->proxy->getId()),
+        m_certificateVerifier->makeAdapterFunc(ctx->proxy->getId(), ctx->proxy->getApiUrl()),
         ownerSessionToken,
         ctx->mergeData,
         nx::utils::guarded(this, std::move(onMergeStarted)));
@@ -230,7 +230,7 @@ void MergeSystemsTool::at_serverInfoReceived(
 
         m_requestManager->createTargetSession(
             ctx.proxy,
-            m_certificateVerifier->makeAdapterFunc(ctx.proxy->getId()),
+            m_certificateVerifier->makeAdapterFunc(ctx.proxy->getId(), ctx.proxy->getApiUrl()),
             ctx.target,
             m_certificateVerifier->makeRestrictedAdapterFunc(ctx.targetPublicKey()),
             request,
@@ -279,7 +279,7 @@ void MergeSystemsTool::at_sessionCreated(
 
         m_requestManager->getTargetLicenses(
             ctx.proxy,
-            m_certificateVerifier->makeAdapterFunc(ctx.proxy->getId()),
+            m_certificateVerifier->makeAdapterFunc(ctx.proxy->getId(), ctx.proxy->getApiUrl()),
             ctx.target,
             ctx.mergeData.remoteSessionToken,
             m_certificateVerifier->makeRestrictedAdapterFunc(ctx.targetPublicKey()),

@@ -1573,7 +1573,7 @@ void LogsManagementWatcher::downloadServerLogs(const QString& folder, LogsManage
         folder,
         currentServer()->getApiUrl(),
         connection()->credentials(),
-        systemContext()->certificateVerifier()->makeAdapterFunc(currentServerId()),
+        systemContext()->certificateVerifier()->makeAdapterFunc(currentServerId(), currentServer()->getApiUrl()),
         [this]{ executeInThread(thread(), [this]{ updateDownloadState(); }); });
 }
 
