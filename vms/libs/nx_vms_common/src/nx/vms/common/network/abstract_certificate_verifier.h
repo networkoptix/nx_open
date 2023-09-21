@@ -26,7 +26,7 @@ public:
     virtual ~AbstractCertificateVerifier();
 
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
-        const QnUuid& serverId, const nx::utils::Url& url = {}) = 0;
+        const QnUuid& serverId, const nx::utils::Url& url) = 0;
 
     nx::network::ssl::AdapterFunc makeAdapterFunc(
         const QnUuid& serverId, const nx::network::SocketAddress& endpoint)
