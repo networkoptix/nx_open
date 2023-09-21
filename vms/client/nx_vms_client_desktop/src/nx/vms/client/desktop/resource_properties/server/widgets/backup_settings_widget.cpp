@@ -216,7 +216,7 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
 
                 AbstractItemPtr newAddedCamerasItem = GenericItemBuilder()
                     .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
-                    .withRole(Qt::DisplayRole, tr("New added cameras"))
+                    .withRole(Qt::DisplayRole, tr("New added cameras (On all servers)"))
                     .withRole(ResourceDialogItemRole::NewAddedCamerasItemRole, true)
                     .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});
 
@@ -266,17 +266,6 @@ void BackupSettingsWidget::updateMessageBarText()
     if (savedBackupSettings == modelBackupSettings)
     {
         ui->messageBar->setText({});
-    }
-    else if (savedBackupSettings.quality != modelBackupSettings.quality)
-    {
-        ui->messageBar->setText(
-            tr("New added cameras settings will apply to all servers in the system."));
-    }
-    else
-    {
-        ui->messageBar->setText(modelBackupSettings.backupNewCameras
-            ? tr("Backup will be turned on for new added cameras on all servers in the system.")
-            : tr("Backup will be turned off for new added cameras on all servers in the system."));
     }
 }
 
