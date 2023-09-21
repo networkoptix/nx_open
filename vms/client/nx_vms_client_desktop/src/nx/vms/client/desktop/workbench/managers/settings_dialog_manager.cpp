@@ -85,6 +85,13 @@ void SettingsDialogManager::editUser(const QnUuid& userId, int tab, QWidget* par
     d->userSettingsDialog->raise();
 }
 
+bool SettingsDialogManager::isEditUserDialogVisible() const
+{
+    return d->userSettingsDialog
+        && d->userSettingsDialog->window()
+        && d->userSettingsDialog->window()->isVisible();
+}
+
 void SettingsDialogManager::createUser(QWidget* parent)
 {
     auto dialog = std::make_unique<UserSettingsDialog>(
@@ -139,6 +146,13 @@ void SettingsDialogManager::editGroup(const QnUuid& groupId, QWidget* parent)
 
     d->groupSettingsDialog->open();
     d->groupSettingsDialog->raise();
+}
+
+bool SettingsDialogManager::isEditGroupDialogVisible() const
+{
+    return d->groupSettingsDialog
+        && d->groupSettingsDialog->window()
+        && d->groupSettingsDialog->window()->isVisible();
 }
 
 void SettingsDialogManager::createGroup(QWidget* parent)
