@@ -44,11 +44,10 @@ Control
         sourceModel: control.model
     }
 
-    ParentGroupsModel
+    DirectParentsModel
     {
         id: parentGroupsModel
 
-        directOnly: true
         sourceModel: control.model
     }
 
