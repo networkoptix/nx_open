@@ -132,13 +132,17 @@ public:
     QnVirtualCameraResourceList getCamerasByFlexibleIds(const std::vector<QString>& flexibleIdList) const;
 
     template<class Resource, class IdList>
-    QnSharedResourcePointerList<Resource> getResourcesByIds(const IdList& idList) const
+    QnSharedResourcePointerList<Resource> getResourcesByIds(
+        const IdList& idList,
+        std::function<QnUuid(const typename IdList::value_type&)> id =
+            [](const auto& item) { return item; }
+    ) const
     {
         NX_READ_LOCKER locker(&m_resourcesMutex);
         QnSharedResourcePointerList<Resource> result;
-        for (const QnUuid& id: idList)
+        for (const auto& item: idList)
         {
-            const auto itr = m_resources.find(id);
+            const auto itr = m_resources.find(id(item));
             if (itr != m_resources.end())
             {
                 if (auto derived = itr.value().template dynamicCast<Resource>())
