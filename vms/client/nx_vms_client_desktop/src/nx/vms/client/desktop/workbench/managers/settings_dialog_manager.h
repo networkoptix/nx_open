@@ -41,6 +41,8 @@ public:
      */
     void editUser(const QnUuid& userId, int tab = -1, QWidget* parent = nullptr);
 
+    bool isEditUserDialogVisible() const;
+
     /**
      * Opens a user creation dialog. Multiple instances could be opened simultaneously. That does
      * not affect the user settings dialog and does not affect the currentEditedUserId().
@@ -62,6 +64,9 @@ public:
      * yet, simply stores the value. The opened dialog is not brought to front and not activated.
      */
     void editGroup(const QnUuid& groupId, QWidget* parent = nullptr);
+
+    bool isEditGroupDialogVisible() const;
+
     /**
      * Opens the specified group in the group settings dialog.
      */
