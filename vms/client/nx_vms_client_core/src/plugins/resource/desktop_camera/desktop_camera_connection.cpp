@@ -335,9 +335,19 @@ void QnDesktopCameraConnection::run()
                 break;
         }
 
+        nx::utils::Url url;
+        {
+            NX_MUTEX_LOCKER lock(&d->mutex);
+            if (!d->server)
+                break;
+
+            url = d->server->getApiUrl();
+        }
+        url.setPath("/desktop_camera");
+
         auto certificateVerifier = connection->certificateCache();
         auto newClient = std::make_unique<nx::network::http::HttpClient>(
-            certificateVerifier->makeAdapterFunc(serverId));
+            certificateVerifier->makeAdapterFunc(serverId, url));
         setupNetwork(std::move(newClient), nullptr);
 
         d->httpClient->addAdditionalHeader("user-name", d->credentials.username);
@@ -349,16 +359,6 @@ void QnDesktopCameraConnection::run()
         d->httpClient->setResponseReadTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
 
         d->httpClient->setCredentials(d->credentials);
-
-        nx::utils::Url url;
-        {
-            NX_MUTEX_LOCKER lock(&d->mutex);
-            if (!d->server)
-                break;
-
-            url = d->server->getApiUrl();
-        }
-        url.setPath("/desktop_camera");
 
         if (!d->httpClient->doGet(url))
         {
