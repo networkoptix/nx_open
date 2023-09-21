@@ -42,9 +42,15 @@ MembershipSettings
     {
         width: parent.width - 16
 
-        text: section === UserSettingsGlobal.kBuiltInGroupsSection
-            ? qsTr("Built-in")
-            : qsTr("Custom")
+        text:
+        {
+            if (section == UserSettingsGlobal.kLdapGroupsSection)
+                return qsTr("LDAP", "Acronym for The Lightweight Directory Access Protocol")
+
+            return section === UserSettingsGlobal.kBuiltInGroupsSection
+                ? qsTr("Built-in", "Section name in a list of items: 'Built-in groups'")
+                : qsTr("Custom", "Section name in a list of items: 'Custom groups'")
+        }
 
         AddGroupButton
         {
