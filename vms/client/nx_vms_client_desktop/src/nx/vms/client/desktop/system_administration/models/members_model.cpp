@@ -766,6 +766,8 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
                 : UserSettingsGlobal::kUsersSection;
 
         case GroupSectionRole:
+            if (m_cache->info(id).userType == api::UserType::ldap)
+                return UserSettingsGlobal::kLdapGroupsSection;
             return PredefinedUserGroups::contains(id)
                 ? UserSettingsGlobal::kBuiltInGroupsSection
                 : UserSettingsGlobal::kCustomGroupsSection;
