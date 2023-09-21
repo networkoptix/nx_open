@@ -655,7 +655,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for cameras"); });
 
     m_securityForPowerUsersAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        Names::securityForPowerUsers, false, this,
+        Names::securityForPowerUsers, true, this,
         [] { return tr("Allow Power User editing Security Settings"); });
 
     m_insecureDeprecatedApiEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
