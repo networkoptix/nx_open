@@ -970,6 +970,10 @@ struct SaveUserAccess
             }
         }
 
+        NX_ASSERT(resourcePool->getResourcesByIds<QnUserResource>(
+            param.resourceAccessRights, [](const auto& pair) { return pair.first; }).empty(),
+            "User should not be an accessible resource");
+
         return ModifyResourceAccess()(systemContext, accessData, param);
     }
 
@@ -1750,6 +1754,10 @@ struct SaveUserRoleAccess
         {
             return res;
         }
+
+        NX_ASSERT(systemContext->resourcePool()->getResourcesByIds<QnUserResource>(
+            param.resourceAccessRights, [](const auto& pair) { return pair.first; }).empty(),
+            "User should not be an accessible resource");
 
         return {};
     }

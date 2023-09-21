@@ -12,6 +12,8 @@ template<typename BeginType, typename EndType>
 class RangeAdapter
 {
 public:
+    using value_type = std::decay_t<decltype(*BeginType())>;
+
     RangeAdapter(BeginType begin, EndType end): m_begin(begin), m_end(end) {}
 
     BeginType begin() const { return m_begin; }
