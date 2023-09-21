@@ -993,6 +993,42 @@ public:
     }
 };
 
+class DirectParentsModel: public QSortFilterProxyModel
+{
+    using base_type = QSortFilterProxyModel;
+
+public:
+    QVariant data(const QModelIndex& index, int role) const override
+    {
+        if (index.row() < 0 || index.row() >= rowCount() || !sourceModel())
+            return {};
+
+        switch (role)
+        {
+            case Qt::ToolTipRole:
+                if (mapToSource(index).data(MembersModel::IsLdap).toBool())
+                    return tr("LDAP group membership is managed in LDAP");
+
+                break;
+
+            default:
+                return mapToSource(index).data(role);
+        }
+
+        return {};
+    }
+
+    bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
+    {
+        if (!sourceModel())
+            return base_type::filterAcceptsRow(sourceRow, sourceParent);
+
+        const auto sourceIndex = sourceModel()->index(sourceRow, 0);
+        return sourceModel()->data(sourceIndex, MembersModel::IsParentRole).toBool()
+            && base_type::filterAcceptsRow(sourceRow, sourceParent);
+    }
+};
+
 void MembersModel::registerQmlType()
 {
     qRegisterMetaType<nx::vms::client::desktop::MembersModelGroup>();
@@ -1002,6 +1038,7 @@ void MembersModel::registerQmlType()
 
     // Groups tab.
     qmlRegisterType<AllowedParentsModel>("nx.vms.client.desktop", 1, 0, "AllowedParentsModel");
+    qmlRegisterType<DirectParentsModel>("nx.vms.client.desktop", 1, 0, "DirectParentsModel");
 
     // Members tab.
     qmlRegisterType<AllowedMembersModel>("nx.vms.client.desktop", 1, 0, "AllowedMembersModel");

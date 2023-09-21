@@ -126,13 +126,9 @@ MembershipSettings
 
     //: 'Member of' as in sentence: 'Current user/group is a member of: group1, group2, group3'.
     summaryText: qsTr("Member of")
-    summaryModel: ParentGroupsModel
+    summaryModel: DirectParentsModel
     {
-        sourceModel: ParentGroupsProvider
-        {
-            context: control.model.editingContext
-            membersModel: control.model
-        }
+        sourceModel: control.model
     }
 
     summaryPlaceholder: [
