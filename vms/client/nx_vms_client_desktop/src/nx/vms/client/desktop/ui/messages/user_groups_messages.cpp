@@ -90,7 +90,7 @@ bool UserGroups::removeGroups(QWidget* parent, const QSet<QnUuid>& groups, bool 
 
     const QString text = groups.size() == 1
         ? tr("Delete group?")
-        : tr("Delete %n groups?", "Numerical form depends on groups count", groups.size());
+        : tr("Delete %n groups?", "", groups.size());
 
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
