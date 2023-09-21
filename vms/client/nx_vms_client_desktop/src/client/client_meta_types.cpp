@@ -48,7 +48,6 @@
 #include <nx/vms/client/desktop/resource_properties/user/models/resource_access_rights_model.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_rights_list.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/limited_model.h>
-#include <nx/vms/client/desktop/resource_properties/user/utils/parent_groups_provider.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/item_view_drag_and_drop_scroll_assist.h>
 #include <nx/vms/client/desktop/rules/model_view/rules_sort_filter_proxy_model.h>
@@ -257,7 +256,6 @@ void QnClientMetaTypes::registerQmlTypes()
     DragAndDrop::registerQmlType();
     ResourceAccessRightsModel::registerQmlTypes();
     CustomAccessSummaryModel::registerQmlTypes();
-    ParentGroupsProvider::registerQmlTypes();
     LimitedModel::registerQmlType();
     GlobalPermissionsModel::registerQmlTypes();
     ResourceIdentificationThumbnail::registerQmlType();
