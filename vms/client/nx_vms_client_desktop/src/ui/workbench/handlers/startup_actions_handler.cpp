@@ -511,7 +511,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     logonData.secondaryInstance = true;
     logonData.connectScenario = ConnectScenario::connectUsingCommand;
 
-    if (uri.hasCloudSystemAddress())
+    if (uri.userAuthType == nx::vms::utils::SystemUri::UserAuthType::cloud)
         logonData.userType = nx::vms::api::UserType::cloud;
 
     if (logonData.userType == nx::vms::api::UserType::cloud
