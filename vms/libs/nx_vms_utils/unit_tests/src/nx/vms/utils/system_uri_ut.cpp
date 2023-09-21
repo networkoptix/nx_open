@@ -315,6 +315,10 @@ TEST_F(SystemUriTest, directSystemValidSystemIdWithAuth)
     // Password credentials are not valid for Cloud Systems.
     m_uri.systemAddress = kCloudSystemAddress;
     EXPECT_FALSE(m_uri.isValid()) << m_uri;
+
+    // Temporary user link with cloud system id
+    m_uri.credentials = kTemporaryTokenCredentials;
+    EXPECT_TRUE(m_uri.isValid()) << m_uri;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -515,6 +519,37 @@ TEST_F(SystemUriTest, directLinkCloudSystem)
         .arg(kAuthCode));
 }
 
+// Only a temporary user can log in to a cloud system without connecting to cloud
+// nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08?tmp_token=vmsTmp-abcde01234
+// nx-vms://d0b73d03-3e2e-405d-8226-019c83b13a08/view?tmp_token=vmsTmp-abcde01234
+// https://d0b73d03-3e2e-405d-8226-019c83b13a08?tmp_token=vmsTmp-abcde01234
+// https://d0b73d03-3e2e-405d-8226-019c83b13a08/view?tmp_token=vmsTmp-abcde01234
+TEST_F(SystemUriTest, directLinkCloudSystemForTemporaryUser)
+{
+    m_uri.scope = SystemUri::Scope::direct;
+    m_uri.protocol = SystemUri::Protocol::Native;
+    m_uri.clientCommand = SystemUri::ClientCommand::Client;
+    m_uri.userAuthType = SystemUri::UserAuthType::temporary;
+    m_uri.credentials = kTemporaryTokenCredentials;
+    m_uri.systemAddress = kCloudSystemAddress;
+
+    validateLink(QString("%1://%2?tmp_token=%3")
+        .arg(nx::branding::nativeUriProtocol())
+        .arg(kCloudSystemAddress)
+        .arg(QString::fromStdString(kTemporaryToken)));
+    validateLink(QString("%1://%2/view?tmp_token=%3")
+        .arg(nx::branding::nativeUriProtocol())
+        .arg(kCloudSystemAddress)
+        .arg(QString::fromStdString(kTemporaryToken)));
+
+    m_uri.protocol = SystemUri::Protocol::Https;
+    validateLink(QString("https://%1?tmp_token=%2")
+        .arg(kCloudSystemAddress)
+        .arg(QString::fromStdString(kTemporaryToken)));
+    validateLink(QString("https://%1/view?tmp_token=%2")
+        .arg(kCloudSystemAddress)
+        .arg(QString::fromStdString(kTemporaryToken)));
+}
 
 // Open the client and login to the Cloud System.
 // nx-vms://nxvms.com/client/d0b73d03-3e2e-405d-8226-019c83b13a08?code=nxcdb-5e2f4fb9-654e-46e4-b0e5-8dcb4f9f3753
