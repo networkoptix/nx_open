@@ -129,15 +129,16 @@ bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayou
         if (personalLayouts.size() == 0)
         {
             messageBox.setInformativeText(
-                tr("These layouts are shared with other users, so they will be deleted for their accounts as well.",
-                    "Numerical form depends on layouts count",
+                tr("These layouts are shared with other users, so they will be deleted for their"
+                    " accounts as well.",
+                    "",
                     sharedLayouts.size()));
         }
         else
         {
             messageBox.setInformativeText(tr("%n layouts are shared with other users, so they will"
                 " be deleted for their accounts as well.",
-                "Numerical form depends on layouts count",
+                "",
                 sharedLayouts.size()));
         }
     }
@@ -248,7 +249,7 @@ bool Resources::deleteResources(
         infoLevel = Qn::RI_NameOnly;
         text = resources.size() == 1
             ? tr("Delete user?")
-            : tr("Delete %n users?", "Numerical form depends on users count", resources.size());
+            : tr("Delete %n users?", "", resources.size());
     }
     else
     {
