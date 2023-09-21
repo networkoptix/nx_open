@@ -427,7 +427,15 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 {
     if (d->hasCycles(state))
     {
-        // TODO: show a banner about cycles.
+        QnMessageBox messageBox(
+            QnMessageBoxIcon::Critical,
+            tr("Failed to apply changes to %1 group").arg(state.name),
+            "",
+            QDialogButtonBox::Ok,
+            QDialogButtonBox::Ok,
+            d->parentWidget);
+        messageBox.setWindowTitle(qApp->applicationDisplayName());
+        messageBox.exec();
         return;
     }
 
