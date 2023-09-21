@@ -187,9 +187,6 @@ bool isValidSystemAddress(const SystemUri& uri)
     if (uri.systemAddress.isEmpty())
         return false;
 
-    const bool cloudAllowed = uri.scope == SystemUri::Scope::generic
-        || uri.protocol == SystemUri::Protocol::Native;
-
     const auto isValidLocalAddress =
         [&uri]()
         {
@@ -197,8 +194,17 @@ bool isValidSystemAddress(const SystemUri& uri)
             return url.isValid() && url.port() > 0;
         };
 
-    return (cloudAllowed && isCloudHostname(uri.systemAddress))
-        || isValidLocalAddress();
+    return isCloudHostname(uri.systemAddress) || isValidLocalAddress();
+}
+
+bool hasValidBearerAuth(const SystemUri& uri)
+{
+    const auto& credentials = uri.credentials;
+
+    if (credentials.authToken.isBearerToken())
+        return !credentials.authToken.empty();
+
+    return false;
 }
 
 bool hasValidAuth(const SystemUri& uri)
@@ -207,10 +213,7 @@ bool hasValidAuth(const SystemUri& uri)
     if (credentials.authToken.isPassword())
         return !credentials.username.empty() && !credentials.authToken.empty();
 
-    if (credentials.authToken.isBearerToken())
-        return !credentials.authToken.empty();
-
-    return false;
+    return hasValidBearerAuth(uri);
 }
 
 bool userAuthTypeMatchCredentials(const SystemUri& uri)
@@ -264,7 +267,7 @@ void parse(const nx::utils::Url& url, SystemUri* uri)
     parseParameters(url, uri);
     if (isCloudHostname(address))
     {
-        if (uri->authCode.isEmpty())
+        if (uri->authCode.isEmpty() && !hasValidBearerAuth(*uri))
             isDirectLink = false;
     }
     else
@@ -366,7 +369,10 @@ bool SystemUri::isValid() const
                 return !hasValidAuth;
 
             // Login to a Cloud System is allowed only by using auth code.
-            return isCloudHostname(systemAddress) ? !authCode.isEmpty() : hasValidAuth;
+            if (isCloudHostname(systemAddress) && !hasValidBearerAuth(*this))
+                return !authCode.isEmpty();
+
+            return hasValidAuth;
         }
 
         // Login to Cloud with credentials is not supported anymore. Auth code should be used.
