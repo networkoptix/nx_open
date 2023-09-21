@@ -189,10 +189,11 @@ protected:
 class UserListWidget::Private: public QObject
 {
     UserListWidget* const q;
-    nx::utils::ImplPtr<Ui::UserListWidget> ui{new Ui::UserListWidget()};
     UserPropertyTracker m_visibleUsers;
 
 public:
+    nx::utils::ImplPtr<Ui::UserListWidget> ui{new Ui::UserListWidget()};
+
     UserListModel* const usersModel{new UserListModel(q)};
     SortedUserListModel* const sortModel{new SortedUserListModel(q)};
     CheckableHeaderView* const header{new CheckableHeaderView(UserListModel::CheckBoxColumn, q)};
@@ -277,6 +278,7 @@ UserListWidget::~UserListWidget()
 void UserListWidget::loadDataToUi()
 {
     d->header->setCheckState(Qt::Unchecked);
+    d->ui->usersTable->setCurrentIndex({});
 }
 
 void UserListWidget::applyChanges()
@@ -578,12 +580,9 @@ void UserListWidget::Private::setupUi()
                 ui->usersTable->setCurrentIndex(sortModel->index(0, 0));
         });
     connect(ui->usersTable, &TreeView::lostFocus, this,
-        [this](Qt::FocusReason reason)
+        [this]()
         {
-            if (reason != Qt::TabFocusReason && reason != Qt::BacktabFocusReason)
-                return;
-
-            if (q->context()->settingsDialogManager()->currentEditedUserId().isNull())
+            if (!q->context()->settingsDialogManager()->isEditUserDialogVisible())
                 ui->usersTable->clearSelection();
         });
 

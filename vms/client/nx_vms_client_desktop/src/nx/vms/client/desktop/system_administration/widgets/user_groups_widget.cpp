@@ -203,9 +203,10 @@ protected:
 class UserGroupsWidget::Private: public QObject
 {
     UserGroupsWidget* const q;
-    nx::utils::ImplPtr<Ui::UserGroupsWidget> ui{new Ui::UserGroupsWidget()};
 
 public:
+    nx::utils::ImplPtr<Ui::UserGroupsWidget> ui{new Ui::UserGroupsWidget()};
+
     const QPointer<UserGroupManager> manager;
     UserGroupListModel* const groupsModel{new UserGroupListModel(q->systemContext(), q)};
     CustomizableSortFilterProxyModel* const sortModel{new CustomizableSortFilterProxyModel(q)};
@@ -301,6 +302,7 @@ UserGroupsWidget::~UserGroupsWidget()
 void UserGroupsWidget::loadDataToUi()
 {
     d->groupsModel->reset(d->userGroups());
+    d->ui->groupsTable->setCurrentIndex({});
 }
 
 void UserGroupsWidget::resetWarnings()
@@ -460,10 +462,7 @@ void UserGroupsWidget::Private::setupUi()
     connect(ui->groupsTable, &TreeView::lostFocus, this,
         [this](Qt::FocusReason reason)
         {
-            if (reason != Qt::TabFocusReason && reason != Qt::BacktabFocusReason)
-                return;
-
-            if (q->context()->settingsDialogManager()->currentEditedUserId().isNull())
+            if (!q->context()->settingsDialogManager()->isEditGroupDialogVisible())
                 ui->groupsTable->clearSelection();
         });
 
