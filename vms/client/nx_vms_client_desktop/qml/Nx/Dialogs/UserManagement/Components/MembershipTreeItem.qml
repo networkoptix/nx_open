@@ -24,7 +24,10 @@ Item
     property bool interactive: true
 
     readonly property bool isTopLevel: (treeItem.offset ?? 0) === 0
-    readonly property bool hovered: treeItemMouseArea.containsMouse || removeGroupButton.hovered
+    readonly property bool hovered:
+        treeItemMouseArea.containsMouse
+        || textMouseArea.containsMouse
+        || removeGroupButton.hovered
     readonly property color textColor: (!isTopLevel || !interactive)
         ? ColorTheme.colors.light13
         : hovered
@@ -97,14 +100,27 @@ Item
             {
                 id: itemText
 
-                textFormat: Text.RichText
                 Layout.alignment: Qt.AlignVCenter
+
+                textFormat: Text.StyledText
+
                 text: treeItem.isTopLevel
                     ? highlightMatchingText(model.text)
                     : model.text
 
                 font: Qt.font({pixelSize: 14, weight: Font.Medium})
                 color: treeItem.textColor
+
+                // Styled text steals hover from underlying MouseArea.
+                MouseArea
+                {
+                    id: textMouseArea
+
+                    enabled: treeItemMouseArea.enabled
+                    hoverEnabled: true
+
+                    anchors.fill: itemText
+                }
             }
 
             ImageButton
@@ -114,7 +130,7 @@ Item
                 width: 20
                 height: 20
 
-                visible: treeItem.hovered
+                visible: treeItem.hovered && treeItem.enabled
                 hoverEnabled: true
 
                 icon.source: "image://svg/skin/user_settings/tree_item_remove.svg"
