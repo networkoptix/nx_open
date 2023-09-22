@@ -26,6 +26,7 @@
 #include "graphics_label.h"
 
 #include <QtGui/QFontMetricsF>
+#include <QtGui/QGuiApplication>
 
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -77,14 +78,19 @@ void GraphicsLabelPrivate::updateSizeHint() {
     }
 }
 
-void GraphicsLabelPrivate::ensurePixmaps() {
+void GraphicsLabelPrivate::ensurePixmaps()
+{
     Q_Q(GraphicsLabel);
 
     if(!pixmapDirty)
         return;
 
     pixmap = QnTextPixmapCache::instance()->pixmap(
-        calculateText(), q->font(), q->palette().color(QPalette::WindowText), shadowRadius);
+        calculateText(),
+        q->font(),
+        q->palette().color(QPalette::WindowText),
+        qApp->devicePixelRatio(),
+        shadowRadius);
     pixmapDirty = false;
 }
 
