@@ -332,6 +332,9 @@ QnAspectRatio AbstractResourceThumbnail::calculateAspectRatio(
     if (!ar.isValid())
         ar = defaultAspectRatio;
 
+    if (resource.objectCast<QnAviResource>())
+        return ar;
+
     QnConstResourceVideoLayoutPtr layout;
     if (const auto mediaResource = resource.dynamicCast<QnMediaResource>())
         layout = mediaResource->getVideoLayout();
