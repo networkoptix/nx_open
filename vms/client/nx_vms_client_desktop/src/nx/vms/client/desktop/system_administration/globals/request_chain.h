@@ -43,6 +43,10 @@ public:
         requestNext();
     }
 
+    size_t size() const { return m_chain.size(); }
+
+    int nextIndex() const { return m_next; }
+
     void requestComplete(bool success, const QString& errorString = {})
     {
         if (!success)
@@ -60,7 +64,14 @@ public:
     }
 
 protected:
-    virtual void makeRequest(const T& data) = 0;
+    /** Override this method to make a request. Must call advance(). */
+    virtual void makeRequest() = 0;
+
+    const T& peekNext() const { return m_chain[m_next]; }
+    void advance() { ++m_next; }
+
+    T& operator[](int i) { return m_chain[i]; }
+    const T& operator[](int i) const { return m_chain[i]; }
 
 private:
     void requestNext()
@@ -75,9 +86,9 @@ private:
             return;
         }
 
-        T& data = m_chain[m_next++];
-
-        makeRequest(data);
+        const auto next = m_next;
+        makeRequest();
+        NX_ASSERT(next != m_next);
     }
 
 private:
