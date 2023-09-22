@@ -592,7 +592,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 void GroupSettingsDialog::removeGroups(
     nx::vms::client::desktop::SystemContext* systemContext,
     const QSet<QnUuid>& idsToRemove,
-    std::function<void(bool, const QString&)> callback)
+    nx::utils::MoveOnlyFunc<void(bool, const QString&)> callback)
 {
     auto chain = new UserGroupRequestChain(systemContext);
 
