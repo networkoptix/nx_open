@@ -1,12 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Items 1.0
+import Nx
+import Nx.Core
+import Nx.Items
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.desktop
 
 TimeMarker
 {
@@ -73,6 +73,17 @@ TimeMarker
 
                 loadingIndicatorTimeoutMs: 0 //< Never times out.
                 blurImageWhileUpdating: true
+
+                SecurityOverlay
+                {
+                    id: securityOverlay
+
+                    parent: resourcePreview.imageArea
+                    anchors.fill: parent
+                    resource: (resourcePreview.source && resourcePreview.source.resource) || null
+                    mode: SecurityOverlay.Archive
+                    font.pixelSize: 18
+                }
             }
         }
     }

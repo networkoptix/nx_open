@@ -19,6 +19,7 @@
 #include <nx/cloud/db/api/result_code.h>
 #include <nx/cloud/db/api/system_data.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/access/screen_recording_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/index_list_model.h>
@@ -342,6 +343,7 @@ void QnClientMetaTypes::registerQmlTypes()
     MotionRegionsItem::registerQmlType();
     GlobalToolTip::registerQmlType();
     CursorOverride::registerQmlType();
+    ScreenRecordingWatcher::registerQmlType();
     utils::WebEngineProfileManager::registerQmlType();
     analytics::TaxonomyManager::registerQmlTypes();
     workbench::timeline::registerQmlType();

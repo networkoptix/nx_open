@@ -237,6 +237,9 @@ AccessController::Private::Private(AccessController* q):
 
 Qn::Permissions AccessController::Private::permissions(const QnResourcePtr& targetResource) const
 {
+    if (!targetResource)
+        return {};
+
     {
         NX_MUTEX_LOCKER lk(&resourceDataMutex);
         const auto it = resourceData.find(targetResource);
