@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>ApiErrorStrings</name>
+    <message>
+        <source>Invalid JSON content.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported content type.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ArchiveDuration</name>
     <message>
         <source>no data for forecast</source>
@@ -18,10 +29,6 @@
 </context>
 <context>
     <name>AuthResultTranslations</name>
-    <message>
-        <source>Wrong password.</source>
-        <translation></translation>
-    </message>
     <message>
         <source>The password is expired. Please contact your system administrator.</source>
         <translation></translation>
@@ -68,6 +75,10 @@
     </message>
     <message>
         <source>The ticket key is invalid or expired.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wrong password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1114,6 +1125,110 @@
             <numerusform>years</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Msec</source>
+        <comment>Capitalized long suffix for displaying milliseconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sec</source>
+        <comment>Capitalized long suffix for displaying seconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Min</source>
+        <comment>Capitalized long suffix for displaying minutes</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hrs</source>
+        <comment>Capitalized long suffix for displaying hours</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Days</source>
+        <comment>Capitalized long suffix for displaying days</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wks</source>
+        <comment>Capitalized long suffix for displaying weeks</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mos</source>
+        <comment>Capitalized long suffix for displaying months</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yrs</source>
+        <comment>Capitalized long suffix for displaying years</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Milliseconds</source>
+        <comment>Capitalized full suffix for displaying milliseconds</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Seconds</source>
+        <comment>Capitalized full suffix for displaying seconds</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Minutes</source>
+        <comment>Capitalized full suffix for displaying minutes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Hours</source>
+        <comment>Capitalized full suffix for displaying hours</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Days</source>
+        <comment>Capitalized fapitalized full suffix for displaying days</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Weeks</source>
+        <comment>Capitalized full suffix for displaying weeks</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Months</source>
+        <comment>Capitalized full suffix for displaying months</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Years</source>
+        <comment>Capitalized full suffix for displaying years</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnTranscoder</name>
@@ -1222,6 +1337,37 @@
     </message>
     <message>
         <source>Cloud storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StringsHelper</name>
+    <message>
+        <source>SaaS uninitialized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SaaS active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SaaS suspended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SaaS shut down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SaaS shut down automatically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contact your channel partner for details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check internet connection between VMS and license server.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1580,10 +1726,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Enable deprecated API functions (unsecure)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Expose IP addresses for autodiscovery</source>
         <translation></translation>
     </message>
@@ -1650,6 +1792,14 @@
     </message>
     <message>
         <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Power User editing Security Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable deprecated API functions (insecure)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2368,10 +2518,6 @@
         <source>Also play on source camera</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Group</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n Groups</source>
         <translation type="unfinished">
@@ -2380,8 +2526,36 @@
         </translation>
     </message>
     <message>
-        <source>All Power Users</source>
+        <source>LDAP Sync Issue</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to connect to LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to complete sync within a %1 timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to complete sync within a given timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are zero LDAP users in VMS after sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some LDAP users were not found in LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 (%n times)</source>
+        <comment>%1 is description of event. Will be replaced in runtime</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 </TS>
