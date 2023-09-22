@@ -198,7 +198,6 @@ private:
     QnUuid m_subjectId;
     bool m_subjectIsUser = false;
     bool m_temporary = false; //< m_subjectId is a temporary user, implies m_subjectIsUser == true.
-    int m_customGroupCount = 0;
 
     MembersCache::Members m_subjectMembers; //< Sorted by id so states can be matched.
 
