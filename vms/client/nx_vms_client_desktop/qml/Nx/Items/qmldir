@@ -11,6 +11,7 @@ ResourceBrowser 1.0 ResourceBrowser.qml
 ResourcePreview 1.0 ResourcePreview.qml
 ResourceSelectionDelegate 1.0 ResourceSelectionDelegate.qml
 ResourceSelectionTree 1.0 ResourceSelectionTree.qml
+SecurityOverlay 1.0 SecurityOverlay.qml
 SelectionMouseArea 1.0 SelectionMouseArea.qml
 Timeline 1.0 Timeline.qml
 TimelineCalendar 1.0 TimelineCalendar.qml
