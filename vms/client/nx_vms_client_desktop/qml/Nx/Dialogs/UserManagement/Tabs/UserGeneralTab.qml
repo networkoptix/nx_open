@@ -318,6 +318,9 @@ Item
                             width: parent.width
                             readOnly: !(control.emailEditable && control.enabled)
 
+                            onTextChanged:
+                                text = fixupFunc(text)
+
                             fixupFunc:
                                 (text) => (control.self ? control.self.extractEmail(text) : text)
 
