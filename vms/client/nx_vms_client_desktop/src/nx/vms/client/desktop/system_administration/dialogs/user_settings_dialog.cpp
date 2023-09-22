@@ -4,7 +4,6 @@
 
 #include <algorithm>
 
-#include <QtCore/QRegularExpression>
 #include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
 #include <QtWidgets/QPushButton>
@@ -58,6 +57,7 @@
 #include <ui/dialogs/audit_log_dialog.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
+#include <utils/email/email.h>
 
 #include "../globals/session_notifier.h"
 #include "../models/members_model.h"
@@ -135,8 +135,6 @@ struct UserSettingsDialog::Private
 
     QnUserResourcePtr user;
     rest::Handle m_currentRequest = 0;
-
-    const QRegularExpression splitEmailRegex{"(?:\"?([^\"]*)\"?\\s)?<?(.+@[^>]+)>?"};
 
     Private(UserSettingsDialog* parent, DialogType dialogType):
         q(parent),
@@ -481,13 +479,10 @@ QString UserSettingsDialog::validateEmail(const QString& email, bool forCloud)
     return result.state != QValidator::Acceptable ? result.errorMessage : "";
 }
 
-QString UserSettingsDialog::extractEmail(const QString& email)
+QString UserSettingsDialog::extractEmail(const QString& userInput)
 {
-    const auto match = d->splitEmailRegex.match(email);
-
-    return match.hasMatch()
-        ? match.captured(2).trimmed()
-        : email.trimmed();
+    const QnEmailAddress email(userInput);
+    return email.isValid() ? email.value() : userInput;
 }
 
 QString UserSettingsDialog::validateLogin(const QString& login)

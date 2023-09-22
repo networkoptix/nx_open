@@ -192,6 +192,9 @@ Item
                             textField.warningState = false
                     }
 
+                    onTextChanged:
+                        text = fixupFunc(text)
+
                     fixupFunc: (text) => (control.self ? control.self.extractEmail(text) : text)
 
                     validateFunc: (text) =>
