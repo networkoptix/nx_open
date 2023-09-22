@@ -18,6 +18,8 @@ MembershipSettings
     property var model
     property bool allowAddGroup: true
 
+    readonly property int customGroupCount: model.customGroupCount
+
     signal addGroupRequested()
 
     component AddGroupButton: TextButton
@@ -58,31 +60,87 @@ MembershipSettings
         }
     }
 
-    editableFooter: SectionHeader
+    editableDelegate: Item
     {
-        id: customHeader
+        id: editableDelegateItem
 
-        visible: !currentSearchRegExp && model.customGroupCount === 0
+        width: parent ? parent.width : 0
 
-        width: parent.width - 16
-        text: qsTr("Custom")
+        height: editableItem.height
+            + (customPlaceholderLoader.item ? customPlaceholderLoader.item.height : 0)
 
-        AddGroupButton
+        readonly property bool noCustomSection:
+            ListView.section == UserSettingsGlobal.kBuiltInGroupsSection
+            && ListView.nextSection != UserSettingsGlobal.kBuiltInGroupsSection
+            && ListView.nextSection != UserSettingsGlobal.kCustomGroupsSection
+
+        property string ss: ` ${ListView.section}:${ListView.nextSection}`
+
+        MembershipEditableItem
         {
-            visible: control.allowAddGroup
+            id: editableItem
+
+            width: parent.width
+
+            text: model.text
+            description: model.description
+            cycle: model.cycle
         }
 
-        Text
+        Loader
         {
-            anchors.top: customHeader.bottom
-            anchors.topMargin: 2
-            anchors.left: customHeader.left
-            anchors.leftMargin: 14
+            id: customPlaceholderLoader
 
-            font: Qt.font({pixelSize: 12, weight: Font.Normal})
-            color: ColorTheme.colors.light16
+            active: !control.currentSearchRegExp
+                && control.customGroupCount === 0
+                && editableDelegateItem.noCustomSection
 
-            text: qsTr("No custom groups yet")
+            sourceComponent: Item
+            {
+                id: customPlaceholderContainer
+
+                y: editableItem.height
+                width: editableDelegateItem.width - 16
+                height: customHeader.height
+                    + customPlaceholderText.height
+                    + customPlaceholderText.anchors.topMargin * 2
+
+                SectionHeader
+                {
+                    id: customHeader
+
+                    width: parent.width
+
+                    text: qsTr("Custom")
+
+                    AddGroupButton
+                    {
+                        visible: control.allowAddGroup
+                    }
+
+                    Text
+                    {
+                        id: customPlaceholderText
+
+                        anchors
+                        {
+                            top: customHeader.bottom
+                            topMargin: 2
+                            left: customHeader.left
+                            leftMargin: 14
+                            right: parent.right
+                        }
+
+                        horizontalAlignment: Text.AlignLeft
+                        elide: Text.ElideRight
+
+                        font: Qt.font({pixelSize: 12, weight: Font.Medium})
+                        color: ColorTheme.colors.light16
+
+                        text: qsTr("No custom groups yet")
+                    }
+                }
+            }
         }
     }
 
