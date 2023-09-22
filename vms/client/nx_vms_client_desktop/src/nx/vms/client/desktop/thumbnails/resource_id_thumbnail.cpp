@@ -133,8 +133,8 @@ struct ResourceIdentificationThumbnail::Private
             QSet<QnVirtualCameraResourcePtr> removedCameras;
             for (const auto& resource: resources)
             {
-                if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-                    removedCameras.insert(camera);
+                if (auto cameraResource = resource.dynamicCast<QnVirtualCameraResource>())
+                    removedCameras.insert(cameraResource);
             }
 
             if (removedCameras.empty())
@@ -313,6 +313,11 @@ void ResourceIdentificationThumbnail::setFallbackImage(const QUrl& imageUrl, qin
     d->fallbackImage = quickImage.image().transformed(QTransform().rotate(-rotationQuadrants * 90));
     AsyncImageResult::setTimestamp(d->fallbackImage, newTimestamp);
     update();
+}
+
+ThumbnailCache* ResourceIdentificationThumbnail::thumbnailCache()
+{
+    return Private::cache();
 }
 
 void ResourceIdentificationThumbnail::registerQmlType()
