@@ -1,13 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Items 1.0
+import Nx
+import Nx.Core
+import Nx.Items
 
-import nx.vms.client.core 1.0
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {
@@ -92,6 +92,12 @@ Item
 
                 mediaPlayer.autoJumpPolicy: MediaPlayer.DisableJumpToLive
                 mediaPlayer.speed: preview.speedFactor
+
+                videoOverlayComponent: SecurityOverlay
+                {
+                    resourceId: preview.resourceId
+                    mode: SecurityOverlay.Archive
+                }
 
                 Connections
                 {

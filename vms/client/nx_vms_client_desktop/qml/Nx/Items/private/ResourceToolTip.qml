@@ -1,15 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Controls 2.5
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Controls 1.0
-import Nx.Core 1.0
-import Nx.Items 1.0
+import Nx
+import Nx.Controls
+import Nx.Core
+import Nx.Items
 
-import nx.vms.client.core 1.0
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 BubbleToolTip
 {
@@ -95,6 +95,15 @@ BubbleToolTip
                             ColorTheme.colors.resourceTree.tooltip.obsolescenceDimmer
                         obsolescenceTextColor:
                             ColorTheme.colors.resourceTree.tooltip.obsolescenceText
+
+                        SecurityOverlay
+                        {
+                            id: securityOverlay
+
+                            parent: preview.imageArea
+                            anchors.fill: parent
+                            resource: resourceHelper.resource
+                        }
                     }
                 }
 
@@ -106,7 +115,7 @@ BubbleToolTip
                     anchors.fill: parent
                     videoQuality: MediaPlayer.LowIframesOnlyVideoQuality
                     audioEnabled: false
-                    visible: loaded
+                    visible: loaded && !securityOverlay.active
                     forcedAspectRatio: preview.sourceAspectRatio
 
                     tag: "ResourceTooltip"
