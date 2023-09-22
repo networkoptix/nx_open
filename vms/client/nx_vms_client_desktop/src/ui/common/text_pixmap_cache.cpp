@@ -186,6 +186,9 @@ const QnTextPixmap& QnTextPixmapCache::pixmap(
     Qt::TextElideMode elideMode,
     qreal shadowRadius)
 {
+    if (!NX_ASSERT(!qFuzzyIsNull(devicePixelRatio)))
+        devicePixelRatio = qApp->devicePixelRatio();
+
     QColor localColor = color.toRgb();
     if (!localColor.isValid())
         localColor = QColor(0, 0, 0, 255);
