@@ -8,7 +8,9 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/compound_visitor.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/scoped_rollback.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
@@ -19,277 +21,446 @@
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+static constexpr int kMaxRequestsPerBatch = 500;
+
+QString errorMessage(const nx::vms::api::JsonRpcError& error)
+{
+    if (error.code == nx::vms::api::JsonRpcError::RequestError && error.data)
+    {
+        nx::network::rest::Result result;
+        if (QJson::deserialize(*error.data, &result))
+            return result.errorString;
+    }
+
+    if (!error.message.empty())
+        return QString::fromStdString(error.message);
+
+    switch (error.code)
+    {
+        case nx::vms::api::JsonRpcError::RequestError:
+            return UserGroupRequestChain::tr("Request error");
+        case nx::vms::api::JsonRpcError::InvalidJson:
+            return UserGroupRequestChain::tr("Invalid JSON");
+        case nx::vms::api::JsonRpcError::InvalidRequest:
+            return UserGroupRequestChain::tr("Invalid request");
+        case nx::vms::api::JsonRpcError::MethodNotFound:
+            return UserGroupRequestChain::tr("Method not found");
+        case nx::vms::api::JsonRpcError::InvalidParams:
+            return UserGroupRequestChain::tr("Invalid parameters");
+        case nx::vms::api::JsonRpcError::InternalError:
+            return UserGroupRequestChain::tr("Internal error");
+    }
+
+    return UserGroupRequestChain::tr("Unknown error - code %1").arg(error.code);
+}
+
+template <auto member, class T>
+QJsonValue getJsonValue(const T& t)
+{
+    QJsonValue v;
+    QJson::serialize(t.*member, &v);
+    return v;
+}
+
+#define JsonField(value, member) \
+    QPair<QString, QJsonValue>( \
+        #member, \
+        getJsonValue<&std::decay_t<decltype(value)>::member>(value))
+
+static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
+    const UserGroupRequest::RemoveUser& data,
+    int reqId)
+{
+    return api::JsonRpcRequest{
+        .method = nx::format("rest.v3.users.%1.delete", data.id).toStdString(),
+        .id = reqId
+    };
+}
+
+static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
+    const UserGroupRequest::RemoveGroup& data,
+    int reqId)
+{
+    return api::JsonRpcRequest{
+        .method = nx::format("rest.v3.userGroups.%1.delete", data.id).toStdString(),
+        .id = reqId
+    };
+}
+
+static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
+    const UserGroupRequest::UpdateUser& data,
+    int reqId)
+{
+    nx::vms::api::UserModelV3 user;
+
+    user.isEnabled = data.enabled;
+    user.isHttpDigestEnabled = data.enableDigest;
+
+    const QJsonObject params{
+        JsonField(user, isEnabled),
+        JsonField(user, isHttpDigestEnabled)
+    };
+
+    return api::JsonRpcRequest{
+        .method = nx::format("rest.v3.users.%1.update", data.id).toStdString(),
+        .params = params,
+        .id = reqId
+    };
+}
+
+static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
+    const UserGroupRequest::ModifyGroupParents& mod,
+    int reqId)
+{
+    nx::vms::api::UserGroupModel group;
+
+    group.parentGroupIds = mod.newParents;
+
+    const QJsonObject params {
+        JsonField(group, parentGroupIds)
+    };
+
+    return api::JsonRpcRequest{
+        .method = nx::format("rest.v3.userGroups.%1.update", mod.id).toStdString(),
+        .params = params,
+        .id = reqId
+    };
+}
+
+static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
+    const UserGroupRequest::ModifyUserParents& mod,
+    int reqId)
+{
+    nx::vms::api::UserModelV3 user;
+
+    user.groupIds = mod.newParents;
+
+    const QJsonObject params{
+        JsonField(user, groupIds)
+    };
+
+    return api::JsonRpcRequest{
+        .method = nx::format("rest.v3.users.%1.update", mod.id).toStdString(),
+        .params = params,
+        .id = reqId
+    };
+}
+
+static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
+    const UserGroupRequest::AddOrUpdateGroup& updateGroup,
+    int reqId)
+{
+    const nx::vms::api::UserGroupModel group = updateGroup.groupData;
+
+    QJsonValue jsonValue;
+    QJson::serialize(group, &jsonValue);
+
+    // Method 'create' does not accept 'id' field.
+    QJsonObject jsonObject = jsonValue.toObject();
+    if (updateGroup.newGroup)
+        jsonObject.remove(JsonField(group, id).first);
+
+    return api::JsonRpcRequest{
+        .method = "rest.v3.userGroups." + (
+            updateGroup.newGroup
+                ? std::string("create")
+                : nx::format("%1.update", updateGroup.groupData.id).toStdString()),
+        .params = jsonObject,
+        .id = reqId
+    };
+}
+
+} // namespace
+
+class UserGroupRequestChain::Private
+{
+    UserGroupRequestChain* const q;
+
+public:
+    Private(UserGroupRequestChain* q): q(q) {}
+
+    template <typename T>
+    void gatherRequests(std::vector<api::JsonRpcRequest>& requests, size_t maxRequests);
+
+    template <typename T>
+    void runRequests(
+        const std::vector<api::JsonRpcRequest>& requests,
+        std::function<void(const T&)> onSuccess);
+
+    template <typename T, typename Result>
+    std::function<void(const T&)> request(std::function<void(const Result&)> callback);
+
+    template <typename T>
+    const T* getRequestData() const;
+
+    nx::vms::api::UserGroupModel fromGroupId(const QnUuid& groupId);
+    nx::vms::api::UserModelV3 fromUserId(const QnUuid& userId);
+
+    void applyGroup(
+        const QnUuid& groupId,
+        const std::vector<QnUuid>& prev,
+        const std::vector<QnUuid>& next);
+
+    void applyUser(
+        const QnUuid& userId,
+        const std::vector<QnUuid>& prev,
+        const std::vector<QnUuid>& next);
+
+    void applyUser(
+        const QnUuid& userId,
+        bool enabled,
+        bool enableDigest);
+
+    void patchRequests(int startFrom, const QnUuid& oldId, const QnUuid& newId)
+    {
+        for (int i = startFrom; (size_t)i < q->size(); ++i)
+        {
+            if (auto mod = get_if<UserGroupRequest::ModifyUserParents>(&(*q)[i]))
+                std::replace(mod->newParents.begin(), mod->newParents.end(), oldId, newId);
+            else if (auto mod = get_if<UserGroupRequest::ModifyGroupParents>(&(*q)[i]))
+                std::replace(mod->newParents.begin(), mod->newParents.end(), oldId, newId);
+        }
+    }
+
+public:
+    nx::vms::common::SessionTokenHelperPtr tokenHelper;
+    rest::Handle currentRequest{};
+    int replyId = -1;
+};
+
 UserGroupRequestChain::UserGroupRequestChain(
     nx::vms::common::SystemContext* systemContext,
     QObject* parent)
     :
     QObject(parent),
-    base_type(systemContext)
+    base_type(systemContext),
+    d(new Private(this))
 {
 }
 
 UserGroupRequestChain::~UserGroupRequestChain()
 {
-    if (m_currentRequest != 0)
-        systemContext()->connectedServerApi()->cancelRequest(m_currentRequest);
+    if (d->currentRequest != 0)
+        systemContext()->connectedServerApi()->cancelRequest(d->currentRequest);
 }
 
 bool UserGroupRequestChain::isRunning() const
 {
-    return m_currentRequest != 0;
+    return d->currentRequest != 0;
+}
+
+void UserGroupRequestChain::setTokenHelper(nx::vms::common::SessionTokenHelperPtr tokenHelper)
+{
+    d->tokenHelper = tokenHelper;
 }
 
 nx::vms::common::SessionTokenHelperPtr UserGroupRequestChain::tokenHelper() const
 {
-    return m_tokenHelper
-        ? m_tokenHelper
+    return d->tokenHelper
+        ? d->tokenHelper
         : systemContext()->restApiHelper()->getSessionTokenHelper();
 }
 
-void UserGroupRequestChain::makeRequest(const UserGroupRequest::Type& data)
+template <typename T>
+const T* UserGroupRequestChain::Private::getRequestData() const
 {
-    NX_ASSERT(m_currentRequest == 0);
+    if (replyId < 0 || (size_t) replyId >= q->size())
+        return nullptr;
 
-    if (const auto mod = std::get_if<UserGroupRequest::ModifyGroupParents>(&data))
-        requestModifyGroupParents(*mod);
-    else if (const auto mod = std::get_if<UserGroupRequest::ModifyUserParents>(&data))
-        requestModifyUserParents(*mod);
-    else if (const auto updateData = std::get_if<UserGroupRequest::AddOrUpdateGroup>(&data))
-        requestSaveGroup(*updateData);
-    else if (const auto removalData = std::get_if<UserGroupRequest::RemoveGroup>(&data))
-        requestRemoveGroup(*removalData);
-    else if (const auto updateData = std::get_if<UserGroupRequest::RemoveUser>(&data))
-        requestRemoveUser(*updateData);
-    else if (const auto updateData = std::get_if<UserGroupRequest::UpdateUser>(&data))
-        requestUpdateUser(*updateData);
-}
-
-void UserGroupRequestChain::requestModifyGroupParents(
-    const UserGroupRequest::ModifyGroupParents& mod)
-{
-    auto groupData = fromGroupId(mod.id);
-    if (groupData.id.isNull())
+    const auto data = std::get_if<T>(&(*q)[replyId]);
+    if (!data)
     {
-        requestComplete(false, tr("Group does not exist"));
-        return;
+        NX_ASSERT(this, "Expected request type %1", typeid(T));
+        return nullptr;
     }
 
-    groupData.parentGroupIds = mod.newParents;
+    return data;
+}
 
-    m_currentRequest = connectedServerApi()->saveGroupAsync(
-        /*newGroup*/ false,
-        groupData,
-        tokenHelper(),
-        nx::utils::guarded(this,
-            [this, mod](
-                bool success,
-                int handle,
-                const rest::ErrorOrData<nx::vms::api::UserGroupModel>& errorOrData)
+template <typename T>
+void UserGroupRequestChain::Private::gatherRequests(
+    std::vector<api::JsonRpcRequest>& requests,
+    size_t maxRequests)
+{
+    // Gather requests of the same type up to maxRequests.
+    while (q->hasNext() && requests.size() < maxRequests)
+    {
+        const auto userData = std::get_if<T>(&q->peekNext());
+        if (!userData)
+            break;
+
+        requests.emplace_back(toJsonRpcRequest(*userData, q->nextIndex()));
+        q->advance();
+    }
+}
+
+template <typename Result>
+void UserGroupRequestChain::Private::runRequests(
+    const std::vector<api::JsonRpcRequest>& requests,
+    std::function<void(const Result&)> onSuccess)
+{
+    currentRequest = q->connectedServerApi()->jsonRpcBatchCall(
+        q->tokenHelper(),
+        requests,
+        nx::utils::guarded(
+            q,
+            [this, onSuccess = std::move(onSuccess)](
+                bool success, rest::Handle handle, const std::vector<api::JsonRpcResponse>& result)
             {
-                if (NX_ASSERT(handle == m_currentRequest))
-                    m_currentRequest = 0;
+                if (NX_ASSERT(handle == currentRequest))
+                    currentRequest = 0;
 
                 QString errorString;
 
                 if (success)
-                    applyGroup(mod.id, mod.prevParents, mod.newParents);
-                else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-                    errorString = error->errorString;
+                {
+                    for (const auto& response: result)
+                    {
+                        if (response.error)
+                        {
+                            success = false;
+                            errorString = errorMessage(*response.error);
+                            break;
+                        }
 
-                requestComplete(success, errorString);
+                        if (!response.result)
+                            continue;
+
+                        Result resultData;
+                        if (!QJson::deserialize(*response.result, &resultData))
+                            continue;
+
+                        const auto replyIdRollback = nx::utils::makeScopedRollback(replyId);
+
+                        if (const int* idPtr = std::get_if<int>(&response.id))
+                        {
+                            if (*idPtr >= 0 && (size_t) *idPtr < q->size())
+                                replyId = *idPtr;
+                        }
+
+                        onSuccess(resultData);
+                    }
+                }
+                else
+                {
+                    if (!result.empty() && result.front().error)
+                        errorString = errorMessage(*result.front().error);
+                    else
+                        errorString = tr("Connection failure");
+                }
+
+                q->requestComplete(success, errorString);
             }),
-        thread());
+        q->thread());
 }
 
-void UserGroupRequestChain::requestModifyUserParents(
-    const UserGroupRequest::ModifyUserParents& mod)
+template <typename T, typename Result>
+std::function<void(const T&)> UserGroupRequestChain::Private::request(
+    std::function<void(const Result&)> callback)
 {
-    nx::vms::api::UserModelV3 userData = fromUserId(mod.id);
-    if (userData.id.isNull())
-    {
-        requestComplete(false, tr("User does not exist"));
-        return;
-    }
-
-    userData.groupIds = mod.newParents;
-
-    m_currentRequest = connectedServerApi()->saveUserAsync(
-        /*newUser*/ false,
-        userData,
-        tokenHelper(),
-        nx::utils::guarded(this,
-            [this, mod](
-                bool success,
-                int handle,
-                const rest::ErrorOrData<nx::vms::api::UserModelV3>& errorOrData)
-            {
-                if (NX_ASSERT(handle == m_currentRequest))
-                    m_currentRequest = 0;
-
-                QString errorString;
-
-                if (success)
-                    applyUser(mod.id, mod.prevParents, mod.newParents);
-                else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-                    errorString = error->errorString;
-
-                requestComplete(success, errorString);
-            }),
-        thread());
-}
-
-void UserGroupRequestChain::requestSaveGroup(const UserGroupRequest::AddOrUpdateGroup& data)
-{
-    const auto onGroupSaved = nx::utils::guarded(this,
-        [this, data](
-            bool success,
-            int handle,
-            rest::ErrorOrData<nx::vms::api::UserGroupModel> errorOrData)
+    return
+        [this, callback = std::move(callback)](const T& t)
         {
-            if (NX_ASSERT(handle == m_currentRequest))
-                m_currentRequest = 0;
+            std::vector<api::JsonRpcRequest> requests;
 
-            QString errorString;
+            gatherRequests<T>(requests, kMaxRequestsPerBatch);
 
-            if (auto userGroup = std::get_if<nx::vms::api::UserGroupModel>(&errorOrData);
-                userGroup && success)
+            runRequests<Result>(requests,
+                [callback = std::move(callback)](const Result& result)
+                {
+                    callback(result);
+                });
+        };
+}
+
+void UserGroupRequestChain::makeRequest()
+{
+    NX_ASSERT(d->currentRequest == 0);
+
+    std::visit(nx::utils::CompoundVisitor{
+        d->request<UserGroupRequest::ModifyUserParents, nx::vms::api::UserModelV3>(
+            [this](const nx::vms::api::UserModelV3& user)
+            {
+                if (const auto data = d->getRequestData<UserGroupRequest::ModifyUserParents>())
+                {
+                    if (NX_ASSERT(data->id == user.id))
+                        d->applyUser(data->id, data->prevParents, user.groupIds);
+                }
+            }),
+
+        d->request<UserGroupRequest::ModifyGroupParents, nx::vms::api::UserGroupModel>(
+            [this](const nx::vms::api::UserGroupModel& group)
+            {
+                if (const auto data = d->getRequestData<UserGroupRequest::ModifyGroupParents>())
+                {
+                    if (NX_ASSERT(data->id == group.id))
+                        d->applyGroup(data->id, data->prevParents, group.parentGroupIds);
+                }
+            }),
+
+        d->request<UserGroupRequest::RemoveUser, nx::vms::api::UserModelV3>(
+            [this](const nx::vms::api::UserModelV3& user)
+            {
+                // Remove if not already removed.
+                if (auto resource = systemContext()->resourcePool()->getResourceById(user.id))
+                    systemContext()->resourcePool()->removeResource(resource);
+            }),
+
+        d->request<UserGroupRequest::RemoveGroup, nx::vms::api::UserGroupModel>(
+            [this](const nx::vms::api::UserGroupModel& group)
+            {
+                // Remove if not already removed.
+                userGroupManager()->remove(group.id);
+            }),
+
+        d->request<UserGroupRequest::UpdateUser, nx::vms::api::UserModelV3>(
+            [this](const nx::vms::api::UserModelV3& user)
+            {
+                if (const auto data = d->getRequestData<UserGroupRequest::UpdateUser>())
+                {
+                    if (NX_ASSERT(data->id == user.id))
+                        d->applyUser(data->id, data->enabled, data->enableDigest);
+                }
+            }),
+
+        d->request<UserGroupRequest::AddOrUpdateGroup, nx::vms::api::UserGroupModel>(
+            [this](const nx::vms::api::UserGroupModel& userGroup)
             {
                 auto group =
                     systemContext()->userGroupManager()->find(
-                        data.groupData.id).value_or(api::UserGroupData{});
+                        userGroup.id).value_or(api::UserGroupData{});
 
                 // Update group locally ahead of receiving update from the server
                 // to avoid UI blinking.
-                group.id = userGroup->id;
-                group.name = userGroup->name;
-                group.description = userGroup->description;
-                group.parentGroupIds = userGroup->parentGroupIds;
-                group.permissions = userGroup->permissions;
+                group.id = userGroup.id;
+                group.name = userGroup.name;
+                group.description = userGroup.description;
+                group.parentGroupIds = userGroup.parentGroupIds;
+                group.permissions = userGroup.permissions;
                 userGroupManager()->addOrUpdate(group);
 
                 updateLayoutSharing(
-                    systemContext(), userGroup->id, userGroup->resourceAccessRights);
+                    systemContext(), userGroup.resourceAccessRights);
 
                 // Update access rights locally.
-                systemContext()->accessRightsManager()->setOwnResourceAccessMap(userGroup->id,
-                    {userGroup->resourceAccessRights.begin(), userGroup->resourceAccessRights.end()});
-            }
-            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-            {
-                errorString = error->errorString;
-            }
+                systemContext()->accessRightsManager()->setOwnResourceAccessMap(userGroup.id,
+                    {userGroup.resourceAccessRights.begin(), userGroup.resourceAccessRights.end()});
 
-            requestComplete(success, errorString);
-        });
-
-    m_currentRequest = connectedServerApi()->saveGroupAsync(
-        data.newGroup,
-        data.groupData,
-        tokenHelper(),
-        onGroupSaved,
-        thread());
-}
-
-void UserGroupRequestChain::requestRemoveUser(const UserGroupRequest::RemoveUser& data)
-{
-    auto onUserRemoved = nx::utils::guarded(this,
-        [this, id = data.id](bool success, int handle, const rest::ErrorOrEmpty& result)
-        {
-            if (NX_ASSERT(handle == m_currentRequest))
-                m_currentRequest = -1;
-
-            QString errorString;
-
-            if (success)
-            {
-                // Remove if not already removed.
-                if (auto resource = systemContext()->resourcePool()->getResourceById(id))
-                    systemContext()->resourcePool()->removeResource(resource);
-            }
-            else if (auto error = std::get_if<nx::network::rest::Result>(&result))
-            {
-                errorString = error->errorString;
-            }
-
-            requestComplete(success, errorString);
-        });
-
-    m_currentRequest = connectedServerApi()->removeUserAsync(
-        data.id, tokenHelper(), onUserRemoved, thread());
-}
-
-void UserGroupRequestChain::requestRemoveGroup(const UserGroupRequest::RemoveGroup& data)
-{
-    const auto onGroupRemoved = nx::utils::guarded(this,
-        [this, id = data.id](bool success, int handle, const rest::ErrorOrEmpty& result)
-        {
-            if (NX_ASSERT(handle == m_currentRequest))
-                m_currentRequest = 0;
-
-            QString errorString;
-
-            if (success)
-            {
-                // Remove if not already removed.
-                userGroupManager()->remove(id);
-            }
-            else if (auto error = std::get_if<nx::network::rest::Result>(&result))
-            {
-                errorString = error->errorString;
-            }
-
-            requestComplete(success, errorString);
-        });
-
-    m_currentRequest = connectedServerApi()->removeGroupAsync(
-        data.id, tokenHelper(), onGroupRemoved, thread());
-}
-
-void UserGroupRequestChain::requestUpdateUser(const UserGroupRequest::UpdateUser& data)
-{
-    nx::vms::api::UserModelV3 userData = fromUserId(data.id);
-    if (userData.id.isNull())
-    {
-        requestComplete(false, tr("User does not exist"));
-        return;
-    }
-
-    userData.isEnabled = data.enabled;
-    userData.isHttpDigestEnabled = data.enableDigest;
-
-    m_currentRequest = connectedServerApi()->saveUserAsync(
-        /*newUser*/ false,
-        userData,
-        tokenHelper(),
-        nx::utils::guarded(this,
-            [this](
-                bool success,
-                int handle,
-                const rest::ErrorOrData<nx::vms::api::UserModelV3>& errorOrData)
-            {
-                if (NX_ASSERT(handle == m_currentRequest))
-                    m_currentRequest = 0;
-
-                QString errorString;
-
-                if (auto userData = std::get_if<nx::vms::api::UserModelV3>(&errorOrData);
-                    userData && success)
+                // A workaround - replace temporary group id with created group id.
+                if (const auto data = d->getRequestData<UserGroupRequest::AddOrUpdateGroup>();
+                    data && data->newGroup && d->replyId >= 0)
                 {
-                    applyUser(userData->id, userData->isEnabled, userData->isHttpDigestEnabled);
+                    d->patchRequests(d->replyId + 1, data->groupData.id, userGroup.id);
                 }
-                else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-                {
-                    errorString = error->errorString;
-                }
-
-                requestComplete(success, errorString);
             }),
-        thread());
+        },
+        peekNext());
 }
 
 void UserGroupRequestChain::updateLayoutSharing(
     nx::vms::client::desktop::SystemContext* systemContext,
-    const QnUuid& id,
     const std::map<QnUuid, nx::vms::api::AccessRights>& accessRights)
 {
     const auto resourcePool = systemContext->resourcePool();
@@ -319,9 +490,9 @@ void UserGroupRequestChain::updateLayoutSharing(
     }
 }
 
-nx::vms::api::UserGroupModel UserGroupRequestChain::fromGroupId(const QnUuid& groupId)
+nx::vms::api::UserGroupModel UserGroupRequestChain::Private::fromGroupId(const QnUuid& groupId)
 {
-    const auto userGroup = systemContext()->userGroupManager()->find(groupId);
+    const auto userGroup = q->systemContext()->userGroupManager()->find(groupId);
     if (!userGroup)
         return {};
 
@@ -334,15 +505,16 @@ nx::vms::api::UserGroupModel UserGroupRequestChain::fromGroupId(const QnUuid& gr
     groupData.type = userGroup->type;
     groupData.permissions = userGroup->permissions;
     groupData.parentGroupIds = userGroup->parentGroupIds;
-    const auto ownResourceAccessMap = systemContext()->accessRightsManager()->ownResourceAccessMap(
-        userGroup->id).asKeyValueRange();
+    const auto ownResourceAccessMap =
+        q->systemContext()->accessRightsManager()->ownResourceAccessMap(
+            userGroup->id).asKeyValueRange();
     groupData.resourceAccessRights = {ownResourceAccessMap.begin(), ownResourceAccessMap.end()};
     return groupData;
 }
 
-nx::vms::api::UserModelV3 UserGroupRequestChain::fromUserId(const QnUuid& userId)
+nx::vms::api::UserModelV3 UserGroupRequestChain::Private::fromUserId(const QnUuid& userId)
 {
-    const auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
+    const auto user = q->systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
     if (!user)
         return {};
 
@@ -361,19 +533,20 @@ nx::vms::api::UserModelV3 UserGroupRequestChain::fromUserId(const QnUuid& userId
 
     userData.groupIds = user->groupIds();
 
-    const auto ownResourceAccessMap = systemContext()->accessRightsManager()->ownResourceAccessMap(
-        user->getId()).asKeyValueRange();
+    const auto ownResourceAccessMap =
+        q->systemContext()->accessRightsManager()->ownResourceAccessMap(
+            user->getId()).asKeyValueRange();
     userData.resourceAccessRights = {ownResourceAccessMap.begin(), ownResourceAccessMap.end()};
 
     return userData;
 }
 
-void UserGroupRequestChain::applyGroup(
+void UserGroupRequestChain::Private::applyGroup(
     const QnUuid& groupId,
     const std::vector<QnUuid>& prev,
     const std::vector<QnUuid>& next)
 {
-    auto userGroup = systemContext()->userGroupManager()->find(groupId);
+    auto userGroup = q->systemContext()->userGroupManager()->find(groupId);
     if (!userGroup)
         return;
 
@@ -381,15 +554,15 @@ void UserGroupRequestChain::applyGroup(
         return; //< Already updated.
 
     userGroup->parentGroupIds = next;
-    systemContext()->userGroupManager()->addOrUpdate(*userGroup);
+    q->systemContext()->userGroupManager()->addOrUpdate(*userGroup);
 }
 
-void UserGroupRequestChain::applyUser(
+void UserGroupRequestChain::Private::applyUser(
     const QnUuid& userId,
     const std::vector<QnUuid>& prev,
     const std::vector<QnUuid>& next)
 {
-    auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
+    auto user = q->systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
     if (!user)
         return;
 
@@ -399,23 +572,27 @@ void UserGroupRequestChain::applyUser(
     user->setGroupIds(next);
 }
 
-void UserGroupRequestChain::applyUser(
+void UserGroupRequestChain::Private::applyUser(
     const QnUuid& userId,
     bool enabled,
     bool enableDigest)
 {
-    auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
+    auto user = q->systemContext()->resourcePool()->getResourceById<QnUserResource>(userId);
     if (!user)
         return;
 
     // TODO: enableDigest shoud be optional in API structure.
 
     user->setEnabled(enabled);
-    user->setPasswordAndGenerateHash(
-        {},
-        enableDigest
-            ? QnUserResource::DigestSupport::enable
-            : QnUserResource::DigestSupport::disable);
+
+    if (!user->isTemporary())
+    {
+        user->setPasswordAndGenerateHash(
+            {},
+            enableDigest
+                ? QnUserResource::DigestSupport::enable
+                : QnUserResource::DigestSupport::disable);
+    }
 }
 
 } // namespace nx::vms::client::desktop
