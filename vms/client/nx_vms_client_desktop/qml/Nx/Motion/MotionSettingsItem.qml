@@ -1,11 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
+import QtQuick
 
-import Nx.Items 1.0
-import Nx.Motion 1.0
+import Nx.Items
+import Nx.Motion
 
-import nx.client.core 1.0
+import nx.client.core
 
 CameraDisplay
 {
@@ -21,9 +21,22 @@ CameraDisplay
     SelectionMouseArea
     {
         id: selectionMouseArea
+
         parent: videoOverlay
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton
+        enabled: !securityOverlay.active
+    }
+
+    SecurityOverlay
+    {
+        id: securityOverlay
+
+        parent: videoOverlay
+        anchors.fill: parent
+        resourceId: motionSettingsItem.cameraResourceId
+        mode: SecurityOverlay.Live
+        font.pixelSize: 32
     }
 
     videoOverlayComponent: Item {}
