@@ -131,7 +131,7 @@ public:
     Q_INVOKABLE QString validateEmail(const QString& email, bool forCloud = false);
     Q_INVOKABLE QString validateCurrentPassword(const QString& password);
 
-    Q_INVOKABLE QString extractEmail(const QString& email);
+    Q_INVOKABLE QString extractEmail(const QString& userInput);
 
     Q_INVOKABLE bool isConnectedToCloud() const;
 
