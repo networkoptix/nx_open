@@ -285,10 +285,10 @@ static constexpr char kLocalhostCertificateAlternativeNames[] =
  * @param serialNumber If not specified then a random number is used.
  * @param hostName Specifies the list of hostnames and/or IP addresses, which will be included in
  *     the certificate as Subject Alternative Names. The string has the following format:
- *     name[, name, …, name]
+ *     name[, name, ..., name]
  *     where name must have one of the following formats:
- *         - <host> or DNS:<host> — DNS-name,
- *         - IP Address:<ip> — IPv4 or IPv6 address.
+ *         - <host> or DNS:<host> - DNS-name,
+ *         - IP Address:<ip> - IPv4 or IPv6 address.
  * @return Certificate and private key in PEM format.
  */
 NX_NETWORK_API std::string makeCertificateAndKey(
