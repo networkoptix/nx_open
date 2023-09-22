@@ -56,15 +56,15 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Cet utilisateur n'existe pas ou ne parvient pas à se connecter.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Plusieurs utilisateurs avec le même identifiant sont présentés.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>Impossible de vérifier le certificat SSL/TLS du serveur LDAP.</translation>
     </message>
   </context>
   <context>
@@ -164,51 +164,51 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administrateurs</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Utilisateurs expérimentés</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Visualisateur avancé</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Visualisateur</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Visualisateur en direct</translation>
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation type="unfinished">System Health Viewers</translation>
+      <translation>Visualisateur d’intégrité du système</translation>
     </message>
     <message>
       <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
-      <translation type="unfinished">Has full control of System configuration, but cannot create or modify other Power Users.</translation>
+      <translation>A un contrôle complet de la configuration du système, mais ne peut pas créer ou modifier d'autres utilisateurs expérimentés.</translation>
     </message>
     <message>
       <source>Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
+      <translation>Peut voir et exécuter les positions PTZ et PTZ Tours, utiliser l'audio bidirectionnel, gérer les boutons Module d'E/S, créer et éditer les signets, et afficher le journal d'événements.</translation>
     </message>
     <message>
       <source>Can view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Can view and export archive and Bookmarks.</translation>
+      <translation>Peut afficher et exporter des archives et des signets.</translation>
     </message>
     <message>
       <source>Can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Can view live videos, I/O modules and web pages.</translation>
+      <translation>Peut visualiser des vidéos en direct, des modules d'E/S et des pages Web.</translation>
     </message>
     <message>
       <source>Can view System Health Monitoring information.</source>
-      <translation type="unfinished">Can view System Health Monitoring information.</translation>
+      <translation>Peut afficher les informations de surveillance de l’état du système.</translation>
     </message>
     <message>
       <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
-      <translation type="unfinished">This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</translation>
+      <translation>Cet utilisateur a des privilèges système illimités et ne peut pas être supprimé. Peut créer et modifier des administrateurs, et peut fusionner des systèmes et lier ou délier des comptes Nx Cloud.</translation>
     </message>
   </context>
   <context>
@@ -435,15 +435,15 @@
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>Des données non valides ont été reçues de l'appareil. Détails: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Des données non valides ont été reçues de la caméra. Détails: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>Des données non valides ont été reçues du module d'E/S. Détails : &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -834,22 +834,22 @@
     <message>
       <source>%1 Licenses</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Licenses</translation>
+      <translation>%1 Licences</translation>
     </message>
     <message numerus="yes">
       <source>%n %1 Licenses</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">
-        <numerusform>%n %1 Licenses</numerusform>
-        <numerusform>%n %1 Licenses</numerusform>
+      <translation>
+        <numerusform>%n %1 Licence</numerusform>
+        <numerusform>%n %1 Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 %2 Licenses</source>
       <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 %2 Licenses</numerusform>
-        <numerusform>%n/%1 %2 Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 %2 Licence</numerusform>
+        <numerusform>%n/%1 %2 Licences</numerusform>
       </translation>
     </message>
   </context>
@@ -1143,7 +1143,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Plusieurs groupes</translation>
     </message>
   </context>
   <context>
@@ -1617,19 +1617,19 @@
     </message>
     <message>
       <source>Cloud storage update period in seconds</source>
-      <translation type="unfinished">Cloud storage update period in seconds</translation>
+      <translation>Période de mise à jour du stockage cloud en secondes</translation>
     </message>
     <message>
       <source>LDAP settings</source>
-      <translation type="unfinished">LDAP settings</translation>
+      <translation>Paramètres LDAP</translation>
     </message>
     <message>
       <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
+      <translation>Paramètres SMTP</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>Durée de vie du jeton de session d'autorisation (secondes)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
@@ -1641,36 +1641,36 @@
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>à l’instant</translation>
     </message>
     <message numerus="yes">
       <source>%n minute(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minute(s) ago</numerusform>
-        <numerusform>%n minute(s) ago</numerusform>
+      <translation>
+        <numerusform>il y a %n minute</numerusform>
+        <numerusform>il y a %n minute(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hour(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hour(s) ago</numerusform>
-        <numerusform>%n hour(s) ago</numerusform>
+      <translation>
+        <numerusform>il y a %n heure</numerusform>
+        <numerusform>il y a %n heures</numerusform>
       </translation>
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>hier</translation>
     </message>
     <message numerus="yes">
       <source>%n day(s) ago</source>
-      <translation type="unfinished">
-        <numerusform>%n day(s) ago</numerusform>
-        <numerusform>%n day(s) ago</numerusform>
+      <translation>
+        <numerusform>il y a %n jour</numerusform>
+        <numerusform>il y a %n jours</numerusform>
       </translation>
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>il y a une semaine</translation>
     </message>
   </context>
   <context>
@@ -1725,7 +1725,7 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Déverrouillez cette partie de l'archive pour exporter son contenu.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -2354,18 +2354,18 @@
     </message>
     <message>
       <source>Group</source>
-      <translation type="unfinished">Group</translation>
+      <translation>Groupe</translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n groupe</numerusform>
+        <numerusform>%n groupes</numerusform>
       </translation>
     </message>
     <message>
       <source>All Power Users</source>
-      <translation type="unfinished">All Power Users</translation>
+      <translation>Tous les utilisateurs expérimentés</translation>
     </message>
   </context>
 </TS>

@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Any server issue</source>
-      <translation type="unfinished">Any server issue</translation>
+      <translation>Tout problème de serveur</translation>
     </message>
   </context>
   <context>
@@ -36,23 +36,23 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Commencer quand</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Se produit à</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>De Type</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Et légende</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Et Description</translation>
     </message>
   </context>
   <context>
@@ -72,15 +72,15 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Se produit à</translation>
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>De Type</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>Et Objet</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Créer un signet</translation>
     </message>
     <message>
       <source>At</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Durée fixe</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Ajouter des mots clés</translation>
     </message>
   </context>
   <context>
@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Limitation des actions</translation>
     </message>
   </context>
   <context>
@@ -163,15 +163,15 @@
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>Signal d'entrée sur l'appareil</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Se produit à</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>Avec ID</translation>
     </message>
   </context>
   <context>
@@ -277,7 +277,7 @@
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Sortie de l'appareil</translation>
     </message>
     <message>
       <source>At</source>
@@ -285,7 +285,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Durée fixe</translation>
     </message>
   </context>
   <context>
@@ -308,7 +308,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>Enregistrement de la caméra</translation>
     </message>
     <message>
       <source>On</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Durée fixe</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -331,7 +331,7 @@
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Sur mise en page</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
@@ -339,18 +339,18 @@
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Fixé pour</translation>
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Retour en arrière</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ExitFullscreenAction</name>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Sur mise en page</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -369,7 +369,7 @@
     </message>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Erreur de ventilateur</translation>
     </message>
     <message>
       <source>At</source>
@@ -392,19 +392,19 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Omettre les logs</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>Et Source</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Et légende</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Et Description</translation>
     </message>
   </context>
   <context>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>Requête HTTP(S)</translation>
     </message>
     <message>
       <source>URL</source>
@@ -481,11 +481,11 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Commencer quand</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Se produit à</translation>
     </message>
   </context>
   <context>
@@ -584,7 +584,7 @@
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Afficher les notifications du bureau</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -603,7 +603,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Retour en arrière</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -618,7 +618,7 @@
     </message>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Enregistrement Panique</translation>
     </message>
   </context>
   <context>
@@ -629,7 +629,7 @@
     </message>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>Jouer un son</translation>
     </message>
     <message>
       <source>At</source>
@@ -637,7 +637,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Aux Utilisateurs</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -652,23 +652,23 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Se produit à</translation>
     </message>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>Pour le plugin</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Et légende</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Et Description</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>Et le niveau est</translation>
     </message>
   </context>
   <context>
@@ -692,18 +692,18 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>Budget PoE dépassé</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Commencer quand</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>Exécuter le préréglage PTZ</translation>
     </message>
     <message>
       <source>At</source>
@@ -711,7 +711,7 @@
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>Préréglages PTZ</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Exécuter pour les utilisateurs</translation>
     </message>
   </context>
   <context>
@@ -738,11 +738,11 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Envoyer une notification mobile</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>Ajouter le nom de l'appareil source au corps</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -761,7 +761,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Répéter le son</translation>
     </message>
     <message>
       <source>At</source>
@@ -788,7 +788,7 @@
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation type="unfinished">Additional Recipients</translation>
+      <translation>Destinataires supplémentaires</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -877,11 +877,11 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Retour en arrière</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Forcer l'ouverture de la mise en page d'alarme</translation>
     </message>
   </context>
   <context>
@@ -912,7 +912,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Se produit à</translation>
     </message>
     <message>
       <source>By</source>
@@ -935,11 +935,11 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>Sur l'appareil</translation>
     </message>
     <message>
       <source>To users</source>
-      <translation type="unfinished">To users</translation>
+      <translation>Aux utilisateurs</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1001,7 +1001,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>Afficher la superposition de texte</translation>
     </message>
     <message>
       <source>At</source>
@@ -1009,11 +1009,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Durée fixe</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>Texte personnalisé</translation>
     </message>
     <message>
       <source>Show to</source>
@@ -1047,7 +1047,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>Écrire dans le journal</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1094,7 +1094,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Action inconnue</translation>
     </message>
   </context>
 </TS>
