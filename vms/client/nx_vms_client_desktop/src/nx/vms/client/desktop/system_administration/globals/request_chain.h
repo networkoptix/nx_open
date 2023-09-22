@@ -6,6 +6,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/utils/move_only_func.h>
+
 namespace nx::vms::client::desktop {
 
 /**
@@ -15,7 +17,7 @@ template <typename T>
 class RequestChain
 {
 public:
-    using ChainCompleteCallback = std::function<void(bool, const QString&)>;
+    using ChainCompleteCallback = nx::utils::MoveOnlyFunc<void(bool, const QString&)>;
 
 public:
     virtual ~RequestChain()

@@ -242,6 +242,7 @@ public:
     nx::vms::api::UserGroupDataList userGroups() const;
 
     void updateBanners();
+    void setMassDeleteInProgress(bool inProgress);
 
 private:
     void createGroup();
@@ -497,6 +498,12 @@ void UserGroupsWidget::Private::setupUi()
     setPaletteColor(selectionControls, QPalette::Window, core::colorTheme()->color("dark11"));
     setPaletteColor(selectionControls, QPalette::WindowText, core::colorTheme()->color("light4"));
     setPaletteColor(selectionControls, QPalette::Dark, core::colorTheme()->color("dark15"));
+    QColor disabledTextColor = core::colorTheme()->color("light4");
+    disabledTextColor.setAlphaF(0.3);
+    setPaletteColor(selectionControls, QPalette::Disabled, QPalette::WindowText,
+        disabledTextColor);
+    setPaletteColor(deleteNotFoundGroupsButton, QPalette::Disabled, QPalette::WindowText,
+        disabledTextColor);
 
     const auto buttonsLayout = selectionControls->horizontalLayout();
     buttonsLayout->setSpacing(16);
@@ -593,6 +600,15 @@ QSize UserGroupsWidget::sizeHint() const
     return QSize(200, 200);
 }
 
+void UserGroupsWidget::Private::setMassDeleteInProgress(bool inProgress)
+{
+    ui->groupsTable->setDisabled(inProgress);
+    ui->deleteGroupAction->setDisabled(inProgress);
+
+    deleteSelectedButton->setDisabled(inProgress);
+    deleteNotFoundGroupsButton->setDisabled(inProgress);
+}
+
 void UserGroupsWidget::Private::handleModelChanged()
 {
     const bool empty = sortModel->rowCount() == 0;
@@ -671,11 +687,13 @@ void UserGroupsWidget::Private::deleteGroups(const QSet<QnUuid>& groupsToDelete)
     if (!ui::messages::UserGroups::removeGroups(q, groupsToDelete, /*allowSilent*/ false))
         return;
 
-    GroupSettingsDialog::removeGroups(q->systemContext(), groupsToDelete, nx::utils::guarded(q,
-        [this, groupsToDelete](bool success, const QString& errorString)
-        {
-            q->setEnabled(true);
+    setMassDeleteInProgress(true);
+    auto rollback = nx::utils::makeScopeGuard([this]{ setMassDeleteInProgress(false); });
 
+    GroupSettingsDialog::removeGroups(q->systemContext(), groupsToDelete, nx::utils::guarded(q,
+        [this, groupsToDelete, rollback = std::move(rollback)](
+            bool success, const QString& errorString)
+        {
             if (success)
                 return;
 
@@ -701,8 +719,6 @@ void UserGroupsWidget::Private::deleteGroups(const QSet<QnUuid>& groupsToDelete)
                 q);
             messageBox.exec();
         }));
-
-    q->setEnabled(false);
 }
 
 void UserGroupsWidget::Private::deleteSelected()
