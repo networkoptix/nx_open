@@ -47,6 +47,8 @@ public:
     Q_INVOKABLE void setFallbackImage(const QUrl& imageUrl, qint64 timestampMs,
         int rotationQuadrants);
 
+    static nx::vms::client::core::ThumbnailCache* thumbnailCache();
+
     static void registerQmlType();
 
 signals:

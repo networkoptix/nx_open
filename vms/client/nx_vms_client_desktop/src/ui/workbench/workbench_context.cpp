@@ -9,6 +9,7 @@
 #include <client/client_startup_parameters.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/thumbnails/thumbnail_cache.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
@@ -27,6 +28,8 @@
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/client/desktop/system_update/server_update_tool.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
+#include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
+#include <nx/vms/client/desktop/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
@@ -73,6 +76,8 @@ QnWorkbenchContext::QnWorkbenchContext(SystemContext* systemContext, QObject* pa
     connect(m_userWatcher, &nx::vms::client::core::UserWatcher::userChanged, this,
         [this](const QnUserResourcePtr& user)
         {
+            LiveCameraThumbnail::thumbnailCache()->clear();
+            ResourceIdentificationThumbnail::thumbnailCache()->clear();
             emit userChanged(user);
             emit userIdChanged();
         });

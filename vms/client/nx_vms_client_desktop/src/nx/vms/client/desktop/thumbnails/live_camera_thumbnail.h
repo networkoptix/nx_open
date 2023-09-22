@@ -30,6 +30,8 @@ public:
     CameraStream stream() const;
     void setStream(CameraStream value);
 
+    static nx::vms::client::core::ThumbnailCache* thumbnailCache();
+
     static void registerQmlType();
 
 signals:

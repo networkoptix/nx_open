@@ -63,6 +63,11 @@ void LiveCameraThumbnail::setStream(CameraStream value)
     update();
 }
 
+ThumbnailCache* LiveCameraThumbnail::thumbnailCache()
+{
+    return Private::cache();
+}
+
 void LiveCameraThumbnail::registerQmlType()
 {
     qmlRegisterType<LiveCameraThumbnail>("nx.vms.client.desktop", 1, 0,
