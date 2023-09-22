@@ -19,7 +19,7 @@ Canvas
 
     onPaint:
     {
-        var ctx = getContext("2d")
+        let ctx = getContext("2d")
         ctx.reset()
         ctx.strokeStyle = icon.color
         ctx.lineJoin = "miter"

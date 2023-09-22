@@ -72,7 +72,7 @@ function getItemProperties(model, depth)
 
 function _createItemsRecursively(parent, visualParent, model, depth)
 {
-    var type = model.type
+    const type = model.type
     if (!type)
         return null
 
@@ -84,7 +84,7 @@ function _createItemsRecursively(parent, visualParent, model, depth)
         return null
     }
 
-    var item = component.createObject(visualParent || null, getItemProperties(model, depth))
+    let item = component.createObject(visualParent || null, getItemProperties(model, depth))
 
     if (item)
     {
@@ -162,13 +162,13 @@ function _processItemsRecursively(item, func, postFunc)
 
     if (item.childrenItem)
     {
-        for (var i = 0; i < item.childrenItem.layoutItems.length; ++i)
+        for (let i = 0; i < item.childrenItem.layoutItems.length; ++i)
             _processItemsRecursively(item.childrenItem.layoutItems[i], func, postFunc)
     }
 
     if (item.sectionStack)
     {
-        for (var i = 1; i < item.sectionStack.children.length; ++i)
+        for (let i = 1; i < item.sectionStack.children.length; ++i)
             _processItemsRecursively(item.sectionStack.children[i], func, postFunc)
     }
 
@@ -178,7 +178,7 @@ function _processItemsRecursively(item, func, postFunc)
 
 function getValues(rootItem)
 {
-    var result = {}
+    let result = {}
 
     _processItemsRecursively(rootItem,
         function(item)

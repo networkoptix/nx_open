@@ -103,7 +103,7 @@ Item
                                 if (!pressed)
                                     return
 
-                                var pos = mapToItem(horizon, mouse.x, mouse.y)
+                                const pos = mapToItem(horizon, mouse.x, mouse.y)
 
                                 settings.alphaDegrees = MathUtils.bound(-180.0,
                                     originalAngles.x + (pos.x - pressPos.x) / horizon.width * 360.0,

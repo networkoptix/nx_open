@@ -27,8 +27,8 @@ Dialog
 
     function openNewIn(control)
     {
-        var x = control.x + (control.width / 2)
-        var y = control.y + (control.height / 2)
+        const x = control.x + (control.width / 2)
+        const y = control.y + (control.height / 2)
         return openNew(x, y)
     }
 }

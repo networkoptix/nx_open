@@ -91,7 +91,7 @@ Item
 
     function lastFilledItemIndex()
     {
-        for (var i = column.layoutItems.length - 1; i >= 0; --i)
+        for (let i = column.layoutItems.length - 1; i >= 0; --i)
         {
             if (Utils.isItemFilled(column.layoutItems[i]))
                 return i
@@ -101,7 +101,7 @@ Item
 
     function updateItemsVisibility()
     {
-        for (var i = 0; i < column.layoutItems.length; ++i)
+        for (let i = 0; i < column.layoutItems.length; ++i)
             column.layoutItems[i].opacity = i < visibleItemsCount ? 1.0 : 0.0
     }
 }

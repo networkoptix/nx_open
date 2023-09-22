@@ -52,7 +52,7 @@ Item
             {
                 paths:
                 {
-                    var angles = []
+                    let angles = []
                     if (d.betaDegrees < -89.9 || d.betaDegrees > 89.9)
                     {
                         // 90 degrees rotation is an extreme case.
@@ -81,19 +81,19 @@ Item
                         // straight horizon with 1 degree step, unproject to the unit
                         // sphere, rotate points on the sphere and project back.
 
-                        var beta = MathUtils.toRadians(d.betaDegrees)
-                        var sinBeta = Math.sin(beta)
-                        var cosBeta = Math.cos(beta)
-                        var rotateX = Qt.matrix4x4(1, 0, 0, 0, 0, cosBeta, sinBeta, 0,
+                        const beta = MathUtils.toRadians(d.betaDegrees)
+                        const sinBeta = Math.sin(beta)
+                        const cosBeta = Math.cos(beta)
+                        const rotateX = Qt.matrix4x4(1, 0, 0, 0, 0, cosBeta, sinBeta, 0,
                             0, -sinBeta, cosBeta, 0, 0, 0, 0, 1)
 
-                        for (var theta = 0; theta < 360; ++theta)
+                        for (let theta = 0; theta < 360; ++theta)
                         {
-                            var pointOnSphere = d.toCarthesian(Qt.vector2d(
+                            const pointOnSphere = d.toCarthesian(Qt.vector2d(
                                 theta - control.alphaDegrees, 0))
 
-                            var rotated = rotateX.times(pointOnSphere)
-                            var newAngles = d.fromCarthesian(rotated)
+                            const rotated = rotateX.times(pointOnSphere)
+                            const newAngles = d.fromCarthesian(rotated)
 
                             angles.push(Qt.vector2d(MathUtils.normalized360(
                                 newAngles.x + control.alphaDegrees), newAngles.y))
@@ -102,14 +102,14 @@ Item
 
                     angles.sort(function(l, r){return l.x - r.x})
 
-                    var path = []
+                    let path = []
                     path.length = angles.length + 2 //< For 2 boundary segments.
 
-                    for (var i = 0; i < angles.length; )
+                    for (let i = 0; i < angles.length; )
                     {
-                        var x = angles[i].x / 360.0 * shape.width
+                        const x = angles[i].x / 360.0 * shape.width
 
-                        var y = 1.0 + ((angles[i].y + 90.0) / 180.0
+                        const y = 1.0 + ((angles[i].y + 90.0) / 180.0
                             * (shape.height - 2.0))
 
                         path[++i] = Qt.point(x, y)
@@ -137,10 +137,10 @@ Item
 
         function toCarthesian(angles)
         {
-            var theta = MathUtils.toRadians(angles.x)
-            var phi = MathUtils.toRadians(angles.y)
+            const theta = MathUtils.toRadians(angles.x)
+            const phi = MathUtils.toRadians(angles.y)
 
-            var cosPhi = Math.cos(phi)
+            const cosPhi = Math.cos(phi)
 
             return Qt.vector3d(
                 cosPhi * Math.sin(theta),

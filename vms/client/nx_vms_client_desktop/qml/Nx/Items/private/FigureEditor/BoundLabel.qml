@@ -92,7 +92,7 @@ UnrotatedArea
 
             if (d.enoughWidth)
             {
-                var preferredX = control.width - textItem.width
+                const preferredX = control.width - textItem.width
                 if (d.enoughBottomOffset)
                     return Qt.point(preferredX, control.height + d.offset)
 
@@ -103,7 +103,7 @@ UnrotatedArea
                     return Qt.point(preferredX, -d.minVerticalOffset)
             }
 
-            var preferredY = control.height - textItem.height
+            const preferredY = control.height - textItem.height
             return d.enoughRightOffset
                 ? Qt.point(control.width + d.offset, preferredY)
                 : Qt.point(-d.minHorizontalOffset, preferredY)

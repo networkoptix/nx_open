@@ -23,10 +23,10 @@ DragInstrument
         const dx = target.x
         const dy = target.y
 
-        var points = pointMakerInstrument.getPoints()
-        for (var i = 0; i < pointMakerInstrument.count; ++i)
+        let points = pointMakerInstrument.getPoints()
+        for (let i = 0; i < pointMakerInstrument.count; ++i)
         {
-            var p = points[i]
+            let p = points[i]
             p.x += dx
             p.y += dy
             points[i] = p

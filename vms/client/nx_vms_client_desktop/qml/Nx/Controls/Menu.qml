@@ -27,9 +27,9 @@ Menu
 
     readonly property real implicitItemsWidth:
     {
-        var result = 0
+        let result = 0
 
-        for (var i = 0; i < count; ++i)
+        for (let i = 0; i < count; ++i)
             result = Math.max(result, itemAt(i).implicitWidth)
 
         return result

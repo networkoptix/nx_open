@@ -34,9 +34,9 @@ Item
         if (!Array.isArray(filledCheckItems))
             return childrenItem.layoutItems
 
-        var result = []
+        let result = []
 
-        for (var i = 0; i < childrenItem.layoutItems.length; ++i)
+        for (let i = 0; i < childrenItem.layoutItems.length; ++i)
         {
             const item = childrenItem.layoutItems[i]
             if (item.hasOwnProperty("name") && filledCheckItems.indexOf(item.name) >= 0)
@@ -56,7 +56,7 @@ Item
             return
         }
 
-        for (var i = 0; i < itemsToCheck.length; ++i)
+        for (let i = 0; i < itemsToCheck.length; ++i)
         {
             if (Utils.isItemFilled(itemsToCheck[i]))
             {

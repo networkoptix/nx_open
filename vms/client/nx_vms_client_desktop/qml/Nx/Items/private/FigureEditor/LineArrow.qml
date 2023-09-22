@@ -30,7 +30,7 @@ Item
 
         onPaint:
         {
-            var ctx = getContext("2d")
+            let ctx = getContext("2d")
             ctx.reset()
             ctx.fillStyle = arrow.checked ? arrow.color : arrow.defaultColor
             ctx.strokeStyle = arrow.outlineColor

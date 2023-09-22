@@ -93,8 +93,8 @@ Instrument
         if (caller)
             position = caller.mapToItem(item, position.x, position.y)
 
-        var rotation = normalizedAngle(_startRotation + calculateAngle(position) - _startAngle)
-        var roundedRotation = Math.round(rotation / roundingAngle) * roundingAngle
+        let rotation = normalizedAngle(_startRotation + calculateAngle(position) - _startAngle)
+        const roundedRotation = Math.round(rotation / roundingAngle) * roundingAngle
         if (Math.abs(rotation - roundedRotation) < roundingThresholdAngle)
             rotation = roundedRotation
 
@@ -106,7 +106,7 @@ Instrument
         if (!target)
             return
 
-        var angle = -Math.atan2(position.x - item.width / 2, position.y - item.height / 2)
+        const angle = -Math.atan2(position.x - item.width / 2, position.y - item.height / 2)
         return MathUtils.toDegrees(angle)
     }
 

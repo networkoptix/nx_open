@@ -39,8 +39,8 @@ Item
 
     function itemToMotionRect(itemRect)
     {
-        var p1 = itemToMotionPoint(itemRect.left, itemRect.top)
-        var p2 = itemToMotionPoint(itemRect.right, itemRect.bottom)
+        const p1 = itemToMotionPoint(itemRect.left, itemRect.top)
+        const p2 = itemToMotionPoint(itemRect.right, itemRect.bottom)
         return Qt.rect(p1.x, p1.y, p2.x - p1.x + 1, p2.y - p1.y + 1)
     }
 
@@ -57,10 +57,10 @@ Item
 
     readonly property rect correctedSelectionRect:
     {
-        var x = MathUtils.bound(0, selectionRect.left, width);
-        var y = MathUtils.bound(0, selectionRect.top, height);
-        var w = MathUtils.bound(x, selectionRect.right, width) - x
-        var h = MathUtils.bound(y, selectionRect.bottom, height) - y
+        const x = MathUtils.bound(0, selectionRect.left, width);
+        const y = MathUtils.bound(0, selectionRect.top, height);
+        const w = MathUtils.bound(x, selectionRect.right, width) - x
+        const h = MathUtils.bound(y, selectionRect.bottom, height) - y
 
         return (w === 0 || h === 0) ? outOfRegionRect : Qt.rect(x, y, w, h)
     }

@@ -102,7 +102,7 @@ Instrument
         function processMove(event)
         {
             event.accepted = true
-            var hoveredIndex = -1
+            let hoveredIndex = -1
             if (count > 0)
             {
                 setPoint(count - 1,
@@ -204,9 +204,9 @@ Instrument
 
     function getPoints()
     {
-        var result = []
+        let result = []
 
-        for (var i = 0; i < pointsModel.count; ++i)
+        for (let i = 0; i < pointsModel.count; ++i)
             result.push(getPoint(i))
 
         return result
@@ -232,12 +232,12 @@ Instrument
         if (pointsModel.count !== points.length)
         {
             pointsModel.clear()
-            for (var i = 0; i < points.length; ++i)
+            for (let i = 0; i < points.length; ++i)
                 pointsModel.append(pointsModel.makePoint(points[i]))
         }
         else
         {
-            for (i = 0; i < points.length; ++i)
+            for (let i = 0; i < points.length; ++i)
                 setPoint(i, points[i])
         }
     }
@@ -289,21 +289,21 @@ Instrument
         if (pointsModel.count !== points.length)
         {
             pointsModel.clear()
-            for (var i = 0; i < points.length; ++i)
+            for (let i = 0; i < points.length; ++i)
                 pointsModel.append(points[i])
         }
         else
         {
-            for (i = 0; i < points.length; ++i)
+            for (let i = 0; i < points.length; ++i)
                 setRelativePoint(i, points[i])
         }
     }
 
     function getRelativePoints()
     {
-        var result = []
+        let result = []
 
-        for (var i = 0; i < pointsModel.count; ++i)
+        for (let i = 0; i < pointsModel.count; ++i)
         {
             const p = pointsModel.get(i)
             result.push(Qt.point(p.x, p.y))

@@ -97,8 +97,8 @@ Item
 
                 function updateCurrentValue()
                 {
-                    var requiredValue = (settings.cameraProjection
-                        === Dewarping.CameraProjection.equirectangular360)
+                    const requiredValue =
+                        settings.cameraProjection === Dewarping.CameraProjection.equirectangular360
                             ? DewarpingSettings.Sphere
                             : DewarpingSettings.Fisheye
 

@@ -73,7 +73,7 @@ Rectangle
             if (cameraDisplay.forcedAspectRatio > 0)
                 return cameraDisplay.forcedAspectRatio
 
-            var aspectRatio = mediaResourceHelper ? mediaResourceHelper.customAspectRatio : 0.0
+            let aspectRatio = mediaResourceHelper ? mediaResourceHelper.customAspectRatio : 0.0
             if (aspectRatio === 0.0)
             {
                 if (mediaPlayer && mediaPlayer.loaded)
@@ -84,7 +84,7 @@ Rectangle
                     aspectRatio = sourceSize.width / sourceSize.height
             }
 
-            var layoutSize = mediaResourceHelper ? mediaResourceHelper.layoutSize : Qt.size(1, 1)
+            const layoutSize = mediaResourceHelper ? mediaResourceHelper.layoutSize : Qt.size(1, 1)
             aspectRatio *= layoutSize.width / layoutSize.height
 
             return aspectRatio

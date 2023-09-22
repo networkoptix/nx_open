@@ -79,7 +79,7 @@ Item
         property: "scale"
         value:
         {
-            var result = 1.0
+            let result = 1.0
             if (contentItem.implicitWidth > 0 && adjuster.maximumWidth > 0)
                 result = Math.min(result, adjuster.maximumWidth / contentItem.implicitWidth)
 

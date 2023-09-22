@@ -126,7 +126,7 @@ LabeledItem
     function openEditDialog()
     {
         dialogLoader.active = true
-        var dialog = dialogLoader.item
+        let dialog = dialogLoader.item
         dialog.title = figureNameEdit.text || qsTr("Figure")
         dialog.deserializeFigure(figure)
         dialog.show()
@@ -140,7 +140,7 @@ LabeledItem
     function getValue()
     {
         // Clone the figure object and fill the rest of fields.
-        var obj = {
+        const obj = {
             "figure": figure ? JSON.parse(JSON.stringify(figure)) : null,
             "label": figureNameEdit.text,
             "showOnCamera": showOnCameraCheckBox.checked

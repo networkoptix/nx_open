@@ -70,7 +70,7 @@ CameraDisplay
                     if (!cameraMotionHelper)
                         return
 
-                    var point = mapFromItem(selectionMouseArea, x, y)
+                    const point = mapFromItem(selectionMouseArea, x, y)
                     if (Geometry.contains(Qt.rect(0, 0, width, height), point))
                     {
                         cameraMotionHelper.fillRegion(motionRegionsOverlay.channelIndex,

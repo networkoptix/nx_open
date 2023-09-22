@@ -15,7 +15,7 @@ VideoPositioner
     videoRotation: resourceHelper ? resourceHelper.customRotation : 0
     customAspectRatio:
     {
-        var aspectRatio = resourceHelper ? resourceHelper.customAspectRatio : 0.0
+        let aspectRatio = resourceHelper ? resourceHelper.customAspectRatio : 0.0
         if (aspectRatio === 0.0)
         {
             if (mediaPlayer && mediaPlayer.loaded)
@@ -26,7 +26,7 @@ VideoPositioner
                 aspectRatio = sourceSize.width / sourceSize.height
         }
 
-        var layoutSize = resourceHelper ? resourceHelper.layoutSize : Qt.size(1, 1)
+        const layoutSize = resourceHelper ? resourceHelper.layoutSize : Qt.size(1, 1)
         aspectRatio *= layoutSize.width / layoutSize.height
 
         return aspectRatio

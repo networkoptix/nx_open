@@ -17,7 +17,7 @@ ScrollBar
 
     function scrollBy(delta)
     {
-        var wasActive = active
+        const wasActive = active
         active = true
         position = MathUtils.bound(0.0, position + delta, 1.0 - size)
         active = wasActive

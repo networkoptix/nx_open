@@ -213,7 +213,7 @@ Item
 
     function setEngineEnabled(engineId, enabled)
     {
-        var engines = viewModel.enabledEngines.slice(0)
+        let engines = viewModel.enabledEngines.slice(0)
         if (enabled)
         {
             engines.push(engineId)

@@ -33,7 +33,7 @@ Control
                 if (control.store.resourceId().isNull())
                     return
 
-                var params = control.store.dewarpingParams()
+                const params = control.store.dewarpingParams()
                 settings.dewarpingEnabled = params.enabled
                 settings.enabled = !store.isReadOnly()
                 settings.centerX = params.xCenter

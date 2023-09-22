@@ -27,7 +27,7 @@ Item
 
         onPaint:
         {
-            var ctx = getContext("2d")
+            let ctx = getContext("2d")
             ctx.reset()
 
             if (points.length < 3)
@@ -42,7 +42,7 @@ Item
             const startY = F.absY(points[0][1], canvas)
 
             ctx.moveTo(startX, startY)
-            for (var i = 0; i < points.length; ++i)
+            for (let i = 0; i < points.length; ++i)
                 ctx.lineTo(F.absX(points[i][0], canvas), F.absY(points[i][1], canvas))
             ctx.lineTo(startX, startY)
 

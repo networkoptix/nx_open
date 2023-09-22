@@ -92,7 +92,7 @@ Button
             {
                 case SelectableTextButton.State.Unselected:
                 {
-                    var shift = (button.hovered && !button.down) ? 1 : 0
+                    const shift = (button.hovered && !button.down) ? 1 : 0
                     if (accented)
                     {
                         return ColorTheme.transparent(

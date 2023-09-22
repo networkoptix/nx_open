@@ -35,7 +35,7 @@ Instrument
         if (!target)
             return
 
-        var point = target.mapFromItem(item, mouse.position.x, mouse.position.y)
+        const point = target.mapFromItem(item, mouse.position.x, mouse.position.y)
         _frameSection = FrameSection.frameSection(
             point, Qt.rect(0, 0, target.width, target.height), frameWidth)
 
@@ -71,13 +71,13 @@ Instrument
         if (!_started || !target)
             return
 
-        var delta = Geometry.cwiseSub(mouse.globalPosition, _pressPosition)
+        let delta = Geometry.cwiseSub(mouse.globalPosition, _pressPosition)
         delta = Geometry.rotated(delta, Qt.point(0, 0), -target.rotation)
         delta = FrameSection.sizeDelta(delta, _frameSection)
 
-        var aspectRatio = Geometry.aspectRatio(_startSize)
+        const aspectRatio = Geometry.aspectRatio(_startSize)
 
-        var newSize = Geometry.cwiseAdd(_startSize, delta)
+        let newSize = Geometry.cwiseAdd(_startSize, delta)
         newSize.width = MathUtils.bound(minWidth, newSize.width, maxWidth)
         newSize.height = MathUtils.bound(minHeight, newSize.height, maxHeight)
 
@@ -88,7 +88,7 @@ Instrument
         else
             newSize = Geometry.expanded(aspectRatio, newSize, Qt.KeepAspectRatioByExpanding)
 
-        var origin = FrameSection.sectionCenterPoint(
+        let origin = FrameSection.sectionCenterPoint(
             Qt.rect(0, 0, newSize.width, newSize.height),
             FrameSection.oppositeSection(_frameSection))
         origin = Geometry.rotated(
@@ -115,8 +115,8 @@ Instrument
         if (!target || !cursorManager)
             return
 
-        var point = target.mapFromItem(item, hover.position.x, hover.position.y)
-        var frameSection = FrameSection.frameSection(
+        const point = target.mapFromItem(item, hover.position.x, hover.position.y)
+        const frameSection = FrameSection.frameSection(
             point, Qt.rect(0, 0, target.width, target.height), frameWidth)
         cursorManager.setCursorForFrameSection(this, frameSection, target.rotation)
     }

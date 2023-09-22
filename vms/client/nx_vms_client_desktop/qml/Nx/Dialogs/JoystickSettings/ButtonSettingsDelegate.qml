@@ -42,7 +42,7 @@ Item
 
     function setActionIndex(actionIndex)
     {
-        var newActionId = buttonActionChoiceModel.data(
+        const newActionId = buttonActionChoiceModel.data(
             buttonActionChoiceModel.index(actionIndex, 0),
             JoystickButtonActionChoiceModel.ActionIdRole)
         model.actionId = newActionId
@@ -295,7 +295,7 @@ Item
 
                             onAccepted:
                             {
-                                var layoutLogicalId = layoutInfo.
+                                const layoutLogicalId = layoutInfo.
                                     getLayoutLogicalId(selectedLayoutIndex)
 
                                 if (layoutLogicalId !== 0)

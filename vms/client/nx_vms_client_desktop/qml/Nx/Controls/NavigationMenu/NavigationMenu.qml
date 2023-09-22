@@ -38,9 +38,9 @@ Scrollable
 
         onChildrenChanged:
         {
-            for (var i = 0; i < children.length; ++i)
+            for (let i = 0; i < children.length; ++i)
             {
-                var item = children[i]
+                let item = children[i]
                 if (item.hasOwnProperty("navigationMenu"))
                     item.navigationMenu = control
             }

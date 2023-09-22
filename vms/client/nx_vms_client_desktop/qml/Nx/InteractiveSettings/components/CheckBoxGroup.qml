@@ -46,10 +46,10 @@ LabeledItem
 
         function updateValue()
         {
-            var newValue = []
-            for (var i = 0; i !== count; ++i)
+            let newValue = []
+            for (let i = 0; i !== count; ++i)
             {
-                var item = itemAt(i)
+                const item = itemAt(i)
                 if (item.checked)
                     newValue.push(item.identifier)
             }
