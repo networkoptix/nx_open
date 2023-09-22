@@ -470,7 +470,7 @@ void UserListWidget::Private::setupUi()
     connect(header, &CheckableHeaderView::checkStateChanged,
         this, &Private::handleHeaderCheckStateChanged);
 
-    ui->usersTable->sortByColumn(UserListModel::LoginColumn, Qt::AscendingOrder);
+    ui->usersTable->sortByColumn(UserListModel::UserTypeColumn, Qt::AscendingOrder);
     const auto scrollBar = new SnappedScrollBar(q->window());
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
     connect(ui->usersTable, &QAbstractItemView::clicked, this, &Private::handleUsersTableClicked);
