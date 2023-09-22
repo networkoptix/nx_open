@@ -20,6 +20,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -232,6 +233,7 @@ public:
     void setupUi();
     void filterDigestUsers() { ui->filterButton->setCurrentAction(filterDigestAction); }
     void updateBanners();
+    void setMassEditInProgress(bool inProgress);
 
 private:
     void createUser();
@@ -283,53 +285,6 @@ void UserListWidget::loadDataToUi()
 
 void UserListWidget::applyChanges()
 {
-    d->requestChain.reset(new UserGroupRequestChain(systemContext()));
-    for (auto user: resourcePool()->getResources<QnUserResource>())
-    {
-        UserGroupRequest::UpdateUser updateUser;
-
-        const bool enabled = d->usersModel->isUserEnabled(user);
-        if (user->isEnabled() != enabled)
-        {
-            updateUser.id = user->getId();
-            updateUser.enabled = enabled;
-        }
-        else
-        {
-            updateUser.enabled = user->isEnabled();
-        }
-
-        if (!d->usersModel->isDigestEnabled(user) && user->shouldDigestAuthBeUsed())
-        {
-            updateUser.id = user->getId();
-            updateUser.enableDigest = false;
-        }
-
-        if (!updateUser.id.isNull())
-            d->requestChain->append(updateUser);
-    }
-
-    setEnabled(false);
-
-    d->requestChain->start(
-        [this](bool success, const QString& errorString)
-        {
-            setEnabled(true);
-            d->hasChanges = false;
-            emit hasChangesChanged();
-
-            if (success)
-                return;
-
-            QnMessageBox messageBox(
-                QnMessageBoxIcon::Critical,
-                errorString,
-                {},
-                QDialogButtonBox::Ok,
-                QDialogButtonBox::Ok,
-                this);
-            messageBox.exec();
-        });
 }
 
 void UserListWidget::discardChanges()
@@ -512,6 +467,12 @@ void UserListWidget::Private::setupUi()
     setPaletteColor(selectionControls, QPalette::Window, core::colorTheme()->color("dark11"));
     setPaletteColor(selectionControls, QPalette::WindowText, core::colorTheme()->color("light4"));
     setPaletteColor(selectionControls, QPalette::Dark, core::colorTheme()->color("dark15"));
+    QColor disabledTextColor = core::colorTheme()->color("light4");
+    disabledTextColor.setAlphaF(0.3);
+    setPaletteColor(selectionControls, QPalette::Disabled, QPalette::WindowText,
+        disabledTextColor);
+    setPaletteColor(deleteNotFoundUsersButton, QPalette::Disabled, QPalette::WindowText,
+        disabledTextColor);
 
     const auto buttonsLayout = selectionControls->horizontalLayout();
     buttonsLayout->setSpacing(16);
@@ -703,6 +664,16 @@ void UserListWidget::Private::updateBanners()
         && !usersModel->nonUniqueUsers().isEmpty());
 }
 
+void UserListWidget::Private::setMassEditInProgress(bool inProgress)
+{
+    ui->usersTable->setDisabled(inProgress);
+    ui->deleteUserAction->setDisabled(inProgress);
+
+    deleteNotFoundUsersButton->setDisabled(inProgress);
+    editButton->setDisabled(inProgress);
+    deleteButton->setDisabled(inProgress);
+}
+
 void UserListWidget::Private::modelUpdated()
 {
     const bool isEmptyModel = !sortModel->rowCount();
@@ -754,13 +725,13 @@ void UserListWidget::Private::deleteUsers(const QnUserResourceList& usersToDelet
     for (const auto& user: usersToDelete)
         chain->append(UserGroupRequest::RemoveUser{.id = user->getId()});
 
-    q->setEnabled(false);
+    setMassEditInProgress(true);
+    auto rollback = nx::utils::makeScopeGuard([this]{ setMassEditInProgress(false); });
 
     chain->start(nx::utils::guarded(this,
-        [this, chain, usersToDelete](bool success, const QString& errorString)
+        [this, chain, usersToDelete, rollback = std::move(rollback)](
+            bool success, const QString& errorString)
         {
-            q->setEnabled(true);
-
             if (!success)
             {
                 QnResourceList nonDeletedUsers;
@@ -891,12 +862,12 @@ void UserListWidget::Private::editSelected()
         requestChain->append(updateUser);
     }
 
-    q->setEnabled(false);
+    setMassEditInProgress(true);
+    auto rollback = nx::utils::makeScopeGuard([this]{ setMassEditInProgress(false); });
 
     requestChain->start(
-        [this](bool success, const QString& errorString)
+        [this, rollback = std::move(rollback)](bool success, const QString& errorString)
         {
-            q->setEnabled(true);
             if (success)
                 return;
 
