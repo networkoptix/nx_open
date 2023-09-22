@@ -29,9 +29,6 @@ static constexpr char kServerConnectionBasePath[] = "/relay/server/{serverId}/.*
 
 static constexpr char kServerClientSessionsPath[] = "/relay/server/{serverId}/client_sessions/";
 
-static constexpr char kClientSessionConnectionsPath[] =
-    "/relay/client_session/{sessionId}/connections/";
-
 static constexpr char kClientGetPostTunnelPath[] =
     "/relay/client_session/{sessionId}/tunnel/get_post/{sequence}";
 
