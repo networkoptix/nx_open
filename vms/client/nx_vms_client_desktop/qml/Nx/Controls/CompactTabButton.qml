@@ -113,7 +113,7 @@ TabButton
             if (!tabButton.focusFrameEnabled)
                 return
 
-            var ctx = getContext("2d")
+            let ctx = getContext("2d")
 
             if (!visible)
             {

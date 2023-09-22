@@ -24,7 +24,7 @@ PolyFigure
         {
             if (pointMakerInstrument.count > 0)
             {
-                var minPoints_ = Math.max(minPoints, geometricMinPoints)
+                const minPoints_ = Math.max(minPoints, geometricMinPoints)
                 if (pointMakerInstrument.count < minPoints_ + 1)
                     return qsTr("This polygon requires at least %n points.", "", minPoints_)
                 else if (pointMakerInstrument.count > minPoints)

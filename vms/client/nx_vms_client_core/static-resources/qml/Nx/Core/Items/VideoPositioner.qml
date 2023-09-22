@@ -32,12 +32,12 @@ Item
         if (sourceSize.width === 0.0 || sourceSize.height === 0.0)
             return Qt.size(0, 0)
 
-        var videoAr = (customAspectRatio == 0
+        const videoAr = (customAspectRatio == 0
             ? sourceSize.width / sourceSize.height
             : customAspectRatio)
 
-        var width = sourceSize.width
-        var height = width / videoAr
+        const width = sourceSize.width
+        const height = width / videoAr
 
         if (Geometry.isRotated90(videoRotation))
             return Qt.size(width, height)
@@ -56,7 +56,7 @@ Item
 
     function updateSize()
     {
-        var size = boundedSize(width, height)
+        const size = boundedSize(width, height)
         if (Geometry.isRotated90(videoRotation))
         {
             item.width = size.height
@@ -89,16 +89,16 @@ Item
         if (height === 0.0 || sourceSize.height === 0.0)
             return Qt.size(0, 0)
 
-        var rotated90 = Geometry.isRotated90(videoRotation)
-        var boundAr = width / height
-        var videoAr = (customAspectRatio == 0
+        const rotated90 = Geometry.isRotated90(videoRotation)
+        const boundAr = width / height
+        let videoAr = (customAspectRatio == 0
             ? sourceSize.width / sourceSize.height
             : customAspectRatio)
         if (rotated90)
             videoAr = 1 / videoAr
 
-        var w
-        var h
+        let w
+        let h
 
         if (boundAr > videoAr)
         {

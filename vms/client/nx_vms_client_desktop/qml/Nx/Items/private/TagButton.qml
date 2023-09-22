@@ -24,7 +24,7 @@ SelectableTextButton
         if (state != SelectableTextButton.State.Deactivated)
             return
 
-        var tag = text
+        const tag = text
         text = ""
         cleared(tag)
     }

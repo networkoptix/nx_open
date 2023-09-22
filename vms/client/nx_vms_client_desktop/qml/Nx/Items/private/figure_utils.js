@@ -37,9 +37,9 @@ function snapped(x, y, sx, sy, snapDistance)
 
 function serializePoints(points)
 {
-    var result = []
+    let result = []
 
-    for (var i = 0; i < points.length; ++i)
+    for (let i = 0; i < points.length; ++i)
     {
         const p = points[i]
         result.push([p.x, p.y])
@@ -50,9 +50,9 @@ function serializePoints(points)
 
 function deserializePoints(points)
 {
-    var result = []
+    let result = []
 
-    for (var i = 0; i < points.length; ++i)
+    for (let i = 0; i < points.length; ++i)
     {
         const p = points[i]
         result.push(Qt.point(p[0], p[1]))
@@ -63,10 +63,10 @@ function deserializePoints(points)
 
 function findSnapPoint(p, points, snapDistance)
 {
-    var minDistance = Infinity
-    var pointIndex = -1
+    let minDistance = Infinity
+    let pointIndex = -1
 
-    for (var i = 0; i < points.length; ++i)
+    for (let i = 0; i < points.length; ++i)
     {
         const dist = distance(p.x, p.y, points[i].x, points[i].y)
         if (dist <= snapDistance && dist < minDistance)

@@ -35,7 +35,7 @@ Item
 
         onPaint:
         {
-            var ctx = getContext("2d")
+            let ctx = getContext("2d")
             ctx.reset()
 
             const points = pathUtil.points
@@ -48,7 +48,7 @@ Item
             ctx.lineWidth = 2
 
             ctx.moveTo(points[0].x, points[0].y)
-            for (var i = 0; i < points.length; ++i)
+            for (let i = 0; i < points.length; ++i)
                 ctx.lineTo(points[i].x, points[i].y)
 
             ctx.stroke()
@@ -86,8 +86,8 @@ Item
             }
             else
             {
-                var absPoints = []
-                for (var i = 0; i < points.length; ++i)
+                let absPoints = []
+                for (let i = 0; i < points.length; ++i)
                 {
                     absPoints.push(
                         Qt.point(F.absX(points[i][0], figure), F.absY(points[i][1], figure)))
@@ -109,8 +109,8 @@ Item
 
     function updatePoints()
     {
-        var absPoints = []
-        for (var i = 0; i < points.length; ++i)
+        let absPoints = []
+        for (let i = 0; i < points.length; ++i)
         {
             absPoints.push(
                 Qt.point(F.absX(points[i][0], figure), F.absY(points[i][1], figure)))

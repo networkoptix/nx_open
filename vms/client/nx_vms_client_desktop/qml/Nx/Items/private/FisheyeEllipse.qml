@@ -168,7 +168,7 @@ Item
 
                 readonly property real latitudeRadiusFraction:
                 {
-                    var degreesFromPole = (index + 1) * fisheyeEllipse.latitudeStepDegrees
+                    const degreesFromPole = (index + 1) * fisheyeEllipse.latitudeStepDegrees
 
                     switch (fisheyeEllipse.lensProjection)
                     {

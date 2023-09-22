@@ -24,7 +24,7 @@ RadioButton
 
         source:
         {
-            var source = "qrc:///skin/theme/radiobutton"
+            let source = "qrc:///skin/theme/radiobutton"
             if (control.checked)
                 source += "_checked"
             if (control.hovered)

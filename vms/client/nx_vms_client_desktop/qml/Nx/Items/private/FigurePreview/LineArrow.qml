@@ -27,7 +27,7 @@ Item
 
         onPaint:
         {
-            var ctx = getContext("2d")
+            let ctx = getContext("2d")
             ctx.reset()
             ctx.fillStyle = arrow.color
             ctx.translate(arrow.padding, 0)

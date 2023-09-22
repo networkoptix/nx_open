@@ -230,7 +230,7 @@ TreeView
 
                     case ResourceTree.NodeType.layoutItem:
                     {
-                        var itemLayout = modelDataAccessor.getData(
+                        const itemLayout = modelDataAccessor.getData(
                             resourceTreeModel.parent(modelIndex), "resource")
 
                         if (!itemLayout || scene.currentLayout !== itemLayout)
@@ -246,7 +246,7 @@ TreeView
                     case ResourceTree.NodeType.edge:
                     case ResourceTree.NodeType.sharedResource:
                     {
-                        var resource = model.resource
+                        const resource = model.resource
                         if (!resource)
                             return ResourceTree.ItemState.normal
 
@@ -270,12 +270,12 @@ TreeView
 
                     case ResourceTree.NodeType.recorder:
                     {
-                        var childCount = resourceTreeModel.rowCount(modelIndex)
-                        var hasSelectedChildren = false
+                        const childCount = resourceTreeModel.rowCount(modelIndex)
+                        let hasSelectedChildren = false
 
-                        for (var i = 0; i < childCount; ++i)
+                        for (let i = 0; i < childCount; ++i)
                         {
-                            var childResource = modelDataAccessor.getData(
+                            const childResource = modelDataAccessor.getData(
                                 resourceTreeModel.index(i, 0, modelIndex), "resource")
 
                             if (!childResource)
@@ -401,8 +401,8 @@ TreeView
             enclosingRect = hoverData.item.mapFromItem(resourceTree,
                 resourceTree.toolTipEnclosingRect)
 
-            var text = modelDataAccessor.getHtmlEscapedData(hoverData.modelIndex, "display")
-            var extra = modelDataAccessor.getData(hoverData.modelIndex, "extraInfo")
+            let text = modelDataAccessor.getHtmlEscapedData(hoverData.modelIndex, "display")
+            const extra = modelDataAccessor.getData(hoverData.modelIndex, "extraInfo")
 
             if (text && extra)
                 text = `<b>${text}</b> ${extra}`

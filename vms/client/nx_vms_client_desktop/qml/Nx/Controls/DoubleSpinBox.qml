@@ -45,7 +45,7 @@ SpinBox
 
     valueFromText: (function(text, locale)
     {
-        var value = Number.fromLocaleString(locale, strippedText(text))
+        const value = Number.fromLocaleString(locale, strippedText(text))
         return Math.round(value ? value * multiplier : 0.0)
     })
 }

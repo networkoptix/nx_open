@@ -248,7 +248,7 @@ Item
             if (helper.status & ResourceStatusHelper.StatusFlag.oldFirmware)
                 return StatusOverlay.OldFirmwareOverlay
 
-            var playingLive = overlay.mediaPlayer && overlay.mediaPlayer.liveMode
+            const playingLive = overlay.mediaPlayer && overlay.mediaPlayer.liveMode
             if (playingLive)
             {
                 if (helper.status & ResourceStatusHelper.StatusFlag.noLiveStream)
@@ -414,7 +414,7 @@ Item
                     if (!(helper.status & ResourceStatusHelper.StatusFlag.canChangePasswords))
                         return []
 
-                    var actions = [ResourceStatusHelper.ActionType.setPassword]
+                    let actions = [ResourceStatusHelper.ActionType.setPassword]
                     if (helper.camerasWithDefaultPassword > 1)
                         actions.push(ResourceStatusHelper.ActionType.setPasswords)
 

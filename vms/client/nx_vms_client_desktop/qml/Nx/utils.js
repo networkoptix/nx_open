@@ -28,11 +28,11 @@ function toArray(list)
     if (Array.isArray(list))
         return list
 
-    var result = []
+    let result = []
     if (!list)
         return result
 
-    for (var i = 0; i < list.length; ++i)
+    for (let i = 0; i < list.length; ++i)
         result.push(list[i])
 
     return result

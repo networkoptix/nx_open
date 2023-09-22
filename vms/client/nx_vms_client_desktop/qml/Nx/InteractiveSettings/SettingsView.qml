@@ -145,7 +145,7 @@ Item
 
         for (let i = 0; i < sectionPath.length; ++i)
         {
-            var sectionIndex = sectionPath[i] + 1
+            const sectionIndex = sectionPath[i] + 1
             if (sectionIndex < stack.count)
             {
                 stack.currentIndex = sectionIndex

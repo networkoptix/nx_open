@@ -34,7 +34,7 @@ ModalDialog
 
     function createListTypeModel()
     {
-        var result = [{ value: null, text: qsTr("Generic") }]
+        let result = [{ value: null, text: qsTr("Generic") }]
         return taxonomy.objectTypes.reduce(
             (list, objectType) =>
             {
@@ -55,10 +55,10 @@ ModalDialog
             return;
         }
 
-        for (var i = 0; i < objectType.attributes.length; ++i)
+        for (let i = 0; i < objectType.attributes.length; ++i)
         {
-            var attribute = objectType.attributes[i]
-            var attributeName = prefix ? prefix + "." + attribute.name : attribute.name
+            const attribute = objectType.attributes[i]
+            const attributeName = prefix ? prefix + "." + attribute.name : attribute.name
             if (attribute.type === Analytics.Attribute.Type.attributeSet)
             {
                 addAttributesRecursive(attribute.attributeSet, attributeName)

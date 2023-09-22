@@ -69,7 +69,7 @@ LabeledItem
     function openEditDialog()
     {
         dialogLoader.active = true
-        var dialog = dialogLoader.item
+        let dialog = dialogLoader.item
         dialog.title = control.caption || qsTr("Size Constraints")
         dialog.showClearButton = false
         dialog.showPalette = false
@@ -119,7 +119,7 @@ LabeledItem
 
     function deserializeSize(sizeJson, defaultSize, minimumSize)
     {
-        var size = Array.isArray(sizeJson)
+        let size = Array.isArray(sizeJson)
             ? Qt.size(sizeJson[0] || defaultSize, sizeJson[1] || defaultSize)
             : Qt.size(defaultSize, defaultSize)
 
@@ -131,11 +131,11 @@ LabeledItem
 
     function deserializePosition(positionJson, size)
     {
-        var defaultPos = Qt.point((1 - size.width) / 2, (1 - size.height) / 2)
+        const defaultPos = Qt.point((1 - size.width) / 2, (1 - size.height) / 2)
         if (!Array.isArray(positionJson))
             return defaultPos
 
-        var pos = Qt.point(
+        const pos = Qt.point(
             Utils.getValue(positionJson[0], defaultPos.x),
             Utils.getValue(positionJson[1], defaultPos.y))
 

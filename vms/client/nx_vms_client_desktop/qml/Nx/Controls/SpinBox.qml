@@ -110,7 +110,7 @@ SpinBox
 
         onTextEdited:
         {
-            var newValue = text ? control.valueFromText(text, control.locale) : 0
+            const newValue = text ? control.valueFromText(text, control.locale) : 0
             if (newValue === control.value)
                 return
 

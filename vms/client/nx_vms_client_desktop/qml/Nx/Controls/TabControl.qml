@@ -19,10 +19,10 @@ Control
 
     readonly property var visibleTabs:
     {
-        var result = []
-        for (var i = 0; i < tabs.length; ++i)
+        let result = []
+        for (let i = 0; i < tabs.length; ++i)
         {
-            var tab = tabs[i]
+            const tab = tabs[i]
             if (tab.visible && tab.button)
                 result.push(tab)
         }
@@ -43,14 +43,14 @@ Control
 
     function selectTab(tab)
     {
-        var index = visibleTabs.indexOf(tab)
+        const index = visibleTabs.indexOf(tab)
         if (index !== -1)
             tabBar.currentIndex = index
     }
 
     function selectPage(page)
     {
-        var index = visibleTabs.findIndex(function(tab) { return tab.page === page })
+        const index = visibleTabs.findIndex(function(tab) { return tab.page === page })
         if (index !== -1)
             tabBar.currentIndex = index
     }
@@ -76,9 +76,9 @@ Control
 
                 onButtonsChanged:
                 {
-                    var previousTab = currentItem
+                    const previousTab = currentItem
 
-                    var itemsCount = count
+                    const itemsCount = count
                     for (let i = 0; i < itemsCount; ++i)
                         takeItem(0)
 
@@ -112,7 +112,7 @@ Control
             {
                 if (tabControl.sizePolicy === TabControl.SizeToAllTabs)
                 {
-                    var reducer =
+                    const reducer =
                         function(size, page)
                         {
                             if (!page)
@@ -127,7 +127,7 @@ Control
                 }
                 else
                 {
-                    var page = pages[tabBar.currentIndex]
+                    const page = pages[tabBar.currentIndex]
                     return page ? Qt.size(page.implicitWidth, page.implicitHeight) : Qt.size(0, 0)
                 }
             }

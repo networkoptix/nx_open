@@ -42,7 +42,7 @@ Control
             GlobalToolTip.delay: 0
             GlobalToolTip.text:
             {
-                var text = "<p>" + toolTipText + "</p>"
+                let text = "<p>" + toolTipText + "</p>"
                 if (hasHelpTopic)
                 {
                     text += "<i style='color: " + ColorTheme.colors.light16 + "'>"

@@ -258,7 +258,7 @@ Column
                 : text
         }
 
-        var result = []
+        let result = []
         for (let name in values)
         {
             const value = values[name]

@@ -119,7 +119,7 @@ Figure
         {
             const points = pointMakerInstrument.getPoints()
 
-            var ctx = getContext("2d")
+            let ctx = getContext("2d")
             ctx.reset()
 
             if (points.length < 2)
@@ -132,7 +132,7 @@ Figure
             ctx.lineJoin = "bevel"
 
             ctx.moveTo(points[0].x, points[0].y)
-            for (var i = 0; i < points.length; ++i)
+            for (let i = 0; i < points.length; ++i)
                 ctx.lineTo(points[i].x, points[i].y)
 
             if (polygon && points.length > 2 && !pointMakerInstrument.enabled)
@@ -174,7 +174,7 @@ Figure
                 {
                     const points = snapPoints()
 
-                    var snapPointIndex = F.findSnapPoint(Qt.point(x, y), points, snapDistance)
+                    const snapPointIndex = F.findSnapPoint(Qt.point(x, y), points, snapDistance)
                     if (snapPointIndex !== -1)
                     {
                         const snapPoint = points[snapPointIndex]
@@ -197,7 +197,7 @@ Figure
                 {
                     const points = snapPoints()
 
-                    var snapPointIndex = F.findSnapPoint(Qt.point(x, y), points, snapDistance)
+                    const snapPointIndex = F.findSnapPoint(Qt.point(x, y), points, snapDistance)
                     if (snapPointIndex !== -1)
                     {
                         if (pointsCount > 3)

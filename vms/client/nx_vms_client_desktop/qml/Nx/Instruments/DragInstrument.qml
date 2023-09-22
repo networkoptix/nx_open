@@ -74,9 +74,9 @@ Instrument
         const pressLocalPos = target.mapFromGlobal(_pressPosition.x, _pressPosition.y)
         const localPos = target.mapFromGlobal(x, y)
 
-        var newX = MathUtils.bound(
+        const newX = MathUtils.bound(
             minX, _pressItemPosition.x + localPos.x - pressLocalPos.x, maxX)
-        var newY = MathUtils.bound(
+        const newY = MathUtils.bound(
             minY, _pressItemPosition.y + localPos.y - pressLocalPos.y, maxY)
 
         target.x = newX

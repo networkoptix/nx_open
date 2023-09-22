@@ -59,19 +59,19 @@ Figure
             }
             else
             {
-                var offset = Qt.point(F.relX(drag.target.x, figure), F.relY(drag.target.y, figure))
+                const offset = Qt.point(F.relX(drag.target.x, figure), F.relY(drag.target.y, figure))
                 drag.target.x = 0
                 drag.target.y = 0
 
                 if (dragBox === minBox)
                 {
-                    var size = Qt.size(minRect.width, minRect.height)
+                    const size = Qt.size(minRect.width, minRect.height)
                     d.minP1 = Qt.point(minRect.x + offset.x, minRect.y + offset.y)
                     d.minP2 = Qt.point(d.minP1.x + size.width, d.minP1.y + size.height)
                 }
                 else if (dragBox === maxBox)
                 {
-                    var size = Qt.size(maxRect.width, maxRect.height)
+                    const size = Qt.size(maxRect.width, maxRect.height)
                     d.maxP1 = Qt.point(maxRect.x + offset.x, maxRect.y + offset.y)
                     d.maxP2 = Qt.point(d.maxP1.x + size.width, d.maxP1.y + size.height)
                 }
@@ -622,13 +622,13 @@ Figure
         const kDefaultMinSize = 0
         const kDefaultMaxSize = 1
 
-        var minimum = deserializeSize(value && value.minimum, kDefaultMinSize, Qt.size(0, 0))
-        var maximum = deserializeSize(value && value.maximum, kDefaultMaxSize, minimum)
+        const minimum = deserializeSize(value && value.minimum, kDefaultMinSize, Qt.size(0, 0))
+        const maximum = deserializeSize(value && value.maximum, kDefaultMaxSize, minimum)
 
-        var minBoxPosition = deserializePosition(
+        const minBoxPosition = deserializePosition(
             value && Array.isArray(value.positions) && value.positions[0], minimum)
 
-        var maxBoxPosition = deserializePosition(
+        const maxBoxPosition = deserializePosition(
             value && Array.isArray(value.positions) && value.positions[1], maximum)
 
         d.minP1 = minBoxPosition
@@ -651,7 +651,7 @@ Figure
 
     function deserializeSize(sizeJson, defaultSize, minimumSize)
     {
-        var size = Array.isArray(sizeJson)
+        let size = Array.isArray(sizeJson)
             ? Qt.size(sizeJson[0] || defaultSize, sizeJson[1] || defaultSize)
             : Qt.size(defaultSize, defaultSize)
 
@@ -663,11 +663,11 @@ Figure
 
     function deserializePosition(positionJson, size)
     {
-        var defaultPos = Qt.point((1 - size.width) / 2, (1 - size.height) / 2)
+        const defaultPos = Qt.point((1 - size.width) / 2, (1 - size.height) / 2)
         if (!Array.isArray(positionJson))
             return defaultPos
 
-        var pos = Qt.point(
+        const pos = Qt.point(
             Utils.getValue(positionJson[0], defaultPos.x),
             Utils.getValue(positionJson[1], defaultPos.y))
 

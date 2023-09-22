@@ -68,8 +68,8 @@ Item
                 if (!pixelDelta)
                     return
 
-                var minY = flickable.originY - flickable.topMargin
-                var maxY = (flickable.originY + flickable.bottomMargin
+                const minY = flickable.originY - flickable.topMargin
+                const maxY = (flickable.originY + flickable.bottomMargin
                     + flickable.contentHeight) - flickable.height
 
 
@@ -99,10 +99,10 @@ Item
         function getPixelDelta(wheel)
         {
             // Standard mouse values.
-            var kUnitsPerDegree = 8
-            var kDegreesPerStep = 15.0
+            const kUnitsPerDegree = 8
+            const kDegreesPerStep = 15.0
 
-            var degrees = wheel.angleDelta.y / kUnitsPerDegree
+            const degrees = wheel.angleDelta.y / kUnitsPerDegree
 
             if (degrees)
                 return Qt.styleHints.wheelScrollLines * pixelsPerLine * (degrees / kDegreesPerStep)

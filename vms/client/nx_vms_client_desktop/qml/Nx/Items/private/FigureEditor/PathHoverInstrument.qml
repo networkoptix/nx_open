@@ -32,10 +32,10 @@ Instrument
 
         function normalizedRect(p1, p2)
         {
-            var x1
-            var y1
-            var x2
-            var y2
+            let x1
+            let y1
+            let x2
+            let y2
 
             if (p1.x < p2.x)
             {
@@ -98,13 +98,13 @@ Instrument
             return
         }
 
-        var minDistance = Infinity
-        var closestEdgeIndex
-        var closestEdgeP1
-        var closestEdgeP2
+        let minDistance = Infinity
+        let closestEdgeIndex
+        let closestEdgeP1
+        let closestEdgeP2
 
-        var prev = closed ? d.getPoint(model.count - 1) : d.getPoint(0)
-        for (var i = closed ? 0 : 1; i < model.count; ++i)
+        let prev = closed ? d.getPoint(model.count - 1) : d.getPoint(0)
+        for (let i = closed ? 0 : 1; i < model.count; ++i)
         {
             const current = d.getPoint(i)
             if (d.closeToPoint(hover.position, current))

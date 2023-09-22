@@ -30,9 +30,9 @@ ScrollView
 
     function hideExtraScrollbars()
     {
-        for (var i = 0; i < children.length; ++i)
+        for (let i = 0; i < children.length; ++i)
         {
-            var child = control.children[i]
+            let child = control.children[i]
             if ((child instanceof T.ScrollBar)
                 && child !== control.ScrollBar.vertical
                 && child !== control.ScrollBar.horizontal)

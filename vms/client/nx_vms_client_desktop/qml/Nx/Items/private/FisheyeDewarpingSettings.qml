@@ -84,7 +84,7 @@ Item
 
                 rollCorrectionDegrees:
                 {
-                    var angle = fisheyeSettings.rollCorrectionDegrees
+                    let angle = fisheyeSettings.rollCorrectionDegrees
                     if (fisheyeSettings.previewSource)
                         angle -= fisheyeSettings.previewSource.rotationQuadrants * 90
 

@@ -43,7 +43,7 @@ ListView
                 if (!hoveredItem)
                     return
 
-                var rect = listView.contentItem.mapFromItem(listView.hoveredItem,
+                const rect = listView.contentItem.mapFromItem(listView.hoveredItem,
                     0, 0, listView.hoveredItem.width, listView.hoveredItem.height)
 
                 hoverHighlight.x = rect.x
