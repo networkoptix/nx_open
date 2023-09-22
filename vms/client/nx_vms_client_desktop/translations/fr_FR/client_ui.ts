@@ -668,22 +668,22 @@
     </message>
     <message>
       <source>Disable import</source>
-      <translation type="unfinished">Disable import</translation>
+      <translation>Désactiver l'importation</translation>
     </message>
     <message>
       <source>Import Video from Device</source>
-      <translation type="unfinished">Import Video from Device</translation>
+      <translation>Importer une vidéo depuis l'appareil</translation>
     </message>
     <message>
       <source>Import camera or server offline periods</source>
-      <translation type="unfinished">Import camera or server offline periods</translation>
+      <translation>Importation des périodes de mise hors ligne de la caméra ou du serveur</translation>
     </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Points chauds</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1978,7 +1978,7 @@
     </message>
     <message>
       <source>Mail from</source>
-      <translation type="unfinished">Mail from</translation>
+      <translation>Courrier de</translation>
     </message>
   </context>
   <context>
@@ -1993,7 +1993,7 @@
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>Se connecter à la page web</translation>
     </message>
   </context>
   <context>
@@ -2571,7 +2571,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation type="unfinished">Display servers in tree for non-power users</translation>
+      <translation>Afficher les serveurs dans l'arborescence pour les utilisateurs ne disposant pas d'une autorisation élevée</translation>
     </message>
   </context>
   <context>

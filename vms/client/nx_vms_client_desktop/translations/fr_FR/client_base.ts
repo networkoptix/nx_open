@@ -12193,26 +12193,26 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
     <message>
       <source>Soft trigger</source>
-      <translation type="unfinished">Soft trigger</translation>
+      <translation>Déclencheur</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>Contient des mots-clés</translation>
     </message>
     <message>
       <source>Does not contain keywords</source>
-      <translation type="unfinished">Does not contain keywords</translation>
+      <translation>Ne contient pas de mots-clés</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>Contient les entrées de la liste</translation>
     </message>
     <message>
       <source>Does not contain list entries</source>
-      <translation type="unfinished">Does not contain list entries</translation>
+      <translation>Ne contient pas les entrées de la liste</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -12220,29 +12220,29 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>A partir de</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation type="unfinished">Lookup lists network request failed</translation>
+      <translation>Listes de consultation pour la demande de réseau échoué</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: </source>
-      <translation type="unfinished">Delete rule error: </translation>
+      <translation>Erreur de suppression de la règle : </translation>
     </message>
     <message>
       <source>Save rule error: </source>
-      <translation type="unfinished">Save rule error: </translation>
+      <translation>Erreur lors de l'enregistrement de la règle : </translation>
     </message>
     <message>
       <source>Reset to defaults error: </source>
-      <translation type="unfinished">Reset to defaults error: </translation>
+      <translation>Erreur de rétablissement des valeurs par défaut: </translation>
     </message>
   </context>
   <context>
@@ -12362,7 +12362,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Points chauds</translation>
     </message>
   </context>
   <context>
@@ -12688,7 +12688,7 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;G
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>Pas assez de droits d'accès</translation>
     </message>
   </context>
   <context>
