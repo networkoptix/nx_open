@@ -308,13 +308,6 @@
     </message>
 </context>
 <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-        <source>Server is offline. Backup settings are not available.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>BackupStatusWidget</name>
     <message>
         <source>Backup is not configured yet.</source>
@@ -2951,8 +2944,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>+ Add Group</source>
-        <translation></translation>
+        <source>Add Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2962,8 +2963,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>+ Add User</source>
-        <translation></translation>
+        <source>Add User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

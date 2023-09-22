@@ -341,10 +341,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enabled</source>
         <translation type="unfinished"></translation>
     </message>
@@ -357,7 +353,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Disable</source>
+        <source>keep current value</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -465,6 +461,14 @@
         <source>Pending</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Suspended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shut Down</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CloudTile</name>
@@ -498,19 +502,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This field cannot be empty</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Login DN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -526,11 +522,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login DN cannot be empty.</source>
+        <source>Use StartTLS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use StartTLS</source>
+        <source>Host cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login DN cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -925,6 +933,10 @@
         <source>Permission Groups</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GroupMembersTab</name>
@@ -969,13 +981,6 @@
     </message>
     <message>
         <source>No groups</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GroupsFlow</name>
-    <message>
-        <source>and %1 more...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1230,10 +1235,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>VMS imports and synchronizes users and groups with LDAP in real time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1254,11 +1255,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Continuous import from LDAP is disabled for this system. Some settings may be not available.</source>
+        <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No users or groups match synchronization settings and are added to the system’s DB. Make sure LDAP server parameters and filters are configured correctly. </source>
+        <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1503,10 +1516,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Built In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Custom</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1531,12 +1540,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LDAP group membership is managed in LDAP</source>
+        <source>Member of</source>
+        <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Member of</source>
-        <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
+        <source>Built-in</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1563,7 +1572,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Passwords do not match.</source>
+        <source>Passwords do not match</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1577,11 +1586,15 @@
 <context>
     <name>PermissionsTab</name>
     <message>
-        <source>Automatically add dependent access rights</source>
+        <source>No resources found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No resources found</source>
+        <source>Automatically add dependent permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2287,10 +2300,6 @@ to activate PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Passwords do not match.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Allow insecure (digest) authentication</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2316,6 +2325,10 @@ to activate PTZ</source>
     </message>
     <message>
         <source>Temporary with link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passwords do not match</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2421,6 +2434,15 @@ to activate PTZ</source>
     </message>
     <message>
         <source>No valid link for this user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copied</source>
+        <comment>Copied here means that a link is copied</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

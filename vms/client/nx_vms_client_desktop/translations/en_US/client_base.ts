@@ -1323,7 +1323,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Delete %n group(s)?</source>
+        <source>Delete %n groups?</source>
+        <comment>Numerical form depends on groups count</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1674,6 +1675,14 @@ License Key: %2</source>
         <source>Connection failed</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Username cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PasswordInformation</name>
@@ -1689,10 +1698,6 @@ License Key: %2</source>
         <source>Weak</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Password should contain different types of symbols.</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
         <translation>
@@ -1704,44 +1709,12 @@ License Key: %2</source>
         <source>Short</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>Password must be at least %n characters long.</source>
-        <translation>
-            <numerusform>Password must be at least %n character long.</numerusform>
-            <numerusform>Password must be at least %n characters long.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Long</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>Password must be no longer than %n characters.</source>
-        <translation>
-            <numerusform>Password must be no longer than %n character.</numerusform>
-            <numerusform>Password must be no longer than %n characters.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Password should not contain %n or more consecutive characters together.</source>
-        <translation>
-            <numerusform>Password should not contain %n or more consecutive character together.</numerusform>
-            <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Password should not contain %n or more repeating characters.</source>
-        <translation>
-            <numerusform>Password should not contain %n or more repeating character.</numerusform>
-            <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Common</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This password is in list of the most popular passwords.</source>
         <translation></translation>
     </message>
     <message>
@@ -1755,6 +1728,42 @@ License Key: %2</source>
     <message>
         <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Password should contain different types of symbols</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Password must be at least %n characters long</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Password must be no longer than %n characters</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Password should not contain %n or more consecutive characters together</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Password should not contain %n or more repeating characters</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This password is in list of the most popular passwords</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1984,11 +1993,7 @@ License Key: %2</source>
 <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
-        <source>SaaS suspended. To attach to Video Wall, SaaS must be in active state. Contact your channel partner for details.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SaaS shut down. To attach to Video Wall, SaaS must be in active state. Contact your channel partner for details.</source>
+        <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2352,16 +2357,16 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>year</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Name cannot be empty.</source>
         <translation></translation>
     </message>
     <message>
         <source>Description cannot be empty</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2899,16 +2904,16 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Passwords do not match.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Password should be at least 8 symbols long and contain different types of characters.</source>
         <translation></translation>
     </message>
     <message>
         <source>Password should not be equal to camera&apos;s user name</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Passwords do not match</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2929,20 +2934,20 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Passwords do not match.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Current Password</source>
         <translation></translation>
     </message>
     <message>
-        <source>To modify your password please enter the existing one.</source>
-        <translation></translation>
+        <source>Passwords do not match</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid current password.</source>
-        <translation></translation>
+        <source>To modify your password please enter the existing one</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid current password</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3216,6 +3221,14 @@ to %1</source>
     </message>
     <message>
         <source>Log In...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your session has expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please sign in again with your link to continue</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3615,13 +3628,6 @@ to %1</source>
     <message>
         <source>Open Camera List</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnGenericTabbedDialog</name>
-    <message>
-        <source>Apply changes before exit?</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4835,21 +4841,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnSessionAwareTabbedDialog</name>
-    <message>
-        <source>Unsaved changes:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save changes before exit?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Apply changes before exit?</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
         <source>Html tags could be used within custom text:
@@ -4984,11 +4975,15 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>SAAS SUSPENDED</source>
+        <source>SAAS SHUT DOWN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SAAS SHUT DOWN</source>
+        <source>NO EXPORT PERMISSION</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NO CONNECTION TO THE LICENSE SERVER</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5456,6 +5451,26 @@ If you intended to move analytics data to another storage location, please conta
         <source>We recommend choosing another location for it instead of the system partition.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Local recording services overused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud storage services overused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paid integrations services overused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System suspended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System shut down</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
@@ -5551,19 +5566,19 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>QnValidatorStrings</name>
     <message>
-        <source>Password cannot be empty.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Avoid leading and trailing spaces.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Email cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Email is not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Avoid leading and trailing spaces</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5898,15 +5913,7 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation></translation>
     </message>
     <message>
-        <source>SaaS suspended</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SaaS shut down</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To add Video Wall, SaaS should be in active state. Contact your channel partner for details.</source>
+        <source>To add Video Wall, SaaS should be in active state. %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6126,13 +6133,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation></translation>
     </message>
     <message numerus="yes">
-        <source>Delete %n users?</source>
-        <translation>
-            <numerusform>Delete %n user?</numerusform>
-            <numerusform>Delete %n users?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Delete %n devices?</source>
         <translation>
             <numerusform>Delete %n device?</numerusform>
@@ -6297,13 +6297,6 @@ We recommend you not to open this integration. If you understand the risks, you 
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Delete user?</source>
         <translation type="unfinished"></translation>
@@ -6313,6 +6306,26 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Delete layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+        <comment>Numerical form depends on layouts count</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n users?</source>
+        <comment>Numerical form depends on users count</comment>
+        <translation type="unfinished">
+            <numerusform>Delete %n user?</numerusform>
+            <numerusform>Delete %n users?</numerusform>
         </translation>
     </message>
 </context>
@@ -6531,10 +6544,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>Select at least one user</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Group</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -6548,10 +6557,6 @@ We recommend you not to open this integration. If you understand the risks, you 
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
-    </message>
-    <message>
-        <source>All Power Users</source>
-        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>%n additional</source>
@@ -6600,6 +6605,25 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
         <source>Reset all rules to defaults?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsaved changes:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save changes before exit?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6756,7 +6780,11 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can edit device settings and video wall layouts</source>
+        <source>Edit Camera Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6977,6 +7005,54 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>Backup is not supported for this device</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Nothing to backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insufficient services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n suitable cloud storage services are required</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n MP</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Megapixels</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Unknown resolution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No suitable cloud storage services available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n suitable cloud storage services available</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Resolution</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
@@ -7003,8 +7079,8 @@ We recommend you not to open this integration. If you understand the risks, you 
 <context>
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
-        <source>Nothing to backup</source>
-        <translation></translation>
+        <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7046,6 +7122,18 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>To enable backup add more drives to use them as backup storage in %1</source>
         <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Server is offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup settings are not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7905,6 +7993,13 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::CommonMessageBar</name>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
         <source>Video Wall is removed on the server and will be closed.</source>
@@ -7945,6 +8040,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
         <source>Your session has expired. Please sign in again with your link to continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authentication details are incorrect</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8608,6 +8707,10 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -8721,14 +8824,6 @@ We recommend you not to open this integration. If you understand the risks, you 
 <context>
     <name>nx::vms::client::desktop::GroupSettingsDialog</name>
     <message>
-        <source>Group name cannot be empty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Group with the same name already exists.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Delete failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8770,6 +8865,18 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
         <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group name cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group with the same name already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to apply changes to %1 group</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8878,10 +8985,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation></translation>
     </message>
     <message>
-        <source>Picture is too big. Maximum size is %1 MB</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Picture cannot be loaded</source>
         <translation></translation>
     </message>
@@ -8929,6 +9032,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
         <source>OFFLINE</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>NO EXPORT PERMISSION</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9288,6 +9395,13 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::MembersModel</name>
+    <message>
+        <source>Inherited from %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
         <source>You are about to merge the current System %1 with System</source>
@@ -9445,6 +9559,13 @@ Remember to return the Logging Level to its default setting after you have colle
         <source>%1 systems have different owners. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::MessageBar</name>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9857,6 +9978,17 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
         <source>Learn more</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::ParentGroupsProvider</name>
+    <message>
+        <source>LDAP group membership is managed in LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inherited from %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10373,17 +10505,6 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::ResourcesChangesManager</name>
-    <message>
-        <source>Resource list is empty</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No connection</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
         <source>Password confirmation is required to apply changes</source>
@@ -10629,14 +10750,6 @@ You can still change quality and FPS directly on the camera.</source>
         <translation></translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>hours</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Archive encryption password</source>
         <translation></translation>
     </message>
@@ -10659,10 +10772,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
         <source>Enables RTSP traffic encryption.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>days</source>
         <translation></translation>
     </message>
     <message>
@@ -10755,6 +10864,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Not Part Of Certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contact a user with Administrators permissions to resolve this issue.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10952,6 +11069,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>Invalid Link</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The provided link is not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
@@ -11104,6 +11225,18 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
             <numerusform>System storage is used for analytics data on %n Server</numerusform>
             <numerusform>System storage is used for analytics data on %n Servers</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Add more services or fix overuse by stopping using services for some devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If no action is taken, required number of services will be released automatically on %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some features may not be available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11316,14 +11449,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation></translation>
     </message>
     <message>
-        <source>Member of</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Permissions</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Group is not found in the LDAP database.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11333,6 +11458,18 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have permissions to modify or delete this group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11371,6 +11508,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
         <source>Failed to delete %n groups.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n existing LDAP groups are not found in the LDAP database.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n groups</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -11421,11 +11576,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>There are multiple users with the same credentials in the system. To avoid issues with log in it is required for all users to have unique credentials.</source>
+        <source>Temporary user</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Temporary user</source>
+        <source>You do not have permissions to modify this user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11455,6 +11614,42 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n existing LDAP users are not found in the LDAP database.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>LDAP server is offline. %n users are not able to log in.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Failed to delete user &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Failed to delete %n users.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
@@ -11478,24 +11673,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid current password.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 user with specified email already exists.</source>
         <comment>%1 is the short cloud name (like Cloud)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Login cannot be empty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Only letters, numbers and symbols %1 are allowed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User with specified login already exists.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11565,6 +11744,43 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>User %1 has been successfully created!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid current password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only letters, numbers and symbols %1 are allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User with specified login already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Link - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Granting broad permissions to the temporary user is not recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in %1</source>
+        <comment>%1 is a duration</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New User</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12276,10 +12492,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>All Users</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Group</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -12293,10 +12505,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
-    </message>
-    <message>
-        <source>All Power Users</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>All Server</source>
@@ -12338,6 +12546,20 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
         <source>Soft trigger</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::rules::TargetLayoutPicker</name>
+    <message>
+        <source>Select layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n layouts</source>
+        <translation type="unfinished">
+            <numerusform>%n layout</numerusform>
+            <numerusform>%n layouts</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12731,14 +12953,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Image processing may take a few moments. Please be patient.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Image too big</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Maximum size is %1 MB.</source>
         <translation></translation>
     </message>
     <message>
