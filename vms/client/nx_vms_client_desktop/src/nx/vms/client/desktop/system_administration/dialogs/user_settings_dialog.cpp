@@ -1029,7 +1029,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                     }
 
                     UserGroupRequestChain::updateLayoutSharing(
-                        systemContext(), data->id, data->resourceAccessRights);
+                        systemContext(), data->resourceAccessRights);
 
                     // Update access rights locally.
                     systemContext()->accessRightsManager()->setOwnResourceAccessMap(data->id,
