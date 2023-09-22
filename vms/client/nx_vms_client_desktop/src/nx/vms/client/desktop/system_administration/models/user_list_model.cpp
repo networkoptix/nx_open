@@ -85,7 +85,7 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
             const QString rightText = right.data(Qt::DisplayRole).toString();
 
             if (leftText != rightText)
-                return leftText < rightText;
+                return nx::utils::naturalStringLess(leftText, rightText);
 
             return userLessThan(left, right, UserListModel::UserTypeColumn);
         }
