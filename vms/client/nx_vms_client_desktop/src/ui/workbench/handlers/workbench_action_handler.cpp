@@ -2517,7 +2517,7 @@ void ActionHandler::at_renameAction_triggered()
         qnResourcesChangesManager->saveServer(server, nx::utils::guarded(this,
             [server, oldName](bool success, rest::Handle /*requestId*/)
             {
-                if (NX_ASSERT(success))
+                if (!success)
                     server->setName(oldName);
             }));
     }
