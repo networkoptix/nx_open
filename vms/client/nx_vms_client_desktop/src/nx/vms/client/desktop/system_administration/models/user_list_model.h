@@ -86,7 +86,6 @@ public:
     explicit SortedUserListModel(QObject* parent = nullptr);
 
     void setDigestFilter(std::optional<bool> value);
-    void setSyncId(const QString& syncId);
 
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
@@ -94,7 +93,6 @@ protected:
 
 private:
     std::optional<bool> m_digestFilter;
-    QString m_syncId;
 };
 
 } // namespace nx::vms::client::desktop
