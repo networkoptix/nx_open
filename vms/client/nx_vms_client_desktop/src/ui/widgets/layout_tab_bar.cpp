@@ -281,7 +281,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
         {
             if (idx.item().runtimeStatus.controlledBy.isNull())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
-            if (idx.item().runtimeStatus.controlledBy == systemContext()->peerId())
+            if (idx.item().runtimeStatus.controlledBy == peerId())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
             return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
         }

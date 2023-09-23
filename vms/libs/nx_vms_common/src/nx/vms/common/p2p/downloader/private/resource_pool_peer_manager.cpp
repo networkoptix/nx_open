@@ -7,7 +7,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/delayed.h>
 
@@ -53,7 +52,7 @@ public:
 
         QList<PeerInformation> result;
 
-        const auto& selfId = q->systemContext()->peerId();
+        const auto& selfId = q->peerId();
 
         for (const auto& server:
             q->resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online))
@@ -144,7 +143,7 @@ QList<QnUuid> ResourcePoolPeerManager::peers() const
 
 int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
 {
-    const auto& connection = systemContext()->messageBusConnection();
+    const auto& connection = messageBusConnection();
     if (!connection)
         return -1;
 

@@ -54,7 +54,6 @@ public:
     MessageBus(
         nx::vms::common::SystemContext* systemContext,
         vms::api::PeerType peerType,
-        QnCommonModule* commonModule,
         ec2::QnJsonTransactionSerializer* jsonTranSerializer,
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
     ~MessageBus() override;

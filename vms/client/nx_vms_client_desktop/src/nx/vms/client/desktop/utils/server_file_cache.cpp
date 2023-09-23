@@ -110,7 +110,7 @@ void ServerFileCache::getFileList() {
         return;
     }
 
-    auto connection = messageBusConnection();
+    auto connection = RemoteConnectionAware::messageBusConnection();
     connection->getStoredFileManager(Qn::kSystemAccess)->listDirectory(
         m_folderName,
         [this](int /*requestId*/, ec2::ErrorCode errorCode, const QStringList& filenames)
@@ -148,7 +148,7 @@ void ServerFileCache::downloadFile(const QString &filename) {
     if (m_loading.values().contains(filename))
       return;
 
-    auto connection = messageBusConnection();
+    auto connection = RemoteConnectionAware::messageBusConnection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
         m_folderName + QLatin1Char('/') + filename,
         [this](int requestId, ec2::ErrorCode errorCode, const QByteArray& fileData)
@@ -211,7 +211,7 @@ void ServerFileCache::uploadFile(const QString &filename) {
     QByteArray data = file.readAll();
     file.close();
 
-    auto connection = messageBusConnection();
+    auto connection = RemoteConnectionAware::messageBusConnection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->addStoredFile(
         m_folderName + QLatin1Char('/') + filename,
         data,
@@ -263,7 +263,7 @@ void ServerFileCache::deleteFile(const QString &filename) {
     if (m_deleting.values().contains(filename))
       return;
 
-    auto connection = messageBusConnection();
+    auto connection = RemoteConnectionAware::messageBusConnection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->deleteStoredFile(
         m_folderName + QLatin1Char('/') + filename,
         [this](int requestId, ec2::ErrorCode errorCode)

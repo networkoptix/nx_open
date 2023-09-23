@@ -1270,7 +1270,7 @@ void SystemSettings::synchronizeNow()
     if (!m_admin)
         return;
 
-    m_context->resourcePropertyDictionary()->saveParamsAsync(m_admin->getId());
+    resourcePropertyDictionary()->saveParamsAsync(m_admin->getId());
 }
 
 bool SystemSettings::resynchronizeNowSync(nx::utils::MoveOnlyFunc<
@@ -1281,7 +1281,7 @@ bool SystemSettings::resynchronizeNowSync(nx::utils::MoveOnlyFunc<
         NX_ASSERT(m_admin, "Invalid sync state");
         if (!m_admin)
             return false;
-        m_context->resourcePropertyDictionary()->markAllParamsDirty(m_admin->getId(), std::move(filter));
+        resourcePropertyDictionary()->markAllParamsDirty(m_admin->getId(), std::move(filter));
     }
     return synchronizeNowSync();
 }
@@ -1295,7 +1295,7 @@ bool SystemSettings::synchronizeNowSync()
     NX_ASSERT(m_admin, "Invalid sync state");
     if (!m_admin)
         return false;
-    return m_context->resourcePropertyDictionary()->saveParams(m_admin->getId());
+    return resourcePropertyDictionary()->saveParams(m_admin->getId());
 }
 
 bool SystemSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)

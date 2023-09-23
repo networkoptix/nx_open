@@ -5,7 +5,6 @@
 #include <optional>
 
 #include <api/model/audit/auth_session.h>
-#include <common/common_module_aware.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_delegate.h>
@@ -13,6 +12,7 @@
 #include <nx/utils/byte_array.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/common/system_context_aware.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
@@ -23,7 +23,7 @@ namespace Qn { struct UserAccessData; }
 
 class NX_VMS_COMMON_API QnTCPConnectionProcessor:
     public QnLongRunnable,
-    public /*mixin*/ QnCommonModuleAware
+    public /*mixin*/ nx::vms::common::SystemContextAware
 {
     using base_type = QnLongRunnable;
 
@@ -157,7 +157,7 @@ protected:
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* dptr,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        QnCommonModule* commonModule,
+        nx::vms::common::SystemContext* systemContext,
         int maxTcpRequestSize);
 
     int maxTcpRequestSize() const { return m_maxTcpRequestSize; }

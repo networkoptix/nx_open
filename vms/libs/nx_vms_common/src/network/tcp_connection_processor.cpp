@@ -6,10 +6,9 @@
 #include <optional>
 
 #ifndef Q_OS_WIN
-#include <netinet/tcp.h>
+    #include <netinet/tcp.h>
 #endif
 
-#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/metrics/metrics_storage.h>
@@ -48,7 +47,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTcpListener* owner,
     int maxTcpRequestSize)
     :
-    QnCommonModuleAware(owner->commonModule()),
+    nx::vms::common::SystemContextAware(owner->systemContext()),
     d_ptr(new QnTCPConnectionProcessorPrivate),
     m_maxTcpRequestSize(maxTcpRequestSize)
 {
@@ -63,7 +62,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTcpListener* owner,
     int maxTcpRequestSize)
     :
-    QnCommonModuleAware(owner->commonModule()),
+    nx::vms::common::SystemContextAware(owner->systemContext()),
     d_ptr(dptr),
     m_maxTcpRequestSize(maxTcpRequestSize)
 {
@@ -75,10 +74,10 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     int maxTcpRequestSize)
     :
-    QnCommonModuleAware(commonModule),
+    nx::vms::common::SystemContextAware(systemContext),
     d_ptr(dptr),
     m_maxTcpRequestSize(maxTcpRequestSize)
 {
@@ -846,8 +845,12 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(
         }
     }
 
-    if (nx::network::http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).empty())
-        d->response.headers.insert(nx::network::http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, peerId().toByteArray()));
+    if (nx::network::http::getHeaderValue(d->response.headers, Qn::SERVER_GUID_HEADER_NAME).empty())
+    {
+        d->response.headers.insert(nx::network::http::HttpHeader(
+            Qn::SERVER_GUID_HEADER_NAME,
+            peerId().toByteArray()));
+    }
 
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
     QByteArray contentEncoding;

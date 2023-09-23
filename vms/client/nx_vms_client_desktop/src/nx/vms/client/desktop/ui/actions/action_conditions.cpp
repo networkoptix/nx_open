@@ -1406,7 +1406,11 @@ ActionVisibility PtzCondition::check(
 {
     for (const QnResourcePtr& resource: resources)
     {
-        auto ptzPool = qnClientCoreModule->commonModule()->findInstance<QnPtzControllerPool>();
+        auto systemContext = SystemContext::fromResource(resource);
+        if (!NX_ASSERT(systemContext))
+            return InvisibleAction;
+
+        auto ptzPool = systemContext->ptzControllerPool();
         if (!checkInternal(ptzPool->controller(resource)))
             return InvisibleAction;
     }
@@ -1684,8 +1688,8 @@ ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/,
         if (!user)
             return InvisibleAction;
 
-        const auto desktopCameraId =core::DesktopResource::calculateUniqueId(
-            context->systemContext()->peerId(), user->getId());
+        const auto desktopCameraId = core::DesktopResource::calculateUniqueId(
+            context->peerId(), user->getId());
 
         /* Do not check real pointer type to speed up check. */
         const auto desktopCamera =
@@ -2322,9 +2326,9 @@ ConditionWrapper hasOtherWindows()
 ConditionWrapper hasNewEventRulesEngine()
 {
     return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
-            auto engine = appContext()->currentSystemContext()->vmsRulesEngine();
+            auto engine = context->systemContext()->vmsRulesEngine();
             return engine && engine->isEnabled();
         });
 }

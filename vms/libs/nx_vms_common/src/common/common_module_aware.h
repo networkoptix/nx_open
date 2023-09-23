@@ -58,7 +58,8 @@ public:
     nx::vms::common::SystemSettings* globalSettings() const;
     nx::vms::event::RuleManager* eventRuleManager() const;
     QnResourceDataPool* dataPool() const;
-    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
+
+    std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
     QnCommonMessageProcessor* messageProcessor() const;
 
 private:

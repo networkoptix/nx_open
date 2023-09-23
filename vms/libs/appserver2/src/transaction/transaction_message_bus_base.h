@@ -16,7 +16,7 @@ namespace ec2
     public:
         TransactionMessageBusBase(
             nx::vms::api::PeerType peerType,
-            QnCommonModule* commonModule,
+            nx::vms::common::SystemContext* systemContext,
             QnJsonTransactionSerializer* jsonTranSerializer,
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
         );

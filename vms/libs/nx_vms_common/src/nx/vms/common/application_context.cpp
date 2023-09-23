@@ -15,6 +15,7 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
+#include <utils/common/instance_storage.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
 #include <utils/media/ffmpeg_initializer.h>
@@ -64,6 +65,10 @@ ApplicationContext::ApplicationContext(
 {
     if (NX_ASSERT(!s_instance))
         s_instance = this;
+
+    // This instantiation is required to put non-template methods of the QnInstanceStorage class
+    // to the export table.
+    QnInstanceStorage instanceStorage;
 
     initializeResources();
     QnCommonMetaTypes::initialize();

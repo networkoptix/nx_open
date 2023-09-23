@@ -3,7 +3,6 @@
 #include "p2p_message_bus.h"
 
 #include <api/runtime_info_manager.h>
-#include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -79,11 +78,10 @@ struct GotUnicastTransactionFuction
 MessageBus::MessageBus(
     nx::vms::common::SystemContext* systemContext,
     vms::api::PeerType peerType,
-    QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
     :
-    TransactionMessageBusBase(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
+    TransactionMessageBusBase(peerType, systemContext, jsonTranSerializer, ubjsonTranSerializer),
     m_miscData(this)
 {
     static const int kMetaTypeRegistrator =

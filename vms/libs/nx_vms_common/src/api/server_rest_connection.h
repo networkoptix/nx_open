@@ -133,8 +133,8 @@ public:
 
 public:
     /**
-     * Used to send REST requests to the mediaserver. It uses ec2Connection and MediaServerResource
-     * to get authentication data.
+     * Used to send REST requests to the mediaserver. It uses messageBusConnection and
+     * MediaServerResource to get authentication data.
      * @param systemContext ServerConnection takes a lot of objects from it.
      * @param serverId resource Id of the mediaserver.
      */
@@ -144,7 +144,7 @@ public:
 
     /**
      * Used to send REST requests to the mediaserver when we still do not have proper resource pool
-     * and ec2Connection instance, but need to send requests to the server.
+     * and messageBusConnection instance, but need to send requests to the server.
      *
      * @param serverId resource Id of the VMS server.
      * @param address Explicit address of the VMS server.

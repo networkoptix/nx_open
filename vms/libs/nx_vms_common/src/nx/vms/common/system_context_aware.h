@@ -5,12 +5,14 @@
 #include <QtCore/QPointer>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/uuid.h>
 
 class QnCameraHistoryPool;
 class QnCommonMessageProcessor;
 class QnGlobalPermissionsManager;
 class QnResourceAccessManager;
 class QnResourcePool;
+class QnResourcePropertyDictionary;
 class QnRuntimeInfoManager;
 
 namespace ec2 { class AbstractECConnection; }
@@ -46,6 +48,15 @@ public:
     SystemContext* systemContext() const;
 
     /**
+     * Id of the current peer in the Message Bus. It is persistent and is not changed between the
+     * application runs. It is stored in the application settings. VMS Server uses it as a Server
+     * Resource id. Desktop Client calculates actual peer id depending on the stored persistent id
+     * and on the number of the running client instance, so different Client windows have different
+     * peer ids.
+     */
+    QnUuid peerId() const;
+
+    /**
      * Interface for the Message Bus connection.
      */
     std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
@@ -59,6 +70,12 @@ public:
      * List of all Resources in the System. Some data is stored in the external dictionaries.
      */
     QnResourcePool* resourcePool() const;
+
+    /**
+     * Properties of all Resources in the System. Stored independently of Resources, can be loaded
+     * earlier. Also can belong to the System as a whole (thus having null key).
+     */
+    QnResourcePropertyDictionary* resourcePropertyDictionary() const;
 
     QnCommonMessageProcessor* messageProcessor() const;
 

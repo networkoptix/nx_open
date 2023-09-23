@@ -9,7 +9,6 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/common/system_context.h>
 #include <utils/common/delayed.h>
 
 #include "private/internet_only_peer_manager.h"
@@ -70,7 +69,7 @@ void Downloader::Private::startDownload(const QString& fileName)
         fileName,
         storage.data(),
         peerManagers,
-        q->systemContext()->peerId());
+        q->peerId());
     workers[fileName] = worker;
 
     connect(worker.get(), &Worker::finished, this,

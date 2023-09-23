@@ -12,11 +12,11 @@ namespace ec2 {
 
 TransactionMessageBusBase::TransactionMessageBusBase(
     api::PeerType peerType,
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
     :
-    AbstractTransactionMessageBus(commonModule),
+    AbstractTransactionMessageBus(systemContext),
     m_thread(new QThread()),
     m_jsonTranSerializer(jsonTranSerializer),
     m_ubjsonTranSerializer(ubjsonTranSerializer),

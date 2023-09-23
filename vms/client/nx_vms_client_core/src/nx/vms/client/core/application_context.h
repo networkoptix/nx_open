@@ -21,6 +21,8 @@ class ColorTheme;
 class CloudStatusWatcher;
 class Settings;
 
+namespace watchers { class KnownServerConnections; }
+
 /**
  * Main context of the desktop client application. Exists through all application lifetime and is
  * accessible from anywhere using `instance()` method.
@@ -68,6 +70,8 @@ public:
     Settings* coreSettings() const;
 
     ColorTheme* colorTheme() const;
+
+    watchers::KnownServerConnections* knownServerConnectionsWatcher() const;
 
 private:
     struct Private;

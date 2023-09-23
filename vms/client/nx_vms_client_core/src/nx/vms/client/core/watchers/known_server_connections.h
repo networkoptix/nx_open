@@ -6,13 +6,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
+#include <nx/network/socket_global.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
-
-class QTimer;
-
-class QnCommonModule;
 
 namespace nx::vms::client::core {
 namespace watchers {
@@ -30,15 +28,17 @@ public:
         bool operator==(const Connection& other) const = default;
     };
 
-    explicit KnownServerConnections(QnCommonModule* commonModule, QObject* parent = nullptr);
+    explicit KnownServerConnections(QObject* parent = nullptr);
     ~KnownServerConnections();
 
     void start();
+    void saveConnection(const QnUuid& serverId, nx::network::SocketAddress address);
 
 private:
-    class Private;
-    QScopedPointer<Private> const d;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
+
 NX_REFLECTION_INSTRUMENT(KnownServerConnections::Connection, (serverId)(url));
 
 } // namespace watchers

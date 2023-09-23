@@ -143,12 +143,6 @@ public:
      */
     std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
 
-    // FIXME: #sivanov Remove compatibility layer.
-    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const
-    {
-        return messageBusConnection();
-    }
-
     QnCommonMessageProcessor* messageProcessor() const;
 
     template <class MessageProcessorType, typename ...Args>

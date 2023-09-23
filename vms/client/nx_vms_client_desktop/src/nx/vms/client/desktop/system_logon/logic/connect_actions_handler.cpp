@@ -358,13 +358,13 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     connect(action(ui::action::LogoutFromCloud), &QAction::triggered,
         this, &ConnectActionsHandler::at_logoutFromCloud);
 
-    connect(systemContext()->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo &info)
         {
-            if (info.uuid != systemContext()->peerId())
+            if (info.uuid != peerId())
                 return;
 
-            if (auto connection = systemContext()->messageBusConnection())
+            if (auto connection = messageBusConnection())
             {
                 connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
                     info.data, [](int /*requestId*/, ec2::ErrorCode) {});
@@ -673,6 +673,10 @@ void ConnectActionsHandler::storeConnectionRecord(
     const nx::vms::api::ModuleInformation& info,
     ConnectionOptions options)
 {
+    // Recent connection address info is stored anyway.
+    core::appContext()->knownServerConnectionsWatcher()->saveConnection(info.id,
+        connectionInfo.address);
+
     /**
      * Note! We don't save connection to new systems. But we have to update
      * weights for any connection using its local id
@@ -1352,7 +1356,7 @@ void ConnectActionsHandler::clearConnection()
 
     systemContext()->showreelManager()->resetShowreels();
 
-    systemContext()->resourcePropertyDictionary()->clear(idList);
+    resourcePropertyDictionary()->clear(idList);
     systemContext()->resourceStatusDictionary()->clear(idList);
     systemContext()->licensePool()->reset();
 

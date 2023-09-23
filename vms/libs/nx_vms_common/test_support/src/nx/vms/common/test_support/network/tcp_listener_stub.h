@@ -2,11 +2,13 @@
 
 #pragma once
 
+#include <network/tcp_listener.h>
+
 class TcpListenerStub: public QnTcpListener
 {
 public:
-    TcpListenerStub(QnCommonModule* commonModule) :
-        QnTcpListener(commonModule, /*maxTcpRequestSize*/ 0, QHostAddress::Any, /*port*/ 0)
+    TcpListenerStub(nx::vms::common::SystemContext* systemContext) :
+        QnTcpListener(systemContext, /*maxTcpRequestSize*/ 0, QHostAddress::Any, /*port*/ 0)
     {
     }
 

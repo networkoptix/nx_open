@@ -33,8 +33,6 @@ SystemContext* QnCommonModule::systemContext() const
 
 QnCommonModule::~QnCommonModule()
 {
-    /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
-    clear();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -128,7 +126,7 @@ QnResourceDataPool* QnCommonModule::resourceDataPool() const
         : nullptr;
 }
 
-std::shared_ptr<ec2::AbstractECConnection> QnCommonModule::ec2Connection() const
+std::shared_ptr<ec2::AbstractECConnection> QnCommonModule::messageBusConnection() const
 {
     return NX_ASSERT(d->systemContext)
         ? d->systemContext->messageBusConnection()

@@ -9,6 +9,7 @@
 #include <QtCore/QTimer>
 #include <QtQml/QQmlEngine>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QToolTip>
 
 #include <api/server_rest_connection.h>
 #include <client/client_autorun_watcher.h>
@@ -38,7 +39,12 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
+#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/settings/systems_visibility_manager.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -65,16 +71,28 @@
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/style/old_style.h>
+#include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
+#include <nx/vms/client/desktop/utils/local_proxy_server.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/utils/external_resources.h>
 #include <nx/vms/utils/translation/translation_manager.h>
 #include <platform/platform_abstraction.h>
+#include <ui/workaround/qtbug_workaround.h>
+#include <utils/math/color_transformations.h>
+
+#if defined(Q_OS_WIN)
+    #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource_searcher_impl.h>
+#else
+    #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource_searcher_impl.h>
+#endif
 
 #if defined(Q_OS_MACOS)
     #include <ui/workaround/mac_utils.h>
@@ -244,12 +262,111 @@ bool initializeLogFromFile(const QString& filename, const QString& suffix)
         suffix);
 }
 
+QPalette makeApplicationPalette()
+{
+    auto colorTheme = core::colorTheme();
+
+    QPalette result(QApplication::palette());
+    result.setColor(QPalette::WindowText, colorTheme->color("light16"));
+    result.setColor(QPalette::Button, colorTheme->color("dark11"));
+    result.setColor(QPalette::Light, colorTheme->color("light10"));
+    result.setColor(QPalette::Midlight, colorTheme->color("dark13"));
+    result.setColor(QPalette::Dark, colorTheme->color("dark9"));
+    result.setColor(QPalette::Mid, colorTheme->color("dark10"));
+    result.setColor(QPalette::Text, colorTheme->color("light4"));
+    result.setColor(QPalette::BrightText, colorTheme->color("light1"));
+    result.setColor(QPalette::ButtonText, colorTheme->color("light4"));
+    result.setColor(QPalette::Base, colorTheme->color("dark7"));
+    result.setColor(QPalette::Window, colorTheme->color("dark7"));
+    result.setColor(QPalette::Shadow, colorTheme->color("dark5"));
+    result.setColor(QPalette::Highlight, colorTheme->color("brand_core"));
+    result.setColor(QPalette::HighlightedText, colorTheme->color("brand_contrast"));
+    result.setColor(QPalette::Link, colorTheme->color("brand_d2"));
+    result.setColor(QPalette::LinkVisited, colorTheme->color("brand_core"));
+    result.setColor(QPalette::AlternateBase, colorTheme->color("dark7"));
+    result.setColor(QPalette::ToolTipBase, colorTheme->color("light4"));
+    result.setColor(QPalette::ToolTipText, colorTheme->color("dark4"));
+    result.setColor(QPalette::PlaceholderText, colorTheme->color("light16"));
+
+    static const auto kDisabledAlpha = 77;
+    static const QList<QPalette::ColorRole> kDimmerRoles{{
+        QPalette::WindowText, QPalette::Button, QPalette::Light,
+        QPalette::Midlight, QPalette::Dark, QPalette::Mid,
+        QPalette::Text, QPalette::BrightText, QPalette::ButtonText,
+        QPalette::Base, QPalette::Shadow, QPalette::HighlightedText,
+        QPalette::Link, QPalette::LinkVisited, QPalette::AlternateBase}};
+
+    for (const QPalette::ColorRole role: kDimmerRoles)
+        result.setColor(QPalette::Disabled, role, withAlpha(result.color(role), kDisabledAlpha));
+
+    return result;
+}
+
 } // namespace
 
 static ApplicationContext* s_instance = nullptr;
 
 struct ApplicationContext::Private
 {
+    ApplicationContext* const q;
+    const Mode mode;
+    const QnStartupParameters startupParameters;
+    std::optional<nx::utils::SoftwareVersion> overriddenVersion;
+    std::vector<QPointer<SystemContext>> systemContexts;
+    std::vector<QPointer<WindowContext>> windowContexts;
+    std::unique_ptr<SystemContext> mainSystemContext; //< Main System Context;
+    std::unique_ptr<QnClientCoreModule> clientCoreModule;
+    std::unique_ptr<UnifiedResourcePool> unifiedResourcePool;
+
+    // Settings modules.
+    std::unique_ptr<LocalSettings> localSettings;
+    std::unique_ptr<QnClientRuntimeSettings> runtimeSettings;
+    std::unique_ptr<ObjectDisplaySettings> objectDisplaySettings;
+    std::unique_ptr<ScreenRecordingSettings> screenRecordingSettings;
+    std::unique_ptr<ShowOnceSettings> showOnceSettings;
+    std::unique_ptr<MessageBarSettings> messageBarSettings;
+
+    // State modules.
+    std::unique_ptr<ClientStateHandler> clientStateHandler;
+    std::unique_ptr<SharedMemoryManager> sharedMemoryManager;
+    std::unique_ptr<RunningInstancesManager> runningInstancesManager;
+    std::unique_ptr<session::DefaultProcessInterface> processInterface;
+    std::unique_ptr<session::SessionManager> sessionManager;
+
+    // Local resources search modules.
+    std::unique_ptr<LocalResourcesContext> localResourcesContext;
+
+    // Specialized context parts.
+    std::unique_ptr<ContextStatisticsModule> statisticsModule;
+
+    // UI Skin parts.
+    std::unique_ptr<core::Skin> skin;
+    std::unique_ptr<CustomCursors> customCursors;
+
+    // Miscelaneous modules.
+    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+    std::unique_ptr<PerformanceMonitor> performanceMonitor;
+
+    std::unique_ptr<nx::vms::utils::TranslationManager> translationManager;
+    std::unique_ptr<ApplauncherGuard> applauncherGuard;
+    std::unique_ptr<QnClientAutoRunWatcher> autoRunWatcher;
+    std::unique_ptr<RadassController> radassController;
+    std::unique_ptr<ResourceFactory> resourceFactory;
+    std::unique_ptr<UploadManager> uploadManager;
+    std::unique_ptr<QnForgottenSystemsManager> forgottenSystemsManager;
+    std::unique_ptr<ResourcesChangesManager> resourcesChangesManager;
+    std::unique_ptr<WebPageIconCache> webPageIconCache;
+    std::unique_ptr<QnQtbugWorkaround> qtBugWorkarounds;
+    std::unique_ptr<core::DesktopResourceSearcher> desktopResourceSearcher;
+    std::unique_ptr<core::SystemsVisibilityManager> systemsVisibilityManager;
+
+    // Network modules
+    std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
+    std::unique_ptr<CloudLayoutsManager> cloudLayoutsManager;
+    std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
+    std::unique_ptr<nx::cloud::gateway::VmsGatewayEmbeddable> cloudGateway;
+    std::unique_ptr<LocalProxyServer> localProxyServer;
+
     void initializeSettings()
     {
         // Make sure application is initialized correctly for settings to be loaded.
@@ -531,56 +648,20 @@ struct ApplicationContext::Private
 #endif
     }
 
-    ApplicationContext* const q;
-    const Mode mode;
-    const QnStartupParameters startupParameters;
-    std::optional<nx::utils::SoftwareVersion> overriddenVersion;
-    std::vector<QPointer<SystemContext>> systemContexts;
-    std::vector<QPointer<WindowContext>> windowContexts;
-    std::unique_ptr<SystemContext> mainSystemContext; //< Main System Context;
-    std::unique_ptr<QnClientCoreModule> clientCoreModule;
-    std::unique_ptr<UnifiedResourcePool> unifiedResourcePool;
+    void initializeSkin()
+    {
+        QStringList paths;
+        paths << ":/skin";
 
-    // Settings modules.
-    std::unique_ptr<LocalSettings> localSettings;
-    std::unique_ptr<QnClientRuntimeSettings> runtimeSettings;
-    std::unique_ptr<ObjectDisplaySettings> objectDisplaySettings;
-    std::unique_ptr<ScreenRecordingSettings> screenRecordingSettings;
-    std::unique_ptr<ShowOnceSettings> showOnceSettings;
-    std::unique_ptr<MessageBarSettings> messageBarSettings;
+        skin = std::make_unique<core::Skin>(paths);
+        customCursors = std::make_unique<CustomCursors>(skin.get());
 
-    // State modules.
-    std::unique_ptr<ClientStateHandler> clientStateHandler;
-    std::unique_ptr<SharedMemoryManager> sharedMemoryManager;
-    std::unique_ptr<RunningInstancesManager> runningInstancesManager;
-    std::unique_ptr<session::DefaultProcessInterface> processInterface;
-    std::unique_ptr<session::SessionManager> sessionManager;
+        QApplication::setWindowIcon(skin->icon(":/logo.png"));
+        QApplication::setStyle([]() { return new OldStyle(new Style()); }());
 
-    // Local resources search modules.
-    std::unique_ptr<LocalResourcesContext> localResourcesContext;
-
-    // Specialized context parts.
-    std::unique_ptr<ContextStatisticsModule> statisticsModule;
-
-    // Miscelaneous modules.
-    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
-    std::unique_ptr<PerformanceMonitor> performanceMonitor;
-
-    std::unique_ptr<nx::vms::utils::TranslationManager> translationManager;
-    std::unique_ptr<ApplauncherGuard> applauncherGuard;
-    std::unique_ptr<QnClientAutoRunWatcher> autoRunWatcher;
-    std::unique_ptr<RadassController> radassController;
-    std::unique_ptr<ResourceFactory> resourceFactory;
-    std::unique_ptr<UploadManager> uploadManager;
-    std::unique_ptr<QnForgottenSystemsManager> forgottenSystemsManager;
-    std::unique_ptr<ResourcesChangesManager> resourcesChangesManager;
-    std::unique_ptr<WebPageIconCache> webPageIconCache;
-
-    // Network modules
-    std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
-    std::unique_ptr<CloudLayoutsManager> cloudLayoutsManager;
-    std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
-    std::unique_ptr<nx::cloud::gateway::VmsGatewayEmbeddable> cloudGateway;
+        QApplication::setPalette(makeApplicationPalette());
+        QToolTip::setPalette(QApplication::palette());
+    }
 };
 
 ApplicationContext::ApplicationContext(
@@ -648,6 +729,7 @@ ApplicationContext::ApplicationContext(
             d->initializeClientCoreModule();
             d->initializeQml();
             d->initializeLocalResourcesSearch();
+            d->initializeSkin();
             d->applauncherGuard = std::make_unique<ApplauncherGuard>();
             d->autoRunWatcher = std::make_unique<QnClientAutoRunWatcher>();
             d->radassController = std::make_unique<RadassController>();
@@ -656,7 +738,10 @@ ApplicationContext::ApplicationContext(
             d->forgottenSystemsManager = std::make_unique<QnForgottenSystemsManager>();
             d->resourcesChangesManager = std::make_unique<ResourcesChangesManager>();
             d->webPageIconCache = std::make_unique<WebPageIconCache>();
+            d->qtBugWorkarounds = std::make_unique<QnQtbugWorkaround>();
             d->cloudGateway = std::make_unique<nx::cloud::gateway::VmsGatewayEmbeddable>();
+            d->localProxyServer = std::make_unique<LocalProxyServer>();
+            d->systemsVisibilityManager = std::make_unique<core::SystemsVisibilityManager>();
             break;
         }
     }
@@ -766,6 +851,18 @@ void ApplicationContext::removeWindowContext(WindowContext* windowContext)
     auto iter = std::find(d->windowContexts.begin(), d->windowContexts.end(), windowContext);
     if (NX_ASSERT(iter != d->windowContexts.end()))
         d->windowContexts.erase(iter);
+}
+
+void ApplicationContext::initializeDesktopCamera([[maybe_unused]] QOpenGLWidget* window)
+{
+#if defined(Q_OS_WIN)
+    auto impl = new WindowsDesktopResourceSearcherImpl(window);
+#else
+    auto impl = new core::DesktopAudioOnlyResourceSearcherImpl();
+#endif
+    d->desktopResourceSearcher = std::make_unique<core::DesktopResourceSearcher>(impl);
+    d->desktopResourceSearcher->setLocal(true);
+    resourceDiscoveryManager()->addDeviceSearcher(d->desktopResourceSearcher.get());
 }
 
 QnUuid ApplicationContext::peerId() const

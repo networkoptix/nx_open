@@ -36,7 +36,6 @@ class MessageBusConnection:
 
 public:
     MessageBusConnection(
-        SystemContext* systemContext,
         nx::vms::api::PeerType peerType,
         nx::vms::api::ModuleInformation moduleInformation,
         QueryProcessorPtr queryProcessor,
@@ -44,7 +43,7 @@ public:
         nx::vms::common::AbstractTimeSyncManagerPtr timeSyncManager)
         :
         base_type(queryProcessor.get()),
-        SystemContextAware(systemContext),
+        SystemContextAware(messageBus->systemContext()),
         m_peerType(peerType),
         m_moduleInformation(moduleInformation),
         m_messageBus(messageBus),
@@ -243,11 +242,10 @@ void RemoteConnection::initializeMessageBusConnection(
     d->timeSynchronizationManager =
         std::make_shared<TimeSyncManager>(systemContext, d->moduleInformation.id);
     d->messageBus = std::make_unique<ThreadsafeMessageBusAdapter>(
-        commonModule,
+        systemContext,
         d->jsonTranSerializer.get(),
         d->ubjsonTranSerializer.get());
     d->messageBusConnection = std::make_shared<MessageBusConnection>(
-        systemContext,
         d->peerType,
         d->moduleInformation,
         d->queryProcessor,

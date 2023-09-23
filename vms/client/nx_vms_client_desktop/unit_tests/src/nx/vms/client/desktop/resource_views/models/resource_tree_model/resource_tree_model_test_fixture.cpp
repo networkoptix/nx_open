@@ -46,7 +46,7 @@ using namespace index_condition;
 void ResourceTreeModelTest::SetUp()
 {
     // Should be not null for correct Videowall Item node display.
-    ASSERT_FALSE(systemContext()->peerId().isNull());
+    ASSERT_FALSE(peerId().isNull());
 
     m_newResourceTreeModel.reset(new entity_item_model::EntityItemModel());
     nx::utils::ModelTransactionChecker::install(m_newResourceTreeModel.get());
