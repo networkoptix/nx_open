@@ -5,7 +5,6 @@
 #include <QtCore/QElapsedTimer>
 
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/common/system_context.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 
 #include "desktop_resource.h"
@@ -42,7 +42,9 @@ public:
     {
         for (int i = 0; i < 2; ++i)
         {
-            m_serializers[i].reset(new QnRtspFfmpegEncoder(DecoderConfig(), owner->commonModule()->metrics()));
+            m_serializers[i].reset(new QnRtspFfmpegEncoder(
+                DecoderConfig(),
+                owner->systemContext()->metrics().get()));
             m_serializers[i]->setAdditionFlags(0);
             m_serializers[i]->setLiveMarker(true);
             m_serializers[i]->setServerVersion(owner->serverVersion());
@@ -120,7 +122,7 @@ DesktopCameraConnectionProcessor::DesktopCameraConnectionProcessor(
     :
     QnTCPConnectionProcessor(new Private(),
         std::move(socket),
-        qnClientCoreModule->commonModule(),
+        desktop->systemContext(),
         kMaxTcpRequestSize),
     d(dynamic_cast<Private*>(d_ptr))
 {

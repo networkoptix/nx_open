@@ -257,7 +257,8 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
     if (!NX_ASSERT(camera->systemContext() == this->systemContext()))
         return StartResult::failed;
 
-    if (!m_context->ec2Connection()) //< Reconnecting to the server after idle.
+    auto connection = messageBusConnection();
+    if (!connection) //< Reconnecting to the server after idle.
         return StartResult::failed;
 
     if (isCameraHistoryValid(camera))
@@ -265,9 +266,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
 
     // TODO: #sivanov Resource context should have access to the corresponding rest connection.
     // Message bus connection exists on the server side and in the main client context.
-    const QnUuid serverId = m_context->messageBusConnection()
-        ? m_context->messageBusConnection()->moduleInformation().id
-        : camera->getParentId();
+    const QnUuid serverId = connection->moduleInformation().id;
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
     if (!NX_ASSERT(server))
         return StartResult::failed;

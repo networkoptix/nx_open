@@ -135,7 +135,7 @@ void QnPopupSettingsWidget::applyChanges()
     {
         m_adaptor->setWatchedEvents(watchedEvents());
         m_adaptor->saveToResource();
-        systemContext()->resourcePropertyDictionary()->saveParamsAsync(context()->user()->getId());
+        resourcePropertyDictionary()->saveParamsAsync(context()->user()->getId());
     }
 
     appContext()->localSettings()->popupSystemHealth = storedSystemHealth();

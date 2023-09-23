@@ -63,7 +63,7 @@ void OrphanCameraWatcher::start()
 
 void OrphanCameraWatcher::update()
 {
-    auto connectionPtr = systemContext()->ec2Connection();
+    auto connectionPtr = messageBusConnection();
     if (!connectionPtr)
         return;
 

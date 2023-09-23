@@ -149,7 +149,7 @@ protected:
 
         // We need a whole Server just to make analytics descriptors work.
         QnMediaServerResourcePtr server(new nx::core::resource::ServerMock());
-        server->setIdUnsafe(systemContext()->peerId());
+        server->setIdUnsafe(peerId());
         resourcePool()->addResource(server);
 
         server->setProperty(nx::analytics::kDescriptorsProperty, QString(kSerializedDescriptors));

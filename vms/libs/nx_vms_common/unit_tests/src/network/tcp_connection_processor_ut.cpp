@@ -62,13 +62,13 @@ class TestTcpListener: public QnTcpListener
 {
 public:
     TestTcpListener(
-        QnCommonModule* commonModule,
+        nx::vms::common::SystemContext* systemContext,
         int maxTcpRequestSize,
         const QHostAddress& address,
         int port)
         :
         QnTcpListener(
-            commonModule,
+            systemContext,
             maxTcpRequestSize,
             address,
             port,
@@ -98,7 +98,7 @@ TEST(TcpConnectionProcessor, sendAsyncData)
 
     // QnTcpListener uses commonModule()->moduleGuid().
     TestTcpListener tcpListener(
-        context.commonModule(), kMaxTcpRequestSize, QHostAddress::Any, /*port*/ 0);
+        context.systemContext(), kMaxTcpRequestSize, QHostAddress::Any, /*port*/ 0);
     tcpListener.start();
 
     QElapsedTimer timer;

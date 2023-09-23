@@ -9,7 +9,6 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/radass/radass_fwd.h>
 
-class QOpenGLWidget;
 class QnClientCoreModule;
 
 namespace nx::vms::api { enum class PeerType; }
@@ -50,7 +49,6 @@ public:
 
     static QnClientModule* instance();
 
-    void initDesktopCamera(QOpenGLWidget* window);
     void startLocalSearchers();
 
     QnClientCoreModule* clientCoreModule() const;
@@ -67,11 +65,8 @@ public:
 
     static void initWebEngine();
 
-    void initSkin();
-
 private:
     static void initSurfaceFormat();
-    void initNetwork();
     void registerResourceDataProviders();
 
 private:

@@ -12,9 +12,11 @@
 #include <nx/build_info_proxy.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
+#include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/external_resources.h>
@@ -98,6 +100,8 @@ struct ApplicationContext::Private
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
     std::unique_ptr<QnVoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
     std::unique_ptr<ColorTheme> colorTheme;
+    std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
+    std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
 };
 
 ApplicationContext::ApplicationContext(
@@ -131,6 +135,9 @@ ApplicationContext::ApplicationContext(
         case Mode::mobileClient:
             d->voiceSpectrumAnalyzer = std::make_unique<QnVoiceSpectrumAnalyzer>();
             d->colorTheme = std::make_unique<ColorTheme>();
+            d->localNetworkInterfacesManager = std::make_unique<LocalNetworkInterfacesManager>();
+            d->knownServerConnectionsWatcher =
+                std::make_unique<watchers::KnownServerConnections>();
             break;
     }
 }
@@ -180,6 +187,11 @@ QnVoiceSpectrumAnalyzer* ApplicationContext::voiceSpectrumAnalyzer() const
 Settings* ApplicationContext::coreSettings() const
 {
     return d->settings.get();
+}
+
+watchers::KnownServerConnections* ApplicationContext::knownServerConnectionsWatcher() const
+{
+    return d->knownServerConnectionsWatcher.get();
 }
 
 } // namespace nx::vms::client::core

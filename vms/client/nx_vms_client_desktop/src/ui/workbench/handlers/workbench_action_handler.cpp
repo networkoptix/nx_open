@@ -1361,11 +1361,8 @@ void ActionHandler::moveResourcesToServer(
         {
             for (const auto& webPage: webPages)
             {
-                qnResourcesChangesManager->saveWebPage(webPage,
-                    [serverId](const QnWebPageResourcePtr& webPage)
-                    {
-                        webPage->setProxyId(serverId);
-                    });
+                webPage->setProxyId(serverId);
+                qnResourcesChangesManager->saveWebPage(webPage);
             }
         };
 
@@ -2536,7 +2533,7 @@ void ActionHandler::at_renameAction_triggered()
         qnResourcesChangesManager->saveServer(server, nx::utils::guarded(this,
             [server, oldName](bool success, rest::Handle /*requestId*/)
             {
-                if (NX_ASSERT(success))
+                if (!success)
                     server->setName(oldName);
             }));
     }
@@ -2545,15 +2542,25 @@ void ActionHandler::at_renameAction_triggered()
         qnResourcesChangesManager->saveCamera(camera,
             [name](const auto& camera) { camera->setName(name); });
     }
-    else if (auto videowall = resource.dynamicCast<QnVideoWallResource>())
+    else if (auto videoWall = resource.dynamicCast<QnVideoWallResource>())
     {
-        qnResourcesChangesManager->saveVideoWall(videowall,
-            [name](const auto& videowall) { videowall->setName(name); });
+        videoWall->setName(name);
+        qnResourcesChangesManager->saveVideoWall(videoWall, nx::utils::guarded(this,
+            [oldName](bool success, const QnVideoWallResourcePtr& videoWall)
+            {
+                if (!success)
+                    videoWall->setName(oldName);
+            }));
     }
     else if (auto webPage = resource.dynamicCast<QnWebPageResource>())
     {
-        qnResourcesChangesManager->saveWebPage(webPage,
-            [name](const auto& webPage) { webPage->setName(name); });
+        webPage->setName(name);
+        qnResourcesChangesManager->saveWebPage(webPage, nx::utils::guarded(this,
+            [oldName](bool success, const QnWebPageResourcePtr& webPage)
+            {
+                if (!success)
+                    webPage->setName(oldName);
+            }));
     }
     else if (auto archive = resource.dynamicCast<QnAbstractArchiveResource>())
     {

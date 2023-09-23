@@ -48,13 +48,13 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
 {
     using namespace nx::vms::api;
 
-    connect(context->resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged,
+    connect(resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged,
         [this](const QnUuid& resourceId, const QString& key)
         {
             if (!resourceId.isNull())
                 return;
 
-            const auto dictionary = systemContext()->resourcePropertyDictionary();
+            const auto dictionary = resourcePropertyDictionary();
             if (key == kSaasDataPropertyKey)
             {
                 if (const auto saasData = getObjectFromDictionary<api::SaasData>(dictionary, key))
@@ -77,7 +77,7 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
             }
         });
 
-    connect(context->resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyRemoved,
+    connect(resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyRemoved,
         [this](const QnUuid& resourceId, const QString& key)
         {
             if (!resourceId.isNull())
@@ -93,7 +93,7 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
 void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
 {
     setJsonToDictionary(
-        systemContext()->resourcePropertyDictionary(),
+        resourcePropertyDictionary(),
         kSaasDataPropertyKey,
         saasDataJson);
 }
@@ -101,7 +101,7 @@ void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
 void ServiceManager::loadServiceData(const std::string_view& servicesJson)
 {
     setJsonToDictionary(
-        systemContext()->resourcePropertyDictionary(),
+        resourcePropertyDictionary(),
         kSaasServicesPropertyKey,
         servicesJson);
 }

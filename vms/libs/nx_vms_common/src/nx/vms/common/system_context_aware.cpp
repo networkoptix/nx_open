@@ -49,6 +49,11 @@ SystemContext* SystemContextAware::systemContext() const
     return d->systemContext.data();
 }
 
+QnUuid SystemContextAware::peerId() const
+{
+    return systemContext()->peerId();
+}
+
 std::shared_ptr<ec2::AbstractECConnection> SystemContextAware::messageBusConnection() const
 {
     return systemContext()->messageBusConnection();
@@ -62,6 +67,11 @@ QnResourceAccessManager* SystemContextAware::resourceAccessManager() const
 QnResourcePool* SystemContextAware::resourcePool() const
 {
     return systemContext()->resourcePool();
+}
+
+QnResourcePropertyDictionary* SystemContextAware::resourcePropertyDictionary() const
+{
+    return systemContext()->resourcePropertyDictionary();
 }
 
 QnCommonMessageProcessor* SystemContextAware::messageProcessor() const

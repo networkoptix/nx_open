@@ -7,6 +7,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/application_context.h>
 
+class QOpenGLWidget;
+
 class QnResourceDiscoveryManager;
 class QnResourcePool;
 
@@ -128,6 +130,12 @@ public:
      * Unregister existing Window Context before destroying.
      */
     void removeWindowContext(WindowContext* windowContext);
+
+    /**
+     * Initialize desktop camera implementation depending on the current OS. For Windows it will be
+     * the screen recording camera, for other OS - audio only.
+     */
+    void initializeDesktopCamera(QOpenGLWidget* window);
 
     /**
      * @return Id of the current peer in the Message Bus. It is persistent and is not changed

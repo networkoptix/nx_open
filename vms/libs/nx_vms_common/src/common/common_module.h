@@ -8,7 +8,6 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
-#include <utils/common/instance_storage.h>
 
 namespace nx::vms::common {
 
@@ -28,9 +27,7 @@ namespace nx::vms::event { class RuleManager; }
  * As a temporary solution, QnCommonModule stores SystemContext for now. This is required to
  * simplify transition process.
  */
-class NX_VMS_COMMON_API QnCommonModule:
-    public QObject,
-    public /*mixin*/ QnInstanceStorage
+class NX_VMS_COMMON_API QnCommonModule: public QObject
 {
     Q_OBJECT
 
@@ -41,9 +38,6 @@ public:
      */
     explicit QnCommonModule(nx::vms::common::SystemContext* systemContext);
     virtual ~QnCommonModule();
-
-    using QnInstanceStorage::instance;
-    using QnInstanceStorage::store;
 
     nx::vms::common::SystemContext* systemContext() const;
 
@@ -62,7 +56,7 @@ public:
     nx::vms::common::SystemSettings* globalSettings() const;
     nx::vms::event::RuleManager* eventRuleManager() const;
     QnResourceDataPool* resourceDataPool() const;
-    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
+    std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
     QnCommonMessageProcessor* messageProcessor() const;
     nx::metrics::Storage* metrics() const;
     std::weak_ptr<nx::metrics::Storage> metricsWeakRef() const;

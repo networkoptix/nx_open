@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "message_bus_adapter.h"
+
 #include <nx/p2p/p2p_message_bus.h>
 
 using namespace nx::vms;
@@ -8,11 +9,11 @@ using namespace nx::vms;
 namespace ec2 {
 
 TransactionMessageBusAdapter::TransactionMessageBusAdapter(
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
     :
-    AbstractTransactionMessageBus(commonModule),
+    AbstractTransactionMessageBus(systemContext),
     m_jsonTranSerializer(jsonTranSerializer),
     m_ubjsonTranSerializer(ubjsonTranSerializer)
 {

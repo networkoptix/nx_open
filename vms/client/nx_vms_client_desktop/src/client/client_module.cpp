@@ -13,8 +13,6 @@
 #include <QtQml/QQmlEngine>
 #include <QtWebEngineCore/QWebEngineProfile>
 #include <QtWebEngineCore/QWebEngineSettings>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QToolTip>
 
 #include <api/network_proxy_factory.h>
 #include <client/client_runtime_settings.h>
@@ -31,12 +29,7 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/crash_dump/systemexcept.h>
-#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
-#include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
-#include <nx/vms/client/core/settings/systems_visibility_manager.h>
-#include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
@@ -50,77 +43,26 @@
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/old_style.h>
-#include <nx/vms/client/desktop/style/style.h>
+#include <nx/vms/client/desktop/state/running_instances_manager.h>
+#include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/license_health_watcher.h>
-#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
-#include <nx/vms/client/desktop/utils/local_proxy_server.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/time/formatter.h>
-#include <ui/workaround/qtbug_workaround.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/math/color_transformations.h>
 
 #if defined(Q_OS_WIN)
-#include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
-#include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource_searcher_impl.h>
-#else
-#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource_searcher_impl.h>
-#endif
-#if defined(Q_OS_MAC)
-#include <ui/workaround/mac_utils.h>
+    #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource.h>
 #endif
 
-#include <nx/vms/client/desktop/state/running_instances_manager.h>
-#include <nx/vms/client/desktop/state/shared_memory_manager.h>
+#if defined(Q_OS_MAC)
+    #include <ui/workaround/mac_utils.h>
+#endif
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
-
-namespace {
-
-QPalette makeApplicationPalette()
-{
-    QPalette result(QApplication::palette());
-    result.setColor(QPalette::WindowText, core::colorTheme()->color("light16"));
-    result.setColor(QPalette::Button, core::colorTheme()->color("dark11"));
-    result.setColor(QPalette::Light, core::colorTheme()->color("light10"));
-    result.setColor(QPalette::Midlight, core::colorTheme()->color("dark13"));
-    result.setColor(QPalette::Dark, core::colorTheme()->color("dark9"));
-    result.setColor(QPalette::Mid, core::colorTheme()->color("dark10"));
-    result.setColor(QPalette::Text, core::colorTheme()->color("light4"));
-    result.setColor(QPalette::BrightText, core::colorTheme()->color("light1"));
-    result.setColor(QPalette::ButtonText, core::colorTheme()->color("light4"));
-    result.setColor(QPalette::Base, core::colorTheme()->color("dark7"));
-    result.setColor(QPalette::Window, core::colorTheme()->color("dark7"));
-    result.setColor(QPalette::Shadow, core::colorTheme()->color("dark5"));
-    result.setColor(QPalette::Highlight, core::colorTheme()->color("brand_core"));
-    result.setColor(QPalette::HighlightedText, core::colorTheme()->color("brand_contrast"));
-    result.setColor(QPalette::Link, core::colorTheme()->color("brand_d2"));
-    result.setColor(QPalette::LinkVisited, core::colorTheme()->color("brand_core"));
-    result.setColor(QPalette::AlternateBase, core::colorTheme()->color("dark7"));
-    result.setColor(QPalette::ToolTipBase, core::colorTheme()->color("light4"));
-    result.setColor(QPalette::ToolTipText, core::colorTheme()->color("dark4"));
-    result.setColor(QPalette::PlaceholderText, core::colorTheme()->color("light16"));
-
-    static const auto kDisabledAlpha = 77;
-    static const QList<QPalette::ColorRole> kDimmerRoles{{
-        QPalette::WindowText, QPalette::Button, QPalette::Light,
-        QPalette::Midlight, QPalette::Dark, QPalette::Mid,
-        QPalette::Text, QPalette::BrightText, QPalette::ButtonText,
-        QPalette::Base, QPalette::Shadow, QPalette::HighlightedText,
-        QPalette::Link, QPalette::LinkVisited, QPalette::AlternateBase}};
-
-    for (const QPalette::ColorRole role: kDimmerRoles)
-        result.setColor(QPalette::Disabled, role, withAlpha(result.color(role), kDisabledAlpha));
-
-    return result;
-}
-
-} // namespace
 
 static QnClientModule* s_instance = nullptr;
 
@@ -157,13 +99,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
     if (d->startupParameters.selfUpdateMode)
         return;
 
-    auto commonModule = clientCoreModule()->commonModule();
-
-    commonModule->store(new QnQtbugWorkaround());
-
-    commonModule->store(new LocalProxyServer());
-
-    commonModule->findInstance<nx::vms::client::core::watchers::KnownServerConnections>()->start();
+    core::appContext()->knownServerConnectionsWatcher()->start();
 
     d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
         appContext()->currentSystemContext()->resourcePool(),
@@ -185,10 +121,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
     d->debugInfoStorage = std::make_unique<DebugInfoStorage>();
 
     d->initLicensesModule();
-    initNetwork();
-
-    // Initialize application UI.
-    initSkin();
+    appContext()->moduleDiscoveryManager()->start(systemContext()->resourcePool());
 
     initSurfaceFormat();
 }
@@ -209,20 +142,6 @@ QnClientModule::~QnClientModule()
 QnClientModule* QnClientModule::instance()
 {
     return s_instance;
-}
-
-void QnClientModule::initDesktopCamera([[maybe_unused]] QOpenGLWidget* window)
-{
-    /* Initialize desktop camera searcher. */
-    auto commonModule = clientCoreModule()->commonModule();
-#if defined(Q_OS_WIN)
-    auto impl = new WindowsDesktopResourceSearcherImpl(window);
-#else
-    auto impl = new core::DesktopAudioOnlyResourceSearcherImpl();
-#endif
-    auto desktopSearcher = commonModule->store(new core::DesktopResourceSearcher(impl));
-    desktopSearcher->setLocal(true);
-    appContext()->resourceDiscoveryManager()->addDeviceSearcher(desktopSearcher);
 }
 
 void QnClientModule::startLocalSearchers()
@@ -247,33 +166,6 @@ void QnClientModule::initSurfaceFormat()
     format.setStencilBufferSize(8);
 
     QSurfaceFormat::setDefaultFormat(format);
-}
-
-void QnClientModule::initNetwork()
-{
-    appContext()->moduleDiscoveryManager()->start(systemContext()->resourcePool());
-
-    auto commonModule = clientCoreModule()->commonModule();
-    commonModule->store(new nx::vms::client::core::SystemsVisibilityManager());
-}
-
-void QnClientModule::initSkin()
-{
-    QStringList paths;
-    paths << ":/skin";
-
-    QScopedPointer<core::Skin> skin(new core::Skin(paths));
-
-    QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
-    QApplication::setStyle([]() { return new OldStyle(new Style()); }());
-
-    auto commonModule = clientCoreModule()->commonModule();
-    commonModule->store(skin.take());
-    commonModule->store(new core::ColorTheme());
-    commonModule->store(new CustomCursors(core::Skin::instance()));
-
-    QApplication::setPalette(makeApplicationPalette());
-    QToolTip::setPalette(QApplication::palette());
 }
 
 void QnClientModule::initWebEngine()

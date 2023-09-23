@@ -636,7 +636,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
     }
     else
     {
-        m_context->resourcePropertyDictionary()->setValue(
+        resourcePropertyDictionary()->setValue(
             param.resourceId,
             param.name,
             param.value,
@@ -663,7 +663,7 @@ void QnCommonMessageProcessor::on_resourceParamRemoved(
 {
     if (canRemoveResourceProperty(param.resourceId, param.name))
     {
-        m_context->resourcePropertyDictionary()->on_resourceParamRemoved(
+        resourcePropertyDictionary()->on_resourceParamRemoved(
             param.resourceId,
             param.name);
     }
@@ -1008,7 +1008,7 @@ void QnCommonMessageProcessor::resetCameraUserAttributesList(
 void QnCommonMessageProcessor::resetPropertyList(const ResourceParamWithRefDataList& params)
 {
     // Store existing parameter keys.
-    auto existingProperties = m_context->resourcePropertyDictionary()->allPropertyNamesByResource();
+    auto existingProperties = resourcePropertyDictionary()->allPropertyNamesByResource();
 
     // Update changed values.
     for (const auto& param: params)

@@ -7,8 +7,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_map.h>
 #include <core/resource_access/resource_access_subject.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 
 namespace nx::vms::client::desktop {
@@ -19,9 +17,7 @@ class SystemContext;
  * Utility class for saving resources user attributes.
  * Supports changes rollback in case they cannot be saved on server.
  */
-class ResourcesChangesManager: public QObject,
-    public core::CommonModuleAware,
-    public core::RemoteConnectionAware
+class ResourcesChangesManager: public QObject
 {
     Q_OBJECT
     typedef QObject base_type;
@@ -34,11 +30,9 @@ public:
     using UserChangesFunction = std::function<void(const QnUserResourcePtr&)>;
     using UserCallbackFunction = std::function<void(bool, const QnUserResourcePtr&)>;
     using RoleCallbackFunction = std::function<void(bool, const nx::vms::api::UserGroupData&)>;
-    using VideoWallChangesFunction = std::function<void(const QnVideoWallResourcePtr&)>;
     using VideoWallCallbackFunction = std::function<void(bool, const QnVideoWallResourcePtr&)>;
     using LayoutChangesFunction = std::function<void(const QnLayoutResourcePtr&)>;
     using LayoutCallbackFunction = std::function<void(bool, const QnLayoutResourcePtr&)>;
-    using WebPageChangesFunction = std::function<void(const QnWebPageResourcePtr&)>;
     using WebPageCallbackFunction = std::function<void(bool, const QnWebPageResourcePtr&)>;
     using AccessRightsCallbackFunction = std::function<void(bool)>;
 
@@ -79,15 +73,12 @@ public:
 
     /* User resource management is handled by UserGroupRequestChain class. */
 
-    /** Apply changes to the given videoWall. */
+    /** Save Video Wall. */
     void saveVideoWall(const QnVideoWallResourcePtr& videoWall,
-        VideoWallChangesFunction applyChanges = VideoWallChangesFunction(),
-        VideoWallCallbackFunction callback = VideoWallCallbackFunction());
+        VideoWallCallbackFunction callback = {});
 
-    /** Apply changes to the given web page. */
-    void saveWebPage(const QnWebPageResourcePtr& webPage,
-        WebPageChangesFunction applyChanges = WebPageChangesFunction(),
-        WebPageCallbackFunction callback = WebPageCallbackFunction());
+    /** Save Web Page. */
+    void saveWebPage(const QnWebPageResourcePtr& webPage, WebPageCallbackFunction callback = {});
 
 signals:
     /** This signal is emitted every time when changes cannot be saved. */

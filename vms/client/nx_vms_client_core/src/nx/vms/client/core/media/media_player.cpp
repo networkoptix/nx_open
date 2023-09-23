@@ -4,9 +4,8 @@
 
 #include <QtQml/QtQml>
 
-#include <common/common_module.h>
-
 #include <client_core/client_core_module.h>
+#include <common/common_module.h>
 
 #include "media_player_channel_adapter.h"
 

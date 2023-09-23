@@ -12,7 +12,6 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/api/data/os_information.h>
 #include <nx/vms/common/application_context.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/statistics/settings.h>
 #include <utils/common/scoped_thread_rollback.h>
@@ -291,7 +290,7 @@ nx::network::http::HttpHeaders ReportData::makeHttpHeaders() const
     const auto binName = fileName.split(QChar('_')).first();
 #endif
 
-    const auto uuidHash = m_host.systemContext()->peerId().toSimpleString().replace("-", "");
+    const auto uuidHash = m_host.peerId().toSimpleString().replace("-", "");
     const auto version = nx::utils::AppInfo::applicationFullVersion();
     const auto systemInfo = nx::vms::api::OsInformation::fromBuildInfo().toString();
     const auto systemRuntime = nx::vms::api::OsInformation::currentSystemRuntime();

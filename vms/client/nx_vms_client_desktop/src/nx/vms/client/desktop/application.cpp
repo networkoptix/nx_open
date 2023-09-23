@@ -302,7 +302,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     mainWindow->show();
     mainWindow->updateDecorationsState();
 
-    client.initDesktopCamera(qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
+    applicationContext->initializeDesktopCamera(
+        qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
 
     workbenchContext->handleStartupParameters(startupParams);

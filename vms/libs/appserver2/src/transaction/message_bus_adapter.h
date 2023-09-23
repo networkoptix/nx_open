@@ -15,7 +15,7 @@ namespace ec2 {
     {
     public:
         TransactionMessageBusAdapter(
-            QnCommonModule* commonModule,
+            nx::vms::common::SystemContext* systemContext,
             QnJsonTransactionSerializer* jsonTranSerializer,
             QnUbjsonTransactionSerializer* ubjsonTranSerializer
         );
@@ -27,7 +27,6 @@ namespace ec2 {
             m_bus.reset(new MessageBusType(
                 systemContext,
                 peerType,
-                commonModule(),
                 m_jsonTranSerializer,
                 m_ubjsonTranSerializer));
 

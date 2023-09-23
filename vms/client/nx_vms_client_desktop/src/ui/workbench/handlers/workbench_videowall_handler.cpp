@@ -408,7 +408,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         [this](const QnPeerRuntimeInfo &info)
         {
             /* Ignore own info change. */
-            if (info.uuid == systemContext()->peerId())
+            if (info.uuid == peerId())
                 return;
 
             bool isControlled = !info.data.videoWallControlSession.isNull();
@@ -426,7 +426,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
                 return;
 
             /* Order by guid. */
-            if (info.uuid < systemContext()->peerId())
+            if (info.uuid < peerId())
             {
                 setControlMode(false);
                 showControlledByAnotherUserMessage();
@@ -580,7 +580,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(
                 updateMode();
             };
         snapshotManager()->save(layout, callback);
-        systemContext()->resourcePropertyDictionary()->saveParamsAsync(layout->getId());
+        resourcePropertyDictionary()->saveParamsAsync(layout->getId());
     }
     else
     {
@@ -1304,7 +1304,7 @@ void QnWorkbenchVideoWallHandler::updateMode()
         auto item = index.item();
         if (item.runtimeStatus.online
             && (item.runtimeStatus.controlledBy.isNull()
-                || item.runtimeStatus.controlledBy == systemContext()->peerId())
+                || item.runtimeStatus.controlledBy == peerId())
             && layout->resource()
             && item.layout == layout->resource()->getId())
         {
@@ -1589,23 +1589,23 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     videoWall->setIdUnsafe(QnUuid::createUuid());
     videoWall->setName(proposedName);
     videoWall->setAutorun(true);
+    resourcePool()->addResource(videoWall);
 
-    // No need to backup newly created videowall.
-    auto applyChangesFunction = ResourcesChangesManager::VideoWallChangesFunction();
-    auto callbackFunction =
+    auto callback =
         [this](bool success, const QnVideoWallResourcePtr& videoWall)
         {
-            // Cannot capture the resource directly because real resource pointer may differ if the
-            // transaction is received before the request callback.
-            NX_ASSERT(videoWall);
-            if (success && videoWall)
+            if (success)
             {
                 menu()->trigger(action::SelectNewItemAction, videoWall);
                 menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
             }
+            else
+            {
+                videoWall->resourcePool()->removeResource(videoWall);
+            }
         };
 
-    qnResourcesChangesManager->saveVideoWall(videoWall, applyChangesFunction, callbackFunction);
+    qnResourcesChangesManager->saveVideoWall(videoWall, callback);
 }
 
 void QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered()
@@ -1655,12 +1655,8 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
     if (!dialog->exec())
         return;
 
-    qnResourcesChangesManager->saveVideoWall(videoWall,
-        [d = dialog.data()](const QnVideoWallResourcePtr& videoWall)
-        {
-            d->submitToResource(videoWall);
-        });
-
+    dialog->submitToResource(videoWall);
+    qnResourcesChangesManager->saveVideoWall(videoWall);
     menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
@@ -2178,8 +2174,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
     if (!user)
         return;
 
-    const auto desktopCameraId = core::DesktopResource::calculateUniqueId(
-        systemContext()->peerId(), user->getId());
+    const auto desktopCameraId = core::DesktopResource::calculateUniqueId(peerId(), user->getId());
 
     const auto desktopCamera = resourcePool()->getResourceByPhysicalId<QnVirtualCameraResource>(
         desktopCameraId);
@@ -3251,7 +3246,7 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(
     }
 
     /* Ignore local changes. */
-    if (controllerId != systemContext()->peerId() && needUpdate)
+    if (controllerId != peerId() && needUpdate)
         updateMode();
 }
 

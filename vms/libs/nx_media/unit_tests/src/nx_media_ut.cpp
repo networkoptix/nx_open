@@ -4,19 +4,19 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/core/access/access_types.h>
-#include <nx/utils/log/log.h>
 #include <common/common_globals.h>
-#include <common/common_module.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/core/access/access_types.h>
 #include <nx/media/abstract_video_decoder.h>
 #include <nx/media/media_player.h>
 #include <nx/media/media_player_quality_chooser.h>
 #include <nx/media/video_decoder_registry.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <utils/media/ffmpeg_initializer.h>
 
@@ -438,15 +438,15 @@ public:
 
 PlayerSetQualityTest::PlayerSetQualityTest()
 {
-    m_context.commonModule()->resourcePool()->clear(); //< Just in case.
+    m_context.systemContext()->resourcePool()->clear(); //< Just in case.
     m_server->setUrl("http://localhost:7001");
-    m_context.commonModule()->resourcePool()->addResource(m_server);
-    m_context.commonModule()->resourcePool()->addResource(m_camera);
+    m_context.systemContext()->resourcePool()->addResource(m_server);
+    m_context.systemContext()->resourcePool()->addResource(m_camera);
 }
 
 PlayerSetQualityTest::~PlayerSetQualityTest()
 {
-    m_context.commonModule()->resourcePool()->clear();
+    m_context.systemContext()->resourcePool()->clear();
 }
 
 void PlayerSetQualityTest::test(const TestCase& testCase)
@@ -486,7 +486,7 @@ class NxMediaPlayerTest: public nx::vms::common::test::ContextBasedTest
 protected:
     virtual void SetUp()
     {
-        context()->commonModule()->store(new QnFfmpegInitializer());
+        ffmpegInitializer = std::make_unique<QnFfmpegInitializer>();
 
         VideoDecoderRegistry::instance()->reinitialize(); //< Just in case.
         VideoDecoderRegistry::instance()->addPlugin<MockVideoDecoder>("MockVideoDecoder");
@@ -495,7 +495,11 @@ protected:
     virtual void TearDown()
     {
         VideoDecoderRegistry::instance()->reinitialize();
+        ffmpegInitializer.reset();
     }
+
+private:
+    std::unique_ptr<QnFfmpegInitializer> ffmpegInitializer;
 };
 
 } // namespace

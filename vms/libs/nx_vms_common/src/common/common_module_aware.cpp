@@ -2,6 +2,7 @@
 
 #include "common_module_aware.h"
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/common/system_context.h>
 
 #include "common_module.h"
@@ -113,9 +114,9 @@ QnResourceDataPool* QnCommonModuleAware::dataPool() const
         : nullptr;
 }
 
-std::shared_ptr<ec2::AbstractECConnection> QnCommonModuleAware::ec2Connection() const
+std::shared_ptr<ec2::AbstractECConnection> QnCommonModuleAware::messageBusConnection() const
 {
-    return NX_ASSERT(m_commonModule) ? m_commonModule->ec2Connection() : nullptr;
+    return NX_ASSERT(m_commonModule) ? m_commonModule->messageBusConnection() : nullptr;
 }
 
 QnCommonMessageProcessor* QnCommonModuleAware::messageProcessor() const

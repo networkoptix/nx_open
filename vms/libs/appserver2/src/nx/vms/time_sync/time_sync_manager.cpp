@@ -180,7 +180,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
     m_isTimeTakenFromInternet = timeData.isTakenFromInternet;
     if (rtt > maxRtt)
         return Result::error; //< Too big rtt. Try again.
-    const auto ownGuid = systemContext()->peerId();
+    const auto ownGuid = peerId();
     NX_DEBUG(this, "Got time %1 (%2 <-- %3), rtt=%4",
         QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate),
         appContext()->moduleDisplayName(ownGuid),
@@ -189,7 +189,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
     if (!setSyncTime(newTime, rtt))
     {
         NX_DEBUG(this, "Server %1 ignore new time %2 because of small delta.",
-            appContext()->moduleDisplayName(systemContext()->peerId()),
+            appContext()->moduleDisplayName(ownGuid),
             QDateTime::fromMSecsSinceEpoch(newTime.count()).toString(Qt::ISODate));
     }
     return Result::ok;
@@ -236,7 +236,7 @@ void TimeSyncManager::doPeriodicTasks()
 
 QString TimeSyncManager::idForToStringFromPtr() const
 {
-    return appContext()->moduleDisplayName(systemContext()->peerId());
+    return appContext()->moduleDisplayName(peerId());
 }
 
 } // namespace nx::vms::time

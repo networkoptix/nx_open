@@ -5,9 +5,9 @@
 #include <QtCore/QThread>
 #include <QtNetwork/QHostAddress>
 
-#include <common/common_module_aware.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/ssl/helpers.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
 
 #include "connection_guard_shared_state.h"
@@ -27,12 +27,16 @@ namespace detail { class QnDbManager; }
 
 class AbstractTransactionMessageBus:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware,
+    public nx::vms::common::SystemContextAware,
     public EnableMultiThreadDirectConnection<AbstractTransactionMessageBus>
 {
     Q_OBJECT;
 public:
-    AbstractTransactionMessageBus(QnCommonModule* value): QnCommonModuleAware(value) {}
+    AbstractTransactionMessageBus(nx::vms::common::SystemContext* value):
+        nx::vms::common::SystemContextAware(value)
+    {
+    }
+
     virtual ~AbstractTransactionMessageBus() {}
 
     virtual void start() = 0;

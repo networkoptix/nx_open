@@ -6,7 +6,6 @@
 #include <QtWidgets/QApplication>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
@@ -49,175 +48,6 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-// TODO: #vkutin Move this function to some common helpers file.
-template<class... Args>
-auto safeProcedure(std::function<void(Args...)> proc)
-{
-    return
-        [proc](Args... args)
-        {
-            if (proc)
-                proc(args...);
-        };
-}
-
-using ReplyProcessorFunction = std::function<void(int reqId, ec2::ErrorCode errorCode)>;
-using ReplyProcessorFunctionRest = std::function<void(
-    bool success, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty result)>;
-
-/**
- * Create handler that will be called in the callee thread and only if we have not changed the
- * actual connection session.
- */
-ReplyProcessorFunction makeReplyProcessor(ResourcesChangesManager* manager,
-    ReplyProcessorFunction handler)
-{
-    QPointer<ResourcesChangesManager> guard(manager);
-    const auto sessionGuid = manager->sessionId();
-    QPointer<QThread> thread(QThread::currentThread());
-    return
-        [thread, guard, sessionGuid, handler](int reqID, ec2::ErrorCode errorCode)
-        {
-            if (!thread)
-                return;
-
-            executeInThread(thread,
-                [guard, sessionGuid, reqID, errorCode, handler]
-                {
-                    if (!guard)
-                        return;
-
-                    // Check if we have already changed session.
-                    if (guard->sessionId() != sessionGuid)
-                        return;
-
-                    handler(reqID, errorCode);
-                }); //< executeInThread
-        };
-}
-
-ReplyProcessorFunctionRest makeReplyProcessorRest(ResourcesChangesManager* manager,
-    ReplyProcessorFunctionRest handler)
-{
-    QPointer<ResourcesChangesManager> guard(manager);
-    const auto sessionGuid = manager->sessionId();
-    QPointer<QThread> thread(QThread::currentThread());
-    return
-        [thread, guard, sessionGuid, handler](
-            bool success, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty result)
-        {
-            if (!thread)
-                return;
-
-            executeInThread(thread,
-                [guard, sessionGuid, success, requestId, result, handler]
-                {
-                    if (!guard)
-                        return;
-
-                    // Check if we have already changed session.
-                    if (guard->sessionId() != sessionGuid)
-                        return;
-
-                    handler(success, requestId, result);
-                }); //< executeInThread
-        };
-    }
-
-template<typename ResourceType>
-using ResourceCallbackFunction =
-    std::function<void(bool, const QnSharedResourcePointer<ResourceType>&)>;
-
-/**
- * Create handler that will be called in the callee thread and only if we have not changed the
- * actual connection session.
- */
-template<typename ResourceType, typename BackupType>
-ReplyProcessorFunction makeSaveResourceReplyProcessor(ResourcesChangesManager* manager,
-    QnSharedResourcePointer<ResourceType> resource,
-    ResourceCallbackFunction<ResourceType> callback = ResourceCallbackFunction<ResourceType>())
-{
-    BackupType backup;
-    ec2::fromResourceToApi(resource, backup);
-
-    auto handler =
-        [manager, resource, backup, callback](int /*reqID*/, ec2::ErrorCode errorCode)
-        {
-            const bool success = errorCode == ec2::ErrorCode::ok;
-
-            if (success)
-            {
-                manager->resourcePool()->addNewResources({{resource}});
-            }
-            else
-            {
-                if (auto existing = manager->resourcePool()->getResourceById<ResourceType>(
-                    resource->getId()))
-                {
-                    ec2::fromApiToResource(backup, existing);
-                }
-            }
-
-            if (callback)
-            {
-                /* Resource could be added by transaction message bus, so shared pointer
-                 * will differ (if we have created a new resource). */
-                auto updatedResource = manager->resourcePool()->getResourceById<ResourceType>(
-                    resource->getId());
-
-                callback(success, updatedResource);
-            }
-
-            if (!success)
-                emit manager->saveChangesFailed({{resource}});
-        };
-
-    return makeReplyProcessor(manager, handler);
-}
-
-template<typename ResourceType, typename BackupType>
-ReplyProcessorFunctionRest makeSaveResourceReplyProcessorRest(ResourcesChangesManager* manager,
-    QnSharedResourcePointer<ResourceType> resource,
-    ResourceCallbackFunction<ResourceType> callback = ResourceCallbackFunction<ResourceType>())
-{
-    BackupType backup;
-    ec2::fromResourceToApi(resource, backup);
-
-    auto handler =
-        [manager, resource, backup, callback](bool success,
-            rest::Handle requestId,
-            rest::ServerConnection::ErrorOrEmpty result)
-        {
-            if (success)
-            {
-                manager->resourcePool()->addNewResources({{resource}});
-            }
-            else
-            {
-                if (auto existing = manager->resourcePool()->getResourceById<ResourceType>(
-                    resource->getId()))
-                {
-                    ec2::fromApiToResource(backup, existing);
-                }
-            }
-
-            if (callback)
-            {
-                // Resource could be added by transaction message bus, so shared pointer
-                // will differ (if we have created a new resource).
-                auto updatedResource = manager->resourcePool()->getResourceById<ResourceType>(
-                    resource->getId());
-
-                callback(success, updatedResource);
-            }
-
-            if (!success)
-                emit manager->saveChangesFailed({{resource}});
-        };
-
-    return makeReplyProcessorRest(manager, handler);
-}
-
 template<class ResourcePtrType>
 QList<QnUuid> idListFromResList(const QList<ResourcePtrType>& resList)
 {
@@ -243,33 +73,29 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
     const DeleteResourceCallbackFunction& callback,
     const nx::vms::common::SessionTokenHelperPtr& helper)
 {
-    const auto safeCallback = safeProcedure(callback);
-
-    if (!resource)
-    {
-        safeCallback(false, resource);
+    auto systemContext = SystemContext::fromResource(resource);
+    if (!NX_ASSERT(systemContext))
         return;
-    }
 
-    auto api = connectedServerApi();
+    auto api = systemContext->connectedServerApi();
     if (!api)
-    {
-        safeCallback(false, resource);
         return;
-    }
 
     auto handler =
-        [this, safeCallback, resource](bool success,
+        [this, callback, resource](bool success,
             rest::Handle /*requestId*/,
             rest::ServerConnection::ErrorOrEmpty /*result*/)
         {
             if (success)
             {
                 NX_DEBUG(this, "About to remove resource %1", resource);
-                resourcePool()->removeResource(resource);
+                auto systemContext = SystemContext::fromResource(resource);
+                if (NX_ASSERT(systemContext))
+                    systemContext->resourcePool()->removeResource(resource);
             }
 
-            safeCallback(success, resource);
+            if (callback)
+                callback(success, resource);
 
             if (!success)
                 emit resourceDeletingFailed({resource});
@@ -306,7 +132,6 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
         action = QString("/rest/v3/webPages/%1").arg(resource->getId().toString());
     }
 
-    const auto systemContext = SystemContext::fromResource(resource);
     const auto tokenHelper = helper
         ? helper
         : systemContext->restApiHelper()->getSessionTokenHelper();
@@ -342,7 +167,17 @@ void ResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList
     if (cameras.isEmpty())
         return;
 
-    auto connection = messageBusConnection();
+    auto systemContext = SystemContext::fromResource(cameras.first());
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    NX_ASSERT(std::all_of(cameras.cbegin(), cameras.cend(),
+        [systemContext](const auto& camera)
+        {
+            return SystemContext::fromResource(camera) == systemContext;
+        }), "Implement saving cameras from different systems");
+
+    auto connection = systemContext->messageBusConnection();
     if (!connection)
         return;
 
@@ -376,12 +211,11 @@ void ResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList
     for (const auto& camera: cameras)
         changes.push_back(camera->getUserAttributes());
 
-    connection->getCameraManager(Qn::kSystemAccess)->saveUserAttributes(
-        changes, makeReplyProcessor(this, handler), this);
+    connection->getCameraManager(Qn::kSystemAccess)->saveUserAttributes(changes, handler, this);
 
     // TODO: #sivanov Values are not rolled back in case of failure.
     auto idList = idListFromResList(cameras);
-    resourcePropertyDictionary()->saveParamsAsync(idList);
+    systemContext->resourcePropertyDictionary()->saveParamsAsync(idList);
 }
 
 void ResourcesChangesManager::saveCamerasCore(
@@ -394,7 +228,17 @@ void ResourcesChangesManager::saveCamerasCore(
     if (cameras.isEmpty())
         return;
 
-    auto connection = messageBusConnection();
+    auto systemContext = SystemContext::fromResource(cameras.first());
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    NX_ASSERT(std::all_of(cameras.cbegin(), cameras.cend(),
+        [systemContext](const auto& camera)
+        {
+            return SystemContext::fromResource(camera) == systemContext;
+        }), "Implement saving cameras from different systems");
+
+    auto connection = systemContext->messageBusConnection();
     if (!connection)
         return;
 
@@ -408,11 +252,16 @@ void ResourcesChangesManager::saveCamerasCore(
             if (errorCode == ec2::ErrorCode::ok)
                 return;
 
-            for (const auto& data: backup)
+            auto systemContext = SystemContext::fromResource(cameras.first());
+            if (NX_ASSERT(systemContext))
             {
-                auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(data.id);
-                if (camera)
-                    ec2::fromApiToResource(data, camera);
+                for (const auto& data: backup)
+                {
+                    auto camera = systemContext->resourcePool()
+                        ->getResourceById<QnVirtualCameraResource>(data.id);
+                    if (camera)
+                        ec2::fromApiToResource(data, camera);
+                }
             }
 
             emit saveChangesFailed(cameras);
@@ -423,8 +272,7 @@ void ResourcesChangesManager::saveCamerasCore(
 
     nx::vms::api::CameraDataList apiCameras;
     ec2::fromResourceListToApi(cameras, apiCameras);
-    connection->getCameraManager(Qn::kSystemAccess)->addCameras(
-        apiCameras, makeReplyProcessor(this, handler), this);
+    connection->getCameraManager(Qn::kSystemAccess)->addCameras(apiCameras, handler, this);
 }
 
 rest::Handle ResourcesChangesManager::saveServer(
@@ -475,7 +323,8 @@ rest::Handle ResourcesChangesManager::saveServer(
     body.locationId = change.locationId;
     body.version = server->getVersion().toString();
 
-    auto modifiedProperties = resourcePropertyDictionary()->modifiedProperties(server->getId());
+    auto modifiedProperties = systemContext->resourcePropertyDictionary()
+        ->modifiedProperties(server->getId());
     for (auto [key, value]: nx::utils::keyValueRange(modifiedProperties))
         body.parameters[key] = QJsonValue(value);
 
@@ -487,64 +336,75 @@ rest::Handle ResourcesChangesManager::saveServer(
         this);
 }
 
-void ResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr& videoWall,
-    VideoWallChangesFunction applyChanges,
+void ResourcesChangesManager::saveVideoWall(
+    const QnVideoWallResourcePtr& videoWall,
     VideoWallCallbackFunction callback)
 {
     NX_ASSERT(videoWall);
     if (!videoWall)
         return;
 
-    auto connection = messageBusConnection();
+    const auto systemContext = SystemContext::fromResource(videoWall);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    auto connection = systemContext->messageBusConnection();
     if (!connection)
         return;
 
-    auto replyProcessor =
-        makeSaveResourceReplyProcessor<QnVideoWallResource, nx::vms::api::VideowallData>(
-            this, videoWall, callback);
+    auto handler =
+        [this, videoWall, callback](int /*reqID*/, ec2::ErrorCode errorCode)
+        {
+            const bool success = (errorCode == ec2::ErrorCode::ok);
 
-    if (applyChanges)
-        applyChanges(videoWall);
+            if (callback)
+                callback(success, videoWall);
+
+            if (!success)
+                emit saveChangesFailed({{videoWall}});
+        };
+
     nx::vms::api::VideowallData apiVideowall;
     ec2::fromResourceToApi(videoWall, apiVideowall);
 
-    connection->getVideowallManager(Qn::kSystemAccess)->save(apiVideowall, replyProcessor, this);
+    connection->getVideowallManager(Qn::kSystemAccess)->save(apiVideowall, handler, this);
 }
 
-void ResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr& webPage,
-    WebPageChangesFunction applyChanges,
+void ResourcesChangesManager::saveWebPage(
+    const QnWebPageResourcePtr& webPage,
     WebPageCallbackFunction callback)
 {
-    NX_ASSERT(webPage);
-    if (!webPage)
+    if (!NX_ASSERT(webPage))
         return;
 
-    auto connection = messageBusConnection();
+    const auto systemContext = SystemContext::fromResource(webPage);
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    auto connection = systemContext->messageBusConnection();
     if (!connection)
         return;
 
-    auto webPageCallback =
-        [this, callback](bool success, const QnWebPageResourcePtr& webPage)
+    auto handler =
+        [this, webPage, callback](int /*reqID*/, ec2::ErrorCode errorCode)
         {
-            // TODO: #sivanov Properties are not rolled back in case of failure.
+            const bool success = (errorCode == ec2::ErrorCode::ok);
+            const auto systemContext = SystemContext::fromResource(webPage);
+
             // Save resource properties only after resource itself is saved.
-            if (success)
-                resourcePropertyDictionary()->saveParamsAsync({webPage->getId()});
+            if (success && NX_ASSERT(systemContext))
+                systemContext->resourcePropertyDictionary()->saveParamsAsync({webPage->getId()});
 
             if (callback)
                 callback(success, webPage);
+
+            if (!success)
+                emit saveChangesFailed({{webPage}});
         };
 
-    auto replyProcessor =
-        makeSaveResourceReplyProcessor<QnWebPageResource, nx::vms::api::WebPageData>(
-            this, webPage, webPageCallback);
-
-    if (applyChanges)
-        applyChanges(webPage);
     nx::vms::api::WebPageData apiWebpage;
     ec2::fromResourceToApi(webPage, apiWebpage);
-
-    connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, replyProcessor, this);
+    connection->getWebPageManager(Qn::kSystemAccess)->save(apiWebpage, handler, this);
 }
 
 } // namespace nx::vms::client::desktop

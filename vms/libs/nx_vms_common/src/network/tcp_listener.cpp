@@ -5,13 +5,13 @@
 #include <atomic>
 #include <regex>
 
-#include <common/common_module.h>
 #include <nx/metrics/metrics_storage.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
+#include <nx/vms/common/system_context.h>
 
 #include "tcp_connection_processor.h"
 
@@ -77,14 +77,14 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
 }
 
 QnTcpListener::QnTcpListener(
-    QnCommonModule* commonModule,
+    nx::vms::common::SystemContext* systemContext,
     int maxTcpRequestSize,
     const QHostAddress& address,
     int port,
     int maxConnections,
     bool useSSL)
     :
-    QnCommonModuleAware(commonModule),
+    nx::vms::common::SystemContextAware(systemContext),
     d_ptr(new QnTcpListenerPrivate()),
     m_maxTcpRequestSize(maxTcpRequestSize)
 {
@@ -334,11 +334,12 @@ void QnTcpListener::run()
             auto clientSocket = d->serverSocket->accept();
             if (clientSocket)
             {
-                if (commonModule())
+                if (systemContext())
                 {
-                    commonModule()->metrics()->tcpConnections().total()++;
+                    systemContext()->metrics()->tcpConnections().total()++;
                     clientSocket->setBeforeDestroyCallback(
-                        [weakRef = this->commonModule()->metricsWeakRef()]()
+                        [weakRef = std::weak_ptr<nx::metrics::Storage>(systemContext()->metrics())]
+                        ()
                         {
                             if (auto metrics = weakRef.lock())
                                 metrics->tcpConnections().total()--;

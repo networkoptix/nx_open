@@ -136,15 +136,11 @@ void QnWorkbenchWebPageHandler::editWebPage()
         return;
     }
 
-    qnResourcesChangesManager->saveWebPage(webPage,
-        [url, name, proxy, subtype, proxyDomainAllowList, certCheck](
-            const QnWebPageResourcePtr& webPage)
-        {
-            webPage->setUrl(url.toString());
-            webPage->setName(name);
-            webPage->setProxyId(proxy);
-            webPage->setSubtype(subtype);
-            webPage->setProxyDomainAllowList(proxyDomainAllowList);
-            webPage->setCertificateCheckEnabled(certCheck);
-        });
+    webPage->setUrl(url.toString());
+    webPage->setName(name);
+    webPage->setProxyId(proxy);
+    webPage->setSubtype(subtype);
+    webPage->setProxyDomainAllowList(proxyDomainAllowList);
+    webPage->setCertificateCheckEnabled(certCheck);
+    qnResourcesChangesManager->saveWebPage(webPage);
 }

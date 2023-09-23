@@ -1176,23 +1176,23 @@ void ServerUpdateTool::requestModuleInformation()
     // We expect that m_serverConnection is created in requestStartUpdate
     if (!m_serverConnection)
     {
-        if (auto ec2connection = systemContext()->messageBusConnection())
+        if (auto messageBusConnection = systemContext()->messageBusConnection())
         {
             const nx::vms::api::ModuleInformation& moduleInformation =
-                ec2connection->moduleInformation();
+                messageBusConnection->moduleInformation();
 
             // TODO: #sivanov Looks like we can take existing rest connection here.
             m_serverConnection.reset(new rest::ServerConnection(
                 moduleInformation.id,
                 /*auditId*/ systemContext()->sessionId(),
                 systemContext()->certificateVerifier(),
-                ec2connection->address(),
-                ec2connection->credentials()));
+                messageBusConnection->address(),
+                messageBusConnection->credentials()));
         }
         else
         {
-            NX_WARNING(this, "requestModuleInformation() - ec2Connection is not available. "
-                "I will have problems tracking server version during install process.");
+            NX_WARNING(this, "requestModuleInformation() - messageBusConnection is not available. "
+                "There will be problems tracking server version during install process.");
         }
     }
     if (m_serverConnection)
