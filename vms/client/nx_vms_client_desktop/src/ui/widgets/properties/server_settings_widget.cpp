@@ -93,6 +93,12 @@ public:
         {
             for (auto handle: requests)
                 api->cancelRequest(handle);
+
+            if (requestHandle != 0)
+            {
+                api->cancelRequest(requestHandle);
+                requestHandle = 0;
+            }
         }
         requests.clear();
     }
@@ -187,6 +193,7 @@ private:
 
 public:
     QSet<int> requests;
+    rest::Handle requestHandle = 0;
 
 private:
     QPointer<QnServerSettingsWidget> q;
@@ -323,6 +330,7 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server)
 void QnServerSettingsWidget::setReadOnlyInternal(bool readOnly)
 {
     using ::setReadOnly;
+    setReadOnly(ui->webCamerasDiscoveryCheckBox, readOnly);
     setReadOnly(ui->failoverGroupBox, readOnly);
     setReadOnly(ui->maxCamerasSpinBox, readOnly);
     setReadOnly(ui->locationIdSpinBox, readOnly);
@@ -393,7 +401,7 @@ bool QnServerSettingsWidget::canApplyChanges() const
 
 bool QnServerSettingsWidget::isNetworkRequestRunning() const
 {
-    return !d->requests.empty();
+    return !d->requests.empty() || d->requestHandle != 0;
 }
 
 void QnServerSettingsWidget::loadDataToUi()
@@ -442,6 +450,15 @@ void QnServerSettingsWidget::applyChanges()
     m_server->setLocationId(ui->locationIdSpinBox->value());
     m_server->setRedundancy(ui->failoverGroupBox->isChecked());
     m_server->setWebCamerasDiscoveryEnabled(isWebCamerasDiscoveryEnabled());
+
+    auto callback = nx::utils::guarded(this,
+        [this](bool /*success*/, rest::Handle requestId)
+        {
+            if (NX_ASSERT(requestId == d->requestHandle || d->requestHandle == 0))
+                d->requestHandle = 0;
+        });
+
+    d->requestHandle = qnResourcesChangesManager->saveServer(m_server, callback);
 }
 
 void QnServerSettingsWidget::discardChanges()
