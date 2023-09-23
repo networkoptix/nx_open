@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr_TR" sourcelanguage="en">
   <context>
+    <name>ApiErrorStrings</name>
+    <message>
+      <source>Invalid JSON content.</source>
+      <translation>Geçersiz JSON içeriği.</translation>
+    </message>
+    <message>
+      <source>Unsupported content type.</source>
+      <translation>Desteklenmeyen içerik türü.</translation>
+    </message>
+  </context>
+  <context>
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
@@ -18,10 +29,6 @@
   </context>
   <context>
     <name>AuthResultTranslations</name>
-    <message>
-      <source>Wrong password.</source>
-      <translation>Hatalı parola.</translation>
-    </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
       <translation>Şifrenin süresi doldu. Lütfen sistem yöneticinize başvurun.</translation>
@@ -66,17 +73,25 @@
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
       <translation>LDAP sunucusu SSL/TLS sertifikası doğrulanamıyor.</translation>
     </message>
+    <message>
+      <source>The ticket key is invalid or expired.</source>
+      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>Hatalı parola</translation>
+    </message>
   </context>
   <context>
-    <name>BookmarkFacade</name>
-    <message>
-      <source>Removed camera</source>
-      <translation>Kaldırılmış Kamera</translation>
-    </message>
+    <name>BookmarkSort</name>
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Sistem Olayı</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>Kaldırılmış Kamera</translation>
     </message>
   </context>
   <context>
@@ -187,36 +202,29 @@
       <translation>Sistem Sağlığı Görüntüleyicileri</translation>
     </message>
     <message>
-      <source>Has full control of System configuration, but cannot create or modify other Power Users.</source>
-      <translation type="unfinished">Has full control of System configuration, but cannot create or modify other Power Users.</translation>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</translation>
     </message>
     <message>
-      <source>Can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation>PTZ konumlarını ve PTZ Turlarını görebilir ve çalıştırabilir, 2 yönlü ses kullanabilir, G/Ç Modülü çalıştırabilir, Yer İşaretleri oluşturabilir ve düzenleyebilir ve Olay Günlüğünü görüntüleyebilir.</translation>
+      <source>Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation type="unfinished">Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
     </message>
     <message>
-      <source>Can view and export archive and Bookmarks.</source>
-      <translation>Arşivi ve Yer İşaretlerini görüntüleyebilir ve dışa aktarabilir.</translation>
+      <source>Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
+      <translation type="unfinished">Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
     </message>
     <message>
-      <source>Can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Can view live videos, I/O modules and web pages.</translation>
+      <source>Members of this group can view and export archive and Bookmarks.</source>
+      <translation type="unfinished">Members of this group can view and export archive and Bookmarks.</translation>
     </message>
     <message>
-      <source>Can view System Health Monitoring information.</source>
-      <translation>Sistem Sağlığı İzleme bilgilerini görüntüleyebilir.</translation>
+      <source>Members of this group can view live videos, I/O modules and web pages.</source>
+      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
     </message>
     <message>
-      <source>This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</source>
-      <translation type="unfinished">This user has unlimited System privileges and cannot be deleted. Can create and modify Administrators, and can merge Systems and link or unlink to Nx Cloud accounts.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QObject</name>
-    <message>
-      <source>System Event</source>
-      <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>Sistem Olayı</translation>
+      <source>Members of this group can view System Health Monitoring information.</source>
+      <translation type="unfinished">Members of this group can view System Health Monitoring information.</translation>
     </message>
   </context>
   <context>
@@ -832,24 +840,26 @@
       </translation>
     </message>
     <message>
-      <source>%1 Licenses</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 Lisanslar</translation>
+      <source>Local Recording</source>
+      <translation>Yerel Kayıt</translation>
+    </message>
+    <message>
+      <source>Local Recording service</source>
+      <translation>Yerel Kayıt hizmeti</translation>
     </message>
     <message numerus="yes">
-      <source>%n %1 Licenses</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <source>%n Local Recording Services</source>
       <translation type="unfinished">
-        <numerusform>%n %1 Lisanslar</numerusform>
-        <numerusform>%n %1 Licenses</numerusform>
+        <numerusform>%n Local Recording Services</numerusform>
+        <numerusform>%n Local Recording Services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n/%1 %2 Licenses</source>
-      <comment>%n will be replaced by the total count,%2 is the short cloud name (like Cloud)</comment>
+      <source>%n/%1 Local Recording Services</source>
+      <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n %1 %2 Lisanslar</numerusform>
-        <numerusform>%n/%1 %2 Licenses</numerusform>
+        <numerusform>%n/%1 Local Recording Services</numerusform>
+        <numerusform>%n/%1 Local Recording Services</numerusform>
       </translation>
     </message>
   </context>
@@ -1115,6 +1125,110 @@
         <numerusform>yıl</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Msec</source>
+      <comment>Capitalized long suffix for displaying milliseconds</comment>
+      <translation type="unfinished">Msec</translation>
+    </message>
+    <message>
+      <source>Sec</source>
+      <comment>Capitalized long suffix for displaying seconds</comment>
+      <translation type="unfinished">Sec</translation>
+    </message>
+    <message>
+      <source>Min</source>
+      <comment>Capitalized long suffix for displaying minutes</comment>
+      <translation>Dk</translation>
+    </message>
+    <message>
+      <source>Hrs</source>
+      <comment>Capitalized long suffix for displaying hours</comment>
+      <translation>Sa</translation>
+    </message>
+    <message>
+      <source>Days</source>
+      <comment>Capitalized long suffix for displaying days</comment>
+      <translation type="unfinished">Days</translation>
+    </message>
+    <message>
+      <source>Wks</source>
+      <comment>Capitalized long suffix for displaying weeks</comment>
+      <translation type="unfinished">Wks</translation>
+    </message>
+    <message>
+      <source>Mos</source>
+      <comment>Capitalized long suffix for displaying months</comment>
+      <translation type="unfinished">Mos</translation>
+    </message>
+    <message>
+      <source>Yrs</source>
+      <comment>Capitalized long suffix for displaying years</comment>
+      <translation>Yıllar</translation>
+    </message>
+    <message numerus="yes">
+      <source>Milliseconds</source>
+      <comment>Capitalized full suffix for displaying milliseconds</comment>
+      <translation type="unfinished">
+        <numerusform>Milliseconds</numerusform>
+        <numerusform>Milliseconds</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Seconds</source>
+      <comment>Capitalized full suffix for displaying seconds</comment>
+      <translation type="unfinished">
+        <numerusform>Seconds</numerusform>
+        <numerusform>Seconds</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Minutes</source>
+      <comment>Capitalized full suffix for displaying minutes</comment>
+      <translation type="unfinished">
+        <numerusform>Minutes</numerusform>
+        <numerusform>Minutes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Hours</source>
+      <comment>Capitalized full suffix for displaying hours</comment>
+      <translation type="unfinished">
+        <numerusform>Hours</numerusform>
+        <numerusform>Hours</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Days</source>
+      <comment>Capitalized fapitalized full suffix for displaying days</comment>
+      <translation type="unfinished">
+        <numerusform>Days</numerusform>
+        <numerusform>Days</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Weeks</source>
+      <comment>Capitalized full suffix for displaying weeks</comment>
+      <translation type="unfinished">
+        <numerusform>Weeks</numerusform>
+        <numerusform>Weeks</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Months</source>
+      <comment>Capitalized full suffix for displaying months</comment>
+      <translation type="unfinished">
+        <numerusform>Months</numerusform>
+        <numerusform>Months</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Years</source>
+      <comment>Capitalized full suffix for displaying years</comment>
+      <translation type="unfinished">
+        <numerusform>Years</numerusform>
+        <numerusform>Years</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnTranscoder</name>
@@ -1209,6 +1323,52 @@
     <message>
       <source>Session authorization required.</source>
       <translation>Oturum yetkilendirmesi gerekli.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServiceTypeDisplayStringHelper</name>
+    <message>
+      <source>Local recording</source>
+      <translation>Yerel kayıt</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation>Entegrasyon</translation>
+    </message>
+    <message>
+      <source>Cloud storage</source>
+      <translation>Bulut depolama</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringsHelper</name>
+    <message>
+      <source>SaaS uninitialized</source>
+      <translation>SaaS başlatılmamış</translation>
+    </message>
+    <message>
+      <source>SaaS active</source>
+      <translation>SaaS aktif</translation>
+    </message>
+    <message>
+      <source>SaaS suspended</source>
+      <translation>SaaS askıya alındı</translation>
+    </message>
+    <message>
+      <source>SaaS shut down</source>
+      <translation>SaaS kapatıldı</translation>
+    </message>
+    <message>
+      <source>SaaS shut down automatically</source>
+      <translation>SaaS otomatik olarak kapanıyor</translation>
+    </message>
+    <message>
+      <source>Contact your channel partner for details.</source>
+      <translation>Ayrıntılar için kanal ortağınızla iletişime geçin.</translation>
+    </message>
+    <message>
+      <source>Check internet connection between VMS and license server.</source>
+      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
     </message>
   </context>
   <context>
@@ -1566,10 +1726,6 @@
       <translation>Kameralar için yalnızca HTTPS kullanın</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions (unsecure)</source>
-      <translation>Kullanımdan kaldırılan API fonksiyonlarını etkinleştir (güvenli değil)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>Otomatik bulma için IP adreslerini açığa çıkarın</translation>
     </message>
@@ -1633,6 +1789,18 @@
       <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
       <translation>Şu anda %1 tarafından kullanılan, kullanımdan kaldırılmış API fonksiyonlarını etkinleştir (güvenli değil)</translation>
+    </message>
+    <message>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>Buluta bağlanmak üzere belirlenmiş Sunucuların noktalı virgülle ayrılmış listesi. Listenin en üstündeki sunucular daha yüksek önceliğe sahiptir. Liste boşsa Bulut bağlantısı için bir Sunucu otomatik olarak seçilir.</translation>
+    </message>
+    <message>
+      <source>Allow Power User editing Security Settings</source>
+      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (insecure)</source>
+      <translation>Kullanımdan kaldırılan API fonksiyonlarını etkinleştir (güvenli değil)</translation>
     </message>
   </context>
   <context>
@@ -2350,10 +2518,6 @@
       <source>Also play on source camera</source>
       <translation>Kaynak kamerada da oynat</translation>
     </message>
-    <message>
-      <source>Group</source>
-      <translation>Grup</translation>
-    </message>
     <message numerus="yes">
       <source>%n Groups</source>
       <translation type="unfinished">
@@ -2362,8 +2526,36 @@
       </translation>
     </message>
     <message>
-      <source>All Power Users</source>
-      <translation type="unfinished">All Power Users</translation>
+      <source>LDAP Sync Issue</source>
+      <translation type="unfinished">LDAP Sync Issue</translation>
+    </message>
+    <message>
+      <source>Failed to connect to LDAP</source>
+      <translation>LDAP' ile bağlantı kurulamadı</translation>
+    </message>
+    <message>
+      <source>Failed to complete sync within a %1 timeout</source>
+      <translation type="unfinished">Failed to complete sync within a %1 timeout</translation>
+    </message>
+    <message>
+      <source>Failed to complete sync within a given timeout</source>
+      <translation type="unfinished">Failed to complete sync within a given timeout</translation>
+    </message>
+    <message>
+      <source>There are zero LDAP users in VMS after sync</source>
+      <translation type="unfinished">There are zero LDAP users in VMS after sync</translation>
+    </message>
+    <message>
+      <source>Some LDAP users were not found in LDAP</source>
+      <translation type="unfinished">Some LDAP users were not found in LDAP</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is description of event. Will be replaced in runtime</comment>
+      <translation type="unfinished">
+        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
+      </translation>
     </message>
   </context>
 </TS>

@@ -308,13 +308,6 @@
     </message>
   </context>
   <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
-    </message>
-  </context>
-  <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
@@ -1725,6 +1718,18 @@
       <source>Test</source>
       <translation>ทดสอบ</translation>
     </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation type="unfinished">Use Credentials</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation type="unfinished">Use Link</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation type="unfinished">Link</translation>
+    </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
@@ -2434,6 +2439,25 @@
     </message>
   </context>
   <context>
+    <name>SaasInfoWidget</name>
+    <message>
+      <source>No services found</source>
+      <translation type="unfinished">No services found</translation>
+    </message>
+    <message>
+      <source>Contact your Channel Partner to add services</source>
+      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+    </message>
+    <message>
+      <source>Channel Partner Contact</source>
+      <translation type="unfinished">Channel Partner Contact</translation>
+    </message>
+    <message>
+      <source>Services Usage</source>
+      <translation type="unfinished">Services Usage</translation>
+    </message>
+  </context>
+  <context>
     <name>SayTextBusinessActionWidget</name>
     <message>
       <source>Speak the following:</source>
@@ -2920,8 +2944,16 @@
       <translation>ค้นหาผู้ใช้</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <source>Add Group</source>
+      <translation type="unfinished">Add Group</translation>
+    </message>
+    <message>
+      <source>Ctrl+F</source>
+      <translation type="unfinished">Ctrl+F</translation>
+    </message>
+    <message>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
@@ -2931,8 +2963,16 @@
       <translation>ค้นหาผู้ใช้</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Add User</translation>
+      <source>Add User</source>
+      <translation type="unfinished">Add User</translation>
+    </message>
+    <message>
+      <source>Ctrl+F</source>
+      <translation type="unfinished">Ctrl+F</translation>
+    </message>
+    <message>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>

@@ -308,13 +308,6 @@
     </message>
   </context>
   <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation>Sunucu çevrimdışı. Yedekleme ayarları mevcut değil.</translation>
-    </message>
-  </context>
-  <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
@@ -1725,6 +1718,18 @@
       <source>Test</source>
       <translation>Test</translation>
     </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation>Kimlik Bilgilerini Kullan</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation>Bağlantıyı Kullan</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation>Bağlantı</translation>
+    </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
@@ -2434,6 +2439,25 @@
     </message>
   </context>
   <context>
+    <name>SaasInfoWidget</name>
+    <message>
+      <source>No services found</source>
+      <translation>Servis Bulunamadı</translation>
+    </message>
+    <message>
+      <source>Contact your Channel Partner to add services</source>
+      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+    </message>
+    <message>
+      <source>Channel Partner Contact</source>
+      <translation type="unfinished">Channel Partner Contact</translation>
+    </message>
+    <message>
+      <source>Services Usage</source>
+      <translation>Servislerin Kullanımı</translation>
+    </message>
+  </context>
+  <context>
     <name>SayTextBusinessActionWidget</name>
     <message>
       <source>Speak the following:</source>
@@ -2920,8 +2944,16 @@
       <translation>Kullanıcıları ara</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation>+ Grup Ekle</translation>
+      <source>Add Group</source>
+      <translation>Grup Ekle</translation>
+    </message>
+    <message>
+      <source>Ctrl+F</source>
+      <translation>Ctrl+F</translation>
+    </message>
+    <message>
+      <source>Del</source>
+      <translation>Sil</translation>
     </message>
   </context>
   <context>
@@ -2931,8 +2963,16 @@
       <translation>Kullanıcıları ara</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Kullanıcı Ekle</translation>
+      <source>Add User</source>
+      <translation>Kullanıcı Ekle</translation>
+    </message>
+    <message>
+      <source>Ctrl+F</source>
+      <translation>Ctrl+F</translation>
+    </message>
+    <message>
+      <source>Del</source>
+      <translation>Sil</translation>
     </message>
   </context>
   <context>

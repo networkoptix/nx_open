@@ -189,6 +189,14 @@
       <source>Connection failed</source>
       <translation>Échec de connexion</translation>
     </message>
+    <message>
+      <source>Your access to this system has expired.</source>
+      <translation>Votre accès à ce système a expiré.</translation>
+    </message>
+    <message>
+      <source>Please contact the system administrator to regain access.</source>
+      <translation>Veuillez contacter l'administrateur du système pour récupérer l'accès.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
