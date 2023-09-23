@@ -390,6 +390,12 @@ void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
         &UserListModel::Private::handleUserChanged);
     connect(user.get(), &QnUserResource::userGroupsChanged, this,
         &UserListModel::Private::handleUserChanged);
+    connect(user.get(), &QnUserResource::externalIdChanged, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (const auto user = resource.objectCast<QnUserResource>())
+                handleUserChanged(user);
+        });
     connect(user.get(), &QnUserResource::enabledChanged, this,
         [this](const QnUserResourcePtr &user)
         {
@@ -898,11 +904,6 @@ void SortedUserListModel::setDigestFilter(std::optional<bool> value)
 {
     m_digestFilter = value;
     invalidateFilter();
-}
-
-void SortedUserListModel::setSyncId(const QString& syncId)
-{
-    m_syncId = syncId;
 }
 
 bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const

@@ -370,7 +370,6 @@ UserListWidget::Private::Private(UserListWidget* q): q(q), m_visibleUsers(q->sys
     sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     sortModel->setFilterKeyColumn(-1);
     sortModel->setSourceModel(usersModel);
-    sortModel->setSyncId(q->globalSettings()->ldap().syncId());
 
     connect(sortModel, &QAbstractItemModel::rowsInserted, this,
         [this](const QModelIndex&, int first, int last)
@@ -406,9 +405,6 @@ UserListWidget::Private::Private(UserListWidget* q): q(q), m_visibleUsers(q->sys
 
             modelUpdated();
         });
-
-    connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
-        [this]() { sortModel->setSyncId(this->q->globalSettings()->ldap().syncId()); });
 }
 
 QSize UserListWidget::sizeHint() const
