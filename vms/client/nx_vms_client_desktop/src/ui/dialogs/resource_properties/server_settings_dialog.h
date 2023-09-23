@@ -34,9 +34,7 @@ public:
 
 protected:
     virtual void retranslateUi() override;
-    virtual void applyChanges() override;
     virtual void discardChanges() override;
-    virtual bool isNetworkRequestRunning() const override;
 
     bool switchServerWithConfirmation();
     virtual bool event(QEvent* event) override;

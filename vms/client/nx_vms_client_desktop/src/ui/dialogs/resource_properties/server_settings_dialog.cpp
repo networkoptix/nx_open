@@ -60,8 +60,6 @@ struct QnServerSettingsDialog::Private
     BackupSettingsWidget* const backupPage;
     QLabel* const webPageLink;
 
-    rest::Handle requestHandle = 0;
-
     Private(QnServerSettingsDialog* q):
         q(q),
         store(new ServerSettingsDialogStore(q)),
@@ -100,20 +98,6 @@ struct QnServerSettingsDialog::Private
         q->setPageVisible(
             PoePage,
             server && server->getServerFlags().testFlag(nx::vms::api::SF_HasPoeManagementCapability));
-    }
-
-    void cancelNetworkRequest()
-    {
-        if (server && requestHandle != 0)
-        {
-            auto systemContext = SystemContext::fromResource(server);
-            if (NX_ASSERT(systemContext))
-            {
-                if (auto api = systemContext->connectedServerApi())
-                    api->cancelRequest(requestHandle);
-            }
-        }
-        requestHandle = 0;
     }
 };
 
@@ -209,7 +193,6 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
     if (d->server)
         d->server->disconnect(this);
 
-    d->cancelNetworkRequest();
     d->server = server;
 
     if (d->store)
@@ -259,36 +242,10 @@ void QnServerSettingsDialog::retranslateUi()
     }
 }
 
-void QnServerSettingsDialog::applyChanges()
-{
-    if (!NX_ASSERT(d->requestHandle == 0))
-        return;
-
-    base_type::applyChanges();
-
-    if (!d->server)
-        return;
-
-    auto callback = nx::utils::guarded(this,
-        [this](bool /*success*/, rest::Handle requestId)
-        {
-            if (NX_ASSERT(requestId == d->requestHandle || d->requestHandle == 0))
-                d->requestHandle = 0;
-        });
-
-    d->requestHandle = qnResourcesChangesManager->saveServer(d->server, callback);
-}
-
 void QnServerSettingsDialog::discardChanges()
 {
     base_type::discardChanges();
-    d->cancelNetworkRequest();
     NX_ASSERT(!isNetworkRequestRunning());
-}
-
-bool QnServerSettingsDialog::isNetworkRequestRunning() const
-{
-    return base_type::isNetworkRequestRunning() || d->requestHandle != 0;
 }
 
 bool QnServerSettingsDialog::switchServerWithConfirmation()
