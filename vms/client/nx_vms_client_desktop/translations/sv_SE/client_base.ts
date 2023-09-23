@@ -32,6 +32,14 @@
     </message>
   </context>
   <context>
+    <name>BookmarkUtilStrings</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation type="unfinished">System Event</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
@@ -65,6 +73,14 @@
     <message>
       <source>Expires</source>
       <translation>Förfaller</translation>
+    </message>
+  </context>
+  <context>
+    <name>ClipboardButton</name>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation>Kopierad</translation>
     </message>
   </context>
   <context>
@@ -1061,6 +1077,10 @@
       <source>Import From Devices...</source>
       <translation>Importera från enheter...</translation>
     </message>
+    <message>
+      <source>User Manual...</source>
+      <translation type="unfinished">User Manual...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1122,6 +1142,10 @@
     <message>
       <source>Event Stops</source>
       <translation type="unfinished">Event Stops</translation>
+    </message>
+    <message>
+      <source>automatic</source>
+      <translation>automatisk</translation>
     </message>
   </context>
   <context>
@@ -1299,10 +1323,11 @@
       <translation>Ta bort grupp?</translation>
     </message>
     <message numerus="yes">
-      <source>Delete %n group(s)?</source>
+      <source>Delete %n groups?</source>
+      <comment>Numerical form depends on groups count</comment>
       <translation type="unfinished">
-        <numerusform>Delete %n group(s)?</numerusform>
-        <numerusform>Delete %n group(s)?</numerusform>
+        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>Delete %n groups?</numerusform>
       </translation>
     </message>
   </context>
@@ -1651,6 +1676,14 @@ Licensnyckel: %2</translation>
       <source>Connection failed</source>
       <translation>Anslutningen misslyckades</translation>
     </message>
+    <message>
+      <source>Username cannot be empty</source>
+      <translation type="unfinished">Username cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation type="unfinished">Password cannot be empty</translation>
+    </message>
   </context>
   <context>
     <name>PasswordInformation</name>
@@ -1666,10 +1699,6 @@ Licensnyckel: %2</translation>
       <source>Weak</source>
       <translation>Svagt</translation>
     </message>
-    <message>
-      <source>Password should contain different types of symbols.</source>
-      <translation>Lösenordet bör innehålla olika typer av symboler.</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1681,45 +1710,13 @@ Licensnyckel: %2</translation>
       <source>Short</source>
       <translation>Kort</translation>
     </message>
-    <message numerus="yes">
-      <source>Password must be at least %n characters long.</source>
-      <translation>
-        <numerusform>Lösenordet måste vara minst %n tecken långt.</numerusform>
-        <numerusform>Lösenordet måste vara minst %n tecken långt.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Long</source>
       <translation>Lång</translation>
     </message>
-    <message numerus="yes">
-      <source>Password must be no longer than %n characters.</source>
-      <translation>
-        <numerusform>Lösenordet måste vara längre än %n tecken.</numerusform>
-        <numerusform>Lösenordet får inte vara längre än %n tecken.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation>
-        <numerusform>Lösenordet ska inte innehålla %n eller flera på varandra följande tecken tillsammans.</numerusform>
-        <numerusform>Lösenordet ska inte innehålla %n eller flera på varandra följande tecken tillsammans.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more repeating characters.</source>
-      <translation>
-        <numerusform>Lösenordet får inte innehålla %n eller flera upprepade tecken.</numerusform>
-        <numerusform>Lösenordet får inte innehålla %n eller flera upprepade tecken.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Common</source>
       <translation>Vanliga</translation>
-    </message>
-    <message>
-      <source>This password is in list of the most popular passwords.</source>
-      <translation>Detta lösenord finns i listan över populära lösenord.</translation>
     </message>
     <message>
       <source>Incorrect</source>
@@ -1732,6 +1729,42 @@ Licensnyckel: %2</translation>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>Endast latinska bokstäver, siffror och symboler är tillåtna.</translation>
+    </message>
+    <message>
+      <source>Password should contain different types of symbols</source>
+      <translation type="unfinished">Password should contain different types of symbols</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long</source>
+      <translation type="unfinished">
+        <numerusform>Password must be at least %n characters long</numerusform>
+        <numerusform>Password must be at least %n characters long</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters</source>
+      <translation type="unfinished">
+        <numerusform>Password must be no longer than %n characters</numerusform>
+        <numerusform>Password must be no longer than %n characters</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together</source>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters</source>
+      <translation type="unfinished">
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>This password is in list of the most popular passwords</source>
+      <translation type="unfinished">This password is in list of the most popular passwords</translation>
     </message>
   </context>
   <context>
@@ -1956,6 +1989,13 @@ Licensnyckel: %2</translation>
     <message>
       <source>NVIDIA hardware acceleration is in beta mode</source>
       <translation>NVIDIA hårdvaruacceleration är i betaläge</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAttachToVideowallDialog</name>
+    <message>
+      <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
+      <translation type="unfinished">%1. To attach to Video Wall, SaaS must be in active state. %2</translation>
     </message>
   </context>
   <context>
@@ -2318,16 +2358,16 @@ Licensnyckel: %2</translation>
       <translation>6 månader</translation>
     </message>
     <message>
-      <source>year</source>
-      <translation>år</translation>
-    </message>
-    <message>
       <source>Name cannot be empty.</source>
       <translation>Namn kan inte vara tomt.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
       <translation>Beskrivning kan inte vara tom</translation>
+    </message>
+    <message>
+      <source>Year</source>
+      <translation type="unfinished">Year</translation>
     </message>
   </context>
   <context>
@@ -2865,16 +2905,16 @@ Licensnyckel: %2</translation>
       <translation>Upprepa lösenord</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>Lösenorden matchar inte.</translation>
-    </message>
-    <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Lösenordet ska vara minst 8 tecken långt och innehålla olika typer av tecken.</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
       <translation>Lösenordet ska inte vara lika med användarnamnet för kamera&apos;s</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation type="unfinished">Passwords do not match</translation>
     </message>
   </context>
   <context>
@@ -2895,20 +2935,20 @@ Licensnyckel: %2</translation>
       <translation>Bekräfta Lösenord</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>Lösenorden matchar inte.</translation>
-    </message>
-    <message>
       <source>Current Password</source>
       <translation>Nuvarande Lösenord</translation>
     </message>
     <message>
-      <source>To modify your password please enter the existing one.</source>
-      <translation>För att ändra ditt lösenord, var god ange det befintliga.</translation>
+      <source>Passwords do not match</source>
+      <translation type="unfinished">Passwords do not match</translation>
     </message>
     <message>
-      <source>Invalid current password.</source>
-      <translation>Ogiltigt nuvarande lösenord.</translation>
+      <source>To modify your password please enter the existing one</source>
+      <translation type="unfinished">To modify your password please enter the existing one</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation type="unfinished">Invalid current password</translation>
     </message>
   </context>
   <context>
@@ -3187,6 +3227,14 @@ till %1</translation>
     <message>
       <source>Log In...</source>
       <translation type="unfinished">Log In...</translation>
+    </message>
+    <message>
+      <source>Your session has expired</source>
+      <translation type="unfinished">Your session has expired</translation>
+    </message>
+    <message>
+      <source>Please sign in again with your link to continue</source>
+      <translation type="unfinished">Please sign in again with your link to continue</translation>
     </message>
   </context>
   <context>
@@ -3588,13 +3636,6 @@ till %1</translation>
     </message>
   </context>
   <context>
-    <name>QnGenericTabbedDialog</name>
-    <message>
-      <source>Apply changes before exit?</source>
-      <translation>Tillämpa ändringar före avslut?</translation>
-    </message>
-  </context>
-  <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
@@ -3972,10 +4013,6 @@ till %1</translation>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
       <translation>%1 (Tur &quot;%2&quot; är aktiv)</translation>
-    </message>
-    <message>
-      <source>Zoom Window</source>
-      <translation>Zoomfönster</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -4452,6 +4489,10 @@ till %1</translation>
       <source>Enter Fullscreen</source>
       <translation>Öppna Fullskärmsläge</translation>
     </message>
+    <message>
+      <source>Zoom Window</source>
+      <translation>Zoomfönster</translation>
+    </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
@@ -4504,6 +4545,10 @@ till %1</translation>
     <message>
       <source>Search</source>
       <translation>Sök</translation>
+    </message>
+    <message>
+      <source>N/A</source>
+      <translation>Ej tillgänglig</translation>
     </message>
   </context>
   <context>
@@ -4801,21 +4846,6 @@ till %1</translation>
     </message>
   </context>
   <context>
-    <name>QnSessionAwareTabbedDialog</name>
-    <message>
-      <source>Unsaved changes:</source>
-      <translation>Osparade ändringar:</translation>
-    </message>
-    <message>
-      <source>Save changes before exit?</source>
-      <translation>Spara ändringar före avslut?</translation>
-    </message>
-    <message>
-      <source>Apply changes before exit?</source>
-      <translation>Tillämpa ändringar före avslut?</translation>
-    </message>
-  </context>
-  <context>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
       <source>Html tags could be used within custom text:
@@ -4949,6 +4979,18 @@ till %1</translation>
     <message>
       <source>Provide</source>
       <translation>Förse</translation>
+    </message>
+    <message>
+      <source>SAAS SHUT DOWN</source>
+      <translation type="unfinished">SAAS SHUT DOWN</translation>
+    </message>
+    <message>
+      <source>NO EXPORT PERMISSION</source>
+      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+    </message>
+    <message>
+      <source>NO CONNECTION TO THE LICENSE SERVER</source>
+      <translation type="unfinished">NO CONNECTION TO THE LICENSE SERVER</translation>
     </message>
   </context>
   <context>
@@ -5271,6 +5313,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Integrations</source>
       <translation>Integrationer</translation>
     </message>
+    <message>
+      <source>Services</source>
+      <translation type="unfinished">Services</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5412,6 +5458,26 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>We recommend choosing another location for it instead of the system partition.</source>
       <translation>Vi rekommenderar att du väljer en annan plats för den istället för systempartitionen.</translation>
     </message>
+    <message>
+      <source>Local recording services overused</source>
+      <translation type="unfinished">Local recording services overused</translation>
+    </message>
+    <message>
+      <source>Cloud storage services overused</source>
+      <translation type="unfinished">Cloud storage services overused</translation>
+    </message>
+    <message>
+      <source>Paid integrations services overused</source>
+      <translation type="unfinished">Paid integrations services overused</translation>
+    </message>
+    <message>
+      <source>System suspended</source>
+      <translation type="unfinished">System suspended</translation>
+    </message>
+    <message>
+      <source>System shut down</source>
+      <translation type="unfinished">System shut down</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -5507,20 +5573,20 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>QnValidatorStrings</name>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Lösenordet kan inte vara tomt.</translation>
-    </message>
-    <message>
-      <source>Avoid leading and trailing spaces.</source>
-      <translation>Undvik ledande och efterföljande mellanslag.</translation>
-    </message>
-    <message>
       <source>Email cannot be empty</source>
       <translation>E-post får inte vara tomt</translation>
     </message>
     <message>
       <source>Email is not valid</source>
       <translation>Ogiltig e-postadress</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation type="unfinished">Password cannot be empty</translation>
+    </message>
+    <message>
+      <source>Avoid leading and trailing spaces</source>
+      <translation type="unfinished">Avoid leading and trailing spaces</translation>
     </message>
   </context>
   <context>
@@ -5859,6 +5925,10 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Activate License...</source>
       <translation>Aktivera licens...</translation>
     </message>
+    <message>
+      <source>To add Video Wall, SaaS should be in active state. %1</source>
+      <translation type="unfinished">To add Video Wall, SaaS should be in active state. %1</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
@@ -6076,13 +6146,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>Du kommer att förlora åtkomst till följande resurser:</translation>
     </message>
     <message numerus="yes">
-      <source>Delete %n users?</source>
-      <translation>
-        <numerusform>Ta bort %n användare?</numerusform>
-        <numerusform>Ta bort %n användare?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Delete %n devices?</source>
       <translation>
         <numerusform>Radera %n enheter?</numerusform>
@@ -6247,13 +6310,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Delete user?</source>
       <translation>Radera användaren?</translation>
@@ -6263,6 +6319,26 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation type="unfinished">
         <numerusform>%n items were not deleted.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Delete layout?</source>
+      <translation type="unfinished">Delete layout?</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerical form depends on layouts count</comment>
+      <translation type="unfinished">
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users?</source>
+      <comment>Numerical form depends on users count</comment>
+      <translation>
+        <numerusform>Ta bort %n användare?</numerusform>
+        <numerusform>Ta bort %n användare?</numerusform>
       </translation>
     </message>
   </context>
@@ -6481,10 +6557,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Select at least one user</source>
       <translation>Välj minst en användare</translation>
     </message>
-    <message>
-      <source>Group</source>
-      <translation type="unfinished">Group</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -6498,10 +6570,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <numerusform>%n Groups</numerusform>
         <numerusform>%n Groups</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>All Power Users</source>
-      <translation type="unfinished">All Power Users</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6551,6 +6619,25 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Reset all rules to defaults?</source>
       <translation type="unfinished">Reset all rules to defaults?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Verkställ</translation>
+    </message>
+    <message>
+      <source>Unsaved changes:</source>
+      <translation>Osparade ändringar:</translation>
+    </message>
+    <message>
+      <source>Save changes before exit?</source>
+      <translation>Spara ändringar före avslut?</translation>
     </message>
   </context>
   <context>
@@ -6706,8 +6793,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation type="unfinished">View Live</translation>
     </message>
     <message>
-      <source>Can edit device settings and video wall layouts</source>
-      <translation type="unfinished">Can edit device settings and video wall layouts</translation>
+      <source>Edit Camera Settings.</source>
+      <translation type="unfinished">Edit Camera Settings.</translation>
+    </message>
+    <message>
+      <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
+      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
     </message>
   </context>
   <context>
@@ -6927,6 +7018,54 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Backup is not supported for this device</source>
       <translation>Säkerhetskopiering stöds inte för den här enheten</translation>
     </message>
+    <message>
+      <source>Nothing to backup</source>
+      <translation>Inget att säkerhetskopiera</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation type="unfinished">Insufficient services</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services are required</source>
+      <translation type="unfinished">
+        <numerusform>%n suitable cloud storage services are required</numerusform>
+        <numerusform>%n suitable cloud storage services are required</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n MP</source>
+      <translation type="unfinished">
+        <numerusform>%n MP</numerusform>
+        <numerusform>%n MP</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Megapixels</source>
+      <translation type="unfinished">
+        <numerusform>%n Megapixels</numerusform>
+        <numerusform>%n Megapixels</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Unknown resolution</source>
+      <translation type="unfinished">Unknown resolution</translation>
+    </message>
+    <message>
+      <source>No suitable cloud storage services available</source>
+      <translation type="unfinished">No suitable cloud storage services available</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services available</source>
+      <translation type="unfinished">
+        <numerusform>%n suitable cloud storage services available</numerusform>
+        <numerusform>%n suitable cloud storage services available</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Resolution</source>
+      <translation type="unfinished">Resolution</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
@@ -6953,8 +7092,8 @@ We recommend you not to open this integration. If you understand the risks, you 
   <context>
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
-      <source>Nothing to backup</source>
-      <translation>Inget att säkerhetskopiera</translation>
+      <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
+      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
     </message>
   </context>
   <context>
@@ -6996,6 +7135,18 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
       <translation>För att aktivera säkerhetskopiering lägg till fler enheter för att använda dem som backuplagring i %1</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation type="unfinished">Server is offline</translation>
+    </message>
+    <message>
+      <source>Backup settings are not available</source>
+      <translation type="unfinished">Backup settings are not available</translation>
+    </message>
+    <message>
+      <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
+      <translation type="unfinished">To perform backup to the cloud storage SaaS must be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -7855,6 +8006,13 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CommonMessageBar</name>
+    <message>
+      <source>Close</source>
+      <translation>Stäng</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
@@ -7888,6 +8046,18 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>OK</source>
       <comment>Dialog button text.</comment>
       <translation>OK</translation>
+    </message>
+    <message>
+      <source>Enter access link to continue your session</source>
+      <translation type="unfinished">Enter access link to continue your session</translation>
+    </message>
+    <message>
+      <source>Your session has expired. Please sign in again with your link to continue.</source>
+      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+    </message>
+    <message>
+      <source>Authentication details are incorrect</source>
+      <translation type="unfinished">Authentication details are incorrect</translation>
     </message>
   </context>
   <context>
@@ -8013,6 +8183,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>Inspelningsschemat innehåller inspelningslägen som inte stöds av de valda kamerorna. Inspelningslägen som inte stöds kommer att ändras till &quot;Spela in alltid&quot;.</translation>
+    </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
     </message>
   </context>
   <context>
@@ -8546,6 +8720,10 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
       <translation>Export är inte tillgänglig: Denna kamera har inte ett videoarkiv för den valda tidsperioden.</translation>
     </message>
+    <message>
+      <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
+      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -8659,14 +8837,6 @@ We recommend you not to open this integration. If you understand the risks, you 
   <context>
     <name>nx::vms::client::desktop::GroupSettingsDialog</name>
     <message>
-      <source>Group name cannot be empty.</source>
-      <translation type="unfinished">Group name cannot be empty.</translation>
-    </message>
-    <message>
-      <source>Group with the same name already exists.</source>
-      <translation type="unfinished">Group with the same name already exists.</translation>
-    </message>
-    <message>
       <source>Delete failed</source>
       <translation type="unfinished">Delete failed</translation>
     </message>
@@ -8709,6 +8879,18 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Delete</source>
       <translation>Radera</translation>
+    </message>
+    <message>
+      <source>Group name cannot be empty</source>
+      <translation type="unfinished">Group name cannot be empty</translation>
+    </message>
+    <message>
+      <source>Group with the same name already exists</source>
+      <translation type="unfinished">Group with the same name already exists</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes to %1 group</source>
+      <translation type="unfinished">Failed to apply changes to %1 group</translation>
     </message>
   </context>
   <context>
@@ -8816,10 +8998,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>Bilden kan inte läsas</translation>
     </message>
     <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Bilden är för stor. Maximal storlek är %1 MB</translation>
-    </message>
-    <message>
       <source>Picture cannot be loaded</source>
       <translation>Bilden kan inte laddas</translation>
     </message>
@@ -8867,6 +9045,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>OFFLINE</source>
       <translation>FRÅNKOPPLAD</translation>
+    </message>
+    <message>
+      <source>NO EXPORT PERMISSION</source>
+      <translation type="unfinished">NO EXPORT PERMISSION</translation>
     </message>
   </context>
   <context>
@@ -9059,6 +9241,10 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
       <source>Version %1</source>
       <translation>Version %1</translation>
     </message>
+    <message>
+      <source>The provided link is not valid or has expired</source>
+      <translation type="unfinished">The provided link is not valid or has expired</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementModel</name>
@@ -9224,6 +9410,13 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::MembersModel</name>
+    <message>
+      <source>Inherited from %1</source>
+      <translation type="unfinished">Inherited from %1</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -9381,6 +9574,13 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 system har olika ägare. Sammanfogning är inte tillåtet.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MessageBar</name>
+    <message>
+      <source>Close</source>
+      <translation>Stäng</translation>
     </message>
   </context>
   <context>
@@ -9697,12 +9897,12 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
       <translation>Du använder en anpassad klient. Kontakta %1 att få uppdateringsinstruktionerna.</translation>
     </message>
     <message>
-      <source>Uploading client packages to Servers...</source>
-      <translation>Laddar upp klientpaket till servrar...</translation>
-    </message>
-    <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
       <translation>Det finns inte tillräckligt med utrymme på din dator för att ladda ner Client update. Frigör lite utrymme på din hårddisk och försök igen.</translation>
+    </message>
+    <message>
+      <source>Uploading offline update packages to Servers...</source>
+      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
     </message>
   </context>
   <context>
@@ -9796,6 +9996,17 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <message>
       <source>Learn more</source>
       <translation>Lär dig mer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ParentGroupsProvider</name>
+    <message>
+      <source>LDAP group membership is managed in LDAP</source>
+      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
+    </message>
+    <message>
+      <source>Inherited from %1</source>
+      <translation type="unfinished">Inherited from %1</translation>
     </message>
   </context>
   <context>
@@ -10312,17 +10523,6 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ResourcesChangesManager</name>
-    <message>
-      <source>Resource list is empty</source>
-      <translation type="unfinished">Resource list is empty</translation>
-    </message>
-    <message>
-      <source>No connection</source>
-      <translation>Ingen anslutning</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
       <source>Password confirmation is required to apply changes</source>
@@ -10572,14 +10772,6 @@ Du kan fortfarande ändra kvalitet och FPS direkt på kameran.</translation>
       <translation>Spårar och loggar alla användaråtgärder.</translation>
     </message>
     <message>
-      <source>minutes</source>
-      <translation>minuter</translation>
-    </message>
-    <message>
-      <source>hours</source>
-      <translation>timmar</translation>
-    </message>
-    <message>
       <source>Archive encryption password</source>
       <translation>Arkivets krypteringslösenord</translation>
     </message>
@@ -10604,10 +10796,6 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
     <message>
       <source>Enables RTSP traffic encryption.</source>
       <translation>Aktiverar RTSP trafikkryptering.</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <translation>dagar</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -10701,6 +10889,14 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Not Part Of Certificate</source>
       <translation type="unfinished">Not Part Of Certificate</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Contact a user with Administrators permissions to resolve this issue.</source>
+      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
     </message>
   </context>
   <context>
@@ -10889,6 +11085,18 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <source>Unknown error</source>
       <translation>Okänt Fel</translation>
     </message>
+    <message>
+      <source>Access Link</source>
+      <translation type="unfinished">Access Link</translation>
+    </message>
+    <message>
+      <source>Invalid Link</source>
+      <translation type="unfinished">Invalid Link</translation>
+    </message>
+    <message>
+      <source>The provided link is not valid</source>
+      <translation type="unfinished">The provided link is not valid</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
@@ -11041,6 +11249,36 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
         <numerusform>Systemlagring används för analysdata på %n servrar</numerusform>
         <numerusform>Systemlagring används för analysdata på %n servrar</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Add more services or fix overuse by stopping using services for some devices.</source>
+      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+    </message>
+    <message>
+      <source>If no action is taken, required number of services will be released automatically on %1.</source>
+      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+    </message>
+    <message>
+      <source>Some features may not be available.</source>
+      <translation type="unfinished">Some features may not be available.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TemporaryUserExpirationWatcher</name>
+    <message>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation type="unfinished">and</translation>
+    </message>
+    <message>
+      <source>Your access to the System expires %1</source>
+      <comment>%1 is a date</comment>
+      <translation type="unfinished">Your access to the System expires %1</translation>
+    </message>
+    <message>
+      <source>Your access to the System expires in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation type="unfinished">Your access to the System expires in %1</translation>
     </message>
   </context>
   <context>
@@ -11235,12 +11473,28 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <translation>Beskrivning</translation>
     </message>
     <message>
-      <source>Member of</source>
-      <translation>Medlem av</translation>
+      <source>Group is not found in the LDAP database.</source>
+      <translation type="unfinished">Group is not found in the LDAP database.</translation>
     </message>
     <message>
-      <source>Permissions</source>
-      <translation>Behörigheter</translation>
+      <source>There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation type="unfinished">There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+    </message>
+    <message>
+      <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
+      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify or delete this group.</source>
+      <translation type="unfinished">You do not have permissions to modify or delete this group.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Anpassad</translation>
     </message>
   </context>
   <context>
@@ -11269,8 +11523,37 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <translation type="unfinished">Change search criteria or create a new group</translation>
     </message>
     <message>
-      <source>Delete failed</source>
-      <translation type="unfinished">Delete failed</translation>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation type="unfinished">Failed to delete group.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation type="unfinished">
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n groups</numerusform>
+        <numerusform>Delete %n groups</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11308,24 +11591,32 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <source>Full Name</source>
       <translation type="unfinished">Full Name</translation>
     </message>
+    <message>
+      <source>LDAP server is offline. Users are not able to log in.</source>
+      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+    </message>
+    <message>
+      <source>User is not found in the LDAP database.</source>
+      <translation type="unfinished">User is not found in the LDAP database.</translation>
+    </message>
+    <message>
+      <source>Temporary user</source>
+      <translation type="unfinished">Temporary user</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this user.</source>
+      <translation type="unfinished">You do not have permissions to modify this user.</translation>
+    </message>
+    <message>
+      <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
+      <translation type="unfinished">There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserListWidget</name>
     <message>
-      <source>Enable</source>
-      <translation>Aktivera</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Avaktivera</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Radera</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Tvinga fram säker autentisering</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -11344,8 +11635,44 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <translation type="unfinished">Change search criteria or create a new user</translation>
     </message>
     <message>
-      <source>Delete failed</source>
-      <translation type="unfinished">Delete failed</translation>
+      <source>Edit</source>
+      <translation>Redigera</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database.</source>
+      <translation type="unfinished">
+        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n users</numerusform>
+        <numerusform>Delete %n users</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation type="unfinished">
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>Failed to delete %n users.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11370,25 +11697,9 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <translation>För att ändra ditt lösenord, var god ange det befintliga.</translation>
     </message>
     <message>
-      <source>Invalid current password.</source>
-      <translation>Ogiltigt nuvarande lösenord.</translation>
-    </message>
-    <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 användare med angiven e-post finns redan.</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty.</source>
-      <translation>Inloggningen kan inte vara tom.</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation>Endast bokstäver, siffror och symboler %1 är tillåtna.</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists.</source>
-      <translation>Användare med angiven inloggning existerar redan.</translation>
     </message>
     <message>
       <source>Save user</source>
@@ -11417,6 +11728,84 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Email cannot be empty</source>
       <translation>E-post får inte vara tomt</translation>
+    </message>
+    <message>
+      <source>Copy Access Link</source>
+      <translation type="unfinished">Copy Access Link</translation>
+    </message>
+    <message>
+      <source>Are you sure you want to terminate access link?</source>
+      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+    </message>
+    <message>
+      <source>This will instantly remove an access to the system for this user</source>
+      <translation type="unfinished">This will instantly remove an access to the system for this user</translation>
+    </message>
+    <message>
+      <source>Terminate</source>
+      <translation type="unfinished">Terminate</translation>
+    </message>
+    <message>
+      <source>Terminate access link</source>
+      <translation type="unfinished">Terminate access link</translation>
+    </message>
+    <message>
+      <source>Create access link</source>
+      <translation type="unfinished">Create access link</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Skapa</translation>
+    </message>
+    <message>
+      <source>Access link has been successfully created!</source>
+      <translation type="unfinished">Access link has been successfully created!</translation>
+    </message>
+    <message>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation type="unfinished">and</translation>
+    </message>
+    <message>
+      <source>User %1 has been successfully created!</source>
+      <translation type="unfinished">User %1 has been successfully created!</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation type="unfinished">Invalid current password</translation>
+    </message>
+    <message>
+      <source>Login cannot be empty</source>
+      <translation type="unfinished">Login cannot be empty</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed</source>
+      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists</source>
+      <translation type="unfinished">User with specified login already exists</translation>
+    </message>
+    <message>
+      <source>New Link - %1</source>
+      <translation type="unfinished">New Link - %1</translation>
+    </message>
+    <message>
+      <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
+      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+    </message>
+    <message>
+      <source>Granting broad permissions to the temporary user is not recommended.</source>
+      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
+    </message>
+    <message>
+      <source>in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation type="unfinished">in %1</translation>
+    </message>
+    <message>
+      <source>New User</source>
+      <translation type="unfinished">New User</translation>
     </message>
   </context>
   <context>
@@ -11533,6 +11922,10 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Select folder to upload</source>
       <translation>Välj mapp att ladda upp</translation>
+    </message>
+    <message>
+      <source>Developer Tools</source>
+      <translation type="unfinished">Developer Tools</translation>
     </message>
   </context>
   <context>
@@ -12053,13 +12446,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::OutputPortPicker</name>
-    <message>
-      <source>automatic</source>
-      <translation>automatisk</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
@@ -12130,10 +12516,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <source>All Users</source>
       <translation>Alla användare</translation>
     </message>
-    <message>
-      <source>Group</source>
-      <translation type="unfinished">Group</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -12147,10 +12529,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
         <numerusform>%n Groups</numerusform>
         <numerusform>%n Groups</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>All Power Users</source>
-      <translation type="unfinished">All Power Users</translation>
     </message>
     <message>
       <source>All Server</source>
@@ -12192,6 +12570,20 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Soft trigger</source>
       <translation type="unfinished">Soft trigger</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::TargetLayoutPicker</name>
+    <message>
+      <source>Select layout...</source>
+      <translation>Välj layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n vyer</numerusform>
+        <numerusform>%n vyer</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12241,6 +12633,25 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Reset to defaults error: </source>
       <translation type="unfinished">Reset to defaults error: </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::saas::ServicesUsageModel</name>
+    <message>
+      <source>Name</source>
+      <translation>Namn</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Typ</translation>
+    </message>
+    <message>
+      <source>Total</source>
+      <translation type="unfinished">Total</translation>
+    </message>
+    <message>
+      <source>Used</source>
+      <translation type="unfinished">Used</translation>
     </message>
   </context>
   <context>
@@ -12361,6 +12772,10 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Hotspots</source>
       <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Toolbar</source>
+      <translation type="unfinished">Toolbar</translation>
     </message>
   </context>
   <context>
@@ -12563,14 +12978,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Image processing may take a few moments. Please be patient.</source>
       <translation>Bildbehandling kan ta ett tag. Var tålmodig.</translation>
-    </message>
-    <message>
-      <source>Image too big</source>
-      <translation>Bilden är för stor</translation>
-    </message>
-    <message>
-      <source>Maximum size is %1 MB.</source>
-      <translation>Maximal storlek är %1 MB.</translation>
     </message>
     <message>
       <source>Failed to upload image</source>

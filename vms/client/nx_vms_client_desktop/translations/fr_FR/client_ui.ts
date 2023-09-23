@@ -308,13 +308,6 @@
     </message>
   </context>
   <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation>Le serveur est hors ligne. Les paramètres de sauvegarde ne sont pas disponibles.</translation>
-    </message>
-  </context>
-  <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
@@ -1725,6 +1718,18 @@
       <source>Test</source>
       <translation>Test</translation>
     </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation>Utiliser les identifiants</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation>Utiliser le lien</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation>Lien</translation>
+    </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
@@ -2434,6 +2439,25 @@
     </message>
   </context>
   <context>
+    <name>SaasInfoWidget</name>
+    <message>
+      <source>No services found</source>
+      <translation>Aucun service trouvé</translation>
+    </message>
+    <message>
+      <source>Contact your Channel Partner to add services</source>
+      <translation>Contactez votre partenaire de distribution pour ajouter des services</translation>
+    </message>
+    <message>
+      <source>Channel Partner Contact</source>
+      <translation>Contact partenaire de distribution</translation>
+    </message>
+    <message>
+      <source>Services Usage</source>
+      <translation>Utilisation des services</translation>
+    </message>
+  </context>
+  <context>
     <name>SayTextBusinessActionWidget</name>
     <message>
       <source>Speak the following:</source>
@@ -2920,8 +2944,16 @@
       <translation>Rechercher des utilisateurs</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation>+ Ajouter un groupe</translation>
+      <source>Add Group</source>
+      <translation>Ajouter un groupe</translation>
+    </message>
+    <message>
+      <source>Ctrl+F</source>
+      <translation>Ctrl+F</translation>
+    </message>
+    <message>
+      <source>Del</source>
+      <translation>Suppr</translation>
     </message>
   </context>
   <context>
@@ -2931,8 +2963,16 @@
       <translation>Rechercher des utilisateurs</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Ajouter Utilisateur</translation>
+      <source>Add User</source>
+      <translation>Ajouter un utilisateur</translation>
+    </message>
+    <message>
+      <source>Ctrl+F</source>
+      <translation>Ctrl+F</translation>
+    </message>
+    <message>
+      <source>Del</source>
+      <translation>Suppr</translation>
     </message>
   </context>
   <context>

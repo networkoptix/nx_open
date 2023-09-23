@@ -62,6 +62,14 @@
       <source>Proxy LDAP requests&lt;br&gt;via server</source>
       <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
     </message>
+    <message>
+      <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
+      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+    </message>
+    <message>
+      <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
+      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+    </message>
   </context>
   <context>
     <name>AdvancedUpdateSettings</name>
@@ -314,6 +322,42 @@
     </message>
   </context>
   <context>
+    <name>BatchUserEditDialog</name>
+    <message numerus="yes">
+      <source>Batch Edit - %n Users</source>
+      <translation type="unfinished">
+        <numerusform>Batch Edit - %n Users</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User status</source>
+      <comment>Whether users are enabled or disabled</comment>
+      <translation type="unfinished">User status</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation type="unfinished">Enabled</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation type="unfinished">Disabled</translation>
+    </message>
+    <message>
+      <source>Insecure (digest) authentication</source>
+      <translation type="unfinished">Insecure (digest) authentication</translation>
+    </message>
+    <message>
+      <source>keep current value</source>
+      <translation type="unfinished">keep current value</translation>
+    </message>
+  </context>
+  <context>
     <name>BooleanRadioGroup</name>
     <message>
       <source>Yes</source>
@@ -415,6 +459,14 @@
       <source>Pending</source>
       <translation>等待处理</translation>
     </message>
+    <message>
+      <source>Suspended</source>
+      <translation type="unfinished">Suspended</translation>
+    </message>
+    <message>
+      <source>Shut Down</source>
+      <translation type="unfinished">Shut Down</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -448,20 +500,12 @@
       <translation>主机</translation>
     </message>
     <message>
-      <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
-    </message>
-    <message>
       <source>Login DN</source>
       <translation type="unfinished">Login DN</translation>
     </message>
     <message>
       <source>Password</source>
       <translation>密码</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty.</source>
-      <translation>密码不能为空。</translation>
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
@@ -476,12 +520,24 @@
       <translation>连接...</translation>
     </message>
     <message>
-      <source>Login DN cannot be empty.</source>
-      <translation type="unfinished">Login DN cannot be empty.</translation>
-    </message>
-    <message>
       <source>Use StartTLS</source>
       <translation type="unfinished">Use StartTLS</translation>
+    </message>
+    <message>
+      <source>Host cannot be empty</source>
+      <translation type="unfinished">Host cannot be empty</translation>
+    </message>
+    <message>
+      <source>Login DN cannot be empty</source>
+      <translation type="unfinished">Login DN cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation type="unfinished">Password cannot be empty</translation>
+    </message>
+    <message>
+      <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
+      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
     </message>
   </context>
   <context>
@@ -662,6 +718,14 @@
       <source>Filter</source>
       <translation>过滤器</translation>
     </message>
+    <message>
+      <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
+      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+    </message>
+    <message>
+      <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
+      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+    </message>
   </context>
   <context>
     <name>FisheyeDewarpingSettings</name>
@@ -740,6 +804,10 @@
     <message>
       <source>Ellipticity</source>
       <translation>椭圆</translation>
+    </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>自动校准失败</translation>
     </message>
   </context>
   <context>
@@ -863,6 +931,10 @@
       <source>Permission Groups</source>
       <translation type="unfinished">Permission Groups</translation>
     </message>
+    <message>
+      <source>When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+    </message>
   </context>
   <context>
     <name>GroupMembersTab</name>
@@ -905,12 +977,9 @@
       <source>Nothing found</source>
       <translation>未找到内容</translation>
     </message>
-  </context>
-  <context>
-    <name>GroupsFlow</name>
     <message>
-      <source>and %1 more...</source>
-      <translation>和 %1 更多...</translation>
+      <source>No groups</source>
+      <translation type="unfinished">No groups</translation>
     </message>
   </context>
   <context>
@@ -967,6 +1036,34 @@
       <source>Refreshing...</source>
       <translation>正在刷新...</translation>
     </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation type="unfinished">Insufficient services</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration service is required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation type="unfinished">
+        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are more cameras using this integration than available
+                services. Please disable integration for some cameras or add more suitable services.
+                Otherwise, it will be done automatically on %1</source>
+      <comment>%1 will be substituted by a date</comment>
+      <translation type="unfinished">There are more cameras using this integration than available
+                services. Please disable integration for some cameras or add more suitable services.
+                Otherwise, it will be done automatically on %1</translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation type="unfinished">0 suitable services available</translation>
+    </message>
+    <message>
+      <source>Services Required</source>
+      <translation type="unfinished">Services Required</translation>
+    </message>
   </context>
   <context>
     <name>IntegrationPanel</name>
@@ -985,6 +1082,10 @@
     <message>
       <source>Select video stream from the camera for analysis</source>
       <translation>从摄像机中选择视频流进行分析</translation>
+    </message>
+    <message>
+      <source>Usage</source>
+      <translation type="unfinished">Usage</translation>
     </message>
   </context>
   <context>
@@ -1133,10 +1234,6 @@
       <translation type="unfinished">Continuous User Import</translation>
     </message>
     <message>
-      <source>VMS imports and synchronizes users and groups with LDAP in real time</source>
-      <translation type="unfinished">VMS imports and synchronizes users and groups with LDAP in real time</translation>
-    </message>
-    <message>
       <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
       <translation type="unfinished">LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</translation>
     </message>
@@ -1157,12 +1254,24 @@
       <translation type="unfinished">No filters</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP is disabled for this system. Some settings may be not available.</source>
-      <translation type="unfinished">Continuous import from LDAP is disabled for this system. Some settings may be not available.</translation>
+      <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
+      <translation type="unfinished">VMS imports and synchronizes users and groups with LDAP server in real time</translation>
     </message>
     <message>
-      <source>No users or groups match synchronization settings and are added to the system’s DB. Make sure LDAP server parameters and filters are configured correctly. </source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system’s DB. Make sure LDAP server parameters and filters are configured correctly. </translation>
+      <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
+      <translation type="unfinished">VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
+      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+    </message>
+    <message>
+      <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
+      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
     </message>
   </context>
   <context>
@@ -1312,6 +1421,21 @@
     </message>
   </context>
   <context>
+    <name>NewLinkDialog</name>
+    <message>
+      <source>New Link - %1</source>
+      <translation type="unfinished">New Link - %1</translation>
+    </message>
+    <message>
+      <source>The previous link will be invalidated once a new one has been issued</source>
+      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation type="unfinished">Create</translation>
+    </message>
+  </context>
+  <context>
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
@@ -1389,10 +1513,6 @@
       <translation type="unfinished">Add Group</translation>
     </message>
     <message>
-      <source>Built In</source>
-      <translation type="unfinished">Built In</translation>
-    </message>
-    <message>
       <source>Custom</source>
       <translation>自定义</translation>
     </message>
@@ -1409,10 +1529,6 @@
       <translation type="unfinished">Change search criteria or create a new group</translation>
     </message>
     <message>
-      <source>Selected groups</source>
-      <translation type="unfinished">Selected groups</translation>
-    </message>
-    <message>
       <source>No groups</source>
       <translation type="unfinished">No groups</translation>
     </message>
@@ -1421,8 +1537,13 @@
       <translation type="unfinished">Use controls on the left to add to a group</translation>
     </message>
     <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
+      <source>Member of</source>
+      <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
+      <translation type="unfinished">Member of</translation>
+    </message>
+    <message>
+      <source>Built-in</source>
+      <translation type="unfinished">Built-in</translation>
     </message>
   </context>
   <context>
@@ -1448,8 +1569,8 @@
       <translation type="unfinished">Confirm password</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>密码不匹配。</translation>
+      <source>Passwords do not match</source>
+      <translation type="unfinished">Passwords do not match</translation>
     </message>
   </context>
   <context>
@@ -1462,16 +1583,16 @@
   <context>
     <name>PermissionsTab</name>
     <message>
-      <source>No resources</source>
-      <translation type="unfinished">No resources</translation>
+      <source>No resources found</source>
+      <translation type="unfinished">No resources found</translation>
     </message>
     <message>
-      <source>Try changing search criteria</source>
-      <translation type="unfinished">Try changing search criteria</translation>
+      <source>Automatically add dependent permissions</source>
+      <translation type="unfinished">Automatically add dependent permissions</translation>
     </message>
     <message>
-      <source>Automatically add dependent access rights</source>
-      <translation type="unfinished">Automatically add dependent access rights</translation>
+      <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation type="unfinished">Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
     </message>
   </context>
   <context>
@@ -2003,6 +2124,30 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>TemporaryLinkSettings</name>
+    <message>
+      <source>Link Valid Until</source>
+      <translation type="unfinished">Link Valid Until</translation>
+    </message>
+    <message>
+      <source>The link will remain accessible until the date specified (including, based on server time)</source>
+      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+    </message>
+    <message>
+      <source>Revoke access after login</source>
+      <translation type="unfinished">Revoke access after login</translation>
+    </message>
+    <message>
+      <source>Access may be revoked earlier if the link validity period ends</source>
+      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+    </message>
+    <message>
+      <source>In</source>
+      <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
+      <translation type="unfinished">In</translation>
+    </message>
+  </context>
+  <context>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
@@ -2150,10 +2295,6 @@ to activate PTZ</source>
       <translation>确认密码</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>密码不匹配。</translation>
-    </message>
-    <message>
       <source>Allow insecure (digest) authentication</source>
       <translation type="unfinished">Allow insecure (digest) authentication</translation>
     </message>
@@ -2168,6 +2309,22 @@ to activate PTZ</source>
     <message>
       <source>Permission Groups</source>
       <translation type="unfinished">Permission Groups</translation>
+    </message>
+    <message>
+      <source>Access</source>
+      <translation type="unfinished">Access</translation>
+    </message>
+    <message>
+      <source>Regular user with credentials</source>
+      <translation type="unfinished">Regular user with credentials</translation>
+    </message>
+    <message>
+      <source>Temporary with link</source>
+      <translation type="unfinished">Temporary with link</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation type="unfinished">Passwords do not match</translation>
     </message>
   </context>
   <context>
@@ -2249,6 +2406,39 @@ to activate PTZ</source>
     <message>
       <source>Permission Groups</source>
       <translation type="unfinished">Permission Groups</translation>
+    </message>
+    <message>
+      <source>Access expires</source>
+      <translation type="unfinished">Access expires</translation>
+    </message>
+    <message>
+      <source>Access Link</source>
+      <translation type="unfinished">Access Link</translation>
+    </message>
+    <message>
+      <source>Copy Link</source>
+      <translation type="unfinished">Copy Link</translation>
+    </message>
+    <message>
+      <source>Terminate</source>
+      <translation type="unfinished">Terminate</translation>
+    </message>
+    <message>
+      <source>New Link...</source>
+      <translation type="unfinished">New Link...</translation>
+    </message>
+    <message>
+      <source>No valid link for this user</source>
+      <translation type="unfinished">No valid link for this user</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>Copied here means that a link is copied</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation type="unfinished">When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
     </message>
   </context>
   <context>

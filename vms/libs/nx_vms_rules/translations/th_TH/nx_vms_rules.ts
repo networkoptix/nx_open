@@ -443,6 +443,13 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::LdapSyncIssueEvent</name>
+    <message>
+      <source>Ldap Sync Issue Event</source>
+      <translation type="unfinished">Ldap Sync Issue Event</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
