@@ -40,7 +40,8 @@ int getNextColorPos(const QByteArray& data, int startPos)
 
 QByteArray customizeSvgColorClasses(const QByteArray& sourceData,
     const QMap<QString /*source class name*/, QColor /*target color*/>& customization,
-    const QString& svgName /*< for debug output*/)
+    const QString& svgName /*< for debug output*/,
+    QSet<QString>* classesMissingCustomization)
 {
     QDomDocument doc;
     if (const auto res = doc.setContent(sourceData); !res)
@@ -49,16 +50,18 @@ QByteArray customizeSvgColorClasses(const QByteArray& sourceData,
         return sourceData;
     }
 
+    QSet<QString> missingClasses;
+
     const auto updateElement =
-        [&customization, svgName](QDomElement element)
+        [&](QDomElement element)
         {
             const auto className = element.attribute("class", "");
             if (className.isEmpty())
                 return;
 
-            const bool hasColor = NX_ASSERT(customization.contains(className),
-                "Customization is missing for svg image \"%1\": \"%2\" is not specified",
-                    svgName, className);
+            const bool hasColor = customization.contains(className);
+            if (!hasColor)
+                missingClasses.insert(className);
 
             auto targetColor = hasColor
                 ? customization.value(className)
@@ -83,6 +86,17 @@ QByteArray customizeSvgColorClasses(const QByteArray& sourceData,
         });
 
     recursiveDfs(doc.documentElement());
+
+    if (classesMissingCustomization)
+    {
+        *classesMissingCustomization = missingClasses;
+    }
+    else
+    {
+        NX_ASSERT(missingClasses.empty(), "Customization is missing for the following classes in "
+            "svg image \"%1\": %2", svgName, missingClasses);
+    }
+
     return doc.toByteArray();
 }
 

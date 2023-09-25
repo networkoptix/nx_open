@@ -66,26 +66,10 @@ QPixmap loadSvgImageUncached(const QString& sourcePath,
     return result;
 }
 
-QString deduceIconCategory(const QString& path)
-{
-    static const QString kGenericCategory = "skin";
-
-    QStringList dirs = path.split('/', Qt::SkipEmptyParts);
-    if (!NX_ASSERT(!dirs.empty()))
-        return {};
-
-    dirs.pop_back(); // Remove filename.
-    if (dirs.empty())
-        return {};
-
-    const auto category = (dirs.size() > 1 && dirs[0] == "skin") ? dirs[1] : dirs[0];
-    return colorTheme()->hasIconCustomization(category) ? category : QString{};
-}
-
 } // namespace
 
 QPixmap loadSvgImage(const QString& sourcePath,
-    const QMap<QString /*source class name*/, QColor /*target color name*/>& customization,
+    const QMap<QString /*source class name*/, QColor /*target color*/>& customization,
     const QSize& desiredPhysicalSize,
     const qreal devicePixelRatio)
 {
