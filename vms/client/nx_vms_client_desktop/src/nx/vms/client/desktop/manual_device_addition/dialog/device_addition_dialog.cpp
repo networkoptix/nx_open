@@ -72,12 +72,6 @@ DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
 {
     ui->setupUi(this);
 
-
-    ui->httpsOnlyBar->init({.level = BarDescription::BarLevel::Info,
-        .isOpenExternalLinks = false,
-        .isEnabledProperty = &messageBarSettings()->httpsOnlyBarInfo});
-    ui->serverOfflineAlertBar->init({.level = BarDescription::BarLevel::Error});
-
     initializeControls();
 
     auto urlChangeListener =
@@ -252,12 +246,17 @@ void DeviceAdditionDialog::initializeControls()
     setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, core::colorTheme()->color("dark14"));
     setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, core::colorTheme()->color("dark14"));
 
-    ui->httpsOnlyBar->setText(
-        tr("Searching for devices on the network is restricted to cameras that"
-           " support HTTPS connections. This can be changed in %1 settings.")
-            .arg(nx::vms::common::html::localLink(tr("System Administration"))));
+    ui->serverOfflineAlertBar->init({.level = BarDescription::BarLevel::Error});
+    ui->httpsOnlyBar->init(
+        {.text = tr("Searching for devices on the network is restricted to cameras that"
+                    " support HTTPS connections. This can be changed in %1 settings.")
+                     .arg(nx::vms::common::html::localLink(tr("System Administration"))),
+            .level = BarDescription::BarLevel::Info,
+            .isOpenExternalLinks = false,
+            .isEnabledProperty = &messageBarSettings()->httpsOnlyBarInfo});
     ui->httpsOnlyBar->setVisible(false);
-    connect(ui->httpsOnlyBar, &CommonMessageBar::linkActivated,
+    connect(ui->httpsOnlyBar,
+        &CommonMessageBar::linkActivated,
         [this]()
         {
             menu()->trigger(ui::action::SystemAdministrationAction,
@@ -763,7 +762,8 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     ui->searchButton->setVisible(!showSearchProgressControls);
     ui->stopSearchButton->setVisible(showSearchProgressControls);
     ui->searchProgressBar->setVisible(showSearchProgressControls);
-    ui->httpsOnlyBar->setVisible(m_currentSearch && systemSettings()->useHttpsOnlyCameras());
+    ui->httpsOnlyBar->setVisible(m_currentSearch && systemSettings()->useHttpsOnlyCameras()
+        && messageBarSettings()->httpsOnlyBarInfo.value());
 
     if (!m_currentSearch)
         return;

@@ -39,13 +39,6 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="nx::vms::client::desktop::CommonMessageBar" name="messageBar" native="true">
-     <property name="text" stdset="0">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="nx::vms::client::desktop::Panel" name="serverChoosePanel" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="leftMargin">
@@ -92,9 +85,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::CommonMessageBar" name="serverOfflineAlertBar" native="true"/>
    </item>
    <item>
     <widget class="nx::vms::client::desktop::Panel" name="searchPanel" native="true">
@@ -949,6 +939,9 @@
       </layout>
      </widget>
     </widget>
+   </item>
+   <item>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="serverOfflineAlertBar" native="true"/>
    </item>
    <item>
     <widget class="nx::vms::client::desktop::CommonMessageBar" name="httpsOnlyBar" native="true"/>
