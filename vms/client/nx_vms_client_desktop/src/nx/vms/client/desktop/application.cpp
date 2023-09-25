@@ -31,6 +31,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 #include <QtOpenGLWidgets/QOpenGLWidget>
+#include <QtQuick/QQuickWindow>
 #include <QtQuickControls2/QQuickStyle>
 #include <QtWidgets/QApplication>
 
@@ -363,6 +364,8 @@ int runApplication(int argc, char** argv)
                 Qt::HighDpiScaleFactorRoundingPolicy::Round);
         }
     }
+
+    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
     if (nx::build_info::isMacOsX())
     {
