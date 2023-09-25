@@ -195,10 +195,10 @@
     </spacer>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="performanceWarning" native="true"/>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="performanceWarning" native="true"/>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::PromoBar" name="detailsWarning" native="true"/>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="detailsWarning" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -229,15 +229,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::PromoBar</class>
+   <class>nx::vms::client::desktop::CommonMessageBar</class>
    <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>nx::vms::client::desktop::AlertBar</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
+   <header>nx/vms/client/desktop/common/widgets/message_bar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
