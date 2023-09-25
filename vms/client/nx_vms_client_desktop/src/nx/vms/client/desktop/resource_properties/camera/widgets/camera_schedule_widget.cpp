@@ -69,9 +69,13 @@ CameraScheduleWidget::CameraScheduleWidget(
     setupUi();
     NX_ASSERT(store && licenseUsageProvider);
 
-    ui->recordingAlertBar->init({
+    ui->highArchiveLengthAlertBar->init({
         .level = BarDescription::BarLevel::Warning,
-        .isEnabledProperty = &messageBarSettings()->recordingWarning,
+        .isEnabledProperty = &messageBarSettings()->highArchiveLengthWarning,
+    });
+    ui->highPreRecordingValueAlertBar->init({
+        .level = BarDescription::BarLevel::Warning,
+        .isEnabledProperty = &messageBarSettings()->highPreRecordingValueWarning,
     });
     ui->hintBar->init({.level = BarDescription::BarLevel::Info});
 
@@ -283,7 +287,23 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
             return QString();
         }());
 
-    ui->recordingAlertBar->setText(
+    ui->highPreRecordingValueAlertBar->setText(
+        [&state]()
+        {
+            if (!state.recordingAlert)
+                return QString();
+
+            switch (*state.recordingAlert)
+            {
+                case CameraSettingsDialogState::RecordingAlert::highPreRecordingValue:
+                    return tr("High pre-recording time will increase RAM utilization "
+                              "on the server");
+                default:
+                    return QString();
+            }
+        }());
+
+    ui->highArchiveLengthAlertBar->setText(
         [&state]()
         {
             if (!state.recordingAlert)
@@ -292,24 +312,16 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
             switch (*state.recordingAlert)
             {
                 case CameraSettingsDialogState::RecordingAlert::highArchiveLength:
-                {
                     return QnCameraDeviceStringSet(
                         tr("High minimum value can lead to archive length "
-                                "decrease on other devices."),
+                           "decrease on other devices."),
                         tr("High minimum value can lead to archive length "
-                                "decrease on other cameras."))
-                            .getString(state.deviceType);
-                }
+                           "decrease on other cameras."))
+                        .getString(state.deviceType);
 
-                case CameraSettingsDialogState::RecordingAlert::highPreRecordingValue:
-                {
-                    return tr("High pre-recording time will increase RAM utilization "
-                        "on the server");
-                }
+                default:
+                    return QString();
             }
-
-            NX_ASSERT(false);
-            return QString();
         }());
 }
 
