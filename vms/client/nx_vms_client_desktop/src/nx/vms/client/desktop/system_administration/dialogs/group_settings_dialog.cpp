@@ -418,6 +418,17 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
             Qn::WriteAccessRightsPermission);
 
         d->deleteAvailable = !systemContext()->nonEditableUsersAndGroups()->containsGroup(groupId);
+
+        state.nameIsUnique = true;
+        const auto groupName = groupData->name.toLower();
+        for (const auto& group: groupManager->groups())
+        {
+            if (group.getId() != groupId && group.name.toLower() == groupName)
+            {
+                state.nameIsUnique = false;
+                break;
+            }
+        }
     }
 
     return state;

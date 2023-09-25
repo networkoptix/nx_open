@@ -49,6 +49,7 @@ DialogWithState
     property bool parentGroupsEditable //< Not used by current dialog type.
     property bool membersEditable //< Not used by current dialog type.
     property bool permissionsEditable //< Not used by current dialog type.
+    property bool nameIsUnique //< Not used by current dialog type.
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
