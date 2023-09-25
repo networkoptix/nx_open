@@ -49,6 +49,7 @@ DialogWithState
     property bool parentGroupsEditable
     property bool membersEditable
     property bool permissionsEditable
+    property alias nameIsUnique: generalSettings.nameIsUnique
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex

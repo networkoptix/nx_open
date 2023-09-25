@@ -913,6 +913,13 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.linkEditable = accessController()->hasPowerUserPermissions()
         && permissions.testFlag(Qn::SavePermission);
 
+    const auto& users = systemContext()->resourcePool()->getResources<QnUserResource>(
+        [id = user->getId(), name = user->getName().toLower()](const auto& otherUser)
+        {
+            return otherUser->getId() != id && otherUser->getName().toLower() == name;
+        });
+
+    state.nameIsUnique = users.isEmpty();
     return state;
 }
 

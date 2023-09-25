@@ -64,6 +64,7 @@ DialogWithState
     property alias revokeAccessEnabled: generalSettings.revokeAccessEnabled
     property alias displayOffsetMs: generalSettings.displayOffsetMs
     property alias firstLoginTime: generalSettings.firstLoginTime
+    property alias nameIsUnique: generalSettings.nameIsUnique
 
     // Mapped to dialog property.
     property alias tabIndex: tabControl.currentTabIndex
