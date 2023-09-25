@@ -47,6 +47,7 @@ struct UserSettingsDialogState
     Q_PROPERTY(nx::vms::api::GlobalPermissions globalPermissions MEMBER globalPermissions)
     Q_PROPERTY(bool permissionsEditable MEMBER permissionsEditable)
     Q_PROPERTY(bool linkEditable MEMBER linkEditable)
+    Q_PROPERTY(bool nameIsUnique MEMBER nameIsUnique)
 
 public:
     bool operator==(const UserSettingsDialogState& other) const = default;
@@ -70,6 +71,7 @@ public:
     bool userEnabledEditable = true;
     bool allowInsecure = false;
     bool allowInsecureEditable = true;
+    bool nameIsUnique = true;
 
     // Expose set of groups as QList for interoperability with QML and correct state comparison.
     std::set<MembersModelGroup> parentGroups;

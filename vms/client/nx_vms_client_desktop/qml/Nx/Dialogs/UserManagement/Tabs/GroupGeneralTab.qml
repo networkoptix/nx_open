@@ -32,6 +32,7 @@ Item
     property bool deleteAvailable: true
     property bool continuousSync: true
     property var editingContext
+    property bool nameIsUnique: true
 
     property alias model: groupsComboBox.model
     property alias parentGroupsEditable: groupsComboBox.enabled
@@ -188,22 +189,31 @@ Item
                 }
             }
         }
-    }
 
-    DialogBanner
-    {
-        id: bannerLdapContinousSyncDisabled
+        DialogBanner
+        {
+            id: bannerLdapContinousSyncDisabled
 
-        style: DialogBanner.Style.Warning
-        visible: control.isLdap && !control.continuousSync
-        closeVisible: true
+            style: DialogBanner.Style.Warning
+            visible: control.isLdap && !control.continuousSync
+            closeVisible: true
+            Layout.fillWidth: true
 
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
+            text: qsTr("When Continuous Sync is disabled, groups do not synchronize automatically. "
+                + "To update this group, initiate a manual sync.")
+            onCloseClicked: bannerLdapContinousSyncDisabled.visible = false
+        }
 
-        text: qsTr("When Continuous Sync is disabled, groups do not synchronize automatically. "
-            + "To update this group, initiate a manual sync.")
-        onCloseClicked: bannerLdapContinousSyncDisabled.visible = false
+        DialogBanner
+        {
+            style: DialogBanner.Style.Info
+            visible: !control.nameIsUnique
+            closeVisible: true
+            text: qsTr("Another group with the same name exists in the system."+
+                " It is recommended to assign unique names to the groups.")
+            Layout.fillWidth: true
+
+            onCloseClicked: visible = false
+        }
     }
 }
