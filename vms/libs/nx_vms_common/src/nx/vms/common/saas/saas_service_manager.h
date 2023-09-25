@@ -16,6 +16,9 @@ class NX_VMS_COMMON_API ServiceManager:
     public SystemContextAware
 {
     Q_OBJECT
+    Q_PROPERTY(bool saasActive READ saasActive NOTIFY dataChanged)
+    Q_PROPERTY(bool saasShutDown READ saasShutDown NOTIFY dataChanged)
+    Q_PROPERTY(bool saasSuspended READ saasSuspended NOTIFY dataChanged)
 
 public:
     ServiceManager(SystemContext* context, QObject* parent = nullptr);
@@ -73,6 +76,16 @@ public:
     std::map<QnUuid, nx::vms::api::SaasCloudStorageParameters> cloudStorageData() const;
 
     /**
+     * @return Whether Saas is in active state.
+     */
+    bool saasActive() const;
+
+    /**
+     * @return Whether Saas is in suspended state.
+     */
+    bool saasSuspended() const;
+
+    /**
      * @return Whether SaaS is in suspended or shutdown state. It doesn't matter if shutdown state
      * was received from license server or set due lost connection to a license server.
      */
@@ -107,6 +120,8 @@ public:
 signals:
     void saasStateChanged();
     void dataChanged();
+    void saasShutDownChanged();
+    void saasSuspendedChanged();
 
 private:
     QnLicensePtr localRecordingLicenseV1Unsafe() const;
