@@ -26,9 +26,9 @@
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx_ec/ec_api_common.h>
 
-#include "../network_manager.h"
 #include "../certificate_verifier.h"
 #include "../cloud_connection_factory.h"
+#include "../network_manager.h"
 
 using namespace ec2;
 using namespace nx::network::http;
@@ -512,13 +512,22 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
     const auto url = makeUrl(context->address(), "/rest/v1/login/sessions/current");
     auto request = d->makeRequestWithCertificateValidation(context->handshakeCertificateChain);
     request->setCredentials(context->credentials());
+
+    ExternalErrorMap expectedErrors{
+        {StatusCode::unprocessableEntity, RemoteConnectionErrorCode::sessionExpired}
+    };
+
+    if (context->isCloudConnection())
+    {
+        expectedErrors[StatusCode::serviceUnavailable] =
+            RemoteConnectionErrorCode::cloudUnavailableOnServer;
+    }
+
     return d->doGet<nx::vms::api::LoginSession>(
         url,
         context,
         std::move(request),
-        expectedErrorCodes({
-            {StatusCode::unprocessableEntity, RemoteConnectionErrorCode::sessionExpired}
-        }));
+        expectedErrorCodes(expectedErrors));
 }
 
 void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(ContextPtr context) const
