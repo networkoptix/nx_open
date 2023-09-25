@@ -9,7 +9,8 @@ namespace nx::vms::client::core {
 
 NX_VMS_CLIENT_CORE_API QByteArray customizeSvgColorClasses(const QByteArray& sourceData,
     const QMap<QString /*source class name*/, QColor /*target color*/>& customization,
-    const QString& svgName /*< for debug output*/);
+    const QString& svgName, //< for debug output, a meaningful value must be passed.
+    QSet<QString>* classesMissingCustomization = nullptr);
 
 [[deprecated]]
 NX_VMS_CLIENT_CORE_API QByteArray substituteSvgColors(const QByteArray& sourceData,
