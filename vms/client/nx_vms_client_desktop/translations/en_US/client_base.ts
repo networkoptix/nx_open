@@ -1132,6 +1132,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Event Occurs</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1141,10 +1145,6 @@
     </message>
     <message>
         <source>Event Stops</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>automatic</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1244,6 +1244,21 @@
     </message>
 </context>
 <context>
+    <name>FileExtensions</name>
+    <message>
+        <source>Pictures</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Files</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>FileSystemStrings</name>
     <message>
         <source>Audio Video Interleave</source>
@@ -1323,8 +1338,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Delete %n groups?</source>
-        <comment>Numerical form depends on groups count</comment>
+        <source>Delete %n group(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -3260,21 +3274,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-        <source>Pictures</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Files</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnDatabaseManagementWidget</name>
     <message>
         <source>Save Database Backup...</source>
@@ -4015,15 +4014,6 @@ to %1</source>
     </message>
     <message>
         <source>Lo-Res</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>press and hold</source>
-        <comment>Soft Trigger</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Disabled by schedule</source>
         <translation></translation>
     </message>
     <message numerus="yes">
@@ -4975,11 +4965,11 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>SAAS SHUT DOWN</source>
+        <source>NO EXPORT PERMISSION</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>NO EXPORT PERMISSION</source>
+        <source>SAAS SHUT DOWN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5450,26 +5440,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>We recommend choosing another location for it instead of the system partition.</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Local recording services overused</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cloud storage services overused</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Paid integrations services overused</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System suspended</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System shut down</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6291,15 +6261,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message numerus="yes">
         <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-        <comment>Numerical form depends on layouts count</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This layout is shared with other users, so it will be deleted for their accounts as well.</numerusform>
+            <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Delete user?</source>
-        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>%n items were not deleted.</source>
@@ -6310,20 +6275,18 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
         <source>Delete layout?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-        <comment>Numerical form depends on layouts count</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n layout is shared with other users, so it will be deleted for their accounts as well.</numerusform>
+            <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n users?</source>
-        <comment>Numerical form depends on users count</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Delete %n user?</numerusform>
             <numerusform>Delete %n users?</numerusform>
         </translation>
@@ -7222,26 +7185,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::CameraButtonController</name>
+    <name>nx::vms::client::desktop::CameraButtonManager</name>
     <message>
-        <source>Heater</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Wiper</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unmute</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Door</source>
-        <translation></translation>
+        <source>Disabled by schedule</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8875,10 +8822,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>Group with the same name already exists</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Failed to apply changes to %1 group</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::HintButton</name>
@@ -9357,6 +9300,32 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
     <message>
         <source>Network request failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::LookupListExportProcessor</name>
+    <message>
+        <source>Text files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export List</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::LookupListPreviewProcessor</name>
+    <message>
+        <source>Import Lookup List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text files</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10863,15 +10832,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation></translation>
     </message>
     <message>
-        <source>Not Part Of Certificate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Contact a user with Administrators permissions to resolve this issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Part Of Certificate</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11226,18 +11195,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
             <numerusform>System storage is used for analytics data on %n Servers</numerusform>
         </translation>
     </message>
-    <message>
-        <source>Add more services or fix overuse by stopping using services for some devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If no action is taken, required number of services will be released automatically on %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some features may not be available.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::TemporaryUserExpirationWatcher</name>
@@ -11449,6 +11406,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation></translation>
     </message>
     <message>
+        <source>You do not have permissions to modify or delete this group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Group is not found in the LDAP database.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11458,10 +11419,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You do not have permissions to modify or delete this group.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11499,21 +11456,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete group &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to delete group.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Failed to delete %n groups.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11526,6 +11468,21 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
         <source>Delete %n groups</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Failed to delete group &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to delete group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Failed to delete %n groups.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -11564,7 +11521,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation></translation>
     </message>
     <message>
-        <source>Full Name</source>
+        <source>You do not have permissions to modify this user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11576,15 +11533,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>There are multiple users with the same credentials in the system. To avoid issues with log in it is required for all users to have unique credentials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Temporary user</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You do not have permissions to modify this user.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
+        <source>Full Name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11702,11 +11659,27 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Copy Access Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid current password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Email cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copy Access Link</source>
+        <source>Login cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only letters, numbers and symbols %1 are allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User with specified login already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11734,36 +11707,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Access link has been successfully created!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and</source>
-        <comment>Example: 1 month and 2 days</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User %1 has been successfully created!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid current password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Login cannot be empty</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Only letters, numbers and symbols %1 are allowed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User with specified login already exists</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Link - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Access link has been successfully created!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11775,12 +11723,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>in %1</source>
-        <comment>%1 is a duration</comment>
+        <source>and</source>
+        <comment>Example: 1 month and 2 days</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>New User</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User %1 has been successfully created!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
