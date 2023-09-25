@@ -12,6 +12,13 @@
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/common/palette.h>
 
+namespace {
+
+constexpr size_t kFontPixelSize = 14;
+constexpr QMargins kMargins{16, 10, 16, 10};
+
+} // namespace
+
 namespace nx::vms::client::desktop {
 
 struct CommonMessageBar::Private
@@ -98,6 +105,12 @@ void CommonMessageBar::init(const BarDescription& barDescription)
 {
     d->closeButton->setVisible(barDescription.isClosable || !barDescription.isEnabledProperty.isNull());
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light4"));
+
+    auto font = d->label->font();
+    font.setWeight(QFont::Medium);
+    font.setPixelSize(kFontPixelSize);
+    d->label->setFont(font);
+    verticalLayout()->setContentsMargins(kMargins);
 
     QString backgroundColor;
     QString frameColor;
