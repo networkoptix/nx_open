@@ -59,8 +59,6 @@
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
-#include <nx/vms/client/core/software_trigger/software_triggers_watcher.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -150,7 +148,6 @@ namespace html = nx::vms::common::html;
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionGrid;
 using nx::vms::client::core::MotionSelection;
-using nx::vms::client::core::SoftwareTriggersWatcher;
 
 namespace {
 
@@ -299,10 +296,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     m_posUtcMs(DATETIME_INVALID),
     m_watermarkPainter(new WatermarkPainter),
     m_itemId(item->uuid()),
-    m_toggleImageEnhancementAction(new QAction(this)),
-    m_buttonManager(layoutResource()->isPreviewSearchLayout() || qnRuntime->isVideoWallMode()
-        ? nullptr
-        : new ButtonManager(this))
+    m_toggleImageEnhancementAction(new QAction(this))
 {
     NX_ASSERT(d->mediaResource, "Media resource widget was created with a non-media resource.");
     d->isExportedLayout = layoutResource()->isFile();
@@ -316,6 +310,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(
             d->noExportPermission = layout->metadata().itemProperties[item->uuid()].flags.testFlag(
                 NovItemProperties::Flag::noExportPermission);
         }
+    }
+
+    if (d->camera
+        && !d->camera->hasFlags(Qn::cross_system)
+        && !d->isPreviewSearchLayout
+        && !qnRuntime->isVideoWallMode())
+    {
+        m_buttonManager = std::make_unique<CameraButtonManager>(this);
     }
 
     initRenderer();

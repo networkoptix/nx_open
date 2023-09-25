@@ -26,7 +26,6 @@
 #include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/media/abstract_analytics_metadata_provider.h>
-#include <nx/vms/client/core/software_trigger/software_triggers_watcher.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/types.h>
@@ -42,7 +41,6 @@ using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 
 namespace nx::vms::client::desktop {
 
-class CameraButtonController;
 class RecordingStatusHelper;
 class MediaResourceWidgetPrivate;
 class AnalyticsOverlayWidget;
@@ -510,6 +508,5 @@ private:
     QnUuid m_itemId;
 
     QAction* const m_toggleImageEnhancementAction;
-    using ButtonManager = nx::vms::client::desktop::CameraButtonManager;
-    std::unique_ptr<ButtonManager> m_buttonManager;
+    std::unique_ptr<nx::vms::client::desktop::CameraButtonManager> m_buttonManager;
 };
