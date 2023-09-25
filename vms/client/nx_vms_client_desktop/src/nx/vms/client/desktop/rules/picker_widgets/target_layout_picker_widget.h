@@ -17,6 +17,7 @@ namespace nx::vms::client::desktop::rules {
 class TargetLayoutPicker:
     public ResourcePickerWidgetBase<vms::rules::TargetLayoutField>
 {
+    Q_OBJECT
 public:
     using ResourcePickerWidgetBase<vms::rules::TargetLayoutField>::ResourcePickerWidgetBase;
 
