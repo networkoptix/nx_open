@@ -271,7 +271,10 @@
     <widget class="nx::vms::client::desktop::CommonMessageBar" name="hintBar" native="true"/>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::CommonMessageBar" name="recordingAlertBar" native="true"/>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="highArchiveLengthAlertBar" native="true"/>
+   </item>
+   <item>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="highPreRecordingValueAlertBar" native="true"/>
    </item>
   </layout>
  </widget>

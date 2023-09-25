@@ -15,7 +15,8 @@ public:
     void reset();
 
     Property<bool> httpsOnlyBarInfo{this, "httpsOnlyBarInfo", true};
-    Property<bool> recordingWarning{this, "recordingWarning", true};
+    Property<bool> highArchiveLengthWarning{this, "highArchiveLengthWarning", true};
+    Property<bool> highPreRecordingValueWarning{this, "highPreRecordingValueWarning", true};
     Property<bool> advancedSettingsAlert{this, "advancedSettingsAlert", true};
     Property<bool> highResolutionInfo{this, "highResolutionInfo", true};
     Property<bool> motionImplicitlyDisabledAlert{this, "motionImplicitlyDisabledAlert", true};
