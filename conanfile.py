@@ -64,7 +64,7 @@ class NxOpenConan(ConanFile):
     requires = (
         f"ffmpeg/{ffmpeg_version_and_revision}",
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
-        "qt/6.5.0" "#cb8a3b2809c86158891e099e140df2d8",
+        "qt/6.5.3" "#db51bfabe97e342eb8d03d65c578a368",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
         "vms_help/6.0.0",
         "quick_start_guide/6.0.0",
@@ -82,12 +82,12 @@ class NxOpenConan(ConanFile):
         generate_conan_package_refs(self)
 
     def build_requirements(self):
-        self.build_requires("qt-host/6.5.0" "#91baa27019116ada0e6bae41c4e23182")
+        self.build_requires("qt-host/6.5.3" "#eb144d410dfc2e7ee3986101cd3c0fc7")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.build_requires("clang/15.0.2" "#a16b73bc47b590db839f3fca74c95b62")
+                self.build_requires("clang/15.0.2" "#9bac3eb3c13d8d3aace16ac4b5fce8d2")
             self.build_requires("sdk-gcc/7.5" "#8e4d5d65d516a14449a95f3c314189f8")
 
         if self.isWindows:
