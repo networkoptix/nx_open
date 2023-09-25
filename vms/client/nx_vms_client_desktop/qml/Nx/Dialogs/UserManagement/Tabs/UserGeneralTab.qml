@@ -56,6 +56,7 @@ Item
 
     property bool ldapError: false
     property bool continuousSync: true
+    property bool nameIsUnique: true
 
     property var self
 
@@ -729,50 +730,55 @@ Item
                 }
             }
         }
-    }
 
-    DialogBanner
-    {
-        id: bannerUserNotFound
-
-        style: DialogBanner.Style.Error
-
-        visible: false
-        closeVisible: true
-
-        Binding
+        DialogBanner
         {
-            target: bannerUserNotFound
-            property: "visible"
-            value: control.ldapError
+            id: bannerUserNotFound
+
+            style: DialogBanner.Style.Error
+
+            visible: false
+            closeVisible: true
+
+            Binding
+            {
+                target: bannerUserNotFound
+                property: "visible"
+                value: control.ldapError
+            }
+
+            text: qsTr("This user is not found in LDAP database and is not able to log in.")
+            buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
+            buttonIcon: "image://svg/skin/user_settings/trash.svg"
+            Layout.fillWidth: true
+
+            onButtonClicked: control.deleteRequested()
+            onCloseClicked: visible = false
         }
 
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
+        DialogBanner
+        {
+            style: DialogBanner.Style.Error
+            visible: !control.nameIsUnique
+            closeVisible: true
+            text: qsTr("This user’s login duplicates the login of another user. None of them is" +
+                " able to login. To resolve this issue you can change user’s login or disable or" +
+                " delete users with duplicating logins.")
+            Layout.fillWidth: true
 
-        text: qsTr("This user is not found in LDAP database and is not able to log in.")
-        buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
-        buttonIcon: "image://svg/skin/user_settings/trash.svg"
+            onCloseClicked: visible = false
+        }
 
-        onButtonClicked: control.deleteRequested()
-        onCloseClicked: bannerUserNotFound.visible = false
-    }
+        DialogBanner
+        {
+            style: DialogBanner.Style.Warning
+            visible: control.userType === UserSettingsGlobal.LdapUser && !control.continuousSync
+            closeVisible: true
+            text: qsTr("When Continuous Sync is disabled, user’s membership in groups do not "
+                + "synchronize automatically. To update this information, initiate a manual sync.")
+            Layout.fillWidth: true
 
-    DialogBanner
-    {
-        id: bannerLdapContinousSyncDisabled
-
-        style: DialogBanner.Style.Warning
-        visible: control.userType === UserSettingsGlobal.LdapUser && !control.continuousSync
-        closeVisible: true
-
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-
-        text: qsTr("When Continuous Sync is disabled, user’s membership in groups do not "
-            + "synchronize automatically. To update this information, initiate a manual sync.")
-        onCloseClicked: bannerLdapContinousSyncDisabled.visible = false
+            onCloseClicked: visible = false
+        }
     }
 }
