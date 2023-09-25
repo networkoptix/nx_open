@@ -14,6 +14,8 @@ public:
     void reload();
     void reset();
 
+    Property<bool> detailsLoggingWarning{this, "detailsLoggingWarning", true};
+    Property<bool> performanceLoggingWarning{this, "performanceLoggingWarning", true};
     Property<bool> httpsOnlyBarInfo{this, "httpsOnlyBarInfo", true};
     Property<bool> highArchiveLengthWarning{this, "highArchiveLengthWarning", true};
     Property<bool> highPreRecordingValueWarning{this, "highPreRecordingValueWarning", true};

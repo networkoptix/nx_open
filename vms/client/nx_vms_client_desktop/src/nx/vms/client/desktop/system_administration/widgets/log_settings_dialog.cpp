@@ -12,6 +12,7 @@
 #include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 #include <nx/vms/text/human_readable.h>
@@ -161,13 +162,19 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
     ui->splitByTimeUnits->addItem(
         QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Days), (T)kDay.count());
 
-    ui->detailsWarning->setText(tr(
-        "The selected Logging Level may not be collecting enough information.\n"
+    ui->detailsWarning->init(
+        {.text = tr("The selected Logging Level may not be collecting enough information.\n"
         "The Logging Level \"%1\" will provide you with more granular information.")
-        .arg(LogsManagementModel::logLevelName(LogsManagementWatcher::defaultLogLevel())));
-    ui->performanceWarning->setText(tr(
-        "The selected Logging Level may degrade your system's performance.\nRemember to return "
-        "the Logging Level to its default setting after you have collected enough logs."));
+        .arg(LogsManagementModel::logLevelName(LogsManagementWatcher::defaultLogLevel())),
+        .level = BarDescription::BarLevel::Info,
+        .isEnabledProperty = &messageBarSettings()->detailsLoggingWarning});
+
+    ui->performanceWarning->init(
+        {.text = tr("The selected Logging Level may degrade your system's performance.\n"
+        "Remember to return the Logging Level to its default setting "
+        "after you have collected enough logs."),
+        .level = BarDescription::BarLevel::Warning,
+        .isEnabledProperty = &messageBarSettings()->performanceLoggingWarning});
 
     auto resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
     resetButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
@@ -264,8 +271,10 @@ void LogSettingsDialog::updateWarnings()
 
     if (auto level = loggingLevel())
     {
-        ui->detailsWarning->setVisible(*level < LogsManagementWatcher::defaultLogLevel());
-        ui->performanceWarning->setVisible(*level > LogsManagementWatcher::defaultLogLevel());
+        ui->detailsWarning->setVisible(*level < LogsManagementWatcher::defaultLogLevel()
+            && messageBarSettings()->detailsLoggingWarning.value());
+        ui->performanceWarning->setVisible(*level > LogsManagementWatcher::defaultLogLevel()
+            && messageBarSettings()->performanceLoggingWarning.value());
     }
 }
 
