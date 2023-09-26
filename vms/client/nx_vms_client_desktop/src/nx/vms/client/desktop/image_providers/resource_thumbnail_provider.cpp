@@ -199,7 +199,9 @@ struct ResourceThumbnailProvider::Private
 
     static QImage createPlaceholder(const QString& path, const QSize& size)
     {
-        const auto pixmap = qnSkin->icon(path, kIconSubstitutions).pixmap(size);
+        const auto pixmap = path.endsWith(".svg")
+            ? qnSkin->icon(path, kIconSubstitutions).pixmap(size)
+            : qnSkin->icon(path).pixmap(size);
         const auto pixelRatio = pixmap.devicePixelRatio();
 
         QPixmap destination(size * pixelRatio);
