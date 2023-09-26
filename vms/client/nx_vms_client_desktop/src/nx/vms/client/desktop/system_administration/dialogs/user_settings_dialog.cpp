@@ -500,22 +500,14 @@ QString UserSettingsDialog::validateLogin(const QString& login)
                         .arg(kAllowedLoginSymbols));
             }
 
-            for (const auto& user: resourcePool()->getResources<QnUserResource>())
-            {
-                if (user->getName().toLower() != text.toLower())
-                    continue;
-
-                // Allow our own login.
-                if (d->user && d->user->getName() == text)
-                    continue;
-
-                if (d->dialogType == CreateUser && currentState().userId == user->getId())
-                    continue;
-
-                return ValidationResult(tr("User with specified login already exists"));
-            }
-
-            return ValidationResult::kValid;
+            const auto duplicateUsers = resourcePool()->getResources<QnUserResource>(
+                [id = currentState().userId, name = text.toLower()](const auto& user)
+                {
+                    return user->getId() != id && user->getName().toLower() == name;
+                });
+            return duplicateUsers.isEmpty()
+                ? ValidationResult::kValid
+                : ValidationResult(tr("User with specified login already exists"));
         };
 
     const auto result = validateFunction(login);
