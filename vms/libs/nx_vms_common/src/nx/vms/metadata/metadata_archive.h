@@ -10,6 +10,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <recording/time_period_list.h>
 
+#include "dao/qfile_metadata_binary_file.h"
+
 namespace nx::vms::metadata {
 
 static const int kGeometrySize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8;
@@ -64,7 +66,7 @@ struct NX_VMS_COMMON_API Index
 
     bool load(const QDateTime& time);
     bool load(qint64 timestampMs);
-    bool load(QFile& indexFile);
+    bool load(AbstractMetadataBinaryFile& indexFile);
 
     qint64 dataOffset(int recordNumber, bool noGeometryMode) const;
     qint64 dataSize(int from, int size, bool noGeometryMode) const;
@@ -140,8 +142,8 @@ protected:
         FixDiscontinue fixDiscontinue = onDiscontinueInMatchedResult);
 
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate) const;
-    void fillFileNames(qint64 datetimeMs, QFile* motionFile, bool noGeometry, QFile* indexFile) const;
-    void fillFileNames(qint64 datetimeMs, QFile* indexFile) const;
+    void fillFileNames(qint64 datetimeMs, AbstractMetadataBinaryFile* motionFile, bool noGeometry, AbstractMetadataBinaryFile* indexFile) const;
+    void fillFileNames(qint64 datetimeMs, AbstractMetadataBinaryFile* indexFile) const;
     bool saveToArchiveInternal(const QnConstAbstractCompressedMetadataPtr& data);
     QString getChannelPrefix() const;
 
@@ -169,7 +171,7 @@ private:
         AddRecordFunc addRecordFunc,
         RecordMatcher* recordMatcher,
         std::function<bool()> interruptionCallback,
-        QFile& motionFile,
+        AbstractMetadataBinaryFile& motionFile,
         const Index& index,
         QVector<IndexRecord>::iterator startItr,
         const QVector<IndexRecord>::iterator endItr,
@@ -187,7 +189,7 @@ private:
         AddRecordFunc addRecordFunc,
         RecordMatcher* recordMatcher,
         std::function<bool()> interruptionCallback,
-        QFile& motionFile,
+        AbstractMetadataBinaryFile& motionFile,
         const Index& index,
         QVector<IndexRecord>::iterator startItr,
         const QVector<IndexRecord>::iterator endItr,
@@ -207,9 +209,9 @@ private:
     int m_recordSize = 0;
     int m_aggregationIntervalSeconds = 0;
 
-    QFile m_detailedMetadataFile;
-    std::unique_ptr<QFile> m_noGeometryMetadataFile;
-    QFile m_detailedIndexFile;
+    std::shared_ptr<AbstractMetadataBinaryFile> m_detailedMetadataFile;
+    std::unique_ptr<AbstractMetadataBinaryFile> m_noGeometryMetadataFile;
+    std::shared_ptr<AbstractMetadataBinaryFile> m_detailedIndexFile;
 
     qint64 m_lastDateForCurrentFile = -1;
 
