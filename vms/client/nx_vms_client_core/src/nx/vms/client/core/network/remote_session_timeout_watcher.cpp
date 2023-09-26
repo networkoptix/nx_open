@@ -151,11 +151,14 @@ void RemoteSessionTimeoutWatcher::tick()
         const auto temporaryTokenRemainingTime = d->temporaryTokenRemainingTime(session);
 
         // Time calculation error caused by duration cast from microseconds to seconds.
-        const auto kTimeCalculationError = 2s;
+        const auto kTimeCalculationError = 5s;
         const auto reason = temporaryTokenRemainingTime
             && *temporaryTokenRemainingTime <= kForceDisconnectTime + kTimeCalculationError
                 ? SessionExpirationReason::temporaryTokenExpired
                 : SessionExpirationReason::sessionExpired;
+
+        if (temporaryTokenRemainingTime)
+            NX_VERBOSE(this, "Temporary token remaining time: %1", *temporaryTokenRemainingTime);
 
         emit sessionExpired(reason);
         return;
