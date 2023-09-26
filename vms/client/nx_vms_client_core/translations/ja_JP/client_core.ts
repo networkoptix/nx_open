@@ -191,11 +191,11 @@
     </message>
     <message>
       <source>Your access to this system has expired.</source>
-      <translation type="unfinished">Your access to this system has expired.</translation>
+      <translation>このシステムへのアクセス有効期限が切れました。</translation>
     </message>
     <message>
       <source>Please contact the system administrator to regain access.</source>
-      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+      <translation>アクセスを回復するには、システム管理者に連絡してください。</translation>
     </message>
   </context>
   <context>

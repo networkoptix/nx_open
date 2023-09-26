@@ -450,7 +450,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>Ldap Sync Issue Event</source>
-      <translation type="unfinished">Ldap Sync Issue Event</translation>
+      <translation>Ldap synkrinisereingshendelse</translation>
     </message>
   </context>
   <context>

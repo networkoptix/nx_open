@@ -35,7 +35,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>システムイベント</translation>
     </message>
   </context>
   <context>

@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>無効な JSON コンテンツです。</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>サポートされていないコンテンツタイプです。</translation>
     </message>
   </context>
   <context>
@@ -75,11 +75,11 @@
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>チケットキーが無効または期限切れです。</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>パスワードが違います</translation>
     </message>
   </context>
   <context>
@@ -198,27 +198,27 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</translation>
+      <translation>このグループのメンバーには無制限のシステム権限があります。管理者は、パワーユーザーの作成および変更、システムの統合、 %1 アカウントへの紐づけまたは解除ができます。</translation>
     </message>
     <message>
       <source>Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>このグループのメンバーは、システム構成の大部分を制御できますが、管理者向け設定の変更、および自身に対するグループと権限の変更や削除は許可されておらず、他のパワーユーザーの作成や編集もできません。</translation>
     </message>
     <message>
       <source>Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
+      <translation>このグループのメンバーは、PTZポジションおよびPTZツアーの表示と実行、双方向音声の使用、I/Oモジュールボタンの操作、ブックマークの作成と編集、イベントログの表示が可能です。</translation>
     </message>
     <message>
       <source>Members of this group can view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can view and export archive and Bookmarks.</translation>
+      <translation>このグループのメンバーは、アーカイブとブックマークの表示およびエクスポートが可能です。</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>このグループのメンバーは、ライブ映像、I/Oモジュール、Webページを表示できます。</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information.</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information.</translation>
+      <translation>このグループのメンバーは、システムの状態監視に関する情報を表示できます。</translation>
     </message>
   </context>
   <context>
@@ -809,23 +809,23 @@
     </message>
     <message>
       <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <translation>ローカル録画</translation>
     </message>
     <message>
       <source>Local Recording service</source>
-      <translation type="unfinished">Local Recording service</translation>
+      <translation>ローカル録画サービス</translation>
     </message>
     <message numerus="yes">
       <source>%n Local Recording Services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local Recording Services</numerusform>
+      <translation>
+        <numerusform>%n ローカル録画サービス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local Recording Services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local Recording Services</numerusform>
+      <translation>
+        <numerusform>%n/%1 ローカル録画サービス</numerusform>
       </translation>
     </message>
   </context>
@@ -1080,97 +1080,97 @@
     <message>
       <source>Msec</source>
       <comment>Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>ミリ秒</translation>
     </message>
     <message>
       <source>Sec</source>
       <comment>Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <source>Min</source>
       <comment>Capitalized long suffix for displaying minutes</comment>
-      <translation type="unfinished">Min</translation>
+      <translation>分</translation>
     </message>
     <message>
       <source>Hrs</source>
       <comment>Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation> 日</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>週</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>ヶ月</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>年</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
+      <translation>
+        <numerusform>ミリ秒</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
+      <translation>
+        <numerusform>秒</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
+      <translation>
+        <numerusform>分</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>時間</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>日</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
+      <translation>
+        <numerusform>週</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>ヶ月</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>Years</numerusform>
+      <translation>
+        <numerusform> 年</numerusform>
       </translation>
     </message>
   </context>
@@ -1273,46 +1273,46 @@
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>ローカル録画</translation>
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>インテグレーション</translation>
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation type="unfinished">Cloud storage</translation>
+      <translation>クラウドストレージ</translation>
     </message>
   </context>
   <context>
     <name>StringsHelper</name>
     <message>
       <source>SaaS uninitialized</source>
-      <translation type="unfinished">SaaS uninitialized</translation>
+      <translation>SaaS が初期化されていません</translation>
     </message>
     <message>
       <source>SaaS active</source>
-      <translation type="unfinished">SaaS active</translation>
+      <translation>SaaS がアクティブです</translation>
     </message>
     <message>
       <source>SaaS suspended</source>
-      <translation type="unfinished">SaaS suspended</translation>
+      <translation>SaaS は一時停止されました</translation>
     </message>
     <message>
       <source>SaaS shut down</source>
-      <translation type="unfinished">SaaS shut down</translation>
+      <translation>SaaS はシャットダウンしました</translation>
     </message>
     <message>
       <source>SaaS shut down automatically</source>
-      <translation type="unfinished">SaaS shut down automatically</translation>
+      <translation>SaaS は自動的にシャットダウンしました</translation>
     </message>
     <message>
       <source>Contact your channel partner for details.</source>
-      <translation type="unfinished">Contact your channel partner for details.</translation>
+      <translation>詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>VMS とライセンスサーバー間のインターネット接続を確認してください。</translation>
     </message>
   </context>
   <context>
@@ -1740,11 +1740,11 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
-      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+      <translation>パワーユーザーによるセキュリティ設定の編集を許可する</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure)</translation>
+      <translation>非推奨の API 関数を有効にする (非セキュア)</translation>
     </message>
   </context>
   <context>
@@ -2456,33 +2456,33 @@
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
+      <translation>LDAP 同期の問題</translation>
     </message>
     <message>
       <source>Failed to connect to LDAP</source>
-      <translation type="unfinished">Failed to connect to LDAP</translation>
+      <translation>LDAP への接続に失敗しました</translation>
     </message>
     <message>
       <source>Failed to complete sync within a %1 timeout</source>
-      <translation type="unfinished">Failed to complete sync within a %1 timeout</translation>
+      <translation>%1 のタイムアウト以内に同期を完了できませんでした</translation>
     </message>
     <message>
       <source>Failed to complete sync within a given timeout</source>
-      <translation type="unfinished">Failed to complete sync within a given timeout</translation>
+      <translation>指定されたタイムアウト以内に同期を完了できませんでした</translation>
     </message>
     <message>
       <source>There are zero LDAP users in VMS after sync</source>
-      <translation type="unfinished">There are zero LDAP users in VMS after sync</translation>
+      <translation>同期後、VMS 上の LDAP ユーザーは存在しなくなります</translation>
     </message>
     <message>
       <source>Some LDAP users were not found in LDAP</source>
-      <translation type="unfinished">Some LDAP users were not found in LDAP</translation>
+      <translation>一部の LDAP ユーザーが LDAP 上で見つかりませんでした</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n 回)</numerusform>
       </translation>
     </message>
   </context>
