@@ -98,14 +98,14 @@ bool Index::load(const QDateTime& time)
 
 bool Index::load(qint64 timestampMs)
 {
-    QFile indexFile;
-    m_owner->fillFileNames(timestampMs, &indexFile);
-    if (!indexFile.open(QFile::ReadOnly))
+    auto indexFile = MetadataBinaryFileFactory::instance().create();
+    m_owner->fillFileNames(timestampMs, indexFile.get());
+    if (!indexFile->openReadOnly())
         return false;
-    return load(indexFile);
+    return load(*indexFile);
 }
 
-bool Index::load(QFile& indexFile)
+bool Index::load(AbstractMetadataBinaryFile& indexFile)
 {
     reset();
     indexFile.seek(0);
@@ -144,6 +144,8 @@ MetadataArchive::MetadataArchive(
     m_filePrefix(filePrefix),
     m_recordSize(baseRecordSize),
     m_aggregationIntervalSeconds(aggregationIntervalSeconds),
+    m_detailedMetadataFile(MetadataBinaryFileFactory::instance().create()),
+    m_detailedIndexFile(MetadataBinaryFileFactory::instance().create()),
     m_index(this),
     m_dataDir(dataDir),
     m_physicalId(physicalId),
@@ -172,12 +174,12 @@ QString MetadataArchive::getChannelPrefix() const
     return m_channel == 0 ? QString() : QString::number(m_channel);
 }
 
-void MetadataArchive::fillFileNames(qint64 datetimeMs, QFile* indexFile) const
+void MetadataArchive::fillFileNames(qint64 datetimeMs, AbstractMetadataBinaryFile* indexFile) const
 {
     fillFileNames(datetimeMs, nullptr, false, indexFile);
 }
 
-void MetadataArchive::fillFileNames(qint64 datetimeMs, QFile* metadataFile, bool noGeometry, QFile* indexFile) const
+void MetadataArchive::fillFileNames(qint64 datetimeMs, AbstractMetadataBinaryFile* metadataFile, bool noGeometry, AbstractMetadataBinaryFile* indexFile) const
 {
     QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs);
     QString fileName = getFilePrefix(datetime.date());
@@ -194,7 +196,7 @@ void MetadataArchive::fillFileNames(qint64 datetimeMs, QFile* metadataFile, bool
     }
 }
 
-bool resizeFile(QFile* file, qint64 size)
+bool resizeFile(AbstractMetadataBinaryFile* file, qint64 size)
 {
     if (file->size() == size)
         return true;
@@ -206,26 +208,26 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
     m_index.reset();
     dateBounds(timestampMs, m_firstTime, m_lastDateForCurrentFile);
 
-    fillFileNames(timestampMs, &m_detailedMetadataFile, /*noGeometry*/ false, &m_detailedIndexFile);
+    fillFileNames(timestampMs, m_detailedMetadataFile.get(), /*noGeometry*/ false, m_detailedIndexFile.get());
 
     auto dirName = getFilePrefix(QDateTime::fromMSecsSinceEpoch(timestampMs).date());
     QDir dir;
     dir.mkpath(dirName);
 
-    if (!m_detailedMetadataFile.open(QFile::ReadWrite))
+    if (!m_detailedMetadataFile->openRW())
         return false;
 
-    if (!m_detailedIndexFile.open(QFile::ReadWrite))
+    if (!m_detailedIndexFile->openRW())
         return false;
 
-    if (m_detailedIndexFile.size() == 0)
+    if (m_detailedIndexFile->size() == 0)
     {
         m_index.header.startTimeMs = m_firstTime;
-        m_detailedIndexFile.write((const char*) &m_index.header, sizeof(IndexHeader));
+        m_detailedIndexFile->write((const char*) &m_index.header, sizeof(IndexHeader));
     }
     else
     {
-        m_index.load(m_detailedIndexFile);
+        m_index.load(*m_detailedIndexFile);
         m_firstTime = m_index.header.startTimeMs;
         if (m_index.records.size() > 0)
             m_lastRecordedTime = m_index.records.last().start + m_index.header.startTimeMs;
@@ -233,31 +235,32 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
 
     if (m_index.header.noGeometryModeSupported() && m_index.header.noGeometryRecordSize() > 0)
     {
-        auto name = m_detailedMetadataFile.fileName();
+        auto name = m_detailedMetadataFile->fileName();
         name = name.replace("detailed", "nogeometry");
-        m_noGeometryMetadataFile = std::make_unique<QFile>(name);
-        m_noGeometryMetadataFile->open(QFile::ReadWrite);
+        m_noGeometryMetadataFile = MetadataBinaryFileFactory::instance().create();
+        m_noGeometryMetadataFile->setFileName(name);
+        m_noGeometryMetadataFile->openRW();
     }
 
     // Truncate biggest file. So, it is error checking.
-    int64_t availableMediaRecords = m_detailedMetadataFile.size() / m_index.header.recordSize;
+    int64_t availableMediaRecords = m_detailedMetadataFile->size() / m_index.header.recordSize;
     if (m_noGeometryMetadataFile)
     {
         availableMediaRecords = std::min(availableMediaRecords,
             (int64_t) m_noGeometryMetadataFile->size() / m_index.header.noGeometryRecordSize());
     }
     int64_t mediaRecords = m_index.truncateTo(availableMediaRecords);
-    if (!resizeFile(&m_detailedIndexFile, m_index.indexFileSize()))
+    if (!resizeFile(m_detailedIndexFile.get(), m_index.indexFileSize()))
     {
         NX_WARNING(this, "Failed to resize file %1 to size %2",
-            m_detailedIndexFile.fileName(), m_index.indexFileSize());
+            m_detailedIndexFile->fileName(), m_index.indexFileSize());
         return false;
     }
 
-    if (!resizeFile(&m_detailedMetadataFile, mediaRecords * m_index.header.recordSize))
+    if (!resizeFile(m_detailedMetadataFile.get(), mediaRecords * m_index.header.recordSize))
     {
         NX_WARNING(this, "Failed to resize file %1 to size %2",
-            m_detailedMetadataFile.fileName(), mediaRecords * m_index.header.recordSize);
+            m_detailedMetadataFile->fileName(), mediaRecords * m_index.header.recordSize);
         return false;
     }
     if (m_noGeometryMetadataFile)
@@ -272,8 +275,8 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
         m_noGeometryMetadataFile->seek(m_noGeometryMetadataFile->size());
     }
 
-    m_detailedMetadataFile.seek(m_detailedMetadataFile.size());
-    m_detailedIndexFile.seek(m_detailedIndexFile.size());
+    m_detailedMetadataFile->seek(m_detailedMetadataFile->size());
+    m_detailedIndexFile->seek(m_detailedIndexFile->size());
 
     return true;
 }
@@ -300,9 +303,9 @@ bool MetadataArchive::saveToArchiveInternal(const QnConstAbstractCompressedMetad
         if (!(m_index.header.flags & IndexHeader::Flags::hasDiscontinue))
         {
             m_index.header.flags |= IndexHeader::Flags::hasDiscontinue;
-            m_detailedIndexFile.seek(0);
-            m_detailedIndexFile.write((const char*)&m_index.header, sizeof(IndexHeader));
-            m_detailedIndexFile.seek(m_detailedIndexFile.size());
+            m_detailedIndexFile->seek(0);
+            m_detailedIndexFile->write((const char*)&m_index.header, sizeof(IndexHeader));
+            m_detailedIndexFile->seek(m_detailedIndexFile->size());
         }
     }
 
@@ -326,26 +329,26 @@ bool MetadataArchive::saveToArchiveInternal(const QnConstAbstractCompressedMetad
         }
     }
 
-    if (m_detailedIndexFile.write((const char*)&relTime, 4) != 4)
+    if (m_detailedIndexFile->write((const char*)&relTime, 4) != 4)
     {
         NX_WARNING(this, "Failed to write index file for camera %1", m_physicalId);
     }
     quint32 durationAndRecordCount = (duration & 0xffffff) + ((recordCount-1) << 24);
-    if (m_detailedIndexFile.write((const char*)&durationAndRecordCount, 4) != 4)
+    if (m_detailedIndexFile->write((const char*)&durationAndRecordCount, 4) != 4)
     {
         NX_WARNING(this, "Failed to write index file for camera %1", m_physicalId);
     }
 
-    if (m_detailedMetadataFile.write(data->data(), data->dataSize())
+    if (m_detailedMetadataFile->write(data->data(), data->dataSize())
         != static_cast<qint64>(data->dataSize()))
     {
         NX_WARNING(this, "Failed to write index file for camera %1", m_physicalId);
     }
 
-    m_detailedMetadataFile.flush();
+    m_detailedMetadataFile->flush();
     if (m_noGeometryMetadataFile)
         m_noGeometryMetadataFile->flush();
-    m_detailedIndexFile.flush();
+    m_detailedIndexFile->flush();
 
     m_lastRecordedTime = timestamp;
     return true;
@@ -474,7 +477,7 @@ void MetadataArchive::loadDataFromIndex(
     AddRecordFunc addRecordFunc,
     RecordMatcher* recordMatcher,
     std::function<bool()> interruptionCallback,
-    QFile& metadataFile,
+    AbstractMetadataBinaryFile& metadataFile,
     const Index& index,
     QVector<IndexRecord>::iterator startItr,
     const QVector<IndexRecord>::iterator endItr,
@@ -564,7 +567,7 @@ void MetadataArchive::loadDataFromIndexDesc(
     AddRecordFunc addRecordFunc,
     RecordMatcher* recordMatcher,
     std::function<bool()> interruptionCallback,
-    QFile& metadataFile,
+    AbstractMetadataBinaryFile& metadataFile,
     const Index& index,
     QVector<IndexRecord>::iterator startItr,
     const QVector<IndexRecord>::iterator endItr,
@@ -693,7 +696,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
         const auto timePointMs = descendingOrder ? msEndTime : msStartTime;
         dateBounds(timePointMs, minTime, maxTime);
 
-        QFile metadataFile;
+        auto metadataFile = MetadataBinaryFileFactory::instance().create();
         Index index(this);
 
         if (index.load(timePointMs))
@@ -705,16 +708,16 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
                 && index.header.noGeometryRecordSize() > 0
                 && recordMatcher->isWholeFrame();
             recordMatcher->setNoGeometryMode(noGeometryMode);
-            fillFileNames(timePointMs, &metadataFile, noGeometryMode, nullptr);
+            fillFileNames(timePointMs, metadataFile.get(), noGeometryMode, nullptr);
             NX_VERBOSE(this, nx::format("Matching metadata periods for camera %1 for month %2")
-                .args(m_physicalId, metadataFile.fileName()));
+                .args(m_physicalId, metadataFile->fileName()));
 
-            if (recordMatcher->isEmpty() || metadataFile.open(QFile::ReadOnly))
+            if (recordMatcher->isEmpty() || metadataFile->openReadOnly())
             {
                 const int recordSize = noGeometryMode
                     ? index.header.noGeometryRecordSize() : index.header.recordSize;
-                if (metadataFile.isOpen())
-                    index.truncateTo(metadataFile.size() / recordSize);
+                if (metadataFile->isOpen())
+                    index.truncateTo(metadataFile->size() / recordSize);
 
                 QVector<IndexRecord>::iterator startItr = index.records.begin();
                 QVector<IndexRecord>::iterator endItr = index.records.end();
@@ -766,7 +769,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
                         loadDataFromIndexDesc(
                             hasDiscontinue ? addToResultDescUnordered : addToResultDesc,
                             recordMatcher, breakCallback,
-                            metadataFile, index, startItr, endItr,
+                            *metadataFile, index, startItr, endItr,
                             rez);
                     }
                     else
@@ -774,7 +777,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
                         loadDataFromIndex(
                             hasDiscontinue ? addToResultAscUnordered : addToResultAsc,
                             recordMatcher, breakCallback,
-                            metadataFile, index, startItr, endItr,
+                            *metadataFile, index, startItr, endItr,
                             rez);
                     }
                 }
