@@ -13,7 +13,7 @@ namespace test {
 class CursorOverrideTest: public testing::Test
 {
 public:
-    static constexpr Qt::CursorShape noCursor = Qt::CursorShape(-1);
+    static inline const Qt::CursorShape noCursor = Qt::CursorShape(-1);
 
     Qt::CursorShape currentCursor() const
     {

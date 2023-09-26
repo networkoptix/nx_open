@@ -8,8 +8,8 @@
 class QnIcon: public QIcon
 {
 public:
-    static constexpr Mode Error = static_cast<Mode>(0xE);
-    static constexpr Mode Pressed = static_cast<Mode>(0xF);
+    static inline const Mode Error = static_cast<Mode>(0xE);
+    static inline const Mode Pressed = static_cast<Mode>(0xF);
 
     using Suffixes = QMap<Mode, QString>;
 };
