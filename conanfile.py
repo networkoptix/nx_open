@@ -100,7 +100,7 @@ class NxOpenConan(ConanFile):
         if not self.options.skipCustomizationPackage:
             self.requires("customization/1.0")  #< Always use the latest revision.
 
-        self.requires("boost/1.78.0" "#298dce0adb40278309cc5f76fc92b47a")
+        self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
         self.requires("rapidjson/1.1.0" "#c2e048b9e956f5d9ff93d2d72b4486da")
 
         if self.isWindows or self.isLinux:
