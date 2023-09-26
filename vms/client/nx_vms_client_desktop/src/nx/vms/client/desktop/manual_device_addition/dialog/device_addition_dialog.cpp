@@ -197,13 +197,11 @@ void DeviceAdditionDialog::initializeControls()
     connect(ui->selectServerMenuButton, &QnChooseServerButton::currentServerChanged,
         this, &DeviceAdditionDialog::handleSelectedServerChanged);
 
-    ui->serverOfflineAlertBar->setText(tr("Server offline"));
     updateSelectedServerButtonVisibility();
     connect(&m_serversWatcher, &CurrentSystemServers::serversCountChanged,
         this, &DeviceAdditionDialog::updateSelectedServerButtonVisibility);
     connect(&m_serverStatusWatcher, &ServerOnlineStatusWatcher::statusChanged,
         this, &DeviceAdditionDialog::handleServerOnlineStateChanged);
-    ui->serverOfflineAlertBar->setVisible(false);
 
     connect(this, &DeviceAdditionDialog::rejected,
         this, &DeviceAdditionDialog::handleDialogClosed);
@@ -246,7 +244,9 @@ void DeviceAdditionDialog::initializeControls()
     setPaletteColor(ui->knownAddressPortPlaceholder, QPalette::Text, core::colorTheme()->color("dark14"));
     setPaletteColor(ui->subnetScanPortPlaceholder, QPalette::Text, core::colorTheme()->color("dark14"));
 
-    ui->serverOfflineAlertBar->init({.level = BarDescription::BarLevel::Error});
+    ui->serverOfflineAlertBar->init({.text=tr("Server offline"),
+        .level = BarDescription::BarLevel::Error});
+    ui->serverOfflineAlertBar->setVisible(false);
     ui->httpsOnlyBar->init(
         {.text = tr("Searching for devices on the network is restricted to cameras that"
                     " support HTTPS connections. This can be changed in %1 settings.")
