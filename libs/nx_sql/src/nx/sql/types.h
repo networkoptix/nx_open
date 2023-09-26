@@ -78,8 +78,10 @@ public:
     QString connectOptions;
     QString encoding;
     int maxConnectionCount = 1;
+
     /** Connection is closed if not used for this interval. */
     std::chrono::seconds inactivityTimeout = std::chrono::minutes(10);
+
     /**
      * If scheduled request has not received DB connection during this timeout
      * it will be cancelled with DBResultCode::cancelled error code.
@@ -87,8 +89,10 @@ public:
      * NOTE: Set to zero to disable this timeout.
      */
     std::chrono::milliseconds maxPeriodQueryWaitsForAvailableConnection = std::chrono::minutes(1);
+
     int maxErrorsInARowBeforeClosingConnection = 7;
     bool failOnDbTuneError = false;
+
     /**
      * If specified, then no more than this amount of data modification queries will be run concurrently.
      * Otherwise, there is no limit (if DB type supports it).
@@ -99,6 +103,12 @@ public:
      * Delay between retries to restore a lost DB connection.
      */
     std::chrono::milliseconds reconnectAfterFailureDelay = std::chrono::seconds(1);
+
+    /**
+     * If application code tells SQL subsystem that some queries can be aggregated under a single
+     * DB transaction, then no more than this amount of queries are aggregated anyway.
+     */
+    int maxQueriesAggregatedUnderSingleTransaction = 9999;
 
     ConnectionOptions();
 
