@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <chrono>
+#include <optional>
+
 #include "connection.h"
 
 namespace nx::cloud::db::api {
@@ -65,10 +68,18 @@ public:
         return m_connection->maintenanceManager();
     }
 
+    void setRequestTimeout(std::chrono::milliseconds timeout)
+    {
+        m_requestTimeout = timeout;
+        if (m_connection)
+            m_connection->setRequestTimeout(timeout);
+    }
+
 private:
     nx::cloud::db::api::ConnectionFactory* m_connectionFactory;
     std::unique_ptr<api::Connection> m_connection;
     std::optional<nx::network::http::Credentials> m_credentials;
+    std::optional<std::chrono::milliseconds> m_requestTimeout;
 
     bool createConnectionIfNeeded()
     {
@@ -78,6 +89,9 @@ private:
                 m_connection = m_connectionFactory->createConnection(*m_credentials);
             else
                 m_connection = m_connectionFactory->createConnection();
+
+            if (m_connection && m_requestTimeout)
+                m_connection->setRequestTimeout(*m_requestTimeout);
         }
 
         return m_connection != nullptr;
