@@ -446,7 +446,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>Ldap Sync Issue Event</source>
-      <translation type="unfinished">Ldap Sync Issue Event</translation>
+      <translation>LDAP 同期障害イベント</translation>
     </message>
   </context>
   <context>

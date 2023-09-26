@@ -36,7 +36,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Systemhendelse</translation>
     </message>
   </context>
   <context>
@@ -1325,9 +1325,9 @@
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
-        <numerusform>Delete %n groups?</numerusform>
+      <translation>
+        <numerusform>Vil du slette %n grupper?</numerusform>
+        <numerusform>Vil du slette %n grupper?</numerusform>
       </translation>
     </message>
   </context>
@@ -1678,11 +1678,11 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>Brukernavnet kan ikke være tomt</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Passordet kan ikke være tomt</translation>
     </message>
   </context>
   <context>
@@ -1732,39 +1732,39 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols</source>
-      <translation type="unfinished">Password should contain different types of symbols</translation>
+      <translation>Passord bør inneholde forskjellige typer symboler</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>Passordet må være på minst %n tegn</numerusform>
+        <numerusform>Passordet må være på minst %n tegn</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
+      <translation>
+        <numerusform>Passordet må ikke være lengre enn %n tegn</numerusform>
+        <numerusform>Passordet må ikke være lengre enn %n tegn</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>Passordet skal ikke inneholde %n eller flere påfølgende tegn sammen</numerusform>
+        <numerusform>Passordet skal ikke inneholde %n eller flere påfølgende tegn sammen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>Passordet skal ikke inneholde %n eller flere repeterende tegn</numerusform>
+        <numerusform>Passordet skal ikke inneholde %n eller flere repeterende tegn</numerusform>
       </translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
-      <translation type="unfinished">This password is in list of the most popular passwords</translation>
+      <translation>Dette passordet er på listen over de mest populære passordene</translation>
     </message>
   </context>
   <context>
@@ -1995,7 +1995,7 @@ Lisensnøkkel: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
-      <translation type="unfinished">%1. To attach to Video Wall, SaaS must be in active state. %2</translation>
+      <translation>%1. For å koble til Video Wall, må SaaS være i aktiv tilstand. %2</translation>
     </message>
   </context>
   <context>
@@ -2367,7 +2367,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>År</translation>
     </message>
   </context>
   <context>
@@ -2914,7 +2914,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Passordene er ikke like</translation>
     </message>
   </context>
   <context>
@@ -2940,11 +2940,11 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Passordene er ikke like</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>For å endre passordet ditt, skriv inn det eksisterende</translation>
     </message>
     <message>
       <source>Invalid current password</source>
@@ -11257,7 +11257,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Some features may not be available.</source>
-      <translation type="unfinished">Some features may not be available.</translation>
+      <translation>Noen funksjoner er kanskje ikke tilgjengelige.</translation>
     </message>
   </context>
   <context>
@@ -11265,17 +11265,17 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>og</translation>
     </message>
     <message>
       <source>Your access to the System expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the System expires %1</translation>
+      <translation>Din tilgang til systemet utløper %1</translation>
     </message>
     <message>
       <source>Your access to the System expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the System expires in %1</translation>
+      <translation>Din tilgang til systemet utløper om %1</translation>
     </message>
   </context>
   <context>
@@ -11471,19 +11471,19 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
-      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+      <translation>Finner ikke gruppen i LDAP-databasen.</translation>
     </message>
     <message>
       <source>There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Det er flere grupper med dette navnet i systemet. For å opprettholde en klar og organisert struktur, foreslår vi å gi unike navn for hver gruppe.</translation>
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+      <translation>Gruppen har en annen gruppe som både sin overordnede og som et underordnet medlem, eller er en del av en slik sirkulær referansekjede. Dette kan føre til feilberegning av tillatelser.</translation>
     </message>
     <message>
       <source>You do not have permissions to modify or delete this group.</source>
-      <translation type="unfinished">You do not have permissions to modify or delete this group.</translation>
+      <translation>Du har ikke tillatelse til å endre eller slette denne gruppen.</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11521,35 +11521,35 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+      <translation>Kunne ikke slette gruppe &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
+      <translation>Kunne ikke slette gruppen.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
+      <translation>
+        <numerusform>Kunne ikke slette %n grupper.</numerusform>
+        <numerusform>Kunne ikke slette %n grupper.</numerusform>
       </translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Flere grupper deler samme navn, noe som kan føre til forvirring. For å opprettholde en klar og organisert struktur, foreslår vi å gi unike navn for hver gruppe.</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>%n eksisterende LDAP-grupper finnes ikke i LDAP-databasen.</numerusform>
+        <numerusform>%n eksisterende LDAP-grupper finnes ikke i LDAP-databasen.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
-        <numerusform>Delete %n groups</numerusform>
+      <translation>
+        <numerusform>Slett %n grupper</numerusform>
+        <numerusform>Slett %n grupper</numerusform>
       </translation>
     </message>
   </context>
@@ -11590,23 +11590,23 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>LDAP-serveren er frakoblet. Brukere kan ikke logge på.</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
-      <translation type="unfinished">User is not found in the LDAP database.</translation>
+      <translation>Brukeren finnes ikke i LDAP-databasen.</translation>
     </message>
     <message>
       <source>Temporary user</source>
-      <translation type="unfinished">Temporary user</translation>
+      <translation>Midlertidig bruker</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this user.</source>
-      <translation type="unfinished">You do not have permissions to modify this user.</translation>
+      <translation>Du har ikke tillatelse til å endre denne brukeren.</translation>
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Det er allerede en bruker med samme innlogging i systemet. For å unngå problemer kreves det at alle brukere har en unik pålogging.</translation>
     </message>
   </context>
   <context>
@@ -11637,38 +11637,38 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+      <translation>Flere brukere deler samme pålogging, noe som forårsaker påloggingsfeil. For å løse dette problemet må du enten oppdatere de berørte brukerpåloggingene eller deaktivere/slette duplikater.</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>%n eksisterende LDAP-brukere finnes ikke i LDAP-databasen.</numerusform>
+        <numerusform>%n eksisterende LDAP-brukere finnes ikke i LDAP-databasen.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
+      <translation>
+        <numerusform>Slett %n brukere</numerusform>
+        <numerusform>Slett %n brukere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      <translation>
+        <numerusform>LDAP-serveren er frakoblet. %n brukere kan ikke logge på.</numerusform>
+        <numerusform>LDAP-serveren er frakoblet. %n brukere kan ikke logge på.</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+      <translation>Kunne ikke slette bruker &quot;%1&quot;.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
+      <translation>
+        <numerusform>Kunne ikke slette %n brukere.</numerusform>
+        <numerusform>Kunne ikke slette %n brukere.</numerusform>
       </translation>
     </message>
   </context>
@@ -11728,11 +11728,11 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>Kopier tilgangskobling</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>Er du sikker på at du vil avslutte tilgangskoblingen?</translation>
     </message>
     <message>
       <source>This will instantly remove an access to the system for this user</source>

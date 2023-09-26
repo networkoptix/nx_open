@@ -64,11 +64,11 @@
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>VMS データベースにすでに追加されている LDAP ユーザーの Digest 認証を有効にするには、各ユーザー設定で直接有効にする必要があります。</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>VMS データベースにすでに追加されている LDAP ユーザーの Digest 認証を無効にするには、各ユーザー設定で直接無効にする必要があります。</translation>
     </message>
   </context>
   <context>
@@ -325,36 +325,36 @@
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>一括編集 - %n ユーザー</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n ユーザー</numerusform>
       </translation>
     </message>
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>ユーザーステータス</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>有効</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>無効</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>安全でない (Digest) 認証</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>現在の値を維持</translation>
     </message>
   </context>
   <context>
@@ -461,11 +461,11 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>一時停止中</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>シャットダウン</translation>
     </message>
   </context>
   <context>
@@ -525,19 +525,19 @@
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>ホストは空にできません</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>ログインDN は空にできません</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>パスワードは空にできません</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>LDAP ユーザーが %1にログインできるようにするには、 %1 と LDAP サーバー間の接続を確立する必要があります。</translation>
     </message>
   </context>
   <context>
@@ -720,11 +720,11 @@
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>ベース DN は、LDAP 検索と同期の開始点を設定します。</translation>
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>フィルターは、ベース DN のどのユーザーやグループを許可するかを指定することにより、システムへのアクセスと同期を制御するのに役立ちます。</translation>
     </message>
   </context>
   <context>
@@ -933,7 +933,7 @@
     </message>
     <message>
       <source>When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>継続的同期が無効になっている場合、グループは自動的に同期しません。このグループを更新するには、手動同期を開始してください。</translation>
     </message>
   </context>
   <context>
@@ -979,7 +979,7 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>グループなし</translation>
     </message>
   </context>
   <context>
@@ -1038,13 +1038,13 @@
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>不十分なサービス</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration service is required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>このインテグレーションを有効にするには、%n 個の適切なインテグレーションサービスが必要です</numerusform>
       </translation>
     </message>
     <message>
@@ -1052,17 +1052,17 @@
                 services. Please disable integration for some cameras or add more suitable services.
                 Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</translation>
+      <translation>利用可能なサービス数を超えるカメラがこのインテグレーションを使用しています。
+                一部カメラのインテグレーションを無効にするか、より適切なサービスを追加してください。
+                対策がとられない場合、%1 に自動的に実行されます。</translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>利用可能な適切なサービスがありません</translation>
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>サービスが必要です</translation>
     </message>
   </context>
   <context>
@@ -1085,7 +1085,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>使用量</translation>
     </message>
   </context>
   <context>
@@ -1255,15 +1255,15 @@
     </message>
     <message>
       <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
-      <translation type="unfinished">VMS imports and synchronizes users and groups with LDAP server in real time</translation>
+      <translation>VMSはリアルタイムで LDAP サーバーと同期して、ユーザーとグループをインポートします</translation>
     </message>
     <message>
       <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
-      <translation type="unfinished">VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</translation>
+      <translation>ユーザーがシステムにログインするときに、VMS はユーザー情報をLDAP サーバーと同期します。グループはリアルタイムで同期されます。</translation>
     </message>
     <message>
       <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</translation>
+      <translation>このシステムでは、LDAP からの継続的なインポートが無効になっています。グループ、ユーザーおよびグループメンバーシップの更新は、手動同期によってのみ行われます。</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
@@ -1424,15 +1424,15 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>新しいリンク - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>新しいリンクが発行されると、以前のリンクは無効になります</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>作成</translation>
     </message>
   </context>
   <context>
@@ -1539,11 +1539,11 @@
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>所属グループ</translation>
     </message>
     <message>
       <source>Built-in</source>
-      <translation type="unfinished">Built-in</translation>
+      <translation>ビルトイン</translation>
     </message>
   </context>
   <context>
@@ -1570,7 +1570,7 @@
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>パスワードが一致しません</translation>
     </message>
   </context>
   <context>
@@ -1584,11 +1584,11 @@
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>リソースが見つかりません</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>依存する権限を自動的に追加する</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
@@ -2125,24 +2125,24 @@ PTZを行います</translation>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>リンクの有効期限</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>リンクは指定された日付までアクセス可能です (サーバー時間に基づき、当日を含む)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>ログイン後の</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>リンクの有効期間が終了すると、アクセスが取り消される可能性があります</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>有効期間</translation>
     </message>
   </context>
   <context>
@@ -2310,19 +2310,19 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>アクセス</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>資格情報を持つ通常ユーザー</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>リンクによる一時的なユーザー</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>パスワードが一致しません</translation>
     </message>
   </context>
   <context>
@@ -2407,32 +2407,32 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>アクセスの有効期限</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>アクセスリンク</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>リンクをコピー</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>終了</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>新しいリンク...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>このユーザーには有効なリンクがありません</translation>
     </message>
     <message>
       <source>Copied</source>
       <comment>Copied here means that a link is copied</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>コピーしました</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>

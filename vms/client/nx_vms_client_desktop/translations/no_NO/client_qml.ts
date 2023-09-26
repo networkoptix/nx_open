@@ -64,11 +64,11 @@
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>For å aktivere sammendragsgodkjenning for LDAP-brukere som allerede er lagt til VMS-databasen, må du aktivere den direkte i disse brukernes&apos; innstillinger.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>For å deaktivere sammendragsgodkjenning for LDAP-brukere som allerede er lagt til VMS-databasen, må du deaktivere den direkte i disse brukernes&apos; innstillinger.</translation>
     </message>
   </context>
   <context>
@@ -327,38 +327,38 @@
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Batchredigering - %n brukere</numerusform>
+        <numerusform>Batchredigering - %n brukere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n brukere</numerusform>
+        <numerusform>%n brukere</numerusform>
       </translation>
     </message>
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Brukerstatus</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Aktivert</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Deaktivert</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Usikker (digest) autentisering</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>beholde gjeldende verdi</translation>
     </message>
   </context>
   <context>
@@ -467,11 +467,11 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Suspendert</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Slå av</translation>
     </message>
   </context>
   <context>
@@ -531,19 +531,19 @@
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>Verten kan ikke være tom</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Innloggings-DN kan ikke være tomt</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Passordet kan ikke være tomt</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>For å tillate LDAP-brukere å logge på %1, er det nødvendig å opprette en forbindelse mellom %1 og en bedrifts LDAP-server.</translation>
     </message>
   </context>
   <context>
@@ -726,11 +726,11 @@
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>Base-DN setter utgangspunktet for LDAP-søk og synkronisering.</translation>
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filtre hjelper med å kontrollere tilgang til systemet og synkronisering ved å spesifisere hvilke brukere og/eller grupper fra Base DN som er tillatt.</translation>
     </message>
   </context>
   <context>
@@ -1059,17 +1059,17 @@
                 services. Please disable integration for some cameras or add more suitable services.
                 Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</translation>
+      <translation>Det er flere kameraer som bruker denne integrasjonen enn tilgjengelige
+                -tjenester. Vennligst deaktiver integrasjon for noen kameraer eller legg til flere passende tjenester.
+                Ellers vil det gjøres automatisk på %1</translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 passende tjenester tilgjengelig</translation>
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Nødvendige tjenester</translation>
     </message>
   </context>
   <context>
@@ -1092,7 +1092,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Bruk</translation>
     </message>
   </context>
   <context>
@@ -1262,23 +1262,23 @@
     </message>
     <message>
       <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
-      <translation type="unfinished">VMS imports and synchronizes users and groups with LDAP server in real time</translation>
+      <translation>VMS importerer og synkroniserer brukere og grupper med LDAP-server i sanntid</translation>
     </message>
     <message>
       <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
-      <translation type="unfinished">VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</translation>
+      <translation>VMS synkroniserer brukere med LDAP-server når de logger på systemet. Grupper synkroniseres i sanntid.</translation>
     </message>
     <message>
       <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</translation>
+      <translation>Kontinuerlig import fra LDAP er deaktivert for dette systemet. Oppdateringer til grupper og bruker&apos;er og gruppe&apos; -medlemskap vil kun skje gjennom manuell synkronisering.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Ingen brukere eller grupper samsvarer med synkroniseringsinnstillinger og legges til i systemdatabasen. Sørg for at LDAP-serverparametere og -filtre er riktig konfigurert.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>Vær forsiktig når du endrer LDAP-innstillinger. Feil konfigurasjon kan forstyrre systemets tilgjengelighet for et stort antall brukere samtidig.</translation>
     </message>
   </context>
   <context>
@@ -1433,15 +1433,15 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Ny lenke - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Den forrige lenken vil bli ugyldig når en ny er utstedt</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Opprette</translation>
     </message>
   </context>
   <context>
@@ -1548,11 +1548,11 @@
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Medlem av</translation>
     </message>
     <message>
       <source>Built-in</source>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Innebygd</translation>
     </message>
   </context>
   <context>
@@ -1579,7 +1579,7 @@
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Passordene er ikke like</translation>
     </message>
   </context>
   <context>
@@ -1593,15 +1593,15 @@
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Ingen ressurser funnet</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Legg automatisk til avhengige tillatelser</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Ressurstabell gir deg en oversikt over bruker-&apos;-er eller gruppetillatelser og lar deg tildele tillatelser for spesifikke ressurser. Klikk på cellene for å velge og oppheve valget av dem. Bruk dra&amp;slipp og Shift+dra&amp;slipp for batchredigering. Hvis du velger en tillatelse som avhenger av en annen tillatelse, vil begge tillatelsene bli gitt automatisk.</translation>
     </message>
   </context>
   <context>
@@ -2140,24 +2140,24 @@ for å aktivere PTZ</translation>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Link gyldig til</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Linken vil forbli tilgjengelig til den angitte datoen (inkludert basert på servertid)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Oppheve tilgang etter pålogging</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Tilgang kan trekkes tilbake tidligere hvis koblingens gyldighetsperiode utløper</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>I</translation>
     </message>
   </context>
   <context>
@@ -2326,19 +2326,19 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Tilgang</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Vanlig bruker med legitimasjon</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Midlertidig med link</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Passordene samsvarer ikke</translation>
     </message>
   </context>
   <context>
@@ -2423,36 +2423,36 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Tilgang utløper</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Tilgangslink</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Kopier link</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Terminere</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Ny lenke...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Ingen gyldig lenke for denne brukeren</translation>
     </message>
     <message>
       <source>Copied</source>
       <comment>Copied here means that a link is copied</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopiert</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Når Kontinuerlig synkronisering er deaktivert, synkroniseres ikke brukerens medlemskap i grupper automatisk. Start en manuell synkronisering for å oppdatere denne informasjonen.</translation>
     </message>
   </context>
   <context>
