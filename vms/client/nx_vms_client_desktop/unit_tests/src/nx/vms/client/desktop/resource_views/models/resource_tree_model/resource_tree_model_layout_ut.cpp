@@ -21,6 +21,7 @@ namespace nx::vms::client::desktop {
 namespace test {
 
 using namespace index_condition;
+using namespace nx::vms::api;
 
 // String constants.
 static constexpr auto kUniqueLayoutName = "unique_layout_name";
@@ -310,7 +311,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderAdmin)
     ASSERT_EQ(allMatchingIndexes(kUniqueLayoutNameCondition).size(), 1);
 }
 
-TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderUser)
+TEST_F(ResourceTreeModelTest, intercomLayoutNodeInvisibleUnderUserWithNotEnoughPermissions)
 {
     // String constants
     static constexpr auto kUniqueUserName = "unique_user_name";
@@ -328,8 +329,33 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderUser)
     // When non-power user is logged in.
     const auto otherUser = loginAsCustomUser(kUniqueUserName);
 
-    // When intercom is accessible for non-power user.
-    setupAccessToResourceForUser(otherUser, intercom, true);
+    // When intercom is accessible for non-power user as view-only camera.
+    setupAccessToResourceForUser(otherUser, intercom, AccessRight::view);
+
+    // Then no nodes with corresponding layout display text appears in the resource tree.
+    ASSERT_TRUE(noneMatches(kUniqueLayoutNameCondition));
+}
+
+TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderUserWithPermissions)
+{
+    // String constants
+    static constexpr auto kUniqueUserName = "unique_user_name";
+    static constexpr auto kIntercomCameraName = "intercom_camera_name";
+
+    // When user with unique name and power user permissions is added to the resource pool.
+    const auto powerUser = addUser("power_user", api::kPowerUsersGroupId);
+
+    // When intercom camera is added to the resource pool.
+    const auto intercom = addIntercomCamera(kIntercomCameraName, powerUser->getId());
+
+    // When intercom layout is added to the resource pool.
+    const auto layout = addIntercomLayout(kUniqueLayoutName, intercom->getId());
+
+    // When non-power user is logged in.
+    const auto otherUser = loginAsCustomUser(kUniqueUserName);
+
+    // When intercom is accessible for non-power user for full operation.
+    setupAccessToResourceForUser(otherUser, intercom, AccessRight::view | AccessRight::userInput);
 
     // Then exactly one node with corresponding layout display text appears in the resource tree.
     ASSERT_TRUE(uniqueMatchingIndex(kUniqueLayoutNameCondition).isValid());
