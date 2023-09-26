@@ -20,7 +20,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/common/read_only.h>
 #include <ui/workbench/workbench_navigator.h>
-#include "nx/vms/client/core/skin/svg_icon_colorer.h"
 
 using nx::vms::client::core::MotionSelection;
 using nx::vms::client::core::AccessController;
@@ -28,10 +27,10 @@ using nx::vms::client::core::AccessController;
 namespace nx::vms::client::desktop {
 
 static const QColor klight16Color = "#698796";
-static const QMap<QIcon::Mode, core::SvgIconColorer::ThemeColorsRemapData> kIconSubstitutions = {
-    {QIcon::Normal, {.primary = "light16"}},
-    {QIcon::Active, {.primary = "light17"}},
-    {QIcon::Selected, {.primary = "light15"}},
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{klight16Color, "light16"}}},
+    {QIcon::Active, {{klight16Color, "light16"}}},
+    {QIcon::Selected, {{klight16Color, "light10"}}},
 };
 
 class SimpleMotionSearchWidget::Private: public QObject
