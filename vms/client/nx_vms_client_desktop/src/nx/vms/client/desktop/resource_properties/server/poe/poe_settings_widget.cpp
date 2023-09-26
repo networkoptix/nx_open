@@ -42,6 +42,8 @@ PoeSettingsWidget::Private::Private(PoeSettingsWidget* owner):
     store(owner->resourcePool())
 {
     ui.setupUi(owner);
+    ui.poeOverBudgetWarningLabel->init(
+        {.text = tr("Attention! Power limit exceeded"), .level = BarDescription::BarLevel::Error});
 
     updateWarningLabel();
     updatePreloaderVisibility();
