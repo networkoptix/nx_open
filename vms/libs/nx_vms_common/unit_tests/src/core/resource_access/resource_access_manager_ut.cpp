@@ -386,7 +386,17 @@ TEST_F(ResourceAccessManagerTest, checkCustomUserLayoutParentChanged)
 //-------------------------------------------------------------------------------------------------
 // Checking intercom layouts
 
-TEST_F(ResourceAccessManagerTest, checkIntercomLayoutPermissions)
+TEST_F(ResourceAccessManagerTest, checkIntercomLayoutPermissionsAsPowerUser)
+{
+    loginAs(kPowerUsersGroupId);
+
+    const auto intercomLayout = addIntercom();
+    const auto intercomId = intercomLayout->getParentId();
+
+    ASSERT_EQ(permissions(intercomLayout), Qn::FullLayoutPermissions);
+}
+
+TEST_F(ResourceAccessManagerTest, checkIntercomLayoutPermissionsAsCustom)
 {
     loginAsCustom();
 
@@ -394,8 +404,19 @@ TEST_F(ResourceAccessManagerTest, checkIntercomLayoutPermissions)
     const auto intercomId = intercomLayout->getParentId();
     setOwnAccessRights(m_currentUser->getId(), {{intercomId, AccessRight::view}});
 
-    // Access to intercom grants access to its layout.
-    ASSERT_EQ(permissions(intercomLayout), Qn::ReadPermission);
+    // Not enough permissions to access intercom layout.
+    ASSERT_EQ(permissions(intercomLayout), Qn::NoPermissions);
+
+    setOwnAccessRights(m_currentUser->getId(), {{intercomId, AccessRight::userInput}});
+
+    // Still not enough permissions to access intercom layout.
+    ASSERT_EQ(permissions(intercomLayout), Qn::NoPermissions);
+
+    setOwnAccessRights(m_currentUser->getId(),
+        {{intercomId, AccessRight::view | AccessRight::userInput}});
+
+    // `view | userInput` permissions to intercom grant access to its layout.
+    ASSERT_EQ(permissions(intercomLayout), Qn::ModifyLayoutPermission);
 
     auto camera = addCamera();
     addToLayout(intercomLayout, camera);

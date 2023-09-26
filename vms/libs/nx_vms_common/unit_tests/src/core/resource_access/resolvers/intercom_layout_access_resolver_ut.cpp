@@ -43,20 +43,29 @@ TEST_F(IntercomLayoutAccessResolverTest, noDirectAccessToIntercomLayout)
     manager->setOwnResourceAccessMap(kTestSubjectId, {{layout->getId(), kFullAccessRights}});
     EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom), kNoAccessRights);
     EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), kNoAccessRights);
-
-    manager->setOwnResourceAccessMap(kTestSubjectId,
-        {{layout->getId(), kFullAccessRights}, {intercom->getId(), kViewAccessRights}});
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom), kViewAccessRights);
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), kViewAccessRights);
 }
 
 TEST_F(IntercomLayoutAccessResolverTest, accessToLayoutViaIntercom)
 {
     const auto intercom = addIntercomCamera();
     const auto layout = addIntercomLayout(intercom);
-    manager->setOwnResourceAccessMap(kTestSubjectId, {{intercom->getId(), kFullAccessRights}});
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom), kFullAccessRights);
-    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), kFullAccessRights);
+
+    // No layout access from single `view` permission to intercom.
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{intercom->getId(), AccessRight::view}});
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom), AccessRight::view);
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+
+    // No layout access from single `userInput` permission to intercom.
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{intercom->getId(), AccessRight::userInput}});
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom), AccessRight::userInput);
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+
+    // `view` layout access from `view | userInput` permissions to intercom.
+    manager->setOwnResourceAccessMap(kTestSubjectId,
+        {{intercom->getId(), AccessRight::view | AccessRight::userInput}});
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, intercom),
+        AccessRight::view | AccessRight::userInput);
+    EXPECT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRight::view);
 }
 
 TEST_F(IntercomLayoutAccessResolverTest, accessDetailsViaIntercom)
