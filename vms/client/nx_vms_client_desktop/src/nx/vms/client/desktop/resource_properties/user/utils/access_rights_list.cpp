@@ -22,40 +22,41 @@ AccessRightsList::AccessRightsList(QObject* parent):
         AccessRightDescriptor{
             .accessRight = AccessRight::view,
             .name = tr("View Live"),
-            .description = tr("Has access to a resource, can view live footage from a camera"),
+            .description = common::html::bold(tr("View Live.")) + " " +
+                tr("Allows users to access a resource and view live footage from a camera."),
             .icon = QUrl(kIconsDir + "view_live.svg")},
         AccessRightDescriptor{
             .accessRight = AccessRight::viewArchive,
             .name = tr("View Archive"),
-            .description = tr("Can view archive footage"),
+            .description = common::html::bold(tr("View Archive")),
             .icon = QUrl(kIconsDir + "view_archive.svg")},
         AccessRightDescriptor{
             .accessRight = AccessRight::exportArchive,
             .name = tr("Export Archive"),
-            .description = tr("Can export parts of archive"),
+            .description = common::html::bold(tr("Export Archive")),
             .icon = QUrl(kIconsDir + "export_archive.svg")},
         AccessRightDescriptor{
             .accessRight = AccessRight::viewBookmarks,
             .name = tr("View Bookmarks"),
-            .description = tr("Can view bookmarks"),
+            .description = common::html::bold(tr("View Bookmarks")),
             .icon = QUrl(kIconsDir + "view_bookmarks.svg")},
         AccessRightDescriptor{
             .accessRight = AccessRight::manageBookmarks,
             .name = tr("Manage Bookmarks"),
-            .description = tr("Can modify bookmarks"),
+            .description = common::html::bold(tr("Modify Bookmarks")),
             .icon = QUrl(kIconsDir + "manage_bookmarks.svg")},
         AccessRightDescriptor{
             .accessRight = AccessRight::userInput,
             .name = tr("User Input"),
-            .description =
-                tr("Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons"),
+            .description = common::html::bold("User Input.") + " " +
+                tr("Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons."),
             .icon = QUrl(kIconsDir + "user_input.svg")},
         AccessRightDescriptor{
             .accessRight = AccessRight::edit,
             .name = tr("Edit Settings"),
-            .description = common::html::bold(tr("Edit Camera Settings.")) + " " + tr("Depending"
-                " on the resource type it either allows user to modify device settings or to"
-                " control video wall."),
+            .description = common::html::bold(tr("Edit Camera Settings.")) + " " +
+                tr("Depending on the resource type it either allows user to modify device settings"
+                " or to control video wall."),
             .icon = QUrl(kIconsDir + "edit_settings.svg")}})
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
