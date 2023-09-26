@@ -151,9 +151,9 @@ LicenseManagerWidget::LicenseManagerWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    const QString alertText = tr("You do not have a valid license installed. "
-        "Please activate your commercial or trial license.");
-    ui->alertBar->setText(alertText);
+    ui->alertBar->init({.text = tr("You do not have a valid license installed. "
+        "Please activate your commercial or trial license."),
+        .level = BarDescription::BarLevel::Error});
     ui->alertBar->setRetainSpaceWhenNotDisplayed(false);
     ui->alertBar->setVisible(false);
 
