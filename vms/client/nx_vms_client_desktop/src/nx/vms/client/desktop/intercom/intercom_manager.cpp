@@ -104,7 +104,8 @@ struct IntercomManager::Private: public QObject
 
     bool hasAccess(const QnVirtualCameraResourcePtr& camera)
     {
-        return q->accessController()->hasPermissions(camera, Qn::ReadPermission);
+        return q->accessController()->hasPermissions(camera,
+            Qn::ViewLivePermission | Qn::TwoWayAudioPermission);
     }
 
     void tryCreateLayouts(const QnVirtualCameraResourceList& intercomCameras)

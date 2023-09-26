@@ -696,9 +696,19 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             if (subject.user() && subject.user()->isAdministrator())
                 return Qn::FullLayoutPermissions;
 
+            const auto ownerId = layout->getParentId();
+
             // Access to global layouts.
             // Simple check is enough, exported layouts are checked on the client side.
-            if (layout->isShared())
+            const bool isShared = layout->isShared();
+            const bool isIntercom = !isShared &&
+                [&]()
+                {
+                    const auto camera = resourcePool()->getResourceById<QnResource>(ownerId);
+                    return nx::vms::common::isIntercom(camera);
+                }();
+
+            if (isShared || isIntercom)
             {
                 if (!accessRights)
                     return Qn::NoPermissions;
@@ -710,8 +720,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                 return Qn::ModifyLayoutPermission;
             }
 
-            const auto ownerId = layout->getParentId();
-
             // Access to videowall layouts.
             const auto videowall = resourcePool()->getResourceById<QnVideoWallResource>(ownerId);
             if (videowall)
@@ -719,17 +727,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                 return hasAccessRights(subject, videowall, AccessRight::edit)
                     ? Qn::FullLayoutPermissions
                     : Qn::NoPermissions;
-            }
-
-            // Access to intercom layouts.
-            const auto camera = resourcePool()->getResourceById<QnResource>(ownerId);
-            if (nx::vms::common::isIntercom(camera))
-            {
-                const auto intercomAccessRights = this->accessRights(subject, camera);
-                if (intercomAccessRights.testFlag(AccessRight::userInput))
-                    return Qn::FullLayoutPermissions;
-
-                return intercomAccessRights ? Qn::ReadPermission : Qn::NoPermissions;
             }
 
             // Checking other user's layout. Only users can have access to them.
