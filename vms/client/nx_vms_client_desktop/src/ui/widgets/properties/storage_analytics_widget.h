@@ -71,6 +71,7 @@ private:
 
     bool m_updating = false;
     bool m_dirty = false;
+    int m_updateTimerId = 0;
 
     QAction* m_selectAllAction = nullptr;
     QAction* m_exportAction = nullptr;
@@ -91,6 +92,8 @@ private:
 
     virtual void resizeEvent(QResizeEvent*) override; //< Use this to resize table columns; accepts null.
     virtual void showEvent(QShowEvent*) override; //< Resizes columns when shown.
+    virtual void hideEvent(QHideEvent*) override;
+    virtual void timerEvent(QTimerEvent*) override;
 
 private:
     void atReceivedStats(

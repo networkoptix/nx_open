@@ -78,6 +78,8 @@ const std::array<qint64, 5> kExtraDataBase =
 
 const int kTicksPerInterval = 100;
 
+constexpr auto kUpdateDataFromServerTimeout = 1min;
+
 } // namespace
 
 QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
@@ -134,8 +136,15 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     connect(m_exportAction, &QAction::triggered,
         this, &QnStorageAnalyticsWidget::atExportAction_triggered);
 
-    connect(refreshButton, &QAbstractButton::clicked,
-        this, [this] { clearCache(); updateDataFromServer(); });
+    connect(refreshButton, &QAbstractButton::clicked, this,
+        [this]
+        {
+            killTimer(m_updateTimerId);
+            m_updateTimerId = startTimer(kUpdateDataFromServerTimeout);
+
+            clearCache();
+            updateDataFromServer();
+        });
 
     connect(ui->extraSpaceSlider, &QSlider::valueChanged,
         this, &QnStorageAnalyticsWidget::atForecastParamsChanged);
@@ -633,4 +642,18 @@ void QnStorageAnalyticsWidget::showEvent(QShowEvent*)
     resizeEvent(nullptr); //< We know true widget geometry only at this point.
     if (m_dirty) //< Update info if it was previously requested.
         updateDataFromServer();
+
+    m_updateTimerId = startTimer(kUpdateDataFromServerTimeout);
+}
+
+void QnStorageAnalyticsWidget::hideEvent(QHideEvent*)
+{
+    killTimer(m_updateTimerId);
+    m_updateTimerId = 0;
+}
+
+void QnStorageAnalyticsWidget::timerEvent(QTimerEvent*)
+{
+    clearCache();
+    updateDataFromServer();
 }
