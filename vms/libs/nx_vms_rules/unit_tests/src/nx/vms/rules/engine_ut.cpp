@@ -611,7 +611,14 @@ TEST_F(EngineTest, timerThread)
     connector.process(event1);
     connector.process(event2);
 
-    std::this_thread::sleep_for(50ms);
+    for (int i = 0; i < 600; ++i)
+    {
+        if (executor.count > 0)
+            break;
+
+        std::this_thread::sleep_for(50ms);
+    }
+
     ASSERT_EQ(executor.actions.size(), 1);
 
     // Timer will be stopped on rule removal in engine's thread.

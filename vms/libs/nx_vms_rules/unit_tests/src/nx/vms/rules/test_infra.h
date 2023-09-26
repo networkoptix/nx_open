@@ -13,10 +13,12 @@ public:
     void execute(const ActionPtr& action)
     {
         actions.push_back(action);
+        ++count;
     }
 
 public:
     std::vector<ActionPtr> actions;
+    std::atomic<size_t> count = 0;
 };
 
 class TestEventConnector: public EventConnector
