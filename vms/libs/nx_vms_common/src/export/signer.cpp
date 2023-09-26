@@ -4,16 +4,14 @@
 
 #include <export/sign_helper.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
 
 MediaSigner::MediaSigner():
     m_audioHash(EXPORT_SIGN_METHOD),
     m_signatureHash(EXPORT_SIGN_METHOD)
 {
-    m_signatureHash.reset();
-    m_signatureHash.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
-
-    m_audioHash.reset();
+    reset();
 }
 
 void MediaSigner::processMedia(AVCodecParameters* avCodecParams, const uint8_t* data, int size)
@@ -50,4 +48,11 @@ QByteArray MediaSigner::currentResult()
 {
     nx::utils::QnCryptographicHash tmpHash = m_signatureHash;
     return tmpHash.result();
+}
+
+void MediaSigner::reset()
+{
+    m_signatureHash.reset();
+    m_signatureHash.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
+    m_audioHash.reset();
 }

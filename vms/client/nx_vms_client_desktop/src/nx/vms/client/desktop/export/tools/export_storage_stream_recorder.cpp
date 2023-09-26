@@ -351,6 +351,7 @@ void ExportStorageStreamRecorder::onSuccessfulWriteData(const QnConstAbstractMed
 
 void ExportStorageStreamRecorder::onSuccessfulPrepare()
 {
+    m_signer.reset();
 }
 
 void ExportStorageStreamRecorder::reportFinished()

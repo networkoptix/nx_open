@@ -22,6 +22,7 @@ public:
     QByteArray buildSignature(QnLicensePool* licensePool, const QnUuid& serverId);
     QByteArray buildSignature(const QByteArray& signPattern);
     QByteArray currentResult();
+    void reset();
 
 private:
     nx::utils::QnCryptographicHash m_audioHash;
