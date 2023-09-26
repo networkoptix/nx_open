@@ -64,7 +64,13 @@ MainTreeResourceItemDecorator::Permissions permissionsSummary(
     const QnResourcePtr& resource)
 {
     if (user.isNull())
-        return {.permissions = Qn::NoPermissions, .hasPowerUserPermissions = false};
+    {
+        return resource->hasFlags(Qn::local_video) || resource->hasFlags(Qn::local_image)
+            ? MainTreeResourceItemDecorator::Permissions{
+                .permissions = Qn::ReadPermission, .hasPowerUserPermissions = false}
+            : MainTreeResourceItemDecorator::Permissions{
+                .permissions = Qn::NoPermissions, .hasPowerUserPermissions = false};
+    }
 
     const auto accessManager = user->systemContext()->resourceAccessManager();
 
@@ -169,12 +175,13 @@ LayoutItemCreator layoutItemCreator(
             const auto itemData = layout->getItem(itemId);
 
             const auto itemResource = getResourceByDescriptor(itemData.resource);
-            if (!itemResource)
+            const auto permSummary = permissionsSummary(user, itemResource);
+            if (permSummary.permissions == Qn::NoPermissions)
                 return {};
 
             return std::make_unique<MainTreeResourceItemDecorator>(
                 createDecoratedResourceItem(factory, itemResource, hasPowerUserPermissions),
-                permissionsSummary(user, itemResource),
+                permSummary,
                 NodeType::layoutItem,
                 itemData.uuid);
         };
