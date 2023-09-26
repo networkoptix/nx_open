@@ -325,7 +325,15 @@ void File::rotateAndStartArchivingIfNeeded()
             << archiveName.toStdString() << '\n';
     }
     QFile::rename(getFileName(), tmpName);
-    m_archive = std::async(std::launch::async, &File::archive, this, tmpName, archiveName);
+    try
+    {
+        m_archive = std::async(std::launch::async, &File::archive, this, tmpName, archiveName);
+    }
+    catch (const std::exception& e)
+    {
+        NX_CRITICAL(this, "Unable to start zipping thread '%1' into '%2': %3",
+            tmpName, archiveName, e.what());
+    }
 }
 
 void File::rotateIfNeeded(nx::Locker<nx::Mutex>* lock)
