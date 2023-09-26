@@ -343,6 +343,11 @@ containing the following fields:
 
     Must have one of the values listed below in the "Attribute types" section.
 
+- `"subtype"`: String
+
+    User-defined id of the particular type. Valid only for user-defined types like `"Enum"`,
+    `"Color"`, `"Object"`.
+
 - `"attributeList"`: String
     Id of an Attribute List. If present, all other fields are ignored.
 
@@ -354,10 +359,10 @@ Other fields depend on the particular attribute type.
 
 Attributes that are inherited from the base type can be "re-defined" as follows:
 
-- "subtype" and "unit" can be specified if not specified in the base type (or had exactly the
+- `"subtype"` and `"unit"` can be specified if not specified in the base type (or had exactly the
     same value);
 
-- "minValue" and "maxValue" can be specified if and only if the inherited range rather than
+- `"minValue"` and `"maxValue"` can be specified if and only if the inherited range rather than
     extend it.
 
 - For Enums and Colors, the Attribute can be re-defined to use another Enum/Color
@@ -408,14 +413,15 @@ override the same Attribute and declare it as a supported one.
     - May contain any Unicode chars, including '\n', '\0' and other control chars.
 
 - `"Enum"`:
-    - Set of Enum items can be empty ­- it makes sense for extending Enums.
-    - `"subtype"` in the attribute definition refers to a Enum id.
+    - The set of Enum items can be empty - it makes sense for extending Enums.
+    - `"subtype"` in the attribute definition refers to a user-defined Enum type id.
     - Item names are not Identifiers - they are Names.
     - Enums can be inherited and extended via `"base"` and `"baseItems"` fields.
 
 - `"Color"`:
     - Similar to an Enum, but each item has an associated RGB value used for this color
         representation in the UI.
+    - `"subtype"` in the attribute definition refers to a user-defined Color type id.
     - The color Name is what appears as the Attbiture value.
     - Like Enums, Colors can be inherited and extended via `"base"` and `"baseItems"` fields.
 
