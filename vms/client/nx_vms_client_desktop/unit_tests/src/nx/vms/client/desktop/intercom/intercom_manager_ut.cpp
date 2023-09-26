@@ -24,6 +24,8 @@ namespace test {
 
 using namespace nx::vms::api;
 
+static constexpr AccessRights kRequiredAccessRights = AccessRight::view | AccessRight::userInput;
+
 class IntercomManagerTest: public ContextBasedTest
 {
 protected:
@@ -86,7 +88,7 @@ protected:
         QnIOPortData intercomFeaturePort;
         intercomFeaturePort.outputName = kOpenDoorPortName;
 
-        camera->setIoPortDescriptions({ intercomFeaturePort }, false);
+        camera->setIoPortDescriptions({intercomFeaturePort}, false);
     }
 
     QnLayoutResourceList layouts() const
@@ -112,7 +114,7 @@ protected:
 
 TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsCreated)
 {
-    loginAs(kLiveViewersGroupId);
+    loginAs(kPowerUsersGroupId);
     EXPECT_TRUE(layouts().empty());
 
     const auto intercomCamera = addIntercomCamera();
@@ -121,9 +123,18 @@ TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsCreated)
     EXPECT_TRUE(layouts()[0]->hasFlags(Qn::local));
 }
 
+TEST_F(IntercomManagerTest, dontCreateIntercomLayoutWithoutRequiredPermissions)
+{
+    loginAs(kViewersGroupId);
+    EXPECT_TRUE(layouts().empty());
+
+    const auto intercomCamera = addIntercomCamera();
+    ASSERT_TRUE(layouts().empty());
+}
+
 TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomIsInitialized)
 {
-    loginAs(kLiveViewersGroupId);
+    loginAs(kPowerUsersGroupId);
     EXPECT_TRUE(layouts().empty());
 
     const auto camera = createCamera();
@@ -146,7 +157,7 @@ TEST_F(IntercomManagerTest, createIntercomLayoutWhenIntercomAccessIsGranted)
 
     systemContext()->accessRightsManager()->setOwnResourceAccessMap(
         accessController()->user()->getId(),
-        {{intercomCamera->getId(), AccessRight::view}});
+        {{intercomCamera->getId(), kRequiredAccessRights}});
 
     ASSERT_EQ(layouts().size(), 1);
     EXPECT_TRUE(nx::vms::common::isIntercomOnIntercomLayout(intercomCamera, layouts()[0]));
@@ -157,7 +168,7 @@ TEST_F(IntercomManagerTest, removeLocalIntercomLayoutWhenIntercomIsDeleted)
 {
     const auto intercomCamera = addIntercomCamera();
 
-    loginAs(kLiveViewersGroupId);
+    loginAs(kPowerUsersGroupId);
     EXPECT_EQ(layouts().size(), 1);
 
     resourcePool()->removeResource(intercomCamera);
@@ -172,7 +183,7 @@ TEST_F(IntercomManagerTest, removeLocalIntercomLayoutWhenIntercomAccessIsRevoked
 
     systemContext()->accessRightsManager()->setOwnResourceAccessMap(
         accessController()->user()->getId(),
-        {{intercomCamera->getId(), AccessRight::view}});
+        {{intercomCamera->getId(), kRequiredAccessRights}});
 
     EXPECT_EQ(layouts().size(), 1);
 
@@ -188,7 +199,7 @@ TEST_F(IntercomManagerTest, dontCreateIntercomLayoutIfOneExists)
     addIntercomLayout(intercomCamera);
     EXPECT_EQ(layouts().size(), 1);
 
-    loginAs(kLiveViewersGroupId);
+    loginAs(kPowerUsersGroupId);
     EXPECT_EQ(layouts().size(), 1);
 }
 
@@ -207,7 +218,7 @@ TEST_F(IntercomManagerTest, dontRemoveRemoteIntercomLayoutWhenIntercomAccessIsRe
 
     systemContext()->accessRightsManager()->setOwnResourceAccessMap(
         accessController()->user()->getId(),
-        {{intercomCamera->getId(), AccessRight::view}});
+        {{intercomCamera->getId(), kRequiredAccessRights}});
 
     EXPECT_EQ(layouts().size(), 1);
 

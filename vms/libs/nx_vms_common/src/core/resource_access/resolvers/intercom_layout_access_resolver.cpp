@@ -157,12 +157,15 @@ ResourceAccessMap IntercomLayoutAccessResolver::Private::ensureAccessMap(
 
     ResourceAccessMap accessMap = baseResolver->resourceAccessMap(subjectId);
 
+    constexpr AccessRights kRequiredAccessRights = AccessRight::view | AccessRight::userInput;
+    constexpr AccessRights kGrantedAccessRights = AccessRight::view;
+
     for (const auto& intercom: allIntercoms)
     {
         const auto accessRights = baseResolver->accessRights(subjectId, intercom);
         const auto intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercom);
-        if (accessRights)
-            accessMap.emplace(intercomLayoutId, accessRights);
+        if (accessRights.testFlags(kRequiredAccessRights))
+            accessMap.emplace(intercomLayoutId, kGrantedAccessRights);
         else
             accessMap.remove(intercomLayoutId);
     }
