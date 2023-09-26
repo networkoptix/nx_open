@@ -29,8 +29,8 @@ namespace nx::vms::client::desktop {
 static const QColor klight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{klight16Color, "light16"}}},
-    {QIcon::Active, {{klight16Color, "light17"}}},
-    {QIcon::Selected, {{klight16Color, "light15"}}},
+    {QIcon::Active, {{klight16Color, "light16"}}},
+    {QIcon::Selected, {{klight16Color, "light10"}}},
 };
 
 class SimpleMotionSearchWidget::Private: public QObject
