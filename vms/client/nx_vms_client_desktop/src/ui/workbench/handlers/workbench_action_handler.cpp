@@ -1571,15 +1571,28 @@ void ActionHandler::at_dropResourcesAction_triggered()
             continue;
         }
 
-        const bool showWarning = std::any_of(resources.cbegin(), resources.cend(),
-            [](const QnResourcePtr& resource)
-            {
-                return resource.objectCast<QnVirtualCameraResource>()
-                    && !ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission);
-            });
+        int totalCameras = 0;
+        int viewableCameras = 0;
 
-        if (showWarning)
-            SceneBanner::show(tr("You do not have permissions to open camera on the layout"));
+        for (const auto& resource: resources)
+        {
+            if (!resource.objectCast<QnVirtualCameraResource>())
+                continue;
+
+            ++totalCameras;
+
+            if (ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission))
+                ++viewableCameras;
+        }
+
+        if (viewableCameras < totalCameras)
+        {
+            const auto warningMessageText = totalCameras == 1
+                ? tr("You do not have permissions to open this camera on the layout")
+                : tr("You do not have permissions to open some of selected cameras on the layout");
+
+            SceneBanner::show(warningMessageText);
+        }
 
         if (!resources.empty())
         {
