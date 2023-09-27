@@ -190,9 +190,11 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
     connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::clicked,
+    ui->forceVideoEncryptionWarning->setText(tr("Encrypting video traffic may significantly increase CPU usage"));
+    ui->useHttpsOnlyCamerasWarning->setText(tr("Connection with cameras that do not support HTTPS will be lost"));
+    connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::toggled,
         ui->forceVideoEncryptionWarning, &QWidget::setVisible);
-    connect(ui->useHttpsOnlyCamerasCheckBox, &QCheckBox::clicked,
+    connect(ui->useHttpsOnlyCamerasCheckBox, &QCheckBox::toggled,
         ui->useHttpsOnlyCamerasWarning, &QWidget::setVisible);
 
     connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged, this,
