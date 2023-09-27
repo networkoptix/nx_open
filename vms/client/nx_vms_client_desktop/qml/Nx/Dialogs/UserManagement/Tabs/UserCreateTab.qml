@@ -151,6 +151,12 @@ Item
                         flatSide: -1 //< Rigth.
                         checked: control.userType == UserSettingsGlobal.LocalUser
                             || control.userType == UserSettingsGlobal.TemporaryUser
+
+                        onCheckedChanged:
+                        {
+                            if (checked && visualFocus)
+                                loginTextField.textField.forceActiveFocus()
+                        }
                     }
 
                     ToggleButton
@@ -159,6 +165,12 @@ Item
                         icon.source: "image://svg/skin/user_settings/toggle_cloud_user.svg"
                         flatSide: 1 //< Left.
                         checked: control.userType == UserSettingsGlobal.CloudUser
+
+                        onCheckedChanged:
+                        {
+                            if (checked && visualFocus)
+                                emailTextField.textField.forceActiveFocus()
+                        }
                     }
                 }
             }
