@@ -29,6 +29,8 @@ FocusScope
     signal textEdited()
     signal editingFinished()
 
+    onFocusChanged: textField.focus = focus
+
     TextField
     {
         id: textField
