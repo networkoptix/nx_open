@@ -89,6 +89,9 @@
       </widget>
      </item>
      <item>
+      <widget class="nx::vms::client::desktop::AlertLabel" name="alertLabel" native="true"/>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1">
        <property name="spacing">
         <number>4</number>
@@ -528,9 +531,6 @@
      </property>
     </spacer>
    </item>
-   <item>
-    <widget class="nx::vms::client::desktop::CommonMessageBar" name="alertBar" native="true"/>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -540,9 +540,9 @@
    <header location="global">nx/vms/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::CommonMessageBar</class>
+   <class>nx::vms::client::desktop::AlertLabel</class>
    <extends>QWidget</extends>
-   <header>nx/vms/client/desktop/common/widgets/message_bar.h</header>
+   <header>nx/vms/client/desktop/common/widgets/alert_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
