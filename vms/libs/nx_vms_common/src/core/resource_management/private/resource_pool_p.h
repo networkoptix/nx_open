@@ -32,6 +32,7 @@ struct QnResourcePool::Private
         void add(QnUserResourcePtr user);
         void remove(const QnUserResourcePtr& user);
         void selectMainUser();
+        int count() const;
 
     private:
         QnUserResourcePtr m_main;
