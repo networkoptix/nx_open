@@ -759,7 +759,7 @@ Item
         DialogBanner
         {
             style: DialogBanner.Style.Error
-            visible: !control.nameIsUnique
+            visible: !control.nameIsUnique && control.userEnabled
             closeVisible: true
             text: qsTr("This user’s login duplicates the login of another user. None of them is" +
                 " able to login. To resolve this issue you can change user’s login or disable or" +
