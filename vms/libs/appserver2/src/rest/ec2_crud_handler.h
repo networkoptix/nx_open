@@ -222,6 +222,8 @@ private:
             case ErrorCode::badRequest:
             case ErrorCode::dbError:
                 throw Exception::badRequest(std::move(r.message));
+            case ErrorCode::notFound:
+                throw Exception::notFound(std::move(r.message));
             default:
                 NX_ASSERT(false, "Unexpected code: %1", r.toString());
                 throw Exception::internalServerError(NX_FMT("Unexpected code: %1", r.toString()));
