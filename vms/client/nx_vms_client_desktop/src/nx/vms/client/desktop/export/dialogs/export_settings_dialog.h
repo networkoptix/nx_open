@@ -7,6 +7,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
+#include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/settings/types/export_mode.h>
@@ -41,6 +42,7 @@ class ExportSettingsDialog: public QnButtonBoxDialog, public QnSessionAwareDeleg
 
 public:
     using FileNameValidator = std::function<bool (const Filename& fileName, bool quiet)>;
+    using BarDescs = std::vector<BarDescription>;
     ExportSettingsDialog(const QnTimePeriod& timePeriod,
         const QnCameraBookmark& bookmark,
         FileNameValidator isFileNameValid,
@@ -75,9 +77,8 @@ private:
     void setupSettingsButtons();
     void initSettingsWidgets();
     void updateTabWidgetSize();
-    void updateAlerts(
-        ExportMode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
-    static void updateAlertsInternal(QLayout* layout, const QStringList& texts, bool severe);
+    void updateMessageBars(ExportMode mode, const BarDescs& barDescriptions);
+    void updateMessageBarsInternal(ExportMode mode, const BarDescs& barDescriptions);
 
     // Updates state of widgets according to internal state
     void updateWidgetsState();

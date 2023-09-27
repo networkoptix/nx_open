@@ -336,20 +336,9 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item>
-           <layout class="QVBoxLayout" name="weakMediaAlertsLayout">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="severeMediaAlertsLayout">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-           </layout>
-          </item>
+           <item>
+            <widget class="nx::vms::client::desktop::MessageBarBlock" name="mediaMessageBarBlock" native="true"/>
+           </item>
          </layout>
         </widget>
        </item>
@@ -555,20 +544,9 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item>
-           <layout class="QVBoxLayout" name="weakLayoutAlertsLayout">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="severeLayoutAlertsLayout">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-           </layout>
-          </item>
+           <item>
+            <widget class="nx::vms::client::desktop::MessageBarBlock" name="messageBarBlock" native="true"/>
+           </item>
          </layout>
         </widget>
        </item>
@@ -659,6 +637,12 @@
    <class>nx::vms::client::desktop::InfoOverlaySettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::MessageBarBlock</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
