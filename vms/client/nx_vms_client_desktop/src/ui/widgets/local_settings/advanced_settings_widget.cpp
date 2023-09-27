@@ -77,8 +77,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->alertBar->init({.level = BarDescription::BarLevel::Warning,
-        .isEnabledProperty = &messageBarSettings()->advancedSettingsAlert});
+    ui->alertLabel->setText(tr("NVIDIA hardware acceleration is in beta mode"));
     ui->dialogContentsLayout->setContentsMargins(nx::style::Metrics::kDefaultTopLevelMargins);
     ui->dialogContentsLayout->setSpacing(nx::style::Metrics::kDefaultLayoutSpacing.height());
 
@@ -572,7 +571,5 @@ void QnAdvancedSettingsWidget::updateNvidiaHardwareAccelerationWarning()
     const auto isNvidiaAcceleration =
         nx::media::getHardwareAccelerationType() == nx::media::HardwareAccelerationType::nvidia;
 
-    ui->alertBar->setText(ui->useHardwareDecodingCheckbox->isChecked() && isNvidiaAcceleration
-        ? tr("NVIDIA hardware acceleration is in beta mode")
-        : QString());
+    ui->alertLabel->setVisible(ui->useHardwareDecodingCheckbox->isChecked() && isNvidiaAcceleration);
 }
