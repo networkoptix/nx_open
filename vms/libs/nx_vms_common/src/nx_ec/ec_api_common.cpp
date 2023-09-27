@@ -35,6 +35,8 @@ QString toString(ErrorCode errorCode)
             return "containsBecauseSequence";
         case ErrorCode::notImplemented:
             return "notImplemented";
+        case ErrorCode::notFound:
+            return "notFound";
     }
     return "unknown error";
 }
