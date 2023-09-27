@@ -329,8 +329,7 @@ void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
         d->dragDropDecoratorModel.reset(new ResourceTreeDragDropDecoratorModel(
             d->context->resourcePool(),
             d->context->menu(),
-            d->context->instance<ui::workbench::ActionHandler>(),
-            d->context->resourceTreeSettings()));
+            d->context->instance<ui::workbench::ActionHandler>()));
 
         d->dragDropDecoratorModel->setSourceModel(d->resourceTreeModel.get());
 
