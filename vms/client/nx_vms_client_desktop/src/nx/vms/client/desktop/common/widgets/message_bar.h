@@ -12,6 +12,7 @@
 #include "control_bars.h"
 
 class QHBoxLayout;
+class QLayout;
 
 namespace nx::vms::client::desktop {
 
@@ -32,6 +33,7 @@ struct BarDescription
     bool isOpenExternalLinks = true;
     PropertyPointer isEnabledProperty;
     std::vector<QHBoxLayout*> additionalRows; //<= Additional rows under the label.
+    bool operator==(const BarDescription&) const = default;
 };
 
 /**
@@ -68,6 +70,20 @@ signals:
     void closeClicked();
     /** Emitted only when `setOpenExternalLinks` is disabled. */
     void linkActivated(const QString& link);
+
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
+};
+
+class MessageBarBlock: public QWidget
+{
+    Q_OBJECT
+    using base_type = QWidget;
+public:
+    explicit MessageBarBlock(QWidget* parent = nullptr);
+    virtual ~MessageBarBlock() override;
+    void setMessageBars(const std::vector<BarDescription>& descs);
 
 private:
     struct Private;

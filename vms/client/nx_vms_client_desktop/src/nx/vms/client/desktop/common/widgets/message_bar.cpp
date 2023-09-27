@@ -2,9 +2,13 @@
 
 #include "message_bar.h"
 
-#include <QtWidgets/QBoxLayout>
+#include <memory>
+#include <vector>
+
+#include <QtWidgets/QLayout>
 #include <QtWidgets/QPushButton>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
@@ -159,6 +163,47 @@ void CommonMessageBar::init(const BarDescription& barDescription)
     }
 
     updateVisibility();
+}
+
+struct MessageBarBlock::Private
+{
+    using MessageBarStorage = std::vector<std::unique_ptr<CommonMessageBar>>;
+    std::vector<BarDescription> barsDescriptions;
+    MessageBarStorage bars;
+};
+
+MessageBarBlock::MessageBarBlock(QWidget* parent):
+    base_type(parent),
+    d(new Private())
+{
+    auto layout = new QVBoxLayout;
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->setContentsMargins({});
+    layout->setSpacing(1);
+    setLayout(layout);
+}
+
+MessageBarBlock::~MessageBarBlock()
+{
+}
+
+void MessageBarBlock::setMessageBars(const std::vector<BarDescription>& descs)
+{
+    if (descs == d->barsDescriptions)
+        return;
+
+    // Clear previous banners.
+    d->bars.clear();
+
+    // Set new ones.
+    for (auto& desc: descs)
+    {
+        auto bar = std::make_unique<CommonMessageBar>(nullptr, desc);
+        layout()->addWidget(bar.get());
+        d->bars.push_back(std::move(bar));
+    }
+
+    d->barsDescriptions = descs;
 }
 
 } // namespace nx::vms::client::desktop

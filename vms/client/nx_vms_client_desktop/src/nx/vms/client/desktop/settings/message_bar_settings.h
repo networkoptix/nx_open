@@ -23,6 +23,14 @@ public:
     Property<bool> highResolutionInfo{this, "highResolutionInfo", true};
     Property<bool> motionImplicitlyDisabledAlert{this, "motionImplicitlyDisabledAlert", true};
     Property<bool> motionRecordingAlert{this, "motionRecordingAlert", true};
+    Property<bool> transcodingExportWarning{this, "transcodingExportWarning", true};
+    Property<bool> aviWithAudioExportInfo{this, "aviWithAudioExportInfo", true};
+    Property<bool> downscalingExportInfo{this, "downscalingExportInfo", true};
+    Property<bool> tooLongExportWarning{this, "tooLongExportWarning", true};
+    Property<bool> tooBigExeFileWarning{this, "tooBigExeFile", true};
+    Property<bool> transcodingInLayoutIsNotSupportedWarning{
+        this, "transcodingInLayoutIsNotSupportedWarning", true};
+    Property<bool> nonCameraResourcesWarning{this,"nonCameraResourcesWarning",true};
 };
 
 MessageBarSettings* messageBarSettings();
