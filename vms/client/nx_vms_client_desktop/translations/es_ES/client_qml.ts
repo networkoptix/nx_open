@@ -1059,17 +1059,17 @@
                 services. Please disable integration for some cameras or add more suitable services.
                 Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</translation>
+      <translation>Hay más cámaras utilizando esta integración que los servicios
+                disponibles. Por favor, deshabilite la integración para algunas cámaras o añada servicios más adecuados.
+                de lo contrario, se hará automáticamente en %1</translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 servicios adecuados disponibles</translation>
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Servicios requeridos</translation>
     </message>
   </context>
   <context>
@@ -1092,7 +1092,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Uso</translation>
     </message>
   </context>
   <context>
@@ -1262,23 +1262,23 @@
     </message>
     <message>
       <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
-      <translation type="unfinished">VMS imports and synchronizes users and groups with LDAP server in real time</translation>
+      <translation>VMS importa y sincroniza usuarios y grupos con el servidor LDAP en tiempo real</translation>
     </message>
     <message>
       <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
-      <translation type="unfinished">VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</translation>
+      <translation>VMS sincroniza a los usuarios con el servidor LDAP cuando inician sesión en el sistema. Los grupos se sincronizan en tiempo real.</translation>
     </message>
     <message>
       <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</translation>
+      <translation>La importación continua desde LDAP está deshabilitada para este sistema. Las actualizaciones de grupos y membresías de usuarios y grupos; se realizarán únicamente mediante sincronización manual.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Ningún usuario o grupo coincide con la configuración de sincronización y se agrega a la base de datos del sistema. Asegúrese de que los parámetros y filtros del servidor LDAP estén configurados correctamente.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>Tenga cuidado al modificar la configuración de LDAP. Una configuración incorrecta podría alterar la disponibilidad del sistema para una gran cantidad de usuarios simultáneamente.</translation>
     </message>
   </context>
   <context>
@@ -1433,15 +1433,15 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nuevo enlace - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>El enlace anterior quedará invalidado una vez emitido uno nuevo</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Crear</translation>
     </message>
   </context>
   <context>
@@ -1548,11 +1548,11 @@
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Miembro de</translation>
     </message>
     <message>
       <source>Built-in</source>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Integrado</translation>
     </message>
   </context>
   <context>
@@ -1579,7 +1579,7 @@
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Las contraseñas no coinciden</translation>
     </message>
   </context>
   <context>
@@ -1593,15 +1593,15 @@
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>No se encontraron recursos</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Agregar automáticamente permisos dependientes</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>La tabla de recursos le brinda una descripción general de los permisos de los usuarios o del grupo y le permite asignar permisos para recursos específicos. Haga clic en las celdas para seleccionarlas y deseleccionarlas. Utilice arrastrar y soltar y Mayús+arrastrar y soltar para editar por lotes. Si selecciona un permiso que depende de otro permiso, ambos permisos se otorgarán automáticamente.</translation>
     </message>
   </context>
   <context>
@@ -2140,24 +2140,24 @@ para activar PTZ</translation>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Enlace válido hasta</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>El enlace permanecerá accesible hasta la fecha especificada (incluso, según la hora del servidor)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Revocar el acceso después de iniciar sesión</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>El acceso podrá ser revocado antes si finaliza el periodo de validez del enlace</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>En</translation>
     </message>
   </context>
   <context>
@@ -2326,19 +2326,19 @@ para activar PTZ</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Acceso</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Usuario habitual con credenciales</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Temporal con enlace</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Las contraseñas no coinciden</translation>
     </message>
   </context>
   <context>
@@ -2423,36 +2423,36 @@ para activar PTZ</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>El acceso expira</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Enlace de acceso</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Copiar enlace</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Terminar</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Nuevo enlace...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>No hay enlace válido para este usuario</translation>
     </message>
     <message>
       <source>Copied</source>
       <comment>Copied here means that a link is copied</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Copiado</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Cuando se deshabilita la sincronización continua, la membresía del usuario en grupos no se sincroniza automáticamente. Para actualizar esta información, inicie una sincronización manual.</translation>
     </message>
   </context>
   <context>
