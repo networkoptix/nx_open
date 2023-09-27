@@ -49,7 +49,7 @@ enum class PasswordStrength
     Incorrect,      /**< Contains invalid characters. */
     IncorrectCamera,/**< Contains invalid characters for camera. */
     WeakAndFair,    /**< Weak, and still quite short. Actual for cameras. */
-    WeakAndGood,    /**< Weak, has good length. Actual for cameras. */
+    WeakAndGood    /**< Weak, has good length. Actual for cameras. */
 };
 
 NX_UTILS_API QString toString(PasswordStrength strength);

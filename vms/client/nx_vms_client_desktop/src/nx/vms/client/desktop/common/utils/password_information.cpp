@@ -78,14 +78,14 @@ PasswordInformation::PasswordInformation(PasswordStrength strength)
 
         case PasswordStrength::IncorrectCamera:
             m_text = tr("Incorrect");
-            m_hint = tr("Only latin letters, numbers and keyboard symbols %1 are allowed.")
+            m_hint = tr("Only latin letters, numbers and keyboard symbols %1 are allowed")
                 .arg(QString::fromLatin1(PasswordLimitations::kCameraAllowedSymbols));
             break;
 
         case PasswordStrength::Incorrect:
         default:
             m_text = tr("Incorrect");
-            m_hint = tr("Only latin letters, numbers and keyboard symbols are allowed.");
+            m_hint = tr("Only latin letters, numbers and keyboard symbols are allowed");
             break;
     }
 }
