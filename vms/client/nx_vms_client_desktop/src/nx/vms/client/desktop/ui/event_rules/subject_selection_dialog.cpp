@@ -58,6 +58,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     m_userListDelegate(new UserListDelegate(this))
 {
     ui->setupUi(this);
+    ui->alertBar->init({.level = BarDescription::BarLevel::Error});
     ui->nothingFoundLabel->setHidden(true);
 
     ui->groupsTreeView->setIgnoreWheelEvents(true);
@@ -269,8 +270,6 @@ void SubjectSelectionDialog::setOptions(const CustomizableOptions& options)
     ui->showAllUsers->setVisible(options.showAllUsersSwitcher);
     ui->usersGroupBox->setVisible(true);
     ui->usersGroupBox->setTitle(options.userListHeader);
-
-    setPaletteColor(ui->alertBar, QPalette::Window, options.alertColor);
 
     m_userListDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
