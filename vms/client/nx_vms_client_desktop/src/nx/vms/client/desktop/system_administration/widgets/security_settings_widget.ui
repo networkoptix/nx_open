@@ -88,6 +88,9 @@
           </widget>
          </item>
          <item>
+          <widget class="nx::vms::client::desktop::AlertLabel" name="useHttpsOnlyCamerasWarning" native="true"/>
+         </item>
+         <item>
           <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="forceTrafficEncryptionCheckBox">
            <property name="text">
             <string>Force servers to accept only encrypted connections</string>
@@ -100,6 +103,9 @@
             <string>Encrypt video traffic to desktop and mobile clients</string>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="nx::vms::client::desktop::AlertLabel" name="forceVideoEncryptionWarning" native="true"/>
          </item>
          <item>
           <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="displayWatermarkCheckBox">
@@ -353,20 +359,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="forceVideoEncryptionWarning" native="true">
-     <property name="text" stdset="0">
-      <string>Encrypting video traffic will significantly increase CPU usage.</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="useHttpsOnlyCamerasWarning" native="true">
-     <property name="text" stdset="0">
-      <string>Connection with cameras that do not support HTTPS will be lost.</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>
