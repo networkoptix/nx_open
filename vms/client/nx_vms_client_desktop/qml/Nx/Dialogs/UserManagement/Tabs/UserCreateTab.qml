@@ -30,9 +30,20 @@ Item
     property alias expiresAfterLoginS: temporaryLinkSettings.expiresAfterLoginS
     property alias revokeAccessEnabled: temporaryLinkSettings.revokeAccessEnabled
     property alias displayOffsetMs: temporaryLinkSettings.displayOffsetMs
-    property alias loginText: loginTextField
 
     property int userType: UserSettingsGlobal.LocalUser
+    readonly property bool isLocalUser: userType != UserSettingsGlobal.CloudUser
+
+    onIsLocalUserChanged:
+    {
+        if (isLocalUser)
+        {
+            if (!login)
+                loginTextField.textField.warningState = false
+            if (!email)
+                emailTextField.textField.warningState = false
+        }
+    }
 
     property var self
     property alias model: groupsComboBox.model
@@ -58,6 +69,18 @@ Item
 
         return true
     }
+
+    function setDefaultFocus()
+    {
+        const textField = isLocalUser
+            ? loginTextField
+            : emailTextField
+
+        if (!textField.text)
+            textField.forceActiveFocus()
+    }
+
+    Component.onCompleted: setDefaultFocus()
 
     Scrollable
     {
@@ -110,6 +133,7 @@ Item
                                 ? UserSettingsGlobal.LocalUser
                                 : UserSettingsGlobal.TemporaryUser)
                             : UserSettingsGlobal.CloudUser
+                        setDefaultFocus()
                     }
                 }
 
@@ -155,7 +179,6 @@ Item
                     id: loginTextField
                     width: parent.width
                     validateFunc: control.self ? (text) => control.self.validateLogin(text) : null
-                    focus: control.userType != UserSettingsGlobal.CloudUser
                 }
             }
 
@@ -179,18 +202,7 @@ Item
                 TextFieldWithValidator
                 {
                     id: emailTextField
-                    focus: control.userType == UserSettingsGlobal.CloudUser
                     width: parent.width
-
-                    readonly property bool isLocalUser:
-                        control.userType == UserSettingsGlobal.LocalUser
-
-                    onIsLocalUserChanged:
-                    {
-                        // Hide empty email warning when switching user type cloud -> local.
-                        if (isLocalUser && !text)
-                            textField.warningState = false
-                    }
 
                     onTextChanged:
                         text = fixupFunc(text)

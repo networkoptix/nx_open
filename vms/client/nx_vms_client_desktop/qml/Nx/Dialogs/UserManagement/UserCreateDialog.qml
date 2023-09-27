@@ -75,12 +75,6 @@ DialogWithState
 
     signal addGroupRequested()
 
-    onVisibleChanged:
-    {
-        if (visible)
-            generalSettings.loginText.forceActiveFocus()
-    }
-
     title: qsTr("New User")
 
     validateFunc: () =>
