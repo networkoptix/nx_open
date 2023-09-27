@@ -80,6 +80,7 @@ MembershipSettings
         {
             id: editableItem
 
+            view: editableDelegateItem.ListView.view
             width: parent.width
 
             text: model.text

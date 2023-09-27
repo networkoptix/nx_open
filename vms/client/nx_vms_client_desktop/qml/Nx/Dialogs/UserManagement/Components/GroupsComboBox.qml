@@ -30,6 +30,13 @@ Control
 
     onEnabledChanged: popupObject.close()
 
+    focusPolicy: Qt.TabFocus
+    Keys.onPressed: event =>
+    {
+        if (event.key === Qt.Key_Space)
+            control.openPopup()
+    }
+
     function highlightMatchingText(text)
     {
         if (currentSearchRegExp)
@@ -65,6 +72,36 @@ Control
         opacity: control.enabled ? 1.0 : 0.3
     }
 
+    function openPopup()
+    {
+        const getYPosition = () =>
+        {
+            let showAbove = false
+
+            // Open popup at line border below mouse click.
+            let popupY = control.height
+
+            const popupBottom = popupObject.parent.mapToGlobal(
+                0,
+                popupY + popupObject.maxHeight)
+
+            // Place popup above mouse click if the popup does not fit within window.
+            const w = control.Window.window
+            const windowBottomY = w.y + w.height
+
+            if (!popupObject.visible)
+                showAbove = popupBottom.y > windowBottomY
+
+            if (showAbove)
+                popupY -= (popupObject.height + control.height)
+
+            return popupY
+        }
+
+        popupObject.y = control.stickyPopup ? Qt.binding(getYPosition) : getYPosition()
+        popupObject.open()
+    }
+
     contentItem: Item
     {
         id: boxContent
@@ -92,41 +129,22 @@ Control
             }
         }
 
+        FocusFrame
+        {
+            anchors.fill: parent
+            anchors.margins: 1
+            visible: control.visualFocus
+            color: ColorTheme.highlight
+            opacity: 0.5
+        }
+
         MouseArea
         {
             id: boxMouseArea
             anchors.fill: parent
 
             hoverEnabled: control.enabled
-            onClicked: (mouse) =>
-            {
-                const clickY = mouse.y
-                let showAbove = false
-
-                const getYPosition = () => {
-                    // Open popup at line border below mouse click.
-                    let popupY = control.height
-
-                    const popupBottom = popupObject.parent.mapToGlobal(
-                        0,
-                        popupY + popupObject.maxHeight)
-
-                    // Place popup above mouse click if the popup does not fit within window.
-                    const w = control.Window.window
-                    const windowBottomY = w.y + w.height
-
-                    if (!popupObject.visible)
-                        showAbove = popupBottom.y > windowBottomY
-
-                    if (showAbove)
-                        popupY -= (popupObject.height + control.height)
-
-                    return popupY
-                }
-
-                popupObject.y = control.stickyPopup ? Qt.binding(getYPosition) : getYPosition()
-                popupObject.open()
-            }
+            onClicked: control.openPopup()
 
             Image
             {
@@ -570,6 +588,12 @@ Control
 
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.topMargin: 6
+
+                                onVisualFocusChanged:
+                                {
+                                    if (visualFocus)
+                                        groupListView.positionViewAtIndex(index, ListView.Contain)
+                                }
                             }
                         }
 

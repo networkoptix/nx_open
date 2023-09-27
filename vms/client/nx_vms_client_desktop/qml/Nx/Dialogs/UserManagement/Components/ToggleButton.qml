@@ -8,6 +8,7 @@ import Nx
 import Nx.Core
 import Nx.Controls
 
+import nx.client.desktop
 import nx.vms.client.desktop
 
 AbstractButton
@@ -41,6 +42,15 @@ AbstractButton
             x: flatSide === 0 ? 0 : - radius/2 - radius * button.flatSide / 2
             width: parent.width + radius * Math.abs(button.flatSide)
             height: parent.height
+        }
+
+        FocusFrame
+        {
+            anchors.fill: parent
+            anchors.margins: 1
+            visible: button.visualFocus
+            color: ColorTheme.highlight
+            opacity: 0.5
         }
     }
 
