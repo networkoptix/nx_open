@@ -537,16 +537,16 @@ Future<typename std::invoke_result_t<Function>> run(
     auto futureImpl = future.impl();
     futureImpl->setTotalTasksToRun(1);
     auto taskRunFunction =
-        [function, futureImpl]()
+        [function = std::move(function), futureImpl]() mutable
         {
-            futureImpl->executeFunctionOnDataAtPos(0, function);
+            futureImpl->executeFunctionOnDataAtPos(0, std::move(function));
         };
     if (!futureImpl->incStartedTaskCountIfAllowed())
     {
         NX_ASSERT(false);
     }
     threadPool->start(
-        new detail::RunnableTask<decltype(taskRunFunction)>(taskRunFunction),
+        new detail::RunnableTask<decltype(taskRunFunction)>(std::move(taskRunFunction)),
         priority);
     return future;
 }
@@ -559,7 +559,7 @@ Future<typename std::invoke_result_t<Function>> run(
     QThreadPool* threadPool,
     Function function)
 {
-    return run(threadPool, kDefaultTaskPriority, function);
+    return run(threadPool, kDefaultTaskPriority, std::move(function));
 }
 
 /**
@@ -568,7 +568,7 @@ Future<typename std::invoke_result_t<Function>> run(
 template<typename Function>
 Future<typename std::invoke_result_t<Function>> run(Function function)
 {
-    return run(QThreadPool::globalInstance(), kDefaultTaskPriority, function);
+    return run(QThreadPool::globalInstance(), kDefaultTaskPriority, std::move(function));
 }
 
 } // namespace concurrent

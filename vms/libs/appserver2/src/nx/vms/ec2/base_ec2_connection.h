@@ -462,13 +462,13 @@ int BaseEc2Connection<QueryProcessorType>::dumpDatabase(
     Handler<nx::vms::api::DatabaseDumpData> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     m_queryProcessor->getAccess(Qn::kSystemAccess)
         .template processQueryAsync<std::nullptr_t, nx::vms::api::DatabaseDumpData>(
             ApiCommand::dumpDatabase,
             nullptr,
-            [requestId, handler](auto&&... args)
+            [requestId, handler = handlerExecutor.bind(std::move(handler))](
+                auto&&... args) mutable
             {
                 handler(requestId, std::move(args)...);
             });
@@ -484,14 +484,14 @@ int BaseEc2Connection<QueryProcessorType>::dumpDatabaseToFile(
     nx::vms::api::StoredFilePath dumpFilePathData;
     dumpFilePathData.path = dumpFilePath;
 
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     m_queryProcessor->getAccess(Qn::kSystemAccess)
         .template processQueryAsync<
             nx::vms::api::StoredFilePath, nx::vms::api::DatabaseDumpToFileData>(
                 ApiCommand::dumpDatabaseToFile,
                 dumpFilePathData,
-                [requestId, handler](Result result, auto&&...)
+                [requestId, handler = handlerExecutor.bind(std::move(handler))](
+                    Result result, auto&&...) mutable
                 {
                     handler(requestId, std::move(result));
                 });
@@ -504,12 +504,14 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabase(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     m_queryProcessor->getAccess(Qn::kSystemAccess).processUpdateAsync(
         ApiCommand::restoreDatabase,
         data,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 

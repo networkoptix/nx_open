@@ -174,12 +174,12 @@ void NetworkManager::doRequest(
     Context context;
     context.client = std::move(request);
     context.connection = connect(this, &NetworkManager::onRequestDone, owner,
-        [callback, reqId]
-            (int requestId, Response response)
+        [callback = std::move(callback), reqId](int requestId, Response response) mutable
         {
             if (reqId == requestId)
                 callback(response);
-        }, connectionType);
+        },
+        connectionType);
 
     // Sending request under mutex to be sure reply is not handled before we store context.
     NX_MUTEX_LOCKER lk(&d->mutex);
@@ -236,7 +236,7 @@ void NetworkManager::doGet(
     RequestCallback callback,
     Qt::ConnectionType connectionType)
 {
-    doRequest(Method::get, std::move(request), std::move(url), owner, callback, connectionType);
+    doRequest(Method::get, std::move(request), std::move(url), owner, std::move(callback), connectionType);
 }
 
 void NetworkManager::doPost(
@@ -246,7 +246,7 @@ void NetworkManager::doPost(
     RequestCallback callback,
     Qt::ConnectionType connectionType)
 {
-    doRequest(Method::post, std::move(request), std::move(url), owner, callback, connectionType);
+    doRequest(Method::post, std::move(request), std::move(url), owner, std::move(callback), connectionType);
 }
 
 void NetworkManager::doPut(
@@ -256,7 +256,7 @@ void NetworkManager::doPut(
     RequestCallback callback,
     Qt::ConnectionType connectionType)
 {
-    doRequest(Method::put, std::move(request), std::move(url), owner, callback, connectionType);
+    doRequest(Method::put, std::move(request), std::move(url), owner, std::move(callback), connectionType);
 }
 
 void NetworkManager::doDelete(
@@ -266,7 +266,7 @@ void NetworkManager::doDelete(
     RequestCallback callback,
     Qt::ConnectionType connectionType)
 {
-    doRequest(Method::delete_, std::move(request), std::move(url), owner, callback, connectionType);
+    doRequest(Method::delete_, std::move(request), std::move(url), owner, std::move(callback), connectionType);
 }
 
 } // namespace nx::vms::client::core
