@@ -103,7 +103,7 @@ private:
         SystemError::ErrorCode completionCode);
 
     void stopProxyChannels(
-        std::function<void()> completionHandler);
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
 };
 
 //-------------------------------------------------------------------------------------------------
