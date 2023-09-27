@@ -477,7 +477,11 @@ bool AbstractResourceThumbnail::Private::calculateIsObsolete() const
 
 bool AbstractResourceThumbnail::Private::supportsObsolescence() const
 {
-    return resource && resource->hasFlags(Qn::live_cam);
+    // Currently virtual cameras incorrectly have all `Qn::live_cam` flags set,
+    // so we must perform an additional check for `Qn::virtual_camera`.
+    return resource
+        && resource->hasFlags(Qn::live_cam)
+        && !resource->hasFlags(Qn::virtual_camera);
 }
 
 void AbstractResourceThumbnail::Private::updateIsArmServer()
