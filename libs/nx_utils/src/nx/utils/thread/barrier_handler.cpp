@@ -19,7 +19,7 @@ BarrierHandler::BarrierHandler(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-std::function<void()> BarrierHandler::fork()
+MoveOnlyFunc<void()> BarrierHandler::fork()
 {
     // TODO: move lambda
     auto holder = std::make_shared<

@@ -86,12 +86,12 @@ int QnResourceManager<T>::getResourceTypes(
     Handler<QnResourceTypeList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<std::nullptr_t, nx::vms::api::ResourceTypeDataList>(
         ApiCommand::getResourceTypes,
         nullptr,
-        [requestId, handler](Result result, const nx::vms::api::ResourceTypeDataList& resTypeList)
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](
+            Result result, const nx::vms::api::ResourceTypeDataList& resTypeList) mutable
         {
             QnResourceTypeList outResTypeList;
             if (result)
@@ -112,12 +112,11 @@ int QnResourceManager<T>::setResourceStatus(
     params.id = resourceId;
     params.status = static_cast<nx::vms::api::ResourceStatus>(status);
 
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::setResourceStatus,
         params,
-        [requestId, handler](Result result)
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](Result result) mutable
         {
             handler(requestId, std::move(result));
         });
@@ -130,12 +129,14 @@ int QnResourceManager<T>::getKvPairs(
     Handler<nx::vms::api::ResourceParamWithRefDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<QnUuid, nx::vms::api::ResourceParamWithRefDataList>(
         ApiCommand::getResourceParams,
         resourceId,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -145,12 +146,14 @@ int QnResourceManager<T>::getStatusList(
     Handler<nx::vms::api::ResourceStatusDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<QnUuid, nx::vms::api::ResourceStatusDataList>(
         ApiCommand::getStatusList,
         resourceId,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -160,12 +163,14 @@ int QnResourceManager<T>::save(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::setResourceParams,
         dataList,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -175,12 +180,14 @@ int QnResourceManager<T>::remove(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeResource,
         nx::vms::api::IdData(resourceId),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -190,12 +197,14 @@ int QnResourceManager<T>::remove(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeResourceParam,
         data,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -209,12 +218,14 @@ int QnResourceManager<T>::remove(
     for (const QnUuid& id: resourceIds)
         params.push_back(id);
 
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeResources,
         params,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -224,12 +235,14 @@ int QnResourceManager<T>::removeHardwareIdMapping(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeHardwareIdMapping,
         nx::vms::api::IdData(resourceId),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 

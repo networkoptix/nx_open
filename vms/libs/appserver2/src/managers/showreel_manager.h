@@ -51,12 +51,14 @@ int ShowreelManager<QueryProcessorType>::getShowreels(
     Handler<nx::vms::api::ShowreelDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<const QnUuid&, nx::vms::api::ShowreelDataList>(
         ApiCommand::getShowreels,
         QnUuid(),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -66,12 +68,14 @@ int ShowreelManager<QueryProcessorType>::save(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::saveShowreel,
         data,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -81,12 +85,14 @@ int ShowreelManager<QueryProcessorType>::remove(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeShowreel,
         nx::vms::api::IdData(tourId),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 

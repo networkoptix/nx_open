@@ -78,12 +78,14 @@ int QnMediaServerManager<T>::getServers(
     Handler<nx::vms::api::MediaServerDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<QnUuid, nx::vms::api::MediaServerDataList> (
         ApiCommand::getMediaServers,
         QnUuid(),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -92,12 +94,14 @@ int QnMediaServerManager<T>::getServersEx(
     Handler<nx::vms::api::MediaServerDataExList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<QnUuid, nx::vms::api::MediaServerDataExList>(
         ApiCommand::getMediaServersEx,
         QnUuid(),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -107,12 +111,14 @@ int QnMediaServerManager<T>::save(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::saveMediaServer,
         data,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -122,12 +128,14 @@ int QnMediaServerManager<T>::remove(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeMediaServer,
         nx::vms::api::IdData(id),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -137,12 +145,14 @@ int QnMediaServerManager<T>::saveUserAttributes(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::saveMediaServerUserAttributesList,
         dataList,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -152,12 +162,14 @@ int QnMediaServerManager<T>::saveStorages(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::saveStorages,
         dataList,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -167,12 +179,14 @@ int QnMediaServerManager<T>::removeStorages(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeStorages,
         dataList,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -183,12 +197,14 @@ int QnMediaServerManager<T>::getUserAttributes(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     using namespace nx::vms::api;
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<QnUuid, MediaServerUserAttributesDataList>(
         ApiCommand::getMediaServerUserAttributesList,
         mediaServerId,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -199,12 +215,14 @@ int QnMediaServerManager<T>::getStorages(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     using namespace nx::vms::api;
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<StorageParentId, StorageDataList>(
         ApiCommand::getStorages,
         mediaServerId,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 

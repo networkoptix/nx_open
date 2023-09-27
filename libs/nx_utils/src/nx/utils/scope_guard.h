@@ -78,7 +78,7 @@ private:
     std::optional<Callback> m_callback;
 };
 
-using Guard = ScopeGuard<std::function<void()>>;
+using Guard = ScopeGuard<nx::utils::MoveOnlyFunc<void()>>;
 
 template<class Func>
 ScopeGuard<Func> makeScopeGuard(Func func)

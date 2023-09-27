@@ -58,12 +58,14 @@ int QnVideowallManager<QueryProcessorType>::getVideowalls(
     Handler<nx::vms::api::VideowallDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<QnUuid, nx::vms::api::VideowallDataList>(
         ApiCommand::getVideowalls,
         QnUuid(),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -73,12 +75,14 @@ int QnVideowallManager<T>::save(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::saveVideowall,
         data,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -88,12 +92,14 @@ int QnVideowallManager<T>::remove(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeVideowall,
         nx::vms::api::IdData(id),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -103,12 +109,14 @@ int QnVideowallManager<T>::sendControlMessage(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::videowallControl,
         data,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 

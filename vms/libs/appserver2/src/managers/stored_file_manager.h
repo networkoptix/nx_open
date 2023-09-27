@@ -60,12 +60,12 @@ int QnStoredFileManager<QueryProcessorType>::getStoredFile(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     using namespace nx::vms::api;
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<StoredFilePath, StoredFileData>(
         ApiCommand::getStoredFile,
         fileName,
-        [requestId, handler](Result result, const nx::vms::api::StoredFileData& fileData)
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](
+            Result result, const nx::vms::api::StoredFileData& fileData) mutable
         {
             handler(requestId, std::move(result), fileData.data);
         });
@@ -83,12 +83,14 @@ int QnStoredFileManager<QueryProcessorType>::addStoredFile(
     params.path = fileName;
     params.data = fileData;
 
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::addStoredFile,
         params,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -98,12 +100,14 @@ int QnStoredFileManager<QueryProcessorType>::deleteStoredFile(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeStoredFile,
         nx::vms::api::StoredFilePath(fileName),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -114,12 +118,12 @@ int QnStoredFileManager<QueryProcessorType>::listDirectory(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     using namespace nx::vms::api;
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<StoredFilePath, StoredFilePathList>(
         ApiCommand::listDirectory,
         nx::vms::api::StoredFilePath(directoryName),
-        [requestId, handler](Result result, const nx::vms::api::StoredFilePathList& folderContents)
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](
+            Result result, const nx::vms::api::StoredFilePathList& folderContents) mutable
         {
             QStringList outputFolderContents;
             std::transform(

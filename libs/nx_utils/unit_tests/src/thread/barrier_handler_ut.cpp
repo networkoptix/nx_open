@@ -11,9 +11,9 @@ namespace test {
 TEST( BarrierHandler, Normal )
 {
     int x = 0;
-    std::function< void() > h1, h2;
+    MoveOnlyFunc<void()> h1, h2;
     {
-        BarrierHandler b( [ & ](){ x = 5; } );
+        BarrierHandler b([&]() { x = 5; });
         h1 = b.fork();
         h2 = b.fork();
     }

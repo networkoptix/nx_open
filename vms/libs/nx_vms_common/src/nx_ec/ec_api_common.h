@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <functional>
-
 #include <QtCore/QString>
+
+#include <nx/utils/move_only_func.h>
 
 namespace ec2 {
 
@@ -62,6 +62,6 @@ enum class NotificationSource
 NX_VMS_COMMON_API QString toString(NotificationSource source);
 
 template <typename... Args>
-using Handler = std::function<void(int reqId, Result, const Args&...)>;
+using Handler = nx::utils::MoveOnlyFunc<void(int reqId, Result, Args&&...)>;
 
 } // namespace ec2
