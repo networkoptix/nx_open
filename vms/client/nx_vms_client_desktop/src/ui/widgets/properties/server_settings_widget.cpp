@@ -217,11 +217,8 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
 {
     ui->setupUi(this);
 
-    ui->alertBar->label()->setContextMenuPolicy(Qt::ContextMenuPolicy::NoContextMenu);
-    ui->alertBar->setOpenExternalLinks(false);
-    ui->alertBar->setRetainSpaceWhenNotDisplayed(false);
-    ui->alertBar->setVisible(false);
-    connect(ui->alertBar, &MessageBar::linkActivated,
+    ui->alertBar->init({.level = BarDescription::BarLevel::Error, .isOpenExternalLinks = false});
+    connect(ui->alertBar, &CommonMessageBar::linkActivated,
         this, &QnServerSettingsWidget::showServerCertificate);
 
     setWarningStyle(ui->failoverWarningLabel);
