@@ -290,14 +290,17 @@ void NotificationListModel::Private::updateCloudItems(const QString& systemId)
 
 void NotificationListModel::Private::removeCloudItems(const QString& systemId)
 {
-    for (auto it = m_itemsByCloudSystem.find(systemId);
-        it != m_itemsByCloudSystem.end() && it.key() == systemId;
-        ++it)
+    const auto eventIds = m_itemsByCloudSystem.values(systemId);
+    int removedCount = 0;
+
+    for (const auto id: eventIds)
     {
-        q->removeEvent(it.value());
+        if (q->removeEvent(id))
+            ++removedCount;
     }
 
-    NX_ASSERT(!m_itemsByCloudSystem.contains(systemId));
+    NX_ASSERT(!m_itemsByCloudSystem.contains(systemId),
+        "System: %1, events: %2, removed %3", systemId, eventIds.size(), removedCount);
 }
 
 void NotificationListModel::Private::onRowsAboutToBeRemoved(
@@ -786,7 +789,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     static const QColor kBasicColor = "#A5B7C0";
     static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
         {QnIcon::Normal, {{kBasicColor, "light10"}}},
-    }; 
+    };
     eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge_24.svg", kIconSubstitutions));
     eventData.extraAction->setText(tr("Acknowledge"));
 
