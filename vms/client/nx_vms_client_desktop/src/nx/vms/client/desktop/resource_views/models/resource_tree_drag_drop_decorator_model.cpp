@@ -15,7 +15,6 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
-#include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -76,14 +75,12 @@ namespace nx::vms::client::desktop {
 ResourceTreeDragDropDecoratorModel::ResourceTreeDragDropDecoratorModel(
     QnResourcePool* resourcePool,
     ui::action::Manager* actionManager,
-    ui::workbench::ActionHandler* actionHandler,
-    ResourceTreeSettings* resourceTreeSettings)
+    ui::workbench::ActionHandler* actionHandler)
     :
     base_type(nullptr),
     m_resourcePool(resourcePool),
     m_actionManager(actionManager),
-    m_actionHandler(actionHandler),
-    m_resourceTreeSettings(resourceTreeSettings)
+    m_actionHandler(actionHandler)
 {
     NX_ASSERT(resourcePool && actionManager);
 }
@@ -235,6 +232,13 @@ bool ResourceTreeDragDropDecoratorModel::canDropMimeData(const QMimeData* mimeDa
     if (!targetIndex.isValid())
         return false;
 
+    if (ini().webPagesAndIntegrations
+        && (hasNodeType(targetIndex, NodeType::webPages)
+            || hasNodeType(targetIndex, NodeType::integrations)))
+    {
+        return false;
+    }
+
     // Don't allow to drop camera items from layouts to the main devices tree.
     if ((hasResourceFlags(targetIndex, Qn::server) && !hasResourceFlags(targetIndex, Qn::fake))
         || hasNodeType(targetIndex, NodeType::camerasAndDevices)
@@ -281,8 +285,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         return true;
     }
 
-    else if (hasNodeType(index, NodeType::webPages)
-        && (!ini().webPagesAndIntegrations || isWebPageDragDropEnabled()))
+    else if (hasNodeType(index, NodeType::webPages) && !ini().webPagesAndIntegrations)
     {
         // Setting empty parent ID for web pages forces them not to be proxied.
         const auto webPages = data.resources().filtered<QnWebPageResource>();
@@ -305,11 +308,8 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         QnResourceList sourceResources;
         std::copy(cameras.cbegin(), cameras.cend(), std::back_inserter(sourceResources));
 
-        if (!ini().webPagesAndIntegrations || isWebPageDragDropEnabled())
-        {
-            const auto webPages = data.resources().filtered<QnWebPageResource>();
-            std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
-        }
+        const auto webPages = data.resources().filtered<QnWebPageResource>();
+        std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
 
         if (sourceResources.empty())
             return true;
@@ -332,47 +332,18 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
 
     if (hasNodeType(index, NodeType::customResourceGroup))
     {
-        const auto dropGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
         const auto cameras = data.resources().filtered<QnVirtualCameraResource>();
+        const auto webPages = data.resources().filtered<QnWebPageResource>();
 
         // Parent server as displayed, i.e it will be null if server nodes aren't displayed in the
         // resource tree.
-        const auto dropParentServer = parentServer(index);
-        const auto dropServerId = dropParentServer ? parentServer(index)->getId() : QnUuid();
-
-        QnResourceList sourceResources;
-        std::copy(cameras.cbegin(), cameras.cend(), std::back_inserter(sourceResources));
-
-        if (!ini().webPagesAndIntegrations || isWebPageDragDropEnabled())
-        {
-            const auto webPages = data.resources().filtered<QnWebPageResource>();
-            std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
-        }
-
-        if (sourceResources.empty())
-            return true;
-
         const auto dragGroupId =
             data.arguments().value(Qn::ResourceTreeCustomGroupIdRole).toString();
 
-        const auto moveResourcesToGroup =
-            [this, dragGroupId, dropGroupId](QnResourceList moved)
-            {
-                moveCustomGroup(moved, dragGroupId, dropGroupId);
-            };
+        const auto dropParentServer = parentServer(index);
+        const auto dropGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
 
-        if (!dropParentServer.isNull() && sourceResources.first()->getParentId() != dropServerId)
-        {
-            m_actionHandler->moveResourcesToServer(
-                sourceResources,
-                dropParentServer,
-                moveResourcesToGroup);
-        }
-        else
-        {
-            moveResourcesToGroup(sourceResources);
-        }
-
+        moveResources(cameras, webPages, dragGroupId, dropGroupId, dropParentServer);
         return true;
     }
 
@@ -400,49 +371,20 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
     {
         const auto server = index.data(Qn::ResourceRole).value<QnResourcePtr>()
             .dynamicCast<QnMediaServerResource>();
+
         if (!NX_ASSERT(!server.isNull()))
             return false;
 
-        const auto serverId = server->getId();
-
         const auto cameras = data.resources().filtered<QnVirtualCameraResource>();
-
-        QnResourceList sourceResources;
-        std::copy(cameras.begin(), cameras.end(), std::back_inserter(sourceResources));
-
-        if (!ini().webPagesAndIntegrations || isWebPageDragDropEnabled())
-        {
-            // Setting parent server ID for web pages forces them to be proxied through that
-            // server.
-            const auto webPages = data.resources().filtered<QnWebPageResource>();
-            std::copy(webPages.begin(), webPages.end(), std::back_inserter(sourceResources));
-        }
-
-        if (sourceResources.empty())
-            return true;
+        const auto webPages = data.resources().filtered<QnWebPageResource>();
 
         const auto dragGroupId =
             data.arguments().value(Qn::ResourceTreeCustomGroupIdRole).toString();
 
         const auto dropGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
 
-        const auto moveResourcesToGroup =
-            [this, dragGroupId, dropGroupId](QnResourceList moved)
-            {
-                moveCustomGroup(moved, dragGroupId, dropGroupId);
-            };
-
-        if (sourceResources.first()->getParentId() != serverId)
-        {
-            m_actionHandler->moveResourcesToServer(
-                sourceResources,
-                server,
-                moveResourcesToGroup);
-        }
-        else
-        {
-            moveResourcesToGroup(sourceResources);
-        }
+        moveResources(cameras, webPages, dragGroupId, dropGroupId, server);
+        return true;
     }
 
     return true;
@@ -475,17 +417,68 @@ void ResourceTreeDragDropDecoratorModel::moveCustomGroup(
     }
 }
 
+void ResourceTreeDragDropDecoratorModel::moveResources(
+    const QnResourceList& cameras,
+    const QnResourceList& webPages,
+    const QString& dragGroupId,
+    const QString& dropGroupId,
+    const QnMediaServerResourcePtr& dropParentServer)
+{
+    const auto moveResourcesToGroup =
+        [=](QnResourceList moved)
+        {
+            moveCustomGroup(moved, dragGroupId, dropGroupId);
+        };
+
+    if (ini().webPagesAndIntegrations)
+    {
+        if (!cameras.empty())
+        {
+            if(!dropParentServer.isNull()
+                && cameras.first()->getParentId() != dropParentServer->getId())
+            {
+                m_actionHandler->moveResourcesToServer(
+                    cameras,
+                    dropParentServer,
+                    moveResourcesToGroup);
+            }
+            else
+            {
+                moveResourcesToGroup(cameras);
+            }
+        }
+
+        // Web pages can only be moved within a server.
+        if (!webPages.empty() && webPages.first()->getParentId() == dropParentServer->getId())
+            moveResourcesToGroup(webPages);
+    }
+    else
+    {
+        QnResourceList sourceResources;
+        std::copy(cameras.cbegin(), cameras.cend(), std::back_inserter(sourceResources));
+        std::copy(webPages.cbegin(), webPages.cend(), std::back_inserter(sourceResources));
+
+        if (sourceResources.empty())
+            return;
+
+        if (!dropParentServer.isNull()
+            && sourceResources.first()->getParentId() != dropParentServer->getId())
+        {
+            m_actionHandler->moveResourcesToServer(
+                sourceResources,
+                dropParentServer,
+                moveResourcesToGroup);
+        }
+        else
+        {
+            moveResourcesToGroup(sourceResources);
+        }
+    }
+}
+
 Qt::DropActions ResourceTreeDragDropDecoratorModel::supportedDropActions() const
 {
     return Qt::CopyAction | Qt::MoveAction;
-}
-
-bool ResourceTreeDragDropDecoratorModel::isWebPageDragDropEnabled() const
-{
-    if (!NX_ASSERT(m_resourceTreeSettings))
-        return false;
-
-    return m_resourceTreeSettings->showProxiedResourcesInServerTree();
 }
 
 QModelIndex ResourceTreeDragDropDecoratorModel::targetDropIndex(const QModelIndex& dropIndex) const
