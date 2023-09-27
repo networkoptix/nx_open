@@ -27,9 +27,6 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="alertBar" native="true"/>
-   </item>
-   <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10000,1,100">
       <property name="leftMargin">
@@ -234,6 +231,9 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="alertBar" native="true"/>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -249,9 +249,9 @@
    <header location="global">nx/vms/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::AlertBar</class>
+   <class>nx::vms::client::desktop::CommonMessageBar</class>
    <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
