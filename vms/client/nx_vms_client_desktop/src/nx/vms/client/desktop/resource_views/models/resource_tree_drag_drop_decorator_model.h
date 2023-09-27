@@ -3,19 +3,14 @@
 #pragma once
 
 #include <QtCore/QIdentityProxyModel>
-#include <QtCore/QPointer>
 
+#include <core/resource/resource_fwd.h>
 #include <core/resource/shared_resource_pointer_list.h>
-
-class QnResourcePool;
-class QnResource;
 
 namespace nx::vms::client::desktop {
 
 namespace ui::action { class Manager; }
 namespace ui::workbench { class ActionHandler; }
-
-class ResourceTreeSettings;
 
 /**
  * Decorator model which implements Resource Tree drag & drop behavior. Logic has been extracted
@@ -33,8 +28,7 @@ public:
     ResourceTreeDragDropDecoratorModel(
         QnResourcePool* resourcePool,
         ui::action::Manager* actionManager,
-        ui::workbench::ActionHandler* actionHandler,
-        ResourceTreeSettings* resourceTreeSettings);
+        ui::workbench::ActionHandler* actionHandler);
 
     virtual ~ResourceTreeDragDropDecoratorModel() override;
 
@@ -49,8 +43,6 @@ public:
 
     virtual Qt::DropActions supportedDropActions() const override;
 
-    bool isWebPageDragDropEnabled() const;
-
 private:
     QModelIndex targetDropIndex(const QModelIndex& dropIndex) const;
 
@@ -59,6 +51,13 @@ private:
         const QString& dragGroupId,
         const QString& dropGroupId);
 
+    void moveResources(
+        const QnResourceList& cameras,
+        const QnResourceList& webPages,
+        const QString& dragGroupId,
+        const QString& dropGroupId,
+        const QnMediaServerResourcePtr& dropParentServer);
+
     QnResourcePool* resourcePool() const;
     ui::action::Manager* actionManager() const;
 
@@ -66,7 +65,6 @@ private:
     QnResourcePool* m_resourcePool = nullptr;
     ui::action::Manager* m_actionManager = nullptr;
     ui::workbench::ActionHandler* m_actionHandler = nullptr;
-    QPointer<ResourceTreeSettings> m_resourceTreeSettings;
 };
 
 } // namespace nx::vms::client::desktop
