@@ -1770,12 +1770,32 @@ struct RemoveUserRoleAccess
         const Qn::UserAccessData& accessData,
         const nx::vms::api::IdData& param)
     {
+        if (!NX_ASSERT(systemContext))
+            return {};
+
         if (auto r = PowerUserAccess()(systemContext, accessData, param); !r)
         {
             r.message = ServerApiErrors::tr(
-                "Removing Role is forbidden because the user has no admin access.");
+                "Removing User Group is forbidden because the user has no power user access.");
             return r;
         }
+
+        if (const auto group = systemContext->userGroupManager()->find(param.id))
+        {
+            // Current group will not be removed from `parentIds` or `parentGroupIds` leaving
+            // existing Users or User Groups with garbage ids of non-existing parents.
+            // This is acceptable for LDAP groups because continuous sync is supposed to fix
+            // such errors on the fly.
+            if (group->type == nx::vms::api::UserType::ldap)
+                return {};
+        }
+        else
+        {
+            return {ErrorCode::notFound, nx::format(
+                ServerApiErrors::tr("User Group '%1' does not exist."), param.id.toString())};
+        }
+
+
 
         const auto memberIds = systemContext->accessSubjectHierarchy()->directMembers(param.id);
         for (const auto& id: memberIds)

@@ -32,6 +32,7 @@ enum class ErrorCode
     notImplemented,
 
     badRequest,
+    notFound,
 };
 
 NX_VMS_COMMON_API QString toString(ErrorCode errorCode);
