@@ -6,6 +6,8 @@ import QtQuick.Controls
 import Nx
 import Nx.Core
 
+import nx.client.desktop
+
 AbstractButton
 {
     id: button
@@ -64,6 +66,15 @@ AbstractButton
 
             x: buttonIcon.width + content.spacing
             width: content.width - x
+        }
+
+        FocusFrame
+        {
+            anchors.fill: buttonText
+            anchors.margins: 0
+            visible: button.visualFocus
+            color: ColorTheme.highlight
+            opacity: 0.5
         }
     }
 }
