@@ -25,7 +25,7 @@ void StreamProxy::pleaseStop(
     nx::utils::BarrierHandler barrierHandler(std::move(completionHandler));
 
     m_sourceAcceptor->pleaseStop(
-        [this, barrierHandler = barrierHandler.fork()]()
+        [this, barrierHandler = barrierHandler.fork()]() mutable
         {
             m_timer.pleaseStopSync();
             stopProxyChannels(std::move(barrierHandler));
@@ -144,7 +144,7 @@ void StreamProxy::removeProxyChannel(
 }
 
 void StreamProxy::stopProxyChannels(
-    std::function<void()> completionHandler)
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     nx::utils::BarrierHandler barrierHandler(std::move(completionHandler));
 

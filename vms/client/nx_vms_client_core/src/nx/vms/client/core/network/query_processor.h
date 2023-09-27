@@ -51,7 +51,7 @@ public:
 
     nx::network::ssl::AdapterFunc adapterFunc(const QnUuid& serverId) const;
 
-    using PostRequestHandler = std::function<void(ec2::ErrorCode)>;
+    using PostRequestHandler = nx::utils::MoveOnlyFunc<void(ec2::ErrorCode)>;
 
     /**
      * Send POST request.
@@ -98,8 +98,10 @@ public:
         ec2::toUrlParams(input, &query);
 
         auto internalHandler =
-            [handler]
-                (ec2::ErrorCode errorCode, Qn::SerializationFormat format, const nx::Buffer& data)
+            [handler = std::move(handler)](
+                ec2::ErrorCode errorCode,
+                Qn::SerializationFormat format,
+                const nx::Buffer& data) mutable
             {
                 if (errorCode != ec2::ErrorCode::ok)
                 {
@@ -130,7 +132,7 @@ public:
                 }
         };
 
-        sendGetRequest(cmdCode, std::move(query), internalHandler);
+        sendGetRequest(cmdCode, std::move(query), std::move(internalHandler));
     }
 
 private:
@@ -139,7 +141,7 @@ private:
     void sendGetRequest(
         ec2::ApiCommand::Value cmdCode,
         QUrlQuery query,
-        std::function<void(ec2::ErrorCode, Qn::SerializationFormat, const nx::Buffer&)> handler);
+        nx::utils::MoveOnlyFunc<void(ec2::ErrorCode, Qn::SerializationFormat, const nx::Buffer&)> handler);
 
     void sendPostRequest(
         ec2::ApiCommand::Value cmdCode,

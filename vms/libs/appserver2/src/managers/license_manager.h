@@ -57,12 +57,12 @@ int QnLicenseManager<T>::getLicenses(
     Handler<QnLicenseList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<std::nullptr_t, nx::vms::api::LicenseDataList>(
         ApiCommand::getLicenses,
         nullptr,
-        [requestId, handler](Result result, const nx::vms::api::LicenseDataList& licenses)
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](
+            Result result, const nx::vms::api::LicenseDataList& licenses) mutable
         {
             QnLicenseList outData;
             if (result)
@@ -82,12 +82,14 @@ int QnLicenseManager<T>::addLicenses(
     nx::vms::api::LicenseDataList params;
     fromResourceListToApi(licenses, params);
 
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::addLicenses,
         params,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -100,11 +102,14 @@ int QnLicenseManager<T>::removeLicense(
     nx::vms::api::LicenseData params;
     fromResourceToApi(license, params);
 
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
-        ApiCommand::removeLicense, params,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        ApiCommand::removeLicense,
+        params,
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 

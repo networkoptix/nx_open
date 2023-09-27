@@ -9,6 +9,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/string.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
 namespace ec2 { enum class ErrorCode; }
@@ -48,7 +49,7 @@ public:
      */
     static void setDefaultTimeouts(nx::network::http::AsyncClient* request);
 
-    using RequestCallback = std::function<void(Response)>;
+    using RequestCallback = nx::utils::MoveOnlyFunc<void(Response)>;
 
     /**
      * Send request of the provided type to the following url. Callback will be delivered using Qt

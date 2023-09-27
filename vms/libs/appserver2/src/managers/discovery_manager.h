@@ -71,12 +71,14 @@ int QnDiscoveryManager<QueryProcessorType>::discoverPeer(
     params.id = id;
     params.url = url.toString();
 
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::discoverPeer,
         params,
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -89,12 +91,14 @@ int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     NX_ASSERT(!url.host().isEmpty());
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::addDiscoveryInformation,
         toApiDiscoveryData(id, url, ignore),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -106,12 +110,14 @@ int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::removeDiscoveryInformation,
         toApiDiscoveryData(id, url, ignore),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 
@@ -120,12 +126,14 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(
     Handler<nx::vms::api::DiscoveryDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    handler = handlerExecutor.bind(std::move(handler));
     const int requestId = generateRequestID();
     processor().template processQueryAsync<QnUuid, nx::vms::api::DiscoveryDataList>(
         ApiCommand::getDiscoveryData,
         QnUuid(),
-        [requestId, handler](auto&&... args) { handler(requestId, std::move(args)...); });
+        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
+        {
+            handler(requestId, std::move(args)...);
+        });
     return requestId;
 }
 

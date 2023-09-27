@@ -142,7 +142,7 @@ Qn::SerializationFormat QueryProcessor::serializationFormat() const
 void QueryProcessor::sendGetRequest(
     ec2::ApiCommand::Value cmdCode,
     QUrlQuery query,
-    std::function<void(ec2::ErrorCode, Qn::SerializationFormat, const nx::Buffer&)> handler)
+    nx::utils::MoveOnlyFunc<void(ec2::ErrorCode, Qn::SerializationFormat, const nx::Buffer&)> handler)
 {
     auto httpClient = d->makeHttpClient();
 
@@ -152,7 +152,7 @@ void QueryProcessor::sendGetRequest(
     requestUrl.setQuery(query);
 
     d->networkManager->doGet(std::move(httpClient), requestUrl, this,
-        [handler](NetworkManager::Response response)
+        [handler = std::move(handler)](NetworkManager::Response response)
         {
             handler(
                 response.errorCode,
@@ -165,7 +165,7 @@ void QueryProcessor::sendGetRequest(
 void QueryProcessor::sendPostRequest(
     ec2::ApiCommand::Value cmdCode,
     QByteArray serializedData,
-    std::function<void(ec2::ErrorCode)> handler)
+    nx::utils::MoveOnlyFunc<void(ec2::ErrorCode)> handler)
 {
     auto httpClient = d->makeHttpClient();
 
@@ -178,7 +178,10 @@ void QueryProcessor::sendPostRequest(
         std::move(httpClient),
         d->makeUrl(cmdCode),
         this,
-        [handler](NetworkManager::Response response) { handler(response.errorCode); },
+        [handler = std::move(handler)](NetworkManager::Response response) mutable
+        {
+            handler(response.errorCode);
+        },
         Qt::DirectConnection);
 }
 
