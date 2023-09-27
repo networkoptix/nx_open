@@ -1079,7 +1079,7 @@
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>Användarmanual...</translation>
     </message>
   </context>
   <context>
@@ -8186,7 +8186,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Recording will not be enabled on some cameras.</source>
-      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
+      <translation>Inspelning kommer inte att aktiveras på vissa kameror.</translation>
     </message>
   </context>
   <context>

@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Ogiltigt JSON-innehåll.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Innehållstyp stöds inte.</translation>
     </message>
   </context>
   <context>
@@ -75,11 +75,11 @@
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Ärendenyckeln är ogiltig eller har gått ut.</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Fel lösenord</translation>
     </message>
   </context>
   <context>
@@ -204,27 +204,27 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</translation>
+      <translation>Medlemmar i denna grupp har obegränsade systembehörigheter. Administratörer kan skapa och ändra avancerade användare och slå samman system och länka eller ta bort länken till %1 konton.</translation>
     </message>
     <message>
       <source>Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Medlemmar i den här gruppen har kontroll över det mesta av systemkonfigurationen, men får inte ändra några administratörsinställningar, ta bort eller ändra sina egna grupper och behörigheter och kan inte skapa eller redigera andra avancerade användare.</translation>
     </message>
     <message>
       <source>Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
+      <translation>Medlemmar i den här gruppen kan se och köra PTZ-positioner och PTZ-turer, använda 2-vägsljud, använda I/O-modulens knappar, skapa och redigera bokmärken och se händelseloggen.</translation>
     </message>
     <message>
       <source>Members of this group can view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can view and export archive and Bookmarks.</translation>
+      <translation>Medlemmar i den här gruppen kan visa och exportera arkiv och bokmärken.</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>Medlemmar i den här gruppen kan se livevideor, I/O-moduler och webbsidor.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information.</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information.</translation>
+      <translation>Medlemmar i denna grupp kan se information om systemhälsoövervakning.</translation>
     </message>
   </context>
   <context>
@@ -841,25 +841,25 @@
     </message>
     <message>
       <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <translation>Lokal inspelning</translation>
     </message>
     <message>
       <source>Local Recording service</source>
-      <translation type="unfinished">Local Recording service</translation>
+      <translation>Lokal inspelningstjänst</translation>
     </message>
     <message numerus="yes">
       <source>%n Local Recording Services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local Recording Services</numerusform>
-        <numerusform>%n Local Recording Services</numerusform>
+      <translation>
+        <numerusform>%n Lokala inspelningstjänster</numerusform>
+        <numerusform>%n Lokala inspelningstjänster</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local Recording Services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local Recording Services</numerusform>
-        <numerusform>%n/%1 Local Recording Services</numerusform>
+      <translation>
+        <numerusform>%n/%1 Lokala inspelningstjänster</numerusform>
+        <numerusform>%n/%1 Lokala inspelningstjänster</numerusform>
       </translation>
     </message>
   </context>
@@ -1128,105 +1128,105 @@
     <message>
       <source>Msec</source>
       <comment>Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>Msek</translation>
     </message>
     <message>
       <source>Sec</source>
       <comment>Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>Sek</translation>
     </message>
     <message>
       <source>Min</source>
       <comment>Capitalized long suffix for displaying minutes</comment>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
     <message>
       <source>Hrs</source>
       <comment>Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>Timmar</translation>
     </message>
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Dagar</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>Veckor</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>Månader</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>År</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
+      <translation>
+        <numerusform>Millisekunder</numerusform>
+        <numerusform>Millisekunder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
+      <translation>
+        <numerusform>Sekunder</numerusform>
+        <numerusform>Sekunder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
+      <translation>
+        <numerusform>Minuter</numerusform>
+        <numerusform>Minuter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>Timmar</numerusform>
+        <numerusform>Timmar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>Dagar</numerusform>
+        <numerusform>Dagar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
+      <translation>
+        <numerusform>Veckor</numerusform>
+        <numerusform>Veckor</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>Månader</numerusform>
+        <numerusform>Månader</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
+      <translation>
+        <numerusform>År</numerusform>
+        <numerusform>År</numerusform>
       </translation>
     </message>
   </context>
@@ -1329,46 +1329,46 @@
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>Lokal inspelning</translation>
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integration</translation>
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation type="unfinished">Cloud storage</translation>
+      <translation>Molnlagring</translation>
     </message>
   </context>
   <context>
     <name>StringsHelper</name>
     <message>
       <source>SaaS uninitialized</source>
-      <translation type="unfinished">SaaS uninitialized</translation>
+      <translation>SaaS oinitierad</translation>
     </message>
     <message>
       <source>SaaS active</source>
-      <translation type="unfinished">SaaS active</translation>
+      <translation>SaaS aktiv</translation>
     </message>
     <message>
       <source>SaaS suspended</source>
-      <translation type="unfinished">SaaS suspended</translation>
+      <translation>SaaS avstängt</translation>
     </message>
     <message>
       <source>SaaS shut down</source>
-      <translation type="unfinished">SaaS shut down</translation>
+      <translation>SaaS stängs av</translation>
     </message>
     <message>
       <source>SaaS shut down automatically</source>
-      <translation type="unfinished">SaaS shut down automatically</translation>
+      <translation>SaaS stängs av automatiskt</translation>
     </message>
     <message>
       <source>Contact your channel partner for details.</source>
-      <translation type="unfinished">Contact your channel partner for details.</translation>
+      <translation>Kontakta din kanalpartner för mer information.</translation>
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>Kontrollera internetanslutningen mellan VMS och licensserver.</translation>
     </message>
   </context>
   <context>
@@ -1796,11 +1796,11 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
-      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+      <translation>Tillåt Power User redigering av säkerhetsinställningar</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure)</translation>
+      <translation>Aktivera föråldrade API-funktioner (osäkra)</translation>
     </message>
   </context>
   <context>
@@ -2527,34 +2527,34 @@
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
+      <translation>LDAP-synkroniseringsproblem</translation>
     </message>
     <message>
       <source>Failed to connect to LDAP</source>
-      <translation type="unfinished">Failed to connect to LDAP</translation>
+      <translation>Det gick inte att ansluta till LDAP</translation>
     </message>
     <message>
       <source>Failed to complete sync within a %1 timeout</source>
-      <translation type="unfinished">Failed to complete sync within a %1 timeout</translation>
+      <translation>Det gick inte att slutföra synkroniseringen inom en timeout på %1</translation>
     </message>
     <message>
       <source>Failed to complete sync within a given timeout</source>
-      <translation type="unfinished">Failed to complete sync within a given timeout</translation>
+      <translation>Det gick inte att slutföra synkroniseringen inom en given timeout</translation>
     </message>
     <message>
       <source>There are zero LDAP users in VMS after sync</source>
-      <translation type="unfinished">There are zero LDAP users in VMS after sync</translation>
+      <translation>Det finns noll LDAP-användare i VMS efter synkronisering</translation>
     </message>
     <message>
       <source>Some LDAP users were not found in LDAP</source>
-      <translation type="unfinished">Some LDAP users were not found in LDAP</translation>
+      <translation>Vissa LDAP-användare hittades inte i LDAP</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n gånger)</numerusform>
+        <numerusform>%1 (%n gånger)</numerusform>
       </translation>
     </message>
   </context>

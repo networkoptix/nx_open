@@ -36,7 +36,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Eventos del Sistema</translation>
     </message>
   </context>
   <context>
@@ -1325,9 +1325,9 @@
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
-        <numerusform>Delete %n groups?</numerusform>
+      <translation>
+        <numerusform>¿Eliminar %n grupos?</numerusform>
+        <numerusform>¿Eliminar %n grupos?</numerusform>
       </translation>
     </message>
   </context>
@@ -1678,11 +1678,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>El nombre de usuario no puede estar vacío</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>El campo de Contraseña no puede estar vacío</translation>
     </message>
   </context>
   <context>
@@ -1732,39 +1732,39 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols</source>
-      <translation type="unfinished">Password should contain different types of symbols</translation>
+      <translation>La contraseña debe tener diferentes tipos de símbolos</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>La contraseña debe tener al menos %n caracteres de longitud</numerusform>
+        <numerusform>La contraseña debe tener al menos %n caracteres de longitud</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
+      <translation>
+        <numerusform>La contraseña no debe tener más de %n caracteres</numerusform>
+        <numerusform>La contraseña no debe tener más de %n caracteres</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>La contraseña no debe contener %n o más caracteres consecutivos juntos</numerusform>
+        <numerusform>La contraseña no debe contener %n o más caracteres consecutivos juntos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>La contraseña no debe contener %n o más caracteres repetitivos</numerusform>
+        <numerusform>La contraseña no debe contener %n o más caracteres repetitivos</numerusform>
       </translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
-      <translation type="unfinished">This password is in list of the most popular passwords</translation>
+      <translation>Esta contraseña está en la lista de las contraseñas más populares</translation>
     </message>
   </context>
   <context>
@@ -1995,7 +1995,7 @@ License Key: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
-      <translation type="unfinished">%1. To attach to Video Wall, SaaS must be in active state. %2</translation>
+      <translation>%1. Para adjuntar a la pared de vídeo, SaaS debe estar en estado activo. %2</translation>
     </message>
   </context>
   <context>
@@ -2367,7 +2367,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>Año</translation>
     </message>
   </context>
   <context>
@@ -2914,7 +2914,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Las contraseñas no coinciden</translation>
     </message>
   </context>
   <context>
@@ -2940,11 +2940,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Las contraseñas no coinciden</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>Para modificar su contraseña, ingrese la existente</translation>
     </message>
     <message>
       <source>Invalid current password</source>
@@ -11258,7 +11258,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Some features may not be available.</source>
-      <translation type="unfinished">Some features may not be available.</translation>
+      <translation>Algunas funcionalidades podrían no estar disponibles</translation>
     </message>
   </context>
   <context>
