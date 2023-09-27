@@ -380,19 +380,13 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
         return;
 
     std::optional<QnUuid> proxyServerId;
-    if (!q->currentServer()->hasInternetAccess())
+    const auto serverUrl = nx::utils::Url::fromUserInput(ui->serverAddressInput->text().trimmed());
+
+    if (!network::HostAddress(serverUrl.host()).isLoopback()
+        && !q->currentServer()->hasInternetAccess())
     {
         if (auto serverWithInternetAccess = q->resourcePool()->serverWithInternetAccess())
-        {
             proxyServerId = serverWithInternetAccess->getId();
-        }
-        else
-        {
-            setConfigurationStatus(Error);
-            setConfigurationStatusHint(tr("Unable to test email settings due to no internet"
-                " connection on any of the active servers"));
-            return;
-        }
     }
 
     const bool testRemoteSettings = !smtpSettingsPasswordChanged() && !smtpSettingsChanged();
@@ -400,7 +394,7 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
     using EmailSettingsTestResult = rest::RestResultWithData<QnTestEmailSettingsReply>;
     auto callback = nx::utils::guarded(q,
         [this, testRemoteSettings]
-        (bool success, int handle, const EmailSettingsTestResult& result)
+        (bool success, int /*handle*/, const EmailSettingsTestResult& result)
         {
             ui->stackedWidget->setCurrentWidget(ui->statusPage);
             m_testSmtpConfigurationButton->setEnabled(true);
