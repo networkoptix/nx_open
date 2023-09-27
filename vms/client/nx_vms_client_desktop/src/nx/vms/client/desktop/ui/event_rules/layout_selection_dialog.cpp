@@ -1,28 +1,27 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "layout_selection_dialog.h"
-#include "private/subject_selection_dialog_p.h"
 #include "ui_layout_selection_dialog.h"
 
-#include <QtGui/QStandardItemModel>
 #include <QItemDelegate>
 #include <QStylePainter>
 
+#include <QtGui/QStandardItemModel>
+
 #include <common/common_module.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <ui/common/indents.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/utils/item_view_utils.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <ui/common/indents.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <nx/utils/string.h>
 
-
-#include <core/resource/layout_resource.h>
-#include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/client/desktop/common/utils/item_view_utils.h>
+#include "private/subject_selection_dialog_p.h"
 
 namespace nx::vms::client::desktop {
 
@@ -48,6 +47,8 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     m_singlePick(singlePick)
 {
     ui->setupUi(this);
+
+    ui->alertBar->init({.level=BarDescription::BarLevel::Error});
     ui->additionalInfoLabel->setHidden(true);
 
     ui->localTreeView->setIgnoreWheelEvents(true);
