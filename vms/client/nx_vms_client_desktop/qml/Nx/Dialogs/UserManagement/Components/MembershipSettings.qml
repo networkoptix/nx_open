@@ -127,6 +127,7 @@ Item
 
             delegate: SelectableGroupItem
             {
+                view: ListView.view
                 width: parent ? parent.width : 0
                 text: model.text
                 description: model.description

@@ -17,6 +17,7 @@ Rectangle
     property string description: ""
 
     property bool cycle: false
+    property var view: null
 
     readonly property bool selected: groupMouseArea.containsMouse || groupCheckbox.checked
 
@@ -44,6 +45,8 @@ Rectangle
 
         enabled: control.enabledProperty ? model[control.enabledProperty] : true
         checked: model[control.editableProperty]
+
+        onCheckedChanged: model[control.editableProperty] = checked
 
         middleItem: IconImage
         {
@@ -83,6 +86,12 @@ Rectangle
             const description = NxGlobals.toHtmlEscaped(checkableItem.description)
             return `${result}<font color="${checkableItem.descriptionColor}">`
                 + ` - ${description}</font>`
+        }
+
+        onVisualFocusChanged:
+        {
+            if (visualFocus && checkableItem.view)
+                checkableItem.view.positionViewAtIndex(index, ListView.Contain)
         }
     }
 
