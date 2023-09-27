@@ -104,6 +104,10 @@ void QnResourcePool::Private::removeUser(const QString& name, const QnUserResour
         return;
 
     it->second.remove(user);
+    NX_VERBOSE(
+        this, "%1: Successfully removed user %2, userByName size: %3",
+        __func__, name, it->second.count());
+
     if (it->second.empty())
         usersByName.erase(it);
 }
@@ -154,6 +158,11 @@ void QnResourcePool::Private::SameNameUsers::remove(const QnUserResourcePtr& use
 
     NX_VERBOSE(this, "Remove user: %1", user);
     selectMainUser();
+}
+
+int QnResourcePool::Private::SameNameUsers::count() const
+{
+    return m_byPriority.size();
 }
 
 void QnResourcePool::Private::SameNameUsers::selectMainUser()
