@@ -94,6 +94,9 @@ TextValidateFunction extendedPasswordValidator()
     return
         [](const QString& password)
         {
+            if (password.isEmpty())
+                return ValidationResult(QnValidatorStrings::tr("Password cannot be empty"));
+
             PasswordInformation info(password, nx::utils::passwordStrength);
             return info.acceptance() == nx::utils::PasswordAcceptance::Good
                 ? ValidationResult()
