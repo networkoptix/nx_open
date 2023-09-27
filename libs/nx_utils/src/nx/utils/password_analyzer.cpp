@@ -3,8 +3,6 @@
 #include "password_analyzer.h"
 #include "password_analyzer_p.h"
 
-#include <nx/utils/literal.h>
-
 #include <numeric>
 #include <string>
 #include <array>
@@ -85,21 +83,44 @@ QString toString(PasswordStrength strength)
 {
     switch (strength)
     {
-        case PasswordStrength::Good: return lit("good");
-        case PasswordStrength::Fair: return lit("fair");
-        case PasswordStrength::Common: return lit("common");
-        case PasswordStrength::Weak: return lit("weak");
-        case PasswordStrength::Short: return lit("short");
-        case PasswordStrength::Conseq: return lit("consecutive sequence of characters");
-        case PasswordStrength::Repeat: return lit("repeating characters");
-        case PasswordStrength::Long: return lit("too much characters");
-        case PasswordStrength::Incorrect: return lit("invalid characters");
-        case PasswordStrength::IncorrectCamera: return lit("invalid characters for camera");
-        case PasswordStrength::WeakAndFair: return lit("weak and still short");
-        case PasswordStrength::WeakAndGood: return lit("good but weak");
+        case PasswordStrength::Good:
+            return "good";
+
+        case PasswordStrength::Fair:
+            return "fair";
+
+        case PasswordStrength::Common:
+            return "common";
+
+        case PasswordStrength::Weak:
+            return "weak";
+
+        case PasswordStrength::Short:
+            return "short";
+
+        case PasswordStrength::Conseq:
+            return "consecutive sequence of characters";
+
+        case PasswordStrength::Repeat:
+            return "repeating characters";
+
+        case PasswordStrength::Long:
+            return "too much characters";
+
+        case PasswordStrength::Incorrect:
+            return "invalid characters";
+
+        case PasswordStrength::IncorrectCamera:
+            return "invalid characters for camera";
+
+        case PasswordStrength::WeakAndFair:
+            return "weak and still short";
+
+        case PasswordStrength::WeakAndGood:
+            return "good but weak";
     }
 
-    const auto result = lit("IncorrectEnumValue=%1").arg(static_cast<int>(strength));
+    const auto result = QString("IncorrectEnumValue=%1").arg(static_cast<int>(strength));
     NX_ASSERT(false, result);
     return result;
 }
