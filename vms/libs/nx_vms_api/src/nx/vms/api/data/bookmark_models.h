@@ -32,7 +32,10 @@ NX_REFLECTION_ENUM_CLASS(BookmarkSortField,
 struct NX_VMS_API BookmarkFilter
 {
     BookmarkFilter() {}
-    BookmarkFilter(QnUuid id): id(std::move(id)) {}
+    BookmarkFilter(QnUuid id, nx::vms::api::json::ValueOrArray<QString> deviceId = {}):
+        id(std::move(id)), deviceId(std::move(deviceId))
+    {
+    }
 
     std::optional<QnUuid> id;
 
