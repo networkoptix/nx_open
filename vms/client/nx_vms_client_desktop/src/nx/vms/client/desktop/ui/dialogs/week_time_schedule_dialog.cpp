@@ -41,6 +41,7 @@ WeekTimeScheduleDialog::WeekTimeScheduleDialog(QWidget* parent, bool isEmptyAllo
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &WeekTimeScheduleDialog::reject);
 
     ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    ui->alertBar->init({.level = BarDescription::BarLevel::Error});
 
     if (!isEmptyAllowed)
     {
