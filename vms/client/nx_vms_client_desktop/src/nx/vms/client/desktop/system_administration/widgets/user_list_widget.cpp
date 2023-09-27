@@ -122,7 +122,7 @@ public:
             if (icon.isNull())
                 return;
 
-            const auto horizontalAlignment = isUserIconColumn ? Qt::AlignCenter : Qt::AlignLeft;
+            const auto horizontalAlignment = isUserIconColumn ? Qt::AlignCenter : Qt::AlignRight;
             const qreal padding = isUserIconColumn ? 0 : style::Metrics::kStandardPadding;
 
             const auto rect = QStyle::alignedRect(Qt::LeftToRight,
