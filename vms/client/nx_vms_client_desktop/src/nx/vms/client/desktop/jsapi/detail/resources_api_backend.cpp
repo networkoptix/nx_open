@@ -51,7 +51,7 @@ ResourcesApiBackend::ResourcesApiBackend(QObject* parent):
             // Do not check availability since after removal we don't have any permission
             // for deleted resource.
             for (const auto& resource: resources)
-                emit removed(resource->getId());
+                emit removed(ResourceUniqueId::from(resource));
         };
 
     const auto pool = appContext()->unifiedResourcePool();
@@ -73,10 +73,15 @@ detail::Resource::List ResourcesApiBackend::resources() const
     return detail::Resource::from(resources);
 }
 
-detail::ResourceResult ResourcesApiBackend::resource(const QUuid& resourceId) const
+detail::ResourceResult ResourcesApiBackend::resource(const ResourceUniqueId& resourceId) const
 {
     const auto pool = appContext()->unifiedResourcePool();
-    const auto resource = pool->resource(resourceId);
+    const auto resource = pool->resource(
+        resourceId.id,
+        resourceId.systemId.isNull()
+            ? appContext()->currentSystemContext()->localSystemId()
+            : resourceId.systemId);
+
     if (isResourceAvailable(resource))
         return detail::ResourceResult{Error::success(), detail::Resource::from(resource)};
 

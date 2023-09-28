@@ -26,7 +26,7 @@ Resources::~Resources()
 {
 }
 
-bool Resources::hasMediaStream(const QUuid& resourceId) const
+bool Resources::hasMediaStream(const QString& resourceId) const
 {
     const auto result = d->resource(resourceId);
     return result.error.code == Globals::success && detail::hasMediaStream(result.resource.type);
@@ -37,7 +37,7 @@ QJsonArray Resources::resources() const
     return detail::toJsonArray(d->resources());
 }
 
-QJsonObject Resources::resource(const QUuid& resourceId) const
+QJsonObject Resources::resource(const QString& resourceId) const
 {
     return detail::toJsonObject(d->resource(resourceId));
 }

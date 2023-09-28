@@ -33,14 +33,10 @@ public:
     Q_INVOKABLE QJsonObject item(const QUuid& itemId) const;
 
     /** Add an item with the specified resource id and parameters to the owning layout. */
-    Q_INVOKABLE QJsonObject addItem(
-        const QUuid& resourceId,
-        const QJsonObject& params);
+    Q_INVOKABLE QJsonObject addItem(const QString& resourceId, const QJsonObject& params);
 
     /** Set specified parameters for the item. */
-    Q_INVOKABLE QJsonObject setItemParams(
-        const QUuid& itemId,
-        const QJsonObject& params);
+    Q_INVOKABLE QJsonObject setItemParams(const QUuid& itemId, const QJsonObject& params);
 
     /** Remove specified item by id. */
     Q_INVOKABLE QJsonObject removeItem(const QUuid& itemId);

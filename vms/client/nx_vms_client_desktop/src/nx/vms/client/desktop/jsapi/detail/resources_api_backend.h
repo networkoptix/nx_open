@@ -27,11 +27,11 @@ public:
     detail::Resource::List resources() const;
 
     /** Description of the resource with the specified identifier. */
-    detail::ResourceResult resource(const QUuid& resourceId) const;
+    detail::ResourceResult resource(const ResourceUniqueId& resourceId) const;
 
 signals:
     void added(const Resource& resource);
-    void removed(const QnUuid& resourceId);
+    void removed(const ResourceUniqueId& resourceId);
 };
 
 } // namespace nx::vms::client::desktop::jsapi::detail

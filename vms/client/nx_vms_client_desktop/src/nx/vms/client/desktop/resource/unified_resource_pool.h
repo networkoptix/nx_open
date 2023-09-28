@@ -22,9 +22,7 @@ public:
 
     using ResourceFilter = std::function<bool (const QnResourcePtr& resource)>;
     QnResourceList resources(ResourceFilter filter = {}) const;
-
-    /** Find first matching resource with given id. */
-    QnResourcePtr resource(const QnUuid& id) const;
+    QnResourcePtr resource(const QnUuid& resourceId, const QnUuid& systemId) const;
 
 signals:
     /**
