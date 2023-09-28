@@ -1320,8 +1320,8 @@
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
+      <translation>
+        <numerusform>%n グループを削除しますか?</numerusform>
       </translation>
     </message>
   </context>
