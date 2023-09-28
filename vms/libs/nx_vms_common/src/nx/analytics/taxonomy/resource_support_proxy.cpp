@@ -159,15 +159,15 @@ struct ResourceSupportProxy::Private:
 
         if (!supportInfoCache[deviceId].contains(engineId))
             return false;
-        
+
         const auto& objectTypeSupport = supportInfoCache[deviceId][engineId].objectTypeSupport;
 
-        // TODO: Remove later. For detailed information see the comment above 
+        // TODO: Remove later. For detailed information see the comment above
         // maybeUnscopedExtendedObjectTypeId().
         if (objectTypeSupport.contains(objectTypeId))
             return true;
         const QString extendedObjectTypeId = maybeUnscopedExtendedObjectTypeId(objectTypeId);
-        return objectTypeSupport.contains(extendedObjectTypeId);            
+        return objectTypeSupport.contains(extendedObjectTypeId);
     }
 
     bool isEventTypeAttributeSupported(

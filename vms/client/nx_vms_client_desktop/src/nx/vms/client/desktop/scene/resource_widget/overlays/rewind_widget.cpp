@@ -17,7 +17,7 @@
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/event_processors.h>
 
-constexpr int kAlpha = 76; 
+constexpr int kAlpha = 76;
 
 namespace nx::vms::client::desktop {
 
@@ -166,7 +166,7 @@ void RewindWidget::tick(int deltaMs)
             animator->setTimeLimit(250);
             animator->animateTo(1.0);
         }
-        
+
         animator1->setTimeLimit(100);
         animator1->animateTo(0.5);
         return;
@@ -231,7 +231,7 @@ void RewindWidget::tick(int deltaMs)
 void RewindWidget::blink()
 {
     setVisible(true);
-    
+
     auto animator = opacityAnimator(m_background);
     auto animator1 = opacityAnimator(m_triangle1);
     auto animator2 = opacityAnimator(m_triangle2);
@@ -239,7 +239,7 @@ void RewindWidget::blink()
 
     if (!NX_ASSERT(animator && animator1 && animator2 && animator3))
         return; //< Some unexpected unpredictable case.
-    
+
     animator->stop();
     animator1->stop();
     animator2->stop();

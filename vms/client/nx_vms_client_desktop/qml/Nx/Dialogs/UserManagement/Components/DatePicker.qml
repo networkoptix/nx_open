@@ -182,7 +182,7 @@ RowLayout
                         font.capitalization: Font.Capitalize
                         color: ColorTheme.text
                         text: `${locale.standaloneMonthName(visibleMonth)} ${visibleYear}`
- 
+
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                     }
@@ -231,7 +231,7 @@ RowLayout
 
                 Spacer {}
 
-                MonthGrid 
+                MonthGrid
                 {
                     id: monthGrid
 
@@ -276,7 +276,7 @@ RowLayout
                         border.width: cellMouseArea.containsMouse ? 1 : 0
 
                         implicitWidth: cellText.implicitWidth
-                        implicitHeight: 32 
+                        implicitHeight: 32
 
                         required property var model
 

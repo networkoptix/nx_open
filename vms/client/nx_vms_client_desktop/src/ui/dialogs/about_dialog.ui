@@ -232,7 +232,7 @@
            <property name="styleSheet">
             <string notr="true">QTableView
 {
-   outline: 0; 
+   outline: 0;
 }
 
 QTableView:item

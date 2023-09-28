@@ -278,18 +278,18 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                
+
                 <param id="PRIMARY%SERVICE%multicastSeparator"
                     dataType="Separator"
                     name="sep"
                     aux="multicast=true"/>
-                    
+
                 <param id="PRIMARY%media/videoprofile/RTPMulticastEnable"
                     name="Enable Multicast"
                     dataType="Bool"
                     writeCmd="update"
                     aux="range=media/videoprofile/add_update/RTPMulticastEnable;profile=primary;groupLead=primaryStreamMulticast;associatedWith=PRIMARY%media/videoprofile/RTPMulticastAddress,PRIMARY%media/videoprofile/RTPMulticastTTL,PRIMARY%media/videoprofile/RTPMulticastPort;associationCondition=true;multicast=true"/>
-                    
+
                 <param id="PRIMARY%media/videoprofile/RTPMulticastAddress"
                     name="Multicast Address"
                     dataType="String"
@@ -305,7 +305,7 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                    
+
                 <param id="PRIMARY%media/videoprofile/RTPMulticastPort"
                     name="Port"
                     dataType="Number"
@@ -321,7 +321,7 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                    
+
                 <param id="PRIMARY%media/videoprofile/RTPMulticastTTL"
                     name="TTL"
                     dataType="Number"
@@ -563,18 +563,18 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                
+
                 <param id="SECONDARY%SERVICE%multicastSeparator"
                     dataType="Separator"
                     name="sep"
                     aux="multicast=true"/>
-                    
+
                 <param id="SECONDARY%media/videoprofile/RTPMulticastEnable"
                     name="Enable Multicast"
                     dataType="Bool"
                     writeCmd="update"
                     aux="range=media/videoprofile/add_update/RTPMulticastEnable;profile=secondary;groupLead=secondaryStreamMulticast;associatedWith=SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL,SECONDARY%media/videoprofile/RTPMulticastPort;associationCondition=true;multicast=true"/>
-                    
+
                 <param id="SECONDARY%media/videoprofile/RTPMulticastAddress"
                     name="Multicast Address"
                     dataType="String"
@@ -590,7 +590,7 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                    
+
                 <param id="SECONDARY%media/videoprofile/RTPMulticastPort"
                     name="Port"
                     dataType="Number"
@@ -606,7 +606,7 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                    
+
                 <param id="SECONDARY%media/videoprofile/RTPMulticastTTL"
                     name="TTL"
                     dataType="Number"
@@ -1060,9 +1060,9 @@
                 <param id="image/imageenhancements/Saturation"
                         name="ColorLevel"
                         dataType="Number"/>
-                <!-- 
+                <!--
                     LDCMode - LDCLevel dependency is based on XND-6085V, LDCEnable is not used
-                    because it's handled by LDCMode. 
+                    because it's handled by LDCMode.
                 -->
                 <param id="image/imageenhancements/LDCMode"
                         name="LDC Mode"

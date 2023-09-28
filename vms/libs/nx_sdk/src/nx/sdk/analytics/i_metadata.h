@@ -31,9 +31,9 @@ public:
     /**
      * Provides values of so-called Metadata Attributes - typically, some object or event
      * properties (e.g. age or color), represented as a name-value map.
-     * 
+     *
      * See the specification for Attribute names in @ref md_src_nx_sdk_attributes.
-     *     
+     *
      * @param index 0-based index of the attribute.
      * @return Item of an attribute array, or null if index is out of range.
      */

@@ -378,7 +378,7 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
             ? tr("Less Settings")
             : tr("More Settings");
 
-        const auto buttonIcon = recording.customBitrateVisible 
+        const auto buttonIcon = recording.customBitrateVisible
             ? qnSkin->icon("text_buttons/arrow_up_20.svg", kIconSubstitutions)
             : qnSkin->icon("text_buttons/arrow_down_20.svg", kIconSubstitutions);
 

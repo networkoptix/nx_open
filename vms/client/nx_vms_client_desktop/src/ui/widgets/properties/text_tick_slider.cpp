@@ -8,11 +8,11 @@
 #include <QtWidgets/QStyleOptionSlider>
 
 
-QnTextTickSlider::QnTextTickSlider(QWidget *parent): 
+QnTextTickSlider::QnTextTickSlider(QWidget *parent):
     QSlider(parent)
 {}
 
-QnTextTickSlider::QnTextTickSlider(Qt::Orientation orientation, QWidget *parent): 
+QnTextTickSlider::QnTextTickSlider(Qt::Orientation orientation, QWidget *parent):
     QSlider(orientation, parent)
 {}
 
@@ -33,7 +33,7 @@ QSize QnTextTickSlider::minimumSizeHint() const {
 
 void QnTextTickSlider::changeEvent(QEvent *event) {
     if(event->type() == QEvent::FontChange)
-        updateGeometry(); 
+        updateGeometry();
 
     base_type::changeEvent(event);
 }
@@ -53,7 +53,7 @@ void QnTextTickSlider::paintEvent(QPaintEvent *event) {
     for (int i = minimum(); i <= maximum(); ++i) {
         QString text = QString::number(i);
         QSize tickSize = metrics.size(Qt::TextSingleLine, text);
-        
+
         // TODO: pprivalov Replace with a proper color when the new colorTheme will be provided.
         painter.setPen(Qt::darkGray);
         if (i != value())

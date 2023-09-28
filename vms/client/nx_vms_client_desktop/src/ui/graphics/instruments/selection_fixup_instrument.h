@@ -10,13 +10,13 @@ class SelectionPreFixupInstrument;
 /**
  * Clicks on graphics widget's frame is treated differently compared to a click
  * on the surface, which results in surprises with selection handling.
- * 
+ *
  * Also in graphics items right click is treated the same as left click, which
  * is not the desired behavior.
- * 
+ *
  * This instrument fixes these problems.
- * 
- * It is to be installed at item level after a forwarding instrument, 
+ *
+ * It is to be installed at item level after a forwarding instrument,
  * but before an instrument that stops event processing.
  */
 class SelectionFixupInstrument: public DragProcessingInstrument {

@@ -69,7 +69,7 @@ QString toString(const ObjectMetadata& objectMetadata)
 
     if (objectMetadata.isBestShot())
     {
-        if (!objectMetadata.imageUrl.isNull()) 
+        if (!objectMetadata.imageUrl.isNull())
             s += ", imageUrl " + nx::kit::utils::toString(objectMetadata.imageUrl);
         if (!objectMetadata.imageDataFormat.isNull())
             s += ", imageDataFormat " + nx::kit::utils::toString(objectMetadata.imageDataFormat);

@@ -174,7 +174,7 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
 
                 case Qt::ForegroundRole:
                     return logLevelColor(unit);
-                
+
                 case Qt::ToolTipRole:
                     return isOnline(unit) ? logLevelTooltip(logLevel(unit)) : "";
             }

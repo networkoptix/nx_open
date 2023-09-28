@@ -13,12 +13,12 @@ namespace QnEvent {
 
 /**
  * Universal custom event.
- * 
+ *
  * Can be used to pass additional data to the receiver.
  */
 class QnInvocationEvent: public QEvent {
 public:
-    QnInvocationEvent(int id = 0, const QVariant &data = QVariant()): 
+    QnInvocationEvent(int id = 0, const QVariant &data = QVariant()):
         QEvent(QnEvent::Invocation),
         m_id(id),
         m_data(data)
@@ -31,7 +31,7 @@ public:
     const QVariant &data() const {
         return m_data;
     }
-    
+
 private:
     int m_id;
     QVariant m_data;

@@ -18,7 +18,7 @@ class NX_UTILS_API BufferOutputStream:
 {
 public:
     BufferOutputStream();
-        
+
     virtual bool processData(const ConstBufferRefType& data) override;
 
     nx::Buffer buffer() const;

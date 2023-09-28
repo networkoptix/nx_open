@@ -33,41 +33,41 @@ Each tab is a special widget containing [EventRibbon] and handling all interacti
 ### nx::vms::client::desktop::NotificationListWidget
 Notifications tab widget. Displays system health informers, progress informers and notifications
 by concatenating (see [ConcatenationListModel]) owned item models ([SystemHealthListModel],
-[LocalNotificationsListModel] and [NotificationListModel]) and passing the resulting model to own 
+[LocalNotificationsListModel] and [NotificationListModel]) and passing the resulting model to own
 [EventRibbon]. Displays "No new notifications" placeholder if the resulting model is empty.
 
 ### nx::vms::client::desktop::AbstractSearchWidget
 A base for *search* widgets. Implements all interaction between [AbstractSearchListModel] and
-[EventRibbon] - fetch requests, fetch direction switches, live/non-live mode switches etc. 
+[EventRibbon] - fetch requests, fetch direction switches, live/non-live mode switches etc.
 Contains typical UI items that can be shown or hidden in descendants: search filters (camera
 selector, time selector, full text search input) and show/hide buttons (previews toggle and
 footers toggle). Displays placeholder if the model is empty (placeholder text and icon are
 provided by descendants).
 
 ### nx::vms::client::desktop::SimpleMotionSearchWidget
-Motion tab widget. Owns [SimpleMotionSearchListModel]. Supports only single-camera filter. 
+Motion tab widget. Owns [SimpleMotionSearchListModel]. Supports only single-camera filter.
 Allows to programmatically set a region in which Motion Search is performed.
 This widget is syncronized with **Workbench** state by [MotionSearchSynchronizer].
 
 ### nx::vms::client::desktop::BookmarkSearchWidget
-Bookmarks tab widget. Owns [BookmarkSearchListModel]. Periodically polls for remote bookmark 
+Bookmarks tab widget. Owns [BookmarkSearchListModel]. Periodically polls for remote bookmark
 updates by calling [BookmarkSearchListModel::dynamicUpdate]
 (@ref nx::vms::client::desktop::BookmarkSearchListModel::dynamicUpdate) method for the time range
-currently in view. This widget is syncronized with **Workbench** state by 
+currently in view. This widget is syncronized with **Workbench** state by
 [BookmarkSearchSynchronizer].
 
 ### nx::vms::client::desktop::EventSearchWidget
 Events tab widget. Owns [EventSearchListModel]. Implements additional filter by event type.
 
 ### nx::vms::client::desktop::AnalyticsSearchWidget
-Analytics tab widget. Owns [AnalyticsSearchListModel]. Implements additional filters by 
+Analytics tab widget. Owns [AnalyticsSearchListModel]. Implements additional filters by
 analytics object type and selected area. This widget is syncronized with **Workbench** state by
 [AnalyticsSearchSynchronizer].
 
 ### nx::vms::client::desktop::EventRibbon
-An item view displaying a scrollable vertical list of 
-[EventTile](@ref nx::vms::client::desktop::EventTile) tiles. Gets data to display from a list 
-item model. Emits a variety of signals to notify about tile mouse interaction, which is handled 
+An item view displaying a scrollable vertical list of
+[EventTile](@ref nx::vms::client::desktop::EventTile) tiles. Gets data to display from a list
+item model. Emits a variety of signals to notify about tile mouse interaction, which is handled
 externally by [TileInteractionHandler].
 
 Data roles used:
@@ -77,7 +77,7 @@ Data roles used:
 - Qt::ToolTipRole - tile tooltip text
 - Qn::DescriptionRole - tile description text
 - Qn::BusyIndicatorVisibleRole - whether the tile is a busy indicator
-- Qn::ProgressValueRole - current progress value and a sign that the tile is a progress 
+- Qn::ProgressValueRole - current progress value and a sign that the tile is a progress
 information tile
 - Qn::AlternateColorRole - whether the tile has *informer* color scheme
 - Qn::TimestampTextRole - tile timestamp
@@ -100,7 +100,7 @@ otherwise)
 - Qn::CreateContextMenuRole - tile context menu (**TODO** Refactor this...)
 
 ### nx::vms::client::desktop::EventTile
-A tile representing a notification, bookmark, event etc. 
+A tile representing a notification, bookmark, event etc.
 
 Can be one of four types:
 - informational tile
@@ -113,7 +113,7 @@ the view when more data is being asynchronously fetched by an item model (see
 [AbstractAsyncSearchListModel](@ref nx::vms::client::desktop::AbstractAsyncSearchListModel)).
 
 **Informational tiles** have switcheable *narrow* or *wide* layout. Can have special captionless mode
-(used in Motion tab). Can have *standard* or *informer* visual styles (color schemes). 
+(used in Motion tab). Can have *standard* or *informer* visual styles (color schemes).
 Consist of several fields (all except caption are optional):
 - caption
 - icon

@@ -56,7 +56,7 @@ public:
         m_guard.clear();
         m_item = nullptr;
     }
-    
+
 private:
     QPointer<QObject> m_guard;
     QGraphicsItem *m_item;

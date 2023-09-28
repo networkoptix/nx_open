@@ -16,7 +16,7 @@ public:
         m_hash(calculateHash(QFont()))
     {}
 
-    QnHashedFont(const QFont &font): 
+    QnHashedFont(const QFont &font):
         m_font(font),
         m_hash(calculateHash(font))
     {}
@@ -50,13 +50,13 @@ private:
 
         /* |31    ...    16|15|14|13 12 11 10| 9  8| 7| 6  5  4| 3| 2| 1| 0| *
          * | StyleStrategy |Rm|Fp| StyleHint |Style|Ls|  Caps  |Kr|St|Ov|Un| */
-        quint32 flags = 
-            (font.underline() << 0) | 
+        quint32 flags =
+            (font.underline() << 0) |
             (font.overline() << 1) |
             (font.strikeOut() << 2) |
             (font.kerning() << 3) |
-            (font.capitalization() << 4) | 
-            (font.letterSpacingType() << 7) | 
+            (font.capitalization() << 4) |
+            (font.letterSpacingType() << 7) |
             (font.style() << 8) |
             (font.styleHint() << 10) |
             (font.fixedPitch() << 14) |
@@ -71,7 +71,7 @@ private:
             (503    * font.weight()) ^
             (197    * font.stretch());
 
-        return 
+        return
             flags ^
             combination ^
             qHash(font.family());

@@ -4,8 +4,8 @@
 
 ## Overview
 
-The key elements of the HTTP server is the listener and request handler.  
-A listener is created by nx::network::http::server::Builder::build function.  
+The key elements of the HTTP server is the listener and request handler.
+A listener is created by nx::network::http::server::Builder::build function.
 Request handler inherits nx::network::http::AbstractRequestHandler class. A request listener can do
 any kind of job such as:
 - authentication
@@ -16,12 +16,12 @@ For example, a typical HTTP authenticator (nx::network::http::server::Authentica
 request handler that implements HTTP authentication and forwards the request down the processing
 pipeline on authentication success or replies with 401 HTTP status on authentication failure.
 
-Request handler chaining is used to create HTTP processing pipelines. Common pipeline is  
+Request handler chaining is used to create HTTP processing pipelines. Common pipeline is
 authenticator -> dispatcher -> business logic handler.
 
 ## REST API server example
 
-The example below demonstrates an HTTP server implementing "key: value" dictionary over HTTP.  
+The example below demonstrates an HTTP server implementing "key: value" dictionary over HTTP.
 This application has the following API:
 - GET /elements/<key>. Returns element with the specified key or reports "404 Not Found".
 - PUT /elements/<key>. Adds new or replaces existing element in the dictionary.

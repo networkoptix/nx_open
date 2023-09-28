@@ -26,7 +26,7 @@ public:
     qreal scalingSpeed() const;
 
     /**
-     * \returns                         Relative part of the movement speed, 
+     * \returns                         Relative part of the movement speed,
      *                                  in rects per second.
      */
     qreal relativeMovementSpeed() const {
@@ -47,13 +47,13 @@ public:
     void setScalingSpeed(qreal scalingSpeed);
 
     /**
-     * \param relativeMovementSpeed     New relative part of the movement speed, 
+     * \param relativeMovementSpeed     New relative part of the movement speed,
      *                                  in rects per second.
      */
     void setRelativeMovementSpeed(qreal relativeMovementSpeed);
 
     /**
-     * \param absoluteMovementSpeed     New absolute part of the movement speed, 
+     * \param absoluteMovementSpeed     New absolute part of the movement speed,
      *                                  in rectangle's space coordinates per second.
      */
     void setAbsoluteMovementSpeed(qreal absoluteMovementSpeed);

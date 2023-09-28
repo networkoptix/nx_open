@@ -40,7 +40,7 @@ public:
         const QString& sourceFile,
         const QString& destinationDir,
         const QString& name,
-        const QStringList& arguments = {}, 
+        const QStringList& arguments = {},
         const QVariant& icon = QVariant()) = 0;
 
     /**

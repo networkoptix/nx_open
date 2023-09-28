@@ -214,7 +214,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->customMediaPortSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setCustomMediaPort);
 
-    connect(ui->customMediaPortSpinBox, QnSpinboxIntValueChanged, this, 
+    connect(ui->customMediaPortSpinBox, QnSpinboxIntValueChanged, this,
         &CameraExpertSettingsWidget::clearSpinBoxSelection, Qt::QueuedConnection);
 
     connect(ui->useAutoWebPagePortCheckBox, &QCheckBox::clicked, this,
@@ -225,7 +225,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     connect(ui->customWebPagePortSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setCustomWebPagePort);
-    connect(ui->customWebPagePortSpinBox, QnSpinboxIntValueChanged, this, 
+    connect(ui->customWebPagePortSpinBox, QnSpinboxIntValueChanged, this,
         &CameraExpertSettingsWidget::clearSpinBoxSelection, Qt::QueuedConnection);
 
     connect(ui->trustCameraTimeCheckBox, &QCheckBox::clicked,
@@ -245,7 +245,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setLogicalId);
-    connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged, this, 
+    connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged, this,
         &CameraExpertSettingsWidget::clearSpinBoxSelection, Qt::QueuedConnection);
 
     connect(ui->generateLogicalIdButton, &QPushButton::clicked,

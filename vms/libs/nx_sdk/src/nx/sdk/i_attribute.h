@@ -21,14 +21,14 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::IAttribute"); }
 
     virtual Type type() const = 0;
-    
+
     /**
      * See the specification for Attribute names in @ref md_src_nx_sdk_attributes.
      */
     virtual const char* name() const = 0;
-    
+
     virtual const char* value() const = 0;
-    
+
     virtual float confidence() const = 0;
 };
 using IAttribute0 = IAttribute;

@@ -9,7 +9,7 @@ class QnSceneTransformations {
 public:
     /**
      * Moves the given viewport.
-     * 
+     *
      * \param view                      Graphics view to move viewport of.
      * \param viewportPositionDelta     Move delta, in viewport coordinates.
      */
@@ -17,7 +17,7 @@ public:
 
     /**
      * Moves the given viewport.
-     * 
+     *
      * \param view                      Graphics view to move viewport of.
      * \param viewportPositionDelta     Move delta, in viewport coordinates.
      */
@@ -25,7 +25,7 @@ public:
 
     /**
      * Moves the given viewport.
-     * 
+     *
      * \param view                      Graphics view to move viewport of.
      * \param scenePositionDelta        Move delta, in scene coordinates.
      */
@@ -33,7 +33,7 @@ public:
 
     /**
      * Centers the given viewport on the given position.
-     * 
+     *
      * \param view                      Graphics view to center viewport of.
      * \param sceneCenter               Position to center on, in scene coordinates.
      */
@@ -41,7 +41,7 @@ public:
 
     /**
      * Scales the given viewport.
-     * 
+     *
      * \param view                      Graphics view to scale viewport of.
      * \param factor                    Viewport scale factor.
      * \param anchor                    Transformation anchor.
@@ -50,7 +50,7 @@ public:
 
     /**
      * Scales the given viewport.
-     * 
+     *
      * \param view                      Graphics view to scale viewport of.
      * \param factor                    Viewport scale factor.
      * \param sceneAnchor               Transformation anchor, in viewport coordinates.
@@ -59,7 +59,7 @@ public:
 
     /**
      * Scales the given viewport to the given size.
-     * 
+     *
      * \param view                      Graphics view to scale viewport of.
      * \param size                      Size to scale to.
      * \param mode                      Aspect ratio mode.

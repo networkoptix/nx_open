@@ -5,7 +5,7 @@
 #include <nx/sdk/cloud_storage/helpers/algorithm.h>
 
 namespace nx::sdk::cloud_storage {
-    
+
 CodecInfo::CodecInfo(const CodecInfoData& codecInfo) : m_codecInfo(codecInfo)
 {
     m_extradata = nx::sdk::cloud_storage::fromBase64(m_codecInfo.extradataBase64);

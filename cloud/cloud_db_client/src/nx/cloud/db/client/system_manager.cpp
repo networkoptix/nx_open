@@ -342,7 +342,7 @@ void SystemManager::deleteSystemAttribute(
    executeRequest</*Reply*/ void>(
         nx::network::http::Method::delete_,
         nx::network::http::rest::substituteParameters(kSystemAttributePath, {systemId, attrName}),
-        std::move(completionHandler)); 
+        std::move(completionHandler));
 }
 
 } // namespace nx::cloud::db::client

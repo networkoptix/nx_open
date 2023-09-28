@@ -11,7 +11,7 @@
 namespace nx::cloud::relay::api::detail {
 
 ClientFactory::ClientFactory():
-    base_type([this](auto&&... args) { 
+    base_type([this](auto&&... args) {
         return defaultFactoryFunction(std::forward<decltype(args)>(args)...);
     })
 {

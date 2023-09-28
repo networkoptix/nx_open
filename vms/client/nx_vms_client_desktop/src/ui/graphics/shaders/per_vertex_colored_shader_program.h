@@ -5,7 +5,7 @@
 
 #include "color_shader_program.h"
 
-class QnColorPerVertexGLShaderProgram : public QnColorGLShaderProgram 
+class QnColorPerVertexGLShaderProgram : public QnColorGLShaderProgram
 {
     Q_OBJECT
 public:

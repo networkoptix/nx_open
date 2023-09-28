@@ -60,11 +60,11 @@ private:
     /* Rubber band item. */
     QPointer<RubberBandItem> m_rubberBand;
 
-    /** Set of items that were selected when rubber banding has started. 
+    /** Set of items that were selected when rubber banding has started.
      *
      * Note that it is unsafe to store pointers as items may get deleted before
      * they are used. However, this scenario is extremely rare, so we don't handle it. */
-    QSet<QGraphicsItem *> m_originallySelected; 
+    QSet<QGraphicsItem *> m_originallySelected;
 
     /** Whether the original selection needs to be restored. */
     bool m_protectSelection;

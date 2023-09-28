@@ -8,7 +8,7 @@
 #include "instrument.h"
 
 /**
- * Instrument that is used internally by instrument manager to maintain a 
+ * Instrument that is used internally by instrument manager to maintain a
  * single animation timer instance.
  */
 class AnimationInstrument: public Instrument {

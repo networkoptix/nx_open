@@ -46,7 +46,7 @@ public:
 
     virtual void setKeepAliveOptions(
         nx::network::KeepAliveOptions options) override;
-    
+
     void setCredentials(std::optional<SystemCredentials> credentials);
 
 protected:

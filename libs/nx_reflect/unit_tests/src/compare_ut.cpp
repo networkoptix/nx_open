@@ -80,7 +80,7 @@ TEST(Compare, fuzzyEqualityDoubleAfterDeserialized)
     const auto serializedValue = nx::reflect::json::serialize(value);
     const auto [deserializedValue, result] =
         nx::reflect::json::deserialize<Double>(serializedValue);
-    
+
     ASSERT_TRUE(result.success);
     ASSERT_TRUE(nx::reflect::equals(value, deserializedValue));
 }

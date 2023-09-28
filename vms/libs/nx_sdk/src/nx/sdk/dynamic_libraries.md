@@ -11,7 +11,7 @@ to VMS Server crashes. And even if the Plugin works well with the particular VMS
 particular OS version, the failures may appear when VMS or OS is upgraded.
 
 The root cause of these issues is the fundamental deficiency of the OS mechanisms which resolve the
-symbols after loading a dynamic library.  
+symbols after loading a dynamic library.
 
 Note that if a plugin is statically linked to certain libraries, it does not guarantee that symbols
 from that libraries are not present in the imported/exported symbol table in the plugin dynamic
@@ -60,19 +60,19 @@ backwards-compatible, and will not be patched for the need of a certain project.
 ## Depending on libstdc++ on Linux
 
 `libstdc++` - the GCC C++ standard library implementation - should be linked dynamically. There is
-a known issue in GCC's `libstdc++` - when linked statically, if some part of the product (in our 
+a known issue in GCC's `libstdc++` - when linked statically, if some part of the product (in our
 case it will be the VMS Server) links to this library dynamically, the input/output streams like
 `std::cerr` will be initialized incorrectly, which may lead to output disruption and/or crashes.
 
-This library must not be bundled with the plugin, because the one coming with the Server will be 
+This library must not be bundled with the plugin, because the one coming with the Server will be
 used anyway, due to the symbol resolution mechanism.
 
 Note that the plugin must use the version of `libstdc++` compatible with the one of the Server with
-which the plugin is supposed to work. So, it is theoretically possible that at some point in the 
+which the plugin is supposed to work. So, it is theoretically possible that at some point in the
 future the Server will be upgraded to the one using some newer incompatible `libstdc++`, and so the
 plugin will malfunction, including being unable to load or crashing.
 
-SOLUTION: For the plugin, use Clang together with its native `libc++` instead of `libstdc++`, and 
+SOLUTION: For the plugin, use Clang together with its native `libc++` instead of `libstdc++`, and
 link to `libc++` statically to make sure that the plugin will function properly even if the Server
 will start using `libc++` at some point in the future.
 

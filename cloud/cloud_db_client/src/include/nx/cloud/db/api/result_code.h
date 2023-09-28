@@ -44,7 +44,7 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
     invalidTotp,
     invalidBackupCode,
     userPasswordRequired,
-    
+
     /** Credentials used for authentication are no longer valid. */
     credentialsRemovedPermanently,
 
@@ -53,7 +53,7 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
     retryLater,
 
     /** Data constraints violation */
-    updateConflict, 
+    updateConflict,
 
     unknownError
 );

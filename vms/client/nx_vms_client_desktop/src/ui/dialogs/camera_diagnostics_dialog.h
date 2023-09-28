@@ -50,7 +50,7 @@ private slots:
 
 private:
     QScopedPointer<Ui::CameraDiagnosticsDialog> ui;
-    
+
     QnVirtualCameraResourcePtr m_resource;
     CameraDiagnostics::DiagnoseTool *m_tool;
     bool m_started, m_finished;

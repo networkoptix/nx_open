@@ -256,7 +256,7 @@ Workbench::Workbench(QObject* parent):
         connect(cachingController, &CachingAccessController::permissionsChanged, this,
             [this](const QnResourcePtr& resource) { d->removeInaccessibleItems(resource); });
     }
-    
+
     // TODO: #sivanov Move to the appropriate place.
     using WebEngineProfileManager = utils::WebEngineProfileManager;
     connect(WebEngineProfileManager::instance(),

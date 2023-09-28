@@ -130,7 +130,7 @@ The following command line arguments are supported by this particular unit test 
       info, debug, verbose, trace) possibly followed by a bracketed tag prefix.
   --log-file=[ABSOLUTE_FILE_PATH]
       Redirect logging to the file with the specified absolute path.
-)";        
+)";
 
     #if defined(_WIN32)
         std::cout << /*suppress newline*/ 1 + (const char*)
@@ -139,7 +139,7 @@ R"(
       Do not create a crash dump if the test fails.
   --enable-full-crash-dump
       Generate full crash dump if the test fails.
-)";        
+)";
     #endif
 }
 
@@ -160,14 +160,14 @@ static void showHelpAndExitIfNeeded(const utils::ArgumentParser& argumentParser)
         {
             printHelp();
             exit(0);
-        }    
+        }
     }
 }
 
 void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 {
     showHelpAndExitIfNeeded(arguments);
-    
+
     if (const auto value = arguments.get<size_t>("timeout-multiplier"))
         setTimeoutMultiplier(*value);
 

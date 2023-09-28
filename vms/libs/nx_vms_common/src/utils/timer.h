@@ -11,7 +11,7 @@ namespace nx {
     {
     public:
         typedef std::chrono::high_resolution_clock Clock;
-        
+
         enum class State
         {
             Stopped,
@@ -25,23 +25,23 @@ namespace nx {
             if (start)
                 restart();
         }
-        
-        void stop() 
-        { 
+
+        void stop()
+        {
             m_state = State::Stopped;
         }
 
-        State state() const { 
-            return m_state; 
+        State state() const {
+            return m_state;
         }
-        
-        void suspend() 
-        { 
+
+        void suspend()
+        {
             m_previousInterval = elapsedUS();
             m_state = State::Paused;
         }
-        
-        void resume() 
+
+        void resume()
         {
             m_start = Clock::now();
             m_state = State::Started;
@@ -59,7 +59,7 @@ namespace nx {
                 return 0;
             else if (m_state == State::Paused)
                 return m_previousInterval;
-            
+
             qint64 interval = std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - m_start).count();
             return interval + m_previousInterval;
         }

@@ -719,10 +719,10 @@ TEST_F(QnCamLicenseUsageHelperTest, offlineNeighbor)
     // Add a camera to the primary server.
     addLicense(Qn::LC_Professional);
     auto camera = addRecordingCameras(Qn::LC_Professional, 1, true, ServerIndex::primary);
-    
+
     // Add a camera to the secondary server.
     auto camera2 = addRecordingCameras(Qn::LC_Professional, 1, true, ServerIndex::secondary);
-    
+
     auto helper = QScopedPointer<CamLicenseUsageHelper>(new CamLicenseUsageHelper(systemContext()));
     helper->setCustomValidator(std::make_unique<QLicenseStubValidator>(systemContext()));
     ASSERT_FALSE(helper->isValid());

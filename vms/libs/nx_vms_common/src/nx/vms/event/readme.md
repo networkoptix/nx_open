@@ -76,7 +76,7 @@ In both cases RuleManager notifies its subscribers about changes in Rule set, bu
 
 ![Rule management dataflow](doc/management.svg)
 
-Initial set or the Rules (which is stored in database) is loaded into RuleManager either on server start up, or during basic client initialization when the client connects to the server. 
+Initial set or the Rules (which is stored in database) is loaded into RuleManager either on server start up, or during basic client initialization when the client connects to the server.
 In both cases RuleManager than is updated by [CommonMessageProcessor](@ref _) that translates signals from a [AbstractBusinessEventNotificationManager](@ref ec2::AbstractBusinessEventNotificationManager) instance ([QnBusinessEventNotificationManager](@ref _)).
 
 ## Data packing

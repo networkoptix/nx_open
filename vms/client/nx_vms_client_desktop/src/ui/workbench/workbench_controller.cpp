@@ -926,7 +926,7 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
             {
                 if (!m_rewindButtonPressedTimer.isValid())
                     m_rewindButtonPressedTimer.start();
-            
+
                 // This part should be triggered on double click on rewind only.
                 if (m_rewindButtonPressedTimer.restart() < kDoubleClickPeriodMs)
                     navigator()->rewind(/*jumpToPreviousChunk*/ true);

@@ -59,7 +59,7 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriodsUnsig
         QnCompressedTimeReader<QByteArray> outputStream(&buffer);
         QnCompressedTime::deserialize( &outputStream, &dstData);
     }
-    
+
     ASSERT_TRUE( dstData == srcData );
 }
 
@@ -70,7 +70,7 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriodsSigne
     std::vector<QnTimePeriod> srcData;
     std::vector<QnTimePeriod> dstData;
     QByteArray buffer;
-    
+
     quint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     srcData.push_back(QnTimePeriod(currentTime, 30 * 1000ll));
     currentTime += 20 * 1000ll;
@@ -107,7 +107,7 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPerio
     currentTime += 1000 * 1000ll;
     data.periods.push_back(QnTimePeriod(currentTime, 1000000ll));
     currentTime += 1000000ll;
-    data.periods.push_back(QnTimePeriod(3000000000ll * 1000ll, 5));       
+    data.periods.push_back(QnTimePeriod(3000000000ll * 1000ll, 5));
 
     srcData.push_back(std::move(data));
 
@@ -116,7 +116,7 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPerio
     bool success = false;
     MultiServerPeriodDataList dstData = QnCompressedTime::deserialized(buffer, MultiServerPeriodDataList(), &success);
 
-    ASSERT_TRUE( success ); 
+    ASSERT_TRUE( success );
     ASSERT_TRUE( dstData == srcData );
 }
 
@@ -134,18 +134,18 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPerio
         currentTime += 1000 * 1000ll;
         data.periods.push_back(QnTimePeriod(currentTime, 1000000ll));
         currentTime += 1000000ll;
-        data.periods.push_back(QnTimePeriod(3000000000ll * 1000ll, 5));       
+        data.periods.push_back(QnTimePeriod(3000000000ll * 1000ll, 5));
 
         srcData.push_back(std::move(data));
     }
 
 
     QByteArray buffer = QnCompressedTime::serialized(srcData, false);
-    
+
     bool success = false;
     MultiServerPeriodDataList dstData = QnCompressedTime::deserialized(buffer, MultiServerPeriodDataList(), &success);
 
-    ASSERT_TRUE( success ); 
+    ASSERT_TRUE( success );
     ASSERT_TRUE( dstData == srcData );
 }
 
@@ -163,7 +163,7 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPerio
     bool success = false;
     MultiServerPeriodDataList dstData = QnCompressedTime::deserialized(buffer, MultiServerPeriodDataList(), &success);
 
-    ASSERT_TRUE( success ); 
+    ASSERT_TRUE( success );
     ASSERT_TRUE( dstData == srcData );
 }
 
@@ -187,6 +187,6 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPerio
     bool success = false;
     MultiServerPeriodDataList dstData = QnCompressedTime::deserialized(buffer, MultiServerPeriodDataList(), &success);
 
-    ASSERT_TRUE( success ); 
+    ASSERT_TRUE( success );
     ASSERT_TRUE( dstData == srcData );
 }

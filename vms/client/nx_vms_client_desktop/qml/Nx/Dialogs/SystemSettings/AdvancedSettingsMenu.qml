@@ -43,4 +43,4 @@ NavigationMenu
 
     signal currentIndexChanged(int idx)
     onItemClicked: (item) => currentIndexChanged(item.idx)
-} 
+}

@@ -42,7 +42,7 @@ public:
     virtual bool reset() override { return m_source->reset();  }
     virtual bool waitForBytesWritten(int msecs) override;
     virtual bool waitForReadyRead(int msecs) override { return m_source->waitForReadyRead(msecs); }
-    
+
     /*
      * Pass QT event to the wrapped QIODevice. QEvent is used to control BufferedFile.
      */

@@ -8,8 +8,8 @@ QnGridHighlightItem::QnGridHighlightItem(QGraphicsItem *parent):
     m_color(QColor(0, 0, 0, 0))
 {
     setAcceptedMouseButtons(Qt::NoButton);
-    
-    /* Don't disable this item here. When disabled, it starts accepting wheel events 
+
+    /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
 

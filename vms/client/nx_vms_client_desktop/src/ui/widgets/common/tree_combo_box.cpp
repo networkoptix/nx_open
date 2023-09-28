@@ -125,9 +125,9 @@ void QnTreeComboBox::updateHighlight()
 {
     if (!m_treeView->isVisible() || !m_treeView->underMouse())
         return;
-                
+
     auto highlightIndex = m_treeView->indexAt(m_treeView->mapFromGlobal(QCursor::pos()));
-                    
+
     if (highlightIndex.isValid())
         m_treeView->setCurrentIndex(highlightIndex);
 }

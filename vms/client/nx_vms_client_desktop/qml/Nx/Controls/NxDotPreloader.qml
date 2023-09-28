@@ -13,7 +13,7 @@ BusyIndicator
     property color borderColor: "black"
     property real borderWidth: 0
     property real dotRadius: 4
-    
+
     visible: running
     spacing: 6
 
