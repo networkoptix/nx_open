@@ -596,12 +596,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     //< Cloud storage isn't tied to any server and is readable for all.
     if (!parentServer)
-    {
-        if (hasPowerUserPermissions(subject))
-            return Qn::ReadWriteSavePermission;
-
         return Qn::ReadPermission;
-    }
 
     if (hasPowerUserPermissions(subject))
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
