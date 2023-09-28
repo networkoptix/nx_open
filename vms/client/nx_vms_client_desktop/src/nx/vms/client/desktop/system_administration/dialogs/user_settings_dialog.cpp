@@ -501,10 +501,14 @@ QString UserSettingsDialog::validateLogin(const QString& login)
             }
 
             const auto duplicateUsers = resourcePool()->getResources<QnUserResource>(
-                [id = currentState().userId, name = text.toLower()](const auto& user)
+                [id = currentState().userId, name = text.toLower(), dialogType = d->dialogType](
+                    const auto& user)
                 {
-                    return user->getId() != id && user->getName().toLower() == name;
+                    return user->getId() != id
+                        && user->getName().toLower() == name
+                        && (user->isEnabled() || dialogType == CreateUser);
                 });
+
             return duplicateUsers.isEmpty()
                 ? ValidationResult::kValid
                 : ValidationResult(tr("User with specified login already exists"));
