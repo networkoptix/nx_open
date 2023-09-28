@@ -452,5 +452,3 @@ void VirtualCameraWorker::pollExtend()
 }
 
 } // namespace nx::vms::client::desktop
-
-

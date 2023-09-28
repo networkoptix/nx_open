@@ -130,4 +130,3 @@ bool QnQtbugWorkaround::nativeEventFilter(const QByteArray& eventType, void* mes
 }
 
 #endif
-

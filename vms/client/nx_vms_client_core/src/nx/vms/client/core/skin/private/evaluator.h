@@ -258,4 +258,3 @@ namespace Qee {
 } // namespace Qee
 
 #endif // QN_EVALUATOR_H
-

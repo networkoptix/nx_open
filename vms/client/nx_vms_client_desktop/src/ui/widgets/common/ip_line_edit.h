@@ -17,4 +17,3 @@ protected:
     virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void focusOutEvent(QFocusEvent* event) override;
 };
-

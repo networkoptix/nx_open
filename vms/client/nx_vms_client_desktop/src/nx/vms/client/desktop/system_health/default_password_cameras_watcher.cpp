@@ -94,4 +94,3 @@ void DefaultPasswordCamerasWatcher::handleResourceRemoved(const QnResourcePtr& r
 }
 
 } // namespace nx::vms::client::desktop
-

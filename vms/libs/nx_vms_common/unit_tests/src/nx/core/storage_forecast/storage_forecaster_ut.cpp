@@ -80,4 +80,3 @@ TEST(storage_forecast, Basic)
     for (int i = 0; i < 6; i++)
         ASSERT_TRUE(forecast[i] == recordingStats[i].archiveDurationSecs);
 }
-

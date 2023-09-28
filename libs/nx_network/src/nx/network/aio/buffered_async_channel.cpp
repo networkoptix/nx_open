@@ -45,4 +45,3 @@ void BufferedAsyncChannel::cancelIoInAioThread(nx::network::aio::EventType event
 }
 
 } // namespace nx::network::aio
-

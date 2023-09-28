@@ -25,5 +25,3 @@ FigurePtr Dummy::clone() const
 }
 
 } // namespace nx::vms::client::desktop::figure
-
-

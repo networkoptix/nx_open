@@ -13,4 +13,3 @@ public:
 #define QnSystemSettingsReply_Fields (settings)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnSystemSettingsReply, (json), NX_VMS_COMMON_API)
-

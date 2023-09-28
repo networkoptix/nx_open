@@ -498,4 +498,3 @@ QString ParameterTypes::toString(const QVariant& items)
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop
-

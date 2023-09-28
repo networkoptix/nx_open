@@ -64,4 +64,3 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
 }
 
 } // namespace nx::vms::client::desktop
-

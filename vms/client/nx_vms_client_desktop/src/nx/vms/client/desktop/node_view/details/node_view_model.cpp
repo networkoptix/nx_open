@@ -203,4 +203,3 @@ QModelIndex NodeViewModel::index(const NodePtr& node, int column) const
 } // namespace details
 } // node_view
 } // namespace nx::vms::client::desktop
-

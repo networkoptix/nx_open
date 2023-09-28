@@ -52,4 +52,3 @@ QSharedPointer<Target> checked_cast(const QSharedPointer<Source> &source) {
 #define checked_cast checked_cast
 
 #endif // QN_CORE_CHECKED_CAST_H
-

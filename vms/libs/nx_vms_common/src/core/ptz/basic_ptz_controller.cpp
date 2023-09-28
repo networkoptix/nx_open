@@ -156,4 +156,3 @@ bool QnBasicPtzController::runAuxiliaryCommand(
 {
     return false;
 }
-

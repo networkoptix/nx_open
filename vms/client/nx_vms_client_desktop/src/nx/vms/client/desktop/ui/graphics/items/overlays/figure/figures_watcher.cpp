@@ -300,4 +300,3 @@ QString RoiFiguresWatcher::figureLabelText(
 }
 
 } // namespace nx::vms::client::desktop::figure
-

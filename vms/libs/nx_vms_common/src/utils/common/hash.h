@@ -35,4 +35,3 @@ inline size_t qHash(const QAuthenticator& auth, size_t seed = 0) noexcept
 }
 
 #endif // QN_HASH_H
-

@@ -126,4 +126,3 @@ void CredentialsStoreDialog::registerAction()
 }
 
 } // namespace nx::vms::client::desktop
-

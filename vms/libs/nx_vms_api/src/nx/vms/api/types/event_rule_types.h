@@ -301,4 +301,3 @@ Q_DECLARE_FLAGS(EventLevels, EventLevel)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EventLevels)
 
 } // namespace nx::vms::api
-

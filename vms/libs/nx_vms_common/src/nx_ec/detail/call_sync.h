@@ -39,4 +39,3 @@ Result callSync(Initiator initiate, Results*... outResults)
 }
 
 } // namespace ec2::detail
-

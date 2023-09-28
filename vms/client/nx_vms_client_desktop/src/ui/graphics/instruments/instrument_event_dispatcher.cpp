@@ -224,5 +224,3 @@ template class InstrumentEventDispatcher<QGraphicsScene>;
 template class InstrumentEventDispatcher<QGraphicsView>;
 template class InstrumentEventDispatcher<QWidget>;
 template class InstrumentEventDispatcher<QGraphicsItem>;
-
-

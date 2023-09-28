@@ -43,4 +43,3 @@ bool QnTextureTransitionShaderProgram::compile()
 
     return link();
 }
-

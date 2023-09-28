@@ -195,4 +195,3 @@ private:
 };
 
 #endif // QN_PTZ_MANAGE_MODEL_H
-

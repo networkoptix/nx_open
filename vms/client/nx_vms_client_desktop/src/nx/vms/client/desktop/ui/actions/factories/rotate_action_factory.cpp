@@ -68,4 +68,3 @@ ui::action::Factory::ActionList RotateActionFactory::newActions(
 }
 
 } // namespace nx::vms::client::desktop
-

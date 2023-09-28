@@ -47,4 +47,3 @@ struct hash<QnResourceAccessSubject>
 };
 
 } // namepsace std
-

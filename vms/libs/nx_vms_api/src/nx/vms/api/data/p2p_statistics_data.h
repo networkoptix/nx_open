@@ -22,4 +22,3 @@ struct NX_VMS_API P2pStatisticsData
 NX_VMS_API_DECLARE_STRUCT(P2pStatisticsData)
 
 } // namespace nx::vms::api
-

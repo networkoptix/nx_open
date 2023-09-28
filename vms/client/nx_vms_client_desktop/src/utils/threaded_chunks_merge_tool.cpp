@@ -90,4 +90,3 @@ void QnThreadedChunksMergeTool::processData() {
         emit finished(handle, result);
     }
 }
-

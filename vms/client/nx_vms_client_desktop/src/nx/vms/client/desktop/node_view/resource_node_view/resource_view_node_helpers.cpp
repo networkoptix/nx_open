@@ -107,4 +107,3 @@ QString extraText(const QModelIndex& index)
 
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

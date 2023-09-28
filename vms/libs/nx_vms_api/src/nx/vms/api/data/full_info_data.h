@@ -76,4 +76,3 @@ NX_VMS_API_DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))
 } // namespace api
 } // namespace vms
 } // namespace nx
-

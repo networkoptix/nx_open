@@ -446,4 +446,3 @@ void RotationInstrument::finishDrag(DragInfo *info) {
 void RotationInstrument::finishDragProcess(DragInfo *info) {
     emit rotationProcessFinished(info->view(), target());
 }
-

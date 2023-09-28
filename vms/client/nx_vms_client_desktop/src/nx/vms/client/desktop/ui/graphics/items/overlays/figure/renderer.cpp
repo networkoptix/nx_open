@@ -385,4 +385,3 @@ void Renderer::renderFigure(
 }
 
 } // namespace nx::vms::client::desktop::figure
-

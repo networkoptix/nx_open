@@ -30,4 +30,3 @@ private:
     Ptz::Trait m_standardTrait;
     QString m_name;
 };
-

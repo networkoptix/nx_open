@@ -12,4 +12,3 @@ public:
     virtual QString value() const override;
     virtual void reset() override;
 };
-

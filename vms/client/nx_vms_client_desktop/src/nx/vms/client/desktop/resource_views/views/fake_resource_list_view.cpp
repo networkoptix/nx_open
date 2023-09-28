@@ -50,4 +50,3 @@ QSize FakeResourceListView::sizeHint() const
 }
 
 } // namespace nx::vms::client::desktop
-

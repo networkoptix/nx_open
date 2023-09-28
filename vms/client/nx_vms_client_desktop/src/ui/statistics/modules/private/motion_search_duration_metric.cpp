@@ -93,4 +93,3 @@ bool MotionSearchDurationMetric::isFromCurrentLayout(const QnMediaResourceWidget
     const auto currentLayout = m_context->workbench()->currentLayout();
     return (currentLayout == widgetLayout);
 }
-

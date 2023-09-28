@@ -38,4 +38,3 @@ void ServerRequestStorage::cancelAllRequests()
 }
 
 } // namespace nx::vms::client::desktop
-

@@ -48,4 +48,3 @@ struct NX_VMS_API AesKeyData
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(AesKeyData)
 
 } // namespace nx::vms::api
-

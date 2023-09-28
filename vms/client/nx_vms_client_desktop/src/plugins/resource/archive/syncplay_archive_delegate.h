@@ -66,4 +66,3 @@ private:
     QPointer<QnArchiveSyncPlayWrapper> m_syncWrapper;
     QnAbstractArchiveDelegate* m_ownerDelegate;
 };
-

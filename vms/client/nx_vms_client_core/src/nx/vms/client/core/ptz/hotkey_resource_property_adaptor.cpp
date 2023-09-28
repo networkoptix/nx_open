@@ -18,4 +18,3 @@ HotkeysResourcePropertyAdaptor::HotkeysResourcePropertyAdaptor(QObject* parent):
 
 } // namespace ptz
 } // namespace nx::vms::client::core
-

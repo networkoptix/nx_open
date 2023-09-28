@@ -190,5 +190,3 @@ void QnClientStorageResource::setWritable( bool isWritable ) {
     }
     emit isWritableChanged(::toSharedPointer(this));
 }
-
-

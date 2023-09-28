@@ -197,4 +197,3 @@ void RadassActionHandler::handleItemAdded(QnWorkbenchItem *item)
 }
 
 } // namespace nx::vms::client::desktop
-

@@ -51,4 +51,3 @@ NX_VMS_API_DECLARE_STRUCT(SyncRequestData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

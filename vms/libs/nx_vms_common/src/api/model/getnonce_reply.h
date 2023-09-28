@@ -12,4 +12,3 @@ struct NX_VMS_COMMON_API QnGetNonceReply
 #define QnGetNonceReply_Fields (nonce)(realm)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnGetNonceReply, (json)(ubjson), NX_VMS_COMMON_API)
-

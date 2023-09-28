@@ -23,4 +23,3 @@ Item
             || control.revertRotationAngle == 270
     }
 }
-

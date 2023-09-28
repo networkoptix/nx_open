@@ -47,4 +47,3 @@ QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr &storage )
     , isOnline(storage->getStatus() == nx::vms::api::ResourceStatus::online)
     , isDbReady(storage->persistentStatusFlags().testFlag(nx::vms::api::StoragePersistentFlag::dbReady))
 {}
-

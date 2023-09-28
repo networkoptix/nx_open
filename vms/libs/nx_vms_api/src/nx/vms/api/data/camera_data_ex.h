@@ -36,4 +36,3 @@ NX_VMS_API bool deserialize(
 } // namespace api
 } // namespace vms
 } // namespace nx
-

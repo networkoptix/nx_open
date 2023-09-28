@@ -718,4 +718,3 @@ void QnWorkbenchPtzHandler::at_ptzFocusAutoAction_triggered()
     widget->setActionText(tr("Focusing..."));
     widget->clearActionText(2s);
 }
-

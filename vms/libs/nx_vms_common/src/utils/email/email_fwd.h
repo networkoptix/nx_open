@@ -55,4 +55,3 @@ namespace nx::email { enum class SmtpError; }
 struct SmtpOperationResult;
 
 #endif // QN_EMAIL_FWD_H
-

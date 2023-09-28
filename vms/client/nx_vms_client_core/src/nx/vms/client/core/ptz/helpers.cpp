@@ -71,4 +71,3 @@ QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList pre
 } // namespace helpers
 } // namespace ptz
 } // namespace nx::vms::client::core
-

@@ -200,4 +200,3 @@ license::RequestInfo LicenseDeactivationReason::info()
 } // namespace dialogs
 } // namespace ui
 } // namespace nx::vms::client::desktop
-

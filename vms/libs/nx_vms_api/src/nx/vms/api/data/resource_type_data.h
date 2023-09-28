@@ -38,4 +38,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceTypeData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

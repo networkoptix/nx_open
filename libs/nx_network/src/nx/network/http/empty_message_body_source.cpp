@@ -35,4 +35,3 @@ void EmptyMessageBodySource::readAsync(
 }
 
 } // namespace nx::network::http
-

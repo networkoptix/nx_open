@@ -81,4 +81,3 @@ public:
 typedef QSharedPointer<AbstractTimerFactory> TimerFactoryPtr;
 
 } // namespace nx::vms::client::desktop
-

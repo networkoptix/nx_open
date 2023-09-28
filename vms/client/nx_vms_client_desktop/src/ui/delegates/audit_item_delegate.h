@@ -50,4 +50,3 @@ private:
     mutable QHash<QString, int> m_sizeHintHash;
     mutable QHash<QString, int> m_boldSizeHintHash;
 };
-

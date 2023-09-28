@@ -209,4 +209,3 @@ void QnStatisticsFileStorage::removeOutdatedFiles()
     for(const auto &fileToRemove: forRemoveFilesList)
         m_statisticsDirectory.remove(fileToRemove);
 }
-

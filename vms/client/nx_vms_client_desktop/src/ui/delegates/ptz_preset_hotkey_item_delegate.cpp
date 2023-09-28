@@ -127,4 +127,3 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(
     model->setData(existingIndex, nx::vms::client::core::ptz::kNoHotkey, Qt::EditRole);
     model->setData(index, hotkey, Qt::EditRole);
 }
-

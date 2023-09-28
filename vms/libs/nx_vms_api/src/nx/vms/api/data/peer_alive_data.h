@@ -30,4 +30,3 @@ NX_VMS_API_DECLARE_STRUCT(PeerAliveData)
 } // namespace api
 } // namespace vms
 } // namespace nx
-
