@@ -1267,11 +1267,11 @@
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>同期設定に一致するユーザーまたはグループが存在しないため、システムの DB には追加されません。 LDAP サーバーのパラメーターとフィルターが正しく構成されていることを確認してください。 </translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>LDAP設定を変更する際はご注意ください。誤った設定により、多数のユーザーがシステムに接続できなくなる可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -1592,7 +1592,7 @@
     </message>
     <message>
       <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>「リソース」テーブルには、ユーザーまたはグループの権限の概要が表示され、特定のリソースに権限を割り当てることができます。セルをクリックして選択または選択解除します。ドラッグ&amp;ドロップ、一括編集にはShift+ドラッグ&amp;ドロップを使用します。別の権限に依存する権限を選択すると、両方の権限が自動的に付与されます。</translation>
     </message>
   </context>
   <context>
@@ -2436,7 +2436,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>継続的同期が無効になっている場合、ユーザーのグループメンバーシップは自動的に同期されません。この情報を更新するには、手動同期を開始してください。</translation>
     </message>
   </context>
   <context>
