@@ -545,6 +545,8 @@ Control
                             anchors.leftMargin: 6
                             anchors.rightMargin: 6
 
+                            baselineOffset: groupItemText.y + groupItemText.baselineOffset
+
                             Image
                             {
                                 id: groupImage
@@ -554,7 +556,7 @@ Control
 
                                 source:
                                 {
-                                    if (model.groupSection == "B")
+                                    if (model.isPredefined)
                                         return "image://svg/skin/user_settings/group_built_in.svg"
 
                                     return model.isLdap
@@ -567,6 +569,8 @@ Control
 
                             Text
                             {
+                                id: groupItemText
+
                                 color: model.isParent
                                     ? ColorTheme.colors.light1
                                     : ColorTheme.colors.light4
@@ -586,8 +590,7 @@ Control
                                 checked: model.isParent
                                 enabled: model.canEditMembers
 
-                                Layout.alignment: Qt.AlignVCenter
-                                Layout.topMargin: 6
+                                Layout.alignment: Qt.AlignBaseline
 
                                 onVisualFocusChanged:
                                 {
