@@ -46,7 +46,7 @@ public:
 
     /** Add item for the specified resource and initializes it with the specified parameters. */
     ItemResult addItem(
-        const QUuid& resourceId,
+        const ResourceUniqueId& resourceId,
         const ItemParams& params);
 
     /** Change specified parameters for the item with the selected id. */

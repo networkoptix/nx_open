@@ -26,10 +26,28 @@ NX_REFLECTION_ENUM_CLASS(ResourceType,
 /** Type of the specified resource. */
 ResourceType resourceType(const QnResourcePtr& resource);
 
+struct ResourceUniqueId
+{
+    QnUuid id;
+    QnUuid systemId;
+
+    ResourceUniqueId() = default;
+    ResourceUniqueId(const QString& id);
+    operator QString() const;
+    bool isNull() const;
+
+    static ResourceUniqueId from(const QnResourcePtr& resource);
+};
+NX_REFLECTION_TAG_TYPE(ResourceUniqueId, useStringConversionForSerialization)
+
+// Functions for serialization and deserialization.
+std::string toString(const ResourceUniqueId& id);
+bool fromString(const std::string& str, ResourceUniqueId* id);
+
 /** Resource description. */
 struct Resource
 {
-    QnUuid id;
+    ResourceUniqueId id;
     QString name;
     ResourceType type = ResourceType::undefined;
     int logicalId = 0;

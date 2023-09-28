@@ -4,6 +4,7 @@
 
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
@@ -27,17 +28,17 @@ public:
     virtual ~Resources() override;
 
     /** Check if a resource with the specified id may have media stream (at least theoretically). */
-    Q_INVOKABLE bool hasMediaStream(const QUuid& resourceId) const;
+    Q_INVOKABLE bool hasMediaStream(const QString& resourceId) const;
 
     /** List of all available (to user and by the API constraints) resources. */
     Q_INVOKABLE QJsonArray resources() const;
 
     /** Description of the resource with the specified identifier. */
-    Q_INVOKABLE QJsonObject resource(const QUuid& resourceId) const;
+    Q_INVOKABLE QJsonObject resource(const QString& resourceId) const;
 
 signals:
     void added(const QJsonObject& resource);
-    void removed(const QnUuid& resourceId);
+    void removed(const QString& resourceId);
 
 private:
     nx::utils::ImplPtr<detail::ResourcesApiBackend> d;

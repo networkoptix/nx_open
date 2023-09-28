@@ -51,9 +51,7 @@ QJsonObject Tab::item(const QUuid& itemId) const
     return toJsonObject(d->item(itemId));
 }
 
-QJsonObject Tab::addItem(
-    const QUuid& resourceId,
-    const QJsonObject& params)
+QJsonObject Tab::addItem(const QString& resourceId, const QJsonObject& params)
 {
     detail::ItemParams itemParams;
     return detail::toJsonObject(fromJsonObject(params, itemParams)
@@ -61,9 +59,7 @@ QJsonObject Tab::addItem(
         : detail::ItemResult{Error::invalidArguments(), {}});
 }
 
-QJsonObject Tab::setItemParams(
-    const QUuid& itemId,
-    const QJsonObject& params)
+QJsonObject Tab::setItemParams(const QUuid& itemId, const QJsonObject& params)
 {
     detail::ItemParams itemParams;
     return detail::toJsonObject(fromJsonObject(params, itemParams)
