@@ -12,6 +12,7 @@
 #include "camera_advanced_param_widgets_manager.h"
 #include "flux/camera_settings_dialog_state.h"
 #include "flux/camera_settings_dialog_store.h"
+#include "widgets/private/motion_stream_alerts.h"
 
 namespace {
 
@@ -90,6 +91,15 @@ CameraAdvancedParamsWidget::CameraAdvancedParamsWidget(
 {
     ui->setupUi(this);
 
+    ui->motionImplicitlyDisabledAlertBar->init({.level = BarDescription::BarLevel::Error});
+    const auto forceDetectionButton = new QPushButton(ui->motionImplicitlyDisabledAlertBar);
+    forceDetectionButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    forceDetectionButton->setText(tr("Force Motion Detection"));
+    ui->motionImplicitlyDisabledAlertBar->addButton(forceDetectionButton);
+
+    connect(forceDetectionButton, &QPushButton::clicked, store,
+        [store]() { store->forceMotionDetection(); });
+
     QList<int> sizes = ui->splitter->sizes();
     if (NX_ASSERT(sizes.size() == 2))
     {
@@ -166,6 +176,10 @@ void CameraAdvancedParamsWidget::loadState(const CameraSettingsDialogState& stat
         setState(State::Init);
         m_advancedParamWidgetsManager->clear();
     }
+
+    ui->motionImplicitlyDisabledAlertBar->setText(MotionStreamAlerts::implicitlyDisabledAlert(
+        state.motion.streamAlert,
+        !state.isSingleCamera()));
 
     this->setEnabled(d->isValid);
     if (d->isValid)
