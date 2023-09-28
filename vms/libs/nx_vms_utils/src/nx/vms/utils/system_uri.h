@@ -84,7 +84,7 @@ public:
         local,
         temporary,
     };
-    
+
     struct Referral
     {
         ReferralSource source = ReferralSource::None;

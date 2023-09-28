@@ -164,7 +164,7 @@ QString maybeUnscopedExtendedObjectTypeId(const QString& scopedExtendedObjectTyp
 {
     if (!scopedExtendedObjectTypeId.contains("$"))
         return scopedExtendedObjectTypeId;
-    
+
     QStringList parts = scopedExtendedObjectTypeId.split("$");
     return parts.last();
 }

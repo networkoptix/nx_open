@@ -23,7 +23,7 @@ QnUuidPool::QnUuidPool(const QnUuid &baseId, offset_type size /* = std::numeric_
 void QnUuidPool::markAsUsed(const QnUuid &id) {
     if (!belongsToPool(id))
         return;
-    
+
     offset_type i = offset(id);
     if (m_usageData.size() < i)
         m_usageData.resize(i, false);
@@ -62,7 +62,7 @@ QnUuidPool::offset_type QnUuidPool::offset(const QnUuid &id) const {
 
 bool QnUuidPool::belongsToPool(const QnUuid &id) const {
     const QUuid uuid(id.getQUuid());
-    
+
     if (offset(id) > m_size)
         return false;
 

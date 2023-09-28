@@ -9,7 +9,7 @@
 
 bool isDataEq(const QByteArray& data, char ch)
 {
-    for(int i = 0; i < data.size(); ++i) 
+    for(int i = 0; i < data.size(); ++i)
     {
         if (data[i] != ch)
             return false;

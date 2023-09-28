@@ -163,7 +163,7 @@ public:
         With empty watcher parameter creates instance which tracks all cameras.
     */
     CamLicenseUsageHelper(
-        common::SystemContext* context, 
+        common::SystemContext* context,
         bool considerOnlineServersOnly = false,
         QObject* parent = nullptr);
 

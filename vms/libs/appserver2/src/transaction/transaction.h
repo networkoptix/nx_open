@@ -49,7 +49,7 @@ struct NotDefinedApiData
  *
  *     // Calculates hash for a persistent transaction. MUST yield the same result for corresponding
  *     // setXXX and removeXXX transactions. Actual for persistent transactions only.
- *     InvalidGetHashHelper(), 
+ *     InvalidGetHashHelper(),
  *
  *     // Actual mostly for persistent transactions. This callable should implement the second
  *     // stage of transaction processing "in memory, non-db" logic (e.g. work with the Resource
@@ -59,14 +59,14 @@ struct NotDefinedApiData
  *
  *     // Actual only for persistent transactions with one element. The warning below MUST be
  *     // fulfilled.
- *     InvalidAccess(), 
+ *     InvalidAccess(),
  *
  *     // Actual only for read transactions with one element. The warning below MUST be fulfilled.
- *     InvalidAccess(), 
+ *     InvalidAccess(),
  *
  *     // Actual only for persistent transactions with an element list. The warning below MUST be
  *     // fulfilled.
- *     InvalidFilterFunc(), 
+ *     InvalidFilterFunc(),
  *
  *     // Filter the requested list by the specified checker. The warning below MUST be fulfilled.
  *     FilterListByAccess<ShowreelAccess>(),

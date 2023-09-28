@@ -4,7 +4,7 @@
 #include "drag_processor.h"
 
 DragProcessHandler::DragProcessHandler():
-    m_processor(nullptr) 
+    m_processor(nullptr)
 {}
 
 DragProcessHandler::~DragProcessHandler() {

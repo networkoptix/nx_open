@@ -132,7 +132,7 @@ protected:
 
         // Try to read one byte more - this way we can detect if the incoming message is larger
         // than expected.
-        Buffer response(expected.size() + 1, 0); 
+        Buffer response(expected.size() + 1, 0);
 
         const auto bytesRead = m_client->recv(response.data(), response.size(), 0);
         const auto errorCode = SystemError::getLastOSErrorCode();

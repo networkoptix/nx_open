@@ -39,7 +39,7 @@ const QColor HintButton::kBasicColor = "#49626F";
 const nx::vms::client::core::SvgIconColorer::IconSubstitutions HintButton::kIconSubstitutions = {
     {QIcon::Normal, {{kBasicColor, "dark15"}}},
     {QIcon::Active, {{kBasicColor, "dark14"}}},
-};              
+};
 
 HintButton::HintButton(QWidget* parent):
     base_type(parent),

@@ -44,7 +44,7 @@ cf::future<std::size_t> futurizeIo(Func func, AbstractAsyncChannel* channel, con
                         #if defined(__linux__) && defined(__GNUC__) && ( \
                             __GNUC__ < 8 \
                             || __GNUC__ == 8 && __GNUC_MINOR__ < 3 \
-                            || __GNUC__ == 9 && __GNUC_MINOR__ < 1) 
+                            || __GNUC__ == 9 && __GNUC_MINOR__ < 1)
                             std::generic_category()
                         #else
                             std::system_category()

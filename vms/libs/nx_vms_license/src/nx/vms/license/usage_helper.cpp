@@ -378,7 +378,7 @@ std::set<QnUuid> UsageHelper::usedDevices(Qn::LicenseType licenseType) const
     /* In all cases but analog encoder licenses m_cache.used contains already valid number. */
     NX_ASSERT(licenseType != Qn::LC_AnalogEncoder);
     std::set<QnUuid> result;
-    
+
     for (const auto& id: m_cache.used[licenseType])
         result.insert(id);
     for (const auto& id: m_cache.overflow[licenseType])

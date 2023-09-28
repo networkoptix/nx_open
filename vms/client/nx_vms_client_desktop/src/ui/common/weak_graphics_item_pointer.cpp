@@ -62,7 +62,7 @@ WeakGraphicsItemPointer::WeakGraphicsItemPointer(QGraphicsItem *item):
         m_guard = object;
         return;
     }
-    
+
     QObject *guard = item->data(GUARD_KEY).value<QObject *>();
     if(guard == nullptr) {
         guard = new GuardItem(item);
@@ -129,7 +129,7 @@ int WeakGraphicsItemPointerList::lastIndexOf(QGraphicsItem *value, int from) con
         from = size() - 1;
     }
 
-    if (from >= 0) 
+    if (from >= 0)
         for(const_iterator pos = begin() + from, end = this->end(); pos != end; pos--)
             if(pos->data() == value)
                 return pos - begin();
@@ -171,6 +171,6 @@ bool WeakGraphicsItemPointerList::removeOne(QGraphicsItem *value) {
         remove(index);
         return true;
     }
-    
+
     return false;
 }

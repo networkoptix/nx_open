@@ -29,5 +29,5 @@ with bookmarks display on the timeline). Updates QnTimelineBookmarksWatcher text
 
 ### nx::vms::client::desktop::AnalyticsSearchSynchronizer
 Synchronizes Analytics chunks display with its *active* state. Synchronizes analytics search
-rectangle in [AnalyticsSearchWidget] with the analytics selection rectangle on current 
+rectangle in [AnalyticsSearchWidget] with the analytics selection rectangle on current
 **Workbench** resource widget.

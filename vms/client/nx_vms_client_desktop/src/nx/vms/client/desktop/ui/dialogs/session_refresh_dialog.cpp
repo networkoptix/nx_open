@@ -148,7 +148,7 @@ void SessionRefreshDialog::refreshSession()
             if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
             {
                 NX_DEBUG(this, "Received token with length: %1", session->token.length());
-                
+
                 if (context()->user()->isTemporary() && context()->user()->getId() != session->id)
                 {
                     desktop::LogonData logonData;

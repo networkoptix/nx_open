@@ -45,7 +45,7 @@ NX_REFLECTION_INSTRUMENT_TEMPLATE(Foo, (v))
 
 //-------------------------------------------------------------------------------------------------
 
-namespace { 
+namespace {
 using FooVector = Foo<QVector<std::string>>;
 } // namespace
 
@@ -54,7 +54,7 @@ TEST_F(QtContainersNxReflectSupport, QVector)
     FooVector foo{{"1", "2", "3"}};
     assertWorks(foo, R"({"v":["1","2","3"]})");
     assertWorks(foo.v, R"(["1","2","3"])");
-    
+
     assertWorks(FooVector{}, "{\"v\":[]}");
     assertWorks(FooVector{}.v, "[]");
 }

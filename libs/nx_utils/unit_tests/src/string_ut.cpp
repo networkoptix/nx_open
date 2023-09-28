@@ -291,31 +291,31 @@ TEST_P(JsonFormatting, validateFormat)
 
 static std::vector<JsonFormatInput> kJsonFormatInput {
     {
-        "{}", 
+        "{}",
         "{}",
     },
     {
-        "[]", 
+        "[]",
         "[]",
     },
     {
-        "{", 
+        "{",
         "{",
     },
     {
-        "[", 
+        "[",
         "[",
     },
     {
-        "}", 
+        "}",
         "\n}"
     },
     {
-        "]", 
+        "]",
         "\n]"
     },
     {
-        "{{", 
+        "{{",
 /*suppress newline*/ 1 + (const char*) R"json(
 {
     {)json"

@@ -26,7 +26,7 @@ public:
     virtual ~QnPlatformProcess() {}
 
     /**
-     * \returns                         PID of this process, or -1 if this 
+     * \returns                         PID of this process, or -1 if this
      *                                  process is not valid (e.g. not yet started).
      */
     virtual qint64 pid() const = 0;

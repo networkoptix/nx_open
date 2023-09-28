@@ -462,13 +462,13 @@ struct SystemOfferPatch
 };
 
 /**
- * System attribute 
+ * System attribute
  */
 struct Attribute
 {
     /**%apidoc Unique attribute name. */
     std::string name;
-    
+
     /**%apidoc Attribute value. */
     std::string value;
 };

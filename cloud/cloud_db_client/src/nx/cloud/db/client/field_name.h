@@ -5,7 +5,7 @@
 // TODO: #akolesnikov. Replace this with nx::reflect::urlencoded
 
 /**
- * Generates static const structName_fieldName_str with "fieldName" value 
+ * Generates static const structName_fieldName_str with "fieldName" value
  * and checks in compile time that specified field actually exists.
  */
 #define MAKE_FIELD_NAME_STR_CONST(structName, fieldName)                    \

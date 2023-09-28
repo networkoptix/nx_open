@@ -21,7 +21,7 @@ std::list<T> generatePath(const T(&verticeArray)[arraySize])
     return l;
 }
 
-} // namespace 
+} // namespace
 
 TEST(Digraph, findAnyPath)
 {

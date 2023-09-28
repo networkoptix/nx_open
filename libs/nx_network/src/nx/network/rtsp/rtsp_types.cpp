@@ -30,7 +30,7 @@ std::string serializeSubseconds(int64_t timeUs)
     return subseconds.toStdString();
 }
 
-} // namespace 
+} // namespace
 
 std::string toString(int statusCode)
 {
@@ -227,7 +227,7 @@ bool Range::parseNxClockTime(int64_t* timeUs, std::string_view serialized)
     int64_t us = toByteArray(serialized).toLongLong(&ok);
     if (!ok)
         return false;
-    
+
     if (us < 1'000'000)
         us *= 1'000'000;
 
@@ -275,7 +275,7 @@ std::string Range::serializeNptTime(int64_t timeUs) const
     if (timeUs == DATETIME_NOW)
         return "now";
 
-    return QString::number((qlonglong) timeUs / 1'000'000).toStdString() + 
+    return QString::number((qlonglong) timeUs / 1'000'000).toStdString() +
            serializeSubseconds(timeUs);
 }
 

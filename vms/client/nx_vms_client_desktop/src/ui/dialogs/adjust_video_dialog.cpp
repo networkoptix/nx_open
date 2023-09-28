@@ -29,7 +29,7 @@ QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent) :
 
     connect(ui->autoGammaCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_sliderValueChanged()));
     connect(ui->enableAdjustment, SIGNAL(toggled(bool)), this, SLOT(at_sliderValueChanged()));
-    
+
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonClicked(QAbstractButton*)));
 
     setHelpTopic(this, HelpTopic::Id::ImageEnhancement);
@@ -49,7 +49,7 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
         m_widget->renderer()->disconnect(this);
         m_widget->renderer()->setHistogramConsumer(0);
     }
-    
+
     m_widget = widget;
     if (m_widget) {
         m_widget->renderer()->setHistogramConsumer(histogramConsumer());
@@ -60,7 +60,7 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
         //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
         m_backupParams = widget->imageEnhancement();
     }
-    
+
     if(!m_widget) {
         setWindowTitle(tr("Image Enhancement"));
     } else {

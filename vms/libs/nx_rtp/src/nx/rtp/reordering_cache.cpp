@@ -136,7 +136,7 @@ void ReorderingCache::insertPacket(const Packet& packet)
     m_packets.insert(pos, packet);
 }
 
-int ReorderingCache::getTotalSize() const 
+int ReorderingCache::getTotalSize() const
 {
     return m_packets.size() + m_lostSequences.size();
 }

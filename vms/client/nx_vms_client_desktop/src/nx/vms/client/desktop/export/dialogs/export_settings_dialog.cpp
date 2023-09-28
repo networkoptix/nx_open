@@ -66,7 +66,7 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
 };
 
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions
-kCheckedIconSubstitutionsSettings =
+    kCheckedIconSubstitutionsSettings =
 {
         {QIcon::Normal, {{kLight16Color, "light15"}}},
 };

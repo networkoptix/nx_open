@@ -11,8 +11,8 @@
 class DestructionGuardItem: public QGraphicsObject {
     Q_OBJECT;
 public:
-    DestructionGuardItem(QGraphicsItem *parent = nullptr): 
-        QGraphicsObject(parent) 
+    DestructionGuardItem(QGraphicsItem *parent = nullptr):
+        QGraphicsObject(parent)
     {
         setFlags(ItemHasNoContents);
         setAcceptedMouseButtons(Qt::NoButton);

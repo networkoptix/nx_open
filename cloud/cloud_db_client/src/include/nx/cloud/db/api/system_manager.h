@@ -183,16 +183,16 @@ public:
     virtual void updateSystemAttribute(
         const std::string& systemId,
         const api::Attribute& attributes,
-        std::function<void(api::ResultCode, api::Attribute)> completionHandler) = 0; 
+        std::function<void(api::ResultCode, api::Attribute)> completionHandler) = 0;
 
     virtual void getSystemAttributes(
         const std::string& systemId,
-        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) = 0; 
+        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) = 0;
 
     virtual void deleteSystemAttribute(
         const std::string& systemId,
         const std::string& attrName,
-        std::function<void(api::ResultCode)> completionHandler) = 0;       
+        std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

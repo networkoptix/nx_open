@@ -21,7 +21,7 @@ struct NX_VMS_API TimeZonesData
     bool hasDaylightTime = false;
 
     /**%apidoc
-     * Whether the time zone is on DST right now. To be reported properly, the server machine 
+     * Whether the time zone is on DST right now. To be reported properly, the server machine
      * should have the correct current time set.
      */
     bool isDaylightTime = false;

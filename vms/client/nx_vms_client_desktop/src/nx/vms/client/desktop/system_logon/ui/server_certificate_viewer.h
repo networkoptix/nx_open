@@ -75,7 +75,7 @@ private:
         Mode mode,
         const nx::vms::api::ModuleInformation& target,
         const nx::network::SocketAddress& primaryAddress);
-        
+
     static QString certificateDafaultName();
 
 private:

@@ -12,9 +12,9 @@ namespace nx::utils {
  * struct A {};
  * struct B {};
  * struct C {};
- * 
+ *
  * using T = std::variant<A, B, C>;
- * 
+ *
  * T getT();
  *
  * void f()

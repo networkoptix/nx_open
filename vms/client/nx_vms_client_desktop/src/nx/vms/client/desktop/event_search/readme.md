@@ -22,9 +22,9 @@
 [BookmarkSearchSynchronizer]: @ref nx::vms::client::desktop::BookmarkSearchSynchronizer
 [AnalyticsSearchSynchronizer]: @ref nx::vms::client::desktop::AnalyticsSearchSynchronizer
 
-Right Panel is a pane at the right side of viewport that displays realtime notifications and 
-system events of different kind, as well as provides means to lookup past events in the archive. 
-Archive lookup is implemented as fetch-on-demand, loading data in batches when more data 
+Right Panel is a pane at the right side of viewport that displays realtime notifications and
+system events of different kind, as well as provides means to lookup past events in the archive.
+Archive lookup is implemented as fetch-on-demand, loading data in batches when more data
 is requested.
 
 The panel consists of several tabs, each of them displaying vertically scrollable ribbon of tiles.
@@ -46,7 +46,7 @@ system notifications. It uses a concatenation of [SystemHealthListModel], [Local
 [NotificationListModel]. Concatenation is done via utility [ConcatenationListModel].
 
 ## Motion tab
-Represented by [SimpleMotionSearchWidget]. Complements motion search mode and displays tiles 
+Represented by [SimpleMotionSearchWidget]. Complements motion search mode and displays tiles
 corresponding to motion chunks. Uses [SimpleMotionSearchListModel]. Is synchronized with
 **Workbench** state by [MotionSearchSynchronizer].
 
@@ -55,7 +55,7 @@ Represented by [BookmarkSearchWidget]. Displays bookmarks. Uses [BookmarkSearchL
 Is synchronized with **Workbench** state by [BookmarkSearchSynchronizer].
 
 ## Events tab
-Represented by [EventSearchWidget]. Displays events recorded to system event log. Uses 
+Represented by [EventSearchWidget]. Displays events recorded to system event log. Uses
 [EventSearchListModel]. Does not require a **Workbench** state synchronizer.
 
 ## Detected objects tab

@@ -14,13 +14,13 @@ namespace Ui {
 class QnImagePreviewDialog : public QnDialog
 {
     Q_OBJECT
-    
+
     typedef QnDialog base_type;
 
 public:
     explicit QnImagePreviewDialog(QWidget *parent);
     ~QnImagePreviewDialog();
-    
+
     void openImage(const QString &filename);
 
 private slots:

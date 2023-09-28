@@ -14,7 +14,7 @@ enum ResourceDialogItemRole
     BackupEnabledRole, //< Type is bool.
     BackupContentTypesRole, //< Type is nx::vms::api::BackupContentTypes.
     BackupQualityRole, //< Type is nx::vms::api::CameraBackupQuality.
-    HasDropdownMenuRole, //< Type is bool.      
+    HasDropdownMenuRole, //< Type is bool.
     InfoMessageRole, //< Type is QString.
     IsItemWarningStyleRole, //< Type is bool, true if item should have special 'Warning' appearance.
     WarningMessagesRole, //< Type is QVector<QPair<QString, QString>>, warning caption and warning description.

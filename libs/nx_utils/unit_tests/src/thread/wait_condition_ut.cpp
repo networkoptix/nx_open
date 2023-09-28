@@ -21,15 +21,15 @@ protected:
                 bool result = m_condVar.waitFor(
                     lock.mutex(),
                     timeout,
-                    [this]() 
-                    { 
+                    [this]()
+                    {
                         ++m_predicatCallCounter;
-                        return m_flag; 
+                        return m_flag;
                     });
                 return result;
             });
     }
-    
+
     void satisfyCondition()
     {
         NX_MUTEX_LOCKER lock(&m_mutex);

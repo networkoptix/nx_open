@@ -18,7 +18,7 @@ namespace nx::vms::common::saas {
  *  for local and cloud licenses.
  *  This class is intended to calculate other (new) services for cloud licenses
  */
-class NX_VMS_COMMON_API CloudServiceUsageHelper: 
+class NX_VMS_COMMON_API CloudServiceUsageHelper:
     public QObject,
     public /*mixin*/ SystemContextAware
 {
@@ -59,7 +59,7 @@ public:
 
     /*
      * @return Information about cameras which consume SAAS integration services.
-     * key - serviceId, value - the list of consumed cameras. 
+     * key - serviceId, value - the list of consumed cameras.
      */
     std::map<QnUuid, std::set<QnUuid>> camerasByService() const;
 

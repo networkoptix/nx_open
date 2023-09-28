@@ -19,7 +19,7 @@ struct NX_VMS_API WebRtcTrackerSettings: public MediaSettings
     /**%apidoc
      * If specified, regulates the speed of streaming from the Archive. Has no effect for live
      * streaming.
-     * 
+     *
      * %value 1.0 Default value.
      * %value unlimited Stream with the maximum possible speed.
      */

@@ -10,7 +10,7 @@
 
 /**
  * Wheel zoom instrument implements scene zooming with a mouse wheel.
- * 
+ *
  * It is to be installed after a scene forwarding instrument.
  */
 class WheelZoomInstrument: public Instrument, protected KineticProcessHandler, public QnWorkbenchContextAware {

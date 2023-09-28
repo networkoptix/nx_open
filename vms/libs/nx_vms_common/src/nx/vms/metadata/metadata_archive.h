@@ -22,8 +22,8 @@ static const int kGeometrySize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 
         //< Record duration. Up to 4.5 hours.
         quint32 duration() const { return durationAndRecCount & 0xffffff; }
         quint8 recordCount() const { return (durationAndRecCount >> 24) + 1; }
-        void setRecordCount(quint8 recordCount) 
-        { 
+        void setRecordCount(quint8 recordCount)
+        {
             durationAndRecCount = (durationAndRecCount & 0xffffff) + ((recordCount - 1) << 24);
         }
     };

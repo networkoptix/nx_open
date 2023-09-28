@@ -246,7 +246,7 @@ Q_INVOKABLE Qt::KeyboardModifiers sendKeys(
                 continue;
             }
         }
-        sendKey(keys.mid(i, 1)); 
+        sendKey(keys.mid(i, 1));
     }
     return Qt::NoModifier;
 }

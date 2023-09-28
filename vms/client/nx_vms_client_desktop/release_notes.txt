@@ -14,17 +14,17 @@ September 27, 2011 UPDATES - Version 1.2.6 (PC and Mac)
 
 September 22, 2011 UPDATES - Version 1.2.5 (PC and Mac)
 
-253 - Video camera recording format is changed from proprietary to standard MKV(Matroska). 
+253 - Video camera recording format is changed from proprietary to standard MKV(Matroska).
       It can now be played in any media player and be instantly be uploaded to YouTube® – IMPROVED
 261 - Some videos had a green line appear on the right edge – FIXED
 269 - “Open in containing folder” menu item didn’t work on Mac – FIXED
 270 - Slowdown in videos that require high CPU usage – IMPROVED
 271 - Slowdown in videos while using fast forward/fast backward – FIXED
 277 - Issues with jumping to 0:00 – FIXED
-183 - Video audio/video synchronization: delay by 120 ms in some videos 
+183 - Video audio/video synchronization: delay by 120 ms in some videos
       (especially H.264) – FIXED
 284 - Acceleration in video after Pause is released - FIXED.
-285 - Layouts: BluRay/DVD disks could not be restored in layouts 
+285 - Layouts: BluRay/DVD disks could not be restored in layouts
      (also layout did not work if items contained localized symbols in their name/path) – FIXED
 
 September 16, 2011 UPDATES - Version D.1.2.2 (Mac)

@@ -75,7 +75,7 @@ void MultipartBodySerializer::startBodyPartInternal(
 
     nx::Buffer serializedData;
     nx::utils::buildString(&serializedData, m_delimiter, "\r\n", "Content-Type: ", contentType, "\r\n");
-    
+
     serializeHeaders(headers, &serializedData);
     if (contentLength && (headers.find("Content-Length") == headers.end()))
     {

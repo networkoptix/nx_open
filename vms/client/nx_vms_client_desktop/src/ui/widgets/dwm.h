@@ -21,7 +21,7 @@ public:
     virtual ~QnDwm();
 
     /**
-     * \returns                         Whether this API is supported. 
+     * \returns                         Whether this API is supported.
      */
     static bool isSupported();
 
@@ -32,7 +32,7 @@ public:
 
     /**
      * Enables blur-behind on a widget.
-     * 
+     *
      * Note that for aero glass to work, <tt>WA_TranslucentBackground</tt> and
      * <tt>WA_NoSystemBackground</tt> attributes must be set.
      *
@@ -60,7 +60,7 @@ public:
     /**
      * Note that this function queries frame margins from the system and returned
      * margins may differ from the ones calculated via <tt>QWidget::frameGeometry</tt>.
-     * 
+     *
      * Also note that window frame includes title bar area.
      *
      * \returns                         Current window's frame margins, negative margins on error.
@@ -74,7 +74,7 @@ public:
     bool setCurrentFrameMargins(const QMargins &margins);
 
     /**
-     * Note that returned margins DO NOT include title bar area. 
+     * Note that returned margins DO NOT include title bar area.
      *
      * \returns                         Frame margins as dictated by the current desktop theme,
      *                                  Negative margins on error.
@@ -82,14 +82,14 @@ public:
     QMargins themeFrameMargins() const;
 
     /**
-     * \returns                         Height of the title bar area as dictated by the 
+     * \returns                         Height of the title bar area as dictated by the
      *                                  current desktop theme, -1 on error.
      */
     int themeTitleBarHeight() const;
 
     /**
      * This function is to be called at the end of widget's <tt>event</tt> handler.
-     * 
+     *
      * \param event                     Event.
      * \returns                         Whether the event was processed.
      */
@@ -97,7 +97,7 @@ public:
 
     /**
      * This function is to be called from widget's <tt>nativeEvent</tt> handler.
-     * 
+     *
      * \param eventType
      * \param message
      * \param[out] result
