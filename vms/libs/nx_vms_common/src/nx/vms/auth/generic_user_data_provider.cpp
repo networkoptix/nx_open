@@ -131,5 +131,3 @@ std::tuple<AuthResult, QnResourcePtr> GenericUserDataProvider::authorize(
         authorize(res.first, method, authorizationHeader, responseHeaders),
         res.first);
 }
-
-

@@ -139,4 +139,3 @@ void QnCurtainAnimator::setCurtained(bool value)
     else
         emit uncurtained();
 }
-

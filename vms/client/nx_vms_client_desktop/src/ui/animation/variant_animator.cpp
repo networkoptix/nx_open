@@ -337,5 +337,3 @@ QVariant VariantAnimator::internalStartValue() const {
         return currentValue();
     }
 }
-
-

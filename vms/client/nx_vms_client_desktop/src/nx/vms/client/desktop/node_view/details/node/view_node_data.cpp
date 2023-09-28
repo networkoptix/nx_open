@@ -310,4 +310,3 @@ ViewNodeData::DifferenceData ViewNodeData::difference(const ViewNodeData& other)
 } // namespace details
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

@@ -44,4 +44,3 @@ public:
 };
 
 } // namespace nx::vms::client::desktop
-

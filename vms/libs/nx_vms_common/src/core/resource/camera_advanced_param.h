@@ -308,4 +308,3 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterCondition,
     NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterOverload, (json), NX_VMS_COMMON_API)
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParamsPostBody, (json), NX_VMS_COMMON_API)
-

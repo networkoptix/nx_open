@@ -49,4 +49,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(DiscoveredServerData, (ubjson)(json)(xml)(
 } // namespace api
 } // namespace vms
 } // namespace nx
-

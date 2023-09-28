@@ -32,5 +32,3 @@ protected:
 };
 
 } // namespace nx::vms::client::desktop::figure
-
-

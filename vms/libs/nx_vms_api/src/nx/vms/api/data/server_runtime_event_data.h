@@ -97,4 +97,3 @@ NX_REFLECTION_INSTRUMENT(DeviceAdvancedSettingsManifestChangedData,
     nx_vms_api_DeviceAdvancedSettingsManifestChangedData_Fields)
 
 } // namespace nx::vms::api
-

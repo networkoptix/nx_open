@@ -17,4 +17,3 @@ __VA_ARGS__ size_t qHash(const TYPE &value, size_t seed = 0);
 #define QN_FUSION_DECLARE_FUNCTIONS_eq(TYPE, ... /* PREFIX */)                  \
 __VA_ARGS__ bool operator==(const TYPE &l, const TYPE &r);                      \
 __VA_ARGS__ bool operator!=(const TYPE &l, const TYPE &r);
-

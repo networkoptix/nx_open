@@ -350,4 +350,3 @@ namespace QnProto {
     }
 
 } // namespace QnProto
-

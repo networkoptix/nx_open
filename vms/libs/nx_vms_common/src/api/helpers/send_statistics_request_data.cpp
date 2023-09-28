@@ -27,4 +27,3 @@ nx::network::rest::Params QnSendStatisticsRequestData::toParams() const
     result.insert(kStatServerUrlTag, statisticsServerUrl);
     return result;
 }
-

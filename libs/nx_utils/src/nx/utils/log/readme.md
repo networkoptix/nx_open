@@ -210,4 +210,3 @@ When using a configuration file (`nx::utils::log::Settings::load(...) `) , then 
 [log]
 logger=...
 ```
-

@@ -49,5 +49,3 @@ private:
 using ValueGroupMonitors = std::map<QString, std::unique_ptr<ValueGroupMonitor>>;
 
 } // namespace nx::vms::utils::metrics
-
-

@@ -37,4 +37,3 @@ void Logger::verbose(const QString& message) const
 }
 
 } // namespace nx::vms::client::desktop::jsapi
-

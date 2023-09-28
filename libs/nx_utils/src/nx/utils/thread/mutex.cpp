@@ -106,4 +106,3 @@ void WaitCondition::wakeOne()
 }
 
 } // namespace nx
-

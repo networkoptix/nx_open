@@ -14,4 +14,3 @@ struct VirtualCameraState;
 using VirtualCameraPayloadList = QList<VirtualCameraPayload>;
 
 } // namespace nx::vms::client::desktop
-

@@ -78,4 +78,3 @@ int glCheckError(const char *context)
     return 0;
 #endif
 }
-

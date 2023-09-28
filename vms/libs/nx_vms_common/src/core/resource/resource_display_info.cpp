@@ -175,4 +175,3 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
         m_extraInfo = m_host;
     }
 }
-

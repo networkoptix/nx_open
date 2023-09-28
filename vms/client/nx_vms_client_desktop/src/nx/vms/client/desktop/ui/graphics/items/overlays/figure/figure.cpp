@@ -197,4 +197,3 @@ bool operator!=(const Figure& left, const Figure& right)
 }
 
 } // namespace nx::vms::client::desktop::figure
-

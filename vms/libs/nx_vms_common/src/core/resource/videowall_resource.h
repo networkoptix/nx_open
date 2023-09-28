@@ -85,4 +85,3 @@ private:
     QScopedPointer<QnThreadsafeItemStorage<QnVideoWallPcData> > m_pcs;
     QScopedPointer<QnThreadsafeItemStorage<QnVideoWallMatrix> > m_matrices;
 };
-

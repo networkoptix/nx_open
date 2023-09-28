@@ -128,4 +128,3 @@ public:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Ptz::Traits)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Ptz::Capabilities)
-

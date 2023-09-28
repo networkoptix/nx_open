@@ -104,4 +104,3 @@ details::NodeViewStatePatch NodeViewStateReducer::applyUserChangesPatch(
 
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

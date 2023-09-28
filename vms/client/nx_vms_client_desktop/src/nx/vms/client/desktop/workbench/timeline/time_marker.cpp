@@ -197,4 +197,3 @@ void TimeMarker::Private::updatePosition()
 }
 
 } // namespace nx::vms::client::desktop::workbench::timeline
-

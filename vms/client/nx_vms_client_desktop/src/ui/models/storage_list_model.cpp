@@ -580,4 +580,3 @@ bool QnStorageListModel::isStorageInRebuild(const QnStorageModelInfo& storage) c
     }
     return false;
 }
-

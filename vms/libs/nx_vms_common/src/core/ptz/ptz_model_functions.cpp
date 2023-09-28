@@ -13,4 +13,3 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzTourSpot, (json), QnPtzTourSpot_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzTour, (json), QnPtzTour_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzData, (json), QnPtzData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzObject, (json), QnPtzObject_Fields)
-

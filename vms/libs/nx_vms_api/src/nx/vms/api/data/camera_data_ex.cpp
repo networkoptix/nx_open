@@ -51,4 +51,3 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, CameraDataEx *targ
 } // namespace api
 } // namespace vms
 } // namespace nx
-

@@ -56,4 +56,3 @@ QString QnCloudResultInfo::toString(ResultCode code)
                 .arg(nx::branding::cloudName());
     }
 }
-

@@ -441,4 +441,3 @@ Return the same result as `/ec2/metrics/{values|alarms}` but includes only resou
 server only. Used internally to implement ec2 versions. Optional parameters:
 - `?formatted` - apply format (like in alarms). Should be used for debug only;
 - `&system` - also show all of the data known to this server (system values for system resources).
-

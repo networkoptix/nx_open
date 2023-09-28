@@ -452,4 +452,3 @@ QnSharedResourcePointer<Resource> QnResource::toSharedPointer(const Resource* re
     using ::toSharedPointer; //< Let ADL kick in.
     return toSharedPointer(resource);
 }
-

@@ -171,4 +171,3 @@ QnVirtualCameraResourcePtr TwoWayAudioAvailabilityWatcher::audioOutputDevice()
 }
 
 } // namespace nx::vms::client::core
-

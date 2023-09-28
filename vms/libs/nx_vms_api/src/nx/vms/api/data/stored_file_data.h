@@ -47,4 +47,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(StoredFilePath)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

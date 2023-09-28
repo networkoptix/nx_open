@@ -121,4 +121,3 @@ NX_VMS_API_DECLARE_STRUCT(PeerDataEx)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

@@ -16,4 +16,3 @@ public:
 
     virtual void reset() = 0;
 };
-

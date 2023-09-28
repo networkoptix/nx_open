@@ -21,4 +21,3 @@ NX_REFLECTION_INSTRUMENT(CloudSystemData, CloudSystemData_Fields)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

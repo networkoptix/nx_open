@@ -163,4 +163,3 @@ protected:
     qreal m_backgroundOpacity = nx::vms::api::LayoutData::kDefaultBackgroundOpacity;
     bool m_locked = false;
 };
-

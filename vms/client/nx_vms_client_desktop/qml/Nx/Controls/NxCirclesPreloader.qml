@@ -77,4 +77,3 @@ BusyIndicator
         return (20 + index * 16);
     }
 }
-

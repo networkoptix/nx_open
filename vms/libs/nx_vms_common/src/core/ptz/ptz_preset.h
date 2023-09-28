@@ -83,4 +83,3 @@ QN_FUSION_DECLARE_FUNCTIONS(QnPtzPresetRecord, (json), NX_VMS_COMMON_API);
 using QnPtzPresetRecordHash = QHash<QString, QnPtzPresetRecord>;
 
 using QnPtzPresetMapping = QMap<QString, QnPtzPreset>;
-

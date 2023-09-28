@@ -153,4 +153,3 @@ ViewNodeData ViewNodeDataBuilder::data() const
 } // namespace details
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

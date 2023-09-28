@@ -8,5 +8,3 @@
 #ifdef _WIN32
     #include "windows/directx_utils.h"
 #endif
-
-

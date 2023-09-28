@@ -115,4 +115,3 @@ CloudCrossSystemContext* CloudCrossSystemManager::systemContext(const QString& s
 }
 
 } // namespace nx::vms::client::desktop
-

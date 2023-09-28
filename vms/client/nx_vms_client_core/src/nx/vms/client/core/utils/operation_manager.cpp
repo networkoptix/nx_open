@@ -42,4 +42,3 @@ void OperationManager::finishOperation(const QString& id, bool success)
 }
 
 } // namespace nx::vms::client::core
-

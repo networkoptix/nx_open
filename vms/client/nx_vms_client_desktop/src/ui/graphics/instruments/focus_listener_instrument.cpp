@@ -35,13 +35,3 @@ void FocusListenerInstrument::setFocusItem(QGraphicsItem *focusItem) {
 
     emit focusItemChanged();
 }
-
-
-
-
-
-
-
-
-
-

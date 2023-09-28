@@ -54,4 +54,3 @@ QCursor QnLinuxImages::bitmapCursor(Qt::CursorShape shape) const {
     XFree(xImage);
     return result;
 }
-

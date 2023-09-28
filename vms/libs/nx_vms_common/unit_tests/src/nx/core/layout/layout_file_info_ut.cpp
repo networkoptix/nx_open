@@ -55,4 +55,3 @@ TEST(LayoutFileInfo, Basic)
     ASSERT_TRUE(fileInfo.isCrypted);
     ASSERT_TRUE(fileInfo.offset == 10000 * sizeof(quint64));
 }
-

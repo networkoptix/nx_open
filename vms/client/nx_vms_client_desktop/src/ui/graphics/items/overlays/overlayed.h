@@ -144,4 +144,3 @@ protected:
 
 
 #endif // QN_OVERLAYED_H
-

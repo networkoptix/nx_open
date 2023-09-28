@@ -268,5 +268,3 @@ QnDirectSystemsFinder::getSystemItByServer(const QnUuid &serverId)
     const auto systemId = it.value();
     return m_systems.find(systemId);
 }
-
-

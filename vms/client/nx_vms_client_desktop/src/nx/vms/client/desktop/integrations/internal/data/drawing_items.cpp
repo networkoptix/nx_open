@@ -41,4 +41,3 @@ bool Line::isValid() const
 }
 
 } // namespace nx::vms::client::desktop::integrations::internal::roi
-

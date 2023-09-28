@@ -62,4 +62,3 @@ struct NX_VMS_COMMON_API QnPtzTour
     QnPtzTourSpotList spots;
 };
 #define QnPtzTour_Fields (id)(name)(spots)
-

@@ -44,4 +44,3 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
     return nx::vms::client::desktop::ui::messages::Resources::changeVideoWallLayout(
         mainWindowWidget(), inaccessible);
 }
-

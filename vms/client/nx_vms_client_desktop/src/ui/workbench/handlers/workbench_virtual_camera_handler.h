@@ -54,4 +54,3 @@ private:
     QnUuid m_currentCameraUuid;
     QHash<QnUuid, QnUuid> m_currentProgresses; //< Camera id -> progress id.
 };
-

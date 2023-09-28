@@ -15,4 +15,3 @@ void InstrumentedBase::updateScene(QGraphicsScene *scene, QGraphicsItem *item) {
     if(InstrumentManager *manager = InstrumentManager::instance(m_scene))
         manager->registerItem(item, true);
 }
-

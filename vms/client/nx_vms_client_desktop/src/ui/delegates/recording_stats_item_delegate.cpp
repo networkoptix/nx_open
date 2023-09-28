@@ -148,4 +148,3 @@ void QnRecordingStatsItemDelegate::initStyleOption(QStyleOptionViewItem* option,
 
     option->fontMetrics = QFontMetrics(option->font);
 }
-

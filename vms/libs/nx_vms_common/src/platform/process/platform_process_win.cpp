@@ -169,4 +169,3 @@ void QnWindowsProcess::setPriority(Priority priority) {
 void QnWindowsProcess::at_process_stateChanged() {
     d_func()->tryInitialize();
 }
-

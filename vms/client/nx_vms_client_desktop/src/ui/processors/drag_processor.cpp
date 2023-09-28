@@ -558,4 +558,3 @@ Qt::KeyboardModifiers DragInfo::modifiers() const {
 QPoint DragInfo::mouseViewportPos() const {
     return view()->viewport()->mapFromGlobal(mouseScreenPos());
 }
-

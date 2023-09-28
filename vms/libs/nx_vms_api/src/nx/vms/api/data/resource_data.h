@@ -125,4 +125,3 @@ struct NX_VMS_API ResourceWithParameters
 };
 
 } // namespace nx::vms::api
-

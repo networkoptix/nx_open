@@ -48,4 +48,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(SystemMergeHistoryRecord)
 } // namespace api
 } // namespace vms
 } // namespace nx
-

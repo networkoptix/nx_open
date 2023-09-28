@@ -17,4 +17,3 @@ struct NX_VMS_API WebPageData: ResourceData
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(WebPageData)
 
 } // namespace nx::vms::api
-

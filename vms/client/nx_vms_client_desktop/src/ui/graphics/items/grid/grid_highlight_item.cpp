@@ -30,4 +30,3 @@ void QnGridHighlightItem::setRect(const QRectF &rect) {
 void QnGridHighlightItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     painter->fillRect(m_rect, m_color);
 }
-

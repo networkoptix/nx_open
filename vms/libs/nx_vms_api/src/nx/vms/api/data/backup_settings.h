@@ -36,4 +36,3 @@ NX_VMS_API_DECLARE_STRUCT_AND_LIST(BackupSettings)
 NX_REFLECTION_INSTRUMENT(BackupSettings, BackupSettings_Fields)
 
 } // namespace nx::vms::api
-

@@ -78,4 +78,3 @@ CloudLayoutsSource::CloudLayoutsSource()
 
 } // namespace entity_resource_tree
 } // namespace nx::vms::client::desktop
-

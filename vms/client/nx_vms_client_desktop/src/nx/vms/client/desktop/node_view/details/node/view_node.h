@@ -71,4 +71,3 @@ size_t qHash(const ViewNodePath& path);
 } // namespace details
 } // namespace node_view
 } // namespace nx::vms::client::desktop
-

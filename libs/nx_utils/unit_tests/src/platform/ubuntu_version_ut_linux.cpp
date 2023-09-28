@@ -172,4 +172,3 @@ BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
 }
 
 } // namespace nx::utils::test
-

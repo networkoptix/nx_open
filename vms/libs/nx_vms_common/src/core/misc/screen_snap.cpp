@@ -92,4 +92,3 @@ QDebug operator<<(QDebug dbg, const QnScreenSnaps& snaps)
         << ")";
     return dbg.space();
 }
-

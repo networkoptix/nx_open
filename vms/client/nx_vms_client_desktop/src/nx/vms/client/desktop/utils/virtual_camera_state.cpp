@@ -75,4 +75,3 @@ QnTimePeriodList VirtualCameraState::periods() const
 }
 
 } // namespace nx::vms::client::desktop
-

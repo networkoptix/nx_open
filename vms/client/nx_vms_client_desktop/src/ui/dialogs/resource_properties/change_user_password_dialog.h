@@ -33,5 +33,3 @@ private:
     Q_DISABLE_COPY(QnChangeUserPasswordDialog)
     QScopedPointer<Ui::ChangeUserPasswordDialog> ui;
 };
-
-
