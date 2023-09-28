@@ -915,7 +915,9 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     const auto& users = systemContext()->resourcePool()->getResources<QnUserResource>(
         [id = user->getId(), name = user->getName().toLower()](const auto& otherUser)
         {
-            return otherUser->getId() != id && otherUser->getName().toLower() == name;
+            return otherUser->isEnabled() &&
+                otherUser->getId() != id &&
+                otherUser->getName().toLower() == name;
         });
 
     state.nameIsUnique = users.isEmpty();
