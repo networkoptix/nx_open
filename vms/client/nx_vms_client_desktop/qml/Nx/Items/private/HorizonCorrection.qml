@@ -105,7 +105,8 @@ Item
                     let path = []
                     path.length = angles.length + 2 //< For 2 boundary segments.
 
-                    for (let i = 0; i < angles.length; )
+                    let i = 0;
+                    while (i < angles.length)
                     {
                         const x = angles[i].x / 360.0 * shape.width
 
