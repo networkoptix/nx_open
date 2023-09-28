@@ -66,7 +66,7 @@ Item
                     return ""
             }
         }
-        if (model.groupSection == "B")
+        if (model.isPredefined)
             return "image://svg/skin/user_settings/group_built_in.svg"
 
         return model.isLdap
