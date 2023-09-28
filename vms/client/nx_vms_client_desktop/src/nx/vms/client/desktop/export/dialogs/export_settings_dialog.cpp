@@ -66,7 +66,7 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
 };
 
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions
-    kCheckedIconSubstitutionsSettings = 
+kCheckedIconSubstitutionsSettings =
 {
         {QIcon::Normal, {{kLight16Color, "light15"}}},
 };
@@ -160,7 +160,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     exportButton->setText(tr("Export"));
     setAccentStyle(exportButton);
 
-    connect(d.data(), &Private::validated, this, &ExportSettingsDialog::updateAlerts);
+    connect(d.data(), &Private::validated, this, &ExportSettingsDialog::updateMessageBars);
     connect(d.data(), &Private::validated, this, &ExportSettingsDialog::updateWidgetsState);
 
     connect(this, &QDialog::accepted, d.get(), &Private::saveSettings);
@@ -538,57 +538,20 @@ void ExportSettingsDialog::updateTabWidgetSize()
     ui->tabWidget->setFixedSize(ui->tabWidget->minimumSizeHint());
 }
 
-void ExportSettingsDialog::updateAlerts(
-    ExportMode mode, const QStringList& weakAlerts, const QStringList& severeAlerts)
+void ExportSettingsDialog::updateMessageBars(ExportMode mode, const BarDescs& barDescriptions)
 {
-    switch (mode)
-    {
-        case ExportMode::media:
-            updateAlertsInternal(ui->weakMediaAlertsLayout, weakAlerts, false);
-            updateAlertsInternal(ui->severeMediaAlertsLayout, severeAlerts, true);
-            break;
-
-        case ExportMode::layout:
-            updateAlertsInternal(ui->weakLayoutAlertsLayout, weakAlerts, false);
-            updateAlertsInternal(ui->severeLayoutAlertsLayout, severeAlerts, true);
-            break;
-    }
-
+    updateMessageBarsInternal(mode, barDescriptions);
     updateTabWidgetSize();
 }
 
-void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
-    const QStringList& texts, bool severe)
+void ExportSettingsDialog::updateMessageBarsInternal(
+    ExportMode mode, const BarDescs& barDescriptions)
 {
-    const auto newCount = texts.count();
-    const auto oldCount = layout->count();
+    if (mode != ExportMode::media && mode != ExportMode::layout)
+        return;
 
-    const auto setAlertText =
-        [layout](int index, const QString& text)
-        {
-            auto item = layout->itemAt(index);
-            // Notice: notifications are added at the runtime. It is possible to have no
-            // widget so far, especially when dialog is only initialized.
-            if (auto bar = item ? qobject_cast<MessageBar*>(item->widget()) : nullptr)
-                bar->setText(text);
-        };
-
-    if (newCount > oldCount)
-    {
-        // Add new alert bars.
-        for (int i = oldCount; i < newCount; ++i)
-            layout->addWidget(severe ? new AlertBar() : new MessageBar());
-    }
-    else
-    {
-        // Clear unused alerts.
-        for (int i = newCount; i < oldCount; ++i)
-            setAlertText(i, QString());
-    }
-
-    // Set alert texts.
-    for (int i = 0; i < newCount; ++i)
-        setAlertText(i, texts[i]);
+    auto alertBlock = mode == ExportMode::media ? ui->mediaMessageBarBlock : ui->messageBarBlock;
+    alertBlock->setMessageBars(barDescriptions);
 }
 
 void ExportSettingsDialog::updateWidgetsState()

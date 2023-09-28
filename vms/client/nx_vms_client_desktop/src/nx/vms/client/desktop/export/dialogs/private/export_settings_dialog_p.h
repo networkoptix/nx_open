@@ -84,8 +84,7 @@ public:
     void renderState();
 
 signals:
-    void validated(
-        ExportMode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
+    void validated(ExportMode mode, const BarDescs&  alertsBySevereLevel);
     void overlaySelected(ExportOverlayType type);
     void frameSizeChanged(const QSize& size);
     void transcodingModeChanged();
@@ -105,9 +104,7 @@ private:
     void refreshMediaPreview();
     void updateOverlaysVisibility();
 
-    static void generateAlerts(ExportMediaValidator::Results results,
-        QStringList& weakAlerts, QStringList& severeAlerts);
-
+    static BarDescs generateMessageBarDescs(ExportMediaValidator::Results results);
 private:
     // Media group
 

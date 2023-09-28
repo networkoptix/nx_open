@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/utils/transcoding_image_processor.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
@@ -266,10 +267,7 @@ void ExportSettingsDialog::Private::validateSettings(ExportMode mode)
         m_layoutValidationResults = results;
     }
 
-    QStringList weakAlerts, severeAlerts;
-    generateAlerts(results, weakAlerts, severeAlerts);
-
-    emit validated(mode, weakAlerts, severeAlerts);
+    emit validated(mode, generateMessageBarDescs(results));
 }
 
 bool ExportSettingsDialog::Private::hasCameraData() const
@@ -512,72 +510,91 @@ bool ExportSettingsDialog::Private::mediaSupportsUtc() const
         && m_mediaResource->toResource()->hasFlags(Qn::utc);
 }
 
-void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results results,
-    QStringList& weakAlerts, QStringList& severeAlerts)
+ExportSettingsDialog::BarDescs ExportSettingsDialog::Private::generateMessageBarDescs(
+    ExportMediaValidator::Results results)
 {
-    const auto alertText =
-        [](ExportMediaValidator::Result res) -> QString
+    ExportSettingsDialog::BarDescs result;
+
+    const auto barDesc = [](ExportMediaValidator::Result res) -> BarDescription
+    {
+        switch (res)
         {
-            switch (res)
-            {
-                case ExportMediaValidator::Result::transcoding:
-                    return ExportSettingsDialog::tr("Chosen settings require transcoding. "
-                        "It will increase CPU usage and may take significant time.");
+            case ExportMediaValidator::Result::transcoding:
+                return {.text = ExportSettingsDialog::tr(
+                            "Chosen settings require transcoding. "
+                            "It will increase CPU usage and may take significant time."),
+                    .level = BarDescription::BarLevel::Warning,
+                    .isEnabledProperty = &messageBarSettings()->transcodingExportWarning};
 
-                case ExportMediaValidator::Result::aviWithAudio:
-                    return ExportSettingsDialog::tr("AVI format is not recommended to export "
-                        "a recording with audio track.");
+            case ExportMediaValidator::Result::aviWithAudio:
+                return {.text = ExportSettingsDialog::tr("AVI format is not recommended to export "
+                                                         "a recording with audio track."),
+                    .level = BarDescription::BarLevel::Info,
+                    .isEnabledProperty = &messageBarSettings()->aviWithAudioExportInfo};
 
-                case ExportMediaValidator::Result::downscaling:
-                    return ExportSettingsDialog::tr("We recommend to export video from "
-                        "this camera as \"Multi Video\" to avoid downscaling.");
+            case ExportMediaValidator::Result::downscaling:
+                return {.text = ExportSettingsDialog::tr(
+                            "We recommend to export video from "
+                            "this camera as \"Multi Video\" to avoid downscaling."),
+                    .level = BarDescription::BarLevel::Info,
+                    .isEnabledProperty = &messageBarSettings()->downscalingExportInfo};
 
-                case ExportMediaValidator::Result::tooLong:
-                    return ExportSettingsDialog::tr("You are about to export a long video. "
-                        "It may require a lot of storage space and take significant time.");
+            case ExportMediaValidator::Result::tooLong:
+                return {.text = ExportSettingsDialog::tr(
+                            "You are about to export a long video. "
+                            "It may require a lot of storage space and take significant time."),
+                    .level = BarDescription::BarLevel::Warning,
+                    .isEnabledProperty = &messageBarSettings()->tooLongExportWarning};
 
-                case ExportMediaValidator::Result::tooBigExeFile:
-                    return ExportSettingsDialog::tr("Exported .EXE file will have size over 4 GB "
-                        "and cannot be opened by double-click in Windows. "
-                        "It can be played only in %1 Client.").arg(nx::branding::company());
+            case ExportMediaValidator::Result::tooBigExeFile:
+                return {.text = ExportSettingsDialog::tr(
+                            "Exported .EXE file will have size over 4 GB "
+                            "and cannot be opened by double-click in Windows. "
+                            "It can be played only in %1 Client.")
+                                    .arg(nx::branding::company()),
+                    .level = BarDescription::BarLevel::Warning,
+                    .isEnabledProperty = &messageBarSettings()->tooBigExeFileWarning};
 
-                case ExportMediaValidator::Result::transcodingInLayoutIsNotSupported:
-                    return ExportSettingsDialog::tr("Settings are not available for .NOV and .EXE files.");
+            case ExportMediaValidator::Result::transcodingInLayoutIsNotSupported:
+                return {.text = ExportSettingsDialog::tr(
+                            "Settings are not available for .NOV and .EXE files."),
+                    .level = BarDescription::BarLevel::Info,
+                    .isEnabledProperty =
+                        &messageBarSettings()->transcodingInLayoutIsNotSupportedWarning};
 
-                case ExportMediaValidator::Result::nonCameraResources:
-                    return ExportSettingsDialog::tr("Local files, server monitor widgets "
-                        "and webpages will not be exported.");
+            case ExportMediaValidator::Result::nonCameraResources:
+                return {.text = ExportSettingsDialog::tr("Local files, server monitor widgets "
+                                                         "and webpages will not be exported."),
+                    .level = BarDescription::BarLevel::Info,
+                    .isEnabledProperty = &messageBarSettings()->nonCameraResourcesWarning};
 
-                case ExportMediaValidator::Result::noCameraData:
-                    return ExportSettingsDialog::tr("Export is not available: This camera does not have "
-                        "a video archive for the selected time period.");
+            case ExportMediaValidator::Result::noCameraData:
+                return {.text = ExportSettingsDialog::tr(
+                            "Export is not available: This camera does not have "
+                            "a video archive for the selected time period."),
+                    .level = BarDescription::BarLevel::Error};
 
-                case ExportMediaValidator::Result::exportNotAllowed:
-                    return ExportSettingsDialog::tr("You do not have a permission to export "
+            case ExportMediaValidator::Result::exportNotAllowed:
+                return {
+                    .text = ExportSettingsDialog::tr(
+                        "You do not have a permission to export "
                         "archive for some of the selected cameras. Video from those cameras will "
-                        "not be exported to the resulting file.");
+                        "not be exported to the resulting file."),
+                    .level = BarDescription::BarLevel::Error};
 
-                default:
-                    NX_ASSERT(false);
-                    return QString();
-            }
-        };
-
-    const auto isSevere =
-        [](ExportMediaValidator::Result code)
-        {
-            return code != ExportMediaValidator::Result::transcoding;
-        };
+            default:
+                NX_ASSERT(false); //<= Unexpected result code.
+                return {};
+        }
+    };
 
     for (int i = 0; i < int(ExportMediaValidator::Result::count); ++i)
     {
         if (results.test(i))
-        {
-            const auto code = ExportMediaValidator::Result(i);
-            auto& list = isSevere(code) ? severeAlerts : weakAlerts;
-            list << alertText(code);
-        }
+            result.push_back(barDesc(ExportMediaValidator::Result(i)));
     }
+
+    return result;
 }
 
 void ExportSettingsDialog::Private::renderState()
