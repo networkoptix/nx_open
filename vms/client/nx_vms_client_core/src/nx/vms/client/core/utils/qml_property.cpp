@@ -12,7 +12,7 @@ namespace nx::vms::client::core {
 class QmlPropertyBase::SharedState: public detail::QmlPropertyConnection
 {
 public:
-    QObject* target = nullptr;
+    QPointer<QObject> target = nullptr;
     QQmlProperty property;
     ObjectHolder* objectHolder = nullptr;
     // Stores the property name when an object holder is used.
