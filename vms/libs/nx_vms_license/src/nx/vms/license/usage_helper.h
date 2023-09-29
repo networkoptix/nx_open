@@ -23,11 +23,17 @@ struct LicenseServer
     static const nx::utils::Url activateV2Url(common::SystemContext* context);
     static const nx::utils::Url deactivateUrl(common::SystemContext* context);
     static const nx::utils::Url validateUrl(common::SystemContext* context);
-    static const nx::utils::Url reportUrl(common::SystemContext* context);
     static const nx::utils::Url cloudLicensesUrl(common::SystemContext* context);
+    static const nx::utils::Url inspectUrl(common::SystemContext* context);
+private:
+    static const QString baseUrl(common::SystemContext* context);
+};
+
+struct ChannelPartnerServer
+{
+    static const nx::utils::Url reportUrl(common::SystemContext* context);
     static const nx::utils::Url saasServicesUrl(common::SystemContext* context);
     static const nx::utils::Url saasDataUrl(common::SystemContext* context);
-    static const nx::utils::Url inspectUrl(common::SystemContext* context);
 private:
     static const QString baseUrl(common::SystemContext* context);
 };
