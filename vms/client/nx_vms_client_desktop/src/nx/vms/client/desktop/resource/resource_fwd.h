@@ -9,6 +9,10 @@
 
 namespace nx::vms::client::desktop {
 
+class ServerResource;
+using ServerResourcePtr = QnSharedResourcePointer<ServerResource>;
+using ServerResourceList = QnSharedResourcePointerList<ServerResource>;
+
 class LayoutResource;
 using LayoutResourcePtr = QnSharedResourcePointer<LayoutResource>;
 using LayoutResourceList = QnSharedResourcePointerList<LayoutResource>;

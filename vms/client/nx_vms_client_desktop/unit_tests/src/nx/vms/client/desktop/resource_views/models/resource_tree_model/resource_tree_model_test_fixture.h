@@ -12,6 +12,7 @@
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_composer.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 
@@ -55,7 +56,7 @@ protected:
 
     QnUserResourcePtr addUser(const QString& name,
         const std::optional<QnUuid>& groupId = std::nullopt) const;
-    QnMediaServerResourcePtr addServer(const QString& name) const;
+    ServerResourcePtr addServer(const QString& name) const;
     QnMediaServerResourcePtr addEdgeServer(const QString& name, const QString& address) const;
     QnMediaServerResourcePtr addFakeServer(const QString& name) const;
     QnAviResourcePtr addLocalMedia(const QString& path) const;
