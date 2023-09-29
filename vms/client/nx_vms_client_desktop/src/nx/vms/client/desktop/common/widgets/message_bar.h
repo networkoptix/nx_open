@@ -12,6 +12,7 @@
 #include "control_bars.h"
 
 class QHBoxLayout;
+class QPushButton;
 class QLayout;
 
 namespace nx::vms::client::desktop {
@@ -66,12 +67,17 @@ public:
     /** Enabled by default. */
     void setOpenExternalLinks(bool open);
 
+    QPushButton* addButton(const QString& text, const QIcon& icon);
+    void addButton(QPushButton* button);
+
 signals:
     void closeClicked();
     /** Emitted only when `setOpenExternalLinks` is disabled. */
     void linkActivated(const QString& link);
 
 private:
+    using ControlBar::verticalLayout;
+
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };

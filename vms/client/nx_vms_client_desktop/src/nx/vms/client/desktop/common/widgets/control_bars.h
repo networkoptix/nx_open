@@ -28,7 +28,7 @@ public:
     virtual ~ControlBar() override;
 
     /** A vertical layout to insert controls to. */
-    QVBoxLayout* verticalLayout() const;
+    virtual QVBoxLayout* verticalLayout() const;
 
     /**
      * A horizontal layout to insert controls to.
