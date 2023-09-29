@@ -4,8 +4,14 @@
 
 #include <range/v3/view/reverse.hpp>
 
+#include <QtCore/QString>
+#include <QtCore/QStringLiteral>
+
 #include <nx/utils/range_adapters.h>
 #include <ui/utils/table_export_helper.h>
+
+// TODO: @pprivalov this is an entrance point when you start to deal with validate
+//#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -192,6 +198,58 @@ void LookupListEntriesModel::exportEntries(const QSet<int>& selectedRows, QTextS
     }
 
     QnTableExportHelper::exportToStreamCsv(this, indexes, outputCsv);
+}
+
+bool LookupListEntriesModel::updateHeaders(const QStringList& headers)
+{
+     if (!NX_ASSERT(m_data))
+        return false;
+
+    auto currentHeaders = m_data->attributeNames();
+    bool differenceFound = false;
+    int i = 0;
+
+    // Replacing old headers. If data is not empty we should update entries as well.
+    for(; i < currentHeaders.size(); ++i)
+    {
+        if (headers.size() <= i)
+            break;
+
+        if (headers[i] != currentHeaders[i])
+        {
+            currentHeaders[i] = headers[i];
+            differenceFound = true;
+        }
+    }
+    // If headers is longer then current, append rest of headers.
+    for (; i < headers.size(); ++i)
+    {
+        currentHeaders.append(headers[i]);
+        differenceFound = true;
+    }
+
+    if (differenceFound)
+    {
+        m_data->setAttributeNames(currentHeaders);
+        // TODO: @pprivalov Update data if nessessary. Do it when validate will be implemented.
+    }
+    return true;
+}
+
+// TODO Implement it later.
+bool LookupListEntriesModel::validate()
+{
+    /*QStringList unparsed;
+    for (const auto& entry : m_data->rawData().entries)
+    {
+        for(const auto& iter : entry)
+        {
+            QString typeId = m_data->rawData().objectTypeId;
+            // TODO validate if iter.second matches the restrictions of iter.first
+        }
+
+    }*/
+    return true; //unparsed.empty();
 }
 
 } // namespace nx::vms::client::desktop

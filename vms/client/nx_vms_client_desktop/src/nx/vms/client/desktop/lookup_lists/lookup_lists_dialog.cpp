@@ -9,6 +9,7 @@
 
 #include "lookup_list_entries_model.h"
 #include "lookup_list_export_processor.h"
+#include "lookup_list_import_processor.h"
 #include "lookup_list_preview_processor.h"
 
 namespace nx::vms::client::desktop {
@@ -20,6 +21,7 @@ void LookupListsDialog::registerQmlTypes()
     qmlRegisterType<LookupListExportProcessor>("nx.vms.client.desktop", 1, 0, "LookupListExportProcessor");
     qmlRegisterType<LookupListPreviewProcessor>("nx.vms.client.desktop", 1, 0, "LookupListPreviewProcessor");
     qmlRegisterType<LookupPreviewEntriesModel>("nx.vms.client.desktop", 1, 0, "LookupPreviewEntriesModel");
+    qmlRegisterType<LookupListImportProcessor>("nx.vms.client.desktop", 1, 0, "LookupListImportProcessor");
 }
 
 LookupListsDialog::LookupListsDialog(SystemContext* systemContext, QWidget* parent):

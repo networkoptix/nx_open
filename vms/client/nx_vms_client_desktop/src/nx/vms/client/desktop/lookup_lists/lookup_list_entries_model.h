@@ -4,6 +4,7 @@
 
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QPointer>
+#include <QtCore/QStringList>
 
 #include <nx/vms/api/data/lookup_list_data.h>
 
@@ -53,6 +54,8 @@ public:
     Q_INVOKABLE void addEntry(const QVariantMap& values);
     Q_INVOKABLE void deleteEntries(const QVector<int>& rows);
     void exportEntries(const QSet<int>& selectedRows, QTextStream& outputCsv);
+    bool updateHeaders(const QStringList& headers);
+    bool validate();
 
 signals:
     void listModelChanged();
