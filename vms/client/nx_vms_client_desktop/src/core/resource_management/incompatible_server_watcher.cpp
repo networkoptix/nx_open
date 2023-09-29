@@ -12,7 +12,10 @@
 #include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -153,11 +156,14 @@ struct QnIncompatibleServerWatcher::Private
     void addResource(
         const nx::vms::api::DiscoveredServerData& serverData)
     {
-        auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(serverData.id);
+        auto server = q->resourcePool()->getResourceById<ServerResource>(serverData.id);
 
-        // Setting '!compatible' flag for original server.
+        // Updating compatibility and merge statuses for the original server.
         if (server)
+        {
             server->setCompatible(false);
+            server->setDetached(serverData.status == nx::vms::api::ResourceStatus::unauthorized);
+        }
 
         QnUuid id = getFakeId(serverData.id);
 
@@ -209,9 +215,12 @@ struct QnIncompatibleServerWatcher::Private
         if (id.isNull())
             return;
 
-        // Removing incompatible flag from original resource.
-        if (auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(id))
+        // Updating compatibility and merge statuses for the original server.
+        if (auto server = q->resourcePool()->getResourceById<ServerResource>(id))
+        {
             server->setCompatible(true);
+            server->setDetached(false);
+        }
 
         QnUuid serverId;
         {
@@ -262,7 +271,7 @@ QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(
     QObject *parent)
     :
     QObject(parent),
-    nx::vms::client::core::SystemContextAware(systemContext),
+    SystemContextAware(systemContext),
     d(new Private{.q = this})
 {
 }
