@@ -16,6 +16,7 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -219,10 +220,13 @@ QVariant ResourceItem::resourceIconKeyData() const
                     discardIconCache));
             }
 
-            if (const auto server = m_resource.staticCast<QnMediaServerResource>())
+            if (const auto server = m_resource.staticCast<ServerResource>())
             {
                 m_connectionsGuard.add(server->connect(server.get(),
-                    &QnMediaServerResource::compatibilityChanged,
+                    &ServerResource::compatibilityChanged,
+                    discardIconCache));
+                m_connectionsGuard.add(server->connect(server.get(),
+                    &ServerResource::isDetachedChanged,
                     discardIconCache));
             }
 

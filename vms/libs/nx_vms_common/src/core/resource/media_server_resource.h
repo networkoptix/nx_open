@@ -105,9 +105,6 @@ public:
     void setRedundancy(bool value);
     bool isRedundancy() const;
 
-    void setCompatible(bool value);
-    bool isCompatible() const;
-
     nx::utils::SoftwareVersion getVersion() const;
     void setVersion(const nx::utils::SoftwareVersion& version);
 
@@ -189,7 +186,6 @@ signals:
     void maxCamerasChanged(const QnResourcePtr& resource);
     void apiUrlChanged(const QnResourcePtr& resource);
     void primaryAddressChanged(const QnResourcePtr& resource);
-    void compatibilityChanged(const QnResourcePtr& resource);
     void edgeServerCanonicalStateChanged(const QnResourcePtr& resource);
     void certificateChanged(const QnMediaServerResourcePtr& server);
     void backupBitrateLimitsChanged(const QnResourcePtr& resource);
@@ -216,7 +212,6 @@ private:
     QVector<nx::network::http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
-    bool m_isCompatible = true;
     mutable nx::Mutex m_attributesMutex;
     nx::vms::api::MediaServerUserAttributesData m_userAttributes;
 

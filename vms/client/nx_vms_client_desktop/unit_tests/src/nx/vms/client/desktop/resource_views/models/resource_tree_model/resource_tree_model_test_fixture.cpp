@@ -110,9 +110,9 @@ QnUserResourcePtr ResourceTreeModelTest::addUser(
     return user;
 }
 
-QnMediaServerResourcePtr ResourceTreeModelTest::addServer(const QString& name) const
+ServerResourcePtr ResourceTreeModelTest::addServer(const QString& name) const
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource());
+    ServerResourcePtr server(new ServerResource());
     server->setIdUnsafe(QnUuid::createUuid());
     server->setName(name);
     resourcePool()->addResource(server);
@@ -121,7 +121,7 @@ QnMediaServerResourcePtr ResourceTreeModelTest::addServer(const QString& name) c
 
 QnMediaServerResourcePtr ResourceTreeModelTest::addEdgeServer(const QString& name, const QString& address) const
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource());
+    QnMediaServerResourcePtr server(new ServerResource());
     server->setIdUnsafe(QnUuid::createUuid());
     server->setName(name);
     server->setServerFlags(server->getServerFlags() | ServerFlag::SF_Edge);
@@ -496,8 +496,8 @@ QnUserResourcePtr ResourceTreeModelTest::loginAs(
     const auto users = resourcePool()->getResources<QnUserResource>();
 
     const std::vector<QnUuid> groupIds = groupId
-        ? std::vector<QnUuid>{}
-        : std::vector<QnUuid>{*groupId};
+        ? std::vector<QnUuid>{*groupId}
+        : std::vector<QnUuid>{};
 
     const auto itr = std::find_if(users.cbegin(), users.cend(),
         [this, name, &groupIds](const QnUserResourcePtr& user)

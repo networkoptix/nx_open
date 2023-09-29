@@ -608,20 +608,6 @@ int QnMediaServerResource::locationId() const
     return m_userAttributes.locationId;
 }
 
-void QnMediaServerResource::setCompatible(bool value)
-{
-    if (m_isCompatible == value)
-        return;
-
-    m_isCompatible = value;
-    emit compatibilityChanged(::toSharedPointer(this));
-}
-
-bool QnMediaServerResource::isCompatible() const
-{
-    return m_isCompatible;
-}
-
 void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version)
 {
     {

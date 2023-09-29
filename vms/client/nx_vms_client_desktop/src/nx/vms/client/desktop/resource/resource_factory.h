@@ -9,6 +9,8 @@ namespace nx::vms::client::desktop {
 class ResourceFactory: public core::ResourceFactory
 {
 public:
+    virtual QnMediaServerResourcePtr createServer() const override;
+
     virtual QnResourcePtr createResource(
         const QnUuid& resourceTypeId,
         const QnResourceParams& params) override;

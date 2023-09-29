@@ -7,10 +7,16 @@
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 
 namespace nx::vms::client::desktop {
+
+QnMediaServerResourcePtr ResourceFactory::createServer() const
+{
+    return QnMediaServerResourcePtr(new ServerResource());
+}
 
 QnResourcePtr ResourceFactory::createResource(
     const QnUuid& resourceTypeId,
