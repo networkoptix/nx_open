@@ -57,6 +57,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(lastMergeSlaveId);
     DECLARE_SETTING_NAME(ldap);
     DECLARE_SETTING_NAME(licenseServer);
+    DECLARE_SETTING_NAME(channelPartnerServer);
     DECLARE_SETTING_NAME(localSystemId);
     DECLARE_SETTING_NAME(maxHttpTranscodingSessions);
     DECLARE_SETTING_NAME(primaryTimeServer);
@@ -102,6 +103,7 @@ struct SystemSettingNames
         disabledVendors,
         insecureDeprecatedApiEnabled,
         licenseServer,
+        channelPartnerServer,
         maxHttpTranscodingSessions,
         remoteSessionTimeoutS,
         remoteSessionUpdateS,
@@ -443,6 +445,9 @@ public:
     QString licenseServerUrl() const;
     void setLicenseServerUrl(const QString& value);
 
+    QString channelPartnerServerUrl() const;
+    void setChannelPartnerServerUrl(const QString& value);
+
     nx::utils::Url resourceFileUri() const;
 
     QString cloudNotificationsLanguage() const;
@@ -671,6 +676,7 @@ private:
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::map<QString, int>>* m_specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_channelPartnerServerUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudNotificationsLanguageAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_additionalLocalFsTypesAdaptor = nullptr;

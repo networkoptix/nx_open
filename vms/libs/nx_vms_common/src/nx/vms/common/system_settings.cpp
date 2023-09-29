@@ -566,6 +566,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::licenseServer, "https://licensing.vmsproxy.com", this,
         [] { return tr("License server"); });
 
+    m_channelPartnerServerUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+        Names::channelPartnerServer, "https://partners.test.hdw.mx", this,
+        [] { return tr("Channel partners service"); });
+
     m_resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::utils::Url>(
         Names::resourceFileUri, "https://resources.vmsproxy.com/resource_data.json", this,
         [] { return tr("URI for resource_data.json automatic update"); });
@@ -1055,6 +1059,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_clientUpdateSettingsAdaptor
         << m_lowQualityScreenVideoCodecAdaptor
         << m_licenseServerUrlAdaptor
+        << m_channelPartnerServerUrlAdaptor
         << m_resourceFileUriAdaptor
         << m_maxHttpTranscodingSessions
         << m_maxEventLogRecordsAdaptor
@@ -1913,6 +1918,16 @@ void SystemSettings::setLicenseServerUrl(const QString& value)
 QString SystemSettings::licenseServerUrl() const
 {
     return m_licenseServerUrlAdaptor->value();
+}
+
+void SystemSettings::setChannelPartnerServerUrl(const QString& value)
+{
+    m_channelPartnerServerUrlAdaptor->setValue(value);
+}
+
+QString SystemSettings::channelPartnerServerUrl() const
+{
+    return m_channelPartnerServerUrlAdaptor->value();
 }
 
 nx::utils::Url SystemSettings::resourceFileUri() const
