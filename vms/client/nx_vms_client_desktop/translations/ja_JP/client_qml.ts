@@ -314,7 +314,7 @@
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation>このフィールドは空にできません</translation>
+      <translation>このフィールドに入力してください</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -525,15 +525,15 @@
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation>ホストは空にできません</translation>
+      <translation>ホストを入力してください</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation>ログインDN は空にできません</translation>
+      <translation>ログインDN を入力してください</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation>パスワードは空にできません</translation>
+      <translation>パスワードを入力してください</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
@@ -712,7 +712,7 @@
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation>ベース DN は空にできません</translation>
+      <translation>ベース DN を入力してください</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -1053,7 +1053,7 @@
                 Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
       <translation>利用可能なサービス数を超えるカメラがこのインテグレーションを使用しています。
-                一部カメラのインテグレーションを無効にするか、より適切なサービスを追加してください。
+                一部カメラのインテグレーションを無効にするか、適切なサービスを追加してください。
                 対策がとられない場合、%1 に自動的に実行されます。</translation>
     </message>
     <message>

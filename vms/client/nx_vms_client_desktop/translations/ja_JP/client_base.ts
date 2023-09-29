@@ -1665,11 +1665,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>ユーザー名を入力してください</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>パスワードを入力してください</translation>
     </message>
   </context>
   <context>
@@ -1718,35 +1718,35 @@ License Key: %2</source>
     </message>
     <message>
       <source>Password should contain different types of symbols</source>
-      <translation type="unfinished">Password should contain different types of symbols</translation>
+      <translation>パスワードには異なる種類の文字を含める必要があります</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>パスワードは %n 文字以上にしてください</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
+      <translation>
+        <numerusform>パスワードは %n 文字以下にしてください</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません</numerusform>
       </translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
-      <translation type="unfinished">This password is in list of the most popular passwords</translation>
+      <translation>このパスワードは、最も一般的なパスワードのひとつです</translation>
     </message>
   </context>
   <context>
@@ -1977,7 +1977,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
-      <translation type="unfinished">%1. To attach to Video Wall, SaaS must be in active state. %2</translation>
+      <translation>%1。ビデオ ウォールに接続するには、SaaS がアクティブな状態である必要があります。 %2</translation>
     </message>
   </context>
   <context>
@@ -2332,15 +2332,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation>名前を空にすることはできません</translation>
+      <translation>名前を入力してください。</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation>説明は空にできません</translation>
+      <translation>説明を入力してください</translation>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>年</translation>
     </message>
   </context>
   <context>
@@ -2876,7 +2876,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>パスワードが一致しません</translation>
     </message>
   </context>
   <context>
@@ -2902,15 +2902,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>パスワードが一致しません</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>パスワードを変更するには、既存のパスワードを入力してください</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>現在のパスワードと一致しません</translation>
     </message>
   </context>
   <context>
@@ -3188,11 +3188,11 @@ to %1</source>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>セッションの有効期限が切れました</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>続行するには、リンクを使用して再度ログインしてください</translation>
     </message>
   </context>
   <context>
@@ -4823,7 +4823,7 @@ to %1</source>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation>要認証</translation>
+      <translation>認証が必要です</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
@@ -4831,11 +4831,11 @@ to %1</source>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation>アクセスなし</translation>
+      <translation>アクセスできません</translation>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
-      <translation>デバイスは使用不可</translation>
+      <translation>デバイスは無効化されています</translation>
     </message>
     <message>
       <source>Device Settings</source>
@@ -4867,7 +4867,7 @@ to %1</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation>ライブストリームなし</translation>
+      <translation>ライブ映像はありません</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -4883,7 +4883,7 @@ to %1</source>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation>サポートされていないファームウェアバージョン</translation>
+      <translation>非対応のファームウェアバージョンです</translation>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
@@ -4915,15 +4915,15 @@ to %1</source>
     </message>
     <message>
       <source>SAAS SHUT DOWN</source>
-      <translation type="unfinished">SAAS SHUT DOWN</translation>
+      <translation>SAAS はシャットダウンされました</translation>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>エクスポート権限がありません</translation>
     </message>
     <message>
       <source>NO CONNECTION TO THE LICENSE SERVER</source>
-      <translation type="unfinished">NO CONNECTION TO THE LICENSE SERVER</translation>
+      <translation>ライセンスサーバーに接続できません</translation>
     </message>
   </context>
   <context>
@@ -5247,7 +5247,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>サービス</translation>
     </message>
   </context>
   <context>
@@ -5392,23 +5392,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local recording services overused</source>
-      <translation type="unfinished">Local recording services overused</translation>
+      <translation>ローカル録画サービスが上限を超えて使用されています</translation>
     </message>
     <message>
       <source>Cloud storage services overused</source>
-      <translation type="unfinished">Cloud storage services overused</translation>
+      <translation>クラウドストレージサービスが上限を超えて使用されています</translation>
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation type="unfinished">Paid integrations services overused</translation>
+      <translation>有料の統合サービスが上限を超えて使用されています</translation>
     </message>
     <message>
       <source>System suspended</source>
-      <translation type="unfinished">System suspended</translation>
+      <translation>システムが一時停止されました</translation>
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>システムがシャットダウンしました</translation>
     </message>
   </context>
   <context>
@@ -5514,11 +5514,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>パスワードを入力してください</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
-      <translation type="unfinished">Avoid leading and trailing spaces</translation>
+      <translation>先頭と末尾のスペースを避けてください</translation>
     </message>
   </context>
   <context>
@@ -5851,7 +5851,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>To add Video Wall, SaaS should be in active state. %1</source>
-      <translation type="unfinished">To add Video Wall, SaaS should be in active state. %1</translation>
+      <translation>ビデオウォールを追加するには、SaaS がアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -6038,7 +6038,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>このレイアウトは他のユーザーと共有されています</translation>
+      <translation>このレイアウトは他のユーザーと共有されています。共有しているユーザーにも変更が反映されます。</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
@@ -6208,7 +6208,7 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
       <translation>
-        <numerusform>これらのレイアウトは他のユーザーと共有されているため、そのユーザーのアカウントでも削除されます。</numerusform>
+        <numerusform>これらのレイアウトは他のユーザーと共有されており、共有しているユーザーのアカウントでも削除されます。</numerusform>
       </translation>
     </message>
     <message>
@@ -6223,13 +6223,13 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>レイアウトを削除しますか?</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>%n レイアウトは他のユーザーと共有されており、共有しているユーザーのアカウントでも削除されます。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6681,15 +6681,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>View Live</source>
-      <translation>ライブを表示</translation>
+      <translation>ライブの表示</translation>
     </message>
     <message>
       <source>Edit Camera Settings.</source>
-      <translation type="unfinished">Edit Camera Settings.</translation>
+      <translation>カメラ設定を編集します。</translation>
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+      <translation>リソースの種類に応じて、ユーザーはデバイス設定を変更することも、ビデオ ウォールを制御することもできます。</translation>
     </message>
   </context>
   <context>
@@ -6914,43 +6914,43 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>不十分なサービス</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+      <translation>
+        <numerusform>%n 個の適切なクラウドストレージサービスが必要です</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
-      <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
+      <translation>
+        <numerusform>%n メガピクセル</numerusform>
       </translation>
     </message>
     <message>
       <source>Unknown resolution</source>
-      <translation type="unfinished">Unknown resolution</translation>
+      <translation>不明な解像度</translation>
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
-      <translation type="unfinished">No suitable cloud storage services available</translation>
+      <translation>適切なクラウドストレージサービスで利用可能なものがありません</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
+      <translation>
+        <numerusform>%n 個の適切なクラウドストレージサービスが利用可能です</numerusform>
       </translation>
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>解像度</translation>
     </message>
   </context>
   <context>
@@ -6978,7 +6978,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
-      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>利用可能なサービス数を超えるカメラがバックアップされています。一部カメラのバックアップを無効にするか、適切なサービスを追加してください。対策がとられない場合、%1 に自動的に実行されます。</translation>
     </message>
   </context>
   <context>
@@ -7023,15 +7023,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>サーバーがオフラインです</translation>
     </message>
     <message>
       <source>Backup settings are not available</source>
-      <translation type="unfinished">Backup settings are not available</translation>
+      <translation>バックアップ設定は利用できません</translation>
     </message>
     <message>
       <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
-      <translation type="unfinished">To perform backup to the cloud storage SaaS must be in active state. %1</translation>
+      <translation>クラウドストレージへのバックアップを実行するには、SaaS がアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -7921,15 +7921,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation type="unfinished">Enter access link to continue your session</translation>
+      <translation>セッションを継続するにはアクセスリンクを入力してください</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+      <translation>セッションの有効期限が切れました。続行するにはリンクを使用して再度ログインしてください。</translation>
     </message>
     <message>
       <source>Authentication details are incorrect</source>
-      <translation type="unfinished">Authentication details are incorrect</translation>
+      <translation>認証の詳細が間違っています</translation>
     </message>
   </context>
   <context>
@@ -8247,7 +8247,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation>アドレス フィールドは空にできません</translation>
+      <translation>アドレス欄に入力してください</translation>
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
@@ -8587,7 +8587,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
-      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+      <translation>選択したカメラの一部について、アーカイブをエクスポートする権限がありません。これらのカメラの映像は、出力ファイルにはエクスポートされません。</translation>
     </message>
   </context>
   <context>
@@ -8629,7 +8629,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation>名前を空にすることはできません</translation>
+      <translation>名前を入力してください。</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -8745,15 +8745,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Group name cannot be empty</source>
-      <translation type="unfinished">Group name cannot be empty</translation>
+      <translation>グループ名を入力してください</translation>
     </message>
     <message>
       <source>Group with the same name already exists</source>
-      <translation type="unfinished">Group with the same name already exists</translation>
+      <translation>同じ名前のグループがすでに存在します</translation>
     </message>
     <message>
       <source>Failed to apply changes to %1 group</source>
-      <translation type="unfinished">Failed to apply changes to %1 group</translation>
+      <translation>%1 グループへの変更の適用に失敗しました</translation>
     </message>
   </context>
   <context>
@@ -8911,7 +8911,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>エクスポート権限がありません</translation>
     </message>
   </context>
   <context>
@@ -9100,7 +9100,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>The provided link is not valid or has expired</source>
-      <translation type="unfinished">The provided link is not valid or has expired</translation>
+      <translation>提供されたリンクが無効または期限切れです。</translation>
     </message>
   </context>
   <context>
@@ -9267,7 +9267,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
+      <translation>%1 から継承</translation>
     </message>
   </context>
   <context>
@@ -9286,7 +9286,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>The login cannot be empty.</source>
-      <translation>ログインは空にできません。</translation>
+      <translation>ログイン名を入力してください。</translation>
     </message>
     <message>
       <source>Testing...</source>
@@ -9755,7 +9755,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>
-      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+      <translation>オフライン更新パッケージをサーバーにアップロードしています...</translation>
     </message>
   </context>
   <context>
@@ -9854,11 +9854,11 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::ParentGroupsProvider</name>
     <message>
       <source>LDAP group membership is managed in LDAP</source>
-      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
+      <translation>LDAP グループのメンバーシップは LDAP で管理されます</translation>
     </message>
     <message>
       <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
+      <translation>%1 から継承</translation>
     </message>
   </context>
   <context>
@@ -10079,7 +10079,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation>URLは空にできません</translation>
+      <translation>URLを入力してください。</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
@@ -10736,7 +10736,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+      <translation>この問題を解決するには、管理者権限を持つユーザーに連絡してください。</translation>
     </message>
   </context>
   <context>
@@ -10926,15 +10926,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>アクセスリンク</translation>
     </message>
     <message>
       <source>Invalid Link</source>
-      <translation type="unfinished">Invalid Link</translation>
+      <translation>無効なリンク</translation>
     </message>
     <message>
       <source>The provided link is not valid</source>
-      <translation type="unfinished">The provided link is not valid</translation>
+      <translation>指定されたリンクは無効です</translation>
     </message>
   </context>
   <context>
@@ -11085,15 +11085,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Add more services or fix overuse by stopping using services for some devices.</source>
-      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+      <translation>サービスを追加するか、一部デバイスのサービス利用を停止して過剰使用を修正してください。</translation>
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
-      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+      <translation>措置が実行されない場合、必要な数のサービスが %1 に自動的に解放されます。</translation>
     </message>
     <message>
       <source>Some features may not be available.</source>
-      <translation type="unfinished">Some features may not be available.</translation>
+      <translation>一部の機能が利用できない場合があります。</translation>
     </message>
   </context>
   <context>
@@ -11101,17 +11101,17 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>と</translation>
     </message>
     <message>
       <source>Your access to the System expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the System expires %1</translation>
+      <translation>システムへのアクセスの有効期限が %1 に切れます</translation>
     </message>
     <message>
       <source>Your access to the System expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the System expires in %1</translation>
+      <translation>システムへのアクセスの有効期限が %1 後に切れます</translation>
     </message>
   </context>
   <context>
@@ -11305,19 +11305,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
-      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+      <translation>グループが LDAP データベース内に見つかりません。</translation>
     </message>
     <message>
       <source>There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>システム内にはこの名前のグループが複数あります。明確で組織的な構造を維持するために、各グループに一意の名前を付けることをお勧めします。</translation>
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+      <translation>グループは、他のグループの親かつ子である、あるいはそういった循環参照の一部となっています。これにより、権限が正しく計算されない可能性があります。</translation>
     </message>
     <message>
       <source>You do not have permissions to modify or delete this group.</source>
-      <translation type="unfinished">You do not have permissions to modify or delete this group.</translation>
+      <translation>このグループを変更または削除する権限がありません。</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11355,32 +11355,32 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+      <translation>グループ &quot;%1&quot; の削除に失敗しました。</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
+      <translation> グループの削除に失敗しました。</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
+      <translation>
+        <numerusform>%n グループの削除に失敗しました。</numerusform>
       </translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>複数のグループが同じ名前を共有しているため、混乱が生じる可能性があります。明確で組織的な構造を維持するために、各グループに一意の名前を付けることをお勧めします。</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>%n つの既存 LDAP グループが LDAP データベース内に見つかりません。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
+      <translation>
+        <numerusform>%n グループを削除</numerusform>
       </translation>
     </message>
   </context>
@@ -11421,23 +11421,23 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>LDAPサーバーがオフラインです。ユーザーはログインできません。</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
-      <translation type="unfinished">User is not found in the LDAP database.</translation>
+      <translation>ユーザーが LDAP データベース内に見つかりません。</translation>
     </message>
     <message>
       <source>Temporary user</source>
-      <translation type="unfinished">Temporary user</translation>
+      <translation>一時ユーザー</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this user.</source>
-      <translation type="unfinished">You do not have permissions to modify this user.</translation>
+      <translation>このユーザーを変更する権限がありません。</translation>
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>システム内に同じログイン名を持つユーザーがすでに存在します。問題を回避するには、すべてのユーザーに一意のログイン名を持たせる必要があります。</translation>
     </message>
   </context>
   <context>
@@ -11468,34 +11468,34 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+      <translation>複数のユーザーが同じログイン名を共有すると、ログインに失敗します。この問題を解決するには、影響を受けるユーザーのログイン名を更新するか、重複ユーザーを無効化または削除します。</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>%n 名の既存 LDAP ユーザーが LDAP データベース内に見つかりません。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users</numerusform>
+      <translation>
+        <numerusform>%n ユーザーを削除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      <translation>
+        <numerusform>LDAPサーバーがオフラインです。%n ユーザーはログインできません。</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+      <translation>ユーザー &quot;%1&quot; の削除に失敗しました。</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
+      <translation>
+        <numerusform>%n ユーザーの削除に失敗しました。</numerusform>
       </translation>
     </message>
   </context>
@@ -11555,27 +11555,27 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>アクセスリンクをコピー</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>アクセスリンクを失効させてもよろしいですか?</translation>
     </message>
     <message>
       <source>This will instantly remove an access to the system for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the system for this user</translation>
+      <translation>このユーザーのシステムへのアクセス権を即座に削除します</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>失効</translation>
     </message>
     <message>
       <source>Terminate access link</source>
-      <translation type="unfinished">Terminate access link</translation>
+      <translation>アクセスリンクを失効</translation>
     </message>
     <message>
       <source>Create access link</source>
-      <translation type="unfinished">Create access link</translation>
+      <translation>アクセスリンクを作成</translation>
     </message>
     <message>
       <source>Create</source>
@@ -11583,53 +11583,53 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
+      <translation>アクセスリンクが正常に作成されました。</translation>
     </message>
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>と</translation>
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
-      <translation type="unfinished">User %1 has been successfully created!</translation>
+      <translation>ユーザー %1 が正常に作成されました。</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>現在のパスワードと一致しません</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>ログイン名を入力してください</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
+      <translation>文字、数字、記号 %1 のみ使用できます</translation>
     </message>
     <message>
       <source>User with specified login already exists</source>
-      <translation type="unfinished">User with specified login already exists</translation>
+      <translation>指定されたログイン名を持つユーザーは既に存在します</translation>
     </message>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>新しいリンク - %1</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+      <translation>一時ユーザーへの幅広い権限の付与は推奨されません。一部のアクションは動作しない可能性があります。</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
+      <translation>一時ユーザーへの幅広い権限の付与は推奨されません。</translation>
     </message>
     <message>
       <source>in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">in %1</translation>
+      <translation>%1後</translation>
     </message>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>新規ユーザー</translation>
     </message>
   </context>
   <context>
@@ -11748,7 +11748,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Developer Tools</source>
-      <translation type="unfinished">Developer Tools</translation>
+      <translation>開発者ツール</translation>
     </message>
   </context>
   <context>
@@ -12463,11 +12463,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>合計</translation>
     </message>
     <message>
       <source>Used</source>
-      <translation type="unfinished">Used</translation>
+      <translation>使用中</translation>
     </message>
   </context>
   <context>
@@ -12591,7 +12591,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Toolbar</source>
-      <translation type="unfinished">Toolbar</translation>
+      <translation>ツールバー</translation>
     </message>
   </context>
   <context>
