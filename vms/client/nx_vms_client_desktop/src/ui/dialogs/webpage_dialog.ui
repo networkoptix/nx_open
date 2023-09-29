@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>660</width>
+    <width>670</width>
     <height>249</height>
    </rect>
   </property>
@@ -226,13 +226,14 @@
     </widget>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::AlertLabel" name="integrationAlertLabel" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="integrationBanner" native="true">
+     <property name="visible">
+      <bool>false</bool>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="webPageBanner" native="true">
      <property name="visible">
       <bool>false</bool>
      </property>
@@ -274,6 +275,12 @@
    <class>nx::vms::client::desktop::AlertLabel</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/alert_label.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::CommonMessageBar</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

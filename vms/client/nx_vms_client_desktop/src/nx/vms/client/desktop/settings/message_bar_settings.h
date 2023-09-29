@@ -31,6 +31,8 @@ public:
     Property<bool> transcodingInLayoutIsNotSupportedWarning{
         this, "transcodingInLayoutIsNotSupportedWarning", true};
     Property<bool> nonCameraResourcesWarning{this,"nonCameraResourcesWarning",true};
+    Property<bool> webPageInformation{this, "webPageInformation", true};
+    Property<bool> integrationWarning{this, "integrationWarning", true};
 };
 
 MessageBarSettings* messageBarSettings();
