@@ -14,8 +14,12 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
+#include <nx/vms/client/desktop/common/widgets/message_bar.h>
+#include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <nx/vms/common/html/html.h>
 
 using namespace nx::vms::api;
 
@@ -77,11 +81,32 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent, EditMode editMode):
         "Proxying all contents exposes any service or device on the server's network to the users"
         " of this webpage"));
 
-    ui->integrationAlertLabel->setText(tr("An integration may interact with the Desktop Client and"
-        " request access to the user session"));
-
     ui->clientApiAlertLabel->setText(tr("The web page can interact with the Desktop Client and"
         " request access to the user session"));
+
+    ui->webPageBanner->init({
+        .text = tr("To allow the use of a client API, create a web integration instead. %1")
+            .arg(nx::vms::common::html::localLink(tr("Learn more..."))),
+        .level = BarDescription::BarLevel::Info,
+        .isOpenExternalLinks = false,
+        .isEnabledProperty = &messageBarSettings()->webPageInformation
+    });
+    ui->webPageBanner->setDisplayed(false);
+
+    connect(ui->webPageBanner, &CommonMessageBar::linkActivated, this,
+        []
+        {
+            HelpHandler::openHelpTopic(HelpTopic::Id::MainWindow_Tree_WebPage);
+        });
+
+    ui->integrationBanner->init({
+        .text = tr("An integration may interact with the Desktop Client and request access to the"
+            " user session"),
+        .level = BarDescription::BarLevel::Warning,
+        .isOpenExternalLinks = false,
+        .isEnabledProperty = &messageBarSettings()->integrationWarning
+    });
+    ui->integrationBanner->setDisplayed(false);
 
     auto aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
@@ -275,7 +300,10 @@ void QnWebpageDialog::setSubtype(WebPageSubtype value)
 
     if (ini().webPagesAndIntegrations)
     {
-        ui->integrationAlertLabel->setVisible(isIntegration);
+        ui->webPageBanner->setDisplayed(
+            !isIntegration && messageBarSettings()->webPageInformation());
+        ui->integrationBanner->setDisplayed(
+            isIntegration && messageBarSettings()->integrationWarning());
     }
     else
     {
