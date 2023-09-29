@@ -72,27 +72,9 @@ const nx::utils::Url LicenseServer::validateUrl(common::SystemContext* context)
     return baseUrl(context) + "/api/v1/validate/";
 }
 
-const nx::utils::Url LicenseServer::reportUrl(common::SystemContext* context)
-{
-    const auto systemId = context->globalSettings()->cloudSystemId();
-    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/system_usage_report", systemId);
-}
-
 const nx::utils::Url LicenseServer::cloudLicensesUrl(common::SystemContext* context)
 {
     return baseUrl(context) + "/api/v2/license/cloud/licenses";
-}
-
-const nx::utils::Url LicenseServer::saasServicesUrl(common::SystemContext* context)
-{
-    const auto systemId = context->globalSettings()->cloudSystemId();
-    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/services/", systemId);
-}
-
-const nx::utils::Url LicenseServer::saasDataUrl(common::SystemContext* context)
-{
-    const auto systemId = context->globalSettings()->cloudSystemId();
-    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/saas_report/", systemId);
 }
 
 const nx::utils::Url LicenseServer::inspectUrl(common::SystemContext* context)
@@ -752,6 +734,35 @@ VideoWallLicenseUsageProposer::~VideoWallLicenseUsageProposer()
     if (!m_helper)
         return;
     m_helper->propose(-m_count);
+}
+
+// --------------------------------------------------- ChannelPartnerServer ----------------------------------------------
+
+const QString ChannelPartnerServer::baseUrl(common::SystemContext* context)
+{
+    auto result = context->globalSettings()->channelPartnerServerUrl();
+    result = result.trimmed();
+    while (result.endsWith('/'))
+        result.chop(1);
+    return result;
+}
+
+const nx::utils::Url ChannelPartnerServer::reportUrl(common::SystemContext* context)
+{
+    const auto systemId = context->globalSettings()->cloudSystemId();
+    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/system_usage_report", systemId);
+}
+
+const nx::utils::Url ChannelPartnerServer::saasServicesUrl(common::SystemContext* context)
+{
+    const auto systemId = context->globalSettings()->cloudSystemId();
+    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/services/", systemId);
+}
+
+const nx::utils::Url ChannelPartnerServer::saasDataUrl(common::SystemContext* context)
+{
+    const auto systemId = context->globalSettings()->cloudSystemId();
+    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/saas_report/", systemId);
 }
 
 } // namespace nx::vms::license
