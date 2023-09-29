@@ -8,6 +8,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace os {
@@ -36,7 +37,7 @@ QnMediaServerResourcePtr ClientUpdateTestEnvironment::makeServer(
     bool online,
     bool compatibleServer)
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource());
+    QnMediaServerResourcePtr server(new nx::vms::client::desktop::ServerResource());
     server->setVersion(version);
     server->setIdUnsafe(QnUuid::createUuid());
     server->setOsInfo(os::windows);

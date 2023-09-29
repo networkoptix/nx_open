@@ -9,6 +9,7 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
@@ -1400,8 +1401,12 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
         this, &PeerStateTracker::atResourceChanged);
     connect(server.data(), &QnMediaServerResource::serverFlagsChanged,
         this, &PeerStateTracker::atResourceChanged);
-    connect(server.data(), &QnMediaServerResource::compatibilityChanged,
-        this, &PeerStateTracker::atResourceChanged);
+
+    if (auto serverResource = server.dynamicCast<ServerResource>(); NX_ASSERT(serverResource))
+    {
+        connect(serverResource.data(), &ServerResource::compatibilityChanged,
+            this, &PeerStateTracker::atResourceChanged);
+    }
     return item;
 }
 
@@ -1429,7 +1434,10 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     auto status = server->getStatus();
 
     bool incompatible = status == nx::vms::api::ResourceStatus::incompatible
-        || server->hasFlags(Qn::fake_server) || !server->isCompatible();
+        || server->hasFlags(Qn::fake_server);
+
+    if (const auto serverResource = server.dynamicCast<ServerResource>(); NX_ASSERT(serverResource))
+        incompatible |= !serverResource->isCompatible();
 
     if (incompatible != item->onlyLegacyUpdate)
     {

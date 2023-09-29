@@ -28,6 +28,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -64,8 +65,14 @@ bool isCurrentlyConnectedServer(const QnResourcePtr& resource)
 
 bool isCompatibleServer(const QnResourcePtr& resource)
 {
-    auto server = resource.dynamicCast<QnMediaServerResource>();
+    auto server = resource.dynamicCast<ServerResource>();
     return NX_ASSERT(server) && server->isCompatible();
+}
+
+bool isDetachedServer(const QnResourcePtr& resource)
+{
+    auto server = resource.dynamicCast<ServerResource>();
+    return NX_ASSERT(server) && server->isDetached();
 }
 
 QIcon loadIcon(const QString& name,
@@ -105,7 +112,7 @@ Key calculateStatus(Key key, const QnResourcePtr& resource)
         }
         case nx::vms::api::ResourceStatus::offline:
         {
-            if (key == Key::Server && !isCompatibleServer(resource))
+            if (key == Key::Server && !isCompatibleServer(resource) && !isDetachedServer(resource))
                 return Status::Incompatible;
 
             return Status::Offline;
