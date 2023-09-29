@@ -35,6 +35,8 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
     {QIcon::Active, {{kLight10Color, "light11"}}},
 };
 
+static const QColor kTextButtonBackgroundColor = "#FFFFFF";
+
 void paintLabelIcon(QRect* labelRect,
     QPainter* painter,
     const QIcon& icon,
@@ -425,19 +427,61 @@ void StylePrivate::drawTextButton(QPainter* painter,
     const bool pressed = option->state.testFlag(QStyle::State_Sunken);
 
     const bool checkable = isCheckableButton(option);
+    const bool hasBackground = hasTextButtonBackgroundStyle(widget);
     const bool hasIcon = !option->icon.isNull();
     const bool hasMenu = option->features.testFlag(QStyleOptionButton::HasMenu);
 
-    QBrush brush = option->palette.brush(foregroundRole);
     QIcon::Mode iconMode = enabled ? QIcon::Normal : QIcon::Disabled;
+    QColor textColor;
 
-    if (hovered && enabled && !pressed)
+    if (hasBackground)
     {
-        brush.setColor(core::colorTheme()->lighter(option->palette.color(foregroundRole), 2));
-        iconMode = QIcon::Active;
+        QColor backgroundColor = kTextButtonBackgroundColor;
+
+        if (pressed)
+        {
+            backgroundColor.setAlphaF(0.05);
+            textColor = core::colorTheme()->color("light7");
+        }
+        else if (hovered)
+        {
+            backgroundColor.setAlphaF(0.15);
+            textColor = core::colorTheme()->color("light1");
+        }
+        else if (enabled)
+        {
+            backgroundColor.setAlphaF(0.10);
+            textColor = core::colorTheme()->color("light4");
+        }
+        else
+        {
+            backgroundColor.setAlphaF(0.03);
+            textColor = core::colorTheme()->color("light4");
+            textColor.setAlphaF(0.3); //< #spanasenko Is it the right way?
+        }
+
+        QnScopedPainterPenRollback pen(painter, Qt::NoPen);
+        QnScopedPainterBrushRollback brush(painter, backgroundColor);
+        painter->drawRoundedRect(option->rect, 4, 4);
+    }
+    else
+    {
+        QBrush brush = option->palette.brush(foregroundRole);
+        if (hovered && enabled && !pressed)
+        {
+            brush.setColor(core::colorTheme()->lighter(option->palette.color(foregroundRole), 2));
+            iconMode = QIcon::Active;
+        }
+        textColor = brush.color();
     }
 
     QRect textRect(option->rect);
+
+    if (hasBackground)
+    {
+        textRect.adjust(
+            Metrics::kTextButtonBackgroundMargin, 0, -Metrics::kTextButtonBackgroundMargin, 0);
+    }
 
     if (checkable)
     {
@@ -459,7 +503,7 @@ void StylePrivate::drawTextButton(QPainter* painter,
             option->icon,
             option->direction,
             Qt::AlignLeft | Qt::AlignVCenter,
-            Metrics::kTextButtonIconMargin,
+            Metrics::kTextButtonIconSpacing,
             iconMode);
     }
 
@@ -487,7 +531,7 @@ void StylePrivate::drawTextButton(QPainter* painter,
     const auto text = option->fontMetrics.elidedText(
         option->text, Qt::ElideRight, textRect.width(), Qt::TextShowMnemonic);
 
-    QnScopedPainterPenRollback penRollback(painter, QPen(brush.color()));
+    QnScopedPainterPenRollback penRollback(painter, QPen(textColor));
     painter->drawText(textRect, kTextFlags, text);
 }
 

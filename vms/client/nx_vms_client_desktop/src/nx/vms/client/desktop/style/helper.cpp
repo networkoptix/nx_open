@@ -24,6 +24,7 @@ const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
 const char* Properties::kTabBarShift = "_qn_tabBarShift";
 const char* Properties::kItemViewRadioButtons = "_qn_itemViewRadioButtons";
 const char* Properties::kPushButtonMargin = "_qn_pushButtonMargin";
+const char* Properties::kTextButtonBackgroundProperty = "_qn_textButtonBackground";
 const char* Properties::kMenuNoMouseReplayArea = "_qn_menuNoMouseReplayArea";
 const char* Properties::kComboBoxPopupWidth = "_qn_comboBoxPopupWidth";
 const char* Properties::kGroupBoxContentTopMargin = "_qn_groupBoxContentTopMargin";
@@ -47,6 +48,11 @@ bool isAccented(const QWidget* widget)
 bool isWarningStyle(const QWidget* widget)
 {
     return widget && widget->property(Properties::kWarningStyleProperty).toBool();
+}
+
+bool hasTextButtonBackgroundStyle(const QWidget* widget)
+{
+    return widget && widget->property(Properties::kTextButtonBackgroundProperty).toBool();
 }
 
 RectCoordinates::RectCoordinates(const QRectF& rect):
