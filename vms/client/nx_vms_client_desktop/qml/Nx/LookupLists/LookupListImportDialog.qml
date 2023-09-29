@@ -223,13 +223,21 @@ Dialog
         {
             text: qsTr("Import")
             isAccentButton: true
-            onClicked: control.accept()
+            onClicked:
+            {
+                importProcessor.importListEntries(processor.filePath, processor.separator, processor.dataHasHeaderRow, model)
+                control.accept()
+            }
         }
 
         Button
         {
             text: qsTr("Cancel")
-            onClicked: control.close()
+            onClicked:
+            {
+                importProcessor.cancelImport()
+                control.close()
+            }
         }
     }
 
@@ -262,5 +270,39 @@ Dialog
     {
         separatorField.focus = false
         processor.reset(previewModel)
+    }
+
+    ExportEntriesProgressDialog
+    {
+        id: importProgressBar
+
+        visible: false
+        onRejected: importProcessor.cancelExport()
+    }
+
+    LookupListImportProcessor
+    {
+        id: importProcessor
+
+        onImportStarted: importProgressBar.progressStarted()
+        onImportFinished: (exitCode) =>
+        {
+            switch (exitCode)
+            {
+                case LookupListImportProcessor.Success:
+                    importProgressBar.progressFinished()
+                    break;
+                case LookupListImportProcessor.ErrorFileNotFound:
+                    importProgressBar.visible = false
+                    MessageBox.exec(MessageBox.Icon.Critical,
+                        qsTr("Could not open file"),
+                        qsTr("Please ensure that file exists and you have access to selected file"),
+                        MessageBox.Ok);
+                    break;
+                default:
+                    exportProgressBar.visible = false
+            }
+
+        }
     }
 }
