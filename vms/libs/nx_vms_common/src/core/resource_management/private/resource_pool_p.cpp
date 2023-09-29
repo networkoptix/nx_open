@@ -118,16 +118,15 @@ static size_t userPriorityGroup(const QnUserResourcePtr& user)
     switch (t)
     {
         // Cloud user login is email, so it's unlikely to clash with other types. And it will newer
-        // clash with build-in admin.
+        // clash with built-in admin.
         case nx::vms::api::UserType::cloud: return 1;
 
         // Users managed by VMS administrators should always be prioritized over external users.
-        case nx::vms::api::UserType::local: return 2;
-
-        case nx::vms::api::UserType::temporaryLocal: return 3;
+        case nx::vms::api::UserType::local:
+        case nx::vms::api::UserType::temporaryLocal: return 2;
 
         // Users managed by LDAP should be fixed on LDAP by it's admin.
-        case nx::vms::api::UserType::ldap: return 4;
+        case nx::vms::api::UserType::ldap: return 3;
      };
 
     NX_ASSERT(false, "Unexpected type %1 of %2", static_cast<int>(t), user);
