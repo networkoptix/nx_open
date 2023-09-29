@@ -43,6 +43,7 @@
 #include "camera_settings_tab.h"
 #include "flux/camera_settings_dialog_state.h"
 #include "flux/camera_settings_dialog_store.h"
+#include "nx/vms/client/desktop/common/widgets/message_bar.h"
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include "utils/device_agent_settings_adapter.h"
 #include "utils/license_usage_provider.h"
@@ -397,7 +398,9 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->fixupScheduleButton = new QPushButton(ui->scheduleAlertBar);
     d->fixupScheduleButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     d->fixupScheduleButton->setText(tr("Change invalid schedule to \"Record Always\""));
-    ui->scheduleAlertBar->verticalLayout()->addWidget(d->fixupScheduleButton.data());
+    ui->scheduleAlertBar->init({.level = BarDescription::BarLevel::Warning, .isOpenExternalLinks = false});
+    ui->scheduleAlertBar->addButton(d->fixupScheduleButton.data());
+
     connect(d->fixupScheduleButton.data(), &QPushButton::clicked, this,
         [this]()
         {
