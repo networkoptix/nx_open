@@ -27,7 +27,6 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"
 #include "private/motion_stream_alerts.h"
 
@@ -133,7 +132,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     const auto forceDetectionButton = new QPushButton(ui->motionImplicitlyDisabledAlertBar);
     forceDetectionButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     forceDetectionButton->setText(tr("Force Motion Detection"));
-    ui->motionImplicitlyDisabledAlertBar->verticalLayout()->addWidget(forceDetectionButton);
+    ui->motionImplicitlyDisabledAlertBar->addButton(forceDetectionButton);
 
     check_box_utils::autoClearTristate(ui->motionDetectionCheckBox);
 
