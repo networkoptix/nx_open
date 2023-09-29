@@ -3587,7 +3587,7 @@ QSize Style::sizeFromContents(
             }
 
             if (textButton)
-                result.rwidth() += (hasIcon ? Metrics::kTextButtonIconMargin : 0);
+                result.rwidth() += (hasIcon ? Metrics::kTextButtonIconSpacing : 0);
             else if (hasText)
                 result.rwidth() = qMax(result.rwidth(), Metrics::kMinimumButtonWidth);
             else // Make button at least square
@@ -3809,7 +3809,11 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption* option, const QWi
                 return Metrics::kSwitchMargin * 2;
 
             if (StylePrivate::isTextButton(option))
-                return 0;
+            {
+                return hasTextButtonBackgroundStyle(widget)
+                    ? Metrics::kTextButtonBackgroundMargin
+                    : 0;
+            }
 
             if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
             {
