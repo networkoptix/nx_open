@@ -748,7 +748,7 @@ distrib_prepareToBuildDistribution() # work_dir log_file "$@"
 
     rm -rf "$distrib_WORK_DIR"
 
-    if [ distrib_KEEP_WORK_DIR = 1 ]
+    if [ $distrib_KEEP_WORK_DIR = 1 ]
     then
         local -r WORK_DIR_NOTE="(ATTENTION: will NOT be deleted)"
     else
