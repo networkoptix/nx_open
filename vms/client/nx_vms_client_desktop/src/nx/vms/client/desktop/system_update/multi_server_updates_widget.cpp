@@ -24,6 +24,9 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/widgets/message_bar.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
+
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -798,20 +801,27 @@ void MultiServerUpdatesWidget::setDayWarningVisible(bool visible)
 
 void MultiServerUpdatesWidget::updateAlertBlock()
 {
-    QStringList messages;
+    std::vector<BarDescription> messages;
 
     if (m_dayWarningVisible)
-        messages.append(tr("Applying System updates at the end of the week is not recommended."));
+    {
+        messages.push_back(
+            {.text = tr("Applying System updates at the end of the week is not recommended"),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->transcodingExportWarning});
+    }
 
     if (nx::branding::isDesktopClientCustomized())
     {
-        messages.append(
-            tr("You are using a custom client. Please contact %1 to get the update instructions.")
-                .arg(nx::branding::company()));
+        messages.push_back(
+            {.text = tr(
+                 "You are using a custom client. Please contact %1 to get the update instructions.")
+                     .arg(nx::branding::company()),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->transcodingExportWarning});
     }
 
-    ui->alertBlock->setAlerts(messages);
-    ui->alertBlock->setVisible(!messages.isEmpty());
+    ui->messageBarBlock->setMessageBars(messages);
 }
 
 nx::utils::Url MultiServerUpdatesWidget::generateUpcombinerUrl() const
