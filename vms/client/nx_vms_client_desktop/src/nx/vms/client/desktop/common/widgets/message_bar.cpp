@@ -5,16 +5,22 @@
 #include <memory>
 #include <vector>
 
+#include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/qboxlayout.h>
+#include <QtWidgets/qpushbutton.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/common/palette.h>
+
+#include "nx/vms/client/desktop/common/widgets/control_bars.h"
 
 namespace {
 
@@ -33,7 +39,49 @@ struct CommonMessageBar::Private
         new QPushButton(qnSkin->icon("banners/close.svg"), QString(), q)};
     QPushButton* icon{new QPushButton(QIcon(), QString(), q)};
     BarDescription::PropertyPointer isEnabledProperty;
+    QHBoxLayout* buttonsHorizontalLayout;
 };
+
+struct MessageBarBlock::Private
+{
+    using MessageBarStorage = std::vector<std::unique_ptr<CommonMessageBar>>;
+    std::vector<BarDescription> barsDescriptions;
+    MessageBarStorage bars;
+};
+
+MessageBarBlock::MessageBarBlock(QWidget* parent):
+    base_type(parent),
+    d(new Private())
+{
+    auto layout = new QVBoxLayout;
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->setContentsMargins({});
+    layout->setSpacing(1);
+    setLayout(layout);
+}
+
+MessageBarBlock::~MessageBarBlock()
+{
+}
+
+void MessageBarBlock::setMessageBars(const std::vector<BarDescription>& descs)
+{
+    if (descs == d->barsDescriptions)
+        return;
+
+    // Clear previous banners.
+    d->bars.clear();
+
+    // Set new ones.
+    for (auto& desc: descs)
+    {
+        auto bar = std::make_unique<CommonMessageBar>(nullptr, desc);
+        layout()->addWidget(bar.get());
+        d->bars.push_back(std::move(bar));
+    }
+
+    d->barsDescriptions = descs;
+}
 
 CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& description):
     base_type(parent),
@@ -65,6 +113,10 @@ CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& descri
         d->closeButton, &QPushButton::clicked, this, &CommonMessageBar::hideInFuture);
 
     init(description);
+
+    d->buttonsHorizontalLayout = new QHBoxLayout;
+    d->buttonsHorizontalLayout->addSpacing(d->icon->size().width() + horizontalLayout()->spacing());
+    verticalLayout()->addLayout(d->buttonsHorizontalLayout);
 }
 
 CommonMessageBar::~CommonMessageBar()
@@ -165,45 +217,22 @@ void CommonMessageBar::init(const BarDescription& barDescription)
     updateVisibility();
 }
 
-struct MessageBarBlock::Private
+QPushButton* CommonMessageBar::addButton(const QString& text, const QIcon& icon)
 {
-    using MessageBarStorage = std::vector<std::unique_ptr<CommonMessageBar>>;
-    std::vector<BarDescription> barsDescriptions;
-    MessageBarStorage bars;
-};
-
-MessageBarBlock::MessageBarBlock(QWidget* parent):
-    base_type(parent),
-    d(new Private())
-{
-    auto layout = new QVBoxLayout;
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    layout->setContentsMargins({});
-    layout->setSpacing(1);
-    setLayout(layout);
+    QPushButton* button = new QPushButton(this);
+    button->setText(text);
+    button->setIcon(icon);
+    addButton(button);
+    return button;
 }
 
-MessageBarBlock::~MessageBarBlock()
+void CommonMessageBar::addButton(QPushButton* button)
 {
-}
+    button->setFlat(true);
+    setTextButtonWithBackgroundStyle(button);
 
-void MessageBarBlock::setMessageBars(const std::vector<BarDescription>& descs)
-{
-    if (descs == d->barsDescriptions)
-        return;
-
-    // Clear previous banners.
-    d->bars.clear();
-
-    // Set new ones.
-    for (auto& desc: descs)
-    {
-        auto bar = std::make_unique<CommonMessageBar>(nullptr, desc);
-        layout()->addWidget(bar.get());
-        d->bars.push_back(std::move(bar));
-    }
-
-    d->barsDescriptions = descs;
+    d->buttonsHorizontalLayout->addWidget(button, 1);
+    d->buttonsHorizontalLayout->setAlignment(button, Qt::AlignLeft | Qt::AlignVCenter);
 }
 
 } // namespace nx::vms::client::desktop
