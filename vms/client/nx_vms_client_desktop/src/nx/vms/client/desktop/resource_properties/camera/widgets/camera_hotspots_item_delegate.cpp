@@ -180,7 +180,7 @@ QWidget* CameraHotspotsItemDelegate::createEditor(
         auto editorButton = new QPushButton(parent);
         editorButton->setText(index.data(Qt::DisplayRole).toString());
         editorButton->setStyleSheet(QString("text-align:left; padding-left:%1")
-            .arg(nx::style::Metrics::kTextButtonIconMargin));
+            .arg(nx::style::Metrics::kTextButtonIconSpacing));
 
         connect(editorButton, &QPushButton::clicked, this,
             [this, index] { emit cameraEditorRequested(index); });

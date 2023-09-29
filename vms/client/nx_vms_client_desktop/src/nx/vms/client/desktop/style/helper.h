@@ -113,8 +113,11 @@ struct Metrics
     /** Margin between menu button text and dropdown indicator. */
     static constexpr int kMenuButtonIndicatorMargin = 2;
 
-    /** Margin between text button icon and text. */
-    static constexpr int kTextButtonIconMargin = 2;
+    /** Margin around text button elements if the button has background. */
+    static constexpr int kTextButtonBackgroundMargin = 6;
+
+    /** Spacing between text button icon and text. */
+    static constexpr int kTextButtonIconSpacing = 2;
 
     /** Margin around push button icon. */
     static constexpr int kPushButtonIconMargin = 6;
@@ -215,6 +218,9 @@ struct Properties
      */
     static const char* kPushButtonMargin;
 
+    /** Name of a property to enable drawing of text button background. */
+    static const char* kTextButtonBackgroundProperty;
+
     /**
      * Name of a property to hold either rectangle in global coordinates (QRect) or a widget
      * (QPointerQWidget>). If menu is closed by click in this area it won't replay mouse event.
@@ -248,6 +254,7 @@ QColor linkColor(const QPalette& palette, bool hovered);
 
 bool isAccented(const QWidget* widget);
 bool isWarningStyle(const QWidget* widget);
+bool hasTextButtonBackgroundStyle(const QWidget* widget);
 
 class RectCoordinates
 {
