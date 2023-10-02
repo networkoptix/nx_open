@@ -320,10 +320,10 @@ FocusScope
 
                 width: parent ? parent.width : 0
                 implicitHeight: Math.max(button.implicitHeight, delegateLoader.implicitHeight)
-                enabled: itemFlags & Qt.ItemIsEnabled
                 clip: true
-
+                enabled: itemFlags & Qt.ItemIsEnabled
                 opacity: enabled ? 1.0 : 0.3
+                visible: inUse
 
                 readonly property bool isSelectable: itemFlags & Qt.ItemIsSelectable
                 readonly property bool isEditable: itemFlags & Qt.ItemIsEditable
@@ -337,7 +337,7 @@ FocusScope
                 readonly property var sourceIndex: NxGlobals.toPersistent(
                     linearizationListModel.mapToSource(modelIndex))
 
-                readonly property alias itemFlags: itemFlagsWatcher.itemFlags
+                readonly property int itemFlags: inUse ? itemFlagsWatcher.itemFlags : 0
                 readonly property bool isCurrent: ListView.isCurrentItem
                 readonly property alias isSelected: selectionHighlight.isItemSelected
 
@@ -390,6 +390,7 @@ FocusScope
                     id: dropArea
 
                     anchors.fill: parent
+                    visible: listItem.inUse
 
                     onEntered:
                     {
@@ -465,6 +466,7 @@ FocusScope
 
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                    visible: listItem.inUse
 
                     drag.onActiveChanged:
                     {
@@ -628,6 +630,7 @@ FocusScope
                     signal finishEditing()
 
                     sourceComponent: treeView.delegate
+                    visible: listItem.inUse
 
                     anchors.left: button.right
                     anchors.right: listItem.right
