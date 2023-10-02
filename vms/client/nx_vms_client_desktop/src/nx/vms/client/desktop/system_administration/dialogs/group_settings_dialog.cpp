@@ -434,6 +434,12 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
 
 void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 {
+    if (d->dialogType == editGroup && !isModified())
+    {
+        saveStateComplete(state);
+        return;
+    }
+
     if (d->hasCycles(state))
     {
         QnMessageBox messageBox(
@@ -448,16 +454,8 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
         return;
     }
 
-    if (d->dialogType == editGroup && !isModified())
-    {
-        saveStateComplete(state);
-        return;
-    }
-
     UserGroupRequest::AddOrUpdateGroup updateData;
-
     updateData.newGroup = d->dialogType == createGroup;
-
     updateData.groupData.id = state.groupId;
     updateData.groupData.name = state.name;
     updateData.groupData.description = state.description;
