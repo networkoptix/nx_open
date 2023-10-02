@@ -287,7 +287,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, lookupLists, "[Feature] Enable Lookup Lists support.");
 
     // VMS-32305
-    NX_INI_FLAG(false, enableRemoteArchiveSynchronization,
+    NX_INI_FLAG(true, enableRemoteArchiveSynchronization,
         "[Feature] Enable ONVIF Profile G");
 
     // VMS-41144
