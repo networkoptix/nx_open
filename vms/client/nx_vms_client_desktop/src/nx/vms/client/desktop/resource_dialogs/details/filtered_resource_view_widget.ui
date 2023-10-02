@@ -184,10 +184,10 @@
     </widget>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::PromoBar" name="infoBar" native="true"/>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="infoBar" native="true"/>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="alertBar" native="true"/>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="alertBar" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="footerContainer" native="true">
@@ -214,12 +214,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nx::vms::client::desktop::PromoBar</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>nx::vms::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/tree_view.h</header>
@@ -231,9 +225,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::AlertBar</class>
+   <class>nx::vms::client::desktop::CommonMessageBar</class>
    <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
