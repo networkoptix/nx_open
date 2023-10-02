@@ -401,6 +401,7 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
 
     const auto change = calculateLayoutChange(layout);
     const auto layoutOwner = layout->getParentResource();
+    const bool revertOnCancel = workbench()->currentLayout()->resource() != layout;
 
     if (confirmLayoutChange(change, layoutOwner))
     {
@@ -423,6 +424,10 @@ void LayoutsHandler::saveLayout(const LayoutResourcePtr& layout)
         {
             snapshotManager->save(layout);
         }
+    }
+    else if (revertOnCancel)
+    {
+        snapshotManager->restore(layout);
     }
 }
 
