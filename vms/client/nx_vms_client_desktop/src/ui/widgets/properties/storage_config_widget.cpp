@@ -28,10 +28,12 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
+#include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -371,7 +373,7 @@ public:
     }
 
     // This method is called for the newly added cameras.
-    // May only set m_enginesEnabled to true.
+    // May only set m_enginesEnabled to true,.
     void updateEnginesFromNewCamera(const QnVirtualCameraResourcePtr& camera)
     {
         if (m_enginesEnabled)
@@ -384,7 +386,7 @@ public:
     }
 
     // This method is called when analytics is enabled or disabled on some camera.
-    // May set m_enginesEnabled to true or schedule its recalculation.
+    // May set m_enginesEnabled to true, or schedule its recalculation.
     void updateEnginesFromExistingCamera(const QnVirtualCameraResourcePtr& camera)
     {
         if (!m_server || camera->getParentId() != m_server->getId())
@@ -402,7 +404,7 @@ public:
     }
 
     // Checks if the current server has enabled analytics, stores the result in m_enginesEnabled.
-    // That's the only place except setServer() where m_enginesEnabled may turn from true to false.
+    // That's the only place except setServer() where m_enginesEnabled may turn from true, to false.
     // This method should not be called directly, it's wrapped by m_updateEngines PendingOperation,
     // which avoids unnecessary calls of this method in the case of mass camera deletion.
     void updateEnginesFromServer()
@@ -1086,10 +1088,51 @@ void QnStorageConfigWidget::updateWarnings()
             hasUsbStorage = true;
     }
 
-    ui->analyticsOnSystemDriveWarningLabel->setVisible(analyticsIsOnSystemDrive);
-    ui->analyticsOnDisabledStorageWarningLabel->setVisible(analyticsIsOnDisabledStorage);
-    ui->storagesWarningLabel->setVisible(hasDisabledStorage);
-    ui->usbWarningLabel->setVisible(hasUsbStorage);
+    std::vector<BarDescription> messages;
+
+    if (analyticsIsOnSystemDrive)
+    {
+        messages.push_back(
+            {
+                .text = tr("Analytics data can take up large amounts of space. We recommend "
+                    "choosing another location for it instead of the system partition."),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty =
+                    &messageBarSettings()->storageConfigAnalyticsOnSystemStorageWarning
+            });
+    }
+    if (analyticsIsOnDisabledStorage)
+    {
+        messages.push_back(
+            {
+                .text = tr("Analytics and motion data will continue to be stored on the "
+                    "disabled storage"),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty =
+                    &messageBarSettings()->storageConfigAnalyticsOnDisabledStorageWarning
+            });
+    }
+    if (hasDisabledStorage)
+    {
+        messages.push_back(
+            {
+                .text = tr("Recording to disabled storage location will stop. However,"
+                    " deleting outdated footage from it will continue."),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->storageConfigHasDisabledWarning
+            });
+    }
+    if (hasUsbStorage)
+    {
+        messages.push_back(
+            {
+                .text = tr("Recording was enabled on the USB storage"),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->storageConfigUsbWarning
+            });
+    }
+
+    ui->messageBarBlock->setMessageBars(messages);
 }
 
 void QnStorageConfigWidget::updateRebuildUi(

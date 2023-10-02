@@ -33,6 +33,12 @@ public:
     Property<bool> nonCameraResourcesWarning{this,"nonCameraResourcesWarning",true};
     Property<bool> webPageInformation{this, "webPageInformation", true};
     Property<bool> integrationWarning{this, "integrationWarning", true};
+    Property<bool> storageConfigAnalyticsOnSystemStorageWarning{
+        this, "storageConfigAnalyticsOnSystemStorageWarning", true};
+    Property<bool> storageConfigAnalyticsOnDisabledStorageWarning{
+        this, "storageConfigAnalyticsOnDisabledStorageWarning", true};
+    Property<bool> storageConfigHasDisabledWarning{this, "storageConfigHasDisabledWarning", true};
+    Property<bool> storageConfigUsbWarning{this, "storageConfigUsbWarning", true};
 };
 
 MessageBarSettings* messageBarSettings();
