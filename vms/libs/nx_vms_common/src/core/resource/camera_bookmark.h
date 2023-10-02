@@ -182,7 +182,7 @@ struct NX_VMS_COMMON_API QnCameraBookmarkSearchFilter
     static const int kNoLimit;
 };
 #define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(orderBy)\
-    (minVisibleLengthMs)(creationStartTimeMs)(creationEndTimeMs)(id)(cameras)
+    (centralTimePointMs)(minVisibleLengthMs)(creationStartTimeMs)(creationEndTimeMs)(id)(cameras)
 NX_REFLECTION_INSTRUMENT(QnCameraBookmarkSearchFilter, QnCameraBookmarkSearchFilter_Fields)
 
 struct NX_VMS_COMMON_API QnCameraBookmarkTag
