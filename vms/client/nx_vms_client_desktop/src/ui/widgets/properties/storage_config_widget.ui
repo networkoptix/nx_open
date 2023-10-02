@@ -188,32 +188,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="analyticsOnSystemDriveWarningLabel" native="true">
-     <property name="text" stdset="0">
-      <string>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="analyticsOnDisabledStorageWarningLabel" native="true">
-     <property name="text" stdset="0">
-      <string>Analytics and motion data will continue to be stored on the disabled storage.</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="storagesWarningLabel" native="true">
-     <property name="text" stdset="0">
-      <string>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="usbWarningLabel" native="true">
-     <property name="text" stdset="0">
-      <string>Recording was enabled on the USB storage</string>
-     </property>
-    </widget>
+    <widget class="nx::vms::client::desktop::MessageBarBlock" name="messageBarBlock" native="true"/>
    </item>
   </layout>
  </widget>
@@ -235,9 +210,9 @@
    <header location="global">nx/vms/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::AlertBar</class>
+   <class>nx::vms::client::desktop::MessageBarBlock</class>
    <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
