@@ -812,7 +812,7 @@ typedef nx::network::test::StopType StopType;
     Type(Name, ConnectToBadAddressIoDelete) \
         { nx::network::test::socketConnectToBadAddress(mkClient, true); } \
     Type(Name, ValidAfterPleaseStop) \
-        { nx::network::test::socketIsValidAfterPleaseStop(mkClient); } \
+        { nx::network::test::socketIsValidAfterPleaseStop(mkClient); }
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, AcceptedSocketOptionsInheritance) \
@@ -822,7 +822,7 @@ typedef nx::network::test::StopType StopType;
     Type(Name, AcceptPleaseStopSync) \
         { nx::network::test::socketAcceptCancelSync(mkServer, StopType::pleaseStop); } \
     Type(Name, PleaseStopCancelsPostedCall) \
-        { nx::network::test::serverSocketPleaseStopCancelsPostedCall(mkServer); } \
+        { nx::network::test::serverSocketPleaseStopCancelsPostedCall(mkServer); }
 
 #define NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, TransferSyncAsyncSwitch) \
@@ -832,7 +832,7 @@ typedef nx::network::test::StopType StopType;
     Type(Name, TransferFragmentation) \
         { nx::network::test::socketTransferFragmentation(mkServer, mkClient, endpointToConnectTo); } \
     Type(Name, MultiConnect) \
-        { nx::network::test::socketMultiConnect(mkServer, mkClient, endpointToConnectTo); } \
+        { nx::network::test::socketMultiConnect(mkServer, mkClient, endpointToConnectTo); }
 
 #define NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(Type, Name, mkServer, mkClient) \
     NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, std::nullopt)
@@ -842,17 +842,17 @@ typedef nx::network::test::StopType StopType;
 
 #define NX_NETWORK_CLIENT_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, std::nullopt) \
-    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, std::nullopt) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, std::nullopt)
 
 #define NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
-    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo)
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
     NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, std::nullopt) \
-    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, std::nullopt) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, std::nullopt)
 
 #define NX_NETWORK_BOTH_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
     NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, std::nullopt) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, std::nullopt) \
-    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, std::nullopt) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, std::nullopt)
