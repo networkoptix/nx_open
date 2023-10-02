@@ -17,20 +17,22 @@ QModelIndex ModelItemFlagsWatcher::index() const
 
 void ModelItemFlagsWatcher::setIndex(const QModelIndex& value)
 {
-    if (m_index == value)
+    // If an invalid index is set over an invalidated persistent index, process it as a change.
+    // Invalidated persistent index can be detected by m_model != nullptr.
+    if (m_index == value && (m_index.isValid() || !m_model))
         return;
 
-    const bool modelChanged = m_index.model() != value.model();
-
-    if (modelChanged && m_index.isValid())
-        m_index.model()->disconnect(this);
+    const bool modelChanged = m_model != value.model();
+    if (modelChanged && m_model)
+        m_model->disconnect(this);
 
     m_index = value;
+    m_model = m_index.model();
     m_itemFlags = value.flags();
 
-    if (modelChanged && m_index.isValid())
+    if (modelChanged && m_model)
     {
-        connect(m_index.model(), &QAbstractItemModel::dataChanged, this,
+        connect(m_model.data(), &QAbstractItemModel::dataChanged, this,
             [this](const QModelIndex& topLeft, const QModelIndex& bottomRight)
             {
                 if (m_index.isValid()
