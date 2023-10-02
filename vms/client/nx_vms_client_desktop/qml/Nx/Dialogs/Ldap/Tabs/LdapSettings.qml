@@ -798,44 +798,52 @@ Rectangle
             }
         }
 
-        DialogBanner
+        ColumnLayout
         {
-            visible: !control.continuousSyncEditable
+            spacing: 0
 
-            style: DialogBanner.Style.Info
+            DialogBanner
+            {
+                visible: !control.continuousSyncEditable
 
-            text: qsTr("Continuous import from LDAP server is disabled for this system. Updates "
-                + "to groups and user and groups membership will occur solely through manual "
-                + "synchronization.")
+                style: DialogBanner.Style.Info
 
-            Layout.fillWidth: true
-        }
+                text: qsTr("Continuous import from LDAP server is disabled for this system. Updates "
+                    + "to groups and user and groups membership will occur solely through manual "
+                    + "synchronization.")
 
-        DialogBanner
-        {
-            visible: control.showEmptyLdapWarning && !control.hideEmptyLdapWarning && !closed
-            closeable: true
+                Layout.fillWidth: true
+            }
 
-            style: DialogBanner.Style.Warning
+            DialogBanner
+            {
+                visible: control.showEmptyLdapWarning && !control.hideEmptyLdapWarning && !closed
 
-            text: qsTr("No users or groups match synchronization settings and are added to the "
-                + "system DB. Make sure LDAP server parameters and filters are configured "
-                + "correctly.")
+                style: DialogBanner.Style.Warning
 
-            Layout.fillWidth: true
-        }
+                text: qsTr("No users or groups match synchronization settings and are added to the "
+                    + "system DB. Make sure LDAP server parameters and filters are configured "
+                    + "correctly.")
 
-        DialogBanner
-        {
-            style: DialogBanner.Style.Warning
+                Layout.fillWidth: true
 
-            text: qsTr("Please use care when altering LDAP settings. Incorrect configuration "
-                + "could disrupt system availability for a large number of users simultaneously.")
+                onCloseClicked: control.hideEmptyLdapWarning = true
+            }
 
-            visible: control.showEditingWarning && !control.hideEditingWarning && !closed
-            closeable: true
+            DialogBanner
+            {
+                style: DialogBanner.Style.Warning
 
-            Layout.fillWidth: true
+                text: qsTr("Please use care when altering LDAP settings. Incorrect configuration "
+                    + "could disrupt system availability for a large number of users simultaneously.")
+
+                visible: control.showEditingWarning && !control.hideEditingWarning && !closed
+                closeable: true
+
+                Layout.fillWidth: true
+
+                onCloseClicked: control.hideEditingWarning = true
+            }
         }
     }
 }
