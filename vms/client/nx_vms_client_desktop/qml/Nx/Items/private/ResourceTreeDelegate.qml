@@ -204,7 +204,7 @@ FocusScope
                 }
             }
 
-            Keys.onShortcutOverride:
+            Keys.onShortcutOverride: (event) =>
             {
                 switch (event.key)
                 {
