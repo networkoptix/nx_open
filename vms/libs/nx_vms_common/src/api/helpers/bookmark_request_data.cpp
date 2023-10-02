@@ -42,6 +42,7 @@ static const QString kDurationParam = lit("duration");
 static const QString kDurationMsParam = lit("durationMs");
 static const QString kTagParam = lit("tag");
 static const QString kEventRuleIdParam = lit("rule_id");
+static const QString kCentralTimePointMs = lit("centralTimePointMs");
 
 static const qint64 kUsPerMs = 1000;
 
@@ -119,6 +120,12 @@ void QnGetBookmarksRequestData::loadFromParams(
     if (params.contains(kLimitParam))
         filter.limit = qMax(0LL, params.value(kLimitParam).toLongLong());
 
+    if (params.contains(kCentralTimePointMs))
+    {
+        filter.centralTimePointMs = milliseconds(
+            nx::utils::parseDateTimeMsec(params.value(kCentralTimePointMs)));
+    }
+
     filter.text = params.value(kFilterParam);
     if (QString param = params.value(QnCameraBookmark::kGuidParam); !param.isEmpty())
     {
@@ -160,6 +167,9 @@ nx::network::rest::Params QnGetBookmarksRequestData::toParams() const
 
     if (filter.id && !filter.id->isNull())
         result.insert(QnCameraBookmark::kGuidParam, QnLexical::serialized(*filter.id));
+
+    if (filter.centralTimePointMs)
+        result.insert(kCentralTimePointMs, QnLexical::serialized(*filter.centralTimePointMs));
 
     return result;
 }
