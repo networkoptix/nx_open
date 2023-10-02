@@ -43,6 +43,7 @@ Item
             if (!email)
                 emailTextField.textField.warningState = false
         }
+        setDefaultFocus()
     }
 
     property var self
@@ -79,8 +80,6 @@ Item
         if (!textField.text)
             textField.forceActiveFocus()
     }
-
-    Component.onCompleted: setDefaultFocus()
 
     Scrollable
     {
