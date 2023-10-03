@@ -63,11 +63,6 @@ public:
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    virtual int remove(
-        const nx::vms::api::IdDataList& ids,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
-
     ErrorCode removeSync(const QnUuid& id);
 
     virtual int getUserRoles(
@@ -85,11 +80,6 @@ public:
 
     virtual int removeUserRole(
         const QnUuid& id,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
-
-    virtual int removeUserRoles(
-        const nx::vms::api::IdDataList& ids,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 

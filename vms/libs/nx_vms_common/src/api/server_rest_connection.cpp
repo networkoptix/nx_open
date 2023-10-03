@@ -2135,7 +2135,7 @@ Handle ServerConnection::setLdapSettingsAsync(
 }
 
 Handle ServerConnection::modifyLdapSettingsAsync(
-    const nx::vms::api::LdapSettingsChange& settings,
+    const nx::vms::api::LdapSettings& settings,
     nx::vms::common::SessionTokenHelperPtr helper,
     Result<ErrorOrData<nx::vms::api::LdapSettings>>::type&& callback,
     QThread* targetThread)
