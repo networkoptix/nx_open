@@ -3,7 +3,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/common/widgets/control_bars.h>
+#include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QPushButton;
@@ -11,11 +11,11 @@ class QPushButton;
 namespace nx::vms::client::desktop {
 
 class DefaultPasswordAlertBar:
-    public nx::vms::client::desktop::AlertBar,
+    public nx::vms::client::desktop::CommonMessageBar,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = nx::vms::client::desktop::AlertBar;
+    using base_type = nx::vms::client::desktop::CommonMessageBar;
 
 public:
     explicit DefaultPasswordAlertBar(QWidget* parent = nullptr);
