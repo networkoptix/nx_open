@@ -1691,10 +1691,13 @@ struct SaveUserRoleAccess
         const Qn::UserAccessData& accessData,
         const nx::vms::api::UserGroupData& param)
     {
+        if (hasSystemAccess(accessData))
+            return {};
+
         if (auto r = PowerUserAccess()(systemContext, accessData, param); !r)
         {
             r.message = ServerApiErrors::tr(
-                "Saving Role is forbidden because the user has no admin access.");
+                "Saving User Group is forbidden because the user has no power user access.");
             return r;
         }
 
@@ -1713,9 +1716,6 @@ struct SaveUserRoleAccess
                 "Circular dependencies are forbidden. This Role is already inherited by '%1'."),
                 cycledGroupNames.join("', '")));
         }
-
-        if (hasSystemAccess(accessData))
-            return {};
 
         const auto existing = systemContext->userGroupManager()->find(param.id);
 
@@ -1760,6 +1760,9 @@ struct RemoveUserRoleAccess
         const Qn::UserAccessData& accessData,
         const nx::vms::api::IdData& param)
     {
+        if (hasSystemAccess(accessData))
+            return {};
+
         if (!NX_ASSERT(systemContext))
             return {};
 
@@ -1784,8 +1787,6 @@ struct RemoveUserRoleAccess
             return {ErrorCode::notFound, nx::format(
                 ServerApiErrors::tr("User Group '%1' does not exist."), param.id.toString())};
         }
-
-
 
         const auto memberIds = systemContext->accessSubjectHierarchy()->directMembers(param.id);
         for (const auto& id: memberIds)
