@@ -157,69 +157,95 @@
       </attribute>
       <layout class="QVBoxLayout" name="advancedVerticalLayout">
        <property name="spacing">
-        <number>8</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <item>
-        <widget class="QCheckBox" name="disableCertificateCheckBox"/>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="clientApiCheckBox">
-         <property name="text">
-          <string>Allow using Client API</string>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>8</number>
          </property>
-        </widget>
+         <property name="leftMargin">
+          <number>16</number>
+         </property>
+         <property name="topMargin">
+          <number>16</number>
+         </property>
+         <property name="rightMargin">
+          <number>16</number>
+         </property>
+         <property name="bottomMargin">
+          <number>16</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="disableCertificateCheckBox"/>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="clientApiCheckBox">
+           <property name="text">
+            <string>Allow using Client API</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="nx::vms::client::desktop::AlertLabel" name="clientApiAlertLabel" native="true">
+           <property name="visible">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="proxyAllContentsCheckBox">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Proxy all requested contents</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="nx::vms::client::desktop::AlertLabel" name="proxyAlertLabel" native="true"/>
+         </item>
+         <item>
+          <widget class="nx::vms::client::desktop::InputField" name="allowListField" native="true">
+           <property name="visible">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="advancedVerticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="nx::vms::client::desktop::AlertLabel" name="clientApiAlertLabel" native="true">
+        <widget class="nx::vms::client::desktop::CommonMessageBar" name="webPageBanner" native="true">
          <property name="visible">
           <bool>false</bool>
          </property>
         </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="proxyAllContentsCheckBox">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Proxy all requested contents</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="nx::vms::client::desktop::AlertLabel" name="proxyAlertLabel" native="true"/>
-       </item>
-       <item>
-        <widget class="nx::vms::client::desktop::InputField" name="allowListField" native="true">
-         <property name="visible">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="advancedVerticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -227,13 +253,6 @@
    </item>
    <item>
     <widget class="nx::vms::client::desktop::CommonMessageBar" name="integrationBanner" native="true">
-     <property name="visible">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::CommonMessageBar" name="webPageBanner" native="true">
      <property name="visible">
       <bool>false</bool>
      </property>
