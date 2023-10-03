@@ -171,11 +171,12 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     enum class RecordingAlert
     {
         // High minimal archive length value selected.
-        highArchiveLength,
+        highArchiveLength = 1 << 0,
 
         // High pre-recording value selected, resulting in increased RAM usage on the server.
-        highPreRecordingValue,
+        highPreRecordingValue = 1 << 1,
     };
+    Q_DECLARE_FLAGS(RecordingAlerts, RecordingAlert)
 
     enum class MotionHint
     {
@@ -377,7 +378,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     UserEditableMultiple<bool> twoWayAudioEnabled;
 
     std::optional<RecordingHint> recordingHint;
-    std::optional<RecordingAlert> recordingAlert;
+    RecordingAlerts recordingAlerts;
     std::optional<MotionHint> motionHint;
     std::optional<MotionAlert> motionAlert;
     ScheduleAlerts scheduleAlerts;
