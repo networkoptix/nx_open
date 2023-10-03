@@ -663,34 +663,17 @@ State::ScheduleAlerts calculateScheduleAlerts(const State& state)
     return scheduledAlerts;
 }
 
-std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state)
+void updateRecordingAlerts(State& state)
 {
-    const bool warning = state.recording.minPeriod.hasManualPeriodValue()
+    const bool highArchiveLengthWarning = state.recording.minPeriod.hasManualPeriodValue()
         && state.recording.minPeriod.displayValue() > kMinArchiveDurationAlertThreshold;
+    state.recordingAlerts.setFlag(
+        State::RecordingAlert::highArchiveLength, highArchiveLengthWarning);
 
-    if (warning)
-        return State::RecordingAlert::highArchiveLength;
-
-    // If this alert shouldn't be shown but it is shown, clear it.
-    if (state.recordingAlert && *state.recordingAlert == State::RecordingAlert::highArchiveLength)
-        return {};
-
-    return state.recordingAlert;
-}
-
-std::optional<State::RecordingAlert> updateHighPreRecordingAlert(const State& state)
-{
-    const bool warning =
-        seconds(state.recording.thresholds.beforeSec()) >= kPreRecordingAlertThreshold;
-
-    if (warning)
-        return State::RecordingAlert::highPreRecordingValue;
-
-    // If this alert shouldn't be shown but it is shown, clear it.
-    if (state.recordingAlert && *state.recordingAlert == State::RecordingAlert::highPreRecordingValue)
-        return {};
-
-    return state.recordingAlert;
+    const bool highPreRecordingValueWarning = state.recording.thresholds.beforeSec.hasValue()
+        && seconds(state.recording.thresholds.beforeSec()) >= kPreRecordingAlertThreshold;
+    state.recordingAlerts.setFlag(
+        State::RecordingAlert::highPreRecordingValue, highPreRecordingValueWarning);
 }
 
 bool canForceZoomCapability(const Camera& camera)
@@ -1181,7 +1164,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.audioEnabled = {};
     state.twoWayAudioEnabled = {};
     state.recordingHint = {};
-    state.recordingAlert = {};
+    state.recordingAlerts = {};
     state.motionHint = {};
     state.motionAlert = {};
     state.expertAlerts = {};
@@ -1942,7 +1925,7 @@ State CameraSettingsDialogStateReducer::setMinRecordingPeriodAutomatic(State sta
             minPeriod.setManualMode();
         }
     }
-    state.recordingAlert = updateArchiveLengthAlert(state);
+    updateRecordingAlerts(state);
     return state;
 }
 
@@ -1957,7 +1940,7 @@ State CameraSettingsDialogStateReducer::setMinRecordingPeriodValue(
 
     state.hasChanges = true;
     minPeriod.setManualModeWithPeriod(value);
-    state.recordingAlert = updateArchiveLengthAlert(state);
+    updateRecordingAlerts(state);
 
     auto& maxPeriod = state.recording.maxPeriod;
     if (maxPeriod.hasManualPeriodValue() && maxPeriod.displayValue() < value)
@@ -2009,7 +1992,7 @@ State CameraSettingsDialogStateReducer::setMaxRecordingPeriodValue(
     if (minPeriod.hasManualPeriodValue() && minPeriod.displayValue() > value)
         minPeriod.setManualModeWithPeriod(value);
 
-    state.recordingAlert = updateArchiveLengthAlert(state);
+    updateRecordingAlerts(state);
 
     return state;
 }
@@ -2021,7 +2004,7 @@ State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State sta
     NX_ASSERT(state.supportsRecordingByEvents());
     state.hasChanges = true;
     state.recording.thresholds.beforeSec.setUser(value);
-    state.recordingAlert = updateHighPreRecordingAlert(state);
+    updateRecordingAlerts(state);
     return state;
 }
 
