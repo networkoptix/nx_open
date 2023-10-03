@@ -22,9 +22,6 @@ public:
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<nx::vms::api::IdDataList>& tran,
-        NotificationSource source);
-    void triggerNotification(
         const QnTransaction<nx::vms::api::UserGroupData>& tran,
         NotificationSource source);
 

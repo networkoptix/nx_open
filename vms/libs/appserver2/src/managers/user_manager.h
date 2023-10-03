@@ -32,11 +32,6 @@ public:
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
-    virtual int remove(
-        const nx::vms::api::IdDataList& ids,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
-
     virtual int getUserRoles(
         Handler<nx::vms::api::UserGroupDataList> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
@@ -48,11 +43,6 @@ public:
 
     virtual int removeUserRole(
         const QnUuid& id,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
-
-    virtual int removeUserRoles(
-        const nx::vms::api::IdDataList& groupList,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -143,23 +133,6 @@ int QnUserManager<QueryProcessorType>::remove(
 }
 
 template<class QueryProcessorType>
-int QnUserManager<QueryProcessorType>::remove(
-    const nx::vms::api::IdDataList& userList,
-    Handler<> handler,
-    nx::utils::AsyncHandlerExecutor handlerExecutor)
-{
-    const int requestId = generateRequestID();
-    processor().processUpdateAsync(
-        ApiCommand::removeResources,
-        userList,
-        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
-        {
-            handler(requestId, std::move(args)...);
-        });
-    return requestId;
-}
-
-template<class QueryProcessorType>
 int QnUserManager<QueryProcessorType>::getUserRoles(
     Handler<nx::vms::api::UserGroupDataList> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
@@ -202,23 +175,6 @@ int QnUserManager<QueryProcessorType>::removeUserRole(
     processor().processUpdateAsync(
         ApiCommand::removeUserGroup,
         nx::vms::api::IdData(id),
-        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
-        {
-            handler(requestId, std::move(args)...);
-        });
-    return requestId;
-}
-
-template<class QueryProcessorType>
-int QnUserManager<QueryProcessorType>::removeUserRoles(
-    const nx::vms::api::IdDataList& userGroups,
-    Handler<> handler,
-    nx::utils::AsyncHandlerExecutor handlerExecutor)
-{
-    const int requestId = generateRequestID();
-    processor().processUpdateAsync(
-        ApiCommand::removeUserGroups,
-        userGroups,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);

@@ -12,6 +12,11 @@ bool LdapSettings::isValid(bool checkPassword) const
         && (!checkPassword || !(adminDn.isEmpty() ^ adminPassword.value_or(QString()).isEmpty()));
 }
 
+bool LdapSettings::isEmpty() const
+{
+    return *this == LdapSettings{.removeRecords = removeRecords};
+}
+
 int LdapSettings::defaultPort(bool useSsl)
 {
     constexpr int kDefaultLdapPort = 389;
@@ -35,7 +40,6 @@ QString LdapSettings::syncId() const
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingSearchFilter, (json), LdapSettingSearchFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettings, (json), LdapSettings_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapSettingsChange, (json), LdapSettingsChange_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LdapStatus, (json), LdapStatus_Fields)
 
 } // namespace nx::vms::api

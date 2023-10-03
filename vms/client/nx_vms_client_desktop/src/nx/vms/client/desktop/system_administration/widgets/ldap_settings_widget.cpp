@@ -485,7 +485,7 @@ void LdapSettingsWidget::applyChanges()
 
     nx::vms::api::LdapSettings settingsBackup = globalSettings()->ldap();
 
-    nx::vms::api::LdapSettingsChange settingsChange = {d->getState()};
+    nx::vms::api::LdapSettings settingsChange = {d->getState()};
     settingsChange.removeRecords = removeExisting;
 
     const auto settingsCallback = nx::utils::guarded(this,
