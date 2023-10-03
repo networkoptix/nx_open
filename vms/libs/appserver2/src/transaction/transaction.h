@@ -758,18 +758,6 @@ APPLY(510, saveUsers, nx::vms::api::UserDataList, \
     ReadListAccessOut<ReadResourceAccess>(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
 /**%apidoc */ \
-APPLY(511, removeUserGroups, nx::vms::api::IdDataList, \
-    true, /*< isPersistent */ \
-    false, /*< isSystem */ \
-    true, /*< isRemoveOperation */ \
-    InvalidGetHashHelper(), /*< getHash */ \
-    UserNotificationManagerHelper(), /*< trigger notification */ \
-    nullptr, /*< save permission checker */ \
-    InvalidAccess(), /*< read permission checker */ \
-    InvalidFilterFunc(), /*< filter read func */ \
-    ReadListAccessOut<AllowForAllAccess>(), /*< check remote peer rights for outgoing transaction */ \
-    RegularTransactionType()) /*< regular transaction type */ \
-/**%apidoc */ \
 APPLY(600, getLayouts, nx::vms::api::LayoutDataList, \
     false, /*< isPersistent */ \
     false, /*< isSystem */ \

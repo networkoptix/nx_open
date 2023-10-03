@@ -104,6 +104,7 @@ bool amendOutputDataIfNeeded(
         if (success)
         {
             ldap.adminPassword.reset();
+            ldap.removeRecords = false;
             paramData->value = QJson::serialized(ldap);
         }
         else
