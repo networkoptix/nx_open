@@ -32,7 +32,6 @@ public:
 
 private:
     void loadState(const CameraSettingsDialogState& state);
-    QStringList alerts(const CameraSettingsDialogState& state) const;
     void clearSpinBoxSelection();
 
 private:

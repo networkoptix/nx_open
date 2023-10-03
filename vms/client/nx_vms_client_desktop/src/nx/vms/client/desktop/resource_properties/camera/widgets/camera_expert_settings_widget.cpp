@@ -393,6 +393,9 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     ui->enableImportFromDeviceRadioButton->setHint(tr("Only camera or server offline periods after "
         "the first addition to the system will be imported automatically."));
+
+    ui->alertLabel->setText(tr("Quality and frame rate (FPS) settings in the Recording Schedule"
+                               " will become irrelevant"));
 }
 
 CameraExpertSettingsWidget::~CameraExpertSettingsWidget()
@@ -750,8 +753,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ::setReadOnly(ui->restoreDefaultsButton, state.readOnly);
 
     // Alerts.
-
-    ui->alertBlock->setAlerts(alerts(state));
+    ui->alertLabel->setVisible(
+        state.expertAlerts.testFlag(CameraSettingsDialogState::ExpertAlert::cameraControlYielded));
 
     ui->motionImplicitlyDisabledAlertBar->setText(MotionStreamAlerts::implicitlyDisabledAlert(
         state.motion.streamAlert,
@@ -769,17 +772,4 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         ui->rightWidget,
         ui->leftWidget});
 }
-
-QStringList CameraExpertSettingsWidget::alerts(const CameraSettingsDialogState& state) const
-{
-    QStringList alerts;
-    if (state.expertAlerts.testFlag(CameraSettingsDialogState::ExpertAlert::cameraControlYielded))
-    {
-        alerts.push_back(tr("Quality and frame rate (FPS) settings in the Recording Schedule"
-            " will become irrelevant."));
-    }
-
-    return alerts;
-}
-
 } // namespace nx::vms::client::desktop

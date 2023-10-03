@@ -144,6 +144,9 @@
                  </widget>
                 </item>
                 <item>
+                  <widget class="nx::vms::client::desktop::AlertLabel" name="alertLabel" native="true"/>
+                </item>
+                <item>
                  <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="bitratePerGopCheckBox">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -814,9 +817,6 @@
    <item>
     <widget class="nx::vms::client::desktop::CommonMessageBar" name="motionImplicitlyDisabledAlertBar" native="true"/>
    </item>
-   <item>
-    <widget class="nx::vms::client::desktop::AlertBlock" name="alertBlock" native="true"/>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -827,9 +827,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::AlertBlock</class>
+   <class>nx::vms::client::desktop::AlertLabel</class>
    <extends>QWidget</extends>
-   <header>nx/vms/client/desktop/common/widgets/control_bars.h</header>
+   <header>nx/vms/client/desktop/common/widgets/alert_label.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
