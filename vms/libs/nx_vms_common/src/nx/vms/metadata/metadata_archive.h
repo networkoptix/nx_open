@@ -87,7 +87,7 @@ struct NX_VMS_COMMON_API Index
 
     void reset();
     bool truncateToBytes(qint64 dataSize, bool noGeometryMode);
-    bool updateTail(QFile* indexFile);
+    bool updateTail(AbstractMetadataBinaryFile* indexFile);
     qint64 indexFileSize() const;
 
     IndexHeader header;

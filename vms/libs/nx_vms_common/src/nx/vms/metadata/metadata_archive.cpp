@@ -112,7 +112,7 @@ void Index::reset()
     memset(header.dummy, 0, sizeof(header.dummy));
 }
 
-bool Index::updateTail(QFile* indexFile)
+bool Index::updateTail(AbstractMetadataBinaryFile* indexFile)
 {
     if (!resizeFile(indexFile, indexFileSize()))
     {
@@ -314,14 +314,14 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
         m_noGeometryMetadataFile->openRW();
     }
 
-    bool isUpdated = m_index.truncateToBytes(m_detailedMetadataFile.size(), /*noGeometryMode*/ false);
+    bool isUpdated = m_index.truncateToBytes(m_detailedMetadataFile->size(), /*noGeometryMode*/ false);
     if (m_noGeometryMetadataFile)
     {
         isUpdated |= m_index.truncateToBytes(m_noGeometryMetadataFile->size(), /*noGeometryMode*/ true);
     }
     if (isUpdated)
     {
-        if (!m_index.updateTail(&m_detailedIndexFile))
+        if (!m_index.updateTail(m_detailedIndexFile.get()))
             return false;
     }
 
@@ -329,7 +329,7 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
     if (!resizeFile(m_detailedMetadataFile.get(), newMetadataFileSize))
     {
         NX_WARNING(this, "Failed to resize file %1 to size %2",
-            m_detailedMetadataFile.fileName(), newMetadataFileSize);
+            m_detailedMetadataFile->fileName(), newMetadataFileSize);
         return false;
     }
     if (m_noGeometryMetadataFile)
@@ -344,8 +344,8 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
         m_noGeometryMetadataFile->seek(m_noGeometryMetadataFile->size());
     }
 
-    m_detailedMetadataFile->seek(m_detailedMetadataFile.size());
-    m_detailedIndexFile->seek(m_detailedIndexFile.size());
+    m_detailedMetadataFile->seek(m_detailedMetadataFile->size());
+    m_detailedIndexFile->seek(m_detailedIndexFile->size());
 
     return true;
 }
