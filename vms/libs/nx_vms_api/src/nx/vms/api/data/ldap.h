@@ -144,10 +144,14 @@ struct NX_VMS_API LdapSettings
      */
     bool ignoreCertificateErrors = false;
 
+    /**%apidoc[opt] Remove all existing LDAP users and groups from VMS. */
+    bool removeRecords = false;
+
     bool operator==(const LdapSettings&) const = default;
     Void getId() const { return {}; }
 
     bool isValid(bool checkPassword = true) const;
+    bool isEmpty() const;
     QString syncId() const;
 
     static int defaultPort(bool useSsl = false);
@@ -168,20 +172,12 @@ struct NX_VMS_API LdapSettings
     (preferredMasterSyncServer) \
     (masterSyncServerCheckIntervalS) \
     (isHttpDigestEnabledOnImport) \
+    (removeRecords) \
     (startTls) \
     (ignoreCertificateErrors)
 
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(LdapSettings, LdapSettings_Fields)
-
-struct NX_VMS_API LdapSettingsChange: LdapSettings
-{
-    /**%apidoc[opt] Remove all existing LDAP users and groups from VMS. */
-    bool removeRecords = false;
-};
-#define LdapSettingsChange_Fields LdapSettings_Fields (removeRecords)
-QN_FUSION_DECLARE_FUNCTIONS(LdapSettingsChange, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(LdapSettingsChange, LdapSettingsChange_Fields)
 
 struct NX_VMS_API LdapStatus
 {

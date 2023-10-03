@@ -42,14 +42,6 @@ void QnUserNotificationManager::triggerNotification(
 }
 
 void QnUserNotificationManager::triggerNotification(
-    const QnTransaction<nx::vms::api::IdDataList>& tran, NotificationSource)
-{
-    NX_ASSERT(tran.command == ApiCommand::removeUserGroups);
-    for (const auto& resource: tran.params)
-        emit userRoleRemoved(resource.id);
-}
-
-void QnUserNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::AccessRightsDataDeprecated>& tran,
     NotificationSource /*source*/)
 {
