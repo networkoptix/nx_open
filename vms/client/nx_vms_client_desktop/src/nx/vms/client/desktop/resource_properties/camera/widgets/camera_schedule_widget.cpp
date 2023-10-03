@@ -288,41 +288,19 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
         }());
 
     ui->highPreRecordingValueAlertBar->setText(
-        [&state]()
-        {
-            if (!state.recordingAlert)
-                return QString();
-
-            switch (*state.recordingAlert)
-            {
-                case CameraSettingsDialogState::RecordingAlert::highPreRecordingValue:
-                    return tr("High pre-recording time will increase RAM utilization "
-                              "on the server");
-                default:
-                    return QString();
-            }
-        }());
+        state.recordingAlerts.testFlag(
+            CameraSettingsDialogState::RecordingAlert::highPreRecordingValue)
+            ? tr("High pre-recording time will increase RAM utilization on the server")
+            : QString());
 
     ui->highArchiveLengthAlertBar->setText(
-        [&state]()
-        {
-            if (!state.recordingAlert)
-                return QString();
-
-            switch (*state.recordingAlert)
-            {
-                case CameraSettingsDialogState::RecordingAlert::highArchiveLength:
-                    return QnCameraDeviceStringSet(
-                        tr("High minimum value can lead to archive length "
-                           "decrease on other devices."),
-                        tr("High minimum value can lead to archive length "
-                           "decrease on other cameras."))
-                        .getString(state.deviceType);
-
-                default:
-                    return QString();
-            }
-        }());
+        state.recordingAlerts.testFlag(
+            CameraSettingsDialogState::RecordingAlert::highArchiveLength)
+            ? QnCameraDeviceStringSet(
+                tr("High minimum value can lead to archive length decrease on other devices."),
+                tr("High minimum value can lead to archive length decrease on other cameras."))
+                  .getString(state.deviceType)
+            : QString());
 }
 
 QnScheduleTaskList CameraScheduleWidget::calculateScheduleTasks() const
