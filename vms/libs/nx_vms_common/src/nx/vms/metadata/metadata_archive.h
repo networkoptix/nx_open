@@ -20,14 +20,12 @@ static const int kGeometrySize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 
     struct IndexRecord
     {
         quint32 start = 0;    //< Relative time in milliseconds as an offset from a file header.
-        quint32 durationAndRecCount = 0;
+        quint16 duration;
+        quint8 extraWords = 0;
+        quint8 recCount = 0;
         //< Record duration. Up to 4.5 hours.
-        quint32 duration() const { return durationAndRecCount & 0xffffff; }
-        quint8 recordCount() const { return (durationAndRecCount >> 24) + 1; }
-        void setRecordCount(quint8 recordCount)
-        {
-            durationAndRecCount = (durationAndRecCount & 0xffffff) + ((recordCount - 1) << 24);
-        }
+        quint8 recordCount() const { return recCount + 1; }
+        void setRecordCount(quint8 recordCount) { recCount = recordCount - 1; }
     };
 
     struct IndexHeader
@@ -46,10 +44,15 @@ static const int kGeometrySize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 
         quint16 recordSize = 0;
 
         quint8 flags = 0;
-        char dummy[2];
+
+        // Multiplier for the variable 'extraWords'.
+        // Record size is calculated as: baseRecordSize + extraWords * wordSize.
+        quint8 wordSize = 0;
+        char dummy[1];
 
         int noGeometryRecordSize() const { return recordSize - kGeometrySize; }
         bool noGeometryModeSupported() const { return version >= 3; }
+        bool variousRecordSizeSupported() const { return version >= 4; }
 
     };
 #pragma pack(pop)
@@ -68,11 +71,23 @@ struct NX_VMS_COMMON_API Index
     bool load(qint64 timestampMs);
     bool load(AbstractMetadataBinaryFile& indexFile);
 
+    qint64 mediaFileSize(bool noGeometryMode) const;
     qint64 dataOffset(int recordNumber, bool noGeometryMode) const;
-    qint64 dataSize(int from, int size, bool noGeometryMode) const;
+
+    /*
+     * Calculate buffer size to read mediaRecords.
+     * Buffer is rounded up to the one or more mediaRecord size
+     * according to the index. It could be rounded up to the several
+     * media records to cover full index record in case of index record
+     * contains several media records.
+     */
+    qint64 mediaSize(int fromIndex, int suggestedbufferSize, bool noGeometryMode) const;
+    qint64 mediaSizeDesc(int from, int suggestedbufferSize, bool noGeometryMode) const;
+    qint64 extraRecordSize(int index) const;
 
     void reset();
-    int64_t truncateTo(qint64 mediaRecords);
+    bool truncateToBytes(qint64 dataSize, bool noGeometryMode);
+    bool updateTail(QFile* indexFile);
     qint64 indexFileSize() const;
 
     IndexHeader header;
@@ -101,6 +116,10 @@ public:
 
     void setNoGeometryMode(bool value) { m_noGeometryMode = value; }
     bool isNoGeometryMode() const { return m_noGeometryMode; }
+
+    virtual void onFileOpened(uint64_t /*timePointMs*/, const IndexHeader& /*header*/) {}
+    virtual bool isNoData() const { return false; }
+
 private:
     const Filter* m_filter;
     bool m_noGeometryMode = false;
@@ -119,11 +138,14 @@ public:
         int channel);
 
     int baseRecordSize() const;
+    int wordSize() const;
     int getChannel() const;
     int aggregationIntervalSeconds() const;
 
     QString physicalId() const;
     QString getFilePrefix(const QDate& datetime) const;
+    bool supportVariousRecordSize(std::chrono::milliseconds timestamp);
+
 
     static constexpr quint32 kMinimalDurationMs = 125;
 protected:
@@ -144,7 +166,7 @@ protected:
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate) const;
     void fillFileNames(qint64 datetimeMs, AbstractMetadataBinaryFile* motionFile, bool noGeometry, AbstractMetadataBinaryFile* indexFile) const;
     void fillFileNames(qint64 datetimeMs, AbstractMetadataBinaryFile* indexFile) const;
-    bool saveToArchiveInternal(const QnConstAbstractCompressedMetadataPtr& data);
+    bool saveToArchiveInternal(const QnConstAbstractCompressedMetadataPtr& data, int extraWords);
     QString getChannelPrefix() const;
 
     template <typename T>
@@ -203,10 +225,13 @@ private:
         const QVector<IndexRecord>::iterator endItr,
         QnTimePeriodList& rez) const;
 
+protected:
     bool openFiles(qint64 timestampMs);
+
 private:
     QString m_filePrefix;
     int m_recordSize = 0;
+    int m_wordSize = 0;
     int m_aggregationIntervalSeconds = 0;
 
     std::shared_ptr<AbstractMetadataBinaryFile> m_detailedMetadataFile;
