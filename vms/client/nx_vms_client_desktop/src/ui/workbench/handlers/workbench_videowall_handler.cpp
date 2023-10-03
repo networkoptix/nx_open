@@ -3481,6 +3481,7 @@ void QnWorkbenchVideoWallHandler::showLicensesErrorDialog(const QString& detail)
         QDialogButtonBox::Ok,
         QDialogButtonBox::Ok,
         mainWindowWidget());
+    messageBox.setEscapeButton(QDialogButtonBox::Ok);
 
     if (menu()->canTrigger(ui::action::PreferencesLicensesTabAction))
     {
