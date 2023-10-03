@@ -2,8 +2,8 @@
 
 #include "default_password_alert_bar.h"
 
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QPushButton>
 
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/core/access/access_controller.h>
@@ -26,15 +26,13 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubst
 namespace nx::vms::client::desktop {
 
 DefaultPasswordAlertBar::DefaultPasswordAlertBar(QWidget* parent):
-    base_type(parent),
+    base_type(parent, {.level = BarDescription::BarLevel::Error}),
     QnWorkbenchContextAware(parent),
     m_setPasswordButton(new QPushButton(this))
 {
     m_setPasswordButton->setFlat(true);
     m_setPasswordButton->setIcon(qnSkin->icon("text_buttons/password_20.svg", kIconSubstitutions));
-
-    overlayLayout()->setContentsMargins(0, 0, style::Metrics::kDefaultTopLevelMargin, 0);
-    overlayLayout()->addWidget(m_setPasswordButton, 0, Qt::AlignRight);
+    addButton(m_setPasswordButton);
 
     connect(this, &DefaultPasswordAlertBar::targetCamerasChanged,
         this, &DefaultPasswordAlertBar::updateState);
