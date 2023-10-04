@@ -1285,6 +1285,11 @@ enum IDType
     DebugDecrementCounterAction,
 
     /**
+     * Toggles `securityForPowerUsers` system flag; available only for Administrators.
+     */
+    DebugToggleSecurityForPowerUsersAction,
+
+    /**
      * Generates PTZ calibration screenshots.
      */
     DebugCalibratePtzAction,
