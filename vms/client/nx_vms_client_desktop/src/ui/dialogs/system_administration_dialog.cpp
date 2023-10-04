@@ -7,6 +7,7 @@
 
 #include <nx/branding.h>
 #include <nx/vms/api/data/system_settings.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -25,6 +26,7 @@
 #include <nx/vms/client/desktop/system_update/multi_server_updates_widget.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/widgets/system_settings/cloud_management_widget.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
 #include <ui/widgets/system_settings/general_system_administration_widget.h>
@@ -80,6 +82,14 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
             setCurrentPage(UserManagement);
             userManagementWidget->manageDigestUsers();
         });
+
+    connect(accessController(), &nx::vms::client::core::AccessController::globalPermissionsChanged,
+        this, &QnSystemAdministrationDialog::updateSecurity);
+
+    connect(globalSettings(), &nx::vms::common::SystemSettings::securityForPowerUsersChanged,
+        this, &QnSystemAdministrationDialog::updateSecurity);
+
+    updateSecurity();
 
     addPage(CloudManagement, new QnCloudManagementWidget(this), nx::branding::cloudName());
     addPage(
@@ -157,4 +167,33 @@ void QnSystemAdministrationDialog::discardChanges()
         api->cancelRequest(m_currentRequest);
     m_currentRequest = 0;
     NX_ASSERT(!isNetworkRequestRunning());
+}
+
+void QnSystemAdministrationDialog::updateSecurity()
+{
+    const auto pageIt = findPage(SecurityPage);
+    if (!NX_ASSERT(pageIt != pages().cend()))
+        return;
+
+    const auto securityWidget = qobject_cast<SecuritySettingsWidget*>(pageIt->widget);
+    if (!NX_ASSERT(securityWidget))
+        return;
+
+    const auto canEditSecuritySettings =
+        [this]() -> bool
+        {
+            const auto globalPermissions = accessController()->globalPermissions();
+            if (globalPermissions.testFlag(GlobalPermission::administrator))
+                return true;
+            if (!globalPermissions.testFlag(GlobalPermission::powerUser))
+                return false;
+
+            return globalSettings()->securityForPowerUsers();
+        };
+
+    const bool securityEnabled = canEditSecuritySettings();
+    setPageVisible(SecurityPage, securityEnabled);
+
+    if (!securityEnabled)
+        securityWidget->resetChanges();
 }

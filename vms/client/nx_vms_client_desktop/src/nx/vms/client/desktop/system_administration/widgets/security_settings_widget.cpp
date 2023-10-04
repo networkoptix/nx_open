@@ -427,6 +427,16 @@ void SecuritySettingsWidget::resetWarnings()
     ui->useHttpsOnlyCamerasWarning->hide();
 }
 
+void SecuritySettingsWidget::resetChanges()
+{
+    if (!hasChanges())
+        return;
+
+    discardChanges();
+    loadDataToUi();
+    emit hasChangesChanged();
+}
+
 void SecuritySettingsWidget::setReadOnlyInternal(bool readOnly)
 {
     using ::setReadOnly;

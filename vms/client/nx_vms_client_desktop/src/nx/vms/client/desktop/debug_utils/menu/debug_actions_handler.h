@@ -20,6 +20,8 @@ public:
 private:
     void registerDebugCounterActions();
 
+    void enableSecurityForPowerUsers(bool value);
+
     void at_debugIncrementCounterAction_triggered();
     void at_debugDecrementCounterAction_triggered();
 };
