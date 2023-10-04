@@ -44,7 +44,15 @@ Rectangle
     property alias text: bannerText.text
     property alias buttonText: bannerButton.text
     property alias buttonIcon: bannerButton.icon.source
-    property alias closeVisible: closeButton.visible
+
+    property bool closeable: false
+    property bool closed: false
+    property var watchToReopen
+
+    visible: !(closeable && closed)
+
+    onWatchToReopenChanged:
+        closed = false
 
     signal buttonClicked()
     signal closeClicked()
@@ -135,14 +143,18 @@ Rectangle
         {
             id: closeButton
 
-            visible: false
+            visible: control.closeable
 
             Layout.alignment: Qt.AlignTop | Qt.AlignRight
 
             icon.source: "image://svg/skin/banners/close.svg"
             icon.color: ColorTheme.colors.light4
 
-            onClicked: control.closeClicked()
+            onClicked:
+            {
+                control.closed = true
+                control.closeClicked()
+            }
         }
     }
 }

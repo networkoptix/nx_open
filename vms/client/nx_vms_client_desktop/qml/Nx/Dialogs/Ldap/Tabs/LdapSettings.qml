@@ -813,8 +813,8 @@ Rectangle
 
         DialogBanner
         {
-            visible: control.showEmptyLdapWarning && !control.hideEmptyLdapWarning
-            closeVisible: true
+            visible: control.showEmptyLdapWarning && !control.hideEmptyLdapWarning && !closed
+            closeable: true
 
             style: DialogBanner.Style.Warning
 
@@ -823,8 +823,6 @@ Rectangle
                 + "correctly.")
 
             Layout.fillWidth: true
-
-            onCloseClicked: control.hideEmptyLdapWarning = true
         }
 
         DialogBanner
@@ -834,12 +832,10 @@ Rectangle
             text: qsTr("Please use care when altering LDAP settings. Incorrect configuration "
                 + "could disrupt system availability for a large number of users simultaneously.")
 
-            visible: control.showEditingWarning && !control.hideEditingWarning
-            closeVisible: true
+            visible: control.showEditingWarning && !control.hideEditingWarning && !closed
+            closeable: true
 
             Layout.fillWidth: true
-
-            onCloseClicked: control.hideEditingWarning = true
         }
     }
 }

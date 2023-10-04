@@ -56,6 +56,7 @@ DialogWithState
     property alias globalPermissions: globalPermissionsModel.globalPermissions
     property alias sharedResources: membersModel.sharedResources
     property bool permissionsEditable: true
+    property bool userIsNotRegisteredInCloud: false
 
     property alias linkEditable: generalSettings.linkEditable
     property alias linkValidFrom: generalSettings.linkValidFrom
@@ -90,7 +91,7 @@ DialogWithState
         id: tabControl
 
         anchors.fill: parent
-        anchors.bottomMargin: buttonBox.height + (banner.visible ? banner.height : 0)
+        anchors.bottomMargin: buttonBox.height + banners.height
 
         dialogLeftPadding: dialog.leftPadding
         dialogRightPadding: dialog.rightPadding
@@ -108,6 +109,7 @@ DialogWithState
                 anchors.fill: parent
 
                 self: dialog.self
+                userId: dialog.userId
 
                 model: membersModel
                 parentGroupsEditable: dialog.parentGroupsEditable
@@ -185,29 +187,44 @@ DialogWithState
         }
     }
 
-    DialogBanner
+    Column
     {
-        id: banner
-
-        style: DialogBanner.Style.Info
-
-        closeVisible: true
-
-        visible: !!text && !dialog.isSelf
-
-        text: dialog.userType === UserSettingsGlobal.TemporaryUser
-            ? dialog.self.warningForTemporaryUser(
-                parentGroups,
-                sharedResources,
-                globalPermissions)
-            : ""
-
-        onCloseClicked: visible = false
+        id: banners
 
         anchors.bottom: buttonBox.top
         anchors.left: parent.left
         anchors.right: parent.right
+        spacing: 0
         z: -1
+
+        DialogBanner
+        {
+            style: DialogBanner.Style.Error
+            width: banners.width
+            visible: dialog.userIsNotRegisteredInCloud
+
+            text: qsTr("This user has not yet signed up for %1",
+                "%1 is the cloud name").arg(Branding.cloudName())
+        }
+
+        DialogBanner
+        {
+            id: temporaryUserWarning
+
+            style: DialogBanner.Style.Info
+            width: banners.width
+
+            closeable: true
+            watchToReopen: dialog.userId
+            visible: !!text && !dialog.isSelf && !closed
+
+            text: dialog.userType === UserSettingsGlobal.TemporaryUser
+                ? dialog.self.warningForTemporaryUser(
+                    parentGroups,
+                    sharedResources,
+                    globalPermissions)
+                : ""
+        }
     }
 
     validateFunc: () =>
