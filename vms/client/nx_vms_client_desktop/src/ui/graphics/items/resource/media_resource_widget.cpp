@@ -791,6 +791,7 @@ void QnMediaResourceWidget::initCameraHotspotsOverlay()
     m_cameraHotspotsOverlayWidget->setContentsMargins(0.0, 0.0, 0.0, 0.0);
 
     addOverlayWidget(m_cameraHotspotsOverlayWidget, {UserVisible, OverlayFlag::none, InfoLayer});
+    m_cameraHotspotsOverlayWidget->stackBefore(m_hudOverlay);
 }
 
 QnMediaResourceWidget::AreaType QnMediaResourceWidget::areaSelectionType() const
