@@ -101,6 +101,7 @@ DialogWithState
                 anchors.fill: parent
 
                 self: dialog.self
+                groupId: dialog.groupId
 
                 enabled: !dialog.isSaving
 

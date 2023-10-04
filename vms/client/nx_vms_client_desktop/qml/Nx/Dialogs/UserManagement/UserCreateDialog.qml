@@ -55,6 +55,7 @@ DialogWithState
     property alias globalPermissions: globalPermissionsModel.globalPermissions
     property alias sharedResources: membersModel.sharedResources
     property bool permissionsEditable: true  //< Not used by current dialog type.
+    property bool userIsNotRegisteredInCloud: false //< Not used by current dialog type.
 
     property bool linkEditable: true
     property date linkValidFrom
@@ -184,10 +185,9 @@ DialogWithState
         id: banner
 
         style: DialogBanner.Style.Info
+        closeable: true
 
-        closeVisible: true
-
-        visible: !!text
+        visible: !!text && !closed
 
         text: dialog.userType === UserSettingsGlobal.TemporaryUser
             ? dialog.self.warningForTemporaryUser(
@@ -195,8 +195,6 @@ DialogWithState
                 sharedResources,
                 globalPermissions)
             : ""
-
-        onCloseClicked: visible = false
 
         anchors.bottom: buttonBox.top
         anchors.left: parent.left
