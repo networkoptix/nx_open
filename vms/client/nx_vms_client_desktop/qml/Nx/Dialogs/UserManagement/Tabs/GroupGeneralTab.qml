@@ -20,6 +20,7 @@ Item
 {
     id: control
 
+    property var groupId
     property alias name: groupNameTextField.text
     property bool nameEditable: true
     property bool descriptionEditable: true
@@ -195,25 +196,24 @@ Item
             id: bannerLdapContinousSyncDisabled
 
             style: DialogBanner.Style.Warning
-            visible: control.isLdap && !control.continuousSync
-            closeVisible: true
+            closeable: true
+            watchToReopen: control.groupId
+            visible: control.isLdap && !control.continuousSync && !closed
             Layout.fillWidth: true
 
             text: qsTr("When Continuous Sync is disabled, groups do not synchronize automatically. "
                 + "To update this group, initiate a manual sync.")
-            onCloseClicked: bannerLdapContinousSyncDisabled.visible = false
         }
 
         DialogBanner
         {
             style: DialogBanner.Style.Info
-            visible: !control.nameIsUnique
-            closeVisible: true
-            text: qsTr("Another group with the same name exists in the system."+
-                " It is recommended to assign unique names to the groups.")
+            visible: !control.nameIsUnique && !closed
+            closeable: true
             Layout.fillWidth: true
 
-            onCloseClicked: visible = false
+            text: qsTr("Another group with the same name exists in the system."+
+                " It is recommended to assign unique names to the groups.")
         }
     }
 }
