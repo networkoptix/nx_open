@@ -49,9 +49,8 @@ void ScopeLocalSystemsFinder::updateSystems()
         fakeServerInfo.cloudHost =
             QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
-        newSystems.insert(system->id(), system);
+        newSystems.insert(system->localId(), system);
     }
 
-    const auto newFinalSystems = filterOutSystems(newSystems);
-    setFinalSystems(newFinalSystems);
+    setSystems(newSystems);
 }
