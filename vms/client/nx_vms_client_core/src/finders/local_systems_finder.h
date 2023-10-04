@@ -16,27 +16,29 @@ public:
     void processSystemAdded(const QnSystemDescriptionPtr& system);
     void processSystemRemoved(const QString& systemId, const QnUuid& localSystemId);
 
-public: // overrides
     virtual SystemDescriptionList systems() const override;
     virtual QnSystemDescriptionPtr getSystem(const QString &id) const override;
 
 protected:
     virtual void updateSystems() = 0;
 
-    typedef QHash<QString, QnSystemDescriptionPtr> SystemsHash;
-    void setFinalSystems(const SystemsHash& newFinalSystems);
+    typedef QHash<QnUuid, QnSystemDescriptionPtr> SystemsHash;
 
-    SystemsHash filterOutSystems(const SystemsHash& source);
-
-    void removeFinalSystem(const QString& id);
+    void setSystems(const SystemsHash& newSystems);
 
 private:
-    typedef QHash<QnUuid, int> IdCountHash;
-    typedef QHash<QString, IdCountHash> IdsDataHash;
+    SystemsHash filterOutSystems(const SystemsHash& source);
+    void removeFilteredSystem(const QnUuid& id);
 
-    // We don't allow to discover recent systems if we have online ones
-    IdsDataHash m_filteringSystems;
+private:
+    typedef QHash<QString, int> IdCountHash;
+    typedef QHash<QnUuid, IdCountHash> IdsDataHash;
 
-    // Recent systems that have no online ones
-    SystemsHash m_finalSystems;
+    // Hide from the finder systems, which discovered by any other finder (and thus are online).
+    IdsDataHash m_nonLocalSystems;
+
+    // Local systems that have no online ones.
+    SystemsHash m_filteredSystems;
+
+    QHash<QString, QnUuid> m_systemToLocalId;
 };
