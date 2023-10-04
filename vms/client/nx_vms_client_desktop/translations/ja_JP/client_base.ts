@@ -1215,11 +1215,11 @@
     </message>
     <message>
       <source>Device issues</source>
-      <translation>デバイスの問題</translation>
+      <translation>デバイス障害</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation>カメラの問題</translation>
+      <translation>カメラ障害</translation>
     </message>
     <message>
       <source>Any analytics event</source>
@@ -11707,7 +11707,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Camera issues</source>
-      <translation>カメラの問題</translation>
+      <translation>カメラ障害</translation>
     </message>
     <message>
       <source>Server events</source>
