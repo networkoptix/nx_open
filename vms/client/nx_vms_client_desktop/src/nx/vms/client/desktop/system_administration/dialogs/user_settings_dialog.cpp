@@ -134,7 +134,7 @@ struct UserSettingsDialog::Private
     QmlProperty<QDateTime> firstLoginTime;
 
     QnUserResourcePtr user;
-    rest::Handle m_currentRequest = 0;
+    rest::Handle currentRequest = 0;
 
     Private(UserSettingsDialog* parent, DialogType dialogType):
         q(parent),
@@ -610,12 +610,12 @@ void UserSettingsDialog::onTerminateLink()
         tr("Terminate"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
-    if (d->m_currentRequest != 0)
-        connectedServerApi()->cancelRequest(d->m_currentRequest);
+    if (d->currentRequest != 0)
+        connectedServerApi()->cancelRequest(d->currentRequest);
 
     d->isSaving = true;
 
-    d->m_currentRequest = connectedServerApi()->saveUserAsync(
+    d->currentRequest = connectedServerApi()->saveUserAsync(
         /*newUser=*/ false,
         userData,
         sessionTokenHelper,
@@ -623,8 +623,8 @@ void UserSettingsDialog::onTerminateLink()
             [this](
                 bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
             {
-                if (NX_ASSERT(handle == d->m_currentRequest))
-                    d->m_currentRequest = 0;
+                if (NX_ASSERT(handle == d->currentRequest))
+                    d->currentRequest = 0;
 
                 d->isSaving = false;
 
@@ -671,12 +671,12 @@ void UserSettingsDialog::onResetLink(
         tr("Create"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
-    if (d->m_currentRequest != 0)
-        connectedServerApi()->cancelRequest(d->m_currentRequest);
+    if (d->currentRequest != 0)
+        connectedServerApi()->cancelRequest(d->currentRequest);
 
     d->isSaving = true;
 
-    d->m_currentRequest = connectedServerApi()->saveUserAsync(
+    d->currentRequest = connectedServerApi()->saveUserAsync(
         /*newUser=*/ false,
         userData,
         sessionTokenHelper,
@@ -684,8 +684,8 @@ void UserSettingsDialog::onResetLink(
             [this, callback](
                 bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
             {
-                if (NX_ASSERT(handle == d->m_currentRequest))
-                    d->m_currentRequest = 0;
+                if (NX_ASSERT(handle == d->currentRequest))
+                    d->currentRequest = 0;
 
                 d->isSaving = false;
 
@@ -715,8 +715,8 @@ void UserSettingsDialog::onResetLink(
 
 void UserSettingsDialog::cancelRequest()
 {
-    if (d->m_currentRequest != 0)
-        connectedServerApi()->cancelRequest(d->m_currentRequest);
+    if (d->currentRequest != 0)
+        connectedServerApi()->cancelRequest(d->currentRequest);
 }
 
 void UserSettingsDialog::onCopyLink()
@@ -870,6 +870,9 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     state.parentGroupsEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
 
+    state.userIsNotRegisteredInCloud = user->userType() == nx::vms::api::UserType::cloud
+        && user->getProperty(cloudAuthInfoPropertyName).isEmpty();
+
     // List of groups.
     for (const QnUuid& groupId: user->groupIds())
         state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), groupId));
@@ -967,12 +970,12 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         tr("Save"),
         FreshSessionTokenHelper::ActionType::updateSettings);
 
-    if (d->m_currentRequest != 0)
-        connectedServerApi()->cancelRequest(d->m_currentRequest);
+    if (d->currentRequest != 0)
+        connectedServerApi()->cancelRequest(d->currentRequest);
 
     d->isSaving = true;
 
-    d->m_currentRequest = connectedServerApi()->saveUserAsync(
+    d->currentRequest = connectedServerApi()->saveUserAsync(
         d->dialogType == CreateUser,
         userData,
         sessionTokenHelper,
@@ -980,8 +983,8 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
             [this, state, actualPassword, sessionTokenHelper](
                 bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModelV3> errorOrData)
             {
-                if (NX_ASSERT(handle == d->m_currentRequest))
-                    d->m_currentRequest = 0;
+                if (NX_ASSERT(handle == d->currentRequest))
+                    d->currentRequest = 0;
 
                 d->isSaving = false;
 
@@ -1076,8 +1079,8 @@ void UserSettingsDialog::refreshToken(const QString& password)
             int handle,
             rest::ErrorOrData<nx::vms::api::LoginSession> errorOrData)
         {
-            if (NX_ASSERT(handle == d->m_currentRequest))
-                d->m_currentRequest = 0;
+            if (NX_ASSERT(handle == d->currentRequest))
+                d->currentRequest = 0;
 
             if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
             {
@@ -1117,7 +1120,7 @@ void UserSettingsDialog::refreshToken(const QString& password)
         });
 
     if (auto api = connectedServerApi(); NX_ASSERT(api, "No Server connection"))
-        d->m_currentRequest = api->loginAsync(loginRequest, std::move(callback), thread());
+        d->currentRequest = api->loginAsync(loginRequest, std::move(callback), thread());
 }
 
 bool UserSettingsDialog::setUser(const QnUserResourcePtr& user)

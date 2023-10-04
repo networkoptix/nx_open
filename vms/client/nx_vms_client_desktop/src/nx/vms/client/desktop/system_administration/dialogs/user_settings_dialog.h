@@ -48,6 +48,7 @@ struct UserSettingsDialogState
     Q_PROPERTY(bool permissionsEditable MEMBER permissionsEditable)
     Q_PROPERTY(bool linkEditable MEMBER linkEditable)
     Q_PROPERTY(bool nameIsUnique MEMBER nameIsUnique)
+    Q_PROPERTY(bool userIsNotRegisteredInCloud MEMBER userIsNotRegisteredInCloud)
 
 public:
     bool operator==(const UserSettingsDialogState& other) const = default;
@@ -92,6 +93,8 @@ public:
     nx::vms::api::GlobalPermissions globalPermissions;
     bool permissionsEditable = true;
     bool linkEditable = true;
+
+    bool userIsNotRegisteredInCloud = false;
 };
 
 class NX_VMS_CLIENT_DESKTOP_API UserSettingsDialog:

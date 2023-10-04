@@ -20,6 +20,7 @@ Item
     id: control
 
     property bool isSelf: false
+    property var userId
 
     property bool deleteAvailable: true
     property bool auditAvailable: true
@@ -736,49 +737,44 @@ Item
             id: bannerUserNotFound
 
             style: DialogBanner.Style.Error
-
-            visible: false
-            closeVisible: true
-
-            Binding
-            {
-                target: bannerUserNotFound
-                property: "visible"
-                value: control.ldapError
-            }
-
-            text: qsTr("This user is not found in LDAP database and is not able to log in.")
-            buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
-            buttonIcon: "image://svg/skin/user_settings/trash.svg"
+            closeable: true
+            watchToReopen: control.userId
+            visible: control.ldapError && !closed
             Layout.fillWidth: true
 
+            text: qsTr("This user is not found in LDAP database and is not able to log in.")
+
+            buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
+            buttonIcon: "image://svg/skin/user_settings/trash.svg"
+
             onButtonClicked: control.deleteRequested()
-            onCloseClicked: visible = false
         }
 
         DialogBanner
         {
             style: DialogBanner.Style.Error
             visible: !control.nameIsUnique && control.userEnabled
-            closeVisible: true
+            closeable: true
+            Layout.fillWidth: true
+
             text: qsTr("This user’s login duplicates the login of another user. None of them is" +
                 " able to login. To resolve this issue you can change user’s login or disable or" +
                 " delete users with duplicating logins.")
-            Layout.fillWidth: true
-
-            onCloseClicked: visible = false
         }
 
         DialogBanner
         {
             style: DialogBanner.Style.Warning
-            visible: control.userType === UserSettingsGlobal.LdapUser && !control.continuousSync
-            closeVisible: true
-            text: qsTr("When Continuous Sync is disabled, user’s membership in groups do not "
-                + "synchronize automatically. To update this information, initiate a manual sync.")
+            closeable: true
+            watchToReopen: control.userId
             Layout.fillWidth: true
 
-            onCloseClicked: visible = false
+            visible: control.userType === UserSettingsGlobal.LdapUser
+                && !control.continuousSync
+                && !closed
+
+            text: qsTr("When Continuous Sync is disabled, user’s membership in groups do not "
+                + "synchronize automatically. To update this information, initiate a manual sync.")
         }
     }
 }
