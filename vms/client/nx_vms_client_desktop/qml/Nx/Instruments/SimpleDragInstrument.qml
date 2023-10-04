@@ -32,6 +32,7 @@ Instrument
 
         d.canceled = true
         d.dragging = false
+        d.dragButton = Qt.NoButton
         canceled()
     }
 
@@ -49,29 +50,34 @@ Instrument
         d.canceled = false
         d.pressPosition = mouse.position
         d.position = mouse.position
+        d.dragButton = mouse.button
     }
 
     onMouseRelease: (mouse) =>
     {
-        mouse.accepted = d.dragging || d.canceled
+        mouse.accepted = (d.dragButton != Qt.NoButton) || d.canceled
 
-        if (dragButtons & mouse.button)
-            d.canceled = false
-
-        if (!d.dragging)
+        if (d.dragButton !== mouse.button)
             return
 
         d.position = mouse.position
-        d.dragging = false
-        finished()
+        d.dragButton = Qt.NoButton
+
+        if (!d.dragging)
+        {
+            d.dragging = false
+
+            if (!d.canceled)
+                finished()
+        }
     }
 
     onMouseMove: (mouse) =>
     {
-        if (!d.canceled)
+        if (mouse.buttons & d.dragButton)
             d.position = mouse.position
 
-        mouse.accepted = d.dragging || d.canceled
+        mouse.accepted = (d.dragButton != Qt.NoButton) || d.canceled
     }
 
     onEnabledChanged: cancel()
@@ -87,6 +93,8 @@ Instrument
         property point pressPosition
         property point position
         property point activeTranslation
+
+        property int dragButton: Qt.NoButton
 
         onPositionChanged:
         {
