@@ -107,7 +107,8 @@ public:
 
     Property<quint64> userIdleTimeoutMs{this, "userIdleTimeoutMs"};
 
-    Property<BackgroundImage> backgroundImage{this, "backgroundImage"};
+    Property<BackgroundImage> backgroundImage{
+        this, "backgroundImage", BackgroundImage::defaultBackground()};
 
     Property<core::ConnectionData> lastUsedConnection{this, "lastUsedConnection"};
     Property<QString> lastLocalConnectionUrl{this, "lastLocalConnectionUrl", {},
