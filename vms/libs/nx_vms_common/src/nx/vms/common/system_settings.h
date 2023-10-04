@@ -551,6 +551,7 @@ signals:
     void showMouseTimelinePreviewChanged();
     void cloudStorageUpdatePeriodChanged();
     void masterCloudSyncChanged();
+    void securityForPowerUsersChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
