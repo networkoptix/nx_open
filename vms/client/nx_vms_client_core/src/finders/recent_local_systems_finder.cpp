@@ -76,9 +76,8 @@ void QnRecentLocalSystemsFinder::updateSystems()
         }
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
         system->setServerHost(fakeServerInfo.id, connection.urls.first());
-        newSystems.insert(system->id(), system);
+        newSystems.insert(system->localId(), system);
     }
 
-    const auto newFinalSystems = filterOutSystems(newSystems);
-    setFinalSystems(newFinalSystems);
+    setSystems(newSystems);
 }
