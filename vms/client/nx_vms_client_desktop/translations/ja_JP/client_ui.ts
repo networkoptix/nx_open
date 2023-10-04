@@ -2013,7 +2013,7 @@
     </message>
     <message>
       <source>Check Again</source>
-      <translation>もう一度確認</translation>
+      <translation>再確認</translation>
     </message>
     <message>
       <source>Try Again</source>
