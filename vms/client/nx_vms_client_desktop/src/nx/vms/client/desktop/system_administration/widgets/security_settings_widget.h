@@ -34,6 +34,7 @@ public:
     virtual bool isNetworkRequestRunning() const override;
 
     void resetWarnings();
+    void resetChanges();
 
 signals:
     void manageUsers();

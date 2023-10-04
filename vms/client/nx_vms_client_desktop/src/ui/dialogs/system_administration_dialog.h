@@ -45,6 +45,9 @@ protected:
     virtual bool isNetworkRequestRunning() const override;
 
 private:
+    void updateSecurity();
+
+private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)
     nx::utils::ImplPtr<Ui::QnSystemAdministrationDialog> ui;
     rest::Handle m_currentRequest = 0;

@@ -2255,6 +2255,11 @@ void initialize(Manager* manager, Action* root)
             .autoRepeat(true)
             .text("Decrement Debug Counter");
 
+        factory(DebugToggleSecurityForPowerUsersAction)
+            .flags(Main | DevMode)
+            .text("Toggle Security for Power Users")
+            .checkable()
+            .condition(ConditionWrapper(new RequiresAdministratorCondition()));
     }
     factory.endSubMenu();
 

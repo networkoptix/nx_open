@@ -7,15 +7,19 @@
 #include <QtWidgets/QPushButton>
 
 #include <api/common_message_processor.h>
+#include <api/server_rest_connection.h>
 #include <client/client_runtime_settings.h>
 #include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/rules/action_builder_fields/substitution.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -48,6 +52,7 @@
 namespace {
 
 using namespace nx::vms::rules;
+using namespace nx::vms::client::desktop::ui;
 
 class DebugEventConnector: public EventConnector
 {
@@ -150,6 +155,21 @@ DebugActionsHandler::DebugActionsHandler(QObject *parent):
     if (ini().joystickInvestigationWizard)
         JoystickInvestigationWizardDialog::registerAction();
 #endif
+
+    connect(action(action::DebugToggleSecurityForPowerUsersAction), &QAction::triggered,
+        this, &DebugActionsHandler::enableSecurityForPowerUsers);
+
+    const auto updateSecurityForPowerUsers =
+        [this]()
+        {
+            action(action::DebugToggleSecurityForPowerUsersAction)->setChecked(
+                globalSettings()->securityForPowerUsers());
+        };
+
+    connect(globalSettings(), &nx::vms::common::SystemSettings::securityForPowerUsersChanged,
+        this, updateSecurityForPowerUsers);
+
+    updateSecurityForPowerUsers();
 }
 
 DebugActionsHandler::~DebugActionsHandler()
@@ -182,6 +202,41 @@ void DebugActionsHandler::registerDebugCounterActions()
         {
             context->menu()->trigger(ui::action::DebugDecrementCounterAction);
         });
+}
+
+void DebugActionsHandler::enableSecurityForPowerUsers(bool value)
+{
+    const auto api = systemContext()->connectedServerApi();
+    if (!api)
+        return;
+
+    const auto handler =
+        [this, oldValue = !value](bool success,
+            rest::Handle /*requestId*/,
+            rest::ServerConnection::ErrorOrEmpty /*result*/)
+        {
+            if (success)
+            {
+                QnMessageBox::information(mainWindowWidget(),
+                    nx::format("Security settings for Power Users have been successfully %1",
+                        oldValue ? "disabled" : "enabled"));
+            }
+            else
+            {
+                action(action::DebugToggleSecurityForPowerUsersAction)->setChecked(oldValue);
+
+                QnMessageBox::critical(mainWindowWidget(),
+                    nx::format("Failed to %1 security settings for Power Users",
+                        oldValue ? "disable" : "enable"));
+            }
+        };
+
+    const auto request = QString("/rest/v3/system/settings/securityForPowerUsers");
+    const auto tokenHelper = systemContext()->restApiHelper()->getSessionTokenHelper();
+    const auto paramValue = value ? "true" : "false";
+
+    api->putRest(
+        tokenHelper, request, network::rest::Params{}, paramValue, handler, thread());
 }
 
 void DebugActionsHandler::at_debugIncrementCounterAction_triggered()

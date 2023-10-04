@@ -662,6 +662,9 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::securityForPowerUsers, true, this,
         [] { return tr("Allow Power User editing Security Settings"); });
 
+    connect(m_securityForPowerUsersAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &SystemSettings::securityForPowerUsersChanged, Qt::QueuedConnection);
+
     m_insecureDeprecatedApiEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::insecureDeprecatedApiEnabled, false, this,
         [] { return tr("Enable deprecated API functions (insecure)"); });
@@ -671,7 +674,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         []
         {
             return nx::format(tr(
-                "Enable deprecated API functions currently used by %1 software (unsecure)",
+                "Enable deprecated API functions currently used by %1 software (insecure)",
                 "%1 is a company name"),
                 nx::branding::company());
         });
