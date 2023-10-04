@@ -28,6 +28,14 @@ struct AccessHelper::Private
         permissions = value;
         emit q->permissionsChanged();
     }
+
+    void updatePermissions()
+    {
+        const auto systemContext = SystemContext::fromResource(resource);
+        setPermissions(resource && NX_ASSERT(systemContext)
+            ? systemContext->accessController()->permissions(resource)
+            : Qn::Permissions{});
+    }
 };
 
 AccessHelper::AccessHelper(
@@ -81,15 +89,18 @@ void AccessHelper::setResource(const QnResourcePtr& value)
     if (d->resource)
     {
         QQmlEngine::setObjectOwnership(d->resource.get(), QQmlEngine::CppOwnership);
-        d->notifier = accessController()->createNotifier(d->resource);
-
-        connect(d->notifier.get(), &AccessController::Notifier::permissionsChanged, this,
-            [this]() { d->setPermissions(accessController()->permissions(d->resource)); });
+        auto systemContext = SystemContext::fromResource(d->resource);
+        if (NX_ASSERT(systemContext))
+        {
+            d->notifier = systemContext->accessController()->createNotifier(d->resource);
+            connect(d->notifier.get(), &AccessController::Notifier::permissionsChanged, this,
+                [this]() { d->updatePermissions(); });
+        }
     }
 
     emit resourceChanged();
 
-    d->setPermissions(accessController()->permissions(d->resource));
+    d->updatePermissions();
 }
 
 QnResource* AccessHelper::rawResource() const
