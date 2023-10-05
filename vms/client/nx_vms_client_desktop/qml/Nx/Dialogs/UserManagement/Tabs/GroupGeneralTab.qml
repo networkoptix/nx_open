@@ -210,6 +210,7 @@ Item
             style: DialogBanner.Style.Info
             visible: !control.nameIsUnique && !closed
             closeable: true
+            watchToReopen: control.groupId
             Layout.fillWidth: true
 
             text: qsTr("Another group with the same name exists in the system."+
