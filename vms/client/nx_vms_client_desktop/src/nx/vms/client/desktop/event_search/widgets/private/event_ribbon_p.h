@@ -75,7 +75,7 @@ public:
     QWidget* viewportHeader() const;
     void setViewportHeader(QWidget* value); //< Takes ownership.
 
-    int count() const;
+    int count(bool excludeDummies = false) const;
 
     int unreadCount() const;
     QnNotificationLevel::Value highestUnreadImportance() const;
@@ -160,6 +160,7 @@ private:
         bool animated = false;
         std::unique_ptr<ResourceThumbnailProvider> preview;
         std::unique_ptr<EventTile> widget;
+        bool dummy = false; //< Whether the tile doesn't contain payload (e.g. separator).
 
         AnimationPtr insertAnimation;
         AnimationPtr removeAnimation;
