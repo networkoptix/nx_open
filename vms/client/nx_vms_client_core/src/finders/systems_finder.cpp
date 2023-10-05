@@ -52,39 +52,8 @@ QnSystemsFinder::QnSystemsFinder(QObject* parent):
     auto recentLocalSystemsFinder = new QnRecentLocalSystemsFinder(this);
     addSystemsFinder(recentLocalSystemsFinder, kRecentFinder);
 
-    const auto initRecentFinderBy =
-        [recentLocalSystemsFinder](const QnAbstractSystemsFinder* finder)
-        {
-            connect(finder, &QnAbstractSystemsFinder::systemDiscovered,
-                recentLocalSystemsFinder, &QnRecentLocalSystemsFinder::processSystemAdded);
-            connect(finder, &QnAbstractSystemsFinder::systemLostInternal,
-                recentLocalSystemsFinder, &QnRecentLocalSystemsFinder::processSystemRemoved);
-
-            for (const auto& system: finder->systems())
-                recentLocalSystemsFinder->processSystemAdded(system);
-        };
-
-    initRecentFinderBy(cloudSystemsFinder);
-    initRecentFinderBy(directSystemsFinder);
-
     auto scopeLocalSystemsFinder = new ScopeLocalSystemsFinder(this);
     addSystemsFinder(scopeLocalSystemsFinder, kScopeFinder);
-
-    const auto initScopeFinderBy =
-        [scopeLocalSystemsFinder](const QnAbstractSystemsFinder* finder)
-        {
-            connect(finder, &QnAbstractSystemsFinder::systemDiscovered,
-                scopeLocalSystemsFinder, &ScopeLocalSystemsFinder::processSystemAdded);
-            connect(finder, &QnAbstractSystemsFinder::systemLostInternal,
-                scopeLocalSystemsFinder, &ScopeLocalSystemsFinder::processSystemRemoved);
-
-            for (const auto& system: finder->systems())
-                scopeLocalSystemsFinder->processSystemAdded(system);
-        };
-
-    initScopeFinderBy(cloudSystemsFinder);
-    initScopeFinderBy(directSystemsFinder);
-    initScopeFinderBy(recentLocalSystemsFinder);
 }
 
 QnSystemsFinder::~QnSystemsFinder()
