@@ -311,7 +311,7 @@ void LicenseActivationDialogs::licenseAlreadyActivatedHere(QWidget* parent)
     Private::showMessage(
         parent,
         QnMessageBoxIcon::Information,
-        tr("You already activated this license")
+        tr("License has already been activated")
     );
 }
 
