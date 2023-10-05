@@ -98,11 +98,6 @@ QSize minimumWidgetSize(QWidget* widget)
     return widget->minimumSizeHint().expandedTo(widget->minimumSize());
 }
 
-bool shouldAnimateTile(const QModelIndex& index)
-{
-    return !index.data(Qt::DisplayRole).toString().isEmpty();
-}
-
 int maxSimultaneousPreviewLoads(const QnMediaServerResourcePtr& server)
 {
     if (QnMediaServerResource::isArmServer(server))
@@ -748,8 +743,13 @@ void EventRibbon::Private::insertNewTiles(
 
         TilePtr tile(new Tile());
         tile->position = currentPosition;
-        tile->importance = modelIndex.data(Qn::NotificationLevelRole).value<Importance>();
-        tile->animated = shouldAnimateTile(modelIndex);
+
+        const auto notificationLevelData = modelIndex.data(Qn::NotificationLevelRole);
+        const auto displayData = modelIndex.data(Qt::DisplayRole);
+
+        tile->importance = notificationLevelData.value<Importance>();
+        tile->animated = !displayData.toString().isEmpty();
+        tile->dummy = notificationLevelData.isNull() && displayData.isNull();
 
         if (closeable && timeout > 0ms)
             m_deadlines[modelIndex] = QDeadlineTimer(kInvisibleAutoCloseDelay);
@@ -835,7 +835,7 @@ void EventRibbon::Private::insertNewTiles(
     if (m_updating)
         return;
 
-    emit q->countChanged(this->count());
+    emit q->countChanged();
     emit q->visibleRangeChanged(m_visible, EventRibbon::QPrivateSignal());
 }
 
@@ -941,7 +941,7 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
     if (m_updating)
         return;
 
-    emit q->countChanged(this->count());
+    emit q->countChanged();
     emit q->visibleRangeChanged(m_visible, EventRibbon::QPrivateSignal());
 }
 
@@ -976,7 +976,7 @@ void EventRibbon::Private::clear()
     if (oldCount <= 0)
         return;
 
-    emit q->countChanged(0);
+    emit q->countChanged();
     emit q->visibleRangeChanged({}, EventRibbon::QPrivateSignal());
 }
 
@@ -1482,8 +1482,16 @@ QWidget* EventRibbon::Private::createFadeCurtain(EventTile* widget, QVariantAnim
     return curtain;
 }
 
-int EventRibbon::Private::count() const
+int EventRibbon::Private::count(bool excludeDummies) const
 {
+    if (excludeDummies)
+    {
+        return std::count_if(
+            m_tiles.begin(),
+            m_tiles.end(),
+            [](const auto& tile) { return !tile->dummy; });
+    }
+
     return int(m_tiles.size());
 }
 

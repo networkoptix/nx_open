@@ -125,11 +125,10 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         &NotificationListWidget::unreadCountChanged);
 
     const auto updateCountLabel =
-        [this](int count)
+        [this]
         {
-            static constexpr int kMinimumCount = 1; //< Separator.
-            m_itemCounterLabel->setText(
-                count <= kMinimumCount ? "" : tr("%n notifications", "", count - kMinimumCount));
+            const auto count = m_eventRibbon->count();
+            m_itemCounterLabel->setText(count > 0 ? tr("%n notifications", "", count) : "");
         };
 
     connect(m_eventRibbon, &EventRibbon::countChanged, this, updateCountLabel);
@@ -142,7 +141,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         this,
         [this] { changeFilterVisibilityIfNeeded(); });
 
-    updateCountLabel(m_eventRibbon->count());
+    updateCountLabel();
 
     TileInteractionHandler::install(m_eventRibbon);
 
