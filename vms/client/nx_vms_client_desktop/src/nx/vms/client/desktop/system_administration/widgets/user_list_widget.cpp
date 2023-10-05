@@ -462,7 +462,6 @@ void UserListWidget::Private::setupUi()
 
     constexpr int kButtonBarHeight = 32;
     selectionControls->setFixedHeight(kButtonBarHeight);
-    selectionControls->setFocusPolicy(Qt::StrongFocus);
 
     setPaletteColor(selectionControls, QPalette::Window, core::colorTheme()->color("dark11"));
     setPaletteColor(selectionControls, QPalette::WindowText, core::colorTheme()->color("light4"));
@@ -482,6 +481,7 @@ void UserListWidget::Private::setupUi()
 
     QWidget::setTabOrder(ui->usersTable, deleteButton);
     QWidget::setTabOrder(deleteButton, editButton);
+    QWidget::setTabOrder(editButton, deleteNotFoundUsersButton);
 
     connect(deleteButton, &QPushButton::clicked, this, &Private::deleteSelected);
     connect(editButton, &QPushButton::clicked, this, &Private::editSelected);
