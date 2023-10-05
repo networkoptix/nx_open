@@ -29,7 +29,7 @@
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
-#include <nx/vms/client/desktop/common/widgets/control_bars.h>
+#include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -200,14 +200,17 @@ public:
     CheckableHeaderView* const header{new CheckableHeaderView(UserListModel::CheckBoxColumn, q)};
     QAction* filterDigestAction = nullptr;
 
-    AlertBar* const notFoundUsersWarning{new AlertBar(q)};
-    QPushButton* const deleteNotFoundUsersButton{new QPushButton(
-        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
-        QString(),
-        notFoundUsersWarning)};
+    CommonMessageBar* const notFoundUsersWarning{
+        new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
+    QPushButton* const deleteNotFoundUsersButton{
+        new QPushButton(qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+            QString(),
+            notFoundUsersWarning)};
 
-    AlertBar* const ldapServerOfflineWarning{new AlertBar(q)};
-    AlertBar* const nonUniqueUsersWarning{new AlertBar(q)};
+    CommonMessageBar* const ldapServerOfflineWarning{
+        new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
+    CommonMessageBar* const nonUniqueUsersWarning{
+        new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
 
     bool hideNotFoundUsersWarning = false;
     bool hideLdapServerOfflineWarning = false;
@@ -435,27 +438,13 @@ void UserListWidget::Private::setupUi()
     ui->createUserButton->setIcon(qnSkin->icon("user_settings/plus.svg"));
     connect(ui->createUserButton, &QPushButton::clicked, this, &Private::createUser);
 
-    setPaletteColor(notFoundUsersWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
-    setPaletteColor(ldapServerOfflineWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
-    setPaletteColor(nonUniqueUsersWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
-    notFoundUsersWarning->setCloseButtonVisible(true);
-    ldapServerOfflineWarning->setCloseButtonVisible(true);
-    nonUniqueUsersWarning->setCloseButtonVisible(true);
     nonUniqueUsersWarning->setText(tr(
         "Multiple users share the same login, causing login failures. To resolve this issue, "
             "either update the affected user logins or disable/delete duplicates."));
 
-    deleteNotFoundUsersButton->setFlat(true);
-    notFoundUsersWarning->verticalLayout()->addWidget(deleteNotFoundUsersButton, 0, Qt::AlignLeft);
+    notFoundUsersWarning->addButton(deleteNotFoundUsersButton);
     connect(deleteNotFoundUsersButton, &QPushButton::clicked, this,
         &Private::deleteNotFoundLdapUsers);
-
-    connect(notFoundUsersWarning, &MessageBar::closeClicked, this,
-        [this]() { hideNotFoundUsersWarning = true; });
-    connect(ldapServerOfflineWarning, &MessageBar::closeClicked, this,
-        [this]() { hideLdapServerOfflineWarning = true; });
-    connect(nonUniqueUsersWarning, &MessageBar::closeClicked, this,
-        [this]() { hideNonUniqueUsersWarning = true; });
 
     deleteButton->setFlat(true);
     editButton->setFlat(true);
@@ -643,7 +632,7 @@ void UserListWidget::Private::setupPlaceholder()
 
 void UserListWidget::Private::updateBanners()
 {
-    notFoundUsersWarning->setText(tr("%n existing LDAP users are not found in the LDAP database.",
+    notFoundUsersWarning->setText(tr("%n existing LDAP users are not found in the LDAP database",
         "", usersModel->notFoundUsers().size()));
     deleteNotFoundUsersButton->setText(
         tr("Delete %n users", "", usersModel->notFoundUsers().size()));
