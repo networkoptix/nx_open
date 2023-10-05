@@ -88,7 +88,7 @@ public:
     static constexpr int kSimultaneousPreviewLoadsLimitArm = 5;
 
 signals:
-    void countChanged(int count);
+    void countChanged();
     void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance, QPrivateSignal);
     void visibleRangeChanged(const nx::utils::Interval<int>& value, QPrivateSignal);
 

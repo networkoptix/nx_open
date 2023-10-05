@@ -172,7 +172,7 @@ bool EventRibbon::event(QEvent* event)
 
 int EventRibbon::count() const
 {
-    return d->count();
+    return d->count(/*excludeDummies*/ true);
 }
 
 int EventRibbon::unreadCount() const
