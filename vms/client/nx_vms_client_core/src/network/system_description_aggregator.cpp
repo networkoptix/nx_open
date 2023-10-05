@@ -328,13 +328,11 @@ void QnSystemDescriptionAggregator::updateServers()
 
 QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::gatherServers() const
 {
-    ServersList result;
-    for (const auto& systemDescription: m_systems)
-    {
-        const auto toAddList = subtractLists(systemDescription->servers(), result);
-        std::copy(toAddList.begin(), toAddList.end(), std::back_inserter(result));
-    }
-    return result;
+    if (m_systems.empty())
+        return {};
+
+    // We are only interested in maximum priority system servers.
+    return m_systems.first()->servers();
 }
 
 bool QnSystemDescriptionAggregator::containsServer(const QnUuid& serverId) const
