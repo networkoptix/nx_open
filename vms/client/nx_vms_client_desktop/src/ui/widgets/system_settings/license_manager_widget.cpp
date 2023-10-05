@@ -637,7 +637,7 @@ void LicenseManagerWidget::handleWidgetStateChange()
                 ui->licenseWidget->clearManualActivationUserInput();
                 break;
             case QnLicenseErrorCode::InvalidSignature:
-                    LicenseActivationDialogs::invalidKeyFile(this);
+                LicenseActivationDialogs::invalidKeyFile(this);
                 break;
             case QnLicenseErrorCode::InvalidHardwareID:
                 LicenseActivationDialogs::licenseAlreadyActivated(this, license->hardwareId());
@@ -655,6 +655,21 @@ void LicenseManagerWidget::handleWidgetStateChange()
 
         if (body.key.isEmpty())
             return;
+    }
+
+    const auto isActivatedAlready = std::any_of(
+        m_licenses.cbegin(),
+        m_licenses.cend(),
+        [&body](const QnLicensePtr& license)
+        {
+            return license->key() == body.key;
+        });
+
+    if (isActivatedAlready)
+    {
+        LicenseActivationDialogs::licenseAlreadyActivatedHere(this);
+        ui->licenseWidget->setState(QnLicenseWidget::Normal);
+        return;
     }
 
     auto callback = nx::utils::guarded(this,
