@@ -487,7 +487,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // Motion detection.
 
     const bool remoteArchiveMdSupported =
-        state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All;
+        state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All
+        && ini().enableRemoteArchiveSynchronization;
 
     ui->groupBoxMotionDetection->setVisible(remoteArchiveMdSupported);
 
