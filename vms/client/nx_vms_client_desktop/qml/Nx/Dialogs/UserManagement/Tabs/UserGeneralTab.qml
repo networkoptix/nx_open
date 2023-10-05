@@ -753,8 +753,9 @@ Item
         DialogBanner
         {
             style: DialogBanner.Style.Error
-            visible: !control.nameIsUnique && control.userEnabled
+            visible: !control.nameIsUnique && control.userEnabled && !closed
             closeable: true
+            watchToReopen: control.userId
             Layout.fillWidth: true
 
             text: qsTr("This user’s login duplicates the login of another user. None of them is" +
