@@ -144,40 +144,12 @@ struct LookupListActionHandler::Private
 };
 
 LookupListActionHandler::LookupListActionHandler(QObject* parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    d(new Private{.q=this})
+    base_type(parent), QnWorkbenchContextAware(parent), d(new Private{.q = this})
 {
-    registerDebugAction(
-        "Lists Lookup Dialog",
-        [this](QnWorkbenchContext* context)
-        {
-            using namespace std::chrono;
-            static constexpr auto kLoadDelay = 500ms;
-            static constexpr auto kSaveDelay = 1000ms;
-
-            static LookupListDataList sourceData = exampleData();
-
-            appContext()->qmlEngine()->clearComponentCache();
-            auto dialog = std::make_unique<LookupListsDialog>(
-                context->systemContext(),
-                context->mainWindowWidget());
-            executeDelayedParented(
-                [d = dialog.get()]() { d->setData(sourceData); }, kLoadDelay, dialog.get());
-
-            connect(dialog.get(), &LookupListsDialog::saveRequested, this,
-                [this, d = dialog.get()](LookupListDataList data)
-                {
-                    executeDelayedParented(
-                        [data, d]
-                        {
-                            sourceData = data;
-                            d->setSaveResult(true);
-                        }, kSaveDelay, d);
-                });
-
-            dialog->exec();
-        });
+    connect(action(ui::action::OpenListsManagementAction),
+        &QAction::triggered,
+        this,
+        &LookupListActionHandler::openLookupListsManagementDialog);
 
     connect(action(ui::action::OpenLookupListsDialogAction), &QAction::triggered, this,
         &LookupListActionHandler::openLookupListsDialog);
@@ -193,6 +165,38 @@ LookupListActionHandler::LookupListActionHandler(QObject* parent):
 LookupListActionHandler::~LookupListActionHandler()
 {
     d->cancelRequest();
+}
+
+void LookupListActionHandler::openLookupListsManagementDialog()
+{
+    using namespace std::chrono;
+    static constexpr auto kLoadDelay = 500ms;
+    static constexpr auto kSaveDelay = 1000ms;
+
+    static LookupListDataList sourceData = exampleData();
+
+    appContext()->qmlEngine()->clearComponentCache();
+    auto dialog =
+        std::make_unique<LookupListsDialog>(context()->systemContext(), context()->mainWindowWidget());
+    executeDelayedParented(
+        [d = dialog.get()]() { d->setData(sourceData); }, kLoadDelay, dialog.get());
+
+    connect(dialog.get(),
+        &LookupListsDialog::saveRequested,
+        this,
+        [this, d = dialog.get()](LookupListDataList data)
+        {
+            executeDelayedParented(
+                [data, d]
+                {
+                    sourceData = data;
+                    d->setSaveResult(true);
+                },
+                kSaveDelay,
+                d);
+        });
+
+    dialog->exec();
 }
 
 void LookupListActionHandler::openLookupListsDialog()

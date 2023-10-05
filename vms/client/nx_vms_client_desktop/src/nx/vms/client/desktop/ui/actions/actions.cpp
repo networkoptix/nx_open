@@ -632,6 +632,12 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Lookup Lists..."))
         .condition(condition::isTrue(ini().lookupLists));
 
+    factory(OpenListsManagementAction)
+        .flags(Main | DevMode)
+        .mode(DesktopMode)
+        .text(ContextMenu::tr("Lists Management..."))
+        .condition(condition::isTrue(ini().lookupLists));
+
     factory(LogsManagementAction)
         .flags(NoTarget)
         .requiredPowerUserPermissions();

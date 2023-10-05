@@ -1493,6 +1493,11 @@ enum IDType
     /** Open Event Log dialog. Should replace OpenBusinessLogAction. */
     OpenEventLogAction,
 
+    /**
+     * Opens the Lookup Lists Management dialog.
+     */
+    OpenListsManagementAction,
+
     ActionCount,
 
     NoAction = -1
