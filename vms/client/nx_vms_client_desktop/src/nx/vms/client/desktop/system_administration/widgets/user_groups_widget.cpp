@@ -511,6 +511,7 @@ void UserGroupsWidget::Private::setupUi()
     buttonsLayout->addStretch();
 
     QWidget::setTabOrder(ui->groupsTable, deleteSelectedButton);
+    QWidget::setTabOrder(deleteSelectedButton, deleteNotFoundGroupsButton);
 
     connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
         [this](const QString& text)
