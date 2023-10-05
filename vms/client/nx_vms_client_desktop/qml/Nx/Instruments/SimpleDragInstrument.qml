@@ -55,7 +55,7 @@ Instrument
 
     onMouseRelease: (mouse) =>
     {
-        mouse.accepted = (d.dragButton != Qt.NoButton) || d.canceled
+        mouse.accepted = d.dragging || d.canceled
 
         if (d.dragButton !== mouse.button)
             return
@@ -77,7 +77,7 @@ Instrument
         if (mouse.buttons & d.dragButton)
             d.position = mouse.position
 
-        mouse.accepted = (d.dragButton != Qt.NoButton) || d.canceled
+        mouse.accepted = d.dragging || d.canceled
     }
 
     onEnabledChanged: cancel()
