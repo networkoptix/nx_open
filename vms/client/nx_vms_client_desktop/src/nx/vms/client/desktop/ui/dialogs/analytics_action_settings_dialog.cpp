@@ -13,7 +13,8 @@ AnalyticsActionSettingsDialog::AnalyticsActionSettingsDialog(
     QmlDialogWrapper(
         QUrl("Nx/InteractiveSettings/SettingsDialog.qml"),
         QVariantMap{{"settingsModel", settingsModel}},
-        parent)
+        parent),
+    QnSessionAwareDelegate(parent)
 {
 }
 
@@ -21,6 +22,16 @@ QJsonObject AnalyticsActionSettingsDialog::getValues() const
 {
     return QJsonObject::fromVariantMap(
         core::invokeQmlMethod<QVariantMap>(rootObjectHolder()->object(), "getValues"));
+}
+
+bool AnalyticsActionSettingsDialog::tryClose(bool /*force*/)
+{
+    reject();
+    return true;
+}
+
+void AnalyticsActionSettingsDialog::forcedUpdate()
+{
 }
 
 std::optional<QJsonObject> AnalyticsActionSettingsDialog::request(

@@ -7,10 +7,13 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsActionSettingsDialog: public QmlDialogWrapper
+class AnalyticsActionSettingsDialog:
+    public QmlDialogWrapper,
+    public QnSessionAwareDelegate
 {
     Q_OBJECT
 public:
@@ -19,6 +22,9 @@ public:
         QWidget* parent = nullptr);
 
     QJsonObject getValues() const;
+
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
 
     static std::optional<QJsonObject> request(
         const QJsonObject& settingsModel,

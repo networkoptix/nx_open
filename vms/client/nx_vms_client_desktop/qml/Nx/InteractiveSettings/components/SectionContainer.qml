@@ -17,6 +17,13 @@ StackLayout
 
     property string name: ""
     property string caption: ""
+
+    // Active Settings parameters dialog properties.
+    property string title: ""
+    property string icon: ""
+    property string header: ""
+    property string description: ""
+
     property Item childrenItem: column
     property StackLayout sectionStack: control
     property Item scrollBarParent: null

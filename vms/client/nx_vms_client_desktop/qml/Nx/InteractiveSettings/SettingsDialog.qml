@@ -1,13 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Dialogs 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+import Nx.Dialogs
 
 Dialog
 {
@@ -18,6 +18,8 @@ Dialog
 
     minimumWidth: 300
     minimumHeight: 100
+
+    title: settingsModel && settingsModel.title || ""
 
     property var settingsModel: null
     property int padding: 16
@@ -49,7 +51,13 @@ Dialog
 
         Image
         {
-            source: "image://svg/skin/standard_icons/sp_message_box_information_64.svg"
+            property var icons: ({
+                "information": "image://svg/skin/standard_icons/sp_message_box_information_64.svg",
+                "question": "image://svg/skin/standard_icons/sp_message_box_question_64.svg",
+                "warning": "image://svg/skin/standard_icons/sp_message_box_warning_64.svg",
+                "critical": "image://svg/skin/standard_icons/sp_message_box_critical_64.svg"
+            })
+            source: icons[settingsModel && settingsModel.icon] || icons["information"]
             Layout.alignment: Qt.AlignTop
         }
 
@@ -59,7 +67,7 @@ Dialog
 
             Text
             {
-                text: qsTr("Enter parameters")
+                text: settingsModel && settingsModel.header || qsTr("Enter parameters")
                 color: ColorTheme.light
                 font.pixelSize: 15
                 font.weight: Font.Bold
@@ -70,7 +78,9 @@ Dialog
 
             Text
             {
-                text: qsTr("This action requires some parameters to be filled.")
+                text: settingsModel && settingsModel.description
+                    || qsTr("This action requires some parameters to be filled.")
+
                 color: ColorTheme.windowText
                 font.pixelSize: 13
 
@@ -119,7 +129,7 @@ Dialog
             Layout.margins: dialog.padding
         }
 
-        Separator {}
+        Separator { visible: !settingsView.isEmpty }
 
         Control
         {
@@ -128,6 +138,7 @@ Dialog
             Layout.minimumWidth: 100
             Layout.minimumHeight: 20
             padding: dialog.padding
+            visible: !settingsView.isEmpty
 
             contentItem: SettingsView
             {
