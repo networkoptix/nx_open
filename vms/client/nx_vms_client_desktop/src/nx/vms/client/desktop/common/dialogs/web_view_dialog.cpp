@@ -18,19 +18,10 @@ static constexpr QSize kBaseDialogSize(600, 500);
 
 namespace nx::vms::client::desktop {
 
-WebViewDialog::WebViewDialog(
-    const QUrl& url,
-    bool enableClientApi,
-    QnWorkbenchContext* context,
-    const QnResourcePtr& resource,
-    std::shared_ptr<AbstractWebAuthenticator> authenticator,
-    bool checkCertificate,
-    QWidget* parent)
-    :
-    base_type(parent, Qt::Window)
+WebViewDialog::WebViewDialog(QWidget* parent):
+    base_type(parent, Qt::Window),
+    m_webWidget(new WebWidget(this))
 {
-    auto webWidget = new WebWidget(this);
-
     auto line = new QFrame(this);
     line->setFrameShape(QFrame::HLine);
     line->setFixedHeight(1);
@@ -39,42 +30,38 @@ WebViewDialog::WebViewDialog(
 
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(QMargins());
-    mainLayout->addWidget(webWidget);
+    mainLayout->addWidget(m_webWidget);
     mainLayout->addWidget(line);
     mainLayout->addWidget(buttonBox);
 
     // Set some resonable size to avoid completely shrinked dialog.
     resize(kBaseDialogSize);
-
-    if (!checkCertificate)
-    {
-        webWidget->controller()->setCertificateValidator(
-            [](const QString& /*certificateChain*/, const QUrl&) { return true; });
-    }
-
-    webWidget->controller()->setAuthenticator(authenticator);
-    webWidget->controller()->load(resource, url);
-
-    if (enableClientApi && context)
-    {
-        auto authCondition = [](const QUrl&) { return true; };
-        webWidget->controller()->initClientApiSupport(context, /*item*/ nullptr, authCondition);
-    }
 }
 
-void WebViewDialog::showUrl(
+int WebViewDialog::showUrl(
     const QUrl& url,
     bool enableClientApi,
     QnWorkbenchContext* context,
     const QnResourcePtr& resource,
     std::shared_ptr<AbstractWebAuthenticator> authenticator,
-    bool checkCertificate,
-    QWidget* parent)
+    bool checkCertificate)
 {
-    QScopedPointer<WebViewDialog> dialog(new WebViewDialog(
-        url, enableClientApi, context, resource, authenticator, checkCertificate, parent));
+    if (!checkCertificate)
+    {
+        m_webWidget->controller()->setCertificateValidator(
+            [](const QString& /*certificateChain*/, const QUrl&) { return true; });
+    }
 
-    dialog->exec();
+    m_webWidget->controller()->setAuthenticator(authenticator);
+    m_webWidget->controller()->load(resource, url);
+
+    if (enableClientApi && context)
+    {
+        auto authCondition = [](const QUrl&) { return true; };
+        m_webWidget->controller()->initClientApiSupport(context, /*item*/ nullptr, authCondition);
+    }
+
+    return exec();
 }
 
 } // namespace nx::vms::client::desktop

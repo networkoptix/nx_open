@@ -22,6 +22,7 @@ Item
     property Item headerItem: null
     property Item placeholderItem: null
     property alias thumbnailSource: sharedData.thumbnailSource
+    readonly property bool isEmpty: !!contentItem && contentItem.isEmpty
 
     /** Function with model argument returns json object or null if the request is canceled. */
     property var requestParametersFunction

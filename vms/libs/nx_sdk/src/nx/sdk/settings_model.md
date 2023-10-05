@@ -46,9 +46,12 @@ Certain fields are supported by some of the controls.
     present a more advanced Settings Model which makes use of `isActive`.
 
 - `"parametersModel"` - Settings Model JSON object. Applies only for controls with the `"isActive"`
-    property set to `true`. Additional parameters are requested when the active control is triggered.
-    NOTE: The `"parametersModel"` model does not support items with the `"isActive"` property set
-    to `true`.
+    property set to `true`. Additional parameters are requested when the active control is
+    triggered. NOTE: The `"parametersModel"` model does not support items with the `"isActive"`
+    property set to `true`. The title, header, description and icon of the parameters dialog can be
+    modified using additional fields in the settings model: `"title"`, `"header"`, `"description"`,
+    `"icon"`. The `"icon"` field accepts the following values: `"information"` (default),
+    `"question"`, `"warning"`, `"critical"`.
 
 The Settings Model itself is a JSON object, which field `"items"` is a JSON array containing
 top-level Setting Models for individual Settings, and those Settings that support inner Settings

@@ -8,7 +8,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ui/dialogs/analytics_action_settings_dialog.h>
-#include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
@@ -22,14 +22,11 @@ void AnalyticsActionsHelper::processResult(
 {
     if (!result.messageToUser.isEmpty())
     {
-        QnMessageBox message(
-            QnMessageBox::Icon::Success,
-            result.messageToUser,
-            /*extras*/ "",
-            QDialogButtonBox::Ok,
-            QDialogButtonBox::NoButton,
-            parent);
-
+        QnSessionAwareMessageBox message(parent);
+        message.setIcon(QnMessageBox::Icon::Success);
+        message.setText(result.messageToUser);
+        message.setStandardButtons(QDialogButtonBox::Ok);
+        message.setDefaultButton(QDialogButtonBox::NoButton);
         setHelpTopic(&message, HelpTopic::Id::Forced_Empty);
         message.exec();
     }
@@ -42,14 +39,14 @@ void AnalyticsActionsHelper::processResult(
         if (result.useDeviceCredentials && !authenticator)
             NX_WARNING(NX_SCOPE_TAG, "Can not authenticate %1", result.actionUrl);
 
-        WebViewDialog::showUrl(
+        QnSessionAware<WebViewDialog> webDialog(parent);
+        webDialog.showUrl(
             result.actionUrl,
             /*enableClientApi*/ true,
             context,
             result.useProxy ? proxyResource : QnResourcePtr{},
             result.useDeviceCredentials ? authenticator : nullptr,
-            /*checkCertificate*/ !result.useDeviceCredentials,
-            parent);
+            /*checkCertificate*/ !result.useDeviceCredentials);
     }
 }
 
