@@ -39,6 +39,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 
+#include "nx/vms/client/desktop/common/widgets/message_bar.h"
 #include "private/highlighted_text_item_delegate.h"
 #include "user_groups_widget.h"
 
@@ -213,13 +214,15 @@ public:
     CheckableHeaderView* const header{new CheckableHeaderView(
         UserGroupListModel::CheckBoxColumn, q)};
 
-    AlertBar* const notFoundGroupsWarning{new AlertBar(q)};
-    QPushButton* const deleteNotFoundGroupsButton{new QPushButton(
-        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
-        QString(),
-        notFoundGroupsWarning)};
+    CommonMessageBar* const notFoundGroupsWarning{
+        new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
+    QPushButton* const deleteNotFoundGroupsButton{
+        new QPushButton(qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+            QString(),
+            notFoundGroupsWarning)};
 
-    AlertBar* const nonUniqueGroupsWarning{new AlertBar(q)};
+    CommonMessageBar* const nonUniqueGroupsWarning{
+        new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
 
     bool hideNotFoundGroupsWarning = false;
     bool hideNonUniqueGroupsWarning = false;
@@ -470,24 +473,13 @@ void UserGroupsWidget::Private::setupUi()
     ui->createGroupButton->setIcon(qnSkin->icon("user_settings/plus.svg"));
     connect(ui->createGroupButton, &QPushButton::clicked, this, &Private::createGroup);
 
-    setPaletteColor(notFoundGroupsWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
-    setPaletteColor(nonUniqueGroupsWarning, QPalette::Dark, core::colorTheme()->color("red_d1"));
-    notFoundGroupsWarning->setCloseButtonVisible(true);
-    nonUniqueGroupsWarning->setCloseButtonVisible(true);
     nonUniqueGroupsWarning->setText(tr(
         "Multiple groups share the same name, which can lead to confusion. To maintain a clear "
             "and organized structure, we suggest providing unique names for each group."));
 
-    deleteNotFoundGroupsButton->setFlat(true);
-    notFoundGroupsWarning->verticalLayout()->addWidget(
-        deleteNotFoundGroupsButton, 0, Qt::AlignLeft);
+    notFoundGroupsWarning->addButton(deleteNotFoundGroupsButton);
     connect(deleteNotFoundGroupsButton, &QPushButton::clicked, this,
         &Private::deleteNotFoundLdapGroups);
-
-    connect(notFoundGroupsWarning, &MessageBar::closeClicked, this,
-        [this]() { hideNotFoundGroupsWarning = true; });
-    connect(nonUniqueGroupsWarning, &MessageBar::closeClicked, this,
-        [this]() { hideNonUniqueGroupsWarning = true; });
 
     deleteSelectedButton->setFlat(true);
     connect(deleteSelectedButton, &QPushButton::clicked, this, &Private::deleteSelected);
