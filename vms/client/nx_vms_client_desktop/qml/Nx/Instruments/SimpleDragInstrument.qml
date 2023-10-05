@@ -63,7 +63,7 @@ Instrument
         d.position = mouse.position
         d.dragButton = Qt.NoButton
 
-        if (!d.dragging)
+        if (d.dragging)
         {
             d.dragging = false
 
@@ -74,7 +74,7 @@ Instrument
 
     onMouseMove: (mouse) =>
     {
-        if (mouse.buttons & d.dragButton)
+        if (d.dragButton !== Qt.NoButton)
             d.position = mouse.position
 
         mouse.accepted = d.dragging || d.canceled
