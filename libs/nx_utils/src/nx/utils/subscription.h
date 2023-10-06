@@ -98,7 +98,7 @@ public:
              )
         {
             m_runningSubscriptionIds.push_back(currentSubscriptionIter->first);
-            auto guard = makeScopeGuard([this, &currentSubscriptionIter, &lock]()
+            auto anotherGuard = makeScopeGuard([this, &currentSubscriptionIter, &lock]()
             {
                 lock.relock();
                 currentSubscriptionIter = m_handlers.upper_bound(m_runningSubscriptionIds.back());

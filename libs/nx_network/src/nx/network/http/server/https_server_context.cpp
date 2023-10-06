@@ -87,7 +87,7 @@ void HttpsServerContext::initializeCertificateFileMonitoring(const Settings& set
             }
             catch (const std::runtime_error& e)
             {
-                NX_WARNING(this, "Failed to reload certificate %1", m_certificatePath);
+                NX_WARNING(this, "Failed to reload certificate %1. %2", m_certificatePath, e.what());
             }
         },
         &m_subscriptionId,
