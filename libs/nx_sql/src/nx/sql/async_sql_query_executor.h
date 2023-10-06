@@ -88,7 +88,8 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler);
 
-    virtual QueryQueueStats stats() const = 0;
+    virtual QueryQueueStats queryQueueStatistics() const = 0;
+    virtual QueryStatistics queryStatistics() const = 0;
 
     /**
      * Convenience overload for executeUpdate where DbFunc returns void or throws an exception
@@ -362,7 +363,8 @@ public:
         nx::sql::QueryContext* const queryContext,
         const std::string& script) override;
 
-    virtual QueryQueueStats stats() const override;
+    virtual QueryQueueStats queryQueueStatistics() const override;
+    virtual QueryStatistics queryStatistics() const override;
 
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
