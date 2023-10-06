@@ -39,6 +39,12 @@ Ptr<ObjectMetadata> generateInstanceOfBaseObjectType()
         makePtr<Attribute>(
             "(Base) Object attribute.Nested Field 2",
             "2.5"),
+        makePtr<Attribute>(
+            "(Base) Show Conditional Attribute",
+            "true"),
+        makePtr<Attribute>(
+            "(Base) Conditional Attribute",
+            "String value")
     });
 
     return objectMetadata;
