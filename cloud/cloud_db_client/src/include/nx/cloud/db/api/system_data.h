@@ -34,6 +34,9 @@ struct Attribute
 /**%apidoc Array of Attributes. */
 using AttributesList = std::vector<Attribute>;
 
+std::string getAttrValueOr(
+    const AttributesList& attrs, const std::string& name, const std::string& defaultV);
+
 /**
  * Information required to register system in cloud.
  */
@@ -107,7 +110,6 @@ struct SystemData
 
     // TODO: #akolesnikov. This field does not belong here. It is not a part of the API.
     std::string authKeyHash;
-    std::string ownerAccountEmail;
     SystemStatus status = SystemStatus::invalid;
 
     /**%apidoc MUST be used as upper 64 bits of 128-bit transaction timestamp. */
@@ -124,24 +126,49 @@ struct SystemData
     /**%apidoc If true, then all cloud users are asked to use 2FA to log in to this system. */
     bool system2faEnabled = false;
 
+    // System attributes. These attributes are present on the same level with other fields
+    // of this structure in the JSON document. They are NOT represented as an "attributes" array
+    // in the JSON document.
+    AttributesList attributes;
+
     bool operator==(const SystemData& right) const
     {
         return
             id == right.id &&
             name == right.name &&
             customization == right.customization &&
-            ownerAccountEmail == right.ownerAccountEmail &&
             status == right.status &&
             systemSequence == right.systemSequence &&
             opaque == right.opaque &&
             system2faEnabled == right.system2faEnabled;
     }
+
+    std::string ownerAccountEmail() const
+    {
+        return getAttrValueOr(attributes, "ownerAccountEmail", std::string());
+    }
+
+    std::string ownerFullName() const
+    {
+        return getAttrValueOr(attributes, "ownerFullName", std::string());
+    }
 };
 
-#define SystemData_Fields (id)(name)(customization)(authKey)(authKeyHash)(ownerAccountEmail) \
-                          (status)(systemSequence) (opaque)(registrationTime)(system2faEnabled)
+#define SystemData_Fields (id)(name)(customization)(authKey)(authKeyHash) \
+    (status)(systemSequence) (opaque)(registrationTime)(system2faEnabled)(attributes)
 
 NX_REFLECTION_INSTRUMENT(SystemData, SystemData_Fields)
+
+// Providing custom JSON serialization functions so that SystemData::attributes are added on the
+// same level with other fields in the resulting JSON document.
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const SystemData& value);
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& ctx,
+    SystemData* value);
 
 struct SystemDataList
 {
@@ -325,8 +352,6 @@ struct SystemDataEx: SystemData
 {
     using base_type = SystemData;
 
-    std::string ownerFullName;
-
     /**%apidoc Access role of the entity (usually, an account) that requested the system information. */
     SystemAccessRole accessRole = SystemAccessRole::none;
 
@@ -354,11 +379,6 @@ struct SystemDataEx: SystemData
     /**%apidoc dictionary{capability: capability version (0-disabled)}. */
     std::map<std::string, int> capabilities;
 
-    // System attributes. These attributes are present on the same level with other fields
-    // of this structure in the JSON document. They are NOT represented as an "attributes" array
-    // in the JSON document.
-    AttributesList attributes;
-
     SystemDataEx() = default;
 
     SystemDataEx(SystemData systemData):
@@ -371,8 +391,8 @@ struct SystemDataEx: SystemData
 // will not been seen anywhere SystemDataEx type is used.
 // TODO: #akolesnikov Move NX_REFLECTION_INSTRUMENT for other types here as well.
 NX_REFLECTION_INSTRUMENT(SystemDataEx,
-    (ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth) \
-    (usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(attributes)(version))
+    (accessRole)(sharingPermissions)(stateOfHealth) \
+    (usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(version))
 
 // Providing custom JSON serialization functions so that SystemDataEx::attributes are added on the
 // same level with other fields in the resulting JSON document.
@@ -391,6 +411,8 @@ struct SystemDataExList
 };
 
 NX_REFLECTION_INSTRUMENT(SystemDataExList, (systems))
+
+//-------------------------------------------------------------------------------------------------
 
 struct SystemHealthHistoryItem
 {
