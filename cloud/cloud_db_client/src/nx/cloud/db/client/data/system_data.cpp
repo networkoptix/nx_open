@@ -240,16 +240,21 @@ static void writeJsonAttribute(
 
 } // namespace
 
-void serialize(
+//-------------------------------------------------------------------------------------------------
+// SystemData & SystemDataEx
+
+template<typename T>
+requires std::is_base_of_v<SystemData, T>
+static void serializeFlattenningAttrs(
     nx::reflect::json::SerializationContext* ctx,
-    const SystemDataEx& value)
+    const T& value)
 {
     ctx->composer.startObject();
 
-    nx::reflect::forEachField<SystemDataEx>(
+    nx::reflect::forEachField<T>(
         [ctx, &value](const auto& field)
         {
-            if (nx::reflect::isSameField(field, &SystemDataEx::attributes))
+            if (nx::reflect::isSameField(field, &SystemData::attributes))
             {
                 // Serializing "attributes" values on the top level of the JSON document.
                 for (const auto& attr: value.attributes)
@@ -265,22 +270,24 @@ void serialize(
     ctx->composer.endObject();
 }
 
-nx::reflect::DeserializationResult deserialize(
+template<typename T>
+requires std::is_base_of_v<SystemData, T>
+static nx::reflect::DeserializationResult deserializeFlattenningAttrs(
     const nx::reflect::json::DeserializationContext& ctx,
-    SystemDataEx* value)
+    T* value)
 {
     nx::reflect::DeserializationResult result;
 
     std::set<std::decay_t<decltype(ctx.value)>::ConstMemberIterator> readMembers;
 
     // Deserializing all fields but "attributes" as usual.
-    nx::reflect::forEachField<SystemDataEx>(
+    nx::reflect::forEachField<T>(
         [&ctx, value, &result, &readMembers](const auto& field)
         {
             if (!result)
                 return; //< Error happened earlier. Skipping...
 
-            if (nx::reflect::isSameField(field, &SystemDataEx::attributes))
+            if (nx::reflect::isSameField(field, &SystemData::attributes))
                 return; //< Attributes will be parsed later.
 
             auto it = ctx.value.FindMember(field.name());
@@ -317,6 +324,34 @@ nx::reflect::DeserializationResult deserialize(
     return result;
 }
 
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const SystemData& value)
+{
+    serializeFlattenningAttrs(ctx, value);
+}
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& ctx,
+    SystemData* value)
+{
+    return deserializeFlattenningAttrs(ctx, value);
+}
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const SystemDataEx& value)
+{
+    serializeFlattenningAttrs(ctx, value);
+}
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& ctx,
+    SystemDataEx* value)
+{
+    return deserializeFlattenningAttrs(ctx, value);
+}
+
 //-------------------------------------------------------------------------------------------------
 // UserSessionDescriptor
 
@@ -350,6 +385,20 @@ void serializeToUrlQuery(const GetSystemUsersRequest& data, QUrlQuery* const url
     urlQuery->addQueryItem(
         GetSystemUsersRequest_localOnly_field,
         QString::number(data.localOnly));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+std::string getAttrValueOr(
+    const AttributesList& attrs, const std::string& name, const std::string& defaultV)
+{
+    for (const auto& attr: attrs)
+    {
+        if (attr.name == name)
+            return attr.value;
+    }
+
+    return defaultV;
 }
 
 } // namespace nx::cloud::db::api

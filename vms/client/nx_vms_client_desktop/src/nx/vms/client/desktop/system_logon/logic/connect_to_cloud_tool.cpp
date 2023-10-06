@@ -70,7 +70,7 @@ bool ConnectToCloudTool::start()
     {
         showFailure(tr("None of your Servers has connection to %1.",
             "%1 is the short cloud name (like Cloud)")
-            .arg(nx::branding::shortCloudName()));
+                        .arg(nx::branding::shortCloudName()));
         return false;
     }
 
@@ -92,8 +92,7 @@ void ConnectToCloudTool::showSuccess(const QString& /*cloudLogin*/)
 {
     menu()->trigger(ui::action::HideCloudPromoAction);
 
-    QnSessionAwareMessageBox::success(
-        getTopWidget(),
+    QnSessionAwareMessageBox::success(getTopWidget(),
         tr("System connected to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::branding::cloudName()));
 
@@ -103,10 +102,9 @@ void ConnectToCloudTool::showSuccess(const QString& /*cloudLogin*/)
     emit finished();
 }
 
-void ConnectToCloudTool::showFailure(const QString &message)
+void ConnectToCloudTool::showFailure(const QString& message)
 {
-    QnSessionAwareMessageBox::critical(
-        getTopWidget(),
+    QnSessionAwareMessageBox::critical(getTopWidget(),
         tr("Failed to connect System to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::branding::cloudName()),
         message);
@@ -128,20 +126,15 @@ QWidget* ConnectToCloudTool::getTopWidget() const
 void ConnectToCloudTool::requestCloudAuthData()
 {
     const QString title = tr("Connect System to %1", "%1 is the cloud name (like Nx Cloud)")
-        .arg(nx::branding::cloudName());
+                              .arg(nx::branding::cloudName());
 
     m_oauthLoginDialog = new OauthLoginDialog(m_parent, core::OauthClientType::connect);
     m_oauthLoginDialog->setWindowTitle(title);
-    connect(
-        m_oauthLoginDialog,
+    connect(m_oauthLoginDialog,
         &OauthLoginDialog::authDataReady,
         this,
         &ConnectToCloudTool::onCloudAuthDataReady);
-    connect(
-        m_oauthLoginDialog,
-        &OauthLoginDialog::rejected,
-        this,
-        &ConnectToCloudTool::cancel);
+    connect(m_oauthLoginDialog, &OauthLoginDialog::rejected, this, &ConnectToCloudTool::cancel);
     m_oauthLoginDialog->setWindowModality(Qt::ApplicationModal);
 
     // Prefill cloud username, if client is logged in.
@@ -163,11 +156,9 @@ void ConnectToCloudTool::onCloudAuthDataReady()
     sysRegistrationData.name = systemSettings()->systemName().toStdString();
     sysRegistrationData.customization = nx::branding::customization().toStdString();
 
-    const auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
-        [this](ResultCode result, SystemData systemData)
-        {
-            onBindFinished(result, std::move(systemData));
-        });
+    const auto handler =
+        nx::utils::AsyncHandlerExecutor(this).bind([this](ResultCode result, SystemData systemData)
+            { onBindFinished(result, std::move(systemData)); });
 
     m_cloudConnection->systemManager()->bindSystem(sysRegistrationData, std::move(handler));
 }
@@ -220,7 +211,7 @@ void ConnectToCloudTool::onBindFinished(ResultCode result, SystemData systemData
 
     qnCloudStatusWatcher->resumeCloudInteraction();
 
-    m_cloudAuthData.credentials.username = systemData.ownerAccountEmail;
+    m_cloudAuthData.credentials.username = systemData.ownerAccountEmail();
     m_systemData = std::move(systemData);
 
     m_oauthLoginDialog->accept();
@@ -232,30 +223,24 @@ void ConnectToCloudTool::onBindFinished(ResultCode result, SystemData systemData
 void ConnectToCloudTool::requestLocalSessionToken()
 {
     const QString title = tr("Connect System to %1?", "%1 is the cloud name (like Nx Cloud)")
-        .arg(nx::branding::cloudName());
-    const QString mainText = tr(
-        "Enter your account password to connect System to %1",
+                              .arg(nx::branding::cloudName());
+    const QString mainText = tr("Enter your account password to connect System to %1",
         "%1 is the cloud name (like Nx Cloud)")
-            .arg(nx::branding::cloudName());
+                                 .arg(nx::branding::cloudName());
 
-    m_localLoginDialog = new SessionRefreshDialog(
-        m_parent,
+    m_localLoginDialog = new SessionRefreshDialog(m_parent,
         title,
         mainText,
         /*infoText*/ QString(),
         tr("Connect", "Connect current System to cloud"),
         /*warningStyledAction*/ false);
 
-    connect(
-        m_localLoginDialog,
+    connect(m_localLoginDialog,
         &SessionRefreshDialog::sessionTokenReady,
         this,
         &ConnectToCloudTool::onLocalSessionTokenReady);
     connect(
-        m_localLoginDialog,
-        &SessionRefreshDialog::rejected,
-        this,
-        &ConnectToCloudTool::cancel);
+        m_localLoginDialog, &SessionRefreshDialog::rejected, this, &ConnectToCloudTool::cancel);
     m_localLoginDialog->setWindowModality(Qt::ApplicationModal);
     m_localLoginDialog->show();
 }
@@ -269,8 +254,7 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
     if (!NX_ASSERT(connection()))
         return;
 
-    auto handleReply = nx::utils::guarded(
-        this,
+    auto handleReply = nx::utils::guarded(this,
         [this](bool, rest::Handle, rest::ErrorOrEmpty reply)
         {
             if (std::holds_alternative<rest::Empty>(reply))
@@ -282,10 +266,8 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
             }
 
             const auto& error = std::get<nx::network::rest::Result>(reply);
-            NX_DEBUG(this,
-                "Server bind failed, error: %1, string: %2",
-                error.error,
-                error.errorString);
+            NX_DEBUG(
+                this, "Server bind failed, error: %1, string: %2", error.error, error.errorString);
 
             QString errorMessage = tr("Internal error. Please try again later.");
             if (ini().developerMode)
@@ -293,8 +275,7 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
             showFailure(errorMessage);
         });
 
-    connectedServerApi()->bindSystemToCloud(
-        QString::fromStdString(m_systemData.id),
+    connectedServerApi()->bindSystemToCloud(QString::fromStdString(m_systemData.id),
         QString::fromStdString(m_systemData.authKey),
         QString::fromStdString(m_cloudAuthData.credentials.username),
         localToken.value,
