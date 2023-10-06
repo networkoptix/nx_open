@@ -23,6 +23,7 @@ AbstractButton
 
     icon.width: 20
     icon.height: 20
+    focusPolicy: Qt.TabFocus
 
     onClicked: if (!checked) checked = true
 
