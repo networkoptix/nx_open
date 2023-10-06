@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Dodaj wpis</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP — ustawienia zaawansowane</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,11 +24,11 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Atrybut logowania</translation>
     </message>
     <message>
       <source>Allow digest authentication for imported users</source>
-      <translation type="unfinished">Allow digest authentication for imported users</translation>
+      <translation>Zezwalaj na uwierzytelnianie szyfrowane dla zaimportowanych użytkowników</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Członkostwo</translation>
     </message>
     <message>
       <source>Misc</source>
@@ -52,11 +52,11 @@
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
-      <translation type="unfinished">Synchronization&lt;br&gt;Interval</translation>
+      <translation>Synchronizacja&lt;br&gt;Interwał</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Limit czasu wyszukiwania</translation>
     </message>
     <message>
       <source>Proxy LDAP requests&lt;br&gt;via server</source>
@@ -251,7 +251,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Integracja API</translation>
     </message>
   </context>
   <context>
@@ -265,15 +265,15 @@
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Integracja API</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>Integracje API oddziałują z serwerem %1 poprzez REST API i wymieniają metadane</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Nowe zapytania</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
