@@ -9,7 +9,10 @@
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
