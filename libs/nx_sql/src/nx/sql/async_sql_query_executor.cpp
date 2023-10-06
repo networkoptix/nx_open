@@ -184,9 +184,14 @@ void AsyncSqlQueryExecutor::reserveConnections(int count)
         openNewConnection(lock);
 }
 
-QueryQueueStats AsyncSqlQueryExecutor::stats() const
+QueryQueueStats AsyncSqlQueryExecutor::queryQueueStatistics() const
 {
     return m_queryQueue.stats();
+}
+
+QueryStatistics AsyncSqlQueryExecutor::queryStatistics() const
+{
+    return m_statisticsCollector.getQueryStatistics();
 }
 
 void AsyncSqlQueryExecutor::createCursorImpl(
