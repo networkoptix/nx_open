@@ -58,6 +58,9 @@ Item
     /** Obsolete preview overlay text. */
     property string obsoletePreviewText: qsTr("OUTDATED")
 
+    /** No access preview overlay text. */
+    property string noAccessText: qsTr("NO ACCESS")
+
     /** Obsolete preview marker background and text colors. */
     property color obsolescenceDimmerColor: ColorTheme.transparent(ColorTheme.colors.dark5, 0.3)
     property color obsolescenceTextColor: ColorTheme.light
@@ -78,6 +81,8 @@ Item
         readonly property int status: preview.source
             ? preview.source.status
             : AbstractResourceThumbnail.Status.empty
+
+        readonly property bool hasAccess: accessHelper.canViewLive
 
         readonly property int rotationQuadrants: (preview.applyRotation && preview.source)
             ? preview.source.rotationQuadrants
@@ -100,6 +105,13 @@ Item
         readonly property bool loadingIndicatorRequired: image.status != Image.Ready
             && (status == AbstractResourceThumbnail.Status.loading
                 || status == AbstractResourceThumbnail.Status.empty)
+
+        AccessHelper
+        {
+            id: accessHelper
+            resource: (preview.source && preview.source.resource) || null
+        }
+
         Item
         {
             id: imageHolder
@@ -199,7 +211,7 @@ Item
             verticalAlignment: Qt.AlignVCenter
             horizontalAlignment: Qt.AlignHCenter
 
-            font.pixelSize: preview.textSize
+            font.pixelSize: accessHelper.canViewLive ? preview.textSize : 32
             font.weight: preview.fontWeight
             fontSizeMode: Text.Fit
             minimumPixelSize: 6
@@ -212,8 +224,8 @@ Item
             visible: !truncated && (content.status == AbstractResourceThumbnail.Status.unavailable
                 || loadingIndicator.timedOut)
 
-            color: preview.foregroundColor
-            text: preview.noDataText
+            color: accessHelper.canViewLive ? preview.foregroundColor : ColorTheme.colors.red_core
+            text: accessHelper.canViewLive ? preview.noDataText : preview.noAccessText
         }
 
         ScaleAdjuster

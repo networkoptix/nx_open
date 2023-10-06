@@ -11,6 +11,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -24,6 +25,7 @@
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/hidpi_workarounds.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 using Geometry = nx::vms::client::core::Geometry;
 
@@ -32,6 +34,18 @@ namespace {
 QFont noDataPlaceholderFont()
 {
     static constexpr auto kFontPixelSize = 24;
+    static constexpr auto kFontWeight = QFont::Normal;
+
+    QFont font;
+    font.setCapitalization(QFont::AllUppercase);
+    font.setPixelSize(kFontPixelSize);
+    font.setWeight(kFontWeight);
+    return font;
+}
+
+QFont noAccessPlaceholderFont()
+{
+    static constexpr auto kFontPixelSize = 32;
     static constexpr auto kFontWeight = QFont::Normal;
 
     QFont font;
@@ -467,9 +481,19 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         painter.drawImage(d->thumbnailRect(), thumbnailImage);
     }
 
-    painter.setFont(noDataPlaceholderFont());
-    if (d->cameraThumbnail->status() == LiveCameraThumbnail::Status::unavailable)
+    const auto systemContext = appContext()->currentSystemContext();
+    if (!systemContext->accessController()->hasPermissions(
+        d->cameraThumbnail->resource(), Qn::ViewLivePermission))
+    {
+        painter.setFont(noAccessPlaceholderFont());
+        QnScopedPainterPenRollback guard(&painter, core::colorTheme()->color("red_core"));
+        painter.drawText(rect(), tr("NO ACCESS"), {Qt::AlignCenter});
+    }
+    else if (d->cameraThumbnail->status() == LiveCameraThumbnail::Status::unavailable)
+    {
+        painter.setFont(noDataPlaceholderFont());
         painter.drawText(rect(), tr("NO DATA"), {Qt::AlignCenter});
+    }
 
     for (int i = 0; i < d->hotspots.size(); ++i)
     {
@@ -488,7 +512,7 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         if (!hotspot.cameraId.isNull())
         {
             option.cameraState = CameraHotspotDisplayOption::CameraState::valid;
-            const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
+            const auto resourcePool = systemContext->resourcePool();
             const auto camera =
                 resourcePool->getResourceById<QnVirtualCameraResource>(hotspot.cameraId);
 
