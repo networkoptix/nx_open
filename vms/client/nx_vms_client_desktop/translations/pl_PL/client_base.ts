@@ -38,7 +38,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Zdarzenia systemowe</translation>
     </message>
   </context>
   <context>
@@ -1017,7 +1017,7 @@
     </message>
     <message>
       <source>Lookup Lists...</source>
-      <translation type="unfinished">Lookup Lists...</translation>
+      <translation>Listy wyszukiwania...</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1025,7 +1025,7 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation type="unfinished">Device...</translation>
+      <translation>Urządzenie...</translation>
     </message>
     <message>
       <source>Add User...</source>
@@ -1033,11 +1033,11 @@
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>Integracja...</translation>
     </message>
     <message>
       <source>New Integration...</source>
-      <translation type="unfinished">New Integration...</translation>
+      <translation>Nowa integracja...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -1045,23 +1045,23 @@
     </message>
     <message>
       <source>Add Showreel...</source>
-      <translation type="unfinished">Add Showreel...</translation>
+      <translation>Dodaj sekwencję...</translation>
     </message>
     <message>
       <source>Add Virtual Camera...</source>
-      <translation type="unfinished">Add Virtual Camera...</translation>
+      <translation>Dodaj kamerę wirtualną...</translation>
     </message>
     <message>
       <source>Integration Settings...</source>
-      <translation type="unfinished">Integration Settings...</translation>
+      <translation>Ustawienia integracji...</translation>
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>Integracja proxy...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
-      <translation type="unfinished">Proxied Web Page...</translation>
+      <translation>Strona internetowa proxy...</translation>
     </message>
     <message>
       <source>Layout</source>
@@ -1073,15 +1073,15 @@
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>Nowy ekran powitalny</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>Pokaż zasoby proxy</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Importuj z urządzeń...</translation>
     </message>
     <message>
       <source>User Manual...</source>
@@ -1139,15 +1139,15 @@
     </message>
     <message>
       <source>Event Occurs</source>
-      <translation type="unfinished">Event Occurs</translation>
+      <translation>Miejsce zdarzenia</translation>
     </message>
     <message>
       <source>Event Starts</source>
-      <translation type="unfinished">Event Starts</translation>
+      <translation>Rozpoczęcie zdarzenia</translation>
     </message>
     <message>
       <source>Event Stops</source>
-      <translation type="unfinished">Event Stops</translation>
+      <translation>Zatrzymanie zdarzenia</translation>
     </message>
     <message>
       <source>automatic</source>
@@ -1170,7 +1170,7 @@
     </message>
     <message>
       <source>Rewind for</source>
-      <translation type="unfinished">Rewind for</translation>
+      <translation>Przewiń do tyłu</translation>
     </message>
   </context>
   <context>
@@ -1330,13 +1330,13 @@
     <name>Groups</name>
     <message>
       <source>Delete group?</source>
-      <translation type="unfinished">Delete group?</translation>
+      <translation>Usunąć grupę?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
       <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>Usunąć %n grup?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
@@ -1684,15 +1684,15 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Cannot reach the server</source>
-      <translation type="unfinished">Cannot reach the server</translation>
+      <translation>Nie można połączyć z serwerem</translation>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
-      <translation type="unfinished">Username or Password are incorrect</translation>
+      <translation>Niepoprawna nazwa użytkownika lub hasło</translation>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>Niebezpieczne</translation>
     </message>
     <message>
       <source>Unable to test email settings due to no internet connection on any of the active servers</source>
@@ -1704,11 +1704,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>Nazwa użytkownika nie może być pusta</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Hasło nie może być puste</translation>
     </message>
   </context>
   <context>
@@ -1760,12 +1760,12 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols</source>
-      <translation type="unfinished">Password should contain different types of symbols</translation>
+      <translation>Hasło powinno zawierać różne rodzaje symboli</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
       <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
+        <numerusform>Hasło musi zawierać co najmniej %n znaków</numerusform>
         <numerusform>Password must be at least %n characters long</numerusform>
         <numerusform>Password must be at least %n characters long</numerusform>
         <numerusform>Password must be at least %n characters long</numerusform>
@@ -1774,7 +1774,7 @@ Klucz licencyjny: %2</translation>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
       <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
+        <numerusform>Hasło nie może być dłuższe niż %n znaków</numerusform>
         <numerusform>Password must be no longer than %n characters</numerusform>
         <numerusform>Password must be no longer than %n characters</numerusform>
         <numerusform>Password must be no longer than %n characters</numerusform>
@@ -1783,7 +1783,7 @@ Klucz licencyjny: %2</translation>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
       <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+        <numerusform>Hasło nie powinno zawierać %n lub więcej następujących po sobie identycznych znaków</numerusform>
         <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
         <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
         <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
@@ -1792,7 +1792,7 @@ Klucz licencyjny: %2</translation>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
       <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+        <numerusform>Hasło nie powinno zawierać %n lub więcej powtarzających się znaków</numerusform>
         <numerusform>Password should not contain %n or more repeating characters</numerusform>
         <numerusform>Password should not contain %n or more repeating characters</numerusform>
         <numerusform>Password should not contain %n or more repeating characters</numerusform>
@@ -1800,7 +1800,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
-      <translation type="unfinished">This password is in list of the most popular passwords</translation>
+      <translation>To hasło jest na liście najbardziej popularnych haseł</translation>
     </message>
   </context>
   <context>
@@ -2031,7 +2031,7 @@ Klucz licencyjny: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
-      <translation type="unfinished">%1. To attach to Video Wall, SaaS must be in active state. %2</translation>
+      <translation>%1. Aby można było podłączyć się do ściany wideo, usługa SaaS musi być w stanie aktywnym. %2</translation>
     </message>
   </context>
   <context>
@@ -2421,7 +2421,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>Rok</translation>
     </message>
   </context>
   <context>
@@ -2990,7 +2990,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Hasła nie są zgodne</translation>
     </message>
   </context>
   <context>
@@ -3016,15 +3016,15 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Hasła nie są zgodne</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>Aby ustawić nowe hasło, musisz najpierw wprowadzić bieżące hasło</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>Nieprawidłowe bieżące hasło</translation>
     </message>
   </context>
   <context>
@@ -3300,15 +3300,15 @@ to %1</source>
     </message>
     <message>
       <source>Log In...</source>
-      <translation type="unfinished">Log In...</translation>
+      <translation>Zaloguj się...</translation>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Twoja sesja wygasła</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>Aby kontynuować, zaloguj się ponownie, korzystając z linku</translation>
     </message>
   </context>
   <context>
@@ -3945,7 +3945,7 @@ to %1</source>
     </message>
     <message>
       <source>Not verified</source>
-      <translation type="unfinished">Not verified</translation>
+      <translation>Nie zweryfikowano</translation>
     </message>
   </context>
   <context>
@@ -4016,7 +4016,7 @@ to %1</source>
     </message>
     <message>
       <source>Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
+      <translation>Ustawienia są tylko do odczytu. Skontaktuj się z administratorem systemu. Wszystkie zmiany zostaną utracone po wyjściu programu.</translation>
     </message>
   </context>
   <context>
@@ -4144,7 +4144,7 @@ to %1</source>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Punkty dostępu</translation>
     </message>
   </context>
   <context>
@@ -4550,18 +4550,18 @@ to %1</source>
     <message>
       <source>User group %1 has no %2 permission</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation type="unfinished">User group %1 has no %2 permission</translation>
+      <translation>Grupa użytkowników %1 nie ma %2 uprawnień</translation>
     </message>
     <message>
       <source>Selected user groups have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation type="unfinished">Selected user groups have no %1 permission</translation>
+      <translation>Wybrane grupy użytkowników nie mają uprawnień %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected user groups have no %2 permission</source>
       <comment>%1 is number of selected user groups, %2 is permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+        <numerusform>%n z %1 wybranych grup użytkowników nie ma %2 uprawnień</numerusform>
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
@@ -4725,11 +4725,11 @@ to %1</source>
     <name>QnSelectLayoutsButton</name>
     <message>
       <source>Any Layout</source>
-      <translation type="unfinished">Any Layout</translation>
+      <translation>Dowolny układ</translation>
     </message>
     <message>
       <source>All Layouts</source>
-      <translation type="unfinished">All Layouts</translation>
+      <translation>Wszystkie układy</translation>
     </message>
     <message>
       <source>Select Layouts...</source>
@@ -5106,15 +5106,15 @@ to %1</source>
     </message>
     <message>
       <source>SAAS SHUT DOWN</source>
-      <translation type="unfinished">SAAS SHUT DOWN</translation>
+      <translation>SAAS WYŁĄCZONY</translation>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>BRAK ZEZWOLENIA NA EKSPORT</translation>
     </message>
     <message>
       <source>NO CONNECTION TO THE LICENSE SERVER</source>
-      <translation type="unfinished">NO CONNECTION TO THE LICENSE SERVER</translation>
+      <translation>BRAK POŁĄCZENIA Z SERWEREM LICENCJI</translation>
     </message>
   </context>
   <context>
