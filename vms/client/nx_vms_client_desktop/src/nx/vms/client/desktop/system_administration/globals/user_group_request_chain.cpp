@@ -59,8 +59,11 @@ QString errorMessage(const nx::vms::api::JsonRpcError& error)
 template <auto member, class T>
 QJsonValue getJsonValue(const T& t)
 {
+    QnJsonContext context;
+    context.setSerializeMapToObject(true);
+    context.setChronoSerializedAsDouble(true);
     QJsonValue v;
-    QJson::serialize(t.*member, &v);
+    QJson::serialize(&context, t.*member, &v);
     return v;
 }
 
@@ -154,8 +157,11 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
 {
     const nx::vms::api::UserGroupModel group = updateGroup.groupData;
 
+    QnJsonContext context;
+    context.setSerializeMapToObject(true);
+    context.setChronoSerializedAsDouble(true);
     QJsonValue jsonValue;
-    QJson::serialize(group, &jsonValue);
+    QJson::serialize(&context, group, &jsonValue);
 
     // Method 'create' does not accept 'id' field.
     QJsonObject jsonObject = jsonValue.toObject();
