@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include <ui/widgets/common/abstract_preferences_widget.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/client/desktop/system_administration/widgets/abstract_system_settings_widget.h>
 
 namespace Ui { class TimeSynchronizationWidget; }
 
@@ -16,15 +15,13 @@ class TimeSynchronizationServerTimeWatcher;
 class TimeSynchronizationServerStateWatcher;
 class TimeSynchronizationServersDelegate;
 
-class TimeSynchronizationWidget:
-    public QnAbstractPreferencesWidget,
-    public SystemContextAware
+class TimeSynchronizationWidget: public AbstractSystemSettingsWidget
 {
-    Q_OBJECT
-    using base_type = QnAbstractPreferencesWidget;
+    using base_type = AbstractSystemSettingsWidget;
 
 public:
-    explicit TimeSynchronizationWidget(SystemContext* context, QWidget* parent = nullptr);
+    explicit TimeSynchronizationWidget(
+        api::SaveableSystemSettings* editableSystemSettings, QWidget* parent = nullptr);
     virtual ~TimeSynchronizationWidget();
 
     virtual void loadDataToUi() override;

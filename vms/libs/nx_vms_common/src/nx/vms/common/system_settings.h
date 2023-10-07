@@ -204,8 +204,8 @@ public:
     bool exposeDeviceCredentials() const;
     void setExposeDeviceCredentials(bool value);
 
-    bool useHttpsOnlyCameras() const;
-    void setUseHttpsOnlyCameras(bool value);
+    bool useHttpsOnlyForCameras() const;
+    void setUseHttpsOnlyForCameras(bool value);
 
     bool securityForPowerUsers() const;
     void setSecurityForPowerUsers(bool value = true);
@@ -510,7 +510,7 @@ signals:
     void auditTrailPeriodDaysChanged();
     void eventLogPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
-    void useHttpsOnlyCamerasChanged();
+    void useHttpsOnlyForCamerasChanged();
     void autoUpdateThumbnailsChanged();
     void useCloudServiceToSendEmailChanged();
     void maxSceneItemsChanged();
@@ -691,7 +691,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_showServersInTreeForNonAdminsAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_supportedOriginsAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_frameOptionsHeaderAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_useHttpsOnlyCamerasAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_useHttpsOnlyForCamerasAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_securityForPowerUsersAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiInUseEnabledAdaptor = nullptr;

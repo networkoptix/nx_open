@@ -13,7 +13,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
-#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
@@ -30,6 +29,8 @@
 #include <ui/common/read_only.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
+
+#include "system_settings_widget.h"
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;
@@ -49,12 +50,16 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kNormalIco
 
 } // namespace
 
-QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget* parent /* = nullptr*/):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    ui(new Ui::GeneralSystemAdministrationWidget)
+QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
+    nx::vms::api::SaveableSystemSettings* editableSystemSettings,
+    QWidget* parent)
+    :
+    AbstractSystemSettingsWidget(editableSystemSettings, parent),
+    ui(new Ui::GeneralSystemAdministrationWidget),
+    m_systemSettingsWidget(new QnSystemSettingsWidget(editableSystemSettings, this))
 {
     ui->setupUi(this);
+    ui->systemSettingsGroupBox->layout()->addWidget(m_systemSettingsWidget);
 
     ui->systemNameLabel->setMaximumWidth(kMaxSystemNameLabelWidth);
     ui->systemNameLabel->setValidator(
@@ -68,6 +73,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
     connect(ui->systemNameLabel, &EditableLabel::editingFinished,
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
+    connect(systemSettings(), &SystemSettings::systemNameChanged,
+        this, &QnGeneralSystemAdministrationWidget::loadDataToUi);
 
     auto buttonLayout = new QHBoxLayout(ui->buttonWidget);
     buttonLayout->setSpacing(0);
@@ -153,29 +160,27 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(ui::action::OpenBookmarksSearchAction); });
 
-    connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
+    connect(m_systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
 {
-    loadSystemName();
-    ui->systemSettingsWidget->loadDataToUi();
+    ui->systemNameLabel->setText(systemSettings()->systemName());
+    m_systemSettingsWidget->loadDataToUi();
 }
 
 void QnGeneralSystemAdministrationWidget::applyChanges()
 {
-    ui->systemSettingsWidget->applyChanges();
+    m_systemSettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
-    const auto systemSetting = systemContext()->systemSettings();
-    systemSetting->systemName = ui->systemNameLabel->text().trimmed();
+    editableSystemSettings->systemName = ui->systemNameLabel->text().trimmed();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const
 {
-    const auto systemSetting = systemContext()->systemSettings();
-    return (ui->systemNameLabel->text().trimmed() != systemSetting->systemName)
-        || ui->systemSettingsWidget->hasChanges();
+    return (ui->systemNameLabel->text().trimmed() != systemSettings()->systemName())
+        || m_systemSettingsWidget->hasChanges();
 }
 
 void QnGeneralSystemAdministrationWidget::retranslateUi()
@@ -215,16 +220,10 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
             tr("Open Device List"),
             tr("Open Camera List"))));
 
-    ui->systemSettingsWidget->retranslateUi();
-}
-
-void QnGeneralSystemAdministrationWidget::loadSystemName()
-{
-    const auto systemSetting = systemContext()->systemSettings();
-    ui->systemNameLabel->setText(systemSetting->systemName);
+    m_systemSettingsWidget->retranslateUi();
 }
 
 void QnGeneralSystemAdministrationWidget::setReadOnlyInternal(bool readOnly)
 {
-    ::setReadOnly(ui->systemSettingsWidget, readOnly);
+    ::setReadOnly(m_systemSettingsWidget, readOnly);
 }

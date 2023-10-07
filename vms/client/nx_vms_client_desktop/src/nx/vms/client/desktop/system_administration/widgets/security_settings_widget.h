@@ -7,8 +7,7 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <nx/vms/api/data/watermark_settings.h>
-#include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/system_administration/widgets/abstract_system_settings_widget.h>
 
 namespace Ui { class SecuritySettingsWidget; }
 
@@ -16,15 +15,13 @@ namespace nx::vms::client::desktop {
 
 class RepeatedPasswordDialog;
 
-class SecuritySettingsWidget:
-    public QnAbstractPreferencesWidget,
-    public QnWorkbenchContextAware
+class SecuritySettingsWidget: public AbstractSystemSettingsWidget
 {
     Q_OBJECT
-    using base_type = QnAbstractPreferencesWidget;
 
 public:
-    explicit SecuritySettingsWidget(QWidget* parent);
+    explicit SecuritySettingsWidget(
+        api::SaveableSystemSettings* editableSystemSettings, QWidget* parent = nullptr);
     virtual ~SecuritySettingsWidget() override;
 
     virtual void loadDataToUi() override;
