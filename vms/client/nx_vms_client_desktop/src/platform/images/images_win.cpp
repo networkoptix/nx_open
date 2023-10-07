@@ -29,7 +29,7 @@ QCursor QnWindowsImages::bitmapCursor(Qt::CursorShape shape) const {
         HCURSOR handle = LoadCursorW(0, cursorName);
 
         QPoint hotSpot;
-        QPixmap pixmap = qt_pixmapFromWinHICON(handle, &hotSpot);
+        QPixmap pixmap = pixmapFromHICON(handle, &hotSpot);
 
         return QCursor(pixmap, hotSpot.x(), hotSpot.y());
     } else {

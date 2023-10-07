@@ -43,6 +43,6 @@
 
 #include "Windows.h"
 
-QPixmap qt_pixmapFromWinHICON(HICON icon, QPoint *hotSpot);
+QPixmap pixmapFromHICON(HICON icon, QPoint* hotSpot);
 
 LPCWSTR standardCursorName(Qt::CursorShape shape);

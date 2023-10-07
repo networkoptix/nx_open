@@ -39,15 +39,14 @@
 
 #include "utils_win.h"
 
-extern QImage qt_imageFromWinHBITMAP(HDC hdc, HBITMAP bitmap, int w, int h);
-
 /**
  * The code is based on <tt>qt_pixmapFromWinHICON</tt> function from <tt>QtGui</tt>.
  *
  * Original code didn't return the icon's hotspot and contained a bug
  * in bitmap size estimation.
  */
-QPixmap qt_pixmapFromWinHICON(HICON icon, QPoint *hotSpot) {
+QPixmap pixmapFromHICON(HICON icon, QPoint* hotSpot)
+{
     bool foundAlpha = false;
     HDC screenDevice = GetDC(0);
     HDC hdc = CreateCompatibleDC(screenDevice);
@@ -89,8 +88,8 @@ QPixmap qt_pixmapFromWinHICON(HICON icon, QPoint *hotSpot) {
 
     HBITMAP winBitmap = CreateDIBSection(hdc, (BITMAPINFO*)&bitmapInfo, DIB_RGB_COLORS, (VOID**)&bits, nullptr, 0);
     HGDIOBJ oldhdc = (HBITMAP)SelectObject(hdc, winBitmap);
-    DrawIconEx( hdc, 0, 0, icon, w, h, 0, 0, DI_NORMAL);
-    QImage image = qt_imageFromWinHBITMAP(hdc, winBitmap, w, h);
+    DrawIconEx(hdc, 0, 0, icon, w, h, 0, 0, DI_NORMAL);
+    QImage image = QImage::fromHBITMAP(winBitmap);
 
     for (int y = 0 ; y < h && !foundAlpha ; y++) {
         QRgb *scanLine= reinterpret_cast<QRgb *>(image.scanLine(y));
@@ -104,7 +103,7 @@ QPixmap qt_pixmapFromWinHICON(HICON icon, QPoint *hotSpot) {
     if (!foundAlpha) {
         //If no alpha was found, we use the mask to set alpha values
         DrawIconEx( hdc, 0, 0, icon, w, h, 0, 0, DI_MASK);
-        QImage mask = qt_imageFromWinHBITMAP(hdc, winBitmap, w, h);
+        QImage mask = QImage::fromHBITMAP(winBitmap);
 
         for (int y = 0 ; y < h ; y++){
             QRgb *scanlineImage = reinterpret_cast<QRgb *>(image.scanLine(y));
