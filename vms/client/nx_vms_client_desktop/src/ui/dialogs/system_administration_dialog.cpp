@@ -6,9 +6,8 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/branding.h>
-#include <nx/vms/api/data/system_settings.h>
+#include <nx/vms/api/data/saveable_system_settings.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -37,14 +36,22 @@
 using namespace std::chrono;
 using namespace nx::vms::client::desktop;
 
+class QnSystemAdministrationDialog::Private
+{
+public:
+    nx::vms::api::SaveableSystemSettings editableSystemSettings;
+    rest::Handle currentRequest = 0;
+};
+
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     base_type(parent),
+    d(new Private()),
     ui(new ::Ui::QnSystemAdministrationDialog)
 {
     ui->setupUi(this);
     setHelpTopic(this, HelpTopic::Id::Administration);
 
-    auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
+    auto generalWidget = new QnGeneralSystemAdministrationWidget(&d->editableSystemSettings, this);
     addPage(GeneralPage, generalWidget, tr("General"));
 
     auto userManagementWidget = new UserManagementTabWidget(
@@ -70,10 +77,11 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
         this,
         updateLicenseAndSaasInfoPagesVisibility);
 
-    auto outgoingMailSettingsWidget = new OutgoingMailSettingsWidget(systemContext(), this);
+    auto outgoingMailSettingsWidget = new OutgoingMailSettingsWidget(
+        &d->editableSystemSettings, this);
     addPage(MailSettingsPage, outgoingMailSettingsWidget, tr("Email"));
 
-    auto securityWidget = new SecuritySettingsWidget(this);
+    auto securityWidget = new SecuritySettingsWidget(&d->editableSystemSettings, this);
     addPage(SecurityPage, securityWidget, tr("Security"));
 
     connect(securityWidget, &SecuritySettingsWidget::manageUsers, this,
@@ -94,7 +102,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     addPage(CloudManagement, new QnCloudManagementWidget(this), nx::branding::cloudName());
     addPage(
         TimeServerSelection,
-        new TimeSynchronizationWidget(systemContext(), this),
+        new TimeSynchronizationWidget(&d->editableSystemSettings, this),
         tr("Time Sync"));
 
     auto routingWidget = new QnRoutingManagementWidget(this);
@@ -135,25 +143,26 @@ QnSystemAdministrationDialog::~QnSystemAdministrationDialog()
 
 bool QnSystemAdministrationDialog::isNetworkRequestRunning() const
 {
-    return base_type::isNetworkRequestRunning() || m_currentRequest > 0;
+    return base_type::isNetworkRequestRunning() || d->currentRequest > 0;
 }
 
 void QnSystemAdministrationDialog::applyChanges()
 {
+    d->editableSystemSettings = {};
+
     base_type::applyChanges();
 
     const auto callback =
-        [this](bool success, rest::Handle requestId)
+        [this](bool /*success*/, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty)
         {
-            NX_ASSERT(requestId == m_currentRequest || m_currentRequest == 0);
-            m_currentRequest = 0;
-            if (success)
-                loadDataToUi();
-
+            NX_ASSERT(requestId == d->currentRequest || d->currentRequest == 0);
+            d->currentRequest = 0;
             updateButtonBox();
         };
 
-    m_currentRequest = systemContext()->systemSettingsManager()->saveSystemSettings(
+    d->currentRequest = systemContext()->connectedServerApi()->patchSystemSettings(
+        systemContext()->getSessionTokenHelper(),
+        d->editableSystemSettings,
         callback,
         this);
 
@@ -163,9 +172,9 @@ void QnSystemAdministrationDialog::applyChanges()
 void QnSystemAdministrationDialog::discardChanges()
 {
     base_type::discardChanges();
-    if (auto api = connectedServerApi(); api && m_currentRequest > 0)
-        api->cancelRequest(m_currentRequest);
-    m_currentRequest = 0;
+    if (auto api = connectedServerApi(); api && d->currentRequest > 0)
+        api->cancelRequest(d->currentRequest);
+    d->currentRequest = 0;
     NX_ASSERT(!isNetworkRequestRunning());
 }
 

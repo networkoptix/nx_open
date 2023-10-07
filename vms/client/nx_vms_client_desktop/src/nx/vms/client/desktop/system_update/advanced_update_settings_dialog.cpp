@@ -6,13 +6,12 @@
 #include <QtWidgets/QWidget>
 
 #include <api/server_rest_connection.h>
-#include <nx/vms/api/data/system_settings.h>
-#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/core/utils/qml_property.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
+#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::common;
@@ -30,34 +29,36 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
         context()->findInstance<ClientUpdateManager>();
     QmlProperty<bool> notifyAboutUpdates(rootObjectHolder(), "notifyAboutUpdates");
 
-    const auto systemSetting = systemContext()->systemSettings();
-    notifyAboutUpdates = systemSetting->updateNotificationsEnabled;
+    notifyAboutUpdates = systemSettings()->isUpdateNotificationsEnabled();
 
     notifyAboutUpdates.connectNotifySignal(
         this,
-        [this, notifyAboutUpdates, systemSetting]()
+        [this, notifyAboutUpdates]()
         {
             NX_ASSERT(m_currentRequest == 0);
 
             auto callback =
-                [this](bool /*success*/, rest::Handle requestId)
+                [this](bool /*success*/,
+                    rest::Handle requestId,
+                    rest::ServerConnection::ErrorOrEmpty)
                 {
                     NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
                     m_currentRequest = 0;
                 };
 
-            systemSetting->updateNotificationsEnabled = notifyAboutUpdates;
-            m_currentRequest = systemContext()->systemSettingsManager()->saveSystemSettings(
+            m_currentRequest = systemContext()->connectedServerApi()->patchSystemSettings(
+                systemContext()->getSessionTokenHelper(),
+                api::SaveableSystemSettings{.updateNotificationsEnabled = notifyAboutUpdates},
                 callback,
                 this);
         });
 
-    connect(systemContext()->systemSettingsManager(),
-        &core::SystemSettingsManager::systemSettingsChanged,
+    connect(systemSettings(),
+        &SystemSettings::updateNotificationsChanged,
         this,
-        [this, notifyAboutUpdates, systemSetting]()
+        [this, notifyAboutUpdates]()
         {
-            notifyAboutUpdates = systemSetting->updateNotificationsEnabled;
+            notifyAboutUpdates = systemSettings()->isUpdateNotificationsEnabled();
         });
 }
 

@@ -742,6 +742,30 @@ Handle ServerConnection::putServerLogSettings(
     return handle;
 }
 
+Handle ServerConnection::patchSystemSettings(
+    nx::vms::common::SessionTokenHelperPtr helper,
+    const nx::vms::api::SaveableSystemSettings& settings,
+    Result<ErrorOrEmpty>::type callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    auto request = prepareRequest(
+        nx::network::http::Method::patch,
+        prepareUrl(
+            "/rest/v3/system/settings",
+            /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        nx::reflect::json::serialize(settings));
+
+    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), executor)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
 Handle ServerConnection::addFileDownload(
     const QString& fileName,
     qint64 size,

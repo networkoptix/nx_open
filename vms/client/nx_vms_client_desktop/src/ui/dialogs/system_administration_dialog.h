@@ -48,7 +48,7 @@ private:
     void updateSecurity();
 
 private:
-    Q_DISABLE_COPY(QnSystemAdministrationDialog)
+    class Private;
+    nx::utils::ImplPtr<Private> d;
     nx::utils::ImplPtr<Ui::QnSystemAdministrationDialog> ui;
-    rest::Handle m_currentRequest = 0;
 };

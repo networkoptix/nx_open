@@ -3,19 +3,16 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
-#include <ui/widgets/common/abstract_preferences_widget.h>
+#include <nx/vms/client/desktop/system_administration/widgets/abstract_system_settings_widget.h>
 
 namespace nx::vms::client::desktop {
 
-class OutgoingMailSettingsWidget: public QnAbstractPreferencesWidget, public SystemContextAware
+class OutgoingMailSettingsWidget: public AbstractSystemSettingsWidget
 {
-    Q_OBJECT
-    using base_type = QnAbstractPreferencesWidget;
-
 public:
-    OutgoingMailSettingsWidget(nx::vms::common::SystemContext* context, QWidget* parent = nullptr);
-    ~OutgoingMailSettingsWidget();
+    OutgoingMailSettingsWidget(
+        api::SaveableSystemSettings* editableSystemSettings, QWidget* parent = nullptr);
+    virtual ~OutgoingMailSettingsWidget() override;
 
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;

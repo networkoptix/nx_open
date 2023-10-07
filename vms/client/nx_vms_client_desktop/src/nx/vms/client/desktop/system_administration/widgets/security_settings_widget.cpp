@@ -10,7 +10,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/desktop/common/dialogs/repeated_password_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
@@ -41,9 +40,11 @@ constexpr auto kNoLimitSessionDuration = 0s;
 
 namespace nx::vms::client::desktop {
 
-SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
+SecuritySettingsWidget::SecuritySettingsWidget(
+    api::SaveableSystemSettings* editableSystemSettings,
+    QWidget* parent)
+    :
+    AbstractSystemSettingsWidget(editableSystemSettings, parent),
     ui(new Ui::SecuritySettingsWidget),
     m_archiveEncryptionPasswordDialog(new RepeatedPasswordDialog(this))
 {
@@ -213,6 +214,24 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
 
     connect(ui->showServersInTreeCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    // Let's assume these options are changed so rare, that we can safely drop unsaved changes.
+    connect(systemSettings(), &SystemSettings::auditTrailEnableChanged, this,
+        &SecuritySettingsWidget::loadDataToUi);
+    connect(systemSettings(), &SystemSettings::trafficEncryptionForcedChanged, this,
+        &SecuritySettingsWidget::loadDataToUi);
+    connect(systemSettings(), &SystemSettings::videoTrafficEncryptionForcedChanged, this,
+        &SecuritySettingsWidget::loadDataToUi);
+    connect(systemSettings(), &SystemSettings::useHttpsOnlyForCamerasChanged, this,
+        &SecuritySettingsWidget::loadDataToUi);
+    connect(systemSettings(), &SystemSettings::watermarkChanged, this,
+        &SecuritySettingsWidget::loadDataToUi);
+    connect(systemSettings(), &SystemSettings::sessionTimeoutChanged, this,
+        &SecuritySettingsWidget::loadDataToUi);
+    connect(systemSettings(), &SystemSettings::useStorageEncryptionChanged, this,
+        &SecuritySettingsWidget::loadDataToUi);
+    connect(systemSettings(), &SystemSettings::showServersInTreeForNonAdminsChanged, this,
+        &SecuritySettingsWidget::loadDataToUi);
 }
 
 SecuritySettingsWidget::~SecuritySettingsWidget()
@@ -252,18 +271,17 @@ void SecuritySettingsWidget::showArchiveEncryptionPasswordDialog(bool viaButton)
 
 void SecuritySettingsWidget::loadDataToUi()
 {
-    const auto systemSetting = systemContext()->systemSettings();
-    ui->auditTrailCheckBox->setChecked(systemSetting->auditTrailEnabled);
+    ui->auditTrailCheckBox->setChecked(systemSettings()->isAuditTrailEnabled());
 
-    ui->forceTrafficEncryptionCheckBox->setChecked(systemSetting->trafficEncryptionForced);
-    ui->useHttpsOnlyCamerasCheckBox->setChecked(systemSetting->useHttpsOnlyForCameras);
+    ui->forceTrafficEncryptionCheckBox->setChecked(systemSettings()->isTrafficEncryptionForced());
+    ui->useHttpsOnlyCamerasCheckBox->setChecked(systemSettings()->useHttpsOnlyForCameras());
     ui->forceVideoTrafficEncryptionCheckBox->setChecked(
-        systemSetting->videoTrafficEncryptionForced);
+        systemSettings()->isVideoTrafficEncryptionForced());
 
-    m_watermarkSettings = systemSetting->watermarkSettings;
+    m_watermarkSettings = systemSettings()->watermarkSettings();
     ui->displayWatermarkCheckBox->setChecked(m_watermarkSettings.useWatermark);
 
-    const auto sessionTimeoutLimit = systemSetting->sessionLimitS;
+    const auto sessionTimeoutLimit = systemSettings()->sessionTimeoutLimit();
     ui->limitSessionLengthCheckBox->setChecked(
         sessionTimeoutLimit.value_or(kNoLimitSessionDuration) != kNoLimitSessionDuration);
     if (sessionTimeoutLimit)
@@ -282,22 +300,21 @@ void SecuritySettingsWidget::loadDataToUi()
         }
     }
 
-    if (!systemSetting->videoTrafficEncryptionForced)
+    if (!systemSettings()->isVideoTrafficEncryptionForced())
         ui->forceVideoEncryptionWarning->hide();
-    if (!systemSetting->useHttpsOnlyForCameras)
+    if (!systemSettings()->useHttpsOnlyForCameras())
         ui->useHttpsOnlyCamerasWarning->hide();
 
     loadEncryptionSettingsToUi();
     loadUserInfoToUi();
     updateLimitSessionControls();
 
-    ui->showServersInTreeCheckBox->setChecked(systemSetting->showServersInTreeForNonAdmins);
+    ui->showServersInTreeCheckBox->setChecked(systemSettings()->showServersInTreeForNonAdmins());
 }
 
 void SecuritySettingsWidget::loadEncryptionSettingsToUi()
 {
-    const auto systemSetting = systemContext()->systemSettings();
-    const bool storageEncryption = systemSetting->storageEncryption;
+    const bool storageEncryption = systemSettings()->useStorageEncryption();
     if (storageEncryption)
     {
         if (m_archivePasswordState != ArchivePasswordState::failedToSet)
@@ -344,16 +361,18 @@ void SecuritySettingsWidget::applyChanges()
     if (!NX_ASSERT(m_currentRequest == 0, "Request was already sent"))
         return;
 
-    const auto systemSetting = systemContext()->systemSettings();
-    systemSetting->auditTrailEnabled = ui->auditTrailCheckBox->isChecked();
-    systemSetting->trafficEncryptionForced = ui->forceTrafficEncryptionCheckBox->isChecked();
-    systemSetting->useHttpsOnlyForCameras = ui->useHttpsOnlyCamerasCheckBox->isChecked();
-    systemSetting->videoTrafficEncryptionForced =
+    editableSystemSettings->auditTrailEnabled = ui->auditTrailCheckBox->isChecked();
+    editableSystemSettings->trafficEncryptionForced =
+        ui->forceTrafficEncryptionCheckBox->isChecked();
+    editableSystemSettings->useHttpsOnlyForCameras = ui->useHttpsOnlyCamerasCheckBox->isChecked();
+    editableSystemSettings->videoTrafficEncryptionForced =
         ui->forceVideoTrafficEncryptionCheckBox->isChecked();
-    systemSetting->watermarkSettings = m_watermarkSettings;
-    systemSetting->sessionLimitS = calculateSessionLimit();
-    systemSetting->storageEncryption = ui->archiveEncryptionGroupBox->isChecked();
-    systemSetting->showServersInTreeForNonAdmins = ui->showServersInTreeCheckBox->isChecked();
+    editableSystemSettings->watermarkSettings = m_watermarkSettings;
+    editableSystemSettings->sessionLimitS = calculateSessionLimit();
+    editableSystemSettings->storageEncryption = ui->archiveEncryptionGroupBox->isChecked();
+    editableSystemSettings->showServersInTreeForNonAdmins =
+        ui->showServersInTreeCheckBox->isChecked();
+
     resetWarnings();
 
     const auto callback = nx::utils::guarded(this,
@@ -402,21 +421,20 @@ bool SecuritySettingsWidget::hasChanges() const
     if (isReadOnly())
         return false;
 
-    const auto systemSetting = systemContext()->systemSettings();
-
-    return (ui->auditTrailCheckBox->isChecked() != systemSetting->auditTrailEnabled)
+    return (ui->auditTrailCheckBox->isChecked() != systemSettings()->isAuditTrailEnabled())
         || (ui->forceTrafficEncryptionCheckBox->isChecked()
-            != systemSetting->trafficEncryptionForced)
-        || (ui->useHttpsOnlyCamerasCheckBox->isChecked() != systemSetting->useHttpsOnlyForCameras)
+            != systemSettings()->isTrafficEncryptionForced())
+        || (ui->useHttpsOnlyCamerasCheckBox->isChecked()
+            != systemSettings()->useHttpsOnlyForCameras())
         || (ui->forceVideoTrafficEncryptionCheckBox->isChecked()
-            != systemSetting->videoTrafficEncryptionForced)
-        || (m_watermarkSettings != systemSetting->watermarkSettings)
-        || (calculateSessionLimit() != systemSetting->sessionLimitS)
-        || (ui->archiveEncryptionGroupBox->isChecked() != systemSetting->storageEncryption)
+            != systemSettings()->isVideoTrafficEncryptionForced())
+        || (m_watermarkSettings != systemSettings()->watermarkSettings())
+        || (calculateSessionLimit() != systemSettings()->sessionTimeoutLimit())
+        || (ui->archiveEncryptionGroupBox->isChecked() != systemSettings()->useStorageEncryption())
         || m_archivePasswordState == ArchivePasswordState::changed
         || m_archivePasswordState == ArchivePasswordState::failedToSet
         || ui->showServersInTreeCheckBox->isChecked()
-            != systemSetting->showServersInTreeForNonAdmins;
+            != systemSettings()->showServersInTreeForNonAdmins();
 }
 
 bool SecuritySettingsWidget::isNetworkRequestRunning() const
@@ -458,7 +476,7 @@ void SecuritySettingsWidget::setReadOnlyInternal(bool readOnly)
 
 void SecuritySettingsWidget::showEvent(QShowEvent* event)
 {
-    base_type::showEvent(event);
+    AbstractSystemSettingsWidget::showEvent(event);
     loadUserInfoToUi();
 }
 

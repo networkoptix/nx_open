@@ -3,8 +3,8 @@
 #include "resource_searcher.h"
 
 #include <common/common_module.h>
-#include <core/resource/resource_type.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_type.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/vms/common/system_settings.h>
@@ -108,7 +108,7 @@ QList<QnResourcePtr> QnAbstractHttpResourceSearcher::checkAddress(AddressCheckPa
     if (const QString scheme = params.url.scheme(); scheme.isEmpty() || scheme == kUrlSchemeName)
     {
         const bool useHttps = params.url.port() == DEFAULT_HTTPS_PORT
-            || globalSettings()->useHttpsOnlyCameras();
+            || globalSettings()->useHttpsOnlyForCameras();
         params.url.setScheme(useHttps ? kSecureUrlSchemeName : kUrlSchemeName);
     }
 
