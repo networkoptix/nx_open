@@ -22,9 +22,6 @@
 
 #pragma comment(lib, "ole32.lib")
 
-/* This one is private API, but it is exported from QtGui. */
-extern QPixmap qt_pixmapFromWinHICON(HICON icon); // TODO: #sivanov Use QtWin::fromHICON
-
 namespace nx::vms::client::core {
 
 struct WinAudioDeviceInfo::Private
@@ -195,7 +192,7 @@ QPixmap WinAudioDeviceInfo::Private::getDeviceIcon() const
     HICON hIcon = LoadIcon(library, MAKEINTRESOURCE(resNumber));
     QPixmap result;
     if (hIcon)
-        result = qt_pixmapFromWinHICON(hIcon);
+        result = QPixmap::fromImage(QImage::fromHICON(hIcon));
     DestroyIcon(hIcon);
     return result;
 }
