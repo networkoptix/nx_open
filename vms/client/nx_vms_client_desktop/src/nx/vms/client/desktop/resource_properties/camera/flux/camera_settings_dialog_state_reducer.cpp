@@ -140,7 +140,7 @@ nx::utils::Url getBaseCameraUrl(const Camera& camera)
 
     // Force HTTP or HTTPS protocol for a webpage.
     // TODO: #sivanov Update protocol on global settings change.
-    const bool useSecureScheme = camera->systemContext()->globalSettings()->useHttpsOnlyCameras()
+    const bool useSecureScheme = camera->systemContext()->globalSettings()->useHttpsOnlyForCameras()
         || (nx::utils::stricmp(scheme, nx::network::http::kSecureUrlSchemeName) == 0);
 
     url.setScheme(nx::network::http::urlScheme(useSecureScheme));

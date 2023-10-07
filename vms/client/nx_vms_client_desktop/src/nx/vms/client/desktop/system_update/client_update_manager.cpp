@@ -19,11 +19,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/vms/api/data/client_update_settings.h>
-#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -151,8 +149,8 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         this,
         &Private::handleConnectionStateChanged);
 
-    connect(systemContext()->systemSettingsManager(),
-        &core::SystemSettingsManager::systemSettingsChanged,
+    connect(systemSettings(),
+        &SystemSettings::clientUpdateSettingsChanged,
         this,
         &Private::handleClientUpdateSettingsChanged);
 
@@ -484,7 +482,7 @@ void ClientUpdateManager::Private::planUpdate()
     const UpdateDate plannedDate = calculateUpdateDate(
         qnSyncTime->value(),
         updateContents.info,
-        QnUuid(systemContext()->systemSettings()->localSystemId),
+        systemSettings()->localSystemId(),
         updateAllowedSince);
 
     generatedUpdateDateTime = plannedDate.date;
@@ -662,21 +660,24 @@ void ClientUpdateManager::Private::handleUpdateStateChanged(ClientUpdateTool::St
 
 nx::vms::api::ClientUpdateSettings ClientUpdateManager::Private::globalClientUpdateSettings() const
 {
-    return systemContext()->systemSettings()->clientUpdateSettings;
+    return systemSettings()->clientUpdateSettings();
 }
 
 void ClientUpdateManager::Private::setGlobalClientUpdateSettings(
     const nx::vms::api::ClientUpdateSettings& settings)
 {
     auto callback =
-        [this](bool /*success*/, rest::Handle requestId)
+        [this](bool /*success*/, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty)
         {
             NX_ASSERT(requestId == currentRequest || currentRequest == 0);
             currentRequest = 0;
         };
 
-    systemContext()->systemSettings()->clientUpdateSettings = settings;
-    currentRequest = systemContext()->systemSettingsManager()->saveSystemSettings(callback, this);
+    currentRequest = systemContext()->connectedServerApi()->patchSystemSettings(
+        systemContext()->getSessionTokenHelper(),
+        api::SaveableSystemSettings{.clientUpdateSettings = settings},
+        callback,
+        this);
 }
 
 void ClientUpdateManager::Private::cancelRequest()

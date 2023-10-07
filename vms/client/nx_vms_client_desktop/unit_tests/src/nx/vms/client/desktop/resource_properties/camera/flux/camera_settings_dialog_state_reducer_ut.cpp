@@ -845,7 +845,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, qualityLimitsChangeKeepsBrush)
 
 // Camera web page address is basically a camera API url without query and path. Also there are
 // some options that affect it:
-// - System Settings -> useHttpsOnlyCameras option forces using https protocol
+// - System Settings -> useHttpsOnlyForCameras option forces using https protocol
 // - http_port property defines custom port (high priority)
 // - http_port query parameter defines custom port (low priority)
 // - default ports (80 for http and 443 for https) are omitted
@@ -876,7 +876,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, webPageAddressDefaultPortHttp)
 TEST_F(CameraSettingsDialogStateReducerTest, webPageForceHttpsSubstitution)
 {
     auto camera = createCamera();
-    camera->systemContext()->globalSettings()->setUseHttpsOnlyCameras(true);
+    camera->systemContext()->globalSettings()->setUseHttpsOnlyForCameras(true);
     camera->setUrl("http://example.com:443/path?query=true");
     State state = Reducer::loadCameras({}, {camera});
     ASSERT_EQ(state.singleCameraProperties.settingsUrl, QString("https://example.com/"));

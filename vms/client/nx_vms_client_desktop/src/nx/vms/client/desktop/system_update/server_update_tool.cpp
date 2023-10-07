@@ -21,12 +21,10 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -128,15 +126,16 @@ void ServerUpdateTool::onConnectToSystem(QnUuid systemId)
     if (!branding::customReleaseListUrl().isEmpty())
     {
         auto callback =
-            [this](bool /*success*/, rest::Handle requestId)
+            [this](bool /*success*/, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty)
             {
                 NX_ASSERT(m_settingsRequest == requestId || m_settingsRequest == 0);
                 m_settingsRequest = 0;
             };
 
         NX_ASSERT(m_settingsRequest == 0);
-        systemContext()->systemSettings()->customReleaseListUrl = branding::customReleaseListUrl();
-        m_settingsRequest = systemContext()->systemSettingsManager()->saveSystemSettings(
+        m_settingsRequest = systemContext()->connectedServerApi()->patchSystemSettings(
+            systemContext()->getSessionTokenHelper(),
+            api::SaveableSystemSettings{.customReleaseListUrl = branding::customReleaseListUrl()},
             callback,
             this);
     }

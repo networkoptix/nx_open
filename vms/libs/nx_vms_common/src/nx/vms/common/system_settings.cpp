@@ -655,7 +655,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_frameOptionsHeaderAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
          Names::frameOptionsHeader, "SAMEORIGIN", this, [] { return tr("HTTP header: X-Frame-Options"); });
 
-    m_useHttpsOnlyCamerasAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+    m_useHttpsOnlyForCamerasAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for cameras"); });
 
     m_securityForPowerUsersAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
@@ -758,10 +758,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        m_useHttpsOnlyCamerasAdaptor,
+        m_useHttpsOnlyForCamerasAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
-        &SystemSettings::useHttpsOnlyCamerasChanged,
+        &SystemSettings::useHttpsOnlyForCamerasChanged,
         Qt::QueuedConnection);
 
     connect(
@@ -1020,7 +1020,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_trafficEncryptionForcedAdaptor
         << m_videoTrafficEncryptionForcedAdaptor
         << m_exposeDeviceCredentialsAdaptor
-        << m_useHttpsOnlyCamerasAdaptor
+        << m_useHttpsOnlyForCamerasAdaptor
         << m_securityForPowerUsersAdaptor
         << m_insecureDeprecatedApiEnabledAdaptor
         << m_insecureDeprecatedApiInUseEnabledAdaptor
@@ -2154,14 +2154,14 @@ void SystemSettings::setSpecificFeatures(std::map<QString, int> value)
     m_specificFeaturesAdaptor->setValue(value);
 }
 
-bool SystemSettings::useHttpsOnlyCameras() const
+bool SystemSettings::useHttpsOnlyForCameras() const
 {
-    return m_useHttpsOnlyCamerasAdaptor->value();
+    return m_useHttpsOnlyForCamerasAdaptor->value();
 }
 
-void SystemSettings::setUseHttpsOnlyCameras(bool value)
+void SystemSettings::setUseHttpsOnlyForCameras(bool value)
 {
-    m_useHttpsOnlyCamerasAdaptor->setValue(value);
+    m_useHttpsOnlyForCamerasAdaptor->setValue(value);
 }
 
 bool SystemSettings::securityForPowerUsers() const
@@ -2209,7 +2209,7 @@ void SystemSettings::update(const vms::api::SystemSettings& value)
     m_cloudNotificationsLanguageAdaptor->setValue(value.cloudNotificationsLanguage);
     m_auditTrailEnabledAdaptor->setValue(value.auditTrailEnabled);
     m_trafficEncryptionForcedAdaptor->setValue(value.trafficEncryptionForced);
-    m_useHttpsOnlyCamerasAdaptor->setValue(value.useHttpsOnlyForCameras);
+    m_useHttpsOnlyForCamerasAdaptor->setValue(value.useHttpsOnlyForCameras);
     m_videoTrafficEncryptionForcedAdaptor->setValue(value.videoTrafficEncryptionForced);
     m_sessionTimeoutLimitSecondsAdaptor->setValue(value.sessionLimitS.value_or(0s).count());
     m_useStorageEncryptionAdaptor->setValue(value.storageEncryption);

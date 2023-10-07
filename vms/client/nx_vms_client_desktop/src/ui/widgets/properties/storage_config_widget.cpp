@@ -20,9 +20,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_scan_info.h>
-#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
-#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -1250,10 +1248,9 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
         {
             NX_ASSERT(m_currentRequest == 0);
 
-            systemContext()->systemSettings()->metadataStorageChangePolicy = policy;
-
             const auto callback =
-                [this, storageId](bool success, rest::Handle requestId)
+                [this, storageId](
+                    bool success, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty)
                 {
                     NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
                     m_currentRequest = 0;
@@ -1273,7 +1270,9 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
                         internalCallback);
                 };
 
-            m_currentRequest = systemContext()->systemSettingsManager()->saveSystemSettings(
+            m_currentRequest = systemContext()->connectedServerApi()->patchSystemSettings(
+                systemContext()->getSessionTokenHelper(),
+                nx::vms::api::SaveableSystemSettings{.metadataStorageChangePolicy = policy},
                 callback,
                 this);
         };

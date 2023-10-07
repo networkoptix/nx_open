@@ -8,14 +8,12 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/network/server_primary_interface_watcher.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
-#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
@@ -66,7 +64,6 @@ struct SystemContext::Private
     std::unique_ptr<ServerTimeWatcher> serverTimeWatcher;
     std::unique_ptr<ServerPrimaryInterfaceWatcher> serverPrimaryInterfaceWatcher;
     std::unique_ptr<nx::vms::rules::EngineHolder> vmsRulesEngineHolder;
-    std::unique_ptr<SystemSettingsManager> systemSettingsManager;
     std::unique_ptr<AccessController> accessController;
 
     mutable nx::Mutex sessionMutex;
@@ -106,7 +103,6 @@ SystemContext::SystemContext(
                 this,
                 std::make_unique<nx::vms::rules::Initializer>(this),
                 /*separateThread*/ false);
-            d->systemSettingsManager = std::make_unique<SystemSettingsManager>(this);
             break;
 
         case Mode::crossSystem:
@@ -253,16 +249,6 @@ WatermarkWatcher* SystemContext::watermarkWatcher() const
 ServerTimeWatcher* SystemContext::serverTimeWatcher() const
 {
     return d->serverTimeWatcher.get();
-}
-
-nx::vms::api::SystemSettings* SystemContext::systemSettings() const
-{
-    return d->systemSettingsManager->systemSettings();
-}
-
-SystemSettingsManager* SystemContext::systemSettingsManager() const
-{
-    return d->systemSettingsManager.get();
 }
 
 common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const

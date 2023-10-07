@@ -21,7 +21,6 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/server_model.h>
-#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/network/remote_connection.h>

@@ -10,7 +10,6 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/algorithm/index_of.h>
-#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -52,9 +51,11 @@ static constexpr auto kZoneFontWeight = QFont::Normal;
 
 } // namespace
 
-TimeSynchronizationWidget::TimeSynchronizationWidget(SystemContext* context, QWidget* parent):
-    base_type(parent),
-    SystemContextAware(context),
+TimeSynchronizationWidget::TimeSynchronizationWidget(
+    api::SaveableSystemSettings* editableSystemSettings,
+    QWidget* parent)
+    :
+    base_type(editableSystemSettings, parent),
     ui(new Ui::TimeSynchronizationWidget),
     m_store(new TimeSynchronizationWidgetStore(this)),
     m_serversModel(new Model(this)),
@@ -180,10 +181,9 @@ void TimeSynchronizationWidget::loadDataToUi()
         servers.push_back(serverInfo);
     }
 
-    const auto systemSetting = systemContext()->systemSettings();
     m_store->initialize(
-        systemSetting->timeSynchronizationEnabled,
-        systemSetting->primaryTimeServer,
+        systemSettings()->isTimeSynchronizationEnabled(),
+        systemSettings()->primaryTimeServer(),
         servers);
 
     m_store->setBaseTime(qnSyncTime->value());
@@ -209,10 +209,9 @@ void TimeSynchronizationWidget::applyChanges()
     if (!hasChanges())
         return;
 
-    const auto systemSetting = systemContext()->systemSettings();
     const auto& state = m_store->state();
-    systemSetting->timeSynchronizationEnabled = state.enabled;
-    systemSetting->primaryTimeServer = state.primaryServer;
+    editableSystemSettings->timeSynchronizationEnabled = state.enabled;
+    editableSystemSettings->primaryTimeServer = state.primaryServer;
 }
 
 bool TimeSynchronizationWidget::hasChanges() const
