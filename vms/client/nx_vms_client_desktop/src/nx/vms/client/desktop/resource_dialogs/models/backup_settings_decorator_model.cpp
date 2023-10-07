@@ -13,9 +13,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
 #include <nx/utils/scoped_change_notifier.h>
-#include <nx/vms/api/data/backup_settings.h>
-#include <nx/vms/api/data/system_settings.h>
-#include <nx/vms/client/core/settings/system_settings_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -195,7 +192,7 @@ void BackupSettingsDecoratorModel::Private::setGlobalBackupSettings(
     auto globalBackupSettingsChangesNotifier = makeGlobalBackupSettingsChangesNotifier(q);
     auto hasChangesNotifier = makeHasChangesNotifier(q);
 
-    const auto savedGlobalBackupSettings = q->systemContext()->systemSettings()->backupSettings;
+    const auto savedGlobalBackupSettings = q->systemSettings()->backupSettings();
     if (savedGlobalBackupSettings == backupSettings)
         changedGlobalBackupSettings.reset();
     else
@@ -358,14 +355,17 @@ void BackupSettingsDecoratorModel::Private::applyChanges()
     if (changedGlobalBackupSettings)
     {
         auto callback =
-            [this](bool /*success*/, rest::Handle requestId)
+            [this](bool /*success*/, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty)
             {
                 NX_ASSERT(requests.contains(requestId) || requests.empty());
                 requests.remove(requestId);
             };
 
-        q->systemContext()->systemSettings()->backupSettings = changedGlobalBackupSettings.value();
-        auto handle = q->systemContext()->systemSettingsManager()->saveSystemSettings(callback, q);
+        auto handle = q->systemContext()->connectedServerApi()->patchSystemSettings(
+            q->systemContext()->getSessionTokenHelper(),
+            api::SaveableSystemSettings{.backupSettings = changedGlobalBackupSettings.value()},
+            callback,
+            q);
         if (handle > 0)
             requests.insert(handle);
     }
@@ -599,7 +599,7 @@ BackupSettings BackupSettingsDecoratorModel::globalBackupSettings() const
 {
     return d->changedGlobalBackupSettings
         ? *d->changedGlobalBackupSettings
-        : systemContext()->systemSettings()->backupSettings;
+        : systemSettings()->backupSettings();
 }
 
 void BackupSettingsDecoratorModel::setBackupContentTypes(

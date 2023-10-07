@@ -102,9 +102,6 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QnSystemSettingsWidget" name="systemSettingsWidget" native="true"/>
-         </item>
         </layout>
        </widget>
       </item>
@@ -134,12 +131,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnSystemSettingsWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/system_settings/system_settings_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>nx::vms::client::desktop::EditableLabel</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/editable_label.h</header>
@@ -149,7 +140,6 @@
  <tabstops>
   <tabstop>systemNameLabel</tabstop>
   <tabstop>buttonWidget</tabstop>
-  <tabstop>systemSettingsWidget</tabstop>
  </tabstops>
  <resources/>
  <connections/>

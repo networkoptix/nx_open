@@ -4,22 +4,19 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/system_administration/widgets/abstract_system_settings_widget.h>
 
 struct QnWatermarkSettings;
 
 namespace Ui { class SystemSettingsWidget; }
 
 class QnSystemSettingsWidget:
-    public QnAbstractPreferencesWidget,
-    public QnWorkbenchContextAware
+    public nx::vms::client::desktop::AbstractSystemSettingsWidget
 {
-    Q_OBJECT
-
-    typedef QnAbstractPreferencesWidget base_type;
 public:
-    QnSystemSettingsWidget(QWidget *parent = nullptr);
+    QnSystemSettingsWidget(
+        nx::vms::api::SaveableSystemSettings* editableSystemSettings,
+        QWidget *parent = nullptr);
     virtual ~QnSystemSettingsWidget();
 
     virtual void loadDataToUi() override;

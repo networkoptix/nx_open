@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <optional>
-
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
@@ -30,7 +28,6 @@ namespace nx::vms::rules { class Engine; }
 namespace nx::vms::client::core {
 
 class AccessController;
-class SystemSettingsManager;
 class UserWatcher;
 class WatermarkWatcher;
 
@@ -125,10 +122,6 @@ public:
     WatermarkWatcher* watermarkWatcher() const;
 
     ServerTimeWatcher* serverTimeWatcher() const;
-
-    nx::vms::api::SystemSettings* systemSettings() const;
-
-    SystemSettingsManager* systemSettingsManager() const;
 
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const;
 

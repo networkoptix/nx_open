@@ -762,7 +762,7 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     ui->searchButton->setVisible(!showSearchProgressControls);
     ui->stopSearchButton->setVisible(showSearchProgressControls);
     ui->searchProgressBar->setVisible(showSearchProgressControls);
-    ui->httpsOnlyBar->setVisible(m_currentSearch && systemSettings()->useHttpsOnlyCameras()
+    ui->httpsOnlyBar->setVisible(m_currentSearch && systemSettings()->useHttpsOnlyForCameras()
         && messageBarSettings()->httpsOnlyBarInfo.value());
 
     if (!m_currentSearch)
