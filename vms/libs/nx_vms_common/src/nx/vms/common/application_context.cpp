@@ -89,6 +89,10 @@ ApplicationContext::ApplicationContext(
 ApplicationContext::~ApplicationContext()
 {
     d->longRunnablePool->stopAll();
+
+    // Long runnables with async destruction should be destroyed before we deinitialize networking.
+    d->longRunableCleanup.reset();
+    d->longRunnablePool.reset();
     deinitNetworking();
 
     if (NX_ASSERT(s_instance == this))
