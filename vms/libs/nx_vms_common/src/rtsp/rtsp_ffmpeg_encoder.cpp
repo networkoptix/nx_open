@@ -12,7 +12,6 @@ namespace {
     static const int kMaxPacketLen = 1024 * 32;
 }
 
-static const int kNxPayloadType = 102;
 static const QString kNxPayloadTypeName("FFMPEG");
 static const uint32_t kNxBasicSsrc = 20'000;
 
@@ -24,15 +23,21 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metric
     m_liveMarker(0),
     m_additionFlags(0),
     m_eofReached(false),
+    m_mtu(kMaxPacketLen),
     m_metrics(metrics)
 {
-    // Do nothing.
+    setSsrc(kNxBasicSsrc);
 }
 
 void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec)
 {
     m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(m_config, m_metrics, dstCodec));
     m_videoTranscoder->setOutputResolutionLimit(dstVideoSize);
+}
+
+void QnRtspFfmpegEncoder::setMtu(int mtu)
+{
+    m_mtu = mtu;
 }
 
 void QnRtspFfmpegEncoder::init()
@@ -116,7 +121,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
 
     bool hasDataContext = !m_codecParamsData.isEmpty();
     bool rtpMarker = hasDataContext;
-    uint32_t ssrc = kNxBasicSsrc + (hasDataContext ? 1 : 0);
+    uint32_t ssrc = *m_ssrc + (hasDataContext ? 1 : 0);
 
     int dataStartIndex = sendBuffer.size();
     sendBuffer.resize(sendBuffer.size() + nx::rtp::RtpHeader::kSize);
@@ -125,7 +130,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
         ssrc,
         rtpMarker,
         m_media->timestamp,
-        kNxPayloadType,
+        nx::rtp::kNxPayloadType,
         m_sequence++);
 
     if (!m_codecParamsData.isEmpty())
@@ -182,7 +187,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
     }
 
     const char* const dataEnd = m_media->data() + m_media->dataSize();
-    int sendLen = qMin<int>(kMaxPacketLen - sendBuffer.size(), dataEnd - m_curDataBuffer);
+    int sendLen = qMin<int>(m_mtu - sendBuffer.size(), dataEnd - m_curDataBuffer);
     sendBuffer.write(m_curDataBuffer, sendLen);
     m_curDataBuffer += sendLen;
 
@@ -204,12 +209,12 @@ QString QnRtspFfmpegEncoder::getSdpMedia(bool isVideo, int trackId, int port)
     QString sdpMedia;
     QTextStream stream(&sdpMedia);
     stream << "m=" << (isVideo ? "video " : "audio ") << port << " RTP/AVP ";
-    stream << kNxPayloadType << "\r\n";
+    stream << nx::rtp::kNxPayloadType << "\r\n";
     stream << "a=control:trackID=" << trackId << "\r\n";
-    stream << "a=rtpmap:" << kNxPayloadType << " " << kNxPayloadTypeName << "/" << 1'000'000 <<"\r\n";
+    stream << "a=rtpmap:" << nx::rtp::kNxPayloadType << " " << kNxPayloadTypeName << "/" << 1'000'000 <<"\r\n";
 
     if (!m_codecParamsData.isEmpty())
-        stream << "a=fmtp:" << kNxPayloadType << " config=" << m_codecParamsData.toBase64() <<"\r\n";
+        stream << "a=fmtp:" << nx::rtp::kNxPayloadType << " config=" << m_codecParamsData.toBase64() <<"\r\n";
 
     return sdpMedia;
 }
