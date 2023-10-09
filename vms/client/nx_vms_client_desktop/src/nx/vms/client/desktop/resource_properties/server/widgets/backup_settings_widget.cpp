@@ -26,8 +26,8 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
 #include <ui/common/palette.h>
@@ -216,7 +216,9 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
 
                 AbstractItemPtr newAddedCamerasItem = GenericItemBuilder()
                     .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
-                    .withRole(Qt::DisplayRole, tr("New added cameras (On all servers)"))
+                    .withRole(Qt::DisplayRole, tr("New added cameras"))
+                    .withRole(Qn::ExtraInfoRole, tr("\u2013 Applies to all servers")) //< EnDash
+                    .withRole(Qn::ForceExtraInfoRole, true)
                     .withRole(ResourceDialogItemRole::NewAddedCamerasItemRole, true)
                     .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});
 
