@@ -103,9 +103,9 @@ void ResourceDialogItemDelegate::initStyleOption(
         option->fontMetrics = QFontMetrics(option->font);
 
         const auto itemIsSelected = option->state.testFlag(QStyle::State_Selected);
-        option->palette.setColor(QPalette::PlaceholderText, itemIsSelected
-            ? kSelectedExtraTextColor
-            : kExtraTextColor);
+        option->palette.setColor(QPalette::PlaceholderText,
+            itemIsSelected || index.data(Qn::ForceExtraInfoRole).toBool() ? kSelectedExtraTextColor
+                                                                          : kExtraTextColor);
     }
 
     static const auto kInvalidTextColor = core::colorTheme()->color("red_core");
@@ -155,8 +155,8 @@ void ResourceDialogItemDelegate::paintItemText(
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget)
         .adjusted(textPadding, 0, -textPadding, 0);
 
-    const auto showExtraInfo =
-        appContext()->localSettings()->resourceInfoLevel() == Qn::RI_FullInfo;
+    const auto showExtraInfo = index.data(Qn::ForceExtraInfoRole).toBool()
+        || appContext()->localSettings()->resourceInfoLevel() == Qn::RI_FullInfo;
 
     // Draw background.
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
@@ -183,7 +183,6 @@ void ResourceDialogItemDelegate::paintItemText(
     textRect.setLeft(textBoundingRect.right() + kExtraTextSpacing);
     if (!textRect.isValid())
         return;
-
 
     if (!option.displayAlignment.testFlag(Qt::AlignLeft))
         return;
