@@ -22,7 +22,8 @@ struct ControlBar::Private
 {
     ControlBar* const q;
     CustomPainted<QWidget>* const background{new CustomPainted<QWidget>(q)};
-    QVBoxLayout* const verticalLayout{new QVBoxLayout(background)};
+    QHBoxLayout* const mainLayout{new QHBoxLayout(background)};
+    QVBoxLayout* const verticalLayout{new QVBoxLayout()};
     QHBoxLayout* const horizontalLayout{new QHBoxLayout()};
     bool retainSpaceWhenNotDisplayed = false;
 
@@ -83,11 +84,18 @@ ControlBar::ControlBar(QWidget* parent):
     layout->addWidget(d->background);
 
     setHidden(!d->retainSpaceWhenNotDisplayed);
+    mainLayout()->addLayout(verticalLayout());
 }
 
 ControlBar::~ControlBar()
 {
     // Required here for forward-declared scoped pointer destruction.
+}
+
+
+QHBoxLayout* ControlBar::mainLayout() const
+{
+    return d->mainLayout;
 }
 
 bool ControlBar::isDisplayed() const
