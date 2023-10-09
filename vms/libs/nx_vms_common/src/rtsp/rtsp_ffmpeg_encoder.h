@@ -22,6 +22,7 @@ public:
     virtual bool getNextPacket(nx::utils::ByteArray& sendBuffer) override;
     virtual void init() override;
     virtual bool isEof() const override { return false; }
+    virtual void setMtu(int mtu) override;
 
     void setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec);
 
@@ -42,8 +43,8 @@ private:
     quint16 m_additionFlags;
     bool m_eofReached;
     QSize m_dstVideSize;
-    AVCodecID m_dstCodec;
     uint16_t m_sequence = 0;
+    int m_mtu = 0;
 
     std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;
     nx::metrics::Storage* m_metrics = nullptr;

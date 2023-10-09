@@ -179,4 +179,20 @@ QString fromVideoCodectoMimeType(AVCodecID codecId)
     }
 }
 
+AVCodecID fromMimeTypeToVideoCodec(const std::string& mime)
+{
+    if (mime == kH264MimeType)
+        return AV_CODEC_ID_H264;
+    else if (mime == kH263MimeType)
+        return AV_CODEC_ID_H263;
+    else if (mime == kHevcMimeType)
+        return AV_CODEC_ID_HEVC;
+    else if (mime == kMjpegMimeType)
+        return AV_CODEC_ID_MJPEG;
+    else if (mime == kMpeg4MimeType)
+        return AV_CODEC_ID_MPEG4;
+    else
+        return AV_CODEC_ID_NONE;
+}
+
 } // namespace nx::media

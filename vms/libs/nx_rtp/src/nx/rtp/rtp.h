@@ -132,4 +132,7 @@ inline void buildRtpHeader(
     rtp->ssrc = qToBigEndian(ssrc);
 }
 
+constexpr int kNxPayloadType = 102;
+constexpr int kNxPayloadTypeFallback = 103; //< Use this type to pass proprietary Nx RTP via single ssrc.
+
 } // namespace nx::rtp
