@@ -331,7 +331,7 @@ void File::rotateAndStartArchivingIfNeeded()
     }
     catch (const std::exception& e)
     {
-        NX_CRITICAL(this, "Unable to start zipping thread '%1' into '%2': %3",
+        NX_CRITICAL(false, "Unable to start zipping thread '%1' into '%2': %3",
             tmpName, archiveName, e.what());
     }
 }
