@@ -101,6 +101,8 @@ struct Metrics
     /** Group box content margins, frame width included. */
     static constexpr QMargins kGroupBoxContentMargins{kDefaultTopLevelMargins};
 
+    static constexpr QMargins kMessageBarContentMargins{16, 10, 16, 10};
+
     /** Group box corner rounding radius. */
     static constexpr qreal kGroupBoxCornerRadius = 2.0;
 
@@ -136,6 +138,7 @@ struct Metrics
     static constexpr int kHeaderViewFontPixelSize = 14;
     static constexpr int kCalendarItemFontPixelSize = 12;
     static constexpr int kCalendarHeaderFontPixelSize = 11;
+    static constexpr int kBannerLabelFontPixelSize = 14;
 
     // TODO: #vbreus Schedule cell size set to fixed size of 32 pixels, likely there is no need
     // to make it resizable.
