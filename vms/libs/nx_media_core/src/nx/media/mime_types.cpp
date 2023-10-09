@@ -4,10 +4,10 @@
 
 namespace nx::media {
 
-const QString kH264MimeType = "video/h264";
-const QString kH263MimeType = "video/h263";
-const QString kHevcMimeType = "video/hevc";
-const QString kMpeg4MimeType = "video/mpeg4";
-const QString kMjpegMimeType = "video/mjpeg";
+const char* kH264MimeType = "video/h264";
+const char* kH263MimeType = "video/h263";
+const char* kHevcMimeType = "video/hevc";
+const char* kMpeg4MimeType = "video/mpeg4";
+const char* kMjpegMimeType = "video/mjpeg";
 
 } // namespace nx::media
