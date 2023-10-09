@@ -24,5 +24,6 @@ NX_MEDIA_CORE_API bool fillExtraDataAnnexB(
 NX_MEDIA_CORE_API std::vector<uint8_t> buildExtraDataAnnexB(const QnConstCompressedVideoDataPtr& frame);
 
 NX_MEDIA_CORE_API QString fromVideoCodectoMimeType(AVCodecID codecId);
+NX_MEDIA_CORE_API AVCodecID fromMimeTypeToVideoCodec(const std::string& mime);
 
 } // namespace nx::media
