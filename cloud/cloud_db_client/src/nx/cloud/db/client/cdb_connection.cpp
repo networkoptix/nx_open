@@ -15,6 +15,7 @@ Connection::Connection(
     m_requestExecutor(endPointFetcher),
     m_accountManager(&m_requestExecutor),
     m_systemManager(&m_requestExecutor),
+    m_organizationManager(&m_requestExecutor),
     m_authProvider(&m_requestExecutor),
     m_maintenanceManager(&m_requestExecutor),
     m_oauthManager(&m_requestExecutor),
@@ -32,6 +33,11 @@ api::AccountManager* Connection::accountManager()
 api::SystemManager* Connection::systemManager()
 {
     return &m_systemManager;
+}
+
+api::OrganizationManager* Connection::organizationManager()
+{
+    return &m_organizationManager;
 }
 
 api::AuthProvider* Connection::authProvider()

@@ -79,6 +79,19 @@ static constexpr char kSystemUsersBatchErrorInfoPath[] = "/cdb/systems/users/bat
 static constexpr char kBatchIdParam[] = "batchId";
 
 //-------------------------------------------------------------------------------------------------
+// Organizations.
+
+static constexpr char kOrganizationSystemsPath[] = "/cdb/organizations/{organizationId}/systems";
+
+static constexpr char kOrganizationSystemPath[] =
+    "/cdb/organizations/{organizationId}/systems/{systemId}";
+
+static constexpr char kOrganizationSystemUsersPath[] =
+    "/cdb/organizations/{organizationId}/systems/{systemId}/users";
+
+static constexpr char kOrganizationIdParam[] = "organizationId";
+
+//-------------------------------------------------------------------------------------------------
 
 static constexpr char kPingPath[] = "/cdb/ping";
 

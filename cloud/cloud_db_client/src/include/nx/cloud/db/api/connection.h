@@ -17,6 +17,7 @@
 #include "maintenance_manager.h"
 #include "module_info.h"
 #include "oauth_manager.h"
+#include "organization_manager.h"
 #include "result_code.h"
 #include "system_manager.h"
 #include "two_factor_auth_manager.h"
@@ -75,6 +76,7 @@ public:
 
     virtual api::AccountManager* accountManager() = 0;
     virtual api::SystemManager* systemManager() = 0;
+    virtual api::OrganizationManager* organizationManager() = 0;
     virtual api::AuthProvider* authProvider() = 0;
 
     /**

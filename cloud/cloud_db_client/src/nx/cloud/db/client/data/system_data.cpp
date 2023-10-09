@@ -14,12 +14,19 @@ using namespace nx::network;
 //-------------------------------------------------------------------------------------------------
 // class SystemRegistrationData
 
+MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, id)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, name)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, customization)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, opaque)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const data)
 {
+    if (urlQuery.hasQueryItem(SystemRegistrationData_id_field))
+    {
+        data->id = std::string();
+        url::deserializeField(urlQuery, SystemRegistrationData_opaque_field, &data->id.value());
+    }
+
     if (!url::deserializeField(urlQuery, SystemRegistrationData_name_field, &data->name))
         return false;
 
@@ -39,6 +46,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const d
 
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery)
 {
+    if (data.id)
+        url::serializeField(urlQuery, SystemRegistrationData_id_field, *data.id);
     url::serializeField(urlQuery, SystemRegistrationData_name_field, data.name);
     url::serializeField(urlQuery, SystemRegistrationData_customization_field, data.customization);
     url::serializeField(urlQuery, SystemRegistrationData_opaque_field, data.opaque);

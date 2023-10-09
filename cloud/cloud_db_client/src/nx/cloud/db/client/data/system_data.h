@@ -14,11 +14,9 @@
 
 namespace nx::cloud::db::api {
 
-#define SystemRegistrationData_Fields (name)(customization)(opaque)
+NX_REFLECTION_INSTRUMENT(SystemRegistrationData, (id)(name)(customization)(opaque))
 
-NX_REFLECTION_INSTRUMENT(SystemRegistrationData, SystemRegistrationData_Fields)
-
-// TODO: #akolesnikov Add corresponding parser/serializer to fusion and remove this function.
+// TODO: #akolesnikov Replace this and similar functions with nx::reflect::urlencoded.
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery);
 

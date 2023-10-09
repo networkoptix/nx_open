@@ -57,6 +57,7 @@ nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resul
         case ResultCode::retryLater:
         case ResultCode::vmsRequestFailure:
             return nx::network::http::StatusCode::serviceUnavailable;
+
         case ResultCode::updateConflict:
             return nx::network::http::StatusCode::conflict;
     }
