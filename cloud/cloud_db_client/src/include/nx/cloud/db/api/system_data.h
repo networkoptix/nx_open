@@ -42,6 +42,11 @@ std::string getAttrValueOr(
  */
 struct SystemRegistrationData
 {
+    /**%apidoc If specified, then an attempt to assign this id will be made.
+     * If the id was alredy taken, an error is raised.
+     */
+    std::optional<std::string> id = std::nullopt;
+
     /**%apidoc Non-unique system name. */
     std::string name;
 

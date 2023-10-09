@@ -23,6 +23,16 @@ UrlQuery::UrlQuery(const QString& query):
 {
 }
 
+UrlQuery::UrlQuery(const std::string_view& str):
+    m_query(QString::fromUtf8(str.data(), str.size()))
+{
+}
+
+UrlQuery::UrlQuery(const char* str):
+    m_query(QString::fromUtf8(str))
+{
+}
+
 bool UrlQuery::hasQueryItem(const QString& key) const
 {
     return m_query.hasQueryItem(key);

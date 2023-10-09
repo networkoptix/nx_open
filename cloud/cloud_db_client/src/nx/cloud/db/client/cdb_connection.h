@@ -10,6 +10,7 @@
 #include "batch_user_processing_manager.h"
 #include "maintenance_manager.h"
 #include "oauth_manager.h"
+#include "organization_manager.h"
 #include "system_manager.h"
 #include "two_factor_auth_manager.h"
 
@@ -23,6 +24,7 @@ public:
 
     virtual api::AccountManager* accountManager() override;
     virtual api::SystemManager* systemManager() override;
+    virtual api::OrganizationManager* organizationManager() override;
     virtual api::AuthProvider* authProvider() override;
     virtual api::MaintenanceManager* maintenanceManager() override;
     virtual api::OauthManager* oauthManager() override;
@@ -52,6 +54,7 @@ private:
     AsyncRequestsExecutor m_requestExecutor;
     AccountManager m_accountManager;
     SystemManager m_systemManager;
+    OrganizationManager m_organizationManager;
     AuthProvider m_authProvider;
     MaintenanceManager m_maintenanceManager;
     OauthManager m_oauthManager;
