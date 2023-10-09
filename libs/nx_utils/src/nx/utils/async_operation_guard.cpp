@@ -81,7 +81,7 @@ AsyncOperationGuard::SharedGuard::Lock::Lock(SharedGuard* guard):
 {
 }
 
-AsyncOperationGuard::SharedGuard::Lock::Lock(Lock&& rhs):
+AsyncOperationGuard::SharedGuard::Lock::Lock(Lock&& rhs) noexcept:
     m_sharedGuard(rhs.m_sharedGuard),
     m_locked(rhs.m_locked)
 {
