@@ -34,11 +34,13 @@ public:
      */
     class NX_UTILS_API SharedGuard
     {
-        SharedGuard();
         friend class AsyncOperationGuard;
 
-        SharedGuard(const AsyncOperationGuard::SharedGuard&);
-        SharedGuard& operator=(const AsyncOperationGuard::SharedGuard&);
+        SharedGuard();
+        SharedGuard(const SharedGuard&) = delete;
+        SharedGuard(SharedGuard&&) = delete;
+        SharedGuard& operator=(const SharedGuard&) = delete;
+        SharedGuard& operator=(SharedGuard&&) = delete;
 
     public:
         /**
@@ -48,15 +50,15 @@ public:
          */
         class NX_UTILS_API Lock
         {
-            Lock(SharedGuard* sharedGuard);
             friend class SharedGuard;
 
-            Lock(const Lock&);
-            Lock& operator=(const Lock&);
+            Lock(SharedGuard* sharedGuard);
+            Lock(const Lock&) = delete;
+            Lock& operator=(const Lock&) = delete;
+            Lock& operator=(Lock&&) = delete;
 
         public:
-            Lock(Lock&& rhs);
-
+            Lock(Lock&& rhs) noexcept;
             void unlock();
             operator bool() const;
             bool operator!() const;
