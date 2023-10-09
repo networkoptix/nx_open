@@ -37,6 +37,11 @@ public:
     QHBoxLayout* horizontalLayout() const;
 
     /**
+     * A horizontal layout, which contains vertical layout.
+     */
+    QHBoxLayout* mainLayout() const;
+
+    /**
      * Whether the bar should keep occupying its space in an exterior layout when not displayed.
      */
     bool retainSpaceWhenNotDisplayed() const;

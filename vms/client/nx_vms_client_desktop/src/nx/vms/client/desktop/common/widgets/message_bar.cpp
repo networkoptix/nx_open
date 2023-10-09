@@ -22,13 +22,6 @@
 
 #include "nx/vms/client/desktop/common/widgets/control_bars.h"
 
-namespace {
-
-constexpr size_t kFontPixelSize = 14;
-constexpr QMargins kMargins{16, 10, 16, 10};
-
-} // namespace
-
 namespace nx::vms::client::desktop {
 
 struct CommonMessageBar::Private
@@ -88,7 +81,10 @@ CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& descri
     d(new Private{.q = this})
 {
     setAttribute(Qt::WA_StyledBackground, true);
-    horizontalLayout()->addWidget(d->icon);
+
+    mainLayout()->insertWidget(0, d->icon, {}, Qt::AlignmentFlag::AlignTop);
+    verticalLayout()->setContentsMargins({});
+
     horizontalLayout()->addWidget(d->label, 1);
     d->label->setForegroundRole(QPalette::Text);
     d->label->label()->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -96,14 +92,15 @@ CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& descri
 
     connect(d->label, &QnWordWrappedLabel::linkActivated, this, &CommonMessageBar::linkActivated);
 
-    horizontalLayout()->addWidget(d->closeButton, 0, Qt::AlignTop);
+    mainLayout()->insertWidget(2, d->closeButton, 0, Qt::AlignTop);
     d->closeButton->setFlat(true);
-    d->closeButton->setFixedSize(20, 20);
+    d->closeButton->setFixedSize(
+        style::Metrics::kDefaultIconSize, style::Metrics::kDefaultIconSize);
     d->closeButton->setToolTip(tr("Close"));
     d->closeButton->setFocusPolicy(Qt::NoFocus);
     d->closeButton->hide();
 
-    d->icon->setFixedSize(20, 20);
+    d->icon->setFixedSize(style::Metrics::kDefaultIconSize, style::Metrics::kDefaultIconSize);
     d->icon->setFocusPolicy(Qt::NoFocus);
     d->icon->setFlat(true);
 
@@ -115,7 +112,6 @@ CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& descri
     init(description);
 
     d->buttonsHorizontalLayout = new QHBoxLayout;
-    d->buttonsHorizontalLayout->addSpacing(d->icon->size().width() + horizontalLayout()->spacing());
     verticalLayout()->addLayout(d->buttonsHorizontalLayout);
 }
 
@@ -164,9 +160,10 @@ void CommonMessageBar::init(const BarDescription& barDescription)
 
     auto font = d->label->font();
     font.setWeight(QFont::Medium);
-    font.setPixelSize(kFontPixelSize);
+    font.setPixelSize(style::Metrics::kBannerLabelFontPixelSize);
     d->label->setFont(font);
-    verticalLayout()->setContentsMargins(kMargins);
+    mainLayout()->setContentsMargins(style::Metrics::kMessageBarContentMargins);
+    mainLayout()->setSpacing(style::Metrics::kStandardPadding);
 
     QString backgroundColor;
     QString frameColor;
