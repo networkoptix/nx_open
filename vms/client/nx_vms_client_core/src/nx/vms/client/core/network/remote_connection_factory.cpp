@@ -382,7 +382,9 @@ struct RemoteConnectionFactory::Private
 
         // Check that the handshake certificate matches one of the targets's.
         CertificateVerificationResult certificateVerificationResult =
-            verifyHandshakeCertificateChain(context->handshakeCertificateChain, *currentServerIt);
+            verifyHandshakeCertificateChain(context->handshakeCertificateChain,
+                *currentServerIt,
+                context->logonData.address.address.toString());
         if (!certificateVerificationResult.success)
         {
             context->setError(RemoteConnectionErrorCode::certificateRejected);
@@ -850,9 +852,11 @@ struct RemoteConnectionFactory::Private
         bool success = false;
         bool isUserProvidedCertificate = false;
     };
+
     CertificateVerificationResult verifyHandshakeCertificateChain(
         const nx::network::ssl::CertificateChain& handshakeCertificateChain,
-        const nx::vms::api::ServerInformation& serverInfo)
+        const nx::vms::api::ServerInformation& serverInfo,
+        const std::string& hostName)
     {
         if (!nx::network::ini().verifyVmsSslCertificates)
             return {.success = true};
@@ -870,10 +874,23 @@ struct RemoteConnectionFactory::Private
         if (handshakeKey == publicKey(serverInfo.certificatePem))
             return {.success = true};
 
+        std::string errorMessage;
+        if (nx::network::ssl::verifyBySystemCertificates(
+                handshakeCertificateChain, hostName, &errorMessage))
+        {
+            NX_VERBOSE(this, "Certificate passed OS check. Hostname: %2, serverId: %3",
+            hostName,
+            serverInfo.id);
+            return {.success = true};
+        }
+
         NX_WARNING(this,
             "The handshake certificate doesn't match any certificate provided by"
-            " the server.\nHandshake key: %1",
-            handshakeKey);
+            " the server.\nHandshake key: %1.\nOS check: %2, hostname: %3, serverId: %4",
+            handshakeKey,
+            errorMessage,
+            hostName,
+            serverInfo.id);
 
         if (const auto& pem = serverInfo.certificatePem; !pem.empty())
         {
