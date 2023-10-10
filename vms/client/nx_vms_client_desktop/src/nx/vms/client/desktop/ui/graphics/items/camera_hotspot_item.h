@@ -7,13 +7,16 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
-
-class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
-class CameraHotspotItem: public QGraphicsObject
+class CameraHotspotItem:
+    public QGraphicsObject,
+    public SystemContextAware,
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = QGraphicsObject;
@@ -21,7 +24,8 @@ class CameraHotspotItem: public QGraphicsObject
 public:
     CameraHotspotItem(
         const nx::vms::common::CameraHotspotData& hotspotData,
-        QnWorkbenchContext* context,
+        SystemContext* systemContext,
+        WindowContext* windowContext,
         QGraphicsItem* parent = nullptr);
     virtual ~CameraHotspotItem() override;
 

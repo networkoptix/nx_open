@@ -119,7 +119,11 @@ void CameraHotspotsOverlayWidget::Private::initHotspotItems()
             if (!accessController->hasPermissions(hotspotCamera, Qn::ReadPermission))
                 continue;
 
-            CameraHotspotItem* item(new CameraHotspotItem(hotspotData, workbenchContext(), q));
+            CameraHotspotItem* item(new CameraHotspotItem(
+                hotspotData,
+                parentMediaResourceWidget->systemContext(),
+                parentMediaResourceWidget->windowContext(),
+                q));
             updateHotspotItem(item);
             hotspotItems.push_back(item);
         }
