@@ -11,10 +11,13 @@
 struct NX_VMS_COMMON_API ConfigureSystemData: public PasswordData
 {
     QnUuid localSystemId;
+    QString cloudSystemId;
     bool wholeSystem = false;
     qint64 sysIdTime = 0;
     nx::vms::api::Timestamp tranLogTime;
     int port = 0;
+
+    // The server from a claster A that call /api/configure to the the server on a claster B.
     nx::vms::api::MediaServerData foreignServer;
     std::vector<nx::vms::api::UserData> foreignUsers;
     nx::vms::api::ResourceParamDataList foreignSettings;
@@ -23,12 +26,17 @@ struct NX_VMS_COMMON_API ConfigureSystemData: public PasswordData
     QString currentPassword; // required for password change only
     QnUuid mergeId;
     std::set<QnUuid> remoteRemovedObjects;
+    bool isLocal = false;
+
+    // All servers from a cluster A.
+    std::set<QnUuid> foreignServers;
 
     bool operator==(const ConfigureSystemData& other) const = default;
 };
 
 #define ConfigureSystemData_Fields PasswordData_Fields \
     (localSystemId) \
+    (cloudSystemId) \
     (wholeSystem) \
     (sysIdTime) \
     (tranLogTime) \
@@ -40,6 +48,8 @@ struct NX_VMS_COMMON_API ConfigureSystemData: public PasswordData
     (systemName) \
     (currentPassword) \
     (mergeId) \
-    (remoteRemovedObjects)
+    (remoteRemovedObjects) \
+    (foreignServers) \
+    (isLocal)
 
 QN_FUSION_DECLARE_FUNCTIONS(ConfigureSystemData, (json), NX_VMS_COMMON_API)
