@@ -631,10 +631,11 @@ NX_REFLECTION_ENUM_CLASS(AuthType,
 namespace header {
 
 /** Common header name constants. */
+static constexpr char kAccept[] = "Accept";
+static constexpr char kAcceptLanguage[] = "Accept-Language";
 static constexpr char kContentType[] = "Content-Type";
 static constexpr char kContentLength[] = "Content-Length";
 static constexpr char kUserAgent[] = "User-Agent";
-static constexpr char kAccept[] = "Accept";
 
 //!Http authentication scheme enumeration
 namespace AuthScheme {

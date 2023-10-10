@@ -20,21 +20,19 @@ nx::network::rest::Result parseRestResult(
         return nx::network::rest::Result();
 
     // Support JSON format only for new REST API.
-    if (format != Qn::JsonFormat)
+    if (format == Qn::JsonFormat)
     {
-        constexpr auto kMessageBodyLogSize = 50;
-        NX_DEBUG(NX_SCOPE_TAG,
-            "Unsupported format '%1', status code: %2, message body: %3 ...",
-            nx::reflect::enumeration::toString(format),
-            httpStatusCode,
-            messageBody.substr(0, kMessageBodyLogSize));
-
-        return nx::network::rest::Result::unsupportedMediaType();
+        nx::network::rest::Result result;
+        if (QJson::deserialize(messageBody, &result))
+            return result;
     }
 
-    nx::network::rest::Result result;
-    if (QJson::deserialize(messageBody, &result))
-        return result;
+    constexpr auto kMessageBodyLogSize = 50;
+    NX_DEBUG(NX_SCOPE_TAG,
+        "Unsupported format '%1', status code: %2, message body: %3 ...",
+        nx::reflect::enumeration::toString(format),
+        httpStatusCode,
+        messageBody.substr(0, kMessageBodyLogSize));
 
     return nx::network::rest::Result(
         nx::network::rest::Result::errorFromHttpStatus(httpStatusCode));
