@@ -32,7 +32,7 @@ Control
         {
             id: prevButton
 
-            icon.source: "qrc:///skin/text_buttons/arrow_left_20.svg"
+            icon.source: "qrc:///skin/ptz/arrow_left_20.svg"
             color: pressed || hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light9
             visible: !bar.isFirstPage
 
