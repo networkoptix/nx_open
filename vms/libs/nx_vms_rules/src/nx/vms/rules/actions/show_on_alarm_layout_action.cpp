@@ -29,7 +29,7 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
             makeFieldDescriptor<EventDevicesField>("eventDeviceIds", "Event devices"),
             utils::makeTextFormatterFieldDescriptor("caption", tr("Alarm: %1").arg("{@EventCaption}")),
             utils::makeTextFormatterFieldDescriptor("description", "{@EventDescription}"),
-            utils::makeTextFormatterFieldDescriptor("tooltip", "{@EventTooltip}"),
+            utils::makeTextFormatterFieldDescriptor("tooltip", "{@ExtendedEventDescription}"),
             utils::makeExtractDetailFieldDescriptor("sourceName", utils::kSourceNameDetailName),
         }
     };
