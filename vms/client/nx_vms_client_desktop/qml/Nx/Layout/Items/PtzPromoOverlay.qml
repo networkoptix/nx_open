@@ -40,20 +40,20 @@ Control
 
             pagesModel.append({
                 "title": "",
-                "text": qsTr("Press arrows keys to move and plus or minus keys to zoom"),
+                "text": qsTr("Press arrow keys to move around. Use plus and minus keys to zoom."),
                 "imageUrl": "image://svg/skin/promo/ptz_promo_keys.svg"
             })
 
             pagesModel.append({
                 "title": "",
-                "text": qsTr("Use the mouse wheel to zoom"),
+                "text": qsTr("Use mouse wheel to zoom"),
                 "imageUrl": "image://svg/skin/promo/ptz_promo_scroll.svg"
             })
 
             pagesModel.append({
                 "title": "",
-                "text": qsTr("Click, double-click, or drag the mouse pointer while pressing "
-                    + "the Shift key to use Advanced PTZ"),
+                "text": qsTr("Click, double-click, or drag mouse pointer while pressing Shift key "
+                    + "to use Advanced PTZ"),
                 "imageUrl": "image://svg/skin/promo/ptz_promo_advanced.svg"
             })
 
@@ -68,8 +68,8 @@ Control
         if (showTargetLock)
         {
             pagesModel.append({
-                "title": qsTr("Target lock tracking"),
-                "text": qsTr("Alt + Click to follow the object"),
+                "title": qsTr("Target Lock Tracking"),
+                "text": qsTr("Alt + Click to follow object"),
                 "imageUrl": "image://svg/skin/promo/ptz_promo_tracking.svg"
             })
         }
