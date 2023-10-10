@@ -19,8 +19,10 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
@@ -52,15 +54,13 @@ struct CameraHotspotItem::Private
     CameraHotspotItem* const q;
 
     const nx::vms::common::CameraHotspotData hotspotData;
-    QnWorkbenchContext* const context;
 
     QPointer<QMenu> contextMenu;
     QPointer<ThumbnailTooltip> tooltip;
 
     Private(
         CameraHotspotItem* const q,
-        nx::vms::common::CameraHotspotData hotspotData,
-        QnWorkbenchContext* context);
+        nx::vms::common::CameraHotspotData hotspotData);
 
     QnMediaResourceWidget* mediaResourceWidget() const;
     QnVirtualCameraResourcePtr hotspotCamera() const;
@@ -100,12 +100,10 @@ private:
 
 CameraHotspotItem::Private::Private(
     CameraHotspotItem* const q,
-    common::CameraHotspotData hotspotData,
-    QnWorkbenchContext* context)
+    common::CameraHotspotData hotspotData)
     :
     q(q),
     hotspotData(hotspotData),
-    context(context),
     hotspotPixmapItem(new QGraphicsPixmapItem(q))
 {
     if (hotspotData.hasDirection())
@@ -128,7 +126,7 @@ QnMediaResourceWidget* CameraHotspotItem::Private::mediaResourceWidget() const
 
 QnVirtualCameraResourcePtr CameraHotspotItem::Private::hotspotCamera() const
 {
-    const auto resourcePool = context->resourcePool();
+    const auto resourcePool = q->resourcePool();
     const auto camera =
         resourcePool->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId);
     NX_ASSERT(camera, "Hotspot refers to a nonexistent camera");
@@ -175,7 +173,7 @@ ThumbnailTooltip* CameraHotspotItem::Private::createTooltip() const
     if (!imageRequest.camera)
         return nullptr;
 
-    const auto tooltip = new ThumbnailTooltip(context);
+    const auto tooltip = new ThumbnailTooltip(q->windowContext()->workbenchContext());
     tooltip->setTooltipOffset(kTooltipOffset);
     tooltip->setEnclosingRect(q->scene()->views().first()->window()->geometry());
     tooltip->setText(tooltipText());
@@ -204,27 +202,27 @@ ui::action::Parameters::ArgumentHash CameraHotspotItem::Private::itemPlaybackPar
 
 void CameraHotspotItem::Private::openItem()
 {
-    const auto actionManager = context->menu();
+    const auto actionManager = q->menu();
 
-    const auto workbenchItems = context->workbench()->currentLayout()->items();
+    const auto workbenchItems = q->workbench()->currentLayout()->items();
     for (const auto item: workbenchItems)
     {
         if (item->resource()->getId() == hotspotData.cameraId)
         {
-            if (context->workbench()->item(Qn::ZoomedRole))
-                context->workbench()->setItem(Qn::ZoomedRole, nullptr);
+            if (q->workbench()->item(Qn::ZoomedRole))
+                q->workbench()->setItem(Qn::ZoomedRole, nullptr);
 
             actionManager->trigger(ui::action::GoToLayoutItemAction, ui::action::Parameters()
                 .withArgument(Qn::ItemUuidRole, item->uuid()));
 
-            if (!context->navigator()->syncEnabled())
+            if (!q->navigator()->syncEnabled())
             {
                 const auto parameters = itemPlaybackParameters();
                 for (const auto& role: parameters.keys())
                     item->setData(static_cast<Qn::ItemDataRole>(role), parameters.value(role));
             }
 
-            const auto display = context->display();
+            const auto display = q->display();
             if (!display->boundedViewportGeometry().contains(display->itemEnclosingGeometry(item)))
                 display->fitInView(true);
 
@@ -233,7 +231,7 @@ void CameraHotspotItem::Private::openItem()
     }
 
     auto parameters = ui::action::Parameters(hotspotCamera());
-    if (!context->navigator()->syncEnabled())
+    if (!q->navigator()->syncEnabled())
         parameters.setArguments(itemPlaybackParameters());
 
     actionManager->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
@@ -242,10 +240,10 @@ void CameraHotspotItem::Private::openItem()
 void CameraHotspotItem::Private::opemItemInNewLayout()
 {
     auto parameters = ui::action::Parameters(hotspotCamera());
-    if (!context->navigator()->syncEnabled())
+    if (!q->navigator()->syncEnabled())
         parameters.setArguments(itemPlaybackParameters());
 
-    context->menu()->trigger(ui::action::OpenInNewTabAction, parameters);
+    q->menu()->trigger(ui::action::OpenInNewTabAction, parameters);
 }
 
 void CameraHotspotItem::Private::openItemInPlace()
@@ -253,13 +251,13 @@ void CameraHotspotItem::Private::openItemInPlace()
     auto parameters = ui::action::Parameters(mediaResourceWidget())
         .withArgument(Qn::ResourceRole, hotspotCamera());
 
-    if (!context->navigator()->syncEnabled()
-        || context->workbench()->currentLayout()->items().size() == 1)
+    if (!q->navigator()->syncEnabled()
+        || q->workbench()->currentLayout()->items().size() == 1)
     {
         parameters.setArguments(itemPlaybackParameters());
     }
 
-    context->menu()->trigger(ui::action::ReplaceLayoutItemAction, parameters);
+    q->menu()->trigger(ui::action::ReplaceLayoutItemAction, parameters);
 }
 
 void CameraHotspotItem::Private::setDevicePixelRatio(qreal value)
@@ -349,11 +347,14 @@ void CameraHotspotItem::Private::updateHotspotDecorationPixmapIfNeeded() const
 
 CameraHotspotItem::CameraHotspotItem(
     const nx::vms::common::CameraHotspotData& hotspotData,
-    QnWorkbenchContext* context,
+    SystemContext* systemContext,
+    WindowContext* windowContext,
     QGraphicsItem* parent)
     :
     base_type(parent),
-    d(new Private({this, hotspotData, context}))
+    SystemContextAware(systemContext),
+    WindowContextAware(windowContext),
+    d(new Private({this, hotspotData}))
 {
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons({Qt::LeftButton, Qt::RightButton});
