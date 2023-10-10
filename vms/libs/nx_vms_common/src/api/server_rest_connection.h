@@ -1000,7 +1000,6 @@ private:
         std::optional<Timeouts> timeouts = {});
 
     QUrl prepareUrl(const QString& path, const nx::network::rest::Params& params) const;
-    QString prepareUserAgent() const;
 
     /**
      * Fills in http request header with parameters like authentication or proxy.
@@ -1017,6 +1016,12 @@ private:
         const QUrl& url,
         const nx::String& contentType = nx::String(),
         const nx::String& messageBody = nx::String());
+
+    /** Same as prepareRequest, but JSON-oriented. */
+    nx::network::http::ClientPool::Request prepareRestRequest(
+        nx::network::http::Method method,
+        const QUrl& url,
+        const nx::String& messageBody = {});
 
     /** Passes request to ClientPool. */
     Handle sendRequest(

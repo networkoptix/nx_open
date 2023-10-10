@@ -294,15 +294,24 @@ QString formatRestId(QnUuid id)
     return id.isNull() ? QString("*") : id.toSimpleString();
 }
 
-std::map<nx::vms::api::PeerType, QString> peerTypeToUserAgentDict = {
-    {nx::vms::api::PeerType::server, "VMS Server"},
-    {nx::vms::api::PeerType::desktopClient, "Desktop Client"},
-    {nx::vms::api::PeerType::videowallClient, "VideoWall Client"},
-    {nx::vms::api::PeerType::oldMobileClient, "Old Mobile Client"},
-    {nx::vms::api::PeerType::mobileClient, "Mobile Client"},
-    {nx::vms::api::PeerType::cloudServer, "Cloud Server"},
-    {nx::vms::api::PeerType::oldServer, "Old VMS Server"},
-    {nx::vms::api::PeerType::notDefined, "Not Defined"}};
+std::string prepareUserAgent()
+{
+    static const QMap<nx::vms::api::PeerType, std::string_view> kPeerTypeToUserAgent = {
+        {nx::vms::api::PeerType::server, "VMS Server"},
+        {nx::vms::api::PeerType::desktopClient, "Desktop Client"},
+        {nx::vms::api::PeerType::videowallClient, "VideoWall Client"},
+        {nx::vms::api::PeerType::oldMobileClient, "Old Mobile Client"},
+        {nx::vms::api::PeerType::mobileClient, "Mobile Client"},
+        {nx::vms::api::PeerType::cloudServer, "Cloud Server"},
+        {nx::vms::api::PeerType::oldServer, "Old VMS Server"},
+        {nx::vms::api::PeerType::notDefined, "Not Defined"}};
+
+
+    return NX_FMT("%1 %2 %3",
+        nx::branding::vmsName(),
+        kPeerTypeToUserAgent.value(nx::vms::common::appContext()->localPeerType(), "Unknown Peer"),
+        nx::build_info::vmsVersion()).toStdString();
+}
 
 } // namespace
 
@@ -603,11 +612,9 @@ Handle ServerConnection::bindSystemToCloud(
     data.authKey = cloudAuthKey;
     data.owner = cloudAccountName;
 
-    auto request = prepareRequest(
+    auto request = prepareRestRequest(
         nx::network::http::Method::post,
-        prepareUrl("/rest/v3/system/cloud/bind",
-            /*params*/ {{"userAgent", prepareUserAgent()}}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        prepareUrl("/rest/v3/system/cloud/bind", /*params*/ {}),
         nx::reflect::json::serialize(data));
     request.credentials = nx::network::http::BearerAuthToken(ownerSessionToken);
 
@@ -628,11 +635,9 @@ Handle ServerConnection::unbindSystemFromCloud(
     nx::vms::api::LocalSystemAuth data;
     data.password = password;
 
-    auto request = prepareRequest(
+    auto request = prepareRestRequest(
         nx::network::http::Method::post,
-        prepareUrl("/rest/v3/system/cloud/unbind",
-            /*params*/ {{"userAgent", prepareUserAgent()}}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        prepareUrl("/rest/v3/system/cloud/unbind", /*params*/ {}),
         nx::reflect::json::serialize(data));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -2470,14 +2475,6 @@ QUrl ServerConnection::prepareUrl(const QString& path, const nx::network::rest::
     return result;
 }
 
-QString ServerConnection::prepareUserAgent() const
-{
-    return NX_FMT("%1 %2 %3",
-        nx::branding::vmsName(),
-        peerTypeToUserAgentDict[qnStaticCommon->localPeerType()],
-        nx::build_info::vmsVersion());
-}
-
 template<typename CallbackType>
 Handle ServerConnection::executeGet(
     const QString& path,
@@ -3300,8 +3297,22 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     request.method = method;
     request.contentType = contentType;
     request.messageBody = messageBody;
-    request.headers.emplace(Qn::kAcceptLanguageHeader,
+    request.headers.emplace(nx::network::http::header::kAcceptLanguage,
         nx::vms::common::appContext()->locale().toStdString());
+    return request;
+}
+
+nx::network::http::ClientPool::Request ServerConnection::prepareRestRequest(
+    nx::network::http::Method method,
+    const QUrl& url,
+    const nx::String& messageBody)
+{
+    static const nx::String contentType = nx::network::http::header::ContentType::kJson.toString();
+
+    auto request = prepareRequest(method, url, contentType, messageBody);
+    request.headers.emplace(nx::network::http::header::kAccept, contentType);
+    request.headers.emplace(nx::network::http::header::kUserAgent, prepareUserAgent());
+
     return request;
 }
 
