@@ -139,9 +139,12 @@ TEST_F(ActionFieldTest, EventTooltip)
 {
     TextWithFields field(systemContext());
 
-    field.setText("{@EventTooltip}");
+    field.setText("{@ExtendedEventDescription}");
+
+    const auto tooltip = field.build(AggregatedEventPtr::create(makeEvent())).toString();
+    EXPECT_NE(tooltip, field.text());
     // Tooltip must not be empty, at least event name and timestamp must exists.
-    EXPECT_FALSE(field.build(AggregatedEventPtr::create(makeEvent())).toString().isEmpty());
+    EXPECT_FALSE(tooltip.isEmpty());
 }
 
 TEST_P(ActionFieldTest, FormatLine)
