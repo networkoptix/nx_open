@@ -7,6 +7,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/data_macros.h>
 
+#include "server_merge_data.h"
+
 namespace nx::vms::api {
 
 /**%apidoc Details about the last Merge operation. */
@@ -17,8 +19,11 @@ struct NX_VMS_API MergeStatusReply
 
     /**%apidoc Whether the last Merge operation is in progress. */
     bool mergeInProgress = false;
+
+    /**%apidoc List of unmerged servers. */
+    std::vector<ServerMergeData> unmergedServers;
 };
-#define MergeStatusReply_Fields (mergeId)(mergeInProgress)
+#define MergeStatusReply_Fields (mergeId)(mergeInProgress)(unmergedServers)
 NX_VMS_API_DECLARE_STRUCT(MergeStatusReply)
 
 } // namespace nx::vms::api
