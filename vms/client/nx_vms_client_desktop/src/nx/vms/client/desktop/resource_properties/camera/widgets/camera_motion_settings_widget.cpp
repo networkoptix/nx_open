@@ -35,7 +35,7 @@ namespace nx::vms::client::desktop {
 namespace {
 
 static constexpr QSize kSensitivityButtonSize(34, 34);
-static constexpr qreal kSensitivityButtonOpacity = 0.3;
+static constexpr float kSensitivityButtonOpacity = 0.3;
 
 using StreamIndex = nx::vms::api::StreamIndex;
 
@@ -64,7 +64,6 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
 
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
-    ui->highResolutionInfoBar->setRetainSpaceWhenNotDisplayed(true);
 
     const QList<QColor> sensitivityColors = core::colorTheme()->colors("camera.sensitivityColors");
 
@@ -312,12 +311,6 @@ void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& sta
 
             return {};
         }());
-
-    ui->highResolutionInfoBar->setRetainSpaceWhenNotDisplayed(
-        ui->motionHintBar->text().isEmpty() &&
-        ui->recordingAlertBar->text().isEmpty() &&
-        ui->motionImplicitlyDisabledAlertBar->text().isEmpty() &&
-        ui->regionsErrorBar->text().isEmpty());
 }
 
 void CameraMotionSettingsWidget::showEvent(QShowEvent* event)
