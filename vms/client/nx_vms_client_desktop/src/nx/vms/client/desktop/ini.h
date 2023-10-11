@@ -291,7 +291,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Feature] Enable ONVIF Profile G");
 
     // VMS-41144
-    NX_INI_FLAG(true, nativeLinkForTemporaryUsers,
+    NX_INI_FLAG(false, nativeLinkForTemporaryUsers,
         "[Feature] Use native link type for temporary user");
 
     // ---------------------------------------------------------------------------------------------
