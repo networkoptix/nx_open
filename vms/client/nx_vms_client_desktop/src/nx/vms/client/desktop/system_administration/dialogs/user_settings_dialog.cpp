@@ -19,11 +19,17 @@
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/http/http_async_client.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -73,6 +79,16 @@ static constexpr auto kAuditTrailDays = 7;
 static constexpr int kDefaultTempUserExpiresAfterLoginS = 60 * 60 * 8; //< 8 hours.
 
 static const QString kAllowedLoginSymbols = "!#$%&'()*+,-./:;<=>?[]^_`{|}~";
+
+static const QString kTrafficRelayUrlRequest = R"json(
+    {
+        "destinationHostName": "%1",
+        "connectionMethods": 5,
+        "cloudConnectVersion": "connectOverHttpHasHostnameAsString"
+    })json";
+
+static const QString kCloudPathTrafficRelayInfo = "/mediator/server/%1/sessions/";
+static const QString kTrafficRelayUrl = "trafficRelayUrl";
 
 bool isAcceptedLoginCharacter(QChar character)
 {
@@ -136,6 +152,10 @@ struct UserSettingsDialog::Private
     QnUserResourcePtr user;
     rest::Handle currentRequest = 0;
 
+    std::unique_ptr<nx::network::http::AsyncClient> httpClient;
+    mutable nx::Mutex mutex;
+    QString trafficRelayUrl;
+
     Private(UserSettingsDialog* parent, DialogType dialogType):
         q(parent),
         syncId(parent->globalSettings()->ldap().syncId()),
@@ -173,6 +193,80 @@ struct UserSettingsDialog::Private
 
         continuousSync = q->globalSettings()->ldap().continuousSync
             == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+
+        connect(parent->globalSettings(),
+            &common::SystemSettings::cloudSettingsChanged,
+            q,
+            [this]() { updateTrafficRelayUrl(); });
+        updateTrafficRelayUrl();
+    }
+
+    void updateTrafficRelayUrl()
+    {
+        const auto cloudSystemId = q->systemSettings()->cloudSystemId();
+        if (cloudSystemId.isEmpty())
+            return;
+
+        const core::CloudUrlHelper cloudUrlHelper(
+            nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
+            nx::vms::utils::SystemUri::ReferralContext::None);
+
+        const auto urlCloud = nx::utils::Url::fromQUrl(cloudUrlHelper.mainUrl());
+
+        const nx::network::SocketAddress address{urlCloud.host().toStdString(),
+            (quint16) urlCloud.port(
+                nx::network::http::defaultPortForScheme(urlCloud.scheme().toStdString()))};
+
+        if (!httpClient)
+        {
+            httpClient = std::make_unique<nx::network::http::AsyncClient>(
+                nx::network::ssl::kAcceptAnyCertificate);
+        }
+
+        const auto url = nx::network::url::Builder()
+            .setScheme(urlCloud.scheme().toStdString())
+            .setEndpoint(address)
+            .setPath(nx::format(kCloudPathTrafficRelayInfo, cloudSystemId))
+            .toUrl();
+
+        auto messageBody = std::make_unique<nx::network::http::BufferSource>(
+            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat),
+            nx::format(kTrafficRelayUrlRequest, cloudSystemId).toStdString());
+
+        httpClient->doPost(url, std::move(messageBody),
+            [this, url]()
+            {
+                NX_MUTEX_LOCKER lock(&mutex);
+                trafficRelayUrl = {};
+                if (httpClient->failed())
+                {
+                    NX_VERBOSE(this, "POST request failed. Url: %1", url);
+                    return;
+                }
+
+                const auto result = httpClient->fetchMessageBodyBuffer();
+                if (result.empty())
+                {
+                    NX_VERBOSE(this, "POST body fetch failed. Url: %1", url);
+                    return;
+                }
+
+                QJsonObject response;
+                if (QJson::deserialize(result.toByteArray(), &response))
+                {
+                    trafficRelayUrl = response[kTrafficRelayUrl].toString();
+                }
+                else
+                {
+                    NX_VERBOSE(this, "Can not deserialize POST response. Url: %1", url);
+                }
+            });
+    }
+
+    QString getTrafficRelayUrl() const
+    {
+        NX_MUTEX_LOCKER lock(&mutex);
+        return trafficRelayUrl;
     }
 
     QDateTime serverDate(milliseconds msecsSinceEpoch) const
@@ -210,9 +304,25 @@ struct UserSettingsDialog::Private
             serverUrl = currentServerUrl;
 
         if (customPriority(serverUrl) == LinkHostPriority::cloud)
-            serverUrl.setHost(serverUrl.host().split('.').back());
+        {
+            const auto url = getTrafficRelayUrl();
+            if (url.isEmpty())
+            {
+                // This is a rare scenario when there is no URL relay yet and need to form a link.
+                serverUrl = currentServerUrl;
+                if (serverUrl.port(-1) == -1)
+                    serverUrl.setPort(info.port);
+            }
+            else
+            {
+                serverUrl = url;
+                serverUrl.setHost(q->systemSettings()->cloudSystemId() + '.' + serverUrl.host());
+            }
+        }
         else if (serverUrl.port(-1) == -1)
+        {
             serverUrl.setPort(info.port);
+        }
 
         if (!ini().nativeLinkForTemporaryUsers)
             return nx::format("https://%1/#/?tmp_token=%2", serverUrl.displayAddress(), token);
