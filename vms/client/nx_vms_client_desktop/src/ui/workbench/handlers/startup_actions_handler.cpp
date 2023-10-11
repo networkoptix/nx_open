@@ -503,7 +503,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
         return false;
 
     const auto systemUrl = nx::utils::Url::fromUserInput(systemAddress);
-    nx::network::SocketAddress address(systemUrl.host(), systemUrl.port());
+    nx::network::SocketAddress address(systemUrl.host(), systemUrl.port(0));
     NX_DEBUG(this, "Custom URI: Connecting to the system %1", address);
 
     LogonData logonData(core::LogonData{.address = address, .credentials = uri.credentials});

@@ -109,10 +109,13 @@ void splitString(const QString& source, QChar separator, QString& left, QString&
 
 bool isCloudHostname(const QString& hostname)
 {
-    if (hostname.length() != kUuidLength)
+    // Relay traffic addresses are only available for cloud systems. Therefore,
+    // https://<cloudSystemId>.<vmsProxy> addresses must be considered cloud addresses.
+    const auto cloudSystemId = hostname.split('.').front();
+    if (cloudSystemId.length() != kUuidLength)
         return false;
 
-    QnUuid uuid = QnUuid::fromStringSafe(hostname);
+    QnUuid uuid = QnUuid::fromStringSafe(cloudSystemId);
     return !uuid.isNull();
 }
 
