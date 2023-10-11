@@ -531,6 +531,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     m_storagePoolMenu(new QMenu(this))
 {
     ui->setupUi(this);
+    connect(m_model.get(), &QnStorageListModel::dataChanged, [this] { updateWarnings(); });
 
     m_storagePoolMenu->setProperty(style::Properties::kMenuAsDropdown, true);
     const auto mainAction = m_storagePoolMenu->addAction(tr("Main"));
