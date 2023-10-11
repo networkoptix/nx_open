@@ -197,8 +197,7 @@ Dialog
             color: ColorTheme.colors.dark12
         }
 
-        //TODO: need to add delegate for header in TableView
-        TableView
+        PreviewTableView
         {
             id: tableView
 
@@ -206,14 +205,8 @@ Dialog
             anchors.topMargin: 4
             anchors.bottom: parent.bottom
             width: parent.width
-
-            horizontalHeaderVisible: true
             model: previewModel
 
-            delegate: BasicTableCellDelegate
-            {
-                color: ColorTheme.colors.light10
-            }
         }
     }
 
