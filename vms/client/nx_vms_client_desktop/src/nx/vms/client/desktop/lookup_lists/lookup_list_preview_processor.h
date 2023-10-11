@@ -19,7 +19,7 @@ class LookupListModel;
 /**
  * Raw presentation of first N rows from CSV.
  */
-class LookupPreviewEntriesModel: public QAbstractTableModel
+class NX_VMS_CLIENT_DESKTOP_API LookupPreviewEntriesModel: public QAbstractTableModel
 {
     Q_OBJECT
     using base_type = QAbstractTableModel;
@@ -48,7 +48,7 @@ private:
  * Processor of input csv/tsv file for preview, used in QML.
  * TBD: processing of changing of attributes type per column.
  */
-class LookupListPreviewProcessor: public QObject
+class NX_VMS_CLIENT_DESKTOP_API LookupListPreviewProcessor: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
