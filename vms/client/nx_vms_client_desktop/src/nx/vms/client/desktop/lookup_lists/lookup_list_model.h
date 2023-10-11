@@ -7,7 +7,7 @@
 namespace nx::vms::client::desktop {
 
 /** Interface class for working with LookupListData from QML. */
-class LookupListModel: public QObject
+class NX_VMS_CLIENT_DESKTOP_API LookupListModel: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(nx::vms::api::LookupListData data MEMBER m_data NOTIFY dataChanged)

@@ -13,7 +13,7 @@
 namespace nx::vms::client::desktop {
 
 /** Entries of a single Lookup List. */
-class LookupListEntriesModel: public QAbstractTableModel
+class NX_VMS_CLIENT_DESKTOP_API LookupListEntriesModel: public QAbstractTableModel
 {
     Q_OBJECT
     Q_PROPERTY(LookupListModel* listModel

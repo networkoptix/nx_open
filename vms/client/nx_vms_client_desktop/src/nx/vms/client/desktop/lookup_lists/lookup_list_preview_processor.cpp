@@ -14,7 +14,7 @@ namespace nx::vms::client::desktop {
 
 struct LookupListPreviewProcessor::Private
 {
-    int rowsNumber;
+    int rowsNumber = 10;
     QString separator;
     QString filePath;
     bool dataHasHeaderRow;
