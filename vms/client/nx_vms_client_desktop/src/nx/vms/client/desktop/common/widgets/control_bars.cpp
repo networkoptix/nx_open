@@ -62,11 +62,28 @@ ControlBar::ControlBar(QWidget* parent):
     d->background->setCustomPaintFunction(
         [this](QPainter* painter, const QStyleOption* option, const QWidget* widget)
         {
-            const auto frameColor = option->palette.color(QPalette::Dark);
-            const auto fillBrush = option->palette.brush(QPalette::Window);
+            const auto& frameColor = option->palette.color(QPalette::Dark);
+            const auto& fillBrush = option->palette.brush(QPalette::Window);
             painter->setPen(frameColor.isValid() ? QPen{frameColor} : QPen{Qt::NoPen});
             painter->setBrush(fillBrush);
-            painter->drawRect(option->rect);
+
+            // Anti-aliasing is necessary to prevent integer rounding that causes the borders to
+            // have unequal thickness on Windows systems with display scaling larger than 100%. Qt
+            // will draw two lines, +/- 0.5 pixels (for pen width == 1) around the given rectangle.
+            // That's why we add 0.5 pixels top-left and subtract 0.5 pixels from the right-bottom
+            // edge, to contain the drawing entirely inside the widget area. Additional subtraction
+            // of 1/2 pixels from the sides is to prevent blurry right and bottom edges on Windows
+            // systems with display scaling factor 100%.
+            painter->save();
+            painter->setRenderHint(QPainter::Antialiasing);
+
+            QRectF rect(option->rect);
+            auto penWidth = painter->pen().widthF();
+            rect.adjust(penWidth / 2, penWidth / 2, -3 * penWidth / 2, -3 * penWidth / 2);
+
+            painter->drawRect(rect);
+            painter->restore();
+
             return true;
         });
 
