@@ -9,35 +9,13 @@ import Nx
 import Nx.Controls
 import Nx.Dialogs
 
-Dialog
+ProgressDialog
 {
     id: control
-
     title: qsTr("Export Lists")
-    minimumWidth: 450
-    minimumHeight: 135
-    maximumHeight: minimumHeight
-    modality: Qt.ApplicationModal
-    leftPadding: 0
-    rightPadding: 0
-    topPadding: 0
-    bottomPadding: 0
+    processName: qsTr("Exporting")
 
-    signal progressFinished
-    signal progressStarted
     signal openFolderRequested
-
-    ProgressBar
-    {
-        id: progressBar
-
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.margins: 16
-        value: 1.0
-    }
-
 
     buttonBox: DialogButtonBox
     {
@@ -55,42 +33,22 @@ Dialog
 
             Button
             {
-                id: cancelButton
-
                 anchors.right: parent.right
                 anchors.margins: 16
+                visible: isVisibleCancelButton
                 text: qsTr("Cancel")
                 onClicked: control.reject()
             }
 
             Button
             {
-                id: doneButton
-
                 anchors.right: parent.right
                 anchors.margins: 16
-                visible: false
+                visible: isVisibleDoneButton
                 text: qsTr("Done")
                 isAccentButton: true
                 onClicked: control.accept()
             }
         }
-    }
-
-    onProgressStarted:
-    {
-        control.visible = true
-        progressBar.title = qsTr("Exporting")
-        progressBar.indeterminate = true
-        cancelButton.visible = true
-        doneButton.visible = false
-    }
-
-    onProgressFinished:
-    {
-        progressBar.title = qsTr("Finished")
-        progressBar.indeterminate = false
-        cancelButton.visible = false
-        doneButton.visible = true
     }
 }

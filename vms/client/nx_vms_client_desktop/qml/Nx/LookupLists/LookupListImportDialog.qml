@@ -218,8 +218,8 @@ Dialog
             isAccentButton: true
             onClicked:
             {
-                importProcessor.importListEntries(processor.filePath, processor.separator, processor.dataHasHeaderRow, model)
-                control.accept()
+                importProcessor.importListEntries(processor.filePath, processor.separator,
+                    processor.dataHasHeaderRow, model)
             }
         }
 
@@ -265,12 +265,15 @@ Dialog
         processor.reset(previewModel)
     }
 
-    ExportEntriesProgressDialog
+    ProgressDialog
     {
         id: importProgressBar
 
+        title: qsTr("Import List")
+        processName: qsTr("Importing")
         visible: false
-        onRejected: importProcessor.cancelExport()
+        onRejected: importProcessor.cancelImport()
+        onDoneClicked: control.accept()
     }
 
     LookupListImportProcessor
