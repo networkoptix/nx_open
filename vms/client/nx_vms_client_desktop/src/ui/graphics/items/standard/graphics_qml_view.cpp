@@ -37,11 +37,8 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
-using namespace std::chrono;
-
 namespace {
 
-const auto kTextureResizeTimeout = 50ms;
 constexpr auto kQuadVertexCount = 4;
 constexpr auto kCoordPerVertex = 2; //< x, y
 constexpr auto kQuadArrayLength = kQuadVertexCount * kCoordPerVertex;
@@ -234,7 +231,6 @@ struct GraphicsQmlView::Private
     QScopedPointer<RenderControl> renderControl;
     QScopedPointer<QOffscreenSurface> offscreenSurface;
     QScopedPointer<QOpenGLContext> openglContext;
-    QElapsedTimer textureResizeTimer;
     GLuint renderTexture = 0;
     QSize renderTextureSize;
     QScopedPointer<QQmlComponent> qmlComponent;
@@ -256,7 +252,6 @@ struct GraphicsQmlView::Private
     void updateSizes();
     bool isTextureInitializationRequired(qreal devicePixelRatio);
     void initializeTexture(qreal devicePixelRatio);
-    void scheduleUpdateSizes();
     void paintQml(qreal devicePixelRatio);
 
     static QSize rounded(const QSizeF& size);
@@ -288,6 +283,7 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     d->quickWindow.reset(new QQuickWindow(d->renderControl.data()));
     d->quickWindow->setTitle(QString::fromLatin1("Offscreen"));
     d->quickWindow->setGeometry(0, 0, 640, 480); //< Will be resized later.
+    d->quickWindow->setColor(palette().color(QPalette::Window));
 
     d->ensureOffscreen();
 
@@ -333,7 +329,7 @@ void GraphicsQmlView::setRootObject(std::shared_ptr<QQuickItem> root)
     d->resetComponent(); //< Avoid processing signals from previous root item.
     d->rootItem = root;
     d->rootItem->setParentItem(d->quickWindow->contentItem());
-    d->scheduleUpdateSizes();
+    d->updateSizes();
 }
 
 QList<QQmlError> GraphicsQmlView::errors() const
@@ -362,7 +358,7 @@ void GraphicsQmlView::Private::resetComponent()
 
                     rootItem->setParentItem(quickWindow->contentItem());
 
-                    scheduleUpdateSizes();
+                    updateSizes();
                     emit view->statusChanged(QQuickWidget::Ready);
                     return;
                 }
@@ -378,15 +374,9 @@ void GraphicsQmlView::Private::resetComponent()
         });
 }
 
-void GraphicsQmlView::Private::scheduleUpdateSizes()
-{
-    textureResizeTimer.restart();
-    updateSizes();
-}
-
 void GraphicsQmlView::updateWindowGeometry()
 {
-    d->scheduleUpdateSizes();
+    d->updateSizes();
 }
 
 QQmlEngine* GraphicsQmlView::engine() const
@@ -403,16 +393,6 @@ bool GraphicsQmlView::Private::isTextureInitializationRequired(qreal devicePixel
 
     if (renderTexture && renderTextureSize == requiredSize)
         return false;
-
-    if (!textureResizeTimer.isValid())
-        textureResizeTimer.start();
-
-    // Avoid frequent texture resize because it's time consuming.
-    if (renderTexture
-        && !textureResizeTimer.hasExpired(duration_cast<milliseconds>(kTextureResizeTimeout).count()))
-    {
-        return false;
-    }
 
     return true;
 }
@@ -435,8 +415,6 @@ void GraphicsQmlView::Private::initializeTexture(qreal devicePixelRatio)
     const auto renderTarget =
         QQuickRenderTarget::fromOpenGLTexture(renderTexture, renderTextureSize);
     quickWindow->setRenderTarget(renderTarget);
-
-    textureResizeTimer.invalidate();
 }
 
 bool GraphicsQmlView::event(QEvent* event)
@@ -465,7 +443,7 @@ bool GraphicsQmlView::event(QEvent* event)
         }
         case QEvent::GraphicsSceneResize:
         case QEvent::GraphicsSceneMove:
-            d->scheduleUpdateSizes();
+            d->updateSizes();
             event->accept();
             break;
         default:
@@ -756,9 +734,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     const auto glWidget = qobject_cast<QOpenGLWidget*>(scene()->views().first()->viewport());
 
-    const QSizeF outputSize = d->textureResizeTimer.isValid()
-        ? size()
-        : QSizeF(Private::rounded(size()));
+    const QSizeF outputSize = QSizeF(Private::rounded(size()));
 
     const auto devicePixelRatio = painter->device()->devicePixelRatioF();
     d->paintQml(devicePixelRatio);
@@ -775,9 +751,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     functions->glActiveTexture(GL_TEXTURE0);
     functions->glBindTexture(GL_TEXTURE_2D, d->renderTexture);
 
-    const auto naturalTextureSize = outputSize * devicePixelRatio;
-    const bool enableSharpPainting = QSizeF(d->renderTextureSize) == naturalTextureSize;
-    const auto filter = enableSharpPainting ? GL_NEAREST : GL_LINEAR;
+    const auto filter = GL_NEAREST;
     functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
@@ -792,11 +766,8 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     auto shader = renderer->getTextureShader();
 
-    if (enableSharpPainting)
-    {
-        const auto modelView = sharpMatrix(renderer->pushModelViewMatrix());
-        renderer->setModelViewMatrix(modelView);
-    }
+    const auto modelView = sharpMatrix(renderer->pushModelViewMatrix());
+    renderer->setModelViewMatrix(modelView);
 
     d->ensureVao(shader);
     d->positionBuffer.bind();
@@ -809,8 +780,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     renderer->drawBindedTextureOnQuadVao(&d->vertices, shader);
     shader->release();
 
-    if (enableSharpPainting)
-        renderer->popModelViewMatrix();
+    renderer->popModelViewMatrix();
 
     QnGlNativePainting::end(painter);
 }
