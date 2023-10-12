@@ -110,7 +110,7 @@ void OpenLayoutActionWidget::displayWarning(LayoutWarning warning)
     {
         case LayoutWarning::LocalResource:
             setWarningStyle(ui->warningForLayouts);
-            ui->warningForLayouts->setText(tr("Local layouts can only be shown to their owners."));
+            ui->warningForLayouts->setText(tr("Local layouts can only be shown to their owners"));
             break;
         case LayoutWarning::NoWarning:
             break;
@@ -337,7 +337,7 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
             });
 
         if (!localLayouts.empty())
-            dialog.showAlert(tr("Local layouts can only be shown to their owners."));
+            dialog.showAlert(tr("Local layouts can only be shown to their owners"));
     }
     else if (users.size() == 1)
     {
