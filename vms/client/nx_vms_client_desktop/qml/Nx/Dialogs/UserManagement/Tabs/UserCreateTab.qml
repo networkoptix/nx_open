@@ -189,6 +189,7 @@ Item
                 {
                     id: loginTextField
                     width: parent.width
+                    fixupFunc: (text) => (text.trim())
                     validateFunc: control.self ? (text) => control.self.validateLogin(text) : null
                 }
             }
