@@ -105,8 +105,9 @@ public:
         initStyleOption(&opt, index);
 
         // Paint center-aligned group type icon or left-aligned custom permissions icon:
-        const bool isUserTypeColumn = index.column() == UserGroupListModel::GroupTypeColumn;
-        if (isUserTypeColumn || index.column() == UserGroupListModel::PermissionsColumn)
+        const bool isGroupIconColumn = index.column() == UserGroupListModel::GroupTypeColumn
+            || index.column() == UserGroupListModel::GroupWarningColumn;
+        if (isGroupIconColumn || index.column() == UserGroupListModel::PermissionsColumn)
         {
             if (opt.state.testFlag(QStyle::StateFlag::State_Selected))
                 painter->fillRect(opt.rect, opt.palette.highlight());
@@ -115,8 +116,8 @@ public:
             if (icon.isNull())
                 return;
 
-            const auto horizontalAlignment = isUserTypeColumn ? Qt::AlignHCenter : Qt::AlignLeft;
-            const qreal padding = isUserTypeColumn ? 0 : style::Metrics::kStandardPadding;
+            const auto horizontalAlignment = isGroupIconColumn ? Qt::AlignHCenter : Qt::AlignLeft;
+            const qreal padding = isGroupIconColumn ? 0 : style::Metrics::kStandardPadding;
 
             const auto rect = QStyle::alignedRect(Qt::LeftToRight,
                 horizontalAlignment | Qt::AlignVCenter,
