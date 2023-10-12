@@ -120,10 +120,11 @@ Item
                 loadingStatusChanged(loadRequest.status)
         }
 
-        onJavaScriptDialogRequested: showDialog("requestJavaScriptDialog", request)
-        onAuthenticationDialogRequested: showDialog("requestAuthenticationDialog", request)
-        onFileDialogRequested:  showDialog("requestFileDialog", request)
-        onColorDialogRequested: showDialog("requestColorDialog", request)
+        onJavaScriptDialogRequested: request => showDialog("requestJavaScriptDialog", request)
+        onAuthenticationDialogRequested:
+            request => showDialog("requestAuthenticationDialog", request)
+        onFileDialogRequested: request => showDialog("requestFileDialog", request)
+        onColorDialogRequested: request => showDialog("requestColorDialog", request)
         onSelectClientCertificate:
         {
             if (controller)
