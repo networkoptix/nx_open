@@ -75,7 +75,7 @@ QPixmap pixmapFromHICON(HICON icon, QPoint* hotSpot)
     BITMAPINFOHEADER bitmapInfo;
     bitmapInfo.biSize        = sizeof(BITMAPINFOHEADER);
     bitmapInfo.biWidth       = w;
-    bitmapInfo.biHeight      = h;
+    bitmapInfo.biHeight      = -h; //< Top to bottom.
     bitmapInfo.biPlanes      = 1;
     bitmapInfo.biBitCount    = 32;
     bitmapInfo.biCompression = BI_RGB;
@@ -84,12 +84,15 @@ QPixmap pixmapFromHICON(HICON icon, QPoint* hotSpot)
     bitmapInfo.biYPelsPerMeter = 0;
     bitmapInfo.biClrUsed       = 0;
     bitmapInfo.biClrImportant  = 0;
-    DWORD *bits;
+    DWORD* bits = nullptr;
 
     HBITMAP winBitmap = CreateDIBSection(hdc, (BITMAPINFO*)&bitmapInfo, DIB_RGB_COLORS, (VOID**)&bits, nullptr, 0);
     HGDIOBJ oldhdc = (HBITMAP)SelectObject(hdc, winBitmap);
     DrawIconEx(hdc, 0, 0, icon, w, h, 0, 0, DI_NORMAL);
-    QImage image = QImage::fromHBITMAP(winBitmap);
+
+    QImage image(w, h, QImage::Format_ARGB32_Premultiplied);
+    if (bits)
+        memcpy(image.bits(), bits, image.sizeInBytes());
 
     for (int y = 0 ; y < h && !foundAlpha ; y++) {
         QRgb *scanLine= reinterpret_cast<QRgb *>(image.scanLine(y));
