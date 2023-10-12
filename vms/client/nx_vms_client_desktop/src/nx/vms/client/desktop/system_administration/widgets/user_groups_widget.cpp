@@ -222,7 +222,7 @@ public:
             notFoundGroupsWarning)};
 
     CommonMessageBar* const nonUniqueGroupsWarning{
-        new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
+        new CommonMessageBar(q, {.level = BarDescription::BarLevel::Info, .isClosable = true})};
     CommonMessageBar* const cycledGroupsWarning{
         new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
 
