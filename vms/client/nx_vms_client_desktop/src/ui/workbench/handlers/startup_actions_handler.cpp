@@ -9,6 +9,7 @@
 #include <QtGui/QAction>
 #include <QtQml/QQmlEngine>
 
+#include <api/common_message_processor.h>
 #include <api/helpers/layout_id_helper.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
@@ -196,8 +197,8 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
     connect(action(ProcessStartupParametersAction), &QAction::triggered, this,
         &StartupActionsHandler::handleStartupParameters);
 
-    connect(context(), &QnWorkbenchContext::userChanged, this,
-        &StartupActionsHandler::handleUserLoggedIn);
+    connect(context()->messageProcessor(), &QnCommonMessageProcessor::initialResourcesReceived,
+        this, &StartupActionsHandler::handleConnected);
 
     // Delayed system connection may require information from qnSystemFinder,
     // so let it process signal first, by queuing following connection.
@@ -210,9 +211,9 @@ StartupActionsHandler::~StartupActionsHandler()
 {
 }
 
-void StartupActionsHandler::handleUserLoggedIn(const QnUserResourcePtr& user)
+void StartupActionsHandler::handleConnected()
 {
-    if (!user)
+    if (!context()->user())
         return;
 
     // We should not change state when using "Open in New Window". Otherwise workbench will be
@@ -225,10 +226,10 @@ void StartupActionsHandler::handleUserLoggedIn(const QnUserResourcePtr& user)
     // selection menu. As temporary workaround we can just remove that layouts.
     // TODO: #dklychkov Do not create new empty layout before this method end.
     // See: LayoutsHandler::at_openNewTabAction_triggered()
-    if (user && !qnRuntime->isAcsMode())
+    if (!qnRuntime->isAcsMode())
     {
         for (const QnLayoutResourcePtr& layout: resourcePool()->getResourcesByParentId(
-                 user->getId()).filtered<QnLayoutResource>())
+            context()->user()->getId()).filtered<QnLayoutResource>())
         {
             if (layout->hasFlags(Qn::local) && !layout->isFile())
                 resourcePool()->removeResource(layout);
@@ -267,7 +268,7 @@ void StartupActionsHandler::submitDelayedDrops()
     }
 
     const auto createResourceCallback =
-        [this](nx::vms::common::ResourceDescriptor descriptor) -> QnResourcePtr
+        [](nx::vms::common::ResourceDescriptor descriptor) -> QnResourcePtr
         {
             const QString cloudSystemId = crossSystemResourceSystemId(descriptor);
             auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId);
