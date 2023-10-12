@@ -90,7 +90,7 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
             });
 
         if (!localLayouts.empty())
-            dialog.showAlert(tr("Local layouts can only be shown to their owners."));
+            dialog.showAlert(tr("Local layouts can only be shown to their owners"));
     }
     else if (users.size() == 1)
     {
