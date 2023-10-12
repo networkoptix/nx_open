@@ -348,7 +348,7 @@ public:
 
     virtual void registerRequestHandlers(
         const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher) override;
+        nx::network::http::AbstractMessageDispatcher* messageDispatcher) override;
 };
 
 template<typename ...ApplicationData>
@@ -360,7 +360,7 @@ ExperimentalTunnelServer<ApplicationData...>::~ExperimentalTunnelServer()
 template<typename ...ApplicationData>
 void ExperimentalTunnelServer<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
-    server::rest::MessageDispatcher* messageDispatcher)
+    nx::network::http::AbstractMessageDispatcher* messageDispatcher)
 {
     // Tunnel initiation is done by opening tunnel down channel.
     messageDispatcher->registerRequestProcessorFunc(

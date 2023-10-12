@@ -37,11 +37,17 @@ public:
      * @return true if response has been received.
      */
     bool doGet(const nx::utils::Url& url);
+
     /**
      * @return true if response has been received.
      */
     bool doUpgrade(
         const nx::utils::Url& url,
+        const std::string& protocolToUpgradeTo);
+
+    bool doUpgrade(
+        const nx::utils::Url& url,
+        Method method,
         const std::string& protocolToUpgradeTo);
 
     /**

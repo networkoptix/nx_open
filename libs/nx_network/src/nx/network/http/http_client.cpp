@@ -56,10 +56,23 @@ bool HttpClient::doUpgrade(
     const nx::utils::Url& url,
     const std::string& protocolToUpgradeTo)
 {
-    using namespace std::placeholders;
-    return doRequest(std::bind(
-        static_cast<void(AsyncClient::*)(const nx::utils::Url&, const std::string&)>(
-            &nx::network::http::AsyncClient::doUpgrade), _1, url, protocolToUpgradeTo));
+    return doRequest(
+        [url, protocolToUpgradeTo](AsyncClient* client)
+        {
+            client->doUpgrade(url, protocolToUpgradeTo);
+        });
+}
+
+bool HttpClient::doUpgrade(
+    const nx::utils::Url& url,
+    Method method,
+    const std::string& protocolToUpgradeTo)
+{
+    return doRequest(
+        [url, method, protocolToUpgradeTo](AsyncClient* client)
+        {
+            client->doUpgrade(url, method, protocolToUpgradeTo);
+        });
 }
 
 bool HttpClient::doConnect(const nx::utils::Url& proxyUrl, const std::string& targetHost)

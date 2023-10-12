@@ -84,6 +84,8 @@ public:
 
     /**
      * By default, it is MessageBodyDeliveryType::buffer.
+     * Note: setting to MessageBodyDeliveryType::stream means transparent forwarding the
+     * message body from serve() to processRequest().
      */
     void setRequestBodyDeliveryType(MessageBodyDeliveryType value);
 
@@ -96,8 +98,8 @@ protected:
      * WARNING: This object can be removed in completionHandler
      */
     virtual void processRequest(
-        http::RequestContext requestContext,
-        http::RequestProcessedHandler completionHandler) = 0;
+        RequestContext requestContext,
+        RequestProcessedHandler completionHandler) = 0;
 
     // TODO: #akolesnikov Remove this method.
     http::Response* response();
