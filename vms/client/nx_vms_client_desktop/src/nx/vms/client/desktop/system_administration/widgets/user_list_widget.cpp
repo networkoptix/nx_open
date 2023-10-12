@@ -428,7 +428,7 @@ void UserListWidget::Private::setupUi()
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
     connect(ui->usersTable, &QAbstractItemView::clicked, this, &Private::handleUsersTableClicked);
 
-    ui->createUserButton->setIcon(qnSkin->icon("user_settings/plus.svg"));
+    ui->createUserButton->setIcon(qnSkin->icon("buttons/add_20x20.svg", kTextButtonColors));
     connect(ui->createUserButton, &QPushButton::clicked, this, &Private::createUser);
 
     nonUniqueUsersWarning->setText(tr(
