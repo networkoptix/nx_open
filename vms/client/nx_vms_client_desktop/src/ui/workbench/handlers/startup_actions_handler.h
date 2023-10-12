@@ -24,7 +24,7 @@ public:
     virtual ~StartupActionsHandler() override;
 
 private:
-    void handleUserLoggedIn(const QnUserResourcePtr& user);
+    void handleConnected();
     void submitDelayedDrops();
 
     void handleStartupParameters();

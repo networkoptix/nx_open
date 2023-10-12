@@ -147,7 +147,7 @@ void ClientStateHandler::clientStarted(StartupParameters parameters)
             break;
     }
 
-    applyState(d->sessionState, ClientStateDelegate::Substate::systemIndependentParameters);
+    loadClientState(d->sessionState, ClientStateDelegate::Substate::systemIndependentParameters);
 }
 
 void ClientStateHandler::storeSystemIndependentState()
@@ -160,7 +160,7 @@ void ClientStateHandler::storeSystemIndependentState()
     d->clientStateStorage.writeCommonSubstate(state);
 }
 
-void ClientStateHandler::clientConnected(
+void ClientStateHandler::connectionToSystemEstablished(
     bool fullRestoreIsEnabled,
     SessionId sessionId,
     core::LogonData logonData)
@@ -187,7 +187,7 @@ void ClientStateHandler::clientConnected(
             }
 
             // Full restore hasn't been executed. Use autosaved state instead.
-            applyState(
+            loadClientState(
                 d->clientStateStorage.readSystemSubstate(d->sessionId),
                 ClientStateDelegate::Substate::systemSpecificParameters);
 
@@ -195,14 +195,16 @@ void ClientStateHandler::clientConnected(
         }
         case StartupParameters::Mode::inheritState:
         {
-            applyState(d->sessionState, ClientStateDelegate::Substate::systemSpecificParameters);
+            loadClientState(
+                d->sessionState,
+                ClientStateDelegate::Substate::systemSpecificParameters);
             break;
         }
         case StartupParameters::Mode::loadSession:
         {
             if (NX_ASSERT(d->startupParameters.sessionId == d->sessionId))
             {
-                applyState(
+                loadClientState(
                     d->sessionState,
                     ClientStateDelegate::Substate::systemSpecificParameters);
             }
@@ -317,16 +319,16 @@ void ClientStateHandler::restoreWindowsConfiguration(core::LogonData logonData)
     for (const auto& filename: stateFilenames)
     {
         StartupParameters parameters{
-            StartupParameters::Mode::loadSession,
-            d->sessionId,
-            filename,
-            logonData};
+            .mode = StartupParameters::Mode::loadSession,
+            .sessionId = d->sessionId,
+            .key = filename,
+            .logonData = logonData};
 
         if (NX_ASSERT(d->processExecutionInterface))
             d->processExecutionInterface->runClient(parameters);
     }
 
-    applyState(ownState, ClientStateDelegate::Substate::allParameters, /*force*/ true);
+    loadClientState(ownState, ClientStateDelegate::Substate::allParameters, /*force*/ true);
 }
 
 void ClientStateHandler::deleteWindowsConfiguration()
@@ -362,7 +364,7 @@ void ClientStateHandler::clientRequestedToRestoreState(const QString& filename)
         return;
 
     auto state = d->clientStateStorage.readSessionState(d->sessionId, filename);
-    applyState(state, ClientStateDelegate::Substate::allParameters, /*force*/ true);
+    loadClientState(state, ClientStateDelegate::Substate::allParameters, /*force*/ true);
 }
 
 void ClientStateHandler::setStatisticsModules(
@@ -390,23 +392,23 @@ SessionState ClientStateHandler::serializeState(ClientStateDelegate::SubstateFla
     return result;
 }
 
-void ClientStateHandler::applyState(
+void ClientStateHandler::loadClientState(
     const SessionState& state,
     ClientStateDelegate::SubstateFlags flags,
-    bool force)
+    bool applyState)
 {
     if (!NX_ASSERT(qnRuntime->isDesktopMode()))
         return;
 
     if (d->statisticsModule)
-        d->statisticsModule->startCapturing(force);
+        d->statisticsModule->startCapturing(applyState);
 
     for (const auto& [delegateId, delegate]: d->delegates)
     {
         // Startup parameters are used to override window geometry.
         // They should be used only on client startup, not on windows restore.
         // Note: d->startupParams is cleaned up after the first disconnect, but that's ok.
-        const StartupParameters params = force ? StartupParameters() : d->startupParameters;
+        const StartupParameters params = applyState ? StartupParameters() : d->startupParameters;
 
         const auto it = state.find(delegateId);
         const DelegateState& delegateState = (it == state.end())
@@ -414,7 +416,7 @@ void ClientStateHandler::applyState(
             : it.value();
 
         delegate->loadState(delegateState, flags, params);
-        if (force)
+        if (applyState)
             delegate->forceLoad();
     }
 

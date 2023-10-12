@@ -667,7 +667,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
         welcomeScreen->connectionToSystemEstablished(systemId);
 
     // TODO: #sivanov Implement separate address and credentials handling.
-    appContext()->clientStateHandler()->clientConnected(
+    appContext()->clientStateHandler()->connectionToSystemEstablished(
         appContext()->localSettings()->restoreUserSessionData(),
         session->sessionId(),
         logonData);

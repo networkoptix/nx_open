@@ -1,9 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <array>
 #include <memory>
+
+#include <gtest/gtest.h>
 
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
@@ -477,7 +477,7 @@ TEST_F(ClientStateHandlerTest, DISABLED_noSystemSubstate)
     randomizeCurrentSession();
     const auto lastSession = currentSession();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     // Data were not changed.
     ASSERT_EQ(currentSession(), lastSession);
@@ -490,7 +490,7 @@ TEST_F(ClientStateHandlerTest, loadSystemSubstate)
     randomizeCurrentSession();
 
     clientStateHandler()->clientStarted(kEmptyStartupParameters);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
@@ -501,12 +501,12 @@ TEST_F(ClientStateHandlerTest, loadSystemSubstate)
 
 TEST_F(ClientStateHandlerTest, saveSystemSubstateOnDisconnect)
 {
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
     const auto lastSession = currentSession();
     clientStateHandler()->clientDisconnected();
     randomizeCurrentSession();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
         ASSERT_EQ(currentSession().data[i].specific, lastSession.data[i].specific);
@@ -516,12 +516,12 @@ TEST_F(ClientStateHandlerTest, saveSystemSubstateOnDisconnect)
 TEST_F(ClientStateHandlerTest, systemSubstateIsNotSavedOnDisconnectInVideoWallMode)
 {
     clientRuntimeSettings()->setVideoWallMode(true);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
     const auto lastSession = currentSession();
     clientStateHandler()->clientDisconnected();
     randomizeCurrentSession();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
         ASSERT_NE(currentSession().data[i].specific, lastSession.data[i].specific);
@@ -541,7 +541,7 @@ TEST_F(ClientStateHandlerTest, loadTemporaryState)
     };
 
     clientStateHandler()->clientStarted(startupParameters);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     ASSERT_EQ(currentSession(), temporaryState());
     ASSERT_FALSE(QFile::exists(temporaryState().path));
@@ -549,7 +549,7 @@ TEST_F(ClientStateHandlerTest, loadTemporaryState)
 
 TEST_F(ClientStateHandlerTest, createNewWindow)
 {
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     clientStateHandler()->createNewWindow();
     clientStateHandler()->createNewWindow(kLogonData);
@@ -565,7 +565,7 @@ TEST_F(ClientStateHandlerTest, fullRestoreOnConnect)
     givenSavedSession(1);
     randomizeCurrentSession();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     ASSERT_EQ(currentSession(), savedSession(0));
 
@@ -577,7 +577,7 @@ TEST_F(ClientStateHandlerTest, skipFullRestoreWhenStateIsNotSaved)
 {
     givenSystemSubstate();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
@@ -591,7 +591,7 @@ TEST_F(ClientStateHandlerTest, skipFullRestoreWhenItIsDisabled)
     givenSavedSession(0);
     givenSavedSession(1);
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
@@ -606,7 +606,7 @@ TEST_F(ClientStateHandlerTest, skipFullRestoreWhenSessionIsStartedAlready)
     givenSavedSession();
 
     givenAnotherRunningInstance(kSessionId);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
@@ -617,7 +617,7 @@ TEST_F(ClientStateHandlerTest, skipFullRestoreWhenSessionIsStartedAlready)
 TEST_F(ClientStateHandlerTest, saveWindowsConfiguration)
 {
     givenAnotherRunningInstance(kSessionId);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     clientStateHandler()->saveWindowsConfiguration();
 
@@ -631,7 +631,7 @@ TEST_F(ClientStateHandlerTest, restoreWindowsConfiguration1)
     const auto firstId = givenAnotherRunningInstance(kSessionId);
     const auto secondId = givenAnotherRunningInstance(kSessionId);
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     clientStateHandler()->restoreWindowsConfiguration(kLogonData);
 
@@ -646,7 +646,7 @@ TEST_F(ClientStateHandlerTest, restoreWindowsConfiguration2)
     givenSavedSession(0);
     givenSavedSession(1);
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     clientStateHandler()->restoreWindowsConfiguration(kLogonData);
 
@@ -658,7 +658,7 @@ TEST_F(ClientStateHandlerTest, restoreWindowsConfiguration2)
 TEST_F(ClientStateHandlerTest, deleteWindowsConfiguration)
 {
     givenSavedSession();
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     ASSERT_TRUE(clientStateHandler()->hasSavedConfiguration());
 
@@ -668,7 +668,7 @@ TEST_F(ClientStateHandlerTest, deleteWindowsConfiguration)
 
 TEST_F(ClientStateHandlerTest, requestedToSaveState)
 {
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     ASSERT_FALSE(clientStateHandler()->hasSavedConfiguration());
 
@@ -679,7 +679,7 @@ TEST_F(ClientStateHandlerTest, requestedToSaveState)
 TEST_F(ClientStateHandlerTest, requestToLoadState)
 {
     givenSavedSession();
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
+    clientStateHandler()->connectionToSystemEstablished(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     clientStateHandler()->clientRequestedToRestoreState(savedSession(0).filename);
     ASSERT_EQ(currentSession(), savedSession(0));
