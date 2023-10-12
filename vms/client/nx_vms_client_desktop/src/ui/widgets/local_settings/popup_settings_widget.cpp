@@ -13,6 +13,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/property_adaptors.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -41,9 +42,9 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     setHelpTopic(this, HelpTopic::Id::SystemSettings_Notifications);
 
     ui->deprecationMessageBar->init(
-        {.text = tr("These settings apply only to the System you are logged"
-        " in to and will be removed in future versions."),
-        .level = BarDescription::BarLevel::Info});
+        {.text = tr("These settings apply only to the system you are logged in."
+            " They will be removed in future versions."),
+        .isEnabledProperty = &messageBarSettings()->notificationsDeprecationInfo});
 
     for (EventType eventType: nx::vms::event::allEvents())
     {
