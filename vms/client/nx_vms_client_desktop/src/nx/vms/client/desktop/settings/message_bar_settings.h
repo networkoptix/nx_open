@@ -30,7 +30,7 @@ public:
     Property<bool> tooBigExeFileWarning{this, "tooBigExeFile", true};
     Property<bool> transcodingInLayoutIsNotSupportedWarning{
         this, "transcodingInLayoutIsNotSupportedWarning", true};
-    Property<bool> nonCameraResourcesWarning{this,"nonCameraResourcesWarning",true};
+    Property<bool> nonCameraResourcesWarning{this, "nonCameraResourcesWarning", true};
     Property<bool> webPageInformation{this, "webPageInformation", true};
     Property<bool> integrationWarning{this, "integrationWarning", true};
     Property<bool> storageConfigAnalyticsOnSystemStorageWarning{
@@ -40,6 +40,7 @@ public:
     Property<bool> storageConfigHasDisabledWarning{this, "storageConfigHasDisabledWarning", true};
     Property<bool> storageConfigUsbWarning{this, "storageConfigUsbWarning", true};
     Property<bool> storageConfigCloudStorageWarning{this, "storageConfigCloudStorageWarning", true};
+    Property<bool> notificationsDeprecationInfo{this, "notificationsDeprecationInfo", true};
 };
 
 MessageBarSettings* messageBarSettings();
