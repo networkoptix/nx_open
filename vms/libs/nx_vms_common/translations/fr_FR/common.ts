@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Contenu JSON invalide.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Type de contenu non pris en charge.</translation>
     </message>
   </context>
   <context>
@@ -75,11 +75,11 @@
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>La clé de ticket est invalide ou a expiré.</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Mot de passe incorrect</translation>
     </message>
   </context>
   <context>
