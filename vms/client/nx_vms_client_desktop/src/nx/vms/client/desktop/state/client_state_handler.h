@@ -140,7 +140,7 @@ public:
      *
      * @param logonData Logon data to run new client instances to connect to the same System.
      */
-    void clientConnected(
+    void connectionToSystemEstablished(
         bool fullRestoreIsEnabled,
         SessionId sessionId,
         core::LogonData logonData);
@@ -209,10 +209,10 @@ public:
 
 private:
     SessionState serializeState(ClientStateDelegate::SubstateFlags flags) const;
-    void applyState(
+    void loadClientState(
         const SessionState& state,
         ClientStateDelegate::SubstateFlags flags,
-        bool force = false);
+        bool applyState = false);
 
 private:
     struct Private;
