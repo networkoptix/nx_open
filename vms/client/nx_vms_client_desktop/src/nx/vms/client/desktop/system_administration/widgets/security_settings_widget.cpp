@@ -35,6 +35,7 @@ using namespace std::chrono_literals;
 namespace {
 
 constexpr auto kSessionLengthAlertLimit = std::chrono::hours(720);
+constexpr auto kNoLimitSessionDuration = 0s;
 
 } // namespace
 
@@ -227,15 +228,16 @@ void SecuritySettingsWidget::updateLimitSessionControls()
      ui->limitSessionAlertLabel->setVisible(!hasSessionLimit);
 
      const auto limit = calculateSessionLimit();
-     ui->limitSessionLengthAlertLabel->setVisible(limit && (*limit > kSessionLengthAlertLimit));
+     ui->limitSessionLengthAlertLabel->setVisible(
+         limit != kNoLimitSessionDuration && limit > kSessionLengthAlertLimit);
 
      emit hasChangesChanged();
  }
 
-std::optional<std::chrono::seconds> SecuritySettingsWidget::calculateSessionLimit() const
+std::chrono::seconds SecuritySettingsWidget::calculateSessionLimit() const
 {
     if (!ui->limitSessionLengthCheckBox->isChecked())
-        return std::nullopt;
+        return kNoLimitSessionDuration;
 
     return ui->limitSessionUnitsComboBox->currentData().value<seconds>()
         * ui->limitSessionValueSpinBox->value();
@@ -262,7 +264,8 @@ void SecuritySettingsWidget::loadDataToUi()
     ui->displayWatermarkCheckBox->setChecked(m_watermarkSettings.useWatermark);
 
     const auto sessionTimeoutLimit = systemSetting->sessionLimitS;
-    ui->limitSessionLengthCheckBox->setChecked(sessionTimeoutLimit.has_value());
+    ui->limitSessionLengthCheckBox->setChecked(
+        sessionTimeoutLimit.value_or(kNoLimitSessionDuration) != kNoLimitSessionDuration);
     if (sessionTimeoutLimit)
     {
         for (int index = ui->limitSessionUnitsComboBox->count() - 1; index >= 0; --index)
