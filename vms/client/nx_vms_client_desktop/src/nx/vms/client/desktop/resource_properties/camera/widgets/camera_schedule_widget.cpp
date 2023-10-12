@@ -277,11 +277,11 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
             switch (*state.recordingHint)
             {
                 case CameraSettingsDialogState::RecordingHint::brushChanged:
-                    return tr("Select areas on the schedule to apply chosen parameters to.");
+                    return tr("Select areas on the schedule to apply chosen parameters to");
 
                 case CameraSettingsDialogState::RecordingHint::emptySchedule:
                     return tr("Set recording parameters and select areas "
-                        "on the schedule grid to apply them to.");
+                        "on the schedule grid to apply them to");
             }
 
             return QString();
@@ -297,8 +297,8 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
         state.recordingAlerts.testFlag(
             CameraSettingsDialogState::RecordingAlert::highArchiveLength)
             ? QnCameraDeviceStringSet(
-                tr("High minimum value can lead to archive length decrease on other devices."),
-                tr("High minimum value can lead to archive length decrease on other cameras."))
+                tr("High minimum value can lead to archive length decrease on other devices"),
+                tr("High minimum value can lead to archive length decrease on other cameras"))
                   .getString(state.deviceType)
             : QString());
 }

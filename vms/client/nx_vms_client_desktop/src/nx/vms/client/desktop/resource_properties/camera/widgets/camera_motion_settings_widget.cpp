@@ -303,11 +303,11 @@ void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& sta
             switch (*state.motionHint)
             {
                 case MotionHint::sensitivityChanged:
-                    return tr("Select areas on the preview to set chosen sensitivity for.");
+                    return tr("Select areas on the preview to set chosen sensitivity for");
 
                 case MotionHint::completelyMaskedOut:
                     return tr("Choose a motion detection sensitivity and select some areas "
-                        "on the preview to set it for.");
+                        "on the preview to set it for");
             }
 
             return {};
