@@ -1111,11 +1111,11 @@ PTZを行います</translation>
     <name>SettingsDialog</name>
     <message>
       <source>Enter parameters</source>
-      <translation>パラメータを入力してください</translation>
+      <translation>パラメーターを入力してください</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation>このアクションにはパラメータ入力が必要です。</translation>
+      <translation>このアクションでは、一部パラメーターの入力が必要です。</translation>
     </message>
   </context>
   <context>
