@@ -1,19 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.11
-import QtQuick.Window 2.15
+import QtQuick
+import QtQuick.Window
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Analytics 1.0
-import Nx.Controls 1.0
-import Nx.Models 1.0
-import Nx.RightPanel 1.0
+import Nx
+import Nx.Core
+import Nx.Analytics
+import Nx.Controls
+import Nx.Models
+import Nx.RightPanel
 
-import nx.client.desktop 1.0
-import nx.vms.client.core 1.0
-import nx.vms.client.desktop 1.0
-import nx.vms.client.desktop.analytics 1.0 as Analytics
+import nx.client.desktop
+import nx.vms.client.core
+import nx.vms.client.desktop
+import nx.vms.client.desktop.analytics as Analytics
 
 import ".."
 
@@ -48,6 +48,16 @@ Window
         // Always load new tiles when the dialog is reopened.
         if (dialog.visible)
             counterBlock.commitAvailableNewTracks()
+    }
+
+    onTransientParentChanged:
+    {
+        if (visible)
+        {
+            // Reopen the dialog to apply the new transient parent.
+            hide()
+            show()
+        }
     }
 
     signal accepted()
@@ -687,6 +697,7 @@ Window
 
         function showSelectionOnLayout()
         {
+            dialog.transientParent = null //< Allows to raise the main window.
             if (selection.index.valid)
                 eventModel.showOnLayout(selection.index.row)
         }
