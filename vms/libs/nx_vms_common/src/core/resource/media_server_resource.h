@@ -165,6 +165,8 @@ public:
     void setWebCamerasDiscoveryEnabled(bool value);
     bool isGuidConflictDetected() const;
     void setGuidConflictDetected(bool value);
+    void setOwnArchiveDirectoryOnly(bool value);
+    bool ownArchiveDirectoryOnly() const;
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
