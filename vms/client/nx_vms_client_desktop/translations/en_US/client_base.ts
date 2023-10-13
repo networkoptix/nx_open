@@ -1566,10 +1566,6 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>%1 users will start receiving emails immediately after you apply these settings</source>
         <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
         <translation></translation>
