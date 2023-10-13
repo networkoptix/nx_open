@@ -326,6 +326,12 @@ int runApplication(int argc, char** argv)
 {
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
+    if (build_info::isLinux())
+    {
+        if (qgetenv("QT_QPA_PLATFORM").isEmpty())
+            qputenv("QT_QPA_PLATFORM", "xcb");
+    }
+
 #ifdef Q_WS_X11
     XInitThreads();
 #endif
