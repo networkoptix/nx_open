@@ -287,7 +287,7 @@ static nx::reflect::DeserializationResult deserializeFlattenningAttrs(
 {
     nx::reflect::DeserializationResult result;
 
-    std::set<std::decay_t<decltype(ctx.value)>::ConstMemberIterator> readMembers;
+    std::set<typename std::decay_t<decltype(ctx.value)>::ConstMemberIterator> readMembers;
 
     // Deserializing all fields but "attributes" as usual.
     nx::reflect::forEachField<T>(
