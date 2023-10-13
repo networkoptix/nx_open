@@ -154,14 +154,21 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
 {
     QString urlString = normalizePath(path);
 
-    if (urlString.indexOf(lit("://")) == -1)
-        urlString = lit("smb://%1").arg(urlString);
-    QUrl url(urlString);
+    QUrl url{urlString};
+    if (url.scheme().isEmpty())
+        url.setScheme("smb");
+
     if (!login.isEmpty())
         url.setUserName(login);
+
     if (!password.isEmpty())
         url.setPassword(password);
-    return QString::fromUtf8(QUrl::toPercentEncoding(url.toString()));
+
+    // Do not use the QUrl::toPercentEncoding method here, as if user info, e.g., 'user:passwd%',
+    // contains a '%' character, it is encoded twice. The first time on url parsing, it becomes
+    // equal to 'user:passwd%25'. The second on QUrl::toPercentEncoding, it becomes equal to
+    // 'user%3Apasswd%2525'.
+    return url.toEncoded();
 }
 
 void QnStorageUrlDialog::atStorageStatusReply(const StorageStatusReply& reply)
@@ -171,17 +178,18 @@ void QnStorageUrlDialog::atStorageStatusReply(const StorageStatusReply& reply)
 
 void QnStorageUrlDialog::accept()
 {
-    QString protocol = qvariant_cast<QString>(ui->protocolComboBox->currentData());
-    QString urlText = ui->urlEdit->text();
+    const auto protocol = ui->protocolComboBox->currentData().toString();
+    auto urlText = ui->urlEdit->text().trimmed();
 
-    if (protocol == lit("smb"))
+    if (protocol == "smb")
     {
-        if (!urlText.startsWith(lit("\\\\")))
-            urlText = lit("\\\\") + urlText;
+        constexpr auto kSmbPathPrefix = R"(\\)";
+        if (!urlText.startsWith(kSmbPathPrefix))
+            urlText = kSmbPathPrefix + urlText;
     }
-    else if (!urlText.toUpper().startsWith(protocol.toUpper() + lit("://")))
+    else if (!urlText.toUpper().startsWith(protocol.toUpper() + "://"))
     {
-        urlText = protocol.toLower() + lit("://") + urlText;
+        urlText = protocol.toLower() + "://" + urlText;
     }
 
     enum {
