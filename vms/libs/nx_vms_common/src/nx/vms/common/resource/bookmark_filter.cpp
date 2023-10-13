@@ -8,7 +8,7 @@ namespace nx::vms::common {
 
 BookmarkTextFilter::BookmarkTextFilter(const QString& text)
 {
-    for (const QString& word: text.split(QRegularExpression("[\\W]"), Qt::SkipEmptyParts))
+    for (const QString& word: text.split(QRegularExpression("[\\s]"), Qt::SkipEmptyParts))
     {
         m_words.emplace_back(word, QRegularExpression(QString("\\b%1").arg(word),
             QRegularExpression::CaseInsensitiveOption));
@@ -27,13 +27,18 @@ bool BookmarkTextFilter::match(const QnCameraBookmark& bookmark) const
         bool tagFound = false;
 
         for (const QString &tag: bookmark.tags)
+        {
             if (tag.startsWith(word, Qt::CaseInsensitive))
             {
                 tagFound = true;
                 break;
             }
+        }
 
         if (tagFound)
+            continue;
+
+        if (!bookmark.name.isEmpty() && bookmark.name.startsWith(word, Qt::CaseInsensitive))
             continue;
 
         if (wordRegExp.match(bookmark.name).hasMatch() ||
