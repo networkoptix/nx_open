@@ -29,8 +29,8 @@ public:
     void setConfiguredResolution(int width, int height);
 
 private:
-    int makeHeaders(
-        quint8* p, int type, int w, int h, const quint8* lqt, const quint8* cqt, unsigned short dri);
+    void makeHeaders(
+        int type, int width, int height, const quint8* lqt, const quint8* cqt, unsigned short dri);
 
     void updateHeaderTables(const quint8* lumaTable, const quint8* chromaTable);
     void fixResolution(int* width, int* height);
@@ -54,14 +54,13 @@ private:
     int m_hdrDri;
     int m_hdrWidth;
     int m_hdrHeight;
-    quint8 m_hdrBuffer[1024];
-    int m_headerLen;
-    quint8* m_lumaTablePos;
-    quint8* m_chromaTablePos;
+    std::vector<uint8_t> m_hdrBuffer;
+    int m_lumaTablePos;
+    int m_chromaTablePos;
 
     //nx::utils::ByteArray m_frameData;
     int m_frameSize;
-    std::vector<quint8> m_extendedJpegHeader;
+    std::vector<uint8_t> m_onvifJpegHeader;
     bool m_sofFound = false;
     CodecParametersConstPtr m_codecParameters;
     struct Chunk
