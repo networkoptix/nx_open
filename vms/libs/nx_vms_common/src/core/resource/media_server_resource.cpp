@@ -43,6 +43,7 @@ namespace {
 
 const QString protoVersionPropertyName = lit("protoVersion");
 const bool kWebCamerasDiscoveryEnabledDefaultValue = false;
+const bool kOwnArchiveDirectoryOnlyDefaultValue = true;
 
 } // namespace
 
@@ -816,4 +817,18 @@ void QnMediaServerResource::setWebCamerasDiscoveryEnabled(bool value)
     setProperty(ResourcePropertyKey::Server::kWebCamerasDiscoveryEnabled,
         value == kWebCamerasDiscoveryEnabledDefaultValue ? QString() : QnLexical::serialized(value)
     );
+}
+
+void QnMediaServerResource::setOwnArchiveDirectoryOnly(bool value)
+{
+    setProperty(ResourcePropertyKey::Server::kOwnArchiveDirectoryOnly,
+        value == kOwnArchiveDirectoryOnlyDefaultValue ? QString() : QnLexical::serialized(value)
+    );
+}
+
+bool QnMediaServerResource::ownArchiveDirectoryOnly() const
+{
+    return QnLexical::deserialized(
+        getProperty(ResourcePropertyKey::Server::kOwnArchiveDirectoryOnly),
+        kOwnArchiveDirectoryOnlyDefaultValue);
 }

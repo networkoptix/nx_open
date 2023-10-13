@@ -118,6 +118,7 @@ const QString kCertificate("certificate");
 const QString kUserProvidedCertificate("userProvidedCertificate");
 const QString kWebCamerasDiscoveryEnabled("webCamerasDiscoveryEnabled");
 const QString kMetadataStorageIdKey("metadataStorageId");
+const QString kOwnArchiveDirectoryOnly("ownArchiveDirectoryOnly");
 
 } // namespace ResourcePropertyKey::Server
 
