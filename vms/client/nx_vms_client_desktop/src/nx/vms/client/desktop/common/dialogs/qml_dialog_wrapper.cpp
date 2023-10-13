@@ -196,12 +196,13 @@ void QmlDialogWrapper::setInitialProperties(const QVariantMap& initialProperties
 
 QWindow* QmlDialogWrapper::transientParent() const
 {
-    return d->transientParent;
+    return d->window ? d->window->transientParent() : d->transientParent;
 }
 
 void QmlDialogWrapper::setTransientParent(QWindow* window)
 {
-    if (d->transientParent == window)
+    // Update both the initial value and the actual property of the window.
+    if (d->transientParent == window && (!d->window || d->window->transientParent() == window))
         return;
 
     d->transientParent = window;
@@ -213,8 +214,7 @@ void QmlDialogWrapper::setTransientParent(QWindow* window)
 
 void QmlDialogWrapper::setTransientParent(QWidget* widget)
 {
-    if (widget)
-        setTransientParent(widget->window()->windowHandle());
+    setTransientParent(widget ? widget->window()->windowHandle() : nullptr);
 }
 
 QQuickWindow* QmlDialogWrapper::window() const
