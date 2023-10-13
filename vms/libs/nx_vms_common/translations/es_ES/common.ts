@@ -1643,8 +1643,8 @@
       <translation type="unfinished">Enable deprecated API functions currently used by %1 software (unsecure)</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>Tiempo de espera de RTP (milisegundos)</translation>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>Lista de servidores separados por punto y coma designados para conectarse a la nube. Los servidores que encabezan la lista tienen mayor prioridad. Si la lista está vacía, se selecciona automáticamente un Servidor para la conexión a la Nube.</translation>
     </message>
   </context>
   <context>

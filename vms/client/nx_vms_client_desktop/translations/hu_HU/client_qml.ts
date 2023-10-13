@@ -493,6 +493,10 @@
       <source>Ellipticity</source>
       <translation>Ellipszicitás</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Autokalibrálása sikertelen</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>

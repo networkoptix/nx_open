@@ -489,6 +489,10 @@
       <source>Ellipticity</source>
       <translation>Ellipticity</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Hiệu chuẩn tự động thất bại</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>

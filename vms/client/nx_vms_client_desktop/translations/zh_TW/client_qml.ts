@@ -489,6 +489,10 @@
       <source>Ellipticity</source>
       <translation>橢圓</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>自動校準失敗</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>

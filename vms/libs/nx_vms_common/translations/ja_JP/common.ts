@@ -1597,8 +1597,8 @@
       <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTPタイムアウト (ミリ秒)</translation>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>クラウドに接続するように指定されたサーバーのセミコロン区切りのリスト。リストの先頭にあるサーバーの優先度が高くなります。リストが空の場合、クラウド接続用のサーバーが自動的に選択されます。</translation>
     </message>
   </context>
   <context>

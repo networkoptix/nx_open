@@ -1031,6 +1031,10 @@
       <source>Save Cloud Layout As...</source>
       <translation>Bulut Düzenini Farklı Kaydet...</translation>
     </message>
+    <message>
+      <source>User Manual...</source>
+      <translation>Kullanım kılavuzu...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1152,6 +1156,21 @@
         <numerusform>%n düzen</numerusform>
         <numerusform>%n düzenleri</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Resimler</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>
@@ -1545,10 +1564,6 @@ License Key: %2</source>
     <message>
       <source>Unknown error</source>
       <translation>Bilinmeyen hata</translation>
-    </message>
-    <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation>Sunucuların hiçbirinde internet bağlantısı olmadığından e-posta ayarları test edilemiyor</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -3137,21 +3152,6 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Kapsamlı Olay Oluşturmak İçin, Lütfen %1'e Bakın.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Resimler</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>
@@ -8262,6 +8262,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>Kayıt Takvimi, seçilen kameralar tarafından desteklenmeyen kayıt modları içermektedir. Desteklenmeyen kayıt modları &quot;Her Zaman Kayıt&quot; olarak değiştirilecektir.</translation>
+    </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation>Bazı kameralarda kayıt etkinleştirilmeyecektir.</translation>
     </message>
   </context>
   <context>

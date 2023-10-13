@@ -493,6 +493,10 @@
       <source>Ellipticity</source>
       <translation>Elliptisk</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Automatisk kalibrering mislyktes</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>

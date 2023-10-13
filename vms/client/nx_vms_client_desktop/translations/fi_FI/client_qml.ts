@@ -493,6 +493,10 @@
       <source>Ellipticity</source>
       <translation>Soikeus</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Automaattinen kalibrointi epäonnistui</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>
