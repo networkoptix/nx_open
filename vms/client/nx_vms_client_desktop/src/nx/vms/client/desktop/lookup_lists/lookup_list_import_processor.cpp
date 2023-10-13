@@ -77,6 +77,8 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
         tempModel->addEntry(entry);
     }
 
+    if (tempModel->rowCount() == 0)
+        return EmptyFileError;
     /*
     // TODO: @pprivalov Handle replacements
     if (m_tempModel->validate())

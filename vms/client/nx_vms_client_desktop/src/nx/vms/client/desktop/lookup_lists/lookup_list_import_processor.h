@@ -35,6 +35,7 @@ public:
         Success,
         Canceled,
         InternalError,
+        EmptyFileError,
         ErrorFileNotFound
     };
 

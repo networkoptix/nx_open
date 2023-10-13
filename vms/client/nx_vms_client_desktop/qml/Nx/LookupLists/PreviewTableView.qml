@@ -16,6 +16,7 @@ CoreItems.TableView
 
     flickableDirection: CoreItems.Flickable.VerticalFlick
     boundsBehavior: CoreItems.Flickable.StopAtBounds
+    topMargin: columnsHeader.height
 
     // TODO: make width of header and elements dynamic
     columnWidthProvider: function (column)
@@ -35,7 +36,6 @@ CoreItems.TableView
     delegate: BasicTableCellDelegate
     {
         leftPadding: 8
-        topPadding: 6
         bottomPadding: 6
         rightPadding: 8
         color: ColorTheme.colors.light10
@@ -52,7 +52,7 @@ CoreItems.TableView
         y: control.contentY
         z: 2 //< Is needed for hiding scrolled rows.
         width: parent.width
-        height: buttonHeight + 8
+        height: comboBoxHeight + 8
         color: ColorTheme.colors.dark7
 
         CoreItems.Row

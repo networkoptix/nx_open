@@ -26,6 +26,7 @@ Dialog
     property bool saving: false
     property bool closing: false
     property bool hasChanges: false
+    property bool editing: false
 
     title: qsTr("Lookup Lists")
 
@@ -228,6 +229,7 @@ Dialog
 
                         text: qsTr("Delete")
                         visible: false
+                        enabled: !editing
                         icon.source: "image://svg/skin/text_buttons/delete_20_deprecated.svg"
                         onClicked:
                         {
@@ -239,6 +241,7 @@ Dialog
                     {
                         text: qsTr("Import")
                         icon.source: "image://svg/skin/text_buttons/import.svg"
+                        enabled: !editing
                         onClicked: importDialog.visible = true
                     }
                     TextButton
@@ -247,6 +250,7 @@ Dialog
 
                         text: qsTr("Export")
                         icon.source: "image://svg/skin/text_buttons/export.svg"
+                        enabled: !editing
                         onClicked:
                         {
                             exportProcessor.exportListEntries(
@@ -279,16 +283,8 @@ Dialog
                     }
                 }
 
-                onEditingStarted:
-                {
-                    deleteItemButton.enabled = false
-                    exportListButton.enabled = false
-                }
-                onEditingFinished:
-                {
-                    deleteItemButton.enabled = true
-                    exportListButton.enabled = true
-                }
+                onEditingStarted: editing = true
+                onEditingFinished: editing = false
                 onValueChanged: hasChanges = true
 
                 anchors
@@ -350,6 +346,7 @@ Dialog
 
         model: entriesModel
         visible: false
+        onEntriesImported: hasChanges = true
     }
 
     contentItem: Loader
