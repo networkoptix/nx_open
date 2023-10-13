@@ -48,23 +48,11 @@ void QnDesktopClientMessageProcessor::updateResource(
         return;
     }
 
-    // Special processing of existing layouts updates.
-
-    const bool localCopyOfRemoteLayoutWasModified = layout->hasFlags(Qn::remote)
-        && NX_ASSERT(!layout->hasFlags(Qn::local), layout)
-        && systemContext->layoutSnapshotManager()->isChanged(layout);
-
     // Update snapshot early to ensure all indirect access rights are resolved by the time
     // the actual resource is updated.
     systemContext->layoutSnapshotManager()->update(layout, remoteLayout);
-
-    if (!localCopyOfRemoteLayoutWasModified)
-    {
-        base_type::updateResource(resource, source);
-
-        // Snapshot is already updated at this point, but we need to clear `isChanged` flag.
-        systemContext->layoutSnapshotManager()->store(layout);
-    }
+    base_type::updateResource(resource, source);
+    systemContext->layoutSnapshotManager()->store(layout);
 }
 
 void QnDesktopClientMessageProcessor::handleTourAddedOrUpdated(
