@@ -29,6 +29,8 @@ Dialog
     bottomPadding: 16
     rightPadding: 15
 
+    signal entriesImported
+
     function resetTextFieldFocus()
     {
         separatorField.focus = false
@@ -287,6 +289,7 @@ Dialog
             {
                 case LookupListImportProcessor.Success:
                     importProgressBar.progressFinished()
+                    entriesImported()
                     break;
                 case LookupListImportProcessor.ErrorFileNotFound:
                     importProgressBar.visible = false
@@ -296,7 +299,7 @@ Dialog
                         MessageBox.Ok);
                     break;
                 default:
-                    exportProgressBar.visible = false
+                    importProgressBar.visible = false
             }
 
         }
