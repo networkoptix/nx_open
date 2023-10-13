@@ -61,8 +61,8 @@ QSize getFrameSize(const QnCompressedVideoData* frame)
         }
         case AV_CODEC_ID_MJPEG:
         {
-            nx_jpg::ImageInfo imgInfo;
-            nx_jpg::readJpegImageInfo((const quint8*) frame->data(), frame->dataSize(), &imgInfo);
+            nx::media::jpeg::ImageInfo imgInfo;
+            nx::media::jpeg::readJpegImageInfo((const quint8*) frame->data(), frame->dataSize(), &imgInfo);
             return QSize(imgInfo.width, imgInfo.height);
         }
         case AV_CODEC_ID_H263:

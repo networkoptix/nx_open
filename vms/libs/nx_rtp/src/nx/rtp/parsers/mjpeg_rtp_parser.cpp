@@ -2,6 +2,7 @@
 
 #include "mjpeg_rtp_parser.h"
 
+#include <nx/codec/jpeg/jpeg_utils.h>
 #include <nx/media/config.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/video_data_packet.h>
@@ -174,42 +175,88 @@ quint8 chm_ac_symbols[] = {
         0xf9, 0xfa,
 };
 
-quint8* MakeQuantHeader(quint8* p, const quint8* qt, int tableNo)
+void appendDQT(std::vector<uint8_t>& buffer, const uint8_t* qt, int tableNo)
 {
-    *p++ = 0xff;
-    *p++ = 0xdb; //< DQT
-    *p++ = 0; //< length msb
-    *p++ = 67; //< length lsb
-    *p++ = tableNo;
-    memcpy(p, qt, 64);
-    return p + 64;
+    buffer.push_back(0xff);
+    buffer.push_back(0xdb); //< DQT
+    buffer.push_back(0); //< length msb
+    buffer.push_back(67); //< length lsb
+    buffer.push_back(tableNo);
+    buffer.insert(buffer.end(), qt, qt + 64);
 }
 
-quint8* MakeHuffmanHeader(quint8* p, quint8* codelens, int ncodes,
-    quint8* symbols, int nsymbols, int tableNo, int tableClass)
+void appendDHT(std::vector<uint8_t>& buffer, uint8_t* codelens, int ncodes,
+    uint8_t* symbols, int nsymbols, int tableNo, int tableClass)
 {
-    *p++ = 0xff;
-    *p++ = 0xc4; //< DHT
-    *p++ = 0; //< length msb
-    *p++ = 3 + ncodes + nsymbols; //< length lsb
-    *p++ = (tableClass << 4) | tableNo;
-    memcpy(p, codelens, ncodes);
-    p += ncodes;
-    memcpy(p, symbols, nsymbols);
-    p += nsymbols;
-    return p;
+    buffer.push_back(0xff);
+    buffer.push_back(0xc4); //< DHT
+    buffer.push_back(0); //< length msb
+    buffer.push_back(3 + ncodes + nsymbols); //< length lsb
+    buffer.push_back((tableClass << 4) | tableNo);
+    buffer.insert(buffer.end(), codelens, codelens + ncodes);
+    buffer.insert(buffer.end(), symbols, symbols + nsymbols);
 }
 
-quint8* MakeDRIHeader(quint8* p, u_short dri)
+void appendDRI(std::vector<uint8_t>& buffer, u_short dri)
 {
-    *p++ = 0xff;
-    *p++ = 0xdd; //< DRI
-    *p++ = 0x0; //< length msb
-    *p++ = 4; //< length lsb
-    *p++ = dri >> 8; //< dri msb
-    *p++ = dri & 0xff; //< dri lsb
-    return p;
+    buffer.push_back(0xff);
+    buffer.push_back(0xdd); //< DRI
+    buffer.push_back(0x0); //< length msb
+    buffer.push_back(4); //< length lsb
+    buffer.push_back(dri >> 8); //< dri msb
+    buffer.push_back(dri & 0xff); //< dri lsb
 }
+
+void appendSOI(std::vector<uint8_t>& buffer)
+{
+    buffer.push_back(0xff);
+    buffer.push_back(0xd8);
+}
+
+void appendSOF(std::vector<uint8_t>& buffer, int type, int width, int height)
+{
+    buffer.push_back(0xff);
+    buffer.push_back(0xc0); //< SOF
+    buffer.push_back(0); //< length msb
+    buffer.push_back(17); //< length lsb
+    buffer.push_back(8); //< 8-bit precision
+    buffer.push_back(height >> 8); //< height msb
+    buffer.push_back(height); //< height lsb
+    buffer.push_back(width >> 8); //< width msb
+    buffer.push_back(width); //< width lsb
+    buffer.push_back(3); //< number of components
+    buffer.push_back(1); //< comp 1
+    if (type == 0)
+        buffer.push_back(0x21); //< hsamp = 2, vsamp = 1
+    else
+        buffer.push_back(0x22); //< hsamp = 2, vsamp = 2
+    buffer.push_back(0); //< quant table 0
+    buffer.push_back(2); //< comp 2
+    buffer.push_back(0x11); //< hsamp = 1, vsamp = 1
+    buffer.push_back(1); //< quant table 1
+    buffer.push_back(3); //< comp 3
+    buffer.push_back(0x11); //< hsamp = 1, vsamp = 1
+    buffer.push_back(1); //< quant table 1
+}
+
+void appendSOS(std::vector<uint8_t>& buffer)
+{
+    buffer.push_back(0xff);
+    buffer.push_back(0xda); //< SOS
+    buffer.push_back(0); //< length msb
+    buffer.push_back(12); //< length lsb
+    buffer.push_back(3); //< 3 components
+    buffer.push_back(1); //< comp 1
+    buffer.push_back(0); //< huffman table 0
+    buffer.push_back(2); //< comp 2
+    buffer.push_back(0x11); //< huffman table 1
+    buffer.push_back(3); //< comp 3
+    buffer.push_back(0x11); //< huffman table 1
+    buffer.push_back(0); //< first DCT coeff
+    buffer.push_back(63); //< last DCT coeff
+    buffer.push_back(0); //< successive approx.
+}
+
 
 /**
  * Generate a frame and scan headers that can be prepended to the RTP/JPEG data payload to produce
@@ -223,94 +270,51 @@ quint8* MakeDRIHeader(quint8* p, u_short dri)
  * @param p Pointer to the return array.
  * @return Length of the generated headers.
  */
-int MjpegParser::makeHeaders(
-    quint8* p, int type, int w, int h, const quint8* lqt, const quint8* cqt, unsigned short dri)
+void MjpegParser::makeHeaders(
+    int type, int width, int height, const quint8* lqt, const quint8* cqt, unsigned short dri)
 {
-    quint8* start = p;
+    m_hdrBuffer.clear();
+    m_hdrBuffer.reserve(1024);
 
     // Convert from blocks to pixels.
-    w <<= 3;
-    h <<= 3;
-    *p++ = 0xff;
-    *p++ = 0xd8; //< SOI
+    width <<= 3;
+    height <<= 3;
 
-    m_lumaTablePos = p + 5;
-    p = MakeQuantHeader(p, lqt, 0);
-    m_chromaTablePos = p + 5;
-    p = MakeQuantHeader(p, cqt, 1);
+    appendSOI(m_hdrBuffer);
+    m_lumaTablePos = m_hdrBuffer.size() + 5;
+    appendDQT(m_hdrBuffer, lqt, 0);
+    m_chromaTablePos = m_hdrBuffer.size() + 5;
+    appendDQT(m_hdrBuffer, cqt, 1);
 
     if (dri != 0)
-        p = MakeDRIHeader(p, dri);
+        appendDRI(m_hdrBuffer, dri);
 
-    const int bytesLeft = sizeof(m_hdrBuffer) - (p - start);
-    if (m_extendedJpegHeader.size() > 0 && (int)m_extendedJpegHeader.size() < bytesLeft)
+    if (!m_onvifJpegHeader.empty())
     {
-        memcpy(p, m_extendedJpegHeader.data(), m_extendedJpegHeader.size());
-        p += m_extendedJpegHeader.size();
+        m_hdrBuffer.insert(m_hdrBuffer.end(), m_onvifJpegHeader.begin(), m_onvifJpegHeader.end());
         if (m_sofFound) // SOF already in onvif jpeg extension.
-            return p - start;
+            return;
     }
+    appendSOF(m_hdrBuffer, type, width, height);
 
-    *p++ = 0xff;
-    *p++ = 0xc0; //< SOF
-    *p++ = 0; //< length msb
-    *p++ = 17; //< length lsb
-    *p++ = 8; //< 8-bit precision
-    *p++ = h >> 8; //< height msb
-    *p++ = h; //< height lsb
-    *p++ = w >> 8; //< width msb
-    *p++ = w; //< width lsb
-    *p++ = 3; //< number of components
-    *p++ = 1; //< comp 1
-    if (type == 0)
-        *p++ = 0x21; //< hsamp = 2, vsamp = 1
-    else
-        *p++ = 0x22; //< hsamp = 2, vsamp = 2
-    *p++ = 0; //< quant table 0
-    *p++ = 2; //< comp 2
-    *p++ = 0x11; //< hsamp = 1, vsamp = 1
-    *p++ = 1; //< quant table 1
-    *p++ = 3; //< comp 3
-    *p++ = 0x11; //< hsamp = 1, vsamp = 1
-    *p++ = 1; //< quant table 1
-    p = MakeHuffmanHeader(p, lum_dc_codelens,
+    appendDHT(m_hdrBuffer, lum_dc_codelens,
         sizeof(lum_dc_codelens),
         lum_dc_symbols,
         sizeof(lum_dc_symbols), 0, 0);
-    p = MakeHuffmanHeader(p, lum_ac_codelens,
+    appendDHT(m_hdrBuffer, lum_ac_codelens,
         sizeof(lum_ac_codelens),
         lum_ac_symbols,
         sizeof(lum_ac_symbols), 0, 1);
-    p = MakeHuffmanHeader(p, chm_dc_codelens,
+    appendDHT(m_hdrBuffer, chm_dc_codelens,
         sizeof(chm_dc_codelens),
         chm_dc_symbols,
         sizeof(chm_dc_symbols), 1, 0);
-    p = MakeHuffmanHeader(p, chm_ac_codelens,
+    appendDHT(m_hdrBuffer, chm_ac_codelens,
         sizeof(chm_ac_codelens),
         chm_ac_symbols,
         sizeof(chm_ac_symbols), 1, 1);
-    *p++ = 0xff;
-    *p++ = 0xda; //< SOS
-    *p++ = 0; //< length msb
-    *p++ = 12; //< length lsb
-    *p++ = 3; //< 3 components
-    *p++ = 1; //< comp 1
-    *p++ = 0; //< huffman table 0
-    *p++ = 2; //< comp 2
-    *p++ = 0x11; //< huffman table 1
-    *p++ = 3; //< comp 3
-    *p++ = 0x11; //< huffman table 1
-    *p++ = 0; //< first DCT coeff
-    *p++ = 63; //< last DCT coeff
-    *p++ = 0; //< successive approx.
 
-    return p - start;
-}
-
-void MjpegParser::updateHeaderTables(const quint8* lumaTable, const quint8* chromaTable)
-{
-    memcpy(m_lumaTablePos, lumaTable, 64 * 1);
-    memcpy(m_chromaTablePos, chromaTable, 64 * 1);
+    appendSOS(m_hdrBuffer);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -328,7 +332,6 @@ MjpegParser::MjpegParser()
     m_hdrDri = 0;
     m_hdrWidth = -1;
     m_hdrHeight = -1;
-    m_headerLen = 0;
     m_lumaTablePos = 0;
     m_chromaTablePos = 0;
     m_frameSize = 0;
@@ -384,21 +387,17 @@ Result MjpegParser::processRtpExtension(
         while (size > 0 && data[size - 1] == 0xff)
             --size;
 
-        m_extendedJpegHeader.resize(size);
+        m_onvifJpegHeader.resize(size);
         if (size > 0)
-            memcpy(m_extendedJpegHeader.data(), data, size);
-        m_sofFound = false;
+            memcpy(m_onvifJpegHeader.data(), data, size);
 
-        if (size >= 9)
+        m_sofFound = false;
+        nx::media::jpeg::ImageInfo imgInfo;
+        if (nx::media::jpeg::readJpegImageInfo(data, size, &imgInfo))
         {
-            quint16 markerType = (data[0] << 8) + data[1];
-            if (markerType == 0xffc0)
-            {
-                // Ffmpeg SOF header. Extract size from offset [5..8]
-                m_frameHeight = (data[5] << 8) + data[6];
-                m_frameWidth = (data[7] << 8) + data[8];
-                m_sofFound = true;
-            }
+            m_frameHeight = imgInfo.height;
+            m_frameWidth = imgInfo.width;
+            m_sofFound = true;
         }
     }
     return { true };
@@ -546,20 +545,18 @@ Result MjpegParser::processData(
         }
 
         if (m_hdrQ != jpegQ || dri != m_hdrDri || m_hdrWidth != width || m_hdrHeight != height ||
-           !m_extendedJpegHeader.empty())
+           !m_onvifJpegHeader.empty())
         {
             if (jpegQ != 255)
             {
-                m_headerLen = makeHeaders(m_hdrBuffer, jpegType, width, height,
-                    m_lumaTable, m_chromaTable, dri); //< use deep copy
+                makeHeaders(jpegType, width, height, m_lumaTable, m_chromaTable, dri); //< use deep copy
             }
             else
             {
                 if (!lumaTable || !chromaTable)
                     return {false, NX_FMT("Missing luma or chroma table")};
 
-                m_headerLen = makeHeaders(m_hdrBuffer, jpegType, width, height,
-                    lumaTable, chromaTable, dri); //< use tables direct pointer
+                makeHeaders(jpegType, width, height, lumaTable, chromaTable, dri); //< use tables direct pointer
             }
             m_hdrQ = jpegQ;
             m_hdrDri = dri;
@@ -568,7 +565,12 @@ Result MjpegParser::processData(
         }
         else if (lumaTable && chromaTable)
         {
-            updateHeaderTables(lumaTable, chromaTable);
+            // Update header tables.
+            if ((int)m_hdrBuffer.size() > m_lumaTablePos + 64)
+                memcpy(m_hdrBuffer.data() + m_lumaTablePos, lumaTable, 64);
+
+            if ((int)m_hdrBuffer.size() > m_chromaTablePos + 64)
+                memcpy(m_hdrBuffer.data() + m_chromaTablePos, chromaTable, 64);
         }
 
         m_chunks.clear();
@@ -595,9 +597,9 @@ Result MjpegParser::processData(
             m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1];
 
         QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(
-            m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
+            m_hdrBuffer.size() + m_frameSize + (needAddMarker ? 2 : 0)));
         m_mediaData = videoData;
-        videoData->m_data.uncheckedWrite((const char*)m_hdrBuffer, m_headerLen);
+        videoData->m_data.uncheckedWrite((const char*)m_hdrBuffer.data(), m_hdrBuffer.size());
         //m_videoData->data.write(m_frameData);
         for (uint i = 0; i < m_chunks.size(); ++i)
         {
