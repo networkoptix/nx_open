@@ -1029,6 +1029,10 @@
       <source>Save Cloud Layout As...</source>
       <translation>Lưu bố cục đám mây dưới dạng...</translation>
     </message>
+    <message>
+      <source>User Manual...</source>
+      <translation>Hướng dẫn sử dụng...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1149,6 +1153,21 @@
       <translation>
         <numerusform>Bố cục %n</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Hình ảnh</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Tất cả các file</translation>
     </message>
   </context>
   <context>
@@ -1535,10 +1554,6 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Unknown error</source>
       <translation>Lỗi không xác định</translation>
-    </message>
-    <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation>Không thể kiểm tra cài đặt email do không có kết nối internet trên bất kỳ máy chủ nào đang hoạt động</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -3101,21 +3116,6 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Để tạo Sự kiện chung, vui lòng tham khảo %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Hình ảnh</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tất cả các file</translation>
     </message>
   </context>
   <context>
@@ -8141,6 +8141,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>Các camera đã chọn không hỗ trợ các chế độ ghi trong Lịch biểu Ghi. Các chế độ ghi không được hỗ trợ sẽ được thay đổi thành &quot;Luôn Ghi&quot;.</translation>
+    </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation>Chế độ ghi sẽ không được kích hoạt trên một số camera.</translation>
     </message>
   </context>
   <context>

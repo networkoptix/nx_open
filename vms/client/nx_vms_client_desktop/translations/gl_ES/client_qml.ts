@@ -493,6 +493,10 @@
       <source>Ellipticity</source>
       <translation type="unfinished">Ellipticity</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation type="unfinished">Auto calibration failed</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>

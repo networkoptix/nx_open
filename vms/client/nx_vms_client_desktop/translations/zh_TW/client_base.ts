@@ -1029,6 +1029,10 @@
       <source>Save Cloud Layout As...</source>
       <translation>另存Cloud佈局為…</translation>
     </message>
+    <message>
+      <source>User Manual...</source>
+      <translation type="unfinished">User Manual...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1149,6 +1153,21 @@
       <translation>
         <numerusform>%n 佈局</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>圖片</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>影像</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>所有檔案</translation>
     </message>
   </context>
   <context>
@@ -1535,10 +1554,6 @@ License Key: %2</source>
     <message>
       <source>Unknown error</source>
       <translation>未知的錯誤</translation>
-    </message>
-    <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation>因伺服器皆無對外網路連線，故無法執行電子郵件測試。</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -3105,21 +3120,6 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>要產生通用事件, 請參考 %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>圖片</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>影像</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>所有檔案</translation>
     </message>
   </context>
   <context>
@@ -8144,6 +8144,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>指定的錄影模式無法套用至全部已選取的攝影機。若某攝影機不支援此指定的錄影模式，則將自動設定為&quot;全時錄影&quot;</translation>
+    </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
     </message>
   </context>
   <context>

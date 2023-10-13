@@ -1643,8 +1643,8 @@
       <translation>Şu anda %1 tarafından kullanılan, kullanımdan kaldırılmış API fonksiyonlarını etkinleştir (güvenli değil)</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTP zaman aşımı (milisaniye)</translation>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>Buluta bağlanmak üzere belirlenmiş Sunucuların noktalı virgülle ayrılmış listesi. Listenin en üstündeki sunucular daha yüksek önceliğe sahiptir. Liste boşsa Bulut bağlantısı için bir Sunucu otomatik olarak seçilir.</translation>
     </message>
   </context>
   <context>

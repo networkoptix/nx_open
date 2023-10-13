@@ -493,6 +493,10 @@
       <source>Ellipticity</source>
       <translation>Eliptiklik oranı</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Otomatik kalibrasyon başarısız oldu</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>

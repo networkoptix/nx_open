@@ -1029,6 +1029,10 @@
       <source>Save Cloud Layout As...</source>
       <translation type="unfinished">Save Cloud Layout As...</translation>
     </message>
+    <message>
+      <source>User Manual...</source>
+      <translation type="unfinished">User Manual...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1149,6 +1153,21 @@
       <translation>
         <numerusform>%n 布局</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>图片</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>视频</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>所有文件</translation>
     </message>
   </context>
   <context>
@@ -1535,10 +1554,6 @@ License Key: %2</translation>
     <message>
       <source>Unknown error</source>
       <translation>未知的错误</translation>
-    </message>
-    <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -3101,21 +3116,6 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>生成通用事件,请参考 %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>图片</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>视频</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>所有文件</translation>
     </message>
   </context>
   <context>
@@ -8140,6 +8140,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>录制计划包含所选摄像机不支持的录制模式。不支持的录制模式将更改为 &quot;Record Always&quot;。</translation>
+    </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
     </message>
   </context>
   <context>

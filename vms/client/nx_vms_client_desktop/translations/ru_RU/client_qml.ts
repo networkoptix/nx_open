@@ -501,6 +501,10 @@
       <source>Ellipticity</source>
       <translation>Эллиптичность</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Автоматическая калибровка не удалась</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>

@@ -1597,8 +1597,8 @@
       <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>
     </message>
     <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>Hết thời gian chờ RTP (mili giây)</translation>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>Danh sách Máy chủ được phân tách bằng dấu chấm phẩy được chỉ định để kết nối với Đám mây. Máy chủ ở đầu danh sách có mức độ ưu tiên cao hơn. Nếu danh sách trống, Máy chủ dành cho kết nối Đám mây sẽ tự động được chọn.</translation>
     </message>
   </context>
   <context>

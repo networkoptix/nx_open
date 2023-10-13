@@ -1031,6 +1031,10 @@
       <source>Save Cloud Layout As...</source>
       <translation>Lagre skyoppsett som...</translation>
     </message>
+    <message>
+      <source>User Manual...</source>
+      <translation>Brukermanual...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1152,6 +1156,21 @@
         <numerusform>%n visning</numerusform>
         <numerusform>%n visninger</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Bilder</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alle filer</translation>
     </message>
   </context>
   <context>
@@ -1546,10 +1565,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Unknown error</source>
       <translation>Ukjent feil</translation>
-    </message>
-    <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation>Kan ikke teste e-postinnstillinger på grunn av manglende internettforbindelse på de aktive serverne</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -3142,21 +3157,6 @@ til %1</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>For å generere generisk hendelse, se %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Bilder</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alle filer</translation>
     </message>
   </context>
   <context>
@@ -8268,6 +8268,10 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>Opptaksplan inneholder opptaksmoduser som ikke støttes av de valgte kameraene. Ustøttede opptaksmoduser vil bli endret til &quot;Ta opp alltid&quot;.</translation>
+    </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation>Opptak vil ikke være aktivert på enkelte kameraer.</translation>
     </message>
   </context>
   <context>

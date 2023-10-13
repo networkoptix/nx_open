@@ -1031,6 +1031,10 @@
       <source>Save Cloud Layout As...</source>
       <translation>Enregistrer la mise en page du nuage sous...</translation>
     </message>
+    <message>
+      <source>User Manual...</source>
+      <translation>Manuel d'utilisateur...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1152,6 +1156,21 @@
         <numerusform>%n mise en page</numerusform>
         <numerusform>%n mises en page</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Images</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Vidéo</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Tous les fichiers</translation>
     </message>
   </context>
   <context>
@@ -1546,10 +1565,6 @@ Clé de licence : %2</translation>
     <message>
       <source>Unknown error</source>
       <translation>Erreur inconnue</translation>
-    </message>
-    <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation>Impossible de tester les paramètres de messagerie en raison de l'absence de connexion Internet sur l'un des serveurs actifs</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -3142,21 +3157,6 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Pour générer un'événement générique, S.V.P. se référer à %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Images</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Vidéo</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tous les fichiers</translation>
     </message>
   </context>
   <context>
@@ -8268,6 +8268,10 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>Le calendrier d’enregistrement contient des modes d’enregistrement qui ne sont pas pris en charge par les caméras sélectionnées. Les modes d’enregistrement non pris en charge seront changés en &quot;Enregistrer Toujours&quot;.</translation>
+    </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation>L'enregistrement ne sera pas activé sur certaines caméras.</translation>
     </message>
   </context>
   <context>

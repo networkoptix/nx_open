@@ -1035,6 +1035,10 @@
       <source>Save Cloud Layout As...</source>
       <translation>Zapisz układ chmury jako...</translation>
     </message>
+    <message>
+      <source>User Manual...</source>
+      <translation type="unfinished">User Manual...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1158,6 +1162,21 @@
         <numerusform>%n układów</numerusform>
         <numerusform>%n układów</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Zdjęcia</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Wideo</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Wszystkie pliki</translation>
     </message>
   </context>
   <context>
@@ -1568,10 +1587,6 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>Unknown error</source>
       <translation>Nieznany błąd</translation>
-    </message>
-    <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation>Nie można przetestować ustawień e-mail ze względu na brak połączenia z internetem na żadnym z aktywnych serwerów</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -3212,21 +3227,6 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Aby wygenerować inne zdarzenie, zobacz %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Zdjęcia</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Wideo</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Wszystkie pliki</translation>
     </message>
   </context>
   <context>
@@ -8506,6 +8506,10 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>Harmonogram nagrywania zawiera tryby nagrywania, które nie są obsługiwane przez wybrane kamery. Nieobsługiwane tryby nagrywania zostaną zmienione na &quot; Zapisuj zawsze &quot;.</translation>
+    </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
     </message>
   </context>
   <context>
