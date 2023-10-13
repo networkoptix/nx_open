@@ -662,7 +662,7 @@
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 アナログエンコーダライセンス</numerusform>
+        <numerusform>%n/%1 アナログエンコーダーライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
