@@ -5,9 +5,6 @@
 #include <transcoding/filters/scale_image_filter.h>
 #include <utils/media/frame_info.h>
 
-#include <nx/utils/nx_utils_ini.h>
-#include <nx/build_info.h>
-
 namespace {
 
 CLVideoDecoderOutputPtr generateFrame(const QSize& size)
@@ -23,13 +20,8 @@ class ScaleFilterTest: public ::testing::Test
 {
 public:
     ScaleFilterTest(const CLVideoDecoderOutputPtr &frame = CLVideoDecoderOutputPtr()) :
-        m_frame(frame),
-        m_iniTweaks(new nx::kit::IniConfig::Tweaks())
+        m_frame(frame)
     {
-        // Windows specifics: DebugBreak is called on NX_ASSERT even if crashes are disabled, and
-        // CI catches it. On other OS we can check the backup behavior when assert fails.
-        if (nx::build_info::isWindows())
-            m_iniTweaks->set(&nx::utils::ini().assertCrash, true);
     }
 
     void thenScalingSuccessful(const QSize& size)
@@ -42,15 +34,9 @@ public:
     void thenScalingFailed(const QSize& size)
     {
         QnScaleImageFilter filter(size);
-        if (nx::utils::ini().assertCrash)
-        {
-            ASSERT_DEATH(filter.updateImage(m_frame), "Error while scaling frame .*");
-        }
-        else
-        {
-            CLVideoDecoderOutputPtr frame = filter.updateImage(m_frame);
-            ASSERT_EQ(frame->size(), m_frame->size());
-        }
+        const auto result = filter.updateImage(m_frame);
+        ASSERT_TRUE((bool) result);
+        ASSERT_EQ(result->size(), m_frame->size());
     }
 
     void givenFrame(const QSize& size)
@@ -60,7 +46,6 @@ public:
 
 private:
     CLVideoDecoderOutputPtr m_frame;
-    std::unique_ptr<nx::kit::IniConfig::Tweaks> m_iniTweaks;
 };
 
 class BatchScaleFilterTest: public ScaleFilterTest
