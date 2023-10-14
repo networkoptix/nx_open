@@ -786,7 +786,7 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
             {
                 return camera->isOnline()
                     && !camera->enabledAnalyticsEngines().empty()
-                    && q->accessController()->hasPermissions(camera, Qn::ViewContentPermission);
+                    && q->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
             };
 
         // Preserve existing receivers that are still relevant.
