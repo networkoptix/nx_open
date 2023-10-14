@@ -151,7 +151,7 @@ public:
             throwError(std::move(result));
     }
 
-    using SubscriptionCallback = nx::utils::MoveOnlyFunc<void()>;
+    using SubscriptionCallback = nx::utils::MoveOnlyFunc<void(const QString&)>;
     nx::utils::Guard doSubscribe(const QString& id, SubscriptionCallback callback)
     {
         using namespace details;
@@ -174,13 +174,17 @@ public:
                             const auto doNotify =
                                 [this](const auto& transaction)
                                 {
-                                    const auto it =
-                                        m_subscribedIds.find(nx::toString(transaction.params.getId()));
+                                    const QString id = nx::toString(transaction.params.getId());
+                                    auto it = m_subscribedIds.find(id);
                                     if (it == m_subscribedIds.end())
-                                        return false;
+                                    {
+                                        it = m_subscribedIds.find(QString("*"));
+                                        if (it == m_subscribedIds.end())
+                                            return false;
+                                    }
 
                                     for (auto callback: it->second)
-                                        (*callback)();
+                                        (*callback)(id);
                                     return true;
                                 };
 
@@ -227,12 +231,16 @@ public:
         if (request.method() == nx::network::http::Method::get)
         {
             return request.params().toJson(/*excludeCommon*/ true).isEmpty()
-                ? QString("*") //< TODO: Support subscription for all ids.
+                ? QString("*")
                 : nx::toString(request.parseContentOrThrow<Filter>().getId());
         }
 
         if (request.method() == nx::network::http::Method::delete_)
-            return nx::toString(request.parseContentOrThrow<DeleteInput>().getId());
+        {
+            return request.params().toJson(/*excludeCommon*/ true).isEmpty()
+                ? QString("*")
+                : nx::toString(request.parseContentOrThrow<DeleteInput>().getId());
+        }
 
         NX_ASSERT(false, "Use `get` to `subscribe` or `delete` to `unsubscribe`");
         return {};
