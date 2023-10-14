@@ -14,6 +14,7 @@ struct NX_VMS_API IdData
 {
     IdData() = default;
     IdData(const QnUuid& id): id(id) {}
+    IdData(const QString& id): id(id) {}
 
     bool operator==(const IdData& other) const = default;
 

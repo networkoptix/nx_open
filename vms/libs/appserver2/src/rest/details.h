@@ -2,18 +2,11 @@
 
 #pragma once
 
+#include <nx/utils/member_detector.h>
+
 namespace ec2::details {
 
-#define MEMBER_CHECKER(member) \
-template<typename T, typename = std::void_t<>> \
-struct member##Exists: std::false_type \
-{ \
-}; \
-template<typename T> \
-struct member##Exists<T, std::void_t<decltype(&T::member)>>: std::true_type \
-{ \
-}
-
+#define MEMBER_CHECKER(MEMBER) NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(MEMBER##Exists, MEMBER)
 MEMBER_CHECKER(fromDbTypes);
 MEMBER_CHECKER(toDbTypes);
 MEMBER_CHECKER(kResourceTypeId);
