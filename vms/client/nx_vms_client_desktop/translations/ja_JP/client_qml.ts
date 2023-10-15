@@ -1267,7 +1267,7 @@
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation>同期設定に一致するユーザーまたはグループが存在しないため、システムの DB には追加されません。 LDAP サーバーのパラメーターとフィルターが正しく構成されていることを確認してください。 </translation>
+      <translation>同期設定に一致するユーザーまたはグループが存在しないため、システムの DB には追加されません。 LDAP サーバーのパラメーターとフィルターが正しく構成されていることを確認してください。</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
@@ -1988,11 +1988,11 @@ PTZを行います</translation>
     <name>SettingsDialog</name>
     <message>
       <source>Enter parameters</source>
-      <translation>パラメータを入力してください</translation>
+      <translation>パラメーターを入力してください</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation>このアクションにはパラメータ入力が必要です。</translation>
+      <translation>このアクションでは、一部パラメーターの入力が必要です。</translation>
     </message>
   </context>
   <context>

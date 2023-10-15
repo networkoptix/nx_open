@@ -269,7 +269,7 @@
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation>パラメーター %1 設定失敗</translation>
+      <translation>パラメーター %1 の設定に失敗しました。</translation>
     </message>
     <message>
       <source>Please contact support.</source>
@@ -741,7 +741,7 @@
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 アナログエンコーダライセンス</numerusform>
+        <numerusform>%n/%1 アナログエンコーダーライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1208,7 +1208,7 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation>必要なパラメータがありません: %1</translation>
+      <translation>必須パラメーターがありません: %1。</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
@@ -1262,7 +1262,7 @@
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation>無効なパラメータ `%1`: %2。</translation>
+      <translation>無効なパラメーター `%1`: %2。</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
@@ -1707,7 +1707,7 @@
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、その後最初の接続を閉じます。したがって、このパラメータには2以上の値を設定することをお勧めします。</translation>
+      <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、その後最初の接続を閉じます。したがって、このパラメーターには2以上の値を設定することをお勧めします。</translation>
     </message>
     <message>
       <source>Update releases.json file URL</source>

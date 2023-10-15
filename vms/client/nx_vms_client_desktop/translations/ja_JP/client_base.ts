@@ -1435,7 +1435,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation>パラメータをコピー</translation>
+      <translation>パラメーターをコピー</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
@@ -7441,7 +7441,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>選択したパラメータを適用するスケジュール領域を指定してください。</translation>
+      <translation>選択したパラメーターを適用するスケジュール領域を指定してください。</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
@@ -12135,7 +12135,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation>メディアストリームが存在しないリソースのメディアパラメータは指定できません。</translation>
+      <translation>メディアストリームが存在しないリソースのメディアパラメーターは指定できません。</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
