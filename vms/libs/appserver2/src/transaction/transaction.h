@@ -527,7 +527,7 @@ APPLY(401, saveMediaServer, nx::vms::api::MediaServerData, \
     false, /*< isRemoveOperation */ \
     CreateHashByIdHelper(), /*< getHash */ \
     MediaServerNotificationManagerHelper(), \
-    PowerUserAccess(), \
+    SaveServerDataAccess(), \
     ReadResourceAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     ReadResourceAccessOut(), /*< check remote peer rights for outgoing transaction */ \
