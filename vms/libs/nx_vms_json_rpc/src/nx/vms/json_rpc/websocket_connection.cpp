@@ -210,11 +210,17 @@ void WebSocketConnection::addGuard(const QString& id, nx::utils::Guard guard)
     if (!NX_ASSERT(guard))
         return;
 
-    dispatch([this, id, g = std::move(guard)]() mutable { m_guards[id] = std::move(g); });
+    NX_VERBOSE(this, "Add guard for %1", id);
+    dispatch(
+        [this, id, g = std::move(guard)]() mutable
+        {
+            NX_ASSERT(m_guards.emplace(id, std::move(g)).second);
+        });
 }
 
 void WebSocketConnection::removeGuard(const QString& id)
 {
+    NX_VERBOSE(this, "Remove guard for %1", id);
     dispatch([this, id]() mutable { m_guards.erase(id); });
 }
 
