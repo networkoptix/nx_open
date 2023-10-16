@@ -157,14 +157,30 @@ Item
             if (!controller)
                 return
 
+            // Open tab in the same item. New window can be opened using window.open() js method.
+            if (request.destination === WebEngineNewWindowRequest.InNewTab
+                || request.destination === WebEngineNewWindowRequest.InNewBackgroundTab)
+            {
+                webView.url = request.requestedUrl
+                return
+            }
+
             let newWindow = controller.newWindow()
 
+            const kDefaultSize = Qt.size(800, 740)
             const newGeometry = request.requestedGeometry
-            const newWidth = newGeometry.width <= 0 ? width : newGeometry.width
-            const newHeight = newGeometry.height <= 0 ? height : newGeometry.height
+            const newWidth = newGeometry.width <= 0 ? kDefaultSize.width : newGeometry.width
+            const newHeight = newGeometry.height <= 0 ? kDefaultSize.height : newGeometry.height
 
-            newWindow.setWindowFrameGeometry(
-                Qt.rect(newGeometry.x, newGeometry.y, newWidth, newHeight))
+            if (newGeometry.x <= 0 && newGeometry.y <= 0) //< No position is specified.
+            {
+                newWindow.setWindowSize(newWidth, newHeight)
+            }
+            else
+            {
+                newWindow.setWindowFrameGeometry(
+                    Qt.rect(newGeometry.x, newGeometry.y, newWidth, newHeight))
+            }
 
             newWindow.rootReady.connect(root =>
             {
