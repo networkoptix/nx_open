@@ -691,6 +691,14 @@ bool parseNameValueFile(
     return result;
 }
 
+std::string toUpper(const std::string& str)
+{
+    std::string result = str;
+    for (auto& c: result)
+        c = (c >= 'a' && c <= 'z') ? (c - 'a' + 'A') : c;
+    return result;
+}
+
 } // namespace utils
 } // namespace kit
 } // namespace nx
