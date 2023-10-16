@@ -273,7 +273,7 @@ floatNumber=non-number
         /*suppress newline*/ 1 + (const char*)
 R"(
 test.ini [{iniFilePath}]
-test.ini ERROR: Missing "=" after the name missingEqualsAfterName. Line 3, file {iniFilePath}
+test.ini ERROR: Missing "=" after the name "missingEqualsAfterName". Line 3, file {iniFilePath}
 test.ini ERROR: The name part (before "=") is empty. Line 4, file {iniFilePath}
   ! enableOutput=false [invalid value in file]
   ! enableTime=true [invalid value in file]
@@ -298,6 +298,54 @@ test.ini ERROR: The name part (before "=") is empty. Line 4, file {iniFilePath}
   ! unknownParam [unexpected param in file]
   ! unknownParamWithEmptyValue [unexpected param in file]
 )");
+}
+
+static void testBom(const char* iniFileContentPrefix)
+{
+    if (!IniConfig::isEnabled())
+    {
+        std::cerr << "IniConfig::isEnabled() -> false" << std::endl;
+        return; //< Nothing to test if IniConfig is disabled at compile time.
+    }
+
+    IniConfig::setIniFilesDir(nx::kit::test::tempDir());
+
+    TestIni ini;
+
+    TestIni expectedIni;
+    const_cast<bool&>(expectedIni.enableOutput) = true;
+
+    nx::kit::test::createFile(
+        ini.iniFilePath(),
+        std::string(iniFileContentPrefix) + "enableOutput=true");
+
+    testReload(__LINE__, expectedIni, &ini, "testBom",
+        /*suppress newline*/ 1 + (const char*)
+R"(
+test.ini [{iniFilePath}]
+  * enableOutput=true
+    enableTime=true
+    enableFps=true
+    str0=" string with leading space"
+    str1="string with middle \" quote"
+    str2="\" string with leading quote"
+    str3="string with trailing quote \""
+    str4="\"enquoted string\""
+    str5="plain string"
+    str6="plain string with \\ backslash"
+    intNumber=113
+    floatNumber=310.55
+)");
+}
+
+TEST(iniConfig, testBomAtStartOfFirstLine)
+{
+    testBom("\xEF\xBB\xBF");
+}
+
+TEST(iniConfig, testBomAsFirstLine)
+{
+    testBom("\xEF\xBB\xBF\n");
 }
 
 TEST(iniConfig, testGetParamTypeAndValue)
