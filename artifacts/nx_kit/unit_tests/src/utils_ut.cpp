@@ -522,6 +522,15 @@ TEST(utils, trimString)
     ASSERT_EQ("a\nb", trimString("a\nb\n\n"));
 }
 
+TEST(utils, toUpper)
+{
+    ASSERT_EQ("", toUpper(""));
+    ASSERT_EQ("ABCI", toUpper("abci"));
+    ASSERT_EQ("DFG", toUpper("DFG"));
+    // The following string contains escaped characters for the plus-minus sign.
+    ASSERT_EQ("ABC \xB1", toUpper("abc \xB1"));
+}
+
 } // namespace test
 } // namespace utils
 } // namespace kit
