@@ -4,6 +4,7 @@
 
 #include <nx/sdk/i_string.h>
 #include <nx/sdk/interface.h>
+#include <nx/sdk/result.h>
 
 namespace nx::sdk {
 
@@ -65,7 +66,7 @@ public:
     virtual const char* serverId() const = 0;
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider2>
+class IUtilityProvider3: public Interface<IUtilityProvider3, IUtilityProvider2>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider3"); }
@@ -73,6 +74,57 @@ public:
     virtual IString* cloudSystemId() const = 0;
     virtual IString* cloudAuthKey() const = 0;
 };
-using IUtilityProvider3 = IUtilityProvider;
+
+class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider3>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider4"); }
+
+    enum class HttpDomainName: int
+    {
+        cloud,
+        vms,
+    };
+
+    /**
+     * Handler which allows to pass a response from the Server to the Plugin. The execute() method
+     * will be called when a response from sendHttpRequest() will be available.
+     */
+    class IHttpRequestCompletionHandler: public Interface<IHttpRequestCompletionHandler>
+    {
+    public:
+        static auto interfaceId() { return makeId("nx::sdk::IHttpRequestCompletionHandler"); }
+
+        virtual void execute(Result<IString*> response) = 0;
+    };
+    using IHttpRequestCompletionHandler0 = IHttpRequestCompletionHandler;
+
+    /** Called by sendHttpRequest() */
+    protected: virtual void doSendHttpRequest(
+        HttpDomainName requestDomainName,
+        const char* path,
+        const char* httpMethod,
+        const char* mimeType,
+        const char* requestBody,
+        IHttpRequestCompletionHandler* callback) const = 0;
+    /**
+     * Allows to send asynchronous HTTP requests to the Cloud or VMS Server.
+     * IHttpRequestCompletionHandler::execute() will be called later. An error or HTTP response will
+     * be passed to this method as a parameter. HTTP response will consist of a status line, HTTP
+     * headers and a message body seperated by an empty line.
+     */
+    public: void sendHttpRequest(
+        HttpDomainName requestDomainName,
+        const char* path,
+        const char* httpMethod,
+        const char* mimeType,
+        const char* requestBody,
+        Ptr<IHttpRequestCompletionHandler> callback) const
+    {
+        doSendHttpRequest(
+            requestDomainName, path, httpMethod, mimeType, requestBody, callback.get());
+    }
+};
+using IUtilityProvider4 = IUtilityProvider;
 
 } // namespace nx::sdk
