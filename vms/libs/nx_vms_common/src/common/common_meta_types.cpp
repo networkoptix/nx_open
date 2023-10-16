@@ -118,13 +118,14 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<Qn::ResourceFlags>();
     QMetaType::registerConverter<Qn::ResourceFlags, int>();
+
     qRegisterMetaType<nx::vms::event::EventReason>("nx::vms::event::EventReason");
-    qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
-    qRegisterMetaType<nx::vms::event::AnalyticsSdkObjectDetectedPtr>();
-    qRegisterMetaType<nx::vms::event::PluginDiagnosticEventPtr>();
-    qRegisterMetaType<nx::vms::event::PoeOverBudgetEventPtr>();
-    qRegisterMetaType<nx::vms::event::FanErrorEventPtr>();
-    qRegisterMetaType<nx::vms::event::ServerCertificateErrorPtr>();
+    qRegisterMetaType<nx::vms::event::PluginDiagnosticEventPtr>(
+        "nx::vms::event::PluginDiagnosticEventPtr");
+    qRegisterMetaType<nx::vms::event::PoeOverBudgetEventPtr>(
+        "nx::vms::event::PoeOverBudgetEventPtr");
+    qRegisterMetaType<nx::vms::event::FanErrorEventPtr>(
+        "nx::vms::event::FanErrorEventPtr");
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
