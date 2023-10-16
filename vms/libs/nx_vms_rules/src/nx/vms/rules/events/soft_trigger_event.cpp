@@ -110,7 +110,7 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
         },
         .permissions = {
             .resourcePermissions = {
-                {utils::kCameraIdFieldName, {Qn::ViewContentPermission, Qn::ViewFootagePermission}}
+                {utils::kCameraIdFieldName, {Qn::ViewContentPermission}}
             }
         },
         .emailTemplatePath = ":/email_templates/software_trigger.mustache"
