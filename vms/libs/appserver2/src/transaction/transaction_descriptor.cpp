@@ -1662,6 +1662,29 @@ static Result userHasAccess(
     return Result();
 }
 
+class SaveServerDataAccess
+{
+public:
+    Result operator()(SystemContext* context,
+        const Qn::UserAccessData& accessData,
+        const api::MediaServerData& param) const
+    {
+        // TODO: #skolesnik
+        //     Limit `PowerUser` permissions (`Power User` is more limited than `Administrator`).
+        //     `PowerUser` cannot:
+        //          - Detach server
+        //          - Delete server (relates to an option “Delete Server” that appears in the
+        //          resource tree for not online servers only)
+        //          - Reset to defaults
+        //          - Pin certificate (in case of certificate error)
+        //          - (? Not in the table, but logical to have) Create server
+        //     Will be fixed by `VMS-41187_power-user-permissions`.
+        return userHasGlobalAccess(context, accessData, GlobalPermission::powerUser);
+    }
+
+private:
+};
+
 struct PowerUserAccess
 {
     template<typename Param>
