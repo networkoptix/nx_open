@@ -12,33 +12,31 @@
 
     #include <windows.h>
 #else
-    #include <unistd.h>
     #include <dlfcn.h>
+    #include <unistd.h>
 #endif
 
 #include <nx/kit/debug.h>
-#include <nx/kit/test.h>
 #include <nx/kit/json.h>
-
-#include <nx/sdk/interface.h>
-#include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/to_string.h>
-#include <nx/sdk/ptr.h>
-#include <nx/sdk/helpers/string_map.h>
-#include <nx/sdk/helpers/device_info.h>
-#include <nx/sdk/helpers/string.h>
-#include <nx/sdk/helpers/error.h>
-#include <nx/sdk/helpers/settings_response.h>
-#include <nx/sdk/helpers/lib_context.h>
+#include <nx/kit/test.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
-#include <nx/sdk/uuid.h>
-#include <nx/sdk/i_utility_provider.h>
-
-#include <nx/sdk/analytics/i_consuming_device_agent.h>
-#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
 #include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/analytics/i_uncompressed_video_frame.h>
+#include <nx/sdk/helpers/device_info.h>
+#include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/lib_context.h>
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/to_string.h>
+#include <nx/sdk/i_utility_provider.h>
+#include <nx/sdk/interface.h>
+#include <nx/sdk/ptr.h>
+#include <nx/sdk/uuid.h>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -266,6 +264,19 @@ public:
     virtual const char* serverId() const override { return ""; }
     virtual IString* cloudSystemId() const { return new nx::sdk::String(); }
     virtual IString* cloudAuthKey() const { return new nx::sdk::String(); }
+
+    virtual void doSendHttpRequest(
+        HttpDomainName requestDomain,
+        const char* path,
+        const char* httpMethod,
+        const char* mimeType,
+        const char* requestBody,
+        IHttpRequestCompletionHandler* callback) const override
+    {
+        NX_PRINT << "Making HTTP request with HttpDomainName = " << (int) requestDomain << " path = " << path << ", httpMethod = " << httpMethod
+                 << ", mimeType = " << mimeType << ", requestBody = " << requestBody;
+        callback->execute({new nx::sdk::String()});
+    }
 
     virtual const nx::sdk::IString* getServerSdkVersion() const override
     {

@@ -279,6 +279,9 @@ NX_KIT_API bool parseNameValueFile(
     std::ostream* out,
     bool* isFileEmpty);
 
+/** Converts ASCII characters from the input string to the upper case. */
+NX_KIT_API std::string toUpper(const std::string& str);
+
 } // namespace utils
 } // namespace kit
 } // namespace nx
