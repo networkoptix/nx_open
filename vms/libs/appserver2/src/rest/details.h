@@ -332,58 +332,50 @@ Result validateResourceTypeId(const T& data)
     return ErrorCode::ok;
 }
 
+constexpr ApiObjectType commandToObjectType(ApiCommand::Value deleteCommand)
+{
+    switch (deleteCommand)
+    {
+        case ApiCommand::removeMediaServer:
+            return ApiObject_Server;
+        case ApiCommand::removeCamera:
+            return ApiObject_Camera;
+        case ApiCommand::removeUser:
+            return ApiObject_User;
+        case ApiCommand::removeLayout:
+            return ApiObject_Layout;
+        case ApiCommand::removeVideowall:
+            return ApiObject_Videowall;
+        case ApiCommand::removeStorage:
+            return ApiObject_Storage;
+        case ApiCommand::removeWebPage:
+            return ApiObject_WebPage;
+        case ApiCommand::removeAnalyticsPlugin:
+            return ApiObject_AnalyticsPlugin;
+        case ApiCommand::removeAnalyticsEngine:
+            return ApiObject_AnalyticsEngine;
+        default:
+            return ApiObject_NotDefined;
+    }
+}
+
 template<typename T>
-Result validateType(const auto& processor, const T& data, ApiCommand::Value deleteCommand)
+void validateType(const auto& processor, const T& data, ApiObjectType requiredType)
 {
     if constexpr (idExists<T>::value)
     {
         const auto& id = data.id;
         if constexpr (std::is_same_v<std::decay_t<decltype(id)>, QnUuid>)
         {
-            ApiObjectType requiredType = ApiObject_NotDefined;
-            switch (deleteCommand)
-            {
-                case ApiCommand::removeMediaServer:
-                    requiredType = ApiObject_Server;
-                    break;
-                case ApiCommand::removeCamera:
-                    requiredType = ApiObject_Camera;
-                    break;
-                case ApiCommand::removeUser:
-                    requiredType = ApiObject_User;
-                    break;
-                case ApiCommand::removeLayout:
-                    requiredType = ApiObject_Layout;
-                    break;
-                case ApiCommand::removeVideowall:
-                    requiredType = ApiObject_Videowall;
-                    break;
-                case ApiCommand::removeStorage:
-                    requiredType = ApiObject_Storage;
-                    break;
-                case ApiCommand::removeWebPage:
-                    requiredType = ApiObject_WebPage;
-                    break;
-                case ApiCommand::removeAnalyticsPlugin:
-                    requiredType = ApiObject_AnalyticsPlugin;
-                    break;
-                case ApiCommand::removeAnalyticsEngine:
-                    requiredType = ApiObject_AnalyticsEngine;
-                    break;
-                default:
-                    return ErrorCode::ok;
-            }
+            if (requiredType == ApiObject_NotDefined)
+                return;
 
             const auto objectType = processor.getObjectType(id);
             if (objectType == ApiObject_NotDefined || objectType == requiredType)
-                return ErrorCode::ok;
+                return;
 
             throw nx::network::rest::Exception::notFound();
         }
-    }
-    else
-    {
-        return ErrorCode::ok;
     }
 }
 
