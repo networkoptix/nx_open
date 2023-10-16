@@ -79,7 +79,7 @@ const ItemDescriptor& GenericEvent::manifest()
         },
         .permissions = {
             .resourcePermissions = {
-                {utils::kDeviceIdsFieldName, {Qn::ViewContentPermission, Qn::ViewFootagePermission}}
+                {utils::kDeviceIdsFieldName, {Qn::ViewContentPermission}}
             }
         },
         .emailTemplatePath = ":/email_templates/generic_event.mustache"

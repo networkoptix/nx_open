@@ -107,7 +107,7 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         },
         .permissions = {
             .resourcePermissions = {
-                {utils::kCameraIdFieldName, {Qn::ViewContentPermission, Qn::ViewFootagePermission}}
+                {utils::kCameraIdFieldName, {Qn::ViewContentPermission}}
             }
         },
         .emailTemplatePath = ":/email_templates/analytics_object.mustache"
