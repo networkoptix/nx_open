@@ -21,6 +21,10 @@ class NX_VMS_CLIENT_DESKTOP_API LookupListEntriesModel: public QAbstractTableMod
         WRITE setListModel
         NOTIFY listModelChanged);
 
+    Q_PROPERTY(int rowCount
+        READ rowCount
+        NOTIFY rowCountChanged);
+
     using base_type = QAbstractTableModel;
 
     enum DataRole
@@ -59,6 +63,7 @@ public:
 
 signals:
     void listModelChanged();
+    void rowCountChanged();
 
 private:
     QPointer<LookupListModel> m_data;

@@ -143,7 +143,10 @@ void LookupListEntriesModel::setListModel(LookupListModel* value)
     emit listModelChanged();
 
     if (m_data)
+    {
         emit headerDataChanged(Qt::Orientation::Horizontal, 0, columnCount() - 1);
+        emit rowCountChanged();
+    }
 }
 
 void LookupListEntriesModel::addEntry(const QVariantMap& values)
@@ -163,6 +166,7 @@ void LookupListEntriesModel::addEntry(const QVariantMap& values)
     m_data->rawData().entries.push_back(std::move(entry));
 
     endInsertRows();
+    emit rowCountChanged();
 }
 
 void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
@@ -178,6 +182,7 @@ void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
         beginRemoveRows({}, index, index);
         m_data->rawData().entries.erase(m_data->rawData().entries.begin() + index);
         endRemoveRows();
+        emit rowCountChanged();
     }
 }
 

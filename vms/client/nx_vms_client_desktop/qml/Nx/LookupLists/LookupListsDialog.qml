@@ -30,8 +30,8 @@ Dialog
 
     title: qsTr("Lookup Lists")
 
-    width: 800
-    height: 600
+    minimumWidth: 800
+    minimumHeight: 600
     leftPadding: 0
     rightPadding: 0
     topPadding: 0
@@ -298,6 +298,17 @@ Dialog
                     rightMargin: 16
                     bottomMargin: 8
                 }
+            }
+
+            Label
+            {
+                id: noEntriesLabel
+
+                anchors.centerIn: tableView
+                visible: entriesModel.rowCount === 0
+                text: qsTr("No Entries")
+                font.pixelSize: 14
+                color: ColorTheme.colors.dark17
             }
         }
     }
