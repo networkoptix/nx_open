@@ -524,7 +524,7 @@ TEST(utils, trimString)
 
 TEST(utils, isSpaceOrControlChar)
 {
-    for (char c = 0; c <= 32; ++c) 
+    for (char c = 0; c <= 32; ++c)
     {
         ASSERT_TRUE(isSpaceOrControlChar(c));
     }
@@ -533,6 +533,15 @@ TEST(utils, isSpaceOrControlChar)
     ASSERT_FALSE(isSpaceOrControlChar('A'));
     ASSERT_FALSE(isSpaceOrControlChar('\x9C'));
     ASSERT_FALSE(isSpaceOrControlChar('\xEA'));
+}
+
+TEST(utils, toUpper)
+{
+    ASSERT_EQ("", toUpper(""));
+    ASSERT_EQ("ABCI", toUpper("abci"));
+    ASSERT_EQ("DFG", toUpper("DFG"));
+    // The following string contains escaped characters for the plus-minus sign.
+    ASSERT_EQ("ABC \xB1", toUpper("abc \xB1"));
 }
 
 } // namespace test
