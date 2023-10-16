@@ -126,10 +126,6 @@ QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventDat
     if (!event.previewCamera)
         return {};
 
-    // Assuming the rights are checked before sending the notification.
-    if (event.previewCamera->hasFlags(Qn::ResourceFlag::cross_system))
-        return event.previewCamera;
-
     const auto accessController = ResourceAccessManager::accessController(event.previewCamera);
     if (!NX_ASSERT(accessController))
         return {};

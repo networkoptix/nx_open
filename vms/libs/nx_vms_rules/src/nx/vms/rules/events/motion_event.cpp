@@ -52,7 +52,7 @@ const ItemDescriptor& MotionEvent::manifest()
         },
         .permissions = {
             .resourcePermissions = {
-                {utils::kCameraIdFieldName, {Qn::ViewContentPermission, Qn::ViewFootagePermission}}
+                {utils::kCameraIdFieldName, {Qn::ViewContentPermission}}
             }
         },
         .emailTemplatePath = ":/email_templates/camera_motion.mustache"
