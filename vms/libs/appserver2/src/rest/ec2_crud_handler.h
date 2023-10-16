@@ -12,6 +12,7 @@
 #include <transaction/transaction.h>
 
 #include "details.h"
+#include "subscription.h"
 
 namespace ec2 {
 
@@ -32,7 +33,7 @@ public:
         using namespace details;
 
         auto processor = m_queryProcessor->getAccess(request.userSession);
-        validateType(processor, filter, DeleteCommand);
+        validateType(processor, filter, m_objectType);
 
         auto query =
             [id = std::move(filter.getId()), &processor](auto&& x)
@@ -65,7 +66,7 @@ public:
         using namespace details;
 
         auto processor = m_queryProcessor->getAccess(request.userSession);
-        validateType(processor, id, DeleteCommand);
+        validateType(processor, id, m_objectType);
 
         std::promise<Result> promise;
         processor.processUpdateAsync(
@@ -89,19 +90,14 @@ public:
         auto processor = m_queryProcessor->getAccess(request.userSession);
         if constexpr (toDbTypesExists<Model>::value)
         {
-            auto id = data.getId();
             auto items = std::move(data).toDbTypes();
-            using IgnoredDbType = std::decay_t<decltype(std::get<0>(items))>;
-            callUpdateFunc(items,
-                [&processor](const auto& x)
-                {
-                    if (const auto r = validateType(processor, x, DeleteCommand); !r)
-                        return r;
-                    return validateResourceTypeId(x);
-                });
+            const auto& mainDbItem = std::get<0>(items);
+            validateType(processor, mainDbItem, m_objectType);
+            validateResourceTypeId(mainDbItem);
 
+            using IgnoredDbType = std::decay_t<decltype(mainDbItem)>;
             auto update =
-                [id = std::move(id)](auto&& x, auto& copy, auto* list)
+                [id = data.getId()](auto&& x, auto& copy, auto* list)
                 {
                     using DbType = std::decay_t<decltype(x)>;
                     Result result;
@@ -141,7 +137,8 @@ public:
         }
         else
         {
-            validateType(processor, data, DeleteCommand);
+            validateType(processor, data, m_objectType);
+            validateResourceTypeId(data);
             processor.processUpdateAsync(
                 getUpdateCommand<Model>(),
                 data,
@@ -151,10 +148,15 @@ public:
             throwError(std::move(result));
     }
 
-    using SubscriptionCallback = nx::utils::MoveOnlyFunc<void(const QString&)>;
-    nx::utils::Guard doSubscribe(const QString& id, SubscriptionCallback callback)
+    nx::utils::Guard addSubscription(const QString& id, SubscriptionCallback callback)
     {
         using namespace details;
+
+        auto subscription = std::make_shared<SubscriptionCallback>(std::move(callback));
+        NX_VERBOSE(this, "Add subscription %1 for %2", subscription.get(), id);
+
+        nx::utils::MoveOnlyFunc<void()> guard =
+            [this, subscription]() { removeSubscription(subscription); };
 
         NX_MUTEX_LOCKER lock(&m_mutex);
         if (m_subscribedIds.empty())
@@ -165,62 +167,10 @@ public:
                 {
                     commands.push_back(getUpdateCommand<std::decay_t<decltype(data)>>());
                 });
+            NX_VERBOSE(this, "Add monitor for %1", commands);
             m_guard = m_queryProcessor->addMonitor(
-                [this](const auto& transaction)
-                {
-                    invokeOnDbTypes<applyOr, Model>(
-                        [this, &transaction](auto&& data)
-                        {
-                            const auto doNotify =
-                                [this](const auto& transaction)
-                                {
-                                    const QString id = nx::toString(transaction.params.getId());
-                                    auto it = m_subscribedIds.find(id);
-                                    if (it == m_subscribedIds.end())
-                                    {
-                                        it = m_subscribedIds.find(QString("*"));
-                                        if (it == m_subscribedIds.end())
-                                            return false;
-                                    }
-
-                                    for (auto callback: it->second)
-                                        (*callback)(id);
-                                    return true;
-                                };
-
-                            NX_MUTEX_LOCKER lock(&m_mutex);
-                            if (DeleteCommand == transaction.command)
-                                return doNotify(static_cast<const QnTransaction<DeleteInput>&>(transaction));
-
-                            using T = std::decay_t<decltype(data)>;
-                            // TODO: Remove `details::` when MSVC v17 will be used.
-                            if (details::getUpdateCommand<T>() == transaction.command)
-                                return doNotify(static_cast<const QnTransaction<T>&>(transaction));
-
-                            return false;
-                        });
-                },
-                std::move(commands));
+                [this](const auto& transaction) { notify(transaction); }, std::move(commands));
         }
-
-        auto subscription = std::make_shared<SubscriptionCallback>(std::move(callback));
-        nx::utils::MoveOnlyFunc<void()> guard =
-            [this, subscription]()
-            {
-                NX_MUTEX_LOCKER lock(&m_mutex);
-                if (auto s = m_subscriptions.find(subscription); s != m_subscriptions.end())
-                {
-                    if (auto it = m_subscribedIds.find(s->second); it != m_subscribedIds.end())
-                    {
-                        it->second.erase(subscription.get());
-                        if (it->second.empty())
-                            m_subscribedIds.erase(it);
-                    }
-                    m_subscriptions.erase(s);
-                }
-                if (m_subscribedIds.empty())
-                    m_guard.fire();
-            };
         m_subscribedIds[id].emplace(subscription.get());
         m_subscriptions.emplace(std::move(subscription), id);
         return guard;
@@ -250,6 +200,88 @@ protected:
     QueryProcessor* const m_queryProcessor;
 
 private:
+    void removeSubscription(const std::shared_ptr<SubscriptionCallback>& subscription)
+    {
+        NX_VERBOSE(this, "Remove subscription %1", subscription.get());
+        nx::utils::Guard guard;
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            if (auto s = m_subscriptions.find(subscription); s != m_subscriptions.end())
+            {
+                if (auto it = m_subscribedIds.find(s->second); it != m_subscribedIds.end())
+                {
+                    it->second.erase(subscription.get());
+                    if (it->second.empty())
+                        m_subscribedIds.erase(it);
+                }
+                m_subscriptions.erase(s);
+            }
+            if (m_subscribedIds.empty())
+                guard = std::move(m_guard);
+        }
+        if (guard)
+            NX_VERBOSE(this, "Remove monitor");
+    }
+
+    bool isValidType(const QnUuid& id) const
+    {
+        const auto objectType = m_queryProcessor->getAccess(Qn::kSystemAccess).getObjectType(id);
+        return objectType == ApiObject_NotDefined || objectType == m_objectType;
+    }
+
+    bool isValidType(const nx::vms::api::LicenseKey&) const
+    {
+        return DeleteCommand == ApiCommand::removeLicense;
+    }
+
+    void notify(const QnAbstractTransaction& transaction)
+    {
+        using namespace details;
+
+        const auto doNotify =
+            [this, &transaction](const auto& id)
+            {
+                NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
+                const auto type =
+                    DeleteCommand == transaction.command ? NotifyType::delete_ : NotifyType::update;
+                NX_MUTEX_LOCKER lock(&m_mutex);
+                if (auto it = m_subscribedIds.find(id); it != m_subscribedIds.end())
+                {
+                    for (auto callback: it->second)
+                        (*callback)(id, type);
+                }
+                if (auto it = m_subscribedIds.find(QString("*")); it != m_subscribedIds.end())
+                {
+                    for (auto callback: it->second)
+                        (*callback)(id, type);
+                }
+            };
+
+        if (DeleteCommand == transaction.command)
+        {
+            const auto id =
+                static_cast<const QnTransaction<DeleteInput>&>(transaction).params.getId();
+            if (isValidType(id))
+                doNotify(nx::toString(id));
+            return;
+        }
+
+        invokeOnDbTypes<applyOr, Model>(
+            [this, &transaction, &doNotify](auto&& data)
+            {
+                using T = std::decay_t<decltype(data)>;
+                if (getUpdateCommand<T>() != transaction.command)
+                    return false;
+
+                const auto id = static_cast<const QnTransaction<T>&>(transaction).params.getId();
+                if (isValidType(id))
+                    doNotify(nx::toString(id));
+                return true;
+            });
+    }
+
+private:
+    static constexpr ApiObjectType m_objectType = details::commandToObjectType(DeleteCommand);
     nx::Mutex m_mutex;
     nx::utils::Guard m_guard;
     std::unordered_map<std::shared_ptr<SubscriptionCallback>, QString> m_subscriptions;
