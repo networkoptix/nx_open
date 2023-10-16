@@ -655,7 +655,7 @@ static ParsedNameValue parseNameValue(const std::string& lineStr)
 
     if (*(p++) != '=')
     {
-        result.error = "Missing \"=\" after the name " + result.name + ".";
+        result.error = "Missing \"=\" after the name " + toString(result.name) + ".";
         return result;
     }
     skipWhitespace(&p);
@@ -694,6 +694,11 @@ bool parseNameValueFile(
     while (std::getline(file, lineStr))
     {
         ++line;
+
+        static constexpr char kBom[] = "\xEF\xBB\xBF";
+        if (line == 1 && stringStartsWith(lineStr, kBom))
+            lineStr.erase(0, sizeof(kBom) - /* Terminating NUL */ 1);
+        
         const ParsedNameValue parsed = parseNameValue(lineStr);
         if (!parsed.error.empty())
         {
