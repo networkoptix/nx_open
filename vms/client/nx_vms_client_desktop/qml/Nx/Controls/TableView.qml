@@ -56,6 +56,8 @@ TableView
 
     columnWidthProvider: function (column)
     {
+        if (isCheckboxColumn(control.model, column))
+            return Math.max(getButtonItem(column).implicitWidth, 28)
         return control.width / (control.columns || 1)
     }
 

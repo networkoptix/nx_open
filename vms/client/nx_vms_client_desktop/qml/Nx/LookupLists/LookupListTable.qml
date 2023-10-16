@@ -23,45 +23,11 @@ TableView
     signal editingFinished
     signal valueChanged
 
-    function getColumnWidth(columnIndex)
-    {
-        let w = explicitColumnWidth(columnIndex)
-        if (w >= 0)
-            return w
-
-        return -1
-    }
-
     columnSpacing: 0
     rowSpacing: 0
 
     showCheckboxColumn: true
     horizontalHeaderVisible: true
-
-    columnWidthProvider: function (columnIndex)
-    {
-        if (isCheckboxColumn(control.model, columnIndex))
-            return Math.max(getButtonItem(columnIndex).implicitWidth, 28)
-
-        // Stretch the last column to the entire free width.
-        if (columnIndex === columns - 1)
-        {
-            let occupiedSpace = 0
-            for (let i = 0; i < columnIndex; ++i)
-            {
-                const w1 = getColumnWidth(i)
-                console.log("Width of " + i + " is " + w1)
-                occupiedSpace += getColumnWidth(i)
-            }
-
-            // For some unknown yet reason we need to hardcode an indentation here.
-            const lastColumnWidth = width - occupiedSpace - 10
-            const lastColumnMinSize = getColumnWidth(columnIndex)
-            return Math.max(lastColumnWidth, lastColumnMinSize)
-        }
-
-        return getColumnWidth(columnIndex)
-    }
 
     DelegateChooser
     {
