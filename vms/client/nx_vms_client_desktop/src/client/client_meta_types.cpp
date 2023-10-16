@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/common/models/index_list_model.h>
 #include <nx/vms/client/desktop/common/models/linearization_list_model.h>
 #include <nx/vms/client/desktop/common/models/row_selection_model.h>
+#include <nx/vms/client/desktop/common/models/sort_filter_proxy_model.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
 #include <nx/vms/client/desktop/common/utils/list_navigation_helper.h>
 #include <nx/vms/client/desktop/common/utils/qml_client_state_selegate.h>
@@ -347,4 +348,5 @@ void QnClientMetaTypes::registerQmlTypes()
     workbench::timeline::registerQmlType();
     rules::RulesTableModel::registerQmlType();
     rules::RulesSortFilterProxyModel::registerQmlType();
+    SortFilterProxyModel::registerQmlType();
 }
