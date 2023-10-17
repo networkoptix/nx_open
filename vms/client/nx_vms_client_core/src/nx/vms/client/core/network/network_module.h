@@ -7,8 +7,8 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
-class QnCommonModule;
 namespace nx::vms::api { enum class PeerType; }
 
 namespace nx::vms::client::core {
@@ -22,13 +22,13 @@ class RemoteSessionTimeoutWatcher;
  * Single storage place for all network-related classes intances in the client core. Maintains their
  * lifetime, internal dependencies and construction / destruction order.
  */
-class NX_VMS_CLIENT_CORE_API NetworkModule: public QObject
+class NX_VMS_CLIENT_CORE_API NetworkModule: public QObject, public SystemContextAware
 {
     Q_OBJECT
 
 public:
     NetworkModule(
-        QnCommonModule* commonmModule,
+        SystemContext* systemContext,
         nx::vms::api::PeerType peerType,
         Qn::SerializationFormat serializationFormat);
     virtual ~NetworkModule();

@@ -5,9 +5,9 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/joystick/settings/device_hid.h>
 #include <nx/vms/client/desktop/joystick/settings/osal/implementations/os_hid_device_virtual_mac.h>
 #include <nx/vms/client/desktop/joystick/settings/osal/implementations/os_hid_driver_mac.h>
@@ -31,7 +31,7 @@ joystick::OsHidDeviceVirtual* VirtualJoystickDialog::m_virtualJoystickDevice = n
 VirtualJoystickDialog::VirtualJoystickDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::VirtualJoystickDialog()),
-    m_virtualJoystickWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this))
+    m_virtualJoystickWidget(new QQuickWidget(appContext()->qmlEngine(), this))
 {
     setWindowFlags(Qt::Dialog);
 

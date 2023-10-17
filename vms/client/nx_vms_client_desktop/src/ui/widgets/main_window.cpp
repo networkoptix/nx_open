@@ -36,20 +36,19 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_list_action_handler.h>
 #include <nx/vms/client/desktop/manual_device_addition/workbench/workbench_manual_device_addition_handler.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/radass/radass_action_handler.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/rules/vms_rules_action_handler.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/screen_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/cloud_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/system_merge/incompatible_servers_action_handler.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/handlers/alarm_layout_handler.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/client/desktop/workbench/handlers/workbench_action_executor.h>
@@ -72,16 +71,12 @@
 #include <ui/workbench/handlers/startup_actions_handler.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
-#include <ui/workbench/handlers/workbench_layouts_handler.h>
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_resource_grouping_action_handler.h>
 #include <ui/workbench/handlers/workbench_resources_settings_handler.h>
-#include <ui/workbench/handlers/workbench_screen_recording_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 #include <ui/workbench/handlers/workbench_text_overlays_handler.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h>
-#include <ui/workbench/handlers/workbench_virtual_camera_handler.h>
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
@@ -156,12 +151,14 @@ struct MainWindow::Private
     QSharedPointer<MainWindowTitleBarStateStore> titleBarStateStore;
 };
 
-MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
+MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags flags):
     base_type(parent, flags),
-    QnWorkbenchContextAware(context),
-    d(new Private(this)),
-    m_welcomeScreen(qnRuntime->isDesktopMode() ? new WelcomeScreen(this) : nullptr)
+    WindowContextAware(context),
+    d(new Private(this))
 {
+    if (qnRuntime->isDesktopMode())
+        m_welcomeScreen = new WelcomeScreen(context, this);
+
     QnHiDpiWorkarounds::init();
 
 #ifdef Q_OS_MACX
@@ -196,7 +193,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark4"));
 
     /* Initialize animations manager. */
-    context->instance<ui::workbench::Animations>();
+    workbenchContext()->instance<ui::workbench::Animations>();
 
     if (!qnRuntime->isVideoWallMode())
     {
@@ -230,7 +227,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
             }
             updateHelpTopic();
         });
-    connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
+    connect(action(menu::ToggleShowreelModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
     updateHelpTopic();
 
     m_view.reset(new QnGraphicsView(m_scene.data(), this));
@@ -245,67 +242,57 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     // Controls which are initialized further access mainWindow() through the context. Set it here
     // to avoid passing main window pointer to constructors (though it will certainly be more
     // correct).
-    context->setMainWindow(this);
+    workbenchContext()->setMainWindow(this);
 
     if (qnRuntime->isVideoWallMode())
         display()->setNormalMarginFlags({});
     else
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
-    m_titleBar = new QnMainWindowTitleBarWidget(context, this);
+    m_titleBar = new QnMainWindowTitleBarWidget(windowContext(), this);
     m_titleBar->setStateStore(d->titleBarStateStore);
-    m_controller.reset(new QnWorkbenchController(this));
+    m_controller.reset(new QnWorkbenchController(context, this));
     if (qnRuntime->isVideoWallMode())
         m_controller->setMenuEnabled(false);
-    m_ui.reset(new WorkbenchUi(this));
+    m_ui.reset(new WorkbenchUi(context, this));
     if (qnRuntime->isVideoWallMode())
         m_ui->setFlags(WorkbenchUi::HideWhenZoomed | WorkbenchUi::HideWhenNormal );
     else
         m_ui->setFlags(WorkbenchUi::HideWhenZoomed | WorkbenchUi::AdjustMargins);
 
-    /* State manager */
-    context->instance<QnWorkbenchStateManager>();
-
     // Initialize action handlers.
-    context->instance<ui::workbench::ActionHandler>();
-    context->instance<ConnectActionsHandler>();
-    context->instance<QnWorkbenchNotificationsHandler>();
-    context->instance<NotificationActionExecutor>();
-    context->instance<WorkbenchActionExecutor>();
-    context->instance<QnWorkbenchScreenshotHandler>();
-    context->instance<WorkbenchExportHandler>();
-    context->instance<ui::workbench::LayoutsHandler>();
-    context->instance<QnWorkbenchPtzHandler>();
-    context->instance<DebugActionsHandler>();
-    context->instance<QnWorkbenchVideoWallHandler>();
-    context->instance<QnWorkbenchWebPageHandler>();
-    context->instance<IncompatibleServersActionHandler>();
-    context->instance<QnWorkbenchResourcesSettingsHandler>();
-    context->instance<QnWorkbenchBookmarksHandler>();
-    context->instance<WorkbenchManualDeviceAdditionHandler>();
-    context->instance<AlarmLayoutHandler>();
-    context->instance<QnWorkbenchTextOverlaysHandler>();
-    context->instance<CloudActionsHandler>();
-    context->instance<QnWorkbenchVirtualCameraHandler>();
-    context->instance<ShowreelActionsHandler>();
-    context->instance<LookupListActionHandler>();
-    context->instance<RadassActionHandler>();
-    context->instance<StartupActionsHandler>();
-    context->instance<ui::workbench::ResourceGroupingActionHandler>();
-    context->instance<ui::workbench::ResourceTreeSettingsActionHandler>();
-    context->instance<rules::VmsRulesActionHandler>();
+    workbenchContext()->instance<ui::workbench::ActionHandler>();
+    workbenchContext()->instance<NotificationActionExecutor>();
+    workbenchContext()->instance<WorkbenchActionExecutor>();
+    workbenchContext()->instance<QnWorkbenchScreenshotHandler>();
+    workbenchContext()->instance<WorkbenchExportHandler>();
+    workbenchContext()->instance<QnWorkbenchPtzHandler>();
+    workbenchContext()->instance<QnWorkbenchVideoWallHandler>();
+    workbenchContext()->instance<QnWorkbenchWebPageHandler>();
+    workbenchContext()->instance<IncompatibleServersActionHandler>();
+    workbenchContext()->instance<QnWorkbenchResourcesSettingsHandler>();
+    workbenchContext()->instance<QnWorkbenchBookmarksHandler>();
+    workbenchContext()->instance<WorkbenchManualDeviceAdditionHandler>();
+    workbenchContext()->instance<AlarmLayoutHandler>();
+    workbenchContext()->instance<QnWorkbenchTextOverlaysHandler>();
+    workbenchContext()->instance<CloudActionsHandler>();
+    workbenchContext()->instance<LookupListActionHandler>();
+    workbenchContext()->instance<RadassActionHandler>();
+    workbenchContext()->instance<StartupActionsHandler>();
+    workbenchContext()->instance<ResourceGroupingActionHandler>();
+    workbenchContext()->instance<ui::workbench::ResourceTreeSettingsActionHandler>();
+    workbenchContext()->instance<rules::VmsRulesActionHandler>();
 
-    context->instance<QnWorkbenchPtzDialogWatcher>();
+    workbenchContext()->instance<QnWorkbenchPtzDialogWatcher>();
 
-    context->instance<QnWorkbenchResourcesChangesWatcher>();
-    context->instance<QnWorkbenchBookmarkTagsWatcher>();
-    context->instance<QnWorkbenchItemBookmarksWatcher>();
-    context->instance<QnTimelineBookmarksWatcher>();
-    context->instance<QnWorkbenchServerPortWatcher>();
-    context->instance<QnWorkbenchScreenRecordingHandler>();
+    workbenchContext()->instance<QnWorkbenchResourcesChangesWatcher>();
+    workbenchContext()->instance<QnWorkbenchBookmarkTagsWatcher>();
+    workbenchContext()->instance<QnWorkbenchItemBookmarksWatcher>();
+    workbenchContext()->instance<QnTimelineBookmarksWatcher>();
+    workbenchContext()->instance<QnWorkbenchServerPortWatcher>();
 
     /* Set up watchers. */
-    context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
+    workbenchContext()->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
     const auto updateTimeMode =
         []()
@@ -325,80 +312,80 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     updateTimeMode();
 
     /* Set up actions. Only these actions will be available through hotkeys. */
-    addAction(action(action::NotificationsTabAction));
-    addAction(action(action::ResourcesTabAction));
-    addAction(action(action::SearchResourcesAction));
-    addAction(action(action::MotionTabAction));
-    addAction(action(action::SwitchMotionTabAction));
-    addAction(action(action::BookmarksTabAction));
-    addAction(action(action::EventsTabAction));
-    addAction(action(action::ObjectsTabAction));
-    addAction(action(action::ObjectSearchModeAction));
-    addAction(action(action::NextLayoutAction));
-    addAction(action(action::PreviousLayoutAction));
-    addAction(action(action::SaveCurrentLayoutAction));
-    addAction(action(action::SaveCurrentLayoutAsAction));
-    addAction(action(action::SaveCurrentVideoWallReviewAction));
-    addAction(action(action::CloseAllWindowsAction));
-    addAction(action(action::ExitAction));
-    addAction(action(action::EscapeHotkeyAction));
-    addAction(action(action::FullscreenMaximizeHotkeyAction));
-    addAction(action(action::AboutAction));
-    addAction(action(action::PreferencesGeneralTabAction));
-    addAction(action(action::OpenBookmarksSearchAction));
-    addAction(action(action::OpenBusinessLogAction));
-    addAction(action(action::CameraListAction));
-    addAction(action(action::BusinessEventsAction));
-    addAction(action(action::OpenFileAction));
-    addAction(action(action::OpenNewTabAction));
-    addAction(action(action::OpenNewWindowAction));
-    addAction(action(action::OpenWelcomeScreenAction));
-    addAction(action(action::CloseLayoutAction));
-    addAction(action(action::MainMenuAction));
-    addAction(action(action::OpenLoginDialogAction));
-    addAction(action(action::DisconnectMainMenuAction));
-    addAction(action(action::OpenInFolderAction));
-    addAction(action(action::RemoveLayoutItemAction));
-    addAction(action(action::RemoveLayoutItemFromSceneAction));
-    addAction(action(action::RemoveFromServerAction));
-    addAction(action(action::DeleteVideoWallItemAction));
-    addAction(action(action::DeleteVideowallMatrixAction));
-    addAction(action(action::RemoveShowreelAction));
-    addAction(action(action::SelectAllAction));
-    addAction(action(action::CheckFileSignatureAction));
-    addAction(action(action::TakeScreenshotAction));
-    addAction(action(action::AdjustVideoAction));
-    addAction(action(action::ToggleShowreelModeAction));
-    addAction(action(action::DebugIncrementCounterAction));
-    addAction(action(action::DebugDecrementCounterAction));
-    addAction(action(action::DebugControlPanelAction));
-    addAction(action(action::SystemAdministrationAction));
-    if (auto screenRecordingAction = action(action::ToggleScreenRecordingAction))
+    addAction(action(menu::NotificationsTabAction));
+    addAction(action(menu::ResourcesTabAction));
+    addAction(action(menu::SearchResourcesAction));
+    addAction(action(menu::MotionTabAction));
+    addAction(action(menu::SwitchMotionTabAction));
+    addAction(action(menu::BookmarksTabAction));
+    addAction(action(menu::EventsTabAction));
+    addAction(action(menu::ObjectsTabAction));
+    addAction(action(menu::ObjectSearchModeAction));
+    addAction(action(menu::NextLayoutAction));
+    addAction(action(menu::PreviousLayoutAction));
+    addAction(action(menu::SaveCurrentLayoutAction));
+    addAction(action(menu::SaveCurrentLayoutAsAction));
+    addAction(action(menu::SaveCurrentVideoWallReviewAction));
+    addAction(action(menu::CloseAllWindowsAction));
+    addAction(action(menu::ExitAction));
+    addAction(action(menu::EscapeHotkeyAction));
+    addAction(action(menu::FullscreenMaximizeHotkeyAction));
+    addAction(action(menu::AboutAction));
+    addAction(action(menu::PreferencesGeneralTabAction));
+    addAction(action(menu::OpenBookmarksSearchAction));
+    addAction(action(menu::OpenBusinessLogAction));
+    addAction(action(menu::CameraListAction));
+    addAction(action(menu::BusinessEventsAction));
+    addAction(action(menu::OpenFileAction));
+    addAction(action(menu::OpenNewTabAction));
+    addAction(action(menu::OpenNewWindowAction));
+    addAction(action(menu::OpenWelcomeScreenAction));
+    addAction(action(menu::CloseLayoutAction));
+    addAction(action(menu::MainMenuAction));
+    addAction(action(menu::OpenLoginDialogAction));
+    addAction(action(menu::DisconnectMainMenuAction));
+    addAction(action(menu::OpenInFolderAction));
+    addAction(action(menu::RemoveLayoutItemAction));
+    addAction(action(menu::RemoveLayoutItemFromSceneAction));
+    addAction(action(menu::RemoveFromServerAction));
+    addAction(action(menu::DeleteVideoWallItemAction));
+    addAction(action(menu::DeleteVideowallMatrixAction));
+    addAction(action(menu::RemoveShowreelAction));
+    addAction(action(menu::SelectAllAction));
+    addAction(action(menu::CheckFileSignatureAction));
+    addAction(action(menu::TakeScreenshotAction));
+    addAction(action(menu::AdjustVideoAction));
+    addAction(action(menu::ToggleShowreelModeAction));
+    addAction(action(menu::DebugIncrementCounterAction));
+    addAction(action(menu::DebugDecrementCounterAction));
+    addAction(action(menu::DebugControlPanelAction));
+    addAction(action(menu::SystemAdministrationAction));
+    if (auto screenRecordingAction = action(menu::ToggleScreenRecordingAction))
         addAction(screenRecordingAction);
-    addAction(action(action::ShowFpsAction));
-    addAction(action(action::OpenNewSceneAction));
-    addAction(action(action::OpenVmsRulesDialogAction));
-    addAction(action(action::CreateNewCustomGroupAction));
-    addAction(action(action::RemoveCustomGroupAction));
-    addAction(action(action::PreviousFrameAction));
-    addAction(action(action::NextFrameAction));
-    addAction(action(action::JumpToStartAction));
-    addAction(action(action::JumpToEndAction));
-    addAction(action(action::VolumeUpAction));
-    addAction(action(action::VolumeDownAction));
-    addAction(action(action::ToggleMuteAction));
-    addAction(action(action::JumpToLiveAction));
-    addAction(action(action::ToggleSyncAction));
-    addAction(action(action::ToggleSmartSearchAction));
-    addAction(action(action::ToggleInfoAction));
-    addAction(action(action::FreespaceAction));
-    addAction(action(action::ShowDebugOverlayAction));
+    addAction(action(menu::ShowFpsAction));
+    addAction(action(menu::OpenNewSceneAction));
+    addAction(action(menu::OpenVmsRulesDialogAction));
+    addAction(action(menu::CreateNewCustomGroupAction));
+    addAction(action(menu::RemoveCustomGroupAction));
+    addAction(action(menu::PreviousFrameAction));
+    addAction(action(menu::NextFrameAction));
+    addAction(action(menu::JumpToStartAction));
+    addAction(action(menu::JumpToEndAction));
+    addAction(action(menu::VolumeUpAction));
+    addAction(action(menu::VolumeDownAction));
+    addAction(action(menu::ToggleMuteAction));
+    addAction(action(menu::JumpToLiveAction));
+    addAction(action(menu::ToggleSyncAction));
+    addAction(action(menu::ToggleSmartSearchAction));
+    addAction(action(menu::ToggleInfoAction));
+    addAction(action(menu::FreespaceAction));
+    addAction(action(menu::ShowDebugOverlayAction));
 
-    connect(action(action::MaximizeAction), &QAction::toggled, this,
+    connect(action(menu::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);
-    connect(action(action::FullscreenAction), &QAction::toggled, this,
+    connect(action(menu::FullscreenAction), &QAction::toggled, this,
         &MainWindow::setFullScreen);
-    connect(action(action::MinimizeAction), &QAction::triggered, this,
+    connect(action(menu::MinimizeAction), &QAction::triggered, this,
         [this]()
         {
             showMinimized();
@@ -408,8 +395,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
             setUpdatesEnabled(!isMinimized());
         });
 
-    connect(action(action::FullscreenMaximizeHotkeyAction), &QAction::triggered,
-        action(action::EffectiveMaximizeAction), &QAction::trigger);
+    connect(action(menu::FullscreenMaximizeHotkeyAction), &QAction::triggered,
+        action(menu::EffectiveMaximizeAction), &QAction::trigger);
 
     menu()->setTargetProvider(m_ui.data());
 
@@ -440,7 +427,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     // Initialize system-wide menu
     if (nx::build_info::isMacOsX())
-        menu()->newMenu(action::MainScope, this);
+        menu()->newMenu(menu::MainScope, this);
 
     if (ini().limitFrameRate && ini().enableVSyncWorkaround)
     {
@@ -525,7 +512,7 @@ void MainWindow::updateWidgetsVisibility()
 
             // We cannot synchronize it with QmlResourceBrowserWidget visibility inside it,
             // because it can be isVisible being non-current in QStackedLayout.
-            action(ui::action::SearchResourcesAction)->setEnabled(currentWidget != m_welcomeScreen);
+            action(menu::SearchResourcesAction)->setEnabled(currentWidget != m_welcomeScreen);
         };
 
     switchWidgetsCallback();
@@ -649,7 +636,7 @@ void MainWindow::showFullScreen() {
     updateDecorationsState();
 
     // We have to disable minimize button in Mac OS for application in fullscreen mode
-    action(action::MinimizeAction)->setEnabled(false);
+    action(menu::MinimizeAction)->setEnabled(false);
 #else
     QnEmulatedFrameWidget::showFullScreen();
 #endif
@@ -660,7 +647,7 @@ void MainWindow::showNormal() {
     mac_showFullScreen((void*)winId(), false);
     updateDecorationsState();
     // We have to enable minimize button in Mac OS for application in non-fullscreen mode only
-    action(action::MinimizeAction)->setEnabled(true);
+    action(menu::MinimizeAction)->setEnabled(true);
 #else
     QnEmulatedFrameWidget::showNormal();
 #endif
@@ -673,7 +660,7 @@ void MainWindow::updateScreenInfo()
 
 std::pair<int, bool> MainWindow::calculateHelpTopic() const
 {
-    if (action(action::ToggleShowreelModeAction)->isChecked())
+    if (action(menu::ToggleShowreelModeAction)->isChecked())
         return {HelpTopic::Id::MainWindow_Scene_TourInProgress, true};
 
     if (auto layout = workbench()->currentLayout())
@@ -713,12 +700,13 @@ bool MainWindow::handleOpenFile(const QString &message)
 {
     const auto files = message.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     const auto resources = QnFileProcessor::createResourcesForFiles(
-        QnFileProcessor::findAcceptedFiles(files), resourcePool());
+        QnFileProcessor::findAcceptedFiles(files),
+        system()->resourcePool());
 
     if (resources.isEmpty())
         return false;
 
-    menu()->trigger(action::DropResourcesAction, resources);
+    menu()->trigger(menu::DropResourcesAction, resources);
     return true;
 }
 
@@ -742,8 +730,8 @@ void MainWindow::updateDecorationsState()
 #endif
     bool maximized = isMaximized();
 
-    action(action::FullscreenAction)->setChecked(fullScreen);
-    action(action::MaximizeAction)->setChecked(maximized);
+    action(menu::FullscreenAction)->setChecked(fullScreen);
+    action(menu::MaximizeAction)->setChecked(maximized);
 
 #ifdef Q_OS_MACX
     bool uiTitleUsed = fullScreen;
@@ -765,14 +753,14 @@ bool MainWindow::handleKeyPress(int key)
     if (key == Qt::Key_Alt || key == Qt::Key_Control || key == Qt::Key_Shift)
         return false;
 
-    const bool isTourRunning = action(action::ToggleShowreelModeAction)->isChecked();
+    const bool isTourRunning = action(menu::ToggleShowreelModeAction)->isChecked();
 
     if (!isTourRunning)
     {
         if (key == Qt::Key_Space)
         {
-            menu()->triggerIfPossible(action::PlayPauseAction,
-                navigator()->currentParameters(action::TimelineScope));
+            menu()->triggerIfPossible(menu::PlayPauseAction,
+                navigator()->currentParameters(menu::TimelineScope));
             return true;
         }
 
@@ -786,7 +774,7 @@ bool MainWindow::handleKeyPress(int key)
         case Qt::Key_Left:
         case Qt::Key_Up:
         case Qt::Key_PageUp:
-            menu()->trigger(action::PreviousLayoutAction);
+            menu()->trigger(menu::PreviousLayoutAction);
             break;
 
         case Qt::Key_Enter:
@@ -795,12 +783,12 @@ bool MainWindow::handleKeyPress(int key)
         case Qt::Key_Right:
         case Qt::Key_Down:
         case Qt::Key_PageDown:
-            menu()->trigger(action::NextLayoutAction);
+            menu()->trigger(menu::NextLayoutAction);
             break;
 
         case Qt::Key_Escape:
             // Stop Showreel if it is running.
-            menu()->trigger(action::ToggleShowreelModeAction);
+            menu()->trigger(menu::ToggleShowreelModeAction);
             break;
     }
     return true;
@@ -839,7 +827,7 @@ bool MainWindow::event(QEvent* event)
 {
     const bool result = base_type::event(event);
     if (event->type() == QnEvent::WinSystemMenu)
-        menu()->trigger(action::MainMenuAction);
+        menu()->trigger(menu::MainMenuAction);
 
     return result;
 }
@@ -847,7 +835,7 @@ bool MainWindow::event(QEvent* event)
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     event->ignore();
-    menu()->trigger(action::ExitAction);
+    menu()->trigger(menu::ExitAction);
 }
 
 void MainWindow::changeEvent(QEvent* event)

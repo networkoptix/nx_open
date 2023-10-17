@@ -7,8 +7,8 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <utils/common/event_processors.h>
 
 #include "../scene_banners.h"
@@ -22,7 +22,7 @@ class SceneBanners::Private: public QObject
 public:
     Private(SceneBanners* q, QWidget* parentWidget):
         q(q),
-        container(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), parentWidget))
+        container(new QQuickWidget(appContext()->qmlEngine(), parentWidget))
     {
         NX_CRITICAL(parentWidget, "Parent widget must be specified");
         container->setResizeMode(QQuickWidget::SizeViewToRootObject);

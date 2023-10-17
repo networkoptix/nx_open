@@ -34,6 +34,8 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
@@ -41,8 +43,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -57,8 +58,6 @@
 using namespace nx;
 using namespace nx::vms::event;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
-
 using namespace std::chrono;
 
 namespace {
@@ -147,7 +146,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_updateDisabled(false),
     m_dirty(false),
     m_lastMouseButton(Qt::NoButton),
-    m_helper(new StringsHelper(systemContext()))
+    m_helper(new StringsHelper(system()))
 {
     ui->setupUi(this);
 
@@ -174,6 +173,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     initEventsModel();
     initActionsModel();
 
+    connect(windowContext(), &WindowContext::systemChanged, this,
+        &QnEventLogDialog::retranslateUi);
     retranslateUi();
 
     m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
@@ -217,7 +218,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->eventComboBox,      QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->actionComboBox,     QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnEventLogDialog::updateData);
-    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          context()->action(action::BusinessEventsAction), &QAction::trigger);
+    connect(ui->eventRulesButton, &QAbstractButton::clicked,
+        action(menu::BusinessEventsAction), &QAction::trigger);
 
     connect(ui->cameraButton,       &QAbstractButton::clicked,          this,   &QnEventLogDialog::at_cameraButton_clicked);
     connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
@@ -243,9 +245,9 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
                 updateServerEventsMenu();
         };
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded,
+    connect(system()->resourcePool(), &QnResourcePool::resourceAdded,
         this, updateServerEventsMenuIfNeeded);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,
+    connect(system()->resourcePool(), &QnResourcePool::resourceRemoved,
         this, updateServerEventsMenuIfNeeded);
 
     ItemViewAutoHider::create(ui->gridEvents, tr("No events"));
@@ -264,8 +266,8 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, EventT
     if (rootItem)
         rootItem->appendRow(item);
 
-    const auto accessibleEvents =
-        NvrEventsActionsAccess::removeInacessibleNvrEvents(childEvents(value), resourcePool());
+    const auto accessibleEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
+        childEvents(value), system()->resourcePool());
 
     for (auto childValue: accessibleEvents)
         createEventTree(item, childValue);
@@ -303,9 +305,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
                 parent->sortChildren(0);
         });
 
-    auto analyticsEventsSearchTreeBuilder =
-        context()->findInstance<AnalyticsEventsSearchTreeBuilder>();
-    const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
+    const auto root = system()->analyticsEventsSearchTreeBuilder()->eventTypesTree();
     addItemRecursive(rootItem, root);
 }
 
@@ -347,7 +347,7 @@ void QnEventLogDialog::updateServerEventsMenu()
 
     const auto anyServerEventItem = m_eventTypesModel->itemFromIndex(anyServerEventIndex);
     const auto accessibleEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
-        childEvents(EventType::anyServerEvent), resourcePool());
+        childEvents(EventType::anyServerEvent), system()->resourcePool());
 
     auto selectedEventType = eventType(ui->eventComboBox->currentModelIndex());
 
@@ -412,7 +412,7 @@ void QnEventLogDialog::initEventsModel()
     updateAnalyticsSubmenuOperation->fire();
     updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
-    connect(context()->findInstance<AnalyticsEventsSearchTreeBuilder>(),
+    connect(system()->analyticsEventsSearchTreeBuilder(),
         &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         updateAnalyticsSubmenuOperation,
         &nx::utils::PendingOperation::requestOperation);
@@ -426,7 +426,7 @@ void QnEventLogDialog::initActionsModel()
     m_actionTypesModel->appendRow(anyActionItem);
 
     const auto accessibleActions =
-        NvrEventsActionsAccess::removeInacessibleNvrActions(allActions(), resourcePool());
+        NvrEventsActionsAccess::removeInacessibleNvrActions(allActions(), system()->resourcePool());
 
     for (ActionType actionType: accessibleActions)
     {
@@ -472,7 +472,7 @@ void QnEventLogDialog::updateData()
     if (serverIssue)
         setCameraList(QSet<QnUuid>());
 
-    bool istantOnly = !hasToggleState(eventType, vms::event::EventParameters(), systemContext())
+    bool istantOnly = !hasToggleState(eventType, vms::event::EventParameters(), system())
         && eventType != EventType::undefinedEvent;
 
     updateActionList(istantOnly);
@@ -519,7 +519,8 @@ void QnEventLogDialog::query(qint64 fromMsec,
     m_requests.clear();
     m_allEvents.clear();
 
-    if (!connection())
+    const auto api = system()->connectedServerApi();
+    if (!api)
         return;
 
     QnEventLogRequestData request;
@@ -557,13 +558,11 @@ void QnEventLogDialog::query(qint64 fromMsec,
                 requestFinished();
         };
 
-    const auto onlineServers = resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online);
+    const auto onlineServers = system()->resourcePool()->getAllServers(
+        nx::vms::api::ResourceStatus::online);
     for (const QnMediaServerResourcePtr& server: onlineServers)
     {
-        auto handle = connectedServerApi()->getEvents(
-            server->getId(),
-            request,
-            callback, this->thread());
+        auto handle = api->getEvents(server->getId(), request, callback, this->thread());
 
         if (handle <= 0)
             continue;
@@ -603,7 +602,7 @@ void QnEventLogDialog::retranslateUi()
         item->setText(actionName);
     }
 
-    ui->eventRulesButton->setVisible(menu()->canTrigger(action::BusinessEventsAction));
+    ui->eventRulesButton->setVisible(menu()->canTrigger(menu::BusinessEventsAction));
 }
 
 void QnEventLogDialog::requestFinished()
@@ -643,12 +642,12 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
     QnResourceList resources = m_model->resourcesForPlayback(idx).filtered(
         [this](const QnResourcePtr& resource)
         {
-            return systemContext()->accessController()->hasPermissions(resource, Qn::ReadPermission);
+            return system()->accessController()->hasPermissions(resource, Qn::ReadPermission);
         });
 
     if (!resources.isEmpty())
     {
-        action::Parameters params(resources);
+        menu::Parameters params(resources);
 
         const auto timePos = m_model->eventTimestamp(idx.row());
         if (timePos != AV_NOPTS_VALUE)
@@ -657,7 +656,7 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
             params.setArgument(Qn::ItemTimeRole, pos);
         }
 
-        context()->menu()->trigger(action::OpenInNewTabAction, params);
+        menu()->trigger(menu::OpenInNewTabAction, params);
 
         if (isMaximized())
             showNormal();
@@ -766,14 +765,14 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     if (idx.isValid())
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
-        auto manager = context()->menu();
-        if (resource && systemContext()->accessController()->hasPermissions(resource,
+        auto manager = this->menu();
+        if (resource && system()->accessController()->hasPermissions(resource,
             Qn::ViewContentPermission))
         {
-            action::Parameters parameters(resource);
+            menu::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
 
-            menu.reset(manager->newMenu(action::TreeScope, this, parameters));
+            menu.reset(manager->newMenu(menu::TreeScope, this, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }

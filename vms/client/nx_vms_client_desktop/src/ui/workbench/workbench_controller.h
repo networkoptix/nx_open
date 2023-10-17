@@ -12,11 +12,10 @@
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/graphics/instruments/click_info.h>
 #include <utils/color_space/image_correction.h>
-
-#include "workbench_context_aware.h"
 
 Q_MOC_INCLUDE("QtWidgets/QGraphicsItem")
 
@@ -61,26 +60,17 @@ class WeakGraphicsItemPointerList;
 /**
  * This class implements default scene manipulation logic.
  */
-class QnWorkbenchController: public QObject, public QnWorkbenchContextAware
+class QnWorkbenchController: public QObject, public nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
-
     typedef QObject base_type;
 
 public:
-    /**
-     * Constructor.
-     *
-     * \param parent                    Parent for this object.
-     */
-    QnWorkbenchController(QObject *parent = nullptr);
+    QnWorkbenchController(
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QObject *parent = nullptr);
 
-    /**
-     * Virtual destructor.
-     */
-    virtual ~QnWorkbenchController() = default;
-
-    QnWorkbenchGridMapper *mapper() const;
+    QnWorkbenchGridMapper* mapper() const;
 
     Instrument* motionSelectionInstrument() const;
 

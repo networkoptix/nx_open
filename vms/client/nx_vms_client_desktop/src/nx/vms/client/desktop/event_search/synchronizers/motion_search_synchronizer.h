@@ -18,7 +18,8 @@ class SimpleMotionSearchListModel;
 class MotionSearchSynchronizer: public AbstractSearchSynchronizer
 {
 public:
-    MotionSearchSynchronizer(QnWorkbenchContext* context,
+    MotionSearchSynchronizer(
+        WindowContext* context,
         CommonObjectSearchSetup* commonSetup,
         SimpleMotionSearchListModel* model,
         QObject* parent = nullptr);

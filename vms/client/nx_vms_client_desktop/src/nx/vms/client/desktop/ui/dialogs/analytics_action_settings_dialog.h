@@ -24,7 +24,6 @@ public:
     QJsonObject getValues() const;
 
     virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
 
     static std::optional<QJsonObject> request(
         const QJsonObject& settingsModel,

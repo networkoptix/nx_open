@@ -14,7 +14,7 @@ class VmsEventSearchWidget: public AbstractSearchWidget
     using base_type = AbstractSearchWidget;
 
 public:
-    VmsEventSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    VmsEventSearchWidget(WindowContext* context, QWidget* parent = nullptr);
     virtual ~VmsEventSearchWidget() override;
 
     virtual void resetFilters() override;

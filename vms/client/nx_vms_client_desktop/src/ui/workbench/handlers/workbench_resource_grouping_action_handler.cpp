@@ -5,41 +5,38 @@
 #include <QtGui/QAction>
 
 #include <client/client_globals.h>
-#include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
-#include <ui/workbench/workbench_context.h>
-
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
-namespace ui {
-namespace workbench {
 
 ResourceGroupingActionHandler::ResourceGroupingActionHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(action::CreateNewCustomGroupAction), &QAction::triggered,
+    connect(action(menu::CreateNewCustomGroupAction), &QAction::triggered,
         this, &ResourceGroupingActionHandler::createNewCustomResourceTreeGroup);
 
-    connect(action(action::AssignCustomGroupIdAction), &QAction::triggered,
+    connect(action(menu::AssignCustomGroupIdAction), &QAction::triggered,
         this, &ResourceGroupingActionHandler::assignCustomResourceTreeGroupId);
 
-    connect(action(action::RenameCustomGroupAction), &QAction::triggered,
+    connect(action(menu::RenameCustomGroupAction), &QAction::triggered,
         this, &ResourceGroupingActionHandler::renameCustomResourceTreeGroup);
 
-    connect(action(action::MoveToCustomGroupAction), &QAction::triggered,
+    connect(action(menu::MoveToCustomGroupAction), &QAction::triggered,
         this, &ResourceGroupingActionHandler::moveToCustomResourceTreeGroup);
 
-    connect(action(action::RemoveCustomGroupAction), &QAction::triggered,
+    connect(action(menu::RemoveCustomGroupAction), &QAction::triggered,
         this, &ResourceGroupingActionHandler::removeCustomResourceTreeGroup);
 }
 
@@ -93,8 +90,8 @@ void ResourceGroupingActionHandler::createNewCustomResourceTreeGroup() const
     for (const auto& resource: resources)
         resource->savePropertiesAsync();
 
-    menu()->trigger(action::NewCustomGroupCreatedEvent,
-        action::Parameters(Qn::ResourceTreeCustomGroupIdRole, newCompositeGroupId));
+    menu()->trigger(menu::NewCustomGroupCreatedEvent,
+        menu::Parameters(Qn::ResourceTreeCustomGroupIdRole, newCompositeGroupId));
 }
 
 void ResourceGroupingActionHandler::assignCustomResourceTreeGroupId() const
@@ -116,7 +113,7 @@ void ResourceGroupingActionHandler::assignCustomResourceTreeGroupId() const
     for (const auto& resource: resources)
         resource->savePropertiesAsync();
 
-    menu()->trigger(action::CustomGroupIdAssignedEvent);
+    menu()->trigger(menu::CustomGroupIdAssignedEvent);
 }
 
 void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
@@ -155,9 +152,9 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
         });
 
     const bool merging = it != allCameras.cend();
-    if (merging && !messages::Resources::mergeResourceGroups(mainWindowWidget(), newGroupName))
+    if (merging && !ui::messages::Resources::mergeResourceGroups(mainWindowWidget(), newGroupName))
     {
-        menu()->trigger(ui::action::EditResourceInTreeAction);
+        menu()->trigger(menu::EditResourceInTreeAction);
         return;
     }
 
@@ -176,8 +173,8 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
     for (const auto& resource: resources)
         resource->savePropertiesAsync();
 
-    menu()->trigger(action::CustomGroupRenamedEvent,
-        action::Parameters(Qn::TargetResourceTreeCustomGroupIdRole, newGroupCompositeId));
+    menu()->trigger(menu::CustomGroupRenamedEvent,
+        menu::Parameters(Qn::TargetResourceTreeCustomGroupIdRole, newGroupCompositeId));
 }
 
 void ResourceGroupingActionHandler::moveToCustomResourceTreeGroup() const
@@ -225,7 +222,7 @@ void ResourceGroupingActionHandler::moveToCustomResourceTreeGroup() const
     for (const auto& resource: resources)
         resource->savePropertiesAsync();
 
-    menu()->trigger(action::MovedToCustomGroupEvent);
+    menu()->trigger(menu::MovedToCustomGroupEvent);
 }
 
 void ResourceGroupingActionHandler::removeCustomResourceTreeGroup() const
@@ -259,7 +256,7 @@ void ResourceGroupingActionHandler::removeCustomResourceTreeGroup() const
     for (const auto& modifiedResource: modifiedResources)
         modifiedResource->savePropertiesAsync();
 
-    menu()->trigger(action::CustomGroupRemovedEvent);
+    menu()->trigger(menu::CustomGroupRemovedEvent);
 }
 
 void ResourceGroupingActionHandler::showMaximumDepthWarning() const
@@ -267,11 +264,4 @@ void ResourceGroupingActionHandler::showMaximumDepthWarning() const
     SceneBanner::show(tr("Maximum level of nesting is reached"));
 }
 
-action::Manager* ResourceGroupingActionHandler::menu() const
-{
-    return context()->menu();
-}
-
-} // namespace workbench
-} // namespace ui
 } // namespace nx::vms::client::desktop

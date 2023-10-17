@@ -40,7 +40,12 @@ class NX_VMS_COMMON_API SystemContextAware
 public:
     SystemContextAware(SystemContext* context);
     SystemContextAware(std::unique_ptr<SystemContextInitializer> initializer);
-    ~SystemContextAware();
+
+    /**
+     * Virtual destructor.
+     * We do dynamic_casts to SystemContextAware, so this class must have a vtable.
+     */
+    virtual ~SystemContextAware();
 
     /**
      * Linked context. May never be changed. Must exist when SystemContextAware is destroyed.

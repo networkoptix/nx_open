@@ -39,8 +39,8 @@ private:
     void exportProcessUpdated(const ExportProcessInfo& info);
     void exportProcessFinished(const ExportProcessInfo& info);
 
-    void handleExportVideoAction(const ui::action::Parameters& parameters);
-    void handleExportBookmarkAction(const ui::action::Parameters& parameters);
+    void handleExportVideoAction(const menu::Parameters& parameters);
+    void handleExportBookmarkAction(const menu::Parameters& parameters);
 
     void handleExportBookmarksAction();
     typedef std::pair<QnUuid, std::unique_ptr<AbstractExportTool>> ExportToolInstance;

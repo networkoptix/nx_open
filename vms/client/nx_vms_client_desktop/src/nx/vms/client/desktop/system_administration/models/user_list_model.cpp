@@ -481,7 +481,7 @@ bool UserListModel::Private::canEditUser(const QnUserResourcePtr& user) const
 
 UserListModel::UserListModel(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::lazy),
+    QnWorkbenchContextAware(parent),
     d(new UserListModel::Private(this))
 {
 }

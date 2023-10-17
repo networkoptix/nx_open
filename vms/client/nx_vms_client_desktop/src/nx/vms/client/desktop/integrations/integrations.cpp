@@ -66,7 +66,7 @@ void connectionEstablished(
         serverApiProcessor->connectionEstablished(currentUser, connection);
 }
 
-void registerActions(ui::action::MenuFactory* factory)
+void registerActions(menu::MenuFactory* factory)
 {
     auto storage = Storage::instance();
     if (!NX_ASSERT(storage))

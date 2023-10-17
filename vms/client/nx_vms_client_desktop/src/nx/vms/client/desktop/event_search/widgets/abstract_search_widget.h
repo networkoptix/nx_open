@@ -30,14 +30,14 @@ class TextFilterSetup;
  */
 class AbstractSearchWidget:
     public QWidget,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
     AbstractSearchWidget(
-        QnWorkbenchContext* context,
+        WindowContext* context,
         AbstractSearchListModel* model, //< Ownership is taken.
         QWidget* parent = nullptr);
 

@@ -43,6 +43,8 @@ class UploadManager;
 class WebPageIconCache;
 class WindowContext;
 
+namespace joystick { class Manager; }
+
 namespace session {
 class SessionManager;
 class DefaultProcessInterface;
@@ -233,6 +235,8 @@ public:
     WebPageIconCache* webPageIconCache() const;
 
     nx::cloud::gateway::VmsGatewayEmbeddable* cloudGateway() const;
+
+    joystick::Manager* joystickManager() const;
 
 signals:
     void systemContextAdded(SystemContext* systemContext);

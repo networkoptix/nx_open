@@ -41,6 +41,7 @@
 #include <nx/vms/client/desktop/jsapi/tab.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
 #include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/dialogs/common/certificate_selection_dialog.h>
 #include <ui/dialogs/common/password_dialog.h>
 #include <ui/graphics/items/standard/graphics_qml_view.h>
@@ -960,7 +961,7 @@ void WebViewController::setCertificateValidator(CertificateValidationFunc valida
 }
 
 void WebViewController::initClientApiSupport(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QnWorkbenchItem* item,
     ClientApiAuthCondition authCondition)
 {
@@ -971,7 +972,7 @@ void WebViewController::initClientApiSupport(
         [=](QObject* parent) -> QObject*
         {
             using External = integrations::c2p::jsapi::External;
-            return new External(context, item, parent);
+            return new External(item, parent);
         });
 
     registerApiObjectWithFactory("vms.tab",
@@ -997,7 +998,7 @@ void WebViewController::initClientApiSupport(
         {
             // Objects may be used with another controller, so use webView to get current url.
             return new jsapi::Auth(
-                context->systemContext(),
+                context->system(),
                 [authCondition, webView = QPointer(d->rootObject())]
                 {
                     if (!NX_ASSERT(webView))

@@ -7,12 +7,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_multi_listener.h>
 #include <nx/vms/client/desktop/common/utils/camera_web_authenticator.h>
-#include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
 #include "../flux/camera_settings_dialog_state.h"
@@ -22,11 +20,10 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::vms::common;
 
-class DeviceAgentSettingsAdapter::Private: public nx::vms::client::core::CommonModuleAware
+class DeviceAgentSettingsAdapter::Private
 {
 public:
     QWidget* parent = nullptr;
-    QnWorkbenchContext* context = nullptr;
     CameraSettingsDialogStore* store = nullptr;
     QnVirtualCameraResourcePtr camera;
     AnalyticsSettingsManager* settingsManager = nullptr;
@@ -35,15 +32,15 @@ public:
 
 DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
     CameraSettingsDialogStore* store,
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QWidget* parent)
     :
     base_type(parent),
+    WindowContextAware(context),
     d(new Private())
 {
     d->store = store;
     d->parent = parent;
-    d->context = context;
     d->settingsManager = qnClientModule->analyticsSettingsManager();
     NX_ASSERT(d->settingsManager);
 }
@@ -90,17 +87,17 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
                 [this, camera](const QnUuid& engineId, const AnalyticsActionResult& result)
                 {
                     const CameraSettingsDialogState& state = d->store->state();
-                    std::shared_ptr<CameraWebAuthenticator> authenticator = std::make_shared<CameraWebAuthenticator>(
-                        d->context->systemContext(),
-                        camera,
-                        result.actionUrl,
-                        state.credentials.login.valueOr(QString{}),
-                        state.credentials.password.valueOr(QString{}));
+                    std::shared_ptr<CameraWebAuthenticator> authenticator =
+                        std::make_shared<CameraWebAuthenticator>(
+                            camera,
+                            result.actionUrl,
+                            state.credentials.login.valueOr(QString{}),
+                            state.credentials.password.valueOr(QString{}));
 
                     AnalyticsActionsHelper::processResult(
                         result,
-                        d->context,
-                        d->resourcePool()->getResourceById(engineId),
+                        windowContext(),
+                        camera->resourcePool()->getResourceById(engineId),
                         authenticator,
                         d->parent);
                 });

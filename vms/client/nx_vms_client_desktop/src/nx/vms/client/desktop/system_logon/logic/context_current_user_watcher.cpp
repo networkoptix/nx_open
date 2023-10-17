@@ -13,8 +13,8 @@
 #include <network/system_helpers.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <utils/common/checked_cast.h>
 
@@ -36,7 +36,7 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
             setCurrentUser({});
 
             if (this->connection())
-                menu()->triggerForced(ui::action::DisconnectAction, {Qn::ForceRole, true});
+                menu()->triggerForced(menu::DisconnectAction, {Qn::ForceRole, true});
         });
 
     connect(systemContext()->globalPermissionsWatcher(),
@@ -219,7 +219,7 @@ bool ContextCurrentUserWatcher::isReconnectRequired(const QnUserResourcePtr &use
 
 void ContextCurrentUserWatcher::reconnect()
 {
-    menu()->trigger(ui::action::ReconnectAction);
+    menu()->trigger(menu::ReconnectAction);
 }
 
 void ContextCurrentUserWatcher::at_user_resourceChanged(const QnResourcePtr &resource)

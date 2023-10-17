@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
-#include <nx/vms/client/desktop/ui/actions/action_text_factories.h>
+#include <nx/vms/client/desktop/menu/action_conditions.h>
+#include <nx/vms/client/desktop/menu/action_text_factories.h>
 
 namespace nx::vms::client::desktop {
-namespace ui {
-namespace action {
+namespace menu {
 
 class ShowreelTextFactory: public TextFactory
 {
@@ -17,8 +16,7 @@ class ShowreelTextFactory: public TextFactory
 public:
     explicit ShowreelTextFactory(QObject* parent = nullptr);
 
-    virtual QString text(const Parameters& parameters,
-        QnWorkbenchContext* context) const override;
+    virtual QString text(const Parameters& parameters, WindowContext* context) const override;
 };
 
 namespace condition
@@ -32,6 +30,5 @@ ConditionWrapper canStartShowreel();
 
 } // namespace condition
 
-} // namespace action
-} // namespace ui
+} // namespace menu
 } // namespace nx::vms::client::desktop

@@ -34,7 +34,9 @@
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/palette.h>
 #include <ui/workbench/workbench_context.h>
@@ -143,7 +145,7 @@ AbstractSearchWidget::Private::Private(
     AbstractSearchWidget* q,
     AbstractSearchListModel* model)
     :
-    QnWorkbenchContextAware(q),
+    WindowContextAware(q),
     q(q),
     ui(new Ui::AbstractSearchWidget()),
     m_mainModel(model),
@@ -161,7 +163,7 @@ AbstractSearchWidget::Private::Private(
     NX_CRITICAL(model, "Model must be specified.");
     m_mainModel->setParent(nullptr); //< Stored as a scoped pointer.
 
-    m_commonSetup->setContext(context());
+    m_commonSetup->setContext(windowContext());
     m_commonSetup->setModel(m_mainModel.get());
 
     ui->setupUi(q);
@@ -599,7 +601,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 QString AbstractSearchWidget::Private::currentDeviceText() const
 {
     const auto camera = m_commonSetup->singleCamera();
-    const auto baseText = QnDeviceDependentStrings::getNameFromSet(resourcePool(),
+    const auto baseText = QnDeviceDependentStrings::getNameFromSet(system()->resourcePool(),
         QnCameraDeviceStringSet(tr("Selected device"), tr("Selected camera")), camera);
 
     return singleDeviceText(baseText, camera);
@@ -625,15 +627,17 @@ QString AbstractSearchWidget::Private::deviceButtonText(
         {
             if (m_commonSetup->cameraCount() > 1)
             {
-                return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+                return QnDeviceDependentStrings::getDefaultNameFromSet(
+                    system()->resourcePool(),
                     tr("%n chosen devices", "", m_commonSetup->cameraCount()),
                     tr("%n chosen cameras", "", m_commonSetup->cameraCount()));
             }
 
             const auto camera = m_commonSetup->singleCamera();
-            const auto baseText = QnDeviceDependentStrings::getNameFromSet(resourcePool(),
+            const auto baseText = QnDeviceDependentStrings::getNameFromSet(
+                system()->resourcePool(),
                 QnCameraDeviceStringSet(tr("Chosen device"), tr("Chosen camera")),
-                    camera);
+                camera);
 
             return singleDeviceText(baseText, camera);
         }
@@ -800,7 +804,7 @@ void AbstractSearchWidget::Private::updateDeviceDependentActions()
         if (item.action)
         {
             item.action->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(), item.mixedString, item.cameraString));
+                system()->resourcePool(), item.mixedString, item.cameraString));
         }
     }
 }

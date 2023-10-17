@@ -4,12 +4,10 @@
 
 #include <memory>
 
-class QnCommonMessageProcessor;
-class QnResourcePool;
-
 namespace nx::vms::client::desktop {
 
 class AnalyticsSettingsManager;
+class SystemContext;
 
 /**
  * Initializes Analytics Settings Manager and creates actual implementations of all it's external
@@ -18,9 +16,9 @@ class AnalyticsSettingsManager;
 class AnalyticsSettingsManagerFactory
 {
 public:
+    // TODO: #sivanov Move all this logic to the manager itself.
     static std::unique_ptr<AnalyticsSettingsManager> createAnalyticsSettingsManager(
-        QnResourcePool* resourcePool,
-        QnCommonMessageProcessor* messageProcessor);
+        SystemContext* systemContext);
 };
 
 } // namespace nx::vms::client::desktop

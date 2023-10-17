@@ -7,7 +7,6 @@
 #include <QtCore/QObject>
 
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/socket_common.h>
 #include <nx/reflect/enum_string_conversion.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scope_guard.h>
@@ -15,16 +14,14 @@
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
-#include <nx/vms/client/desktop/system_update/client_update_tool.h>
-#include <nx/vms/ec2/crash_reporter.h>
-#include <nx_ec/ec_api_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::api { struct ModuleInformation; }
+namespace nx::vms::client::core { struct ConnectionInfo; }
 
 namespace nx::vms::client::desktop {
 
-class ConnectActionsHandler: public QObject, public QnWorkbenchContextAware
+class ConnectActionsHandler: public QObject, public WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -58,7 +55,7 @@ public:
     Q_DECLARE_FLAGS(DisconnectFlags, DisconnectFlag)
 
 public:
-    explicit ConnectActionsHandler(QObject *parent = 0);
+    ConnectActionsHandler(WindowContext* windowContext, QObject* parent = nullptr);
     ~ConnectActionsHandler();
 
 signals:
@@ -98,7 +95,7 @@ private:
     void establishConnection(RemoteConnectionPtr connection);
 
     void storeConnectionRecord(
-        core::ConnectionInfo connectionInfo,
+        const core::ConnectionInfo& connectionInfo,
         const nx::vms::api::ModuleInformation& info,
         ConnectionOptions options);
 

@@ -5,25 +5,27 @@
 #include <QtWidgets/QTabBar>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/menu/action_target_provider.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 class QnLayoutTabBar:
     public QTabBar,
-    public QnWorkbenchContextAware,
-    public nx::vms::client::desktop::ui::action::TargetProvider
+    public nx::vms::client::desktop::WindowContextAware,
+    public nx::vms::client::desktop::menu::TargetProvider
 {
     Q_OBJECT
     typedef QTabBar base_type;
 
 public:
-    QnLayoutTabBar(QWidget* parent = nullptr);
+    QnLayoutTabBar(
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QWidget* parent = nullptr);
 
-    virtual ~QnLayoutTabBar();
+    virtual ~QnLayoutTabBar() override;
 
-    virtual nx::vms::client::desktop::ui::action::ActionScope currentScope() const override;
-    virtual nx::vms::client::desktop::ui::action::Parameters currentParameters(
-        nx::vms::client::desktop::ui::action::ActionScope scope) const override;
+    virtual nx::vms::client::desktop::menu::ActionScope currentScope() const override;
+    virtual nx::vms::client::desktop::menu::Parameters currentParameters(
+        nx::vms::client::desktop::menu::ActionScope scope) const override;
     void setSingleLevelContentMargins();
     void setSingleLevelPalette();
     void setDoubleLevelContentMargins();

@@ -39,7 +39,7 @@ public:
         bool showMilliseconds = false;
     };
 
-    explicit TimeMarker(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit TimeMarker(WindowContext* context, QObject* parent = nullptr);
     virtual ~TimeMarker() override;
 
     bool isShown() const;
@@ -72,7 +72,7 @@ public:
     void setPosition(int pointerX, int bottomY, int minX = 0, int maxX = 0);
 
 protected:
-    explicit TimeMarker(const QUrl& sourceUrl, QnWorkbenchContext* context,
+    explicit TimeMarker(const QUrl& sourceUrl, WindowContext* context,
         QObject* parent = nullptr);
 
 private:

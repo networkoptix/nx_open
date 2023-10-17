@@ -12,8 +12,6 @@
 #include <api/helpers/layout_id_helper.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -36,6 +34,7 @@
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -43,7 +42,6 @@
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -91,11 +89,11 @@ QnLayoutResourcePtr findAvailableLayoutByName(const QnUserResourcePtr& user, QSt
 
 namespace nx::vms::client::desktop {
 
-using namespace ui::action;
+using namespace menu;
 
 struct StartupActionsHandler::Private
 {
-    QnWorkbenchContext* const context;
+    StartupActionsHandler* const q;
 
     bool delayedDropGuard = false;
 
@@ -115,11 +113,6 @@ struct StartupActionsHandler::Private
 
     std::unique_ptr<LogonData> delayedLogonParameters;
     std::unique_ptr<QTimer> delayedLogonTimer;
-
-    Private(QnWorkbenchContext* context):
-        context(context)
-    {
-    }
 
     void onCloudSystemsChanged(const QnCloudSystemList& systems)
     {
@@ -144,7 +137,7 @@ struct StartupActionsHandler::Private
                 }
             }
 
-            context->menu()->trigger(
+            q->menu()->trigger(
                 ConnectAction,
                 Parameters().withArgument(Qn::LogonDataRole, *delayedLogonParameters));
 
@@ -164,7 +157,7 @@ struct StartupActionsHandler::Private
 
         if (delayedLogonParameters)
         {
-            if (auto welcomeScreen = context->mainWindow()->welcomeScreen())
+            if (auto welcomeScreen = q->mainWindow()->welcomeScreen())
                 welcomeScreen->setGlobalPreloaderVisible(true);
 
             delayedLogonTimer = std::make_unique<QTimer>();
@@ -182,7 +175,7 @@ struct StartupActionsHandler::Private
 
         if (hidePreloader)
         {
-            if (auto welcomeScreen = context->mainWindow()->welcomeScreen())
+            if (auto welcomeScreen = q->mainWindow()->welcomeScreen())
                 welcomeScreen->setGlobalPreloaderVisible(false);
         }
     }
@@ -191,7 +184,7 @@ struct StartupActionsHandler::Private
 StartupActionsHandler::StartupActionsHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    d(new Private(context()))
+    d(new Private{.q=this})
 {
     connect(action(ProcessStartupParametersAction), &QAction::triggered, this,
         &StartupActionsHandler::handleStartupParameters);
@@ -393,8 +386,7 @@ void StartupActionsHandler::handleStartupParameters()
     if (ini().developerMode || ini().profilerMode)
         menu()->trigger(ShowFpsAction);
 
-    auto engine = qnClientCoreModule->mainQmlEngine();
-    Director::instance()->setupJSEngine(engine);
+    auto engine = appContext()->qmlEngine();
     testkit::TestKit::setup(engine);
 
     if (!startupParameters.scriptFile.isEmpty())
@@ -463,7 +455,7 @@ void StartupActionsHandler::handleAcsModeResources(
 
 void StartupActionsHandler::handleScriptFile(const QString& path)
 {
-    auto engine = qnClientCoreModule->mainQmlEngine();
+    auto engine = appContext()->qmlEngine();
 
     QFile scriptFile(path);
     if (!scriptFile.open(QIODevice::ReadOnly))

@@ -5,17 +5,17 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QSlider>
 
-#include <ui/workbench/workbench_context_aware.h>
-
 class VariantAnimator;
 
-namespace nx::vms::client::desktop::workbench::timeline {
+namespace nx::vms::client::desktop {
+
+class WindowContext;
+
+namespace workbench::timeline {
 
 class SliderToolTip;
 
-class SpeedSlider:
-    public QSlider,
-    public QnWorkbenchContextAware
+class SpeedSlider: public QSlider
 {
     Q_OBJECT
     Q_PROPERTY(qreal speed READ speed WRITE setSpeed)
@@ -23,7 +23,7 @@ class SpeedSlider:
     using base_type = QSlider;
 
 public:
-    explicit SpeedSlider(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    explicit SpeedSlider(WindowContext* context, QWidget* parent = nullptr);
     virtual ~SpeedSlider() override;
 
     void setTooltipsVisible(bool enabled);
@@ -94,4 +94,5 @@ private:
     std::unique_ptr<SliderToolTip> m_tooltip;
 };
 
-} // namespace nx::vms::client::desktop::workbench::timeline
+} // namespace workbench::timeline
+} // namespace nx::vms::client::desktop

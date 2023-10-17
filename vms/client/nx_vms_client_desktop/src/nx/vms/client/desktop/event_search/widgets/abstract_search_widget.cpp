@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "abstract_search_widget.h"
-#include "private/abstract_search_widget_p.h"
 
 #include <QtWidgets/QMenu>
 
@@ -9,6 +8,9 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
+
+#include "private/abstract_search_widget_p.h"
 
 namespace nx::vms::client::desktop {
 
@@ -22,23 +24,37 @@ static bool isCamera(const QnSharedResourcePointer<QnResource>& resource)
 } // namespace
 
 AbstractSearchWidget::AbstractSearchWidget(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     AbstractSearchListModel* model,
     QWidget* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(context),
+    WindowContextAware(context),
     d(new Private(this, model))
 {
     setRelevantControls(Control::defaults);
 
-    connect(systemContext()->accessController(), &core::AccessController::permissionsMaybeChanged,
-        this,
-        [this](const QnResourceList& resources)
+    auto listenPermissionsChanges =
+        [this]()
         {
-            if (resources.empty() || std::any_of(resources.begin(), resources.end(), isCamera))
-                updateAllowance();
-        });
+            connect(system()->accessController(), &core::AccessController::permissionsMaybeChanged,
+                this,
+                [this](const QnResourceList& resources)
+                {
+                    if (resources.empty()
+                        || std::any_of(resources.cbegin(), resources.cend(), isCamera))
+                    {
+                        updateAllowance();
+                    }
+                });
+        };
+
+    connect(context, &WindowContext::beforeSystemChanged, this,
+        [this]() { system()->accessController()->disconnect(this); } );
+    connect(context, &WindowContext::systemChanged, this, listenPermissionsChanges);
+
+    listenPermissionsChanges();
+
 }
 
 AbstractSearchWidget::~AbstractSearchWidget()

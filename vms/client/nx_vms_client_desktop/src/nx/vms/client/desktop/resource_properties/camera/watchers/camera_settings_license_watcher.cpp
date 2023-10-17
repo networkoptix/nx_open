@@ -169,7 +169,7 @@ CameraSettingsLicenseWatcher::CameraSettingsLicenseWatcher(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy),
+    QnWorkbenchContextAware(parent),
     d(new Private(this, store))
 {
 }

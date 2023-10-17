@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_fwd.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_fwd.h>
 
 namespace nx::vms::client::desktop {
 

@@ -7,6 +7,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
@@ -15,9 +16,9 @@
 
 namespace nx::vms::client::desktop::rules {
 
-SoundPicker::SoundPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
-    PlainFieldPickerWidget<vms::rules::SoundField>(context, parent),
-    m_serverNotificationCache{context->instance<ServerNotificationCache>()}
+SoundPicker::SoundPicker(WindowContext* context, CommonParamsWidget* parent):
+    PlainFieldPickerWidget<vms::rules::SoundField>(context->system(), parent),
+    m_serverNotificationCache{context->workbenchContext()->instance<ServerNotificationCache>()}
 {
     auto contentLayout = new QHBoxLayout;
 

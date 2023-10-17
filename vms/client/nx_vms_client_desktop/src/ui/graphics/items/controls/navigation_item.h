@@ -19,7 +19,7 @@ class ThumbnailPanel;
 
 } // nx::vms::client::desktop::workbench::timeline
 
-class QnNavigationItem : public GraphicsWidget, public QnWorkbenchContextAware
+class QnNavigationItem : public GraphicsWidget, public nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
 

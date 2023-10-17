@@ -8,11 +8,8 @@
 #include <QtQml/QJSEngine>
 #include <QtQml/QJSValue>
 
-#include <nx/utils/singleton.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <ui/workbench/workbench_context_aware.h>
-
-class QnWorkbenchContext;
+#include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -23,12 +20,11 @@ namespace nx::vms::client::desktop {
 
 class Director:
     public QObject,
-    public QnWorkbenchContextAware,
-    public Singleton<Director>
+    public WindowContextAware
 {
     Q_OBJECT
 public:
-    explicit Director(QObject* parent);
+    Director(WindowContext* windowContext, QObject* parent = nullptr);
     virtual ~Director();
 
     /** Registers necessary global objects within QJSEngine instance. */
@@ -41,10 +37,10 @@ public:
      * Registers a js callback function to call when specified action happens.
      * Action parameters are passed as a single js object parameter to callback.
      */
-    Q_INVOKABLE void subscribe(ui::action::IDType action, QJSValue callback);
+    Q_INVOKABLE void subscribe(menu::IDType action, QJSValue callback);
 
     /** Invokes the specified action with parameters converted from js object properties. */
-    Q_INVOKABLE void trigger(ui::action::IDType action, QJSValue parameters);
+    Q_INVOKABLE void trigger(menu::IDType action, QJSValue parameters);
 
     /** Get all resources from ResourcePool as parsed JSON. */
     Q_INVOKABLE QJSValue getResources() const;

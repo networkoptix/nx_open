@@ -71,7 +71,7 @@ template<typename Policy>
 class TargetCameraPicker: public CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>
 {
 public:
-    TargetCameraPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    TargetCameraPicker(SystemContext* context, CommonParamsWidget* parent):
         CameraPickerWidgetBase<vms::rules::TargetDeviceField, Policy>(context, parent)
     {
         auto contentLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());

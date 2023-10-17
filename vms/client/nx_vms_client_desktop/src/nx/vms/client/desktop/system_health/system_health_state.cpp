@@ -22,7 +22,9 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
@@ -30,12 +32,10 @@
 #include <nx/vms/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/vms/client/desktop/system_health/user_emails_watcher.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/email/email.h>
 
@@ -46,7 +46,7 @@ namespace nx::vms::client::desktop {
 // ------------------------------------------------------------------------------------------------
 // SystemHealthState::Private declaration.
 
-class SystemHealthState::Private
+class SystemHealthState::Private: public SystemContextAware
 {
     SystemHealthState* const q;
 
@@ -57,6 +57,7 @@ public:
     QVariant data(SystemHealthIndex index) const;
 
 private:
+    QnUserResourcePtr user() const { return systemContext()->userWatcher()->user(); }
     bool hasResourcesForMessageType(SystemHealthIndex message) const;
     void setResourcesForMessageType(SystemHealthIndex message, QSet<QnResourcePtr> resources);
 
@@ -65,9 +66,7 @@ private:
 
     bool update(SystemHealthIndex index) { return setState(index, calculateState(index)); }
 
-    SystemInternetAccessWatcher* internetAccessWatcher() const;
     DefaultPasswordCamerasWatcher* defaultPasswordWatcher() const;
-    UserEmailsWatcher* userEmailsWatcher() const;
     bool hasPowerUserPermissions() const;
 
     void updateCamerasWithDefaultPassword();
@@ -81,83 +80,83 @@ private:
     std::array<bool, (int) SystemHealthIndex::count> m_state;
     QHash<SystemHealthIndex, QSet<QnResourcePtr>> m_resourcesForMessageType;
     std::unique_ptr<InvalidRecordingScheduleWatcher> m_invalidRecordingScheduleWatcher;
+    std::unique_ptr<SystemInternetAccessWatcher> m_systemInternetAccessWatcher;
+    std::unique_ptr<UserEmailsWatcher> m_userEmailsWatcher;
 };
 
 // ------------------------------------------------------------------------------------------------
 // SystemHealthState::Private definition.
 
 SystemHealthState::Private::Private(SystemHealthState* q):
+    SystemContextAware(q->systemContext()),
     q(q),
     m_state(),
-    m_invalidRecordingScheduleWatcher(std::make_unique<InvalidRecordingScheduleWatcher>())
+    m_invalidRecordingScheduleWatcher(
+        std::make_unique<InvalidRecordingScheduleWatcher>(systemContext())),
+    m_systemInternetAccessWatcher(std::make_unique<SystemInternetAccessWatcher>(systemContext())),
+    m_userEmailsWatcher(std::make_unique<UserEmailsWatcher>(systemContext()))
 {
-#define update(index) [this]() { return update(SystemHealthIndex::index); }
+#define updateSlot(index) [this]() { return update(SystemHealthIndex::index); }
+
+    connect(systemContext()->userWatcher(), &core::UserWatcher::userChanged, q,
+        [this]()
+        {
+            update(SystemHealthIndex::noLicenses);
+            update(SystemHealthIndex::smtpIsNotSet);
+            update(SystemHealthIndex::emailIsEmpty);
+            update(SystemHealthIndex::cloudPromo);
+            update(SystemHealthIndex::metadataStorageNotSet);
+            update(SystemHealthIndex::metadataOnSystemStorage);
+            updateCamerasWithDefaultPassword();
+            updateCamerasWithInvalidSchedule();
+            updateUsersWithInvalidEmail();
+            updateSaasIssues();
+        });
 
     // NoLicenses.
 
-    connect(q->systemContext()->licensePool(),
+    connect(systemContext()->licensePool(),
         &QnLicensePool::licensesChanged,
         q,
-        update(noLicenses));
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(noLicenses));
+        updateSlot(noLicenses));
 
-    update(noLicenses)();
+    update(SystemHealthIndex::noLicenses);
 
     // SmtpIsNotSet.
 
-    connect(q->systemSettings(), &SystemSettings::useCloudServiceToSendEmailChanged,
-        q, update(smtpIsNotSet));
-    connect(q->systemSettings(), &SystemSettings::emailSettingsChanged, q, update(smtpIsNotSet));
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(smtpIsNotSet));
-
-    update(smtpIsNotSet)();
+    connect(systemSettings(), &SystemSettings::useCloudServiceToSendEmailChanged,
+        q, updateSlot(smtpIsNotSet));
+    connect(systemSettings(), &SystemSettings::emailSettingsChanged,
+        q, updateSlot(smtpIsNotSet));
+    update(SystemHealthIndex::smtpIsNotSet);
 
     // NoInternetForTimeSync.
+    m_systemInternetAccessWatcher->start();
+    connect(m_systemInternetAccessWatcher.get(),
+        &SystemInternetAccessWatcher::internetAccessChanged,
+        q, updateSlot(noInternetForTimeSync));
 
-    NX_ASSERT(internetAccessWatcher(), "Internet access watcher is not initialized");
+    connect(systemSettings(), &SystemSettings::timeSynchronizationSettingsChanged,
+        q, updateSlot(noInternetForTimeSync));
 
-    connect(internetAccessWatcher(), &SystemInternetAccessWatcher::internetAccessChanged,
-        q, update(noInternetForTimeSync));
-
-    connect(q->systemSettings(), &SystemSettings::timeSynchronizationSettingsChanged,
-        q, update(noInternetForTimeSync));
-
-    const auto messageProcessor =
-        dynamic_cast<QnClientMessageProcessor*>(q->messageProcessor());
-
+    const auto messageProcessor = clientMessageProcessor();
     connect(messageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, q,
         [this]()
         {
-            update(noInternetForTimeSync);
+            update(SystemHealthIndex::noInternetForTimeSync);
             updateServersWithoutStorages();
         });
 
     connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed,
-        q, update(noInternetForTimeSync));
+        q, updateSlot(noInternetForTimeSync));
 
-    update(noInternetForTimeSync)();
-
-    // replacedDeviceDiscovered.
-
-    connect(messageProcessor, &QnClientMessageProcessor::hardwareIdMappingRemoved, q,
-        [this](const QnUuid& id)
-        {
-            const auto resource = this->q->resourcePool()->getResourceById(id);
-            const auto notificationsHandler =
-                this->q->context()->instance<QnWorkbenchNotificationsHandler>();
-
-            notificationsHandler->setSystemHealthEventVisible(
-                SystemHealthIndex::replacedDeviceDiscovered, resource, false);
-        });
+    update(SystemHealthIndex::noInternetForTimeSync);
 
     // DefaultCameraPasswords.
 
     NX_ASSERT(defaultPasswordWatcher(), "Default password cameras watcher is not initialized");
 
     connect(defaultPasswordWatcher(), &DefaultPasswordCamerasWatcher::cameraSetChanged, q,
-        [this]() { updateCamerasWithDefaultPassword(); });
-
-    connect(q->context(), &QnWorkbenchContext::userChanged, q,
         [this]() { updateCamerasWithDefaultPassword(); });
 
     updateCamerasWithDefaultPassword();
@@ -169,56 +168,43 @@ SystemHealthState::Private::Private(SystemHealthState* q):
         q,
         [this]() { updateCamerasWithInvalidSchedule(); });
 
-    connect(q->context(), &QnWorkbenchContext::userChanged, q,
-        [this]() { updateCamerasWithInvalidSchedule(); });
-
     updateCamerasWithInvalidSchedule();
 
     // EmailIsEmpty.
 
-    NX_ASSERT(userEmailsWatcher(), "User email watcher is not initialized");
-
-    connect(userEmailsWatcher(), &UserEmailsWatcher::userSetChanged, q, update(emailIsEmpty));
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(emailIsEmpty));
-    update(emailIsEmpty)();
+    connect(m_userEmailsWatcher.get(), &UserEmailsWatcher::userSetChanged,
+        q, updateSlot(emailIsEmpty));
+    update(SystemHealthIndex::emailIsEmpty);
 
     // UsersEmailIsEmpty.
 
-    connect(userEmailsWatcher(), &UserEmailsWatcher::userSetChanged, q,
-        [this]() { updateUsersWithInvalidEmail(); });
-
-    connect(q->context(), &QnWorkbenchContext::userChanged, q,
+    connect(m_userEmailsWatcher.get(), &UserEmailsWatcher::userSetChanged, q,
         [this]() { updateUsersWithInvalidEmail(); });
 
     updateUsersWithInvalidEmail();
 
     // StoragesNotConfigured.
-
-    const auto runtimeInfoManager = q->context()->runtimeInfoManager();
-    NX_ASSERT(runtimeInfoManager);
-
-    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded, q,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, q,
         [this]() { updateServersWithoutStorages(); });
 
-    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved, q,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, q,
         [this]() { updateServersWithoutStorages(); });
 
-    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, q,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, q,
         [this]() { updateServersWithoutStorages(); });
 
     updateServersWithoutStorages();
 
     // CloudPromo.
 
-    connect(q->action(ui::action::HideCloudPromoAction), &QAction::triggered, q,
-        [this]
+    connect(&showOnceSettings()->cloudPromo, &ShowOnceSettings::BaseProperty::changed,
+        q,
+        [this](nx::utils::property_storage::BaseProperty* /*property*/)
         {
-            showOnceSettings()->cloudPromo = true;
-            update(cloudPromo)();
+            update(SystemHealthIndex::cloudPromo);
         });
 
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(cloudPromo));
-    update(cloudPromo)();
+    update(SystemHealthIndex::cloudPromo);
 
     // Metadata storage issues.
 
@@ -228,21 +214,16 @@ SystemHealthState::Private::Private(SystemHealthState* q):
     connect(qnServerStorageManager, &QnServerStorageManager::activeMetadataStorageChanged,
         [this]() { updateServersWithMetadataStorageIssues(); });
 
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(metadataStorageNotSet));
-    update(metadataStorageNotSet)();
-
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, update(metadataOnSystemStorage));
-    update(metadataOnSystemStorage)();
+    update(SystemHealthIndex::metadataStorageNotSet);
+    update(SystemHealthIndex::metadataOnSystemStorage);
 
     // SaaS related issues.
 
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, [this] { updateSaasIssues(); });
-    connect(q->systemContext()->saasServiceManager(), &saas::ServiceManager::dataChanged, q,
+    connect(systemContext()->saasServiceManager(), &saas::ServiceManager::dataChanged, q,
         [this] { updateSaasIssues(); } );
-
     updateSaasIssues();
 
-#undef update
+#undef updateSlot
 }
 
 void SystemHealthState::Private::updateCamerasWithDefaultPassword()
@@ -264,7 +245,7 @@ void SystemHealthState::Private::updateCamerasWithInvalidSchedule()
     QSet<QnResourcePtr> resourceSet;
     for (const auto& camera: camerasWithInvalidSchedule)
     {
-        if (q->accessController()->hasPermissions(camera, Qn::ReadWriteSavePermission))
+        if (accessController()->hasPermissions(camera, Qn::ReadWriteSavePermission))
             resourceSet.insert(camera);
     }
 
@@ -273,13 +254,13 @@ void SystemHealthState::Private::updateCamerasWithInvalidSchedule()
 
 void SystemHealthState::Private::updateUsersWithInvalidEmail()
 {
-    const auto usersWithInvalidEmail = userEmailsWatcher()->usersWithInvalidEmail();
+    const auto usersWithInvalidEmail = m_userEmailsWatcher->usersWithInvalidEmail();
 
     QSet<QnResourcePtr> resourceSet;
     for (const auto& user: usersWithInvalidEmail)
     {
-        if (user != q->context()->user()
-            && q->accessController()->hasPermissions(user, Qn::WriteEmailPermission))
+        if (user != this->user()
+            && accessController()->hasPermissions(user, Qn::WriteEmailPermission))
         {
             resourceSet.insert(user);
         }
@@ -293,12 +274,8 @@ void SystemHealthState::Private::updateServersWithoutStorages()
     const auto calculateServersWithoutStorages =
         [this](auto flag) -> QSet<QnResourcePtr>
         {
-            const auto runtimeInfoManager = q->context()->runtimeInfoManager();
-            if (!NX_ASSERT(runtimeInfoManager))
-                return {};
-
             QSet<QnUuid> serverIds;
-            const auto items = runtimeInfoManager->items()->getItems();
+            const auto items = runtimeInfoManager()->items()->getItems();
             for (const auto& item: items)
             {
                 if (item.data.flags.testFlag(flag))
@@ -306,7 +283,7 @@ void SystemHealthState::Private::updateServersWithoutStorages()
             }
 
             const auto servers =
-                q->resourcePool()->getResourcesByIds<QnMediaServerResource>(serverIds);
+                resourcePool()->getResourcesByIds<QnMediaServerResource>(serverIds);
 
             return QSet<QnResourcePtr>(servers.cbegin(), servers.cend());
         };
@@ -323,8 +300,7 @@ void SystemHealthState::Private::updateServersWithMetadataStorageIssues()
     QSet<QnResourcePtr> serversWithoutMetadataStorage;
     QSet<QnResourcePtr> serversWithMetadataOnSystemStorage;
 
-    const auto resourcePool = q->context()->resourcePool();
-    const auto servers = resourcePool->servers();
+    const auto servers = resourcePool()->servers();
     for (const auto& server: servers)
     {
         const auto serverMetadataStorageId = server->metadataStorageId();
@@ -382,42 +358,42 @@ bool SystemHealthState::Private::setState(SystemHealthIndex index, bool value)
 
 bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 {
-    if (!q->context()->user())
+    if (!user())
         return false;
 
     switch (index)
     {
         case SystemHealthIndex::noInternetForTimeSync:
             return hasPowerUserPermissions()
-                && q->systemSettings()->isTimeSynchronizationEnabled()
-                && q->systemSettings()->primaryTimeServer().isNull()
-                && !internetAccessWatcher()->systemHasInternetAccess();
+                && systemSettings()->isTimeSynchronizationEnabled()
+                && systemSettings()->primaryTimeServer().isNull()
+                && !m_systemInternetAccessWatcher->systemHasInternetAccess();
 
         case SystemHealthIndex::noLicenses:
-            return hasPowerUserPermissions() && q->systemContext()->licensePool()->isEmpty();
+            return hasPowerUserPermissions() && systemContext()->licensePool()->isEmpty();
 
         case SystemHealthIndex::smtpIsNotSet:
             return hasPowerUserPermissions()
-                && !(q->systemSettings()->emailSettings().isValid()
-                    || q->systemSettings()->useCloudServiceToSendEmail());
+                && !(systemSettings()->emailSettings().isValid()
+                    || systemSettings()->useCloudServiceToSendEmail());
 
         case SystemHealthIndex::defaultCameraPasswords:
             return hasPowerUserPermissions() && hasResourcesForMessageType(index);
 
         case SystemHealthIndex::emailIsEmpty:
         {
-            const auto user = q->context()->user();
-            return user && userEmailsWatcher()->usersWithInvalidEmail().contains(user)
-                && q->accessController()->hasPermissions(user, Qn::WriteEmailPermission);
+            const auto user = this->user();
+            return user && m_userEmailsWatcher->usersWithInvalidEmail().contains(user)
+                && accessController()->hasPermissions(user, Qn::WriteEmailPermission);
         }
 
         case SystemHealthIndex::usersEmailIsEmpty:
             return hasResourcesForMessageType(index);
 
         case SystemHealthIndex::cloudPromo:
-            return q->context()->user()
-                && q->context()->user()->isAdministrator()
-                && q->systemSettings()->cloudSystemId().isEmpty()
+            return user()
+                && user()->isAdministrator()
+                && systemSettings()->cloudSystemId().isEmpty()
                 && !showOnceSettings()->cloudPromo();
 
         case SystemHealthIndex::storagesNotConfigured:
@@ -437,27 +413,27 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 
         case SystemHealthIndex::saasLocalRecordingServicesOverused:
             return hasPowerUserPermissions()
-                && saas::saasInitialized(q->systemContext())
-                && saas::localRecordingServicesOverused(q->systemContext());
+                && saas::saasInitialized(systemContext())
+                && saas::localRecordingServicesOverused(systemContext());
 
         case SystemHealthIndex::saasCloudStorageServicesOverused:
             return hasPowerUserPermissions()
-                && saas::saasInitialized(q->systemContext())
-                && saas::cloudStorageServicesOverused(q->systemContext());
+                && saas::saasInitialized(systemContext())
+                && saas::cloudStorageServicesOverused(systemContext());
 
         case SystemHealthIndex::saasIntegrationServicesOverused:
             return hasPowerUserPermissions()
-                && saas::saasInitialized(q->systemContext())
-                && saas::integrationServicesOverused(q->systemContext());
+                && saas::saasInitialized(systemContext())
+                && saas::integrationServicesOverused(systemContext());
 
         case SystemHealthIndex::saasInSuspendedState:
             return hasPowerUserPermissions()
-                && q->systemContext()->saasServiceManager()->saasState()
+                && systemContext()->saasServiceManager()->saasState()
                     == nx::vms::api::SaasState::suspend;
 
         case SystemHealthIndex::saasInShutdownState:
             return hasPowerUserPermissions()
-                && q->systemContext()->saasServiceManager()->saasShutDown();
+                && systemContext()->saasServiceManager()->saasShutDown();
 
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");
@@ -507,32 +483,23 @@ void SystemHealthState::Private::setResourcesForMessageType(
 
 bool SystemHealthState::Private::hasPowerUserPermissions() const
 {
-    return q->accessController()->hasPowerUserPermissions();
-}
-
-SystemInternetAccessWatcher* SystemHealthState::Private::internetAccessWatcher() const
-{
-    return q->context()->findInstance<SystemInternetAccessWatcher>();
+    return accessController()->hasPowerUserPermissions();
 }
 
 DefaultPasswordCamerasWatcher* SystemHealthState::Private::defaultPasswordWatcher() const
 {
-    return q->context()->findInstance<DefaultPasswordCamerasWatcher>();
-}
-
-UserEmailsWatcher* SystemHealthState::Private::userEmailsWatcher() const
-{
-    return q->context()->instance<UserEmailsWatcher>();
+    return systemContext()->defaultPasswordCamerasWatcher();
 }
 
 // ------------------------------------------------------------------------------------------------
 // SystemHealthState definition.
 
-SystemHealthState::SystemHealthState(QObject* parent):
+SystemHealthState::SystemHealthState(SystemContext* systemContext, QObject* parent):
     QObject(parent),
-    QnWorkbenchContextAware(parent),
+    SystemContextAware(systemContext),
     d(new Private(this))
 {
+    NX_CRITICAL(messageProcessor());
 }
 
 SystemHealthState::~SystemHealthState()

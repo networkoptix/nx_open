@@ -15,11 +15,11 @@
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -111,7 +111,8 @@ struct GroupSettingsDialog::Private
 
 GroupSettingsDialog::GroupSettingsDialog(
     DialogType dialogType,
-    nx::vms::client::desktop::SystemContext* systemContext,
+    SystemContext* systemContext,
+    WindowContext* windowContext,
     QWidget* parent)
     :
     base_type(
@@ -120,6 +121,7 @@ GroupSettingsDialog::GroupSettingsDialog(
             ? "Nx/Dialogs/UserManagement/GroupEditDialog.qml"
             : "Nx/Dialogs/UserManagement/GroupCreateDialog.qml"),
     SystemContextAware(systemContext),
+    WindowContextAware(windowContext),
     d(new Private(this, dialogType))
 {
     d->self = this;
@@ -133,13 +135,11 @@ GroupSettingsDialog::GroupSettingsDialog(
             {
                 reject();
             });
-
-        connect(d->sessionNotifier, &SessionNotifier::forcedUpdateRequested, this,
-            [this]
-            {
-                updateStateFrom(d->groupId);
-            });
     }
+
+    // FIXME: #sivanov Looks very suspicious.
+    connect(windowContext, &WindowContext::systemChanged, this,
+        [this] { updateStateFrom(d->groupId); });
 
     if (dialogType == DialogType::editGroup)
     {
@@ -252,8 +252,8 @@ QString GroupSettingsDialog::validateName(const QString& text)
 
 void GroupSettingsDialog::onAddGroupRequested()
 {
-    d->sessionNotifier->actionManager()->trigger(ui::action::UserGroupsAction,
-        ui::action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer(window())));
+    menu()->trigger(menu::UserGroupsAction,
+        menu::Parameters().withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }
 
 void GroupSettingsDialog::onDeleteRequested()
@@ -588,7 +588,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 }
 
 void GroupSettingsDialog::removeGroups(
-    nx::vms::client::desktop::SystemContext* systemContext,
+    SystemContext* systemContext,
     const QSet<QnUuid>& idsToRemove,
     nx::utils::MoveOnlyFunc<void(bool, const QString&)> callback)
 {

@@ -30,7 +30,7 @@ class SimpleMotionSearchListModel: public AbstractSearchListModel
     using MotionSelection = nx::vms::client::core::MotionSelection;
 
 public:
-    explicit SimpleMotionSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit SimpleMotionSearchListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~SimpleMotionSearchListModel() override = default;
 
     MotionSelection filterRegions() const;

@@ -26,7 +26,7 @@ class DurationPicker: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    DurationPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    DurationPicker(SystemContext* context, CommonParamsWidget* parent):
         base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

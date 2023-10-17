@@ -22,7 +22,6 @@ class CameraWebAuthenticator:
     Q_OBJECT
 public:
     CameraWebAuthenticator(
-        SystemContext* systemContext,
         QnVirtualCameraResourcePtr camera,
         QUrl settingsUrl,
         QString login,

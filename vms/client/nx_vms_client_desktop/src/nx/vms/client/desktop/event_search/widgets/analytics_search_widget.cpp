@@ -74,7 +74,6 @@ static const QMap<QIcon::Mode, core::SvgIconColorer::ThemeColorsRemapData> kThem
 using namespace std::chrono;
 using namespace nx::analytics::taxonomy;
 using namespace nx::vms::client::desktop::analytics;
-using namespace nx::vms::client::desktop::ui;
 using namespace analytics::taxonomy;
 
 using nx::vms::client::core::AccessController;
@@ -140,7 +139,7 @@ private:
 // ------------------------------------------------------------------------------------------------
 // AnalyticsSearchWidget
 
-AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidget* parent):
+AnalyticsSearchWidget::AnalyticsSearchWidget(WindowContext* context, QWidget* parent):
     base_type(context, new AnalyticsSearchListModel(context), parent),
     d(new Private(this))
 {
@@ -148,12 +147,12 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
     setPlaceholderPixmap(qnSkin->pixmap("left_panel/placeholders/objects.svg"));
     commonSetup()->setCameraSelection(RightPanel::CameraSelection::layout);
 
-    addSearchAction(action(ui::action::OpenAdvancedSearchDialog));
+    addSearchAction(action(menu::OpenAdvancedSearchDialog));
 
     connect(model(), &AbstractSearchListModel::isOnlineChanged, this,
         &AnalyticsSearchWidget::updateAllowance);
 
-    connect(action(action::ObjectSearchModeAction), &QAction::toggled, this,
+    connect(action(menu::ObjectSearchModeAction), &QAction::toggled, this,
         [this](bool on)
         {
             if (!on && commonSetup()->cameraSelection() == RightPanel::CameraSelection::current)
@@ -197,7 +196,7 @@ bool AnalyticsSearchWidget::calculateAllowance() const
         return false;
 
     const bool hasPermissions = model()->isOnline()
-        && systemContext()->accessController()->isDeviceAccessRelevant(
+        && system()->accessController()->isDeviceAccessRelevant(
             nx::vms::api::AccessRight::viewArchive);
 
     return hasPermissions && !d->engines().empty();
@@ -208,7 +207,7 @@ bool AnalyticsSearchWidget::calculateAllowance() const
 
 AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     q(q),
-    taxonomyManager(q->systemContext()->taxonomyManager()),
+    taxonomyManager(q->system()->taxonomyManager()),
     m_areaSelectionButton(q->createCustomFilterButton()),
     m_engineSelectionButton(q->createCustomFilterButton()),
     m_typeSelectionButton(q->createCustomFilterButton()),

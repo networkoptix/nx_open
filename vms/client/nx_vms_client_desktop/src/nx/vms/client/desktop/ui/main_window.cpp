@@ -5,7 +5,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFileInfo>
 #include <QtGui/private/qevent_p.h>
-#include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlError>
@@ -14,9 +13,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -70,9 +69,9 @@ protected:
 
 //-------------------------------------------------------------------------------------------------
 
-MainWindow::MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget* parent):
+MainWindow::MainWindow(QQmlEngine* engine, WindowContext* context, QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(context),
+    WindowContextAware(context),
     d(new Private(this))
 {
     engine->addImageProvider("resource", new ResourceIconProvider());
@@ -81,8 +80,7 @@ MainWindow::MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget*
     d->sceneWidget = new QuickWidget(engine, this);
 
     d->sceneWidget->rootContext()->setContextProperty(lit("workbench"), workbench());
-    d->sceneWidget->rootContext()->setContextProperty(
-        QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName, context);
+    d->sceneWidget->rootContext()->setContextProperty(WindowContext::kQmlPropertyName, context);
 
     // TODO: #vkutin Replace with a better calculation?
     d->sceneWidget->rootContext()->setContextProperty("maxTextureSize",

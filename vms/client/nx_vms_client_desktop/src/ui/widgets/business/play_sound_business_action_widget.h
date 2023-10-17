@@ -7,7 +7,7 @@
 #include <ui/widgets/business/subject_target_action_widget.h>
 
 namespace Ui { class PlaySoundBusinessActionWidget; }
-class QnWorkbenchContext;
+namespace nx::vms::client::desktop { class WindowContext; }
 
 namespace nx::vms::client::desktop { class ServerNotificationCache; }
 
@@ -19,7 +19,7 @@ class QnPlaySoundBusinessActionWidget:
 
 public:
     explicit QnPlaySoundBusinessActionWidget(
-        QnWorkbenchContext* context,
+        nx::vms::client::desktop::WindowContext* context,
         QWidget* parent = nullptr);
     virtual ~QnPlaySoundBusinessActionWidget() override;
 

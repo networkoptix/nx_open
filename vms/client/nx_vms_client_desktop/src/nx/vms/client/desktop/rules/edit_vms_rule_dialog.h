@@ -4,6 +4,7 @@
 
 #include <nx/vms/client/desktop/common/widgets/editable_label.h>
 #include <nx/vms/client/desktop/common/widgets/slide_switch.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/rules/rule.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -13,12 +14,13 @@ class ActionTypePickerWidget;
 class EditableTitleWidget;
 class EventTypePickerWidget;
 
-class EditVmsRuleDialog: public QnSessionAwareButtonBoxDialog
+class EditVmsRuleDialog:
+    public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
 public:
-    explicit EditVmsRuleDialog(QWidget* parent = nullptr);
+    EditVmsRuleDialog(QWidget* parent = nullptr);
 
     void setRule(std::shared_ptr<vms::rules::Rule> rule);
 

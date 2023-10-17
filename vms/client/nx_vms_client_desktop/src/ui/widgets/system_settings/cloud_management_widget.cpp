@@ -15,10 +15,10 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_logon/logic/connect_to_cloud_tool.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
@@ -242,7 +242,7 @@ void QnCloudManagementWidget::onDisconnectSuccess()
     messageBox->open();
 
     if (isCloudUser)
-        menu()->trigger(ui::action::DisconnectAction, { Qn::ForceRole, true });
+        menu()->trigger(menu::DisconnectAction, { Qn::ForceRole, true });
 }
 
 bool QnCloudManagementWidget::confirmCloudDisconnect()

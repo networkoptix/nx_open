@@ -16,10 +16,10 @@
 #include <core/resource/resource_display_info.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/messages/ptz_messages.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
@@ -302,34 +302,34 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
-    connect(action(action::PtzSavePresetAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered);
-    connect(action(action::PtzActivatePresetAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered);
-    connect(action(action::PtzActivateTourAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered);
-    connect(action(action::PtzActivateObjectAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered);
-    connect(action(action::PtzManageAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzManageAction_triggered);
-    connect(action(action::DebugCalibratePtzAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
-    connect(action(action::DebugGetPtzPositionAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
+    connect(action(menu::PtzSavePresetAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered);
+    connect(action(menu::PtzActivatePresetAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered);
+    connect(action(menu::PtzActivateTourAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered);
+    connect(action(menu::PtzActivateObjectAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered);
+    connect(action(menu::PtzManageAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzManageAction_triggered);
+    connect(action(menu::DebugCalibratePtzAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
+    connect(action(menu::DebugGetPtzPositionAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
 
     connect(
-        action(action::PtzContinuousMoveAction), &QAction::triggered,
+        action(menu::PtzContinuousMoveAction), &QAction::triggered,
         this, &QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered);
 
     connect(
-        action(action::PtzActivatePresetByIndexAction), &QAction::triggered,
+        action(menu::PtzActivatePresetByIndexAction), &QAction::triggered,
         this, &QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered);
 
     connect(
-        action(action::PtzActivateByHotkeyAction), &QAction::triggered,
+        action(menu::PtzActivateByHotkeyAction), &QAction::triggered,
         this, &QnWorkbenchPtzHandler::at_ptzActivateObjectByHotkeyAction_triggered);
 
     connect(
-        action(action::PtzFocusInAction), &QAction::triggered,
+        action(menu::PtzFocusInAction), &QAction::triggered,
         this, &QnWorkbenchPtzHandler::at_ptzFocusInAction_triggered);
     connect(
-        action(action::PtzFocusOutAction), &QAction::triggered,
+        action(menu::PtzFocusOutAction), &QAction::triggered,
         this, &QnWorkbenchPtzHandler::at_ptzFocusOutAction_triggered);
     connect(
-        action(action::PtzFocusAutoAction), &QAction::triggered,
+        action(menu::PtzFocusAutoAction), &QAction::triggered,
         this, &QnWorkbenchPtzHandler::at_ptzFocusAutoAction_triggered);
 }
 
@@ -389,7 +389,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
     if (widget->ptzController()->activatePreset(id, 1.0))
     {
         if (!widget->dewarpingParams().enabled) //< Do not jump to live if this is a fisheye camera.
-            menu()->trigger(action::JumpToLiveAction, widget);
+            menu()->trigger(menu::JumpToLiveAction, widget);
     }
     else
     {
@@ -438,7 +438,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
     if (widget->ptzController()->activateTour(id))
     {
         if (!widget->dewarpingParams().enabled) //< Do not jump to live if this is a fisheye camera.
-            menu()->trigger(action::JumpToLiveAction, widget);
+            menu()->trigger(menu::JumpToLiveAction, widget);
     }
     else
     {
@@ -464,9 +464,9 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
     const auto preset = std::find_if(presets.cbegin(), presets.cend(),
         [&](const QnPtzPreset &preset) { return preset.id == id; });
     if (preset == presets.cend())
-        menu()->trigger(action::PtzActivateTourAction, parameters);
+        menu()->trigger(menu::PtzActivateTourAction, parameters);
     else
-        menu()->trigger(action::PtzActivatePresetAction, parameters);
+        menu()->trigger(menu::PtzActivatePresetAction, parameters);
 }
 
 
@@ -530,7 +530,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
         if (!guard || !itemGuard)
             break;
 
-        menu()->trigger(action::TakeScreenshotAction, action::Parameters(widget)
+        menu()->trigger(menu::TakeScreenshotAction, menu::Parameters(widget)
             .withArgument(
                 Qn::FileNameRole,
                 lit("PTZ_CALIBRATION_%1.jpg").arg(position.zoom, 0, 'f', 4)));
@@ -624,8 +624,8 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
     if (presetIndex < presetList.size() && presetIndex >= 0)
     {
         menu()->trigger(
-            action::PtzActivateObjectAction,
-            action::Parameters(widget)
+            menu::PtzActivateObjectAction,
+            menu::Parameters(widget)
                 .withArgument(Qn::PtzObjectIdRole, presetList[presetIndex].id));
     }
 }
@@ -650,8 +650,8 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectByHotkeyAction_triggered()
         return;
 
     menu()->trigger(
-        action::PtzActivateObjectAction,
-        action::Parameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
+        menu::PtzActivateObjectAction,
+        menu::Parameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
 }
 
 void QnWorkbenchPtzHandler::at_ptzFocusInAction_triggered()

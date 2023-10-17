@@ -10,8 +10,7 @@
 #include <nx_ec/ec_api_fwd.h>
 
 namespace nx::vms::api { struct ModuleInformation; }
-
-class QnWorkbenchContext;
+namespace nx::vms::client::desktop { class WindowContext; }
 
 class QnConnectionDiagnosticsHelper: public QObject
 {
@@ -32,7 +31,7 @@ public:
      * window will be used as a parent window.
      */
     static void showConnectionErrorMessage(
-        QnWorkbenchContext* context,
+        nx::vms::client::desktop::WindowContext* context,
         RemoteConnectionError errorCode,
         const nx::vms::api::ModuleInformation& moduleInformation,
         const nx::utils::SoftwareVersion& engineVersion,

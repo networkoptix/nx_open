@@ -59,7 +59,7 @@ protected:
 
     virtual void activatedNotify() {}
     virtual void deactivatedNotify() {}
-    virtual void tickNotify(int deltaMs) {}
+    virtual void tickNotify(int /*deltaMs*/) {}
 
     void listenerStartedListening();
     void listenerStoppedListening();

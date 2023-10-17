@@ -13,10 +13,10 @@
 #include <QtCore/QSet>
 #include <QtQml/QtQml>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 template<typename Container, typename ToString>
 QString itemsToString(const Container& items, ToString itemToString)
@@ -1413,7 +1413,7 @@ void LinearizationListModel::Private::setExpanded(
         setExpanded(index,
             [&shouldExpand](const QModelIndex& index)
             {
-                auto arg = qnClientCoreModule->mainQmlEngine()->toScriptValue(index);
+                auto arg = appContext()->qmlEngine()->toScriptValue(index);
                 return shouldExpand.call({arg}).toBool();
             });
     }

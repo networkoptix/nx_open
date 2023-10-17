@@ -14,17 +14,17 @@
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::common;
 
 namespace {
@@ -65,12 +65,11 @@ private:
 namespace nx::vms::client::desktop {
 
 PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QWidget* parent)
     :
-    base_type(context->systemContext(), parent),
+    base_type(context->system(), parent),
     ui(new Ui::PushNotificationBusinessActionWidget),
-    m_context(context),
     m_aligner(new Aligner(this))
 {
     ui->setupUi(this);
@@ -89,9 +88,9 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(
 
     ui->languageButton->setIcon(qnSkin->icon("events/push_language.svg"));
     connect(ui->languageButton, &QPushButton::clicked, this,
-        [this]
+        [this, context]
         {
-            m_context->menu()->trigger(ui::action::SystemAdministrationAction);
+            context->menu()->trigger(menu::SystemAdministrationAction);
         });
 
     m_aligner->addWidgets(
@@ -106,7 +105,7 @@ PushNotificationBusinessActionWidget::PushNotificationBusinessActionWidget(
     connect(
         ui->cloudSettingsButton,
         &QPushButton::clicked,
-        m_context->action(action::PreferencesCloudTabAction),
+        context->menu()->action(menu::PreferencesCloudTabAction),
         &QAction::triggered);
 
     connect(

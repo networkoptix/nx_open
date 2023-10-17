@@ -10,8 +10,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <nx/vms/client/desktop/ui/actions/action_fwd.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/menu/action_fwd.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/common/system_health/message_type.h>
 
 #include "../system_health_list_model.h"
@@ -20,7 +20,7 @@ namespace nx::vms::client::desktop {
 
 class SystemHealthListModel::Private:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -47,8 +47,8 @@ public:
     bool locked(int index) const;
     bool isCloseable(int index) const;
     CommandActionPtr commandAction(int index) const; //< Additional button action with parameters.
-    ui::action::IDType action(int index) const; //< Click-on-tile action id.
-    ui::action::Parameters parameters(int index) const; // Click-on-tile action parameters.
+    menu::IDType action(int index) const; //< Click-on-tile action id.
+    menu::Parameters parameters(int index) const; // Click-on-tile action parameters.
     MessageType messageType(int index) const;
 
     void remove(int first, int count);

@@ -14,7 +14,9 @@ namespace nx::vms::client::desktop {
 
 class MergeSystemsTool;
 
-class ConnectToCurrentSystemTool: public QObject, public QnSessionAwareDelegate
+class ConnectToCurrentSystemTool:
+    public QObject,
+    public QnSessionAwareDelegate
 {
     Q_OBJECT
     using base_type = QObject;
@@ -27,7 +29,6 @@ public:
     virtual ~ConnectToCurrentSystemTool() override;
 
     virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
 
     void start(const QnUuid& targetId);
 

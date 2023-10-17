@@ -10,7 +10,7 @@ namespace nx::vms::client::desktop {
 
 class CallNotificationsListModel::Private:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;

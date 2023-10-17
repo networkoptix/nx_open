@@ -19,14 +19,14 @@ class QQuickWebEngineProfile;
 class QWebEngineCertificateError;
 class QWebEngineScript;
 
-class QnWorkbenchContext;
 class QnWorkbenchItem;
 
 namespace nx::vms::client::desktop {
 
+class AbstractWebAuthenticator;
 class GraphicsQmlView;
 class WebPageIconCache;
-class AbstractWebAuthenticator;
+class WindowContext;
 
 /**
  * C++ part of `WebEngineView` QML component which is used for controlling its behavior.
@@ -164,7 +164,9 @@ public:
      *     May be used with another controller.
      */
     void initClientApiSupport(
-        QnWorkbenchContext* context, QnWorkbenchItem* item, ClientApiAuthCondition authCondition);
+        WindowContext* context,
+        QnWorkbenchItem* item,
+        ClientApiAuthCondition authCondition);
 
     /** Register the save state metatype for suspend()/resume() methods. */
     static void registerMetaType();

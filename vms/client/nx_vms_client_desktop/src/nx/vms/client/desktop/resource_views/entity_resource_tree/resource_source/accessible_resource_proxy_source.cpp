@@ -81,12 +81,12 @@ AccessibleResourceProxySource::AccessibleResourceProxySource(
             }
         });
 
+    // TODO: #sivanov There should be more elegant way to handle unit tests limitations.
     // Message processor does not exist in unit tests.
-    if (auto messageProcessor = this->messageProcessor())
+    if (messageProcessor())
     {
         auto cachesCleaner = new core::SessionResourcesSignalListener<QnResource>(
-            resourcePool(),
-            messageProcessor,
+            systemContext,
             this);
 
         cachesCleaner->setOnRemovedHandler(

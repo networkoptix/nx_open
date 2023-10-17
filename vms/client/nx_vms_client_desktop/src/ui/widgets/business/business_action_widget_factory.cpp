@@ -2,34 +2,34 @@
 
 #include "business_action_widget_factory.h"
 
-#include <ui/widgets/business/empty_business_action_widget.h>
-#include <ui/widgets/business/camera_output_business_action_widget.h>
-#include <ui/widgets/business/recording_business_action_widget.h>
-#include <ui/widgets/business/sendmail_business_action_widget.h>
-#include <ui/widgets/business/popup_business_action_widget.h>
-#include <ui/widgets/business/push_notification_business_action_widget.h>
-#include <ui/widgets/business/play_sound_business_action_widget.h>
-#include <ui/widgets/business/say_text_business_action_widget.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/widgets/business/bookmark_business_action_widget.h>
-#include <ui/widgets/business/show_text_overlay_action_widget.h>
-#include <ui/widgets/business/show_on_alarm_layout_action_widget.h>
-#include <ui/widgets/business/ptz_preset_business_action_widget.h>
-#include <ui/widgets/business/exec_http_request_action_widget.h>
-#include <ui/widgets/business/open_layout_action_widget.h>
-#include <ui/widgets/business/fullscreen_camera_action_widget.h>
-#include <ui/widgets/business/exit_fullscreen_action_widget.h>
 #include <ui/widgets/business/buzzer_business_action_widget.h>
-#include <ui/workbench/workbench_context.h>
+#include <ui/widgets/business/camera_output_business_action_widget.h>
+#include <ui/widgets/business/empty_business_action_widget.h>
+#include <ui/widgets/business/exec_http_request_action_widget.h>
+#include <ui/widgets/business/exit_fullscreen_action_widget.h>
+#include <ui/widgets/business/fullscreen_camera_action_widget.h>
+#include <ui/widgets/business/open_layout_action_widget.h>
+#include <ui/widgets/business/play_sound_business_action_widget.h>
+#include <ui/widgets/business/popup_business_action_widget.h>
+#include <ui/widgets/business/ptz_preset_business_action_widget.h>
+#include <ui/widgets/business/push_notification_business_action_widget.h>
+#include <ui/widgets/business/recording_business_action_widget.h>
+#include <ui/widgets/business/say_text_business_action_widget.h>
+#include <ui/widgets/business/sendmail_business_action_widget.h>
+#include <ui/widgets/business/show_on_alarm_layout_action_widget.h>
+#include <ui/widgets/business/show_text_overlay_action_widget.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
 
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
     vms::api::ActionType actionType,
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QWidget* parent)
 {
-    SystemContext* systemContext = context->systemContext();
+    SystemContext* systemContext = context->system();
 
     switch (actionType)
     {

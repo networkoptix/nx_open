@@ -10,6 +10,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/rules/event_log_fwd.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/rules/rules_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -27,7 +28,7 @@ class EventLogDialog: public QnSessionAwareDialog
     using base_type = QnSessionAwareDialog;
 
 public:
-    explicit EventLogDialog(QWidget* parent);
+    EventLogDialog(QWidget* parent);
     virtual ~EventLogDialog();
 
     void disableUpdateData();
@@ -41,11 +42,11 @@ public:
     void setText(const QString& text);
 
 protected:
-    virtual void retranslateUi() override;
     virtual void showEvent(QShowEvent* event) override;
     virtual void hideEvent(QHideEvent* event) override;
 
 private:
+    void retranslateUi();
     void initEventsModel();
     void initActionsModel();
 

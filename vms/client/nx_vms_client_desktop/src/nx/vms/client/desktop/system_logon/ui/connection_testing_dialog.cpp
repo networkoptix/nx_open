@@ -122,7 +122,7 @@ struct ConnectionTestingDialog::Private
     public:
         ConnectionUserInteractionDelegate(ConnectionTestingDialog* owner):
             m_owner(owner),
-            m_baseDelegate(createConnectionUserInteractionDelegate(owner))
+            m_baseDelegate(createConnectionUserInteractionDelegate([this]() {return m_owner;}))
         {
         }
 

@@ -10,7 +10,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
 
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"

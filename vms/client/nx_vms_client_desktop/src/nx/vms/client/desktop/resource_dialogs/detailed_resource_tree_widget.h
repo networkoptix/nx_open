@@ -5,9 +5,11 @@
 #include <functional>
 #include <memory>
 
+#include <QtWidgets/QWidget>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
-#include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui { class DetailedResourceTreeWidget; }
 

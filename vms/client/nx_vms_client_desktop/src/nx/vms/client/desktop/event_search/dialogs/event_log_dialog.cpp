@@ -30,14 +30,15 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/events/analytics_event.h>
 #include <nx/vms/rules/group.h>
@@ -159,7 +160,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     columns << EventLogModel::DateTimeColumn << EventLogModel::EventColumn << EventLogModel::EventCameraColumn <<
         EventLogModel::ActionColumn << EventLogModel::ActionCameraColumn << EventLogModel::DescriptionColumn;
 
-    m_model = new EventLogModel(this);
+    m_model = new EventLogModel(system(), this);
     m_model->setColumns(columns);
     ui->gridEvents->setModel(m_model);
 
@@ -170,6 +171,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     initEventsModel();
     initActionsModel();
 
+    connect(windowContext(), &WindowContext::systemChanged, this, &EventLogDialog::retranslateUi);
     retranslateUi();
 
     m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
@@ -216,7 +218,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     connect(ui->actionComboBox, QnComboboxCurrentIndexChanged, this, &EventLogDialog::updateData);
     connect(ui->refreshButton, &QAbstractButton::clicked, this, &EventLogDialog::updateData);
     connect(ui->eventRulesButton, &QAbstractButton::clicked,
-        context()->action(ui::action::OpenVmsRulesDialogAction), &QAction::trigger);
+        action(menu::OpenVmsRulesDialogAction), &QAction::trigger);
 
     connect(ui->cameraButton, &QAbstractButton::clicked,
         this, &EventLogDialog::at_cameraButton_clicked);
@@ -265,7 +267,6 @@ EventLogDialog::~EventLogDialog()
 
 QStandardItem* EventLogDialog::createEventTree(const Group& group)
 {
-    const auto engine = systemContext()->vmsRulesEngine();
     const auto stringHelper = rules::utils::StringHelper(systemContext());
 
     auto item = new QStandardItem(group.name);
@@ -318,9 +319,7 @@ void EventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
                 parent->sortChildren(0);
         });
 
-    auto analyticsEventsSearchTreeBuilder =
-        context()->findInstance<AnalyticsEventsSearchTreeBuilder>();
-    const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
+    const auto root = systemContext()->analyticsEventsSearchTreeBuilder()->eventTypesTree();
     addItemRecursive(rootItem, root);
 }
 
@@ -424,7 +423,7 @@ void EventLogDialog::initEventsModel()
     updateAnalyticsSubmenuOperation->fire();
     updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
-    connect(context()->findInstance<AnalyticsEventsSearchTreeBuilder>(),
+    connect(systemContext()->analyticsEventsSearchTreeBuilder(),
         &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         updateAnalyticsSubmenuOperation,
         &nx::utils::PendingOperation::requestOperation);
@@ -589,7 +588,7 @@ void EventLogDialog::retranslateUi()
         ui->cameraButton->selectDevices(cameras);
 
     // TODO: #amalov Update device dependent strings (event/action names).
-    ui->eventRulesButton->setVisible(menu()->canTrigger(ui::action::OpenVmsRulesDialogAction));
+    ui->eventRulesButton->setVisible(menu()->canTrigger(menu::OpenVmsRulesDialogAction));
 }
 
 void EventLogDialog::requestFinished(nx::vms::api::rules::EventLogRecordList&& records)
@@ -642,11 +641,11 @@ void EventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
                 Qn::ViewFootagePermission);
         });
 
-    ui::action::Parameters params(resources);
+    menu::Parameters params(resources);
     if (resources.size() == archiveCameras.size())
         params.setArgument(Qn::ItemTimeRole, m_model->eventTimestamp(idx.row()).count());
 
-    context()->menu()->trigger(ui::action::OpenInNewTabAction, params);
+    menu()->trigger(menu::OpenInNewTabAction, params);
 
     if (isMaximized())
         showNormal();
@@ -756,15 +755,15 @@ void EventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     if (idx.isValid())
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
-        auto manager = context()->menu();
+        auto manager = this->menu();
         if (resource && systemContext()->accessController()->hasPermissions(resource,
             Qn::ViewContentPermission))
         {
-            ui::action::Parameters parameters(resource);
+            menu::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
 
-            menu.reset(manager->newMenu(ui::action::TreeScope, this, parameters));
-            foreach(QAction* action, menu->actions())
+            menu.reset(manager->newMenu(menu::TreeScope, this, parameters));
+            for (QAction* action: menu->actions())
                 action->setShortcut(QKeySequence());
         }
     }

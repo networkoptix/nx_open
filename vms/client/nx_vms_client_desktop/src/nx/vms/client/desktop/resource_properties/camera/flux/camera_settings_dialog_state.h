@@ -30,7 +30,7 @@
 #include <nx/vms/client/desktop/common/flux/flux_types.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/record_schedule_cell_data.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_state.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
 #include <nx/vms/common/resource/remote_archive_types.h>
 #include <utils/common/aspect_ratio.h>

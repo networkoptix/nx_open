@@ -13,7 +13,6 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -22,6 +21,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -83,7 +83,7 @@ struct LdapSettingsWidget::Private
 
     Private(LdapSettingsWidget* parent):
         q(parent),
-        quickWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), parent)),
+        quickWidget(new QQuickWidget(appContext()->qmlEngine(), parent)),
         self(quickWidget, "self"),
         testState(quickWidget, "testState"),
         testMessage(quickWidget, "testMessage"),

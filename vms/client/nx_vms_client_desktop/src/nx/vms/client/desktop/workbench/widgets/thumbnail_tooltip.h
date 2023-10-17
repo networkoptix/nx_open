@@ -19,7 +19,7 @@ class ThumbnailTooltip: public BubbleToolTip
     Q_OBJECT
 
 public:
-    ThumbnailTooltip(QnWorkbenchContext* context);
+    ThumbnailTooltip(WindowContext* context);
     virtual ~ThumbnailTooltip() override;
 
     QString text() const;

@@ -10,21 +10,21 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
-#include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtGui/QPainter>
+#include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtQml/QQmlComponent>
 #include <QtQml/QQmlEngine>
+#include <QtQuick/QQuickGraphicsDevice>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickRenderControl>
 #include <QtQuick/QQuickRenderTarget>
-#include <QtQuick/QQuickGraphicsDevice>
 #include <QtQuick/QQuickWindow>
 
-#include <client_core/client_core_module.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 
@@ -165,7 +165,7 @@ private:
         context(new QOpenGLContext()),
         renderControl(new RenderControl()),
         quickWindow(new QQuickWindow(renderControl.get())),
-        rootComponent(new QQmlComponent(qnClientCoreModule->mainQmlEngine(),
+        rootComponent(new QQmlComponent(appContext()->qmlEngine(),
             QUrl("Nx/Items/NameValueTable.qml"),
             QQmlComponent::CompilationMode::PreferSynchronous)),
         rootItem(qobject_cast<QQuickItem*>(rootComponent->create()))

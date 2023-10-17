@@ -19,11 +19,11 @@
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
@@ -146,19 +146,19 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
     setHelpTopic(m_buttons[kBookmarksButton], HelpTopic::Id::Bookmarks_Search);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(ui::action::OpenBusinessRulesAction); });
+        [this] { menu()->trigger(menu::OpenBusinessRulesAction); });
 
     connect(m_buttons[kCameraListButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(ui::action::CameraListAction); });
+        [this] { menu()->trigger(menu::CameraListAction); });
 
     connect(m_buttons[kAuditLogButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(ui::action::OpenAuditLogAction); });
+        [this] { menu()->trigger(menu::OpenAuditLogAction); });
 
     connect(m_buttons[kEventLogButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(ui::action::OpenBusinessLogAction); });
+        [this] { menu()->trigger(menu::OpenBusinessLogAction); });
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(ui::action::OpenBookmarksSearchAction); });
+        [this] { menu()->trigger(menu::OpenBookmarksSearchAction); });
 
     connect(m_systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
@@ -192,7 +192,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     m_buttons[kCameraListButton   ]->setText(
         QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(), tr("Device List"), tr("Camera List")));
 
-    auto shortcutString = [this](const ui::action::IDType actionId, const QString &baseString) -> QString
+    auto shortcutString = [this](const menu::IDType actionId, const QString &baseString) -> QString
     {
         auto shortcut = action(actionId)->shortcut();
         if (shortcut.isEmpty())
@@ -202,19 +202,19 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
 
-    m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(ui::action::BusinessEventsAction,
+    m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(menu::BusinessEventsAction,
         tr("Open Event Rules Management")));
 
-    m_buttons[kEventLogButton]->setToolTip(shortcutString(ui::action::OpenBusinessLogAction,
+    m_buttons[kEventLogButton]->setToolTip(shortcutString(menu::OpenBusinessLogAction,
         tr("Open Event Log")));
 
-    m_buttons[kAuditLogButton]->setToolTip(shortcutString(ui::action::OpenAuditLogAction,
+    m_buttons[kAuditLogButton]->setToolTip(shortcutString(menu::OpenAuditLogAction,
         tr("Open Audit Trail Log")));
 
-    m_buttons[kBookmarksButton]->setToolTip(shortcutString(ui::action::OpenBookmarksSearchAction,
+    m_buttons[kBookmarksButton]->setToolTip(shortcutString(menu::OpenBookmarksSearchAction,
         tr("Open Bookmarks List")));
 
-    m_buttons[kCameraListButton]->setToolTip(shortcutString(ui::action::CameraListAction,
+    m_buttons[kCameraListButton]->setToolTip(shortcutString(menu::CameraListAction,
         QnDeviceDependentStrings::getDefaultNameFromSet(
             resourcePool(),
             tr("Open Device List"),

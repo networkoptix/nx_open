@@ -9,10 +9,10 @@
 #include <network/base_system_description.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <nx/vms/client/desktop/workbench/state/workbench_state.h>
-#include <ui/workbench/workbench_context_aware.h>
 
-Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
+Q_MOC_INCLUDE("nx/vms/client/desktop/window_context.h")
 Q_MOC_INCLUDE("ui/workbench/workbench_layout.h")
 
 class QnWorkbenchLayout;
@@ -22,7 +22,6 @@ class QQuickItem;
 
 namespace nx::vms::client::desktop {
 
-class WindowContext;
 struct LogonData;
 
 /**
@@ -45,17 +44,17 @@ struct LogonData;
  * <li>Currently zoomed item - an item that is shown in full screen.</li>
  * </ul>
  */
-class Workbench: public QObject, public QnWorkbenchContextAware
+class Workbench: public QObject, public WindowContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QnWorkbenchLayout* currentLayout
         READ currentLayout
         WRITE setCurrentLayout
         NOTIFY currentLayoutChanged)
-    Q_PROPERTY(QnWorkbenchContext* context READ context CONSTANT)
+    Q_PROPERTY(nx::vms::client::desktop::WindowContext* context READ windowContext CONSTANT)
 
 public:
-    Workbench(QObject* parent = nullptr);
+    Workbench(WindowContext* windowContext, QObject* parent = nullptr);
     virtual ~Workbench() override;
 
     /**
@@ -65,13 +64,6 @@ public:
      * number, the better.
      */
     static constexpr qreal kUnitSize = 10000.0;
-
-    /**
-     * Window context of the workbench.
-     * TODO: #sivanov Currently always returns application main window context. Dependencies should
-     * be inverted.
-     */
-    WindowContext* windowContext() const;
 
     /**
      * Clears this workbench by setting all of its properties to their initial

@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <server/server_storage_manager.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -316,7 +317,8 @@ void QnStorageUrlDialog::at_protocolComboBox_currentIndexChanged()
 
 bool QnStorageUrlDialog::storageAlreadyUsed(const QString& path) const
 {
-    QnMediaServerResourceList servers = resourcePool()->getResources<QnMediaServerResource>();
+    QnMediaServerResourceList servers =
+        system()->resourcePool()->getResources<QnMediaServerResource>();
     servers.removeOne(m_server);
 
     bool usedOnOtherServers = std::any_of(servers.begin(), servers.end(),

@@ -389,7 +389,7 @@ void QnBusinessRuleWidget::initActionParameters()
     {
         m_actionParameters = QnBusinessActionWidgetFactory::createWidget(
             m_model->actionType(),
-            context(),
+            windowContext(),
             this);
         m_actionWidgetsByType[m_model->actionType()] = m_actionParameters;
     }

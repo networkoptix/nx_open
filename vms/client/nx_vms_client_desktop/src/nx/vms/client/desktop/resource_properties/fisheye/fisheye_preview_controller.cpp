@@ -14,7 +14,7 @@ namespace nx::vms::client::desktop {
 
 FisheyePreviewController::FisheyePreviewController(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::lazy)
+    QnWorkbenchContextAware(parent)
 {
 }
 

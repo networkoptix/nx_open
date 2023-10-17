@@ -2,12 +2,13 @@
 
 #include "workbench_layout_change_validator.h"
 
-#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <ui/workbench/workbench_context.h>
 
 QnWorkbenchLayoutsChangeValidator::QnWorkbenchLayoutsChangeValidator(QnWorkbenchContext* context):
     QnWorkbenchContextAware(context)

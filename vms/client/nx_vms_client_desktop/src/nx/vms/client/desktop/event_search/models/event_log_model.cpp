@@ -189,12 +189,12 @@ private:
 //-------------------------------------------------------------------------------------------------
 // EventLogModel
 
-EventLogModel::EventLogModel(QObject* parent):
+EventLogModel::EventLogModel(SystemContext* systemContext, QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    SystemContextAware(systemContext),
     m_linkBrush(QPalette().link()),
     m_index(std::make_unique<DataIndex>(this)),
-    m_stringHelper(std::make_unique<rules::utils::StringHelper>(systemContext()))
+    m_stringHelper(std::make_unique<rules::utils::StringHelper>(systemContext))
 {
 }
 

@@ -19,10 +19,10 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/text/human_readable.h>
@@ -43,7 +43,6 @@
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 namespace {
     /** Convert angle from radians to degrees */
@@ -688,7 +687,7 @@ void QnServerResourceWidget::createButtons()
     showLogButton->setToolTip(tr("Show Log"));
     setHelpTopic(showLogButton, HelpTopic::Id::MainWindow_MonitoringItem_Log);
     connect(showLogButton, &QnImageButtonWidget::clicked, this,
-        [this] {menu()->trigger(action::ServerLogsAction, m_resource);});
+        [this] {menu()->trigger(menu::ServerLogsAction, m_resource);});
     titleBar()->rightButtonsBar()->addButton(Qn::ShowLogButton, showLogButton);
 
     auto checkIssuesButton = createStatisticAwareButton("server_widget_check_issues");
@@ -696,7 +695,7 @@ void QnServerResourceWidget::createButtons()
     checkIssuesButton->setCheckable(false);
     checkIssuesButton->setToolTip(tr("Check Issues"));
     connect(checkIssuesButton, &QnImageButtonWidget::clicked, this,
-        [this] { menu()->trigger(action::ServerIssuesAction, m_resource); });
+        [this] { menu()->trigger(menu::ServerIssuesAction, m_resource); });
     titleBar()->rightButtonsBar()->addButton(Qn::CheckIssuesButton, checkIssuesButton);
 }
 
@@ -724,10 +723,10 @@ int QnServerResourceWidget::calculateButtonsVisibility() const
     result &= (Qn::CloseButton | Qn::RotateButton | Qn::InfoButton);
     if (qnRuntime->isDesktopMode())
     {
-        if (menu()->canTrigger(action::ServerLogsAction, m_resource))
+        if (menu()->canTrigger(menu::ServerLogsAction, m_resource))
             result |= Qn::ShowLogButton;
 
-        if (menu()->canTrigger(action::ServerIssuesAction, m_resource))
+        if (menu()->canTrigger(menu::ServerIssuesAction, m_resource))
             result |= Qn::CheckIssuesButton;
     }
     return result;

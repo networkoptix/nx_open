@@ -7,7 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/impl_ptr.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace QnNotificationLevel { enum class Value; }
 
@@ -21,13 +21,13 @@ class EventTile;
  */
 class EventPanel:
     public QWidget,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
-    explicit EventPanel(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    explicit EventPanel(WindowContext* context, QWidget* parent = nullptr);
 
     virtual ~EventPanel() override;
 

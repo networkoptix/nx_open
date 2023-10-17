@@ -52,7 +52,7 @@ Item
         model: RightPanelModel
         {
             id: eventModel
-            context: workbenchContext
+            context: windowContext
             previewsEnabled: searchPanel.showThumbnails
         }
 

@@ -14,6 +14,7 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <nx/vms/client/core/media/time_period_storage.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/time_marker.h>
 #include <ui/animation/animated.h>
@@ -21,7 +22,6 @@
 #include <ui/common/help_topic_queryable.h>
 #include <ui/processors/drag_process_handler.h>
 #include <ui/processors/kinetic_process_handler.h>
-#include <ui/workbench/workbench_context_aware.h>
 #include <utils/math/functors.h>
 
 #include "time_step.h"
@@ -48,7 +48,7 @@ class ThumbnailPanel;
 class QnTimeSlider:
     public Animated<GraphicsSlider>,
     public HelpTopicQueryable,
-    public QnWorkbenchContextAware, //< Required for live preview.
+    public nx::vms::client::desktop::WindowContextAware, //< Required for live preview.
     protected DragProcessHandler
 {
     Q_OBJECT
@@ -150,7 +150,7 @@ public:
     Q_DECLARE_FLAGS(Options, Option);
 
     explicit QnTimeSlider(
-        QnWorkbenchContext* context,
+        nx::vms::client::desktop::WindowContext* context,
         QGraphicsItem* parent = nullptr,
         QGraphicsItem* tooltipParent = nullptr);
 

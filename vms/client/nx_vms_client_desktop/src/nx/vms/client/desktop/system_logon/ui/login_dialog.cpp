@@ -24,11 +24,12 @@
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/utils/system_uri.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
@@ -189,7 +190,7 @@ void LoginDialog::setupIntroView()
     }
     else
     {
-        const auto introWidget = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this);
+        const auto introWidget = new QQuickWidget(appContext()->qmlEngine(), this);
         introWidget->rootContext()->setContextProperty("maxTextureSize",
             QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
 
@@ -258,7 +259,7 @@ void LoginDialog::sendTestConnectionRequest()
             if (isCredentialsTab())
             {
                 QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
-                    context(),
+                    windowContext(),
                     error,
                     d->connectionProcess->context->moduleInformation,
                     appContext()->version(),
@@ -291,7 +292,7 @@ void LoginDialog::sendTestConnectionRequest()
                                 d->connectionProcess->context->logonData,
                                 appContext()->version()))
                         {
-                            menu()->trigger(ui::action::DelayedForcedExitAction);
+                            menu()->trigger(menu::DelayedForcedExitAction);
                         }
                         break;
                     }
@@ -301,8 +302,8 @@ void LoginDialog::sendTestConnectionRequest()
                         logonData.expectedServerId = moduleInformation.id;
                         logonData.expectedServerVersion = moduleInformation.version;
 
-                        menu()->trigger(ui::action::SetupFactoryServerAction,
-                            ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
+                        menu()->trigger(menu::SetupFactoryServerAction,
+                            menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
                         base_type::accept();
                         break;
                     }
@@ -313,11 +314,11 @@ void LoginDialog::sendTestConnectionRequest()
             }
             else
             {
-                if (auto session = RemoteSession::instance())
+                if (auto session = system()->session())
                     session->autoTerminateIfNeeded();
                 auto connection = std::get<RemoteConnectionPtr>(result);
-                menu()->trigger(ui::action::ConnectAction,
-                    ui::action::Parameters().withArgument(Qn::RemoteConnectionRole, connection));
+                menu()->trigger(menu::ConnectAction,
+                    menu::Parameters().withArgument(Qn::RemoteConnectionRole, connection));
                 base_type::accept();
             }
 
@@ -439,7 +440,7 @@ void LoginDialog::at_testButton_clicked()
             expectedNewServerId = expectedServerId;
         });
     connect(dialog.get(), &ConnectionTestingDialog::loginToCloudRequested, this,
-        [this]() { menu()->trigger(ui::action::LoginToCloud); });
+        [this]() { menu()->trigger(menu::LoginToCloud); });
 
     const ConnectionInfo info = connectionInfo();
     dialog->testConnection(info.address, info.credentials, appContext()->version());
@@ -447,10 +448,10 @@ void LoginDialog::at_testButton_clicked()
     updateFocus();
     if (requestedConnection)
     {
-        if (auto session = RemoteSession::instance())
+        if (auto session = system()->session())
             session->autoTerminateIfNeeded();
-        menu()->trigger(ui::action::ConnectAction,
-            ui::action::Parameters().withArgument(Qn::RemoteConnectionRole, requestedConnection));
+        menu()->trigger(menu::ConnectAction,
+            menu::Parameters().withArgument(Qn::RemoteConnectionRole, requestedConnection));
         base_type::accept();
     }
     else if (setupNewServerRequested)
@@ -460,8 +461,8 @@ void LoginDialog::at_testButton_clicked()
             .credentials = info.credentials,
             .expectedServerId = expectedNewServerId});
 
-        menu()->trigger(ui::action::SetupFactoryServerAction,
-            ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
+        menu()->trigger(menu::SetupFactoryServerAction,
+            menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
         base_type::accept();
     }
 }

@@ -14,8 +14,8 @@
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/client_api_auth_dialog.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
@@ -30,7 +30,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <utils/common/delayed.h>
-
 
 using namespace nx::vms::client::desktop;
 
@@ -118,7 +117,7 @@ QnWebResourceWidget::QnWebResourceWidget(
             return ClientApiAuthDialog::isApproved(resource, url);
         };
 
-    controller->initClientApiSupport(workbench()->context(), this->item(), authCondition);
+    controller->initClientApiSupport(windowContext, this->item(), authCondition);
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()
@@ -365,7 +364,7 @@ bool QnWebResourceWidget::askUserToAcceptCertificate(
     warning.button(QDialogButtonBox::Cancel)->setFocus();
 
     const auto settingsAction =
-        isIntegration ? ui::action::IntegrationSettingsAction : ui::action::WebPageSettingsAction;
+        isIntegration ? menu::IntegrationSettingsAction : menu::WebPageSettingsAction;
 
     if (menu()->canTrigger(settingsAction, webPage))
     {

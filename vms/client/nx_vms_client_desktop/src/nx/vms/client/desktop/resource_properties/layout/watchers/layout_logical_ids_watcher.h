@@ -6,14 +6,13 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-
-class QnCommonMessageProcessor;
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class LayoutSettingsDialogStore;
 
-class NX_VMS_CLIENT_DESKTOP_API LayoutLogicalIdsWatcher: public QObject
+class NX_VMS_CLIENT_DESKTOP_API LayoutLogicalIdsWatcher: public QObject, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -21,16 +20,12 @@ class NX_VMS_CLIENT_DESKTOP_API LayoutLogicalIdsWatcher: public QObject
 public:
     LayoutLogicalIdsWatcher(
         LayoutSettingsDialogStore* store,
-        QnResourcePool* resourcePool,
-        QnCommonMessageProcessor* messageProcessor,
+        QnLayoutResourcePtr excludedLayout,
         QObject* parent = nullptr);
     virtual ~LayoutLogicalIdsWatcher() override;
 
-    QnLayoutResourcePtr excludedLayout() const;
-    void setExcludedLayout(const QnLayoutResourcePtr& value);
-
 private:
-    class Private;
+    struct Private;
     nx::utils::ImplPtr<Private> d;
 };
 

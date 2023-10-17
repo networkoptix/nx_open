@@ -2,66 +2,18 @@
 
 #pragma once
 
-#include <QtCore/QObject>
+class QWidget;
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/current_system_context_aware.h>
+#include <nx/vms/client/desktop/workbench/state/workbench_state_manager.h>
 
-/** Delegate to maintain knowledge about current connection session. */
-class QnSessionAwareDelegate: public QnWorkbenchContextAware
+/** Delegate to maintain knowledge about current system context in a window context. */
+class QnSessionAwareDelegate:
+    public nx::vms::client::desktop::CurrentSystemContextAware,
+    public nx::vms::client::desktop::SessionAwareDelegate
+
 {
 public:
-    QnSessionAwareDelegate(
-        QObject* parent = nullptr,
-        InitializationMode initMode = InitializationMode::instant);
-    ~QnSessionAwareDelegate();
-
-    virtual bool tryClose(bool force) = 0;
-    virtual void forcedUpdate() = 0;
-};
-
-template <typename T>
-class QnBasicWorkbenchStateDelegate: public QnSessionAwareDelegate
-{
-public:
-    QnBasicWorkbenchStateDelegate(T* owner):
-        QnSessionAwareDelegate(owner),
-        m_owner(owner)
-    {
-    }
-
-    virtual bool tryClose(bool force) override
-    {
-        return m_owner->tryClose(force);
-    }
-
-    virtual void forcedUpdate() override
-    {
-        m_owner->forcedUpdate();
-    }
-
-private:
-    T* m_owner;
-};
-
-class QnWorkbenchStateManager: public QObject, public QnWorkbenchContextAware
-{
-    Q_OBJECT
-public:
-    QnWorkbenchStateManager(QObject *parent = nullptr);
-
-    /** Forcibly update all delegates.
-     *  Should be called in case of full state re-read (reconnect, merge systems, etc).
-     **/
-    void forcedUpdate();
-
-    bool tryClose(bool force);
-
-private:
-    friend class QnSessionAwareDelegate;
-
-    void registerDelegate(QnSessionAwareDelegate* d);
-    void unregisterDelegate(QnSessionAwareDelegate* d);
-
-private:
-    QList<QnSessionAwareDelegate*> m_delegates;
+    QnSessionAwareDelegate(QObject* parent);
+    QnSessionAwareDelegate(nx::vms::client::desktop::WindowContext* windowContext);
 };

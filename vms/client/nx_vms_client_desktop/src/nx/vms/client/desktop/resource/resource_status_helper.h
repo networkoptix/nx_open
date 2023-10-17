@@ -8,16 +8,17 @@
 #include <nx/utils/impl_ptr.h>
 
 Q_MOC_INCLUDE("core/resource/resource.h")
-Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
-
-class QnWorkbenchContext;
+Q_MOC_INCLUDE("nx/vms/client/desktop/window_context.h")
 
 namespace nx::vms::client::desktop {
+
+class WindowContext;
 
 class ResourceStatusHelper: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QnWorkbenchContext* context READ context WRITE setContext NOTIFY contextChanged)
+    Q_PROPERTY(nx::vms::client::desktop::WindowContext* context
+        READ context WRITE setContext NOTIFY contextChanged)
     Q_PROPERTY(QnResource* resource READ resource WRITE setResource NOTIFY resourceChanged)
     Q_PROPERTY(int status READ status NOTIFY statusChanged)
     Q_PROPERTY(ResourceType resourceType READ resourceType NOTIFY resourceChanged)
@@ -31,8 +32,8 @@ public:
     explicit ResourceStatusHelper(QObject* parent = nullptr);
     virtual ~ResourceStatusHelper() override;
 
-    QnWorkbenchContext* context() const;
-    void setContext(QnWorkbenchContext* value);
+    WindowContext* context() const;
+    void setContext(WindowContext* value);
 
     QnResource* resource() const;
     void setResource(QnResource* value);

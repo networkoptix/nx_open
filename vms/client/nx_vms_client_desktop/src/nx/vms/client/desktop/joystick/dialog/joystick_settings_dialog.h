@@ -6,20 +6,23 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
-namespace nx::vms::client::desktop::joystick {
+namespace nx::vms::client::desktop {
 
-class Manager;
+namespace joystick { class Manager; }
 
-class JoystickSettingsDialog: public QmlDialogWrapper, public QnWorkbenchContextAware
+class JoystickSettingsDialog: public QmlDialogWrapper, public WindowContextAware
 {
     Q_OBJECT
 
     using base_type = QmlDialogWrapper;
 
 public:
-    explicit JoystickSettingsDialog(Manager* manager, QWidget* parent = nullptr);
+    explicit JoystickSettingsDialog(
+        joystick::Manager* manager,
+        WindowContext* windowContext,
+        QWidget* parent = nullptr);
     virtual ~JoystickSettingsDialog() override;
 
     void initWithCurrentActiveJoystick();
@@ -32,4 +35,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::desktop::joystick
+} // namespace nx::vms::client::desktop

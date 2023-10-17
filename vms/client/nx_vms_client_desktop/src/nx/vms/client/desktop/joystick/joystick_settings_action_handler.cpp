@@ -5,32 +5,36 @@
 #include <QtGui/QAction>
 
 #include <core/resource/resource.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "dialog/joystick_settings_dialog.h"
 #include "settings/manager.h"
 
-namespace nx::vms::client::desktop::joystick {
+namespace nx::vms::client::desktop {
 
 JoystickSettingsActionHandler::JoystickSettingsActionHandler(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QObject* parent)
     :
-    base_type(parent)
+    base_type(parent),
+    WindowContextAware(context)
 {
-    connect(context->action(ui::action::JoystickSettingsAction), &QAction::triggered, this,
-        [this, context]
+    connect(action(menu::JoystickSettingsAction), &QAction::triggered, this,
+        [this]
         {
             if (!m_dialog)
             {
                 m_dialog.reset(new JoystickSettingsDialog(
-                    context->joystickManager(), context->mainWindowWidget()));
+                    appContext()->joystickManager(),
+                    windowContext(),
+                    mainWindowWidget()));
 
                 connect(m_dialog.get(), &JoystickSettingsDialog::done,
-                    [context]
+                    [this]
                     {
-                        context->joystickManager()->setDeviceActionsEnabled(true);
+                        appContext()->joystickManager()->setDeviceActionsEnabled(true);
                     });
             }
             else
@@ -38,7 +42,7 @@ JoystickSettingsActionHandler::JoystickSettingsActionHandler(
                 m_dialog->initWithCurrentActiveJoystick();
             }
 
-            context->joystickManager()->setDeviceActionsEnabled(false);
+            appContext()->joystickManager()->setDeviceActionsEnabled(false);
 
             m_dialog->open();
             m_dialog->raise();
@@ -50,4 +54,4 @@ JoystickSettingsActionHandler::~JoystickSettingsActionHandler()
 {
 }
 
-} // namespace nx::vms::client::desktop::joystick
+} // namespace nx::vms::client::desktop

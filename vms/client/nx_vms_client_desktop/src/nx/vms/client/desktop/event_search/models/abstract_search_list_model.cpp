@@ -13,7 +13,9 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/model_row_iterator.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
@@ -21,24 +23,22 @@ namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
 
-AbstractSearchListModel::AbstractSearchListModel(QnWorkbenchContext* context, QObject* parent):
+AbstractSearchListModel::AbstractSearchListModel(WindowContext* context, QObject* parent):
     base_type(context, parent),
-    m_cameraSet(new ManagedCameraSet(resourcePool(),
+    m_cameraSet(new ManagedCameraSet(system()->resourcePool(),
         [this](const QnVirtualCameraResourcePtr& camera)
         {
             return isCameraApplicable(camera);
         }))
 {
-    NX_CRITICAL(messageProcessor() && resourcePool());
-
-    connect(context, &QnWorkbenchContext::userChanged, this,
+    connect(context->workbenchContext(), &QnWorkbenchContext::userChanged, this,
         [this](const QnUserResourcePtr& user)
         {
             const bool isOnline = !user.isNull();
             onOnlineChanged(isOnline);
         });
 
-    onOnlineChanged(!context->user().isNull());
+    onOnlineChanged(!context->workbenchContext()->user().isNull());
 
     connect(m_cameraSet.data(), &ManagedCameraSet::camerasAboutToBeChanged,
         this, &AbstractSearchListModel::clear);

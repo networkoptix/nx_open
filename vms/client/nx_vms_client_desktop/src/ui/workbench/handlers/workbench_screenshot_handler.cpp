@@ -29,10 +29,10 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/time/formatter.h>
 #include <platform/environment.h>
 #include <transcoding/filters/filter_helper.h>
@@ -43,7 +43,6 @@
 #include <ui/workbench/workbench_item.h>
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::api;
 
 namespace {
@@ -223,7 +222,7 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(action::TakeScreenshotAction), &QAction::triggered,
+    connect(action(menu::TakeScreenshotAction), &QAction::triggered,
         this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
 

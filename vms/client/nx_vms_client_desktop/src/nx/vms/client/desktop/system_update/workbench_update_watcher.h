@@ -7,38 +7,32 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_state_manager.h>
-
-class QTimer;
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::client::desktop {
-
-namespace workbench { class LocalNotificationsManager; }
 
 struct UpdateContents;
 class ServerUpdateTool;
 
 class WorkbenchUpdateWatcher:
     public QObject,
-    public QnSessionAwareDelegate
+    public WindowContextAware
 {
     Q_OBJECT
 
 public:
-    WorkbenchUpdateWatcher(QObject* parent = nullptr);
+    WorkbenchUpdateWatcher(WindowContext* windowContext, QObject* parent = nullptr);
     virtual ~WorkbenchUpdateWatcher() override;
 
     /** Get cached update information. */
     const UpdateContents& getUpdateContents() const;
     ServerUpdateTool* getServerUpdateTool();
     std::future<UpdateContents> takeUpdateCheck();
-
-    virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
 
 private:
     void notifyUserAboutWorkbenchUpdate(
@@ -64,13 +58,12 @@ private:
     QTimer m_checkLatestUpdateTimer;
     nx::utils::SoftwareVersion m_notifiedVersion;
 
-    workbench::LocalNotificationsManager* m_notificationsManager = nullptr;
     CommandActionPtr m_updateAction;
     CommandActionPtr m_skipAction;
     QnUuid updateNotificationId;
 
     struct Private;
-    std::unique_ptr<Private> m_private;
+    nx::utils::ImplPtr<Private> m_private;
 };
 
 } // namespace nx::vms::client::desktop

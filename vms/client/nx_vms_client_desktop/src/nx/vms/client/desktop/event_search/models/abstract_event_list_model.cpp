@@ -10,7 +10,6 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/time/formatter.h>
@@ -31,11 +30,10 @@ namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
 
-AbstractEventListModel::AbstractEventListModel(QnWorkbenchContext* context, QObject* parent):
+AbstractEventListModel::AbstractEventListModel(WindowContext* context, QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(context)
+    WindowContextAware(context) //< TODO: #amalov Consider system context aware.
 {
-    NX_CRITICAL(context, "Workbench context must be specified.");
 }
 
 QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
@@ -104,8 +102,7 @@ QString AbstractEventListModel::timestampText(microseconds timestamp) const
 
     const auto timestampMs = duration_cast<milliseconds>(timestamp).count();
 
-    // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
+    const auto timeWatcher = system()->serverTimeWatcher();
     const QDateTime dateTime = timeWatcher->displayTime(timestampMs);
 
     // For current day just display the time in system format.

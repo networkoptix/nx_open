@@ -4,8 +4,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item_index.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include "instrument.h"
 #include "scene_event_filter.h"
@@ -23,7 +23,7 @@ class MimeData;
 class DropInstrument:
     public Instrument,
     public SceneEventFilter,
-    public nx::vms::client::core::CommonModuleAware
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
@@ -55,15 +55,14 @@ protected:
     SceneEventFilterItem *filterItem() const;
 
 private:
-    bool delayedTriggerIfPossible(nx::vms::client::desktop::ui::action::IDType id,
-        const nx::vms::client::desktop::ui::action::Parameters& parameters);
+    bool delayedTriggerIfPossible(nx::vms::client::desktop::menu::IDType id,
+        const nx::vms::client::desktop::menu::Parameters& parameters);
 
     bool isDragValid() const;
 
 private:
     std::unique_ptr<nx::vms::client::desktop::MimeData> m_mimeData;
 
-    QPointer<QnWorkbenchContext> m_context;
     QScopedPointer<SceneEventFilterItem> m_filterItem;
     QPointer<DestructionGuardItem> m_guard;
     QPointer<QGraphicsObject> m_surface;

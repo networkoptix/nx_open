@@ -9,10 +9,10 @@
 #include <QtGui/QVector3D>
 
 #include <client/client_globals.h>
+#include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
-#include "core/ptz/abstract_ptz_controller.h"
 #include "drag_processing_instrument.h"
 
 class FixedArSelectionItem;
@@ -29,14 +29,18 @@ class PtzPromoOverlay;
 class SceneBanner;
 } // namespace nx::vms::client::desktop
 
-class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware
+class PtzInstrument:
+    public DragProcessingInstrument,
+    public nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
-
     using base_type = DragProcessingInstrument;
 
 public:
-    PtzInstrument(QObject* parent = nullptr);
+    PtzInstrument(
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QObject* parent = nullptr);
+
     virtual ~PtzInstrument() override;
 
     // This instrument operates PTZ via mouse interaction with PTZ overlay.

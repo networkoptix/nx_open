@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <utils/common/delete_later.h>
 
@@ -109,10 +110,12 @@ void QnCameraDiagnosticsDialog::retranslateUi()
         return;
     }
 
+    const auto resourcePool = SystemContext::fromResource(m_resource)->resourcePool();
+
     ui->titleLabel->setText(
         nx::format(
             QnDeviceDependentStrings::getNameFromSet(
-                resourcePool(),
+                resourcePool,
                 QnCameraDeviceStringSet(
                     tr("Diagnostics for device %1"),
                     tr("Diagnostics for camera %1"),
@@ -124,7 +127,7 @@ void QnCameraDiagnosticsDialog::retranslateUi()
 
 
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
-        resourcePool(),
+        resourcePool,
         QnCameraDeviceStringSet(
             tr("Device Diagnostics"),
             tr("Camera Diagnostics"),
@@ -144,30 +147,32 @@ void QnCameraDiagnosticsDialog::clearLog()
 
 QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType)
 {
+    const auto resourcePool = SystemContext::fromResource(m_resource)->resourcePool();
+
     switch(stepType)
     {
-    case CameraDiagnostics::Step::mediaServerAvailability:
-        return tr("Confirming server availability.");
-    case CameraDiagnostics::Step::cameraAvailability:
-        return QnDeviceDependentStrings::getNameFromSet(
-            resourcePool(),
-            QnCameraDeviceStringSet(
-                tr("Confirming device is accessible."),
-                tr("Confirming camera is accessible."),
-                tr("Confirming I/O module is accessible.")
-            ), m_resource);
-    case CameraDiagnostics::Step::mediaStreamAvailability:
-        return QnDeviceDependentStrings::getNameFromSet(
-            resourcePool(),
-            QnCameraDeviceStringSet(
-                tr("Confirming target device provides media stream."),
-                tr("Confirming target camera provides media stream."),
-                tr("Confirming target I/O module provides media stream.")
-            ), m_resource);
-    case CameraDiagnostics::Step::mediaStreamIntegrity:
-        return tr("Evaluating media stream for errors.");
-    default:
-        return QString();
+        case CameraDiagnostics::Step::mediaServerAvailability:
+            return tr("Confirming server availability.");
+        case CameraDiagnostics::Step::cameraAvailability:
+            return QnDeviceDependentStrings::getNameFromSet(
+                resourcePool,
+                QnCameraDeviceStringSet(
+                    tr("Confirming device is accessible."),
+                    tr("Confirming camera is accessible."),
+                    tr("Confirming I/O module is accessible.")
+                ), m_resource);
+        case CameraDiagnostics::Step::mediaStreamAvailability:
+            return QnDeviceDependentStrings::getNameFromSet(
+                resourcePool,
+                QnCameraDeviceStringSet(
+                    tr("Confirming target device provides media stream."),
+                    tr("Confirming target camera provides media stream."),
+                    tr("Confirming target I/O module provides media stream.")
+                ), m_resource);
+        case CameraDiagnostics::Step::mediaStreamIntegrity:
+            return tr("Evaluating media stream for errors.");
+        default:
+            return QString();
     }
 }
 
@@ -206,7 +211,8 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone()
     updateOkButtonEnabled();
 }
 
-void QnCameraDiagnosticsDialog::at_copyButton_clicked() {
+void QnCameraDiagnosticsDialog::at_copyButton_clicked()
+{
     QClipboard *clipboard = QApplication::clipboard();
 
     clipboard->setText(ui->textEdit->toPlainText());

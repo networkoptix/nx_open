@@ -93,7 +93,7 @@ QString eventTypesToString(const std::vector<EventType>& types)
 EventSearchListModel::Private::Private(EventSearchListModel* q):
     base_type(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(q->systemContext())),
+    m_helper(new vms::event::StringsHelper(q->system())),
     m_liveUpdateTimer(new QTimer())
 {
     connect(m_liveUpdateTimer.data(), &QTimer::timeout, this, &Private::fetchLive);
@@ -206,7 +206,8 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         [[fallthrough]];
         case Qn::ResourceListRole:
         {
-            const auto resource = q->resourcePool()->getResourceById(eventParams.eventResourceId);
+            const auto resource = q->system()->resourcePool()->getResourceById(
+                eventParams.eventResourceId);
             if (resource)
                 return QVariant::fromValue(QnResourceList({resource}));
 
@@ -221,7 +222,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             if (!hasPreview(eventParams.eventType))
                 return false;
 
-            return QVariant::fromValue<QnResourcePtr>(q->resourcePool()->
+            return QVariant::fromValue<QnResourcePtr>(q->system()->resourcePool()->
                 getResourceById<QnVirtualCameraResource>(eventParams.eventResourceId));
         }
 

@@ -91,7 +91,11 @@ struct QnWorkbenchLayout::Private
     StreamSynchronizationState streamSynchronizationState;
 };
 
-QnWorkbenchLayout::QnWorkbenchLayout(const LayoutResourcePtr& resource):
+QnWorkbenchLayout::QnWorkbenchLayout(
+    WindowContext* windowContext,
+    const LayoutResourcePtr& resource)
+    :
+    WindowContextAware(windowContext),
     d(new Private{.resource = resource})
 {
     if (!NX_ASSERT(resource))
@@ -174,13 +178,13 @@ QnLayoutResource* QnWorkbenchLayout::resourcePtr() const
 
 QnWorkbenchLayout* QnWorkbenchLayout::instance(const LayoutResourcePtr& resource)
 {
-    return appContext()->mainWindowContext()->workbenchContext()->workbench()->layout(resource);
+    return appContext()->mainWindowContext()->workbench()->layout(resource);
 }
 
 QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnVideoWallResourcePtr& videoWall)
 {
     const auto& layouts =
-        appContext()->mainWindowContext()->workbenchContext()->workbench()->layouts();
+        appContext()->mainWindowContext()->workbench()->layouts();
     for (const auto& layout: layouts)
     {
         if (layout->resource()->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>()

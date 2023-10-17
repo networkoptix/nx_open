@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::desktop {
 
-namespace ui::action { class Manager; }
+namespace menu { class Manager; }
 namespace ui::workbench { class ActionHandler; }
 
 /**
@@ -27,7 +27,7 @@ class ResourceTreeDragDropDecoratorModel: public QIdentityProxyModel
 public:
     ResourceTreeDragDropDecoratorModel(
         QnResourcePool* resourcePool,
-        ui::action::Manager* actionManager,
+        menu::Manager* actionManager,
         ui::workbench::ActionHandler* actionHandler);
 
     virtual ~ResourceTreeDragDropDecoratorModel() override;
@@ -59,11 +59,11 @@ private:
         const QnMediaServerResourcePtr& dropParentServer);
 
     QnResourcePool* resourcePool() const;
-    ui::action::Manager* actionManager() const;
+    menu::Manager* actionManager() const;
 
 private:
     QnResourcePool* m_resourcePool = nullptr;
-    ui::action::Manager* m_actionManager = nullptr;
+    menu::Manager* m_actionManager = nullptr;
     ui::workbench::ActionHandler* m_actionHandler = nullptr;
 };
 

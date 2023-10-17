@@ -10,9 +10,11 @@
 
 #include "globals.h"
 
-class QnWorkbenchContext;
+namespace nx::vms::client::desktop {
 
-namespace nx::vms::client::desktop::jsapi {
+class WindowContext;
+
+namespace jsapi {
 
 namespace detail { class TabApiBackend; }
 
@@ -23,7 +25,7 @@ class Tab: public QObject
     using base_type = QObject;
 
 public:
-    Tab(QnWorkbenchContext* context, QObject* parent = nullptr);
+    Tab(WindowContext* context, QObject* parent = nullptr);
     virtual ~Tab() override;
 
     /** State of the tab, including all items and layout information. */
@@ -62,4 +64,5 @@ private:
     nx::utils::ImplPtr<detail::TabApiBackend> d;
 };
 
-} // namespace nx::vms::client::desktop::jsapi
+} // namespace jsapi
+} // namespace nx::vms::client::desktop

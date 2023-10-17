@@ -53,7 +53,6 @@ void setLayoutEnabled(QLayout* layout, bool enabled)
 
 namespace nx::vms::client::desktop {
 
-using namespace ui;
 using namespace std::chrono;
 
 CameraScheduleWidget::CameraScheduleWidget(
@@ -122,10 +121,10 @@ CameraScheduleWidget::CameraScheduleWidget(
         });
 
     connect(ui->licensesButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(action::PreferencesLicensesTabAction); });
+        [this]() { emit actionRequested(menu::PreferencesLicensesTabAction); });
 
     connect(ui->exportScheduleButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(action::CopyRecordingScheduleAction); });
+        [this]() { emit actionRequested(menu::CopyRecordingScheduleAction); });
 
     connect(licenseUsageProvider, &LicenseUsageProvider::stateChanged, store,
         [this, store]()

@@ -11,8 +11,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
@@ -92,7 +92,7 @@ public: //< Overrides 'private:' in macro above.
     }
 };
 
-BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget* parent):
+BookmarkSearchWidget::BookmarkSearchWidget(WindowContext* context, QWidget* parent):
     base_type(context, new BookmarkSearchListModel(context), parent),
     d(new Private{qobject_cast<BookmarkSearchListModel*>(model())})
 {
@@ -150,7 +150,7 @@ QString BookmarkSearchWidget::itemCounterText(int count) const
 
 bool BookmarkSearchWidget::calculateAllowance() const
 {
-    return model()->isOnline() && systemContext()->accessController()->isDeviceAccessRelevant(
+    return model()->isOnline() && system()->accessController()->isDeviceAccessRelevant(
         nx::vms::api::AccessRight::viewBookmarks);
 }
 

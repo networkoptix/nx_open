@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
@@ -30,7 +31,6 @@
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -137,8 +137,8 @@ private:
 class WorkbenchLayout: public QnWorkbenchLayout
 {
 public:
-    WorkbenchLayout(const LayoutResourcePtr& resource):
-        QnWorkbenchLayout(resource)
+    WorkbenchLayout(WindowContext* windowContext, const LayoutResourcePtr& resource):
+        QnWorkbenchLayout(windowContext, resource)
     {
     }
 };
@@ -147,6 +147,8 @@ public:
 
 struct Workbench::Private
 {
+    Workbench* const q;
+
     /** Current layout. */
     QnWorkbenchLayout* currentLayout = nullptr;
 
@@ -161,8 +163,9 @@ struct Workbench::Private
     std::array<QnWorkbenchItem*, Qn::ItemRoleCount> itemByRole = {};
 
     /** Stored dummy layout. It is used to ensure that current layout is never nullptr. */
-    std::unique_ptr<QnWorkbenchLayout> dummyLayout =
-        std::make_unique<WorkbenchLayout>(LayoutResourcePtr(new LayoutResource()));
+    std::unique_ptr<QnWorkbenchLayout> dummyLayout = std::make_unique<WorkbenchLayout>(
+        q->windowContext(),
+        LayoutResourcePtr(new LayoutResource()));
 
     /** Whether current layout is being changed. */
     bool inLayoutChangeProcess = false;
@@ -236,10 +239,10 @@ struct Workbench::Private
     }
 };
 
-Workbench::Workbench(QObject* parent):
+Workbench::Workbench(WindowContext* windowContext, QObject* parent):
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    d(new Private())
+    WindowContextAware(windowContext),
+    d(new Private{.q=this})
 {
     setCurrentLayout(d->dummyLayout.get());
 
@@ -250,7 +253,8 @@ Workbench::Workbench(QObject* parent):
         [this](const QnResourceList& resources) { d->handleResourcesRemoved(resources); });
 
     // Only currenly connected context resources are checked actually.
-    const auto cachingController = qobject_cast<CachingAccessController*>(accessController());
+    const auto cachingController = qobject_cast<CachingAccessController*>(
+        system()->accessController());
     if (NX_ASSERT(cachingController))
     {
         connect(cachingController, &CachingAccessController::permissionsChanged, this,
@@ -262,17 +266,12 @@ Workbench::Workbench(QObject* parent):
     connect(WebEngineProfileManager::instance(),
         &WebEngineProfileManager::downloadRequested,
         this,
-        [this](QObject* item) { utils::WebDownloader::download(item, context()); });
+        [this](QObject* item) { utils::WebDownloader::download(item, this->windowContext()); });
 }
 
 Workbench::~Workbench()
 {
     appContext()->clientStateHandler()->unregisterDelegate(kWorkbenchDataKey);
-}
-
-WindowContext* Workbench::windowContext() const
-{
-    return appContext()->mainWindowContext();
 }
 
 void Workbench::clear()
@@ -344,7 +343,7 @@ QnWorkbenchLayout* Workbench::insertLayout(const LayoutResourcePtr& resource, in
     if (isSpecial)
         layout = std::make_unique<SpecialLayout>(windowContext(), resource);
     else
-        layout = std::make_unique<WorkbenchLayout>(resource);
+        layout = std::make_unique<WorkbenchLayout>(windowContext(), resource);
 
     auto result = layout.get();
     d->layouts.insert(iter, std::move(layout));
@@ -552,7 +551,7 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
                 executeDelayedParented(
                     [this, layout]
                     {
-                        menu()->trigger(action::CloseLayoutAction,
+                        menu()->trigger(menu::CloseLayoutAction,
                             QnWorkbenchLayoutList() << layout);
                     },
                     this);
@@ -733,9 +732,12 @@ void Workbench::update(const WorkbenchState& state)
     QScopedValueRollback<bool> rollback(d->inSessionRestoreProcess, true);
     clear();
 
+    auto systemContext = system();
+    auto resourcePool = systemContext->resourcePool();
+
     for (const auto& id: state.layoutUuids)
     {
-        if (const auto layout = resourcePool()->getResourceById<LayoutResource>(id))
+        if (const auto layout = resourcePool->getResourceById<LayoutResource>(id))
         {
             addLayout(layout);
             continue;
@@ -748,21 +750,21 @@ void Workbench::update(const WorkbenchState& state)
             continue;
         }
 
-        if (const auto videoWall = resourcePool()->getResourceById<QnVideoWallResource>(id))
+        if (const auto videoWall = resourcePool->getResourceById<QnVideoWallResource>(id))
         {
-            menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+            menu()->trigger(menu::OpenVideoWallReviewAction, videoWall);
             continue;
         }
 
-        const auto showreel = systemContext()->showreelManager()->showreel(id);
+        const auto showreel = systemContext->showreelManager()->showreel(id);
         if (showreel.isValid())
         {
-            menu()->trigger(action::ReviewShowreelAction, {Qn::UuidRole, id});
+            menu()->trigger(menu::ReviewShowreelAction, {Qn::UuidRole, id});
             continue;
         }
     }
 
-    if (context()->user())
+    if (auto user = windowContext()->workbenchContext()->user())
     {
         auto initialFillLayoutFromState =
             [](const LayoutResourcePtr& layout, const WorkbenchState::UnsavedLayout& state)
@@ -773,7 +775,7 @@ void Workbench::update(const WorkbenchState& state)
                 layout->setName(state.name);
             };
 
-        const auto userId = context()->user()->getId();
+        const auto userId = user->getId();
         for (const auto& stateLayout: state.unsavedLayouts)
         {
             LayoutResourcePtr layoutResource;
@@ -793,12 +795,12 @@ void Workbench::update(const WorkbenchState& state)
                 if (stateLayout.parentId != userId)
                     continue;
 
-                layoutResource = resourcePool()->getResourceById<LayoutResource>(stateLayout.id);
+                layoutResource = resourcePool->getResourceById<LayoutResource>(stateLayout.id);
                 if (!layoutResource)
                 {
                     layoutResource.reset(new LayoutResource());
                     initialFillLayoutFromState(layoutResource, stateLayout);
-                    resourcePool()->addResource(layoutResource);
+                    resourcePool->addResource(layoutResource);
                 }
             }
 
@@ -840,21 +842,21 @@ void Workbench::update(const WorkbenchState& state)
                 return false;
             };
 
-        if (!restoreCurrentLayout(resourcePool(), state.currentLayoutId))
+        if (!restoreCurrentLayout(resourcePool, state.currentLayoutId))
             restoreCurrentLayout(appContext()->cloudLayoutsPool(), state.currentLayoutId);
     }
 
     // Empty workbench is not supported correctly.
     // Create a new layout in the case there are no opened layouts in the workbench state.
     if (layouts().empty())
-        menu()->trigger(ui::action::OpenNewTabAction);
+        menu()->trigger(menu::OpenNewTabAction);
 
     if (currentLayoutIndex() == -1)
         setCurrentLayoutIndex(layouts().size() - 1);
 
     if (!state.runningTourId.isNull())
     {
-        menu()->trigger(action::ToggleShowreelModeAction, {Qn::UuidRole, state.runningTourId});
+        menu()->trigger(menu::ToggleShowreelModeAction, {Qn::UuidRole, state.runningTourId});
     }
 }
 
@@ -929,13 +931,13 @@ void Workbench::submit(WorkbenchState& state, bool forceIncludeEmptyLayouts)
         }
     }
 
-    state.runningTourId = context()->instance<ShowreelActionsHandler>()->runningShowreel();
+    state.runningTourId = windowContext()->showreelActionsHandler()->runningShowreel();
 }
 
 void Workbench::applyLoadedState()
 {
     auto model = windowContext()->systemTabBarModel();
-    auto modelIndex = model->findSystem(systemContext()->localSystemId());
+    auto modelIndex = model->findSystem(system()->localSystemId());
     if (modelIndex.isValid())
     {
         const auto workbenchState = modelIndex.data(Qn::WorkbenchStateRole).value<WorkbenchState>();

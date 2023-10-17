@@ -7,6 +7,7 @@
 #include <nx/audio/audiodevice.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/action_builder_fields/sound_field.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 #include <nx/vms/rules/utils/field.h>
@@ -23,8 +24,9 @@ constexpr auto kOneHundredPercent = 100;
 
 } // namespace
 
-VolumePicker::VolumePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
-    PlainFieldPickerWidget<vms::rules::VolumeField>(context, parent)
+VolumePicker::VolumePicker(WindowContext* context, CommonParamsWidget* parent):
+    PlainFieldPickerWidget<vms::rules::VolumeField>(context->system(), parent),
+    WindowContextAware(context)
 {
     auto contentLayout = new QHBoxLayout;
 
@@ -100,7 +102,7 @@ void VolumePicker::onTestButtonClicked()
         if (soundUrl.isEmpty())
             return;
 
-        QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(soundUrl);
+        QString filePath = workbenchContext()->instance<ServerNotificationCache>()->getFullPath(soundUrl);
         if (!QFileInfo(filePath).exists())
             return;
 

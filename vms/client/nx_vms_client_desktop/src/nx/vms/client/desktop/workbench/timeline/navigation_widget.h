@@ -11,7 +11,7 @@ namespace nx::vms::client::desktop::workbench::timeline {
 
 class SpeedSlider;
 
-class NavigationWidget: public QWidget, public QnWorkbenchContextAware
+class NavigationWidget: public QWidget, public WindowContextAware
 {
     Q_OBJECT
 
@@ -20,7 +20,7 @@ class NavigationWidget: public QWidget, public QnWorkbenchContextAware
     using CustomPaintedButton = CustomPainted<QPushButton>;
 
 public:
-    explicit NavigationWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    explicit NavigationWidget(WindowContext* context, QWidget* parent = nullptr);
     virtual ~NavigationWidget() override = default;
 
     void setTooltipsVisible(bool enabled);
@@ -31,7 +31,7 @@ signals:
 private:
     void initButton(
         CustomPaintedButton* button,
-        ui::action::IDType actionType,
+        menu::IDType actionType,
         const QString& iconPath,
         const QString& checkedIconPath = "");
     void updatePlaybackButtonsIcons();

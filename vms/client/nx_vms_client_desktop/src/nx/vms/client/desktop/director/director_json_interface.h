@@ -7,6 +7,8 @@
 
 namespace nx::vms::client::desktop {
 
+class Director;
+
 /**
  * DirectorJsonInterface provides access to Director via JSON-encoded commands.
  * Director singleton must exist at the point when process() is called.
@@ -16,11 +18,14 @@ class DirectorJsonInterface: public QObject
 {
     Q_OBJECT
 public:
-    explicit DirectorJsonInterface(QObject* parent);
+    explicit DirectorJsonInterface(Director* director, QObject* parent);
 
     QJsonDocument process(const QJsonDocument& jsonRequest);
 
     enum ErrorCodes {Ok, BadCommand, BadParameters};
+
+private:
+    Director* m_director;
 };
 
 } // namespace nx::vms::client::desktop

@@ -11,17 +11,16 @@
 #include <QtWidgets/QToolTip>
 
 #include <client/client_globals.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
 #include "private/resource_browser_wrapper_p.h"
@@ -32,15 +31,15 @@ struct QmlResourceBrowserWidget::Private
 {
     QmlResourceBrowserWidget* const q;
     const QmlProperty<qreal> opacity{q, "opacity"};
-    const ResourceBrowserWrapper resourceBrowser{q->context(), {q, "resourceBrowser"}, q};
+    const ResourceBrowserWrapper resourceBrowser{q->windowContext(), {q, "resourceBrowser"}, q};
 };
 
 // ------------------------------------------------------------------------------------------------
 // QmlResourceBrowserWidget
 
-QmlResourceBrowserWidget::QmlResourceBrowserWidget(QnWorkbenchContext* context, QWidget* parent):
-    base_type(qnClientCoreModule->mainQmlEngine(), parent),
-    QnWorkbenchContextAware(context),
+QmlResourceBrowserWidget::QmlResourceBrowserWidget(WindowContext* context, QWidget* parent):
+    base_type(appContext()->qmlEngine(), parent),
+    WindowContextAware(context),
     d(new Private{this})
 {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
@@ -50,8 +49,7 @@ QmlResourceBrowserWidget::QmlResourceBrowserWidget(QnWorkbenchContext* context, 
     setAttribute(Qt::WA_AlwaysStackOnTop);
     setAttribute(Qt::WA_TranslucentBackground);
 
-    rootContext()->setContextProperty(
-        QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName, this->context());
+    rootContext()->setContextProperty(WindowContext::kQmlPropertyName, context);
 
     rootContext()->setContextProperty("maxTextureSize",
         QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
@@ -90,7 +88,7 @@ void QmlResourceBrowserWidget::setOpacity(qreal value)
     d->opacity = value;
 }
 
-ui::action::Parameters QmlResourceBrowserWidget::currentParameters(ui::action::ActionScope scope) const
+menu::Parameters QmlResourceBrowserWidget::currentParameters(menu::ActionScope scope) const
 {
     return d->resourceBrowser.currentParameters();
 }

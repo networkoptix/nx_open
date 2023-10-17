@@ -12,8 +12,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <ui/common/notification_levels.h>
 
 #if defined(NX_CLANG_CL)
@@ -57,8 +57,8 @@ public:
         QString sourceName;
 
         // Client action data.
-        ui::action::IDType actionId = ui::action::NoAction;
-        ui::action::Parameters actionParameters;
+        menu::IDType actionId = menu::NoAction;
+        menu::Parameters actionParameters;
         CommandActionPtr extraAction;
 
         // Analytics data.
@@ -69,7 +69,7 @@ public:
     };
 
 public:
-    explicit EventListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit EventListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~EventListModel() override;
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

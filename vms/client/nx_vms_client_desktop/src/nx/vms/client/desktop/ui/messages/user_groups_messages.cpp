@@ -61,8 +61,7 @@ QWidget* createGroupListWidget(QnSessionAwareMessageBox* parent, const QSet<QnUu
 
     for (const auto& id: groups)
     {
-        const auto groupData =
-            parent->context()->systemContext()->userGroupManager()->find(id);
+        const auto groupData = parent->system()->userGroupManager()->find(id);
         if (!groupData)
             continue;
 

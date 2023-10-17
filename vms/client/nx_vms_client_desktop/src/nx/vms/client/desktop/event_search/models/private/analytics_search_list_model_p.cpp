@@ -185,7 +185,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
                 m_gapBeforeNewTracks = false;
         });
 
-    connect(q->accessController(), &AccessController::permissionsMaybeChanged, this,
+    connect(q->system()->accessController(), &AccessController::permissionsMaybeChanged, this,
         [this](const QnResourceList& resources)
         {
             const auto isCamera =
@@ -199,7 +199,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
         });
 
     const auto cameraStatusListener =
-        new core::SessionResourcesSignalListener<QnVirtualCameraResource>(q);
+        new core::SessionResourcesSignalListener<QnVirtualCameraResource>(q->system(), q);
 
     cameraStatusListener->addOnSignalHandler(
         &QnResource::statusChanged,
@@ -229,7 +229,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
         {
             const auto relevantCameras = this->q->cameras();
             const auto serverFootageCameras =
-                this->q->cameraHistoryPool()->getServerFootageCameras(server);
+                this->q->system()->cameraHistoryPool()->getServerFootageCameras(server);
 
             for (const auto& camera: serverFootageCameras)
             {
@@ -241,7 +241,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
             }
         });
 
-    const auto watcher = q->systemContext()->analyticsTaxonomyStateWatcher();
+    const auto watcher = q->system()->analyticsTaxonomyStateWatcher();
     if (NX_ASSERT(watcher))
     {
         connect(watcher, &nx::analytics::taxonomy::AbstractStateWatcher::stateChanged, this,
@@ -427,7 +427,7 @@ void AnalyticsSearchListModel::Private::setAttributeFilters(const QStringList& v
 void AnalyticsSearchListModel::Private::updateRelevantObjectTypes()
 {
     const auto relevantObjectTypes = nx::analytics::db::addDerivedTypeIds(
-        q->systemContext()->analyticsTaxonomyStateWatcher(), m_selectedObjectTypes);
+        q->system()->analyticsTaxonomyStateWatcher(), m_selectedObjectTypes);
 
     if (relevantObjectTypes == m_relevantObjectTypes)
         return;
@@ -492,7 +492,7 @@ void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
 bool AnalyticsSearchListModel::Private::canViewArchive(
     const QnVirtualCameraResourcePtr& camera) const
 {
-    return q->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+    return q->system()->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
 }
 
 AnalyticsSearchListModel::ItemCleanupFunction<nx::analytics::db::ObjectTrack>
@@ -636,7 +636,7 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(const QnTimePeriod& perio
 rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& period,
     GetCallback callback, int limit) const
 {
-    if (!NX_ASSERT(callback && connection() && !q->isFilterDegenerate()))
+    if (!NX_ASSERT(callback && q->system()->connection() && !q->isFilterDegenerate()))
         return {};
 
     Filter request;
@@ -748,7 +748,7 @@ rest::Handle AnalyticsSearchListModel::Private::lookupObjectTracksCached(
         context.filter = request;
         context.callbacks[(intptr_t) this] = std::move(callback);
 
-        const auto api = connectedServerApi();
+        const auto api = q->system()->connectedServerApi();
         if (!api)
             return {};
 
@@ -786,7 +786,7 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
             {
                 return camera->isOnline()
                     && !camera->enabledAnalyticsEngines().empty()
-                    && q->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+                    && q->system()->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
             };
 
         // Preserve existing receivers that are still relevant.
@@ -1026,7 +1026,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
         filter.boundingBox = m_filterRect;
 
     const nx::analytics::taxonomy::ObjectTypeDictionary objectTypeDictionary(
-        q->systemContext()->analyticsTaxonomyStateWatcher());
+        q->system()->analyticsTaxonomyStateWatcher());
 
     const int oldNewTrackCount = m_newTracks.size();
 
@@ -1258,7 +1258,7 @@ void AnalyticsSearchListModel::Private::advanceTrack(ObjectTrack& track,
 const nx::analytics::taxonomy::AbstractObjectType*
     AnalyticsSearchListModel::Private::objectTypeById(const QString& objectTypeId) const
 {
-    const auto watcher = q->systemContext()->analyticsTaxonomyStateWatcher();
+    const auto watcher = q->system()->analyticsTaxonomyStateWatcher();
     if (!NX_ASSERT(watcher))
         return nullptr;
 
@@ -1313,7 +1313,7 @@ QString AnalyticsSearchListModel::Private::engineName(
         return {};
 
     const std::shared_ptr<AbstractState> taxonomyState =
-        q->systemContext()->analyticsTaxonomyState();
+        q->system()->analyticsTaxonomyState();
 
     if (!taxonomyState)
         return QString();
@@ -1331,7 +1331,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     if (!camera)
         return {};
 
-    const nx::analytics::ActionTypeDescriptorManager descriptorManager(q->systemContext());
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(q->system());
     const auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
         track.objectTypeId,
         camera);
@@ -1375,11 +1375,11 @@ QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera(
 {
     const auto& deviceId = track.deviceId;
     if (NX_ASSERT(!deviceId.isNull()))
-        return q->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
+        return q->system()->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
 
     // Fallback mechanism, just in case.
 
-    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(
+    return q->system()->resourcePool()->getResourceById<QnVirtualCameraResource>(
         track.deviceId);
 }
 

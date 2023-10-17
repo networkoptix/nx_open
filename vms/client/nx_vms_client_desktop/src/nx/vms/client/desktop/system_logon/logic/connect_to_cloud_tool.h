@@ -41,7 +41,6 @@ signals:
 
 protected:
     virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
 
 private:
     QWidget* getTopWidget() const;

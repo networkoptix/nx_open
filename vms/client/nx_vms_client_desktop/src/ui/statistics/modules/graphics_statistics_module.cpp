@@ -5,17 +5,15 @@
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
 
+#include <nx/branding.h>
+#include <nx/build_info.h>
 #include <statistics/base/functor_metric.h>
 #include <statistics/base/metrics_container.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/workbench/workbench_context.h>
 #include <ui/statistics/modules/private/avg_tabs_count_metric.h>
 #include <ui/statistics/modules/private/camera_fullscreen_metric.h>
-#include <ui/statistics/modules/private/preview_search_duration_metric.h>
 #include <ui/statistics/modules/private/motion_search_duration_metric.h>
-
-#include <nx/branding.h>
-#include <nx/build_info.h>
+#include <ui/statistics/modules/private/preview_search_duration_metric.h>
 
 QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject* parent):
     base_type(parent),
@@ -23,13 +21,13 @@ QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject* parent):
     m_metrics(new QnMetricsContainer())
 {
     const auto avgTabsCount = QnAbstractMetricPtr(
-        new AvgTabsCountMetric(context()->workbench()));
+        new AvgTabsCountMetric(workbench()));
 
     const auto psearchDuration = QnAbstractMetricPtr(
-        new PreviewSearchDurationMetric(context()->workbench()));
+        new PreviewSearchDurationMetric(workbench()));
 
     const auto cameraFullscreenMetric = QnAbstractMetricPtr(
-        new CameraFullscreenMetric(context()->display()));
+        new CameraFullscreenMetric(display()));
 
     const auto msearchDuration = QnAbstractMetricPtr(
         new MotionSearchDurationMetric(context()));

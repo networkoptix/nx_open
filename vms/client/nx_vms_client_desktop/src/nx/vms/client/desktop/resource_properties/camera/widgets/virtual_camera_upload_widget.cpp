@@ -1,14 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "virtual_camera_upload_widget.h"
 #include "ui_virtual_camera_upload_widget.h"
 
 #include <QtCore/QFileInfo>
 
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>
+#include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_store.h>
 
-#include "../flux/camera_settings_dialog_state.h"
-#include "../flux/camera_settings_dialog_store.h"
+#include "virtual_camera_upload_widget.h"
 
 namespace nx::vms::client::desktop {
 
@@ -19,13 +19,13 @@ VirtualCameraUploadWidget::VirtualCameraUploadWidget(QWidget* parent):
     ui->setupUi(this);
 
     connect(ui->uploadFileButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(ui::action::UploadVirtualCameraFileAction); });
+        [this]() { emit actionRequested(menu::UploadVirtualCameraFileAction); });
 
     connect(ui->uploadFolderButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(ui::action::UploadVirtualCameraFolderAction); });
+        [this]() { emit actionRequested(menu::UploadVirtualCameraFolderAction); });
 
     connect(ui->cancelButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(ui::action::CancelVirtualCameraUploadsAction); });
+        [this]() { emit actionRequested(menu::CancelVirtualCameraUploadsAction); });
 }
 
 VirtualCameraUploadWidget::~VirtualCameraUploadWidget()

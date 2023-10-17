@@ -20,7 +20,7 @@ class VmsEventSearchListModel: public AbstractAsyncSearchListModel
         WRITE setSelectedSubType NOTIFY selectedSubTypeChanged)
 
 public:
-    explicit VmsEventSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit VmsEventSearchListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~VmsEventSearchListModel() override = default;
 
     QString selectedEventType() const;

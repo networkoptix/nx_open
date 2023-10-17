@@ -5,13 +5,12 @@
 #include <memory>
 
 #include <QtCore/QPointer>
-#include <QtQml/QtQml>
 #include <QtGui/QAction>
+#include <QtQml/QtQml>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource_access/resource_access_filter.h>
@@ -19,18 +18,19 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h>
-#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -44,9 +44,10 @@ public:
     Private(ResourceStatusHelper* q): q(q) {}
     virtual ~Private() override = default;
 
-    QnWorkbenchContext* context() const { return m_context; }
-    void setContext(QnWorkbenchContext* value);
+    WindowContext* context() const { return m_context; }
+    void setContext(WindowContext* value);
 
+    QnResourcePtr resourcePtr() const { return m_resource; }
     QnResource* resource() const { return m_resource.get(); }
     ResourceType resourceType() const;
     void setResource(QnResource* value);
@@ -64,7 +65,7 @@ private:
     bool isVideoWallLicenseValid() const;
 
 private:
-    QPointer<QnWorkbenchContext> m_context;
+    QPointer<WindowContext> m_context;
     QnResourcePtr m_resource;
     AccessController::NotifierHelper m_accessNotifier;
     QnVirtualCameraResourcePtr m_camera;
@@ -89,12 +90,12 @@ ResourceStatusHelper::~ResourceStatusHelper()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QnWorkbenchContext* ResourceStatusHelper::context() const
+WindowContext* ResourceStatusHelper::context() const
 {
     return d->context();
 }
 
-void ResourceStatusHelper::setContext(QnWorkbenchContext* value)
+void ResourceStatusHelper::setContext(WindowContext* value)
 {
     d->setContext(value);
 }
@@ -126,10 +127,11 @@ ResourceStatusHelper::LicenseUsage ResourceStatusHelper::licenseUsage() const
 
 int ResourceStatusHelper::defaultPasswordCameras() const
 {
-    if (!d->context())
+    auto systemContext = SystemContext::fromResource(d->resourcePtr());
+    if (!systemContext)
         return 0;
 
-    const auto watcher = d->context()->findInstance<DefaultPasswordCamerasWatcher>();
+    const auto watcher = systemContext->defaultPasswordCamerasWatcher();
     return watcher ? watcher->camerasWithDefaultPassword().size() : 0;
 }
 
@@ -146,7 +148,7 @@ void ResourceStatusHelper::registerQmlType()
 //-------------------------------------------------------------------------------------------------
 // ResourceStatusHelper::Private
 
-void ResourceStatusHelper::Private::setContext(QnWorkbenchContext* value)
+void ResourceStatusHelper::Private::setContext(WindowContext* value)
 {
     if (m_context == value)
         return;
@@ -156,28 +158,13 @@ void ResourceStatusHelper::Private::setContext(QnWorkbenchContext* value)
 
     if (m_context)
     {
-        m_contextConnections << connect(m_context->systemContext()->accessController(),
-            &AccessController::globalPermissionsChanged,
-            this,
-            &Private::updateStatus);
-
-        m_contextConnections << connect(m_context->action(ui::action::ToggleShowreelModeAction),
+        m_contextConnections << connect(m_context->menu()->action(menu::ToggleShowreelModeAction),
             &QAction::toggled,
             this,
             &Private::updateStatus);
-
-        const auto watcher = m_context->findInstance<DefaultPasswordCamerasWatcher>();
-        if (NX_ASSERT(watcher))
-        {
-            m_contextConnections << connect(watcher,
-                &DefaultPasswordCamerasWatcher::cameraSetChanged,
-                q,
-                &ResourceStatusHelper::defaultPasswordCamerasChanged);
-        }
     }
 
     emit q->contextChanged();
-    emit q->defaultPasswordCamerasChanged();
 
     updateStatus();
 }
@@ -240,12 +227,27 @@ void ResourceStatusHelper::Private::setResource(QnResource* value)
                 this,
                 &Private::updateStatus);
 
+            m_resourceConnections << connect(systemContext->accessController(),
+                &AccessController::globalPermissionsChanged,
+                this,
+                &Private::updateStatus);
+
+            const auto watcher = systemContext->defaultPasswordCamerasWatcher();
+            if (NX_ASSERT(watcher))
+            {
+                m_resourceConnections << connect(watcher,
+                    &DefaultPasswordCamerasWatcher::cameraSetChanged,
+                    q,
+                    &ResourceStatusHelper::defaultPasswordCamerasChanged);
+            }
+
             m_accessNotifier = systemContext->accessController()->createNotifier(m_resource);
             m_accessNotifier.callOnPermissionsChanged(this, &Private::updateStatus);
         }
     }
 
     emit q->resourceChanged();
+    emit q->defaultPasswordCamerasChanged();
 
     updateLicenseUsage();
     updateStatus();
@@ -281,7 +283,7 @@ void ResourceStatusHelper::Private::updateStatus()
                 Qn::SavePermission | Qn::WritePermission));
 
         status.setFlag(StatusFlag::canInvokeDiagnostics, m_camera->hasFlags(Qn::live_cam)
-            && !m_context->action(ui::action::ToggleShowreelModeAction)->isChecked());
+            && !m_context->menu()->action(menu::ToggleShowreelModeAction)->isChecked());
 
         status.setFlag(StatusFlag::dts, m_camera->isDtsBased());
 
@@ -290,7 +292,7 @@ void ResourceStatusHelper::Private::updateStatus()
     }
 
     status.setFlag(StatusFlag::canChangePasswords, qnRuntime->isDesktopMode()
-        && m_context->systemContext()->accessController()->hasGlobalPermissions(
+        && SystemContext::fromResource(m_camera)->accessController()->hasGlobalPermissions(
             GlobalPermission::powerUser));
 
     const auto resourceStatus = m_resource->getStatus();
@@ -358,9 +360,9 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
     const auto changeCameraPassword =
         [this](const QnVirtualCameraResourceList& cameras, bool forceShowCamerasList)
         {
-            auto parameters = ui::action::Parameters(cameras);
+            auto parameters = menu::Parameters(cameras);
             parameters.setArgument(Qn::ForceShowCamerasList, forceShowCamerasList);
-            m_context->menu()->trigger(ui::action::ChangeDefaultCameraPasswordAction, parameters);
+            m_context->menu()->trigger(menu::ChangeDefaultCameraPasswordAction, parameters);
         };
 
     switch (type)
@@ -370,7 +372,7 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
             statisticsModule()->controls()->registerClick(
                 "resource_status_overlay_diagnostics");
             if (NX_ASSERT(m_camera))
-                m_context->menu()->trigger(ui::action::CameraDiagnosticsAction, m_camera);
+                m_context->menu()->trigger(menu::CameraDiagnosticsAction, m_camera);
 
             break;
         }
@@ -395,7 +397,7 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
         {
             statisticsModule()->controls()->registerClick(
                 "resource_status_overlay_more_licenses");
-            m_context->menu()->trigger(ui::action::PreferencesLicensesTabAction);
+            m_context->menu()->trigger(menu::PreferencesLicensesTabAction);
             break;
         }
 
@@ -406,8 +408,8 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
             if (!NX_ASSERT(m_camera))
                 break;
 
-            m_context->menu()->trigger(ui::action::CameraSettingsAction,
-                ui::action::Parameters(m_camera).withArgument(Qn::FocusTabRole,
+            m_context->menu()->trigger(menu::CameraSettingsAction,
+                menu::Parameters(m_camera).withArgument(Qn::FocusTabRole,
                     CameraSettingsTab::general));
             break;
         }
@@ -422,9 +424,13 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
 
         case ActionType::setPasswords:
         {
-            const auto watcher = m_context->findInstance<DefaultPasswordCamerasWatcher>();
-            if (NX_ASSERT(watcher))
-                changeCameraPassword(watcher->camerasWithDefaultPassword().values(), true);
+            auto systemContext = SystemContext::fromResource(m_resource);
+            if (NX_ASSERT(systemContext))
+            {
+                const auto watcher = systemContext->defaultPasswordCamerasWatcher();
+                if (NX_ASSERT(watcher))
+                    changeCameraPassword(watcher->camerasWithDefaultPassword().values(), true);
+            }
 
             break;
         }

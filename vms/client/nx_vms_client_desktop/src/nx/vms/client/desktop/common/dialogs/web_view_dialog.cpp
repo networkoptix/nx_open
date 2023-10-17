@@ -41,7 +41,7 @@ WebViewDialog::WebViewDialog(QWidget* parent):
 int WebViewDialog::showUrl(
     const QUrl& url,
     bool enableClientApi,
-    QnWorkbenchContext* context,
+    WindowContext* context,
     const QnResourcePtr& resource,
     std::shared_ptr<AbstractWebAuthenticator> authenticator,
     bool checkCertificate)

@@ -8,7 +8,7 @@ class QPainter;
 
 namespace nx::vms::client::desktop {
 
-namespace ui::action { class MenuFactory; }
+namespace menu { class MenuFactory; }
 
 } // namespace nx::vms::client::desktop
 

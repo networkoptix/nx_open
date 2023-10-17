@@ -9,6 +9,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -44,9 +45,9 @@ public:
     }
 };
 
-WorkbenchLayoutInfo::WorkbenchLayoutInfo(QnWorkbenchContext* context, QObject* parent):
+WorkbenchLayoutInfo::WorkbenchLayoutInfo(WindowContext* context, QObject* parent):
     QObject(parent),
-    QnWorkbenchContextAware(context),
+    WindowContextAware(context),
     m_resources(new ResourceContainer(this))
 {
     connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
@@ -120,7 +121,7 @@ QnVideoWallResource* WorkbenchLayoutInfo::controlledVideoWall() const
         return nullptr;
     }
 
-    m_controlledVideoWall = resourcePool()->getVideoWallItemByUuid(itemId).videowall();
+    m_controlledVideoWall = system()->resourcePool()->getVideoWallItemByUuid(itemId).videowall();
     QQmlEngine::setObjectOwnership(m_controlledVideoWall->get(), QQmlEngine::CppOwnership);
 
     return m_controlledVideoWall->get();

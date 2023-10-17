@@ -22,8 +22,8 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/workbench/workbench_context.h>
@@ -240,9 +240,9 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
                     actuallyFetched = QnTimePeriod::fromInterval(
                         m_prefetch.back().startTimeMs, m_prefetch.front().startTimeMs);
                 }
-                QnWorkbenchContextAware(q).context()->menu()->trigger(
-                    ui::action::BookmarksPrefetchEvent,
-                    ui::action::Parameters().withArgument(Qn::CameraBookmarkListRole, bookmarks));
+                q->menu()->trigger(
+                    menu::BookmarksPrefetchEvent,
+                    menu::Parameters().withArgument(Qn::CameraBookmarkListRole, bookmarks));
             }
             else
             {
@@ -489,7 +489,7 @@ int BookmarkSearchListModel::Private::indexOf(const QnUuid& guid) const
 QnVirtualCameraResourcePtr BookmarkSearchListModel::Private::camera(
     const QnCameraBookmark& bookmark) const
 {
-    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
+    return q->system()->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
 }
 
 QString BookmarkSearchListModel::Private::iconPath()

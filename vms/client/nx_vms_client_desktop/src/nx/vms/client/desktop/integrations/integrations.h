@@ -23,7 +23,7 @@ void connectionEstablished(
 /**
  * Register custom menu actions, provided by the integrations.
  */
-void registerActions(ui::action::MenuFactory* factory);
+void registerActions(menu::MenuFactory* factory);
 
 /**
  * Called after widget is added to the scene.

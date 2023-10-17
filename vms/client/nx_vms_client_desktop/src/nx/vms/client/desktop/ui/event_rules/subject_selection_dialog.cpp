@@ -339,8 +339,8 @@ void SubjectSelectionDialog::validateAllUsers()
 
 std::vector<QnResourceAccessSubject> SubjectSelectionDialog::allSubjects() const
 {
-    const auto users = resourcePool()->getResources<QnUserResource>();
-    const auto groups = userGroupManager()->groups();
+    const auto users = system()->resourcePool()->getResources<QnUserResource>();
+    const auto groups = system()->userGroupManager()->groups();
 
     std::vector<QnResourceAccessSubject> result;
     result.reserve(users.size() + groups.size());
@@ -353,7 +353,7 @@ void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
 {
     QnUserResourceList users;
     QList<QnUuid> groupIds;
-    nx::vms::common::getUsersAndGroups(systemContext(), ids, users, groupIds);
+    nx::vms::common::getUsersAndGroups(system(), ids, users, groupIds);
 
     QSet<QnUuid> userIds;
     bool nonCustomUsers = false;

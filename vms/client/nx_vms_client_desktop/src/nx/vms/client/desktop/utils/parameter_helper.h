@@ -7,20 +7,18 @@
 class QWidget;
 
 namespace nx::vms::client::desktop {
-namespace ui {
-namespace action {
+namespace menu {
 
 class Parameters;
 
-} // namespace action
-} // namespace ui
+} // namespace menu
 
 namespace utils {
 
 using WidgetPtr = QPointer<QWidget>;
 
 WidgetPtr extractParentWidget(
-    const ui::action::Parameters& parameters,
+    const menu::Parameters& parameters,
     QWidget* defaultValue);
 
 } // namespace utils

@@ -11,7 +11,7 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/impl_ptr.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 class QQuickWidget;
 class QnWorkbenchContext;
@@ -23,12 +23,12 @@ namespace nx::vms::client::desktop {
  */
 class BubbleToolTip:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
 
 public:
-    BubbleToolTip(QnWorkbenchContext* context, QObject* parent = nullptr);
+    BubbleToolTip(WindowContext* context, QObject* parent = nullptr);
     virtual ~BubbleToolTip() override;
 
     void show();
@@ -77,7 +77,7 @@ signals:
     void stateChanged(State state);
 
 protected:
-    BubbleToolTip(QnWorkbenchContext* context, const QUrl& componentUrl, QObject* parent = nullptr);
+    BubbleToolTip(WindowContext* context, const QUrl& componentUrl, QObject* parent = nullptr);
 
 private:
     struct Private;

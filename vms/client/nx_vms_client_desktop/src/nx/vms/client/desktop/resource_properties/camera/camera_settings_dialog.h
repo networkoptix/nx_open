@@ -12,13 +12,15 @@ namespace nx::vms::client::desktop {
 
 struct CameraSettingsDialogState;
 
+// TODO: #sivanov Implement independent inheritance from WindowContextAware and SystemContextAware
+// to be able to open Camera Settings for cross-system cameras.
 class CameraSettingsDialog: public QnSessionAwareTabbedDialog
 {
     Q_OBJECT
     using base_type = QnSessionAwareTabbedDialog;
 
 public:
-    explicit CameraSettingsDialog(QWidget* parent = nullptr);
+    CameraSettingsDialog(SystemContext* systemContext, QWidget* parent = nullptr);
     virtual ~CameraSettingsDialog() override;
 
     bool setCameras(const QnVirtualCameraResourceList& cameras, bool force = false);

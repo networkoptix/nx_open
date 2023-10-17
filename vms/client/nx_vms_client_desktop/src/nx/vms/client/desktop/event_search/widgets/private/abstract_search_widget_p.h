@@ -35,7 +35,7 @@ class CommonObjectSearchSetup;
 
 class AbstractSearchWidget::Private:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = QWidget;

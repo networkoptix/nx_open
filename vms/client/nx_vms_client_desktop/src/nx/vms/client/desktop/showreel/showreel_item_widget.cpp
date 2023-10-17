@@ -19,10 +19,10 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/graphics/painters/layout_preview_painter.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/common/palette.h>
@@ -274,7 +274,7 @@ void ShowreelItemWidget::initOverlay()
             item()->setData(Qn::ShowreelItemDelayMsRole, value * 1000);
 
             // Store visual data to the tour and then add it to the save queue.
-            menu()->trigger(ui::action::SaveCurrentShowreelAction);
+            menu()->trigger(menu::SaveCurrentShowreelAction);
         });
 
     connect(layoutResource().get(),

@@ -10,14 +10,14 @@
 #include <nx/vms/client/core/camera/buttons/extended_output_camera_button_controller.h>
 #include <nx/vms/client/core/camera/buttons/software_trigger_camera_button_controller.h>
 #include <nx/vms/client/core/camera/buttons/two_way_audio_camera_button_controller.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/controls/object_tracking_button.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
-#include <ui/graphics/items/overlays/scrollable_items_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
+#include <ui/graphics/items/overlays/scrollable_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
 
@@ -35,7 +35,7 @@ enum ButtonGroup
 
 using CameraButton = core::CameraButton;
 using AggregatedControllerPtr = std::unique_ptr<core::AggregatedCameraButtonController>;
-using namespace nx::vms::client::desktop::ui::action;
+using namespace nx::vms::client::desktop::menu;
 
 static constexpr int kTriggersSpacing = 4;
 static constexpr int kTriggerButtonSize = 40;
@@ -289,7 +289,7 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButton& data)
         {
             if (!button->isLive())
             {
-                q->menu()->trigger(ui::action::JumpToLiveAction, mediaResourceWidget);
+                q->menu()->trigger(menu::JumpToLiveAction, mediaResourceWidget);
                 return;
             }
 
@@ -439,7 +439,7 @@ CameraButtonManager::CameraButtonManager(
     QObject* parent)
     :
     base_type(parent),
-    WindowContextAware(mediaResourceWidget->windowContext()),
+    WindowContextAware(mediaResourceWidget),
     d(new Private(this, getCameraResourceId(mediaResourceWidget), mediaResourceWidget))
 {
 }

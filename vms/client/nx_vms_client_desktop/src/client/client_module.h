@@ -8,6 +8,7 @@
 #include <client/client_startup_parameters.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/radass/radass_fwd.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 class QnClientCoreModule;
 
@@ -28,21 +29,19 @@ class ClientStateHandler;
 class LicenseHealthWatcher;
 class RunningInstancesManager;
 class SharedMemoryManager;
-class SystemContext;
 
 namespace analytics {
 class TaxonomyManager;
 class AttributeHelper;
 } // namespace analytics
 
-} // namespace nx::vms::client::desktop
-
-class NX_VMS_CLIENT_DESKTOP_API QnClientModule: public QObject
+class NX_VMS_CLIENT_DESKTOP_API QnClientModule: public QObject, public SystemContextAware
 {
     Q_OBJECT
 
 public:
     explicit QnClientModule(
+        SystemContext* systemContext,
         const QnStartupParameters& startupParams,
         QObject* parent = nullptr);
     virtual ~QnClientModule() override;
@@ -53,15 +52,13 @@ public:
 
     QnClientCoreModule* clientCoreModule() const;
 
-    nx::vms::client::desktop::SystemContext* systemContext() const;
-
     QnStartupParameters startupParameters() const;
 
-    nx::vms::client::desktop::AnalyticsSettingsManager* analyticsSettingsManager() const;
+    AnalyticsSettingsManager* analyticsSettingsManager() const;
 
     nx::vms::license::VideoWallLicenseUsageHelper* videoWallLicenseUsageHelper() const;
-    nx::vms::client::desktop::analytics::TaxonomyManager* taxonomyManager() const;
-    nx::vms::client::desktop::analytics::AttributeHelper* analyticsAttributeHelper() const;
+    analytics::TaxonomyManager* taxonomyManager() const;
+    analytics::AttributeHelper* analyticsAttributeHelper() const;
 
     static void initWebEngine();
 
@@ -73,10 +70,12 @@ private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 
-    QScopedPointer<nx::vms::client::desktop::AnalyticsMetadataProviderFactory>
+    QScopedPointer<AnalyticsMetadataProviderFactory>
         m_analyticsMetadataProviderFactory;
 
-    QScopedPointer<nx::vms::client::desktop::LicenseHealthWatcher> m_licenseHealthWatcher;
+    QScopedPointer<LicenseHealthWatcher> m_licenseHealthWatcher;
 };
 
-#define qnClientModule QnClientModule::instance()
+} // namespace nx::vms::client::desktop
+
+#define qnClientModule nx::vms::client::desktop::QnClientModule::instance()

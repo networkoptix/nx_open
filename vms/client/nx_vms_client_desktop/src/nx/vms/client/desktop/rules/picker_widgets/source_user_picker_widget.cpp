@@ -16,7 +16,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-SourceUserPicker::SourceUserPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+SourceUserPicker::SourceUserPicker(SystemContext* context, CommonParamsWidget* parent):
     ResourcePickerWidgetBase<vms::rules::SourceUserField>(context, parent)
 {
 }

@@ -5,7 +5,6 @@
 #include <QtWidgets/QCheckBox>
 
 #include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -13,6 +12,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
 #include <nx/vms/client/desktop/resource_properties/camera/flux/camera_settings_dialog_state.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/license/usage_helper.h>
 
 namespace nx::vms::client::desktop {
@@ -45,7 +45,7 @@ CameraSelectionDialog::AlertTextProvider initAlertTextProvider(
                 CamLicenseUsageHelper helper(
                     cameras,
                     /*enableRecording*/ true,
-                    qnClientCoreModule->commonModule()->systemContext());
+                    qnClientCoreModule->systemContext());
 
                 if (!helper.isValid())
                 {

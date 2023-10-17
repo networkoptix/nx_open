@@ -7,8 +7,7 @@
 #include <ui/widgets/business/subject_target_action_widget.h>
 
 namespace Ui { class PushNotificationBusinessActionWidget; }
-
-class QnWorkbenchContext;
+namespace nx::vms::client::desktop { class WindowContext; }
 
 namespace nx::vms::client::desktop {
 
@@ -22,7 +21,7 @@ class PushNotificationBusinessActionWidget:
 
 public:
     explicit PushNotificationBusinessActionWidget(
-        QnWorkbenchContext* context,
+        nx::vms::client::desktop::WindowContext* context,
         QWidget* parent = nullptr);
     virtual ~PushNotificationBusinessActionWidget() override;
 
@@ -38,7 +37,6 @@ private:
 
 private:
     QScopedPointer<Ui::PushNotificationBusinessActionWidget> ui;
-    QnWorkbenchContext* const m_context;
     Aligner* const m_aligner;
 };
 

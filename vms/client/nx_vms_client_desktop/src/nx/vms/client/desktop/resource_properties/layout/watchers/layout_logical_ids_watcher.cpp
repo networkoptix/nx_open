@@ -9,28 +9,30 @@
 #include <core/resource/layout_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "../flux/layout_settings_dialog_store.h"
 
 namespace nx::vms::client::desktop {
 
-class LayoutLogicalIdsWatcher::Private:
-    public QObject
+struct LayoutLogicalIdsWatcher::Private
 {
-public:
-    Private(
-        LayoutSettingsDialogStore* store,
-        QnResourcePool* resourcePool,
-        QnCommonMessageProcessor* messageProcessor)
-        :
-        QObject(),
-        m_store(store)
-    {
-        if (!NX_ASSERT(store))
-            return;
+    LayoutLogicalIdsWatcher* const q;
+    LayoutSettingsDialogStore* const store;
 
+    QHash<QnLayoutResourcePtr, int> logicalIds;
+    QnLayoutResourcePtr excludedLayout;
+
+    Private(
+        LayoutLogicalIdsWatcher* owner,
+        LayoutSettingsDialogStore* store)
+        :
+        q(owner),
+        store(store)
+    {
         auto resourceListener = new core::SessionResourcesSignalListener<QnLayoutResource>(
-            resourcePool, messageProcessor, this);
+            q->systemContext(),
+            q);
 
         resourceListener->setOnAddedHandler(
             [this](const QnLayoutResourceList& layouts)
@@ -40,7 +42,7 @@ public:
                 {
                     if (const int logicalId = layout->logicalId(); logicalId > 0)
                     {
-                        m_logicalIds.insert(layout, logicalId);
+                        logicalIds.insert(layout, logicalId);
                         needToUpdateStore = true;
                     }
                 }
@@ -54,9 +56,9 @@ public:
                 bool needToUpdateStore = false;
                 for (const auto& layout: layouts)
                 {
-                    if (m_excludedLayout == layout)
-                        m_excludedLayout.reset();
-                    else if (m_logicalIds.remove(layout))
+                    if (excludedLayout == layout)
+                        excludedLayout.reset();
+                    else if (logicalIds.remove(layout))
                         needToUpdateStore = true;
                 }
                 if (needToUpdateStore)
@@ -70,84 +72,49 @@ public:
         resourceListener->start();
     }
 
-    QnLayoutResourcePtr excludedLayout() const
-    {
-        return m_excludedLayout;
-    }
-
     void setExcludedLayout(const QnLayoutResourcePtr& value)
     {
-        if (m_excludedLayout == value)
-            return;
-
-        const auto oldExcludedLayout = m_excludedLayout;
-        m_excludedLayout = value;
-
-        if (oldExcludedLayout)
-            update(oldExcludedLayout);
-
-        if (m_excludedLayout)
-            update(m_excludedLayout);
+        excludedLayout = value;
+        update(excludedLayout);
     }
 
-private:
     void update(const QnLayoutResourcePtr& layout)
     {
         const int logicalId = layout->logicalId();
-        if (logicalId == 0 || layout == m_excludedLayout)
+        if (logicalId == 0 || layout == excludedLayout)
         {
-            if (m_logicalIds.remove(layout))
+            if (logicalIds.remove(layout))
                 updateStore();
         }
         else
         {
-            m_logicalIds.insert(layout, logicalId);
+            logicalIds.insert(layout, logicalId);
             updateStore();
         }
     }
 
     void updateStore()
     {
-        if (!m_store)
-            return;
-
-        std::set<int> logicalIds;
-        for (const int logicalId: m_logicalIds)
-            logicalIds.insert(logicalId);
-
-        m_store->setOtherLogicalIds(logicalIds);
+        std::set<int> value{logicalIds.cbegin(), logicalIds.cend()};
+        store->setOtherLogicalIds(value);
     }
-
-private:
-    QPointer<LayoutSettingsDialogStore> m_store;
-    QHash<QnLayoutResourcePtr, int> m_logicalIds;
-    QnLayoutResourcePtr m_excludedLayout;
 };
 
 LayoutLogicalIdsWatcher::LayoutLogicalIdsWatcher(
     LayoutSettingsDialogStore* store,
-    QnResourcePool* resourcePool,
-    QnCommonMessageProcessor* messageProcessor,
+    QnLayoutResourcePtr excludedLayout,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(store, resourcePool, messageProcessor))
+    SystemContextAware(SystemContext::fromResource(excludedLayout)),
+    d(new Private(this, store))
 {
+    d->setExcludedLayout(excludedLayout);
 }
 
 LayoutLogicalIdsWatcher::~LayoutLogicalIdsWatcher()
 {
     // Required here for forward-declared scoped pointer destruction.
-}
-
-QnLayoutResourcePtr LayoutLogicalIdsWatcher::excludedLayout() const
-{
-    return d->excludedLayout();
-}
-
-void LayoutLogicalIdsWatcher::setExcludedLayout(const QnLayoutResourcePtr& value)
-{
-    d->setExcludedLayout(value);
 }
 
 } // namespace nx::vms::client::desktop

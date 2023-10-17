@@ -34,7 +34,6 @@
 #include "destruction_guard_item.h"
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 class DropSurfaceItem: public QGraphicsObject
 {
@@ -59,11 +58,10 @@ private:
 
 DropInstrument::DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent):
     Instrument(Item, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
-    m_context(context),
+    QnWorkbenchContextAware(context),
     m_filterItem(new SceneEventFilterItem()),
     m_intoNewLayout(intoNewLayout)
 {
-    NX_ASSERT(context);
     m_filterItem->setEventFilter(this);
 }
 
@@ -165,10 +163,6 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
     // Reset stored mimedata.
     std::unique_ptr<nx::vms::client::desktop::MimeData> localMimeData = std::move(m_mimeData);
 
-    auto context = m_context.data();
-    if (!context)
-        return true;
-
     const auto mimeData = event->mimeData();
     if (mimeData->hasFormat(Qn::NoSceneDrop))
     {
@@ -183,7 +177,7 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
     if (!showreels.empty())
     {
         for (const auto& showreel: showreels)
-            delayedTriggerIfPossible(action::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
+            delayedTriggerIfPossible(menu::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
 
         // If tour was opened, ignore other items.
         return true;
@@ -192,7 +186,7 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
     // Try to drop videowall items first.
     const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(localMimeData->entities());
     if (!videoWallItems.empty()
-        && delayedTriggerIfPossible(action::StartVideoWallControlAction, videoWallItems))
+        && delayedTriggerIfPossible(menu::StartVideoWallControlAction, videoWallItems))
     {
         // Ignore resources.
         return true;
@@ -203,18 +197,18 @@ bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEv
 
     resourcePool()->addNewResources(localMimeData->resources());
 
-    action::Parameters parameters(localMimeData->resources(), localMimeData->arguments());
+    menu::Parameters parameters(localMimeData->resources(), localMimeData->arguments());
 
     if (!m_intoNewLayout)
     {
         delayedTriggerIfPossible(
-            action::DropResourcesAction,
+            menu::DropResourcesAction,
             parameters.withArgument(Qn::ItemPositionRole,
-                context->workbench()->mapper()->mapToGridF(event->scenePos())));
+                workbench()->mapper()->mapToGridF(event->scenePos())));
     }
     else
     {
-        delayedTriggerIfPossible(action::OpenInNewTabAction, parameters);
+        delayedTriggerIfPossible(menu::OpenInNewTabAction, parameters);
     }
 
     return true;
@@ -228,22 +222,19 @@ SceneEventFilterItem *DropInstrument::filterItem() const {
     return m_filterItem.data();
 }
 
-bool DropInstrument::delayedTriggerIfPossible(action::IDType id, const action::Parameters& parameters)
+bool DropInstrument::delayedTriggerIfPossible(menu::IDType id, const menu::Parameters& parameters)
 {
-    if (!m_context || !m_context->menu()->canTrigger(id, parameters))
+    if (!menu()->canTrigger(id, parameters))
         return false;
 
     const auto triggerIfPossible =
-        [context = m_context, id, parameters]()
+        [this, id, parameters]()
         {
-            if (!context)
-                return;
-
             QApplication::setOverrideCursor(Qt::WaitCursor);
             auto cursorGuard = nx::utils::makeScopeGuard(
                 []() { QApplication::restoreOverrideCursor(); });
 
-            context->menu()->triggerIfPossible(id, parameters);
+            menu()->triggerIfPossible(id, parameters);
         };
 
     executeDelayed(triggerIfPossible);

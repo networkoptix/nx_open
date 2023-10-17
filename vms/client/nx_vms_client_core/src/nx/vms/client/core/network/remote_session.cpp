@@ -122,9 +122,7 @@ RemoteSession::RemoteSession(
 
     d->remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
 
-    d->messageProcessor = static_cast<QnClientMessageProcessor*>(
-        systemContext->messageProcessor());
-
+    d->messageProcessor = systemContext->clientMessageProcessor();
     connect(d->messageProcessor.data(), &QnCommonMessageProcessor::connectionOpened, this,
         &RemoteSession::onMessageBusConnectionOpened);
     connect(d->messageProcessor.data(), &QnCommonMessageProcessor::initialResourcesReceived, this,

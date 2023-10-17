@@ -17,11 +17,11 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
@@ -54,7 +54,7 @@ milliseconds startTime(const QnTimePeriod& period)
 
 } // namespace
 
-SimpleMotionSearchListModel::SimpleMotionSearchListModel(QnWorkbenchContext* context, QObject* parent):
+SimpleMotionSearchListModel::SimpleMotionSearchListModel(WindowContext* context, QObject* parent):
     base_type(context, parent)
 {
     setOfflineAllowed(true);
@@ -102,7 +102,7 @@ bool SimpleMotionSearchListModel::isConstrained() const
 bool SimpleMotionSearchListModel::hasAccessRights() const
 {
     // Panel is hidden for live viewers but should be visible when browsing local files offline.
-    return !isOnline() || systemContext()->accessController()->isDeviceAccessRelevant(
+    return !isOnline() || system()->accessController()->isDeviceAccessRelevant(
         nx::vms::api::AccessRight::viewArchive);
 }
 
@@ -458,8 +458,8 @@ QSharedPointer<QMenu> SimpleMotionSearchListModel::contextMenu(const QnTimePerio
     menu->addAction(tr("Bookmark it..."),
         [this, camera, chunk]()
         {
-            this->menu()->triggerForced(ui::action::AddCameraBookmarkAction,
-                ui::action::Parameters(camera).withArgument(Qn::TimePeriodRole, chunk));
+            this->menu()->triggerForced(menu::AddCameraBookmarkAction,
+                menu::Parameters(camera).withArgument(Qn::TimePeriodRole, chunk));
         });
 
     return menu;

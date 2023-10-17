@@ -27,14 +27,14 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/left_panel/left_panel_widget.h>
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameter_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <ui/animation/animator_group.h>
@@ -221,9 +221,9 @@ static void uiMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     debugLabel->appendTextQueued(msg);
 }
 
-WorkbenchUi::WorkbenchUi(QObject *parent):
+WorkbenchUi::WorkbenchUi(WindowContext* windowContext, QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     m_instrumentManager(display()->instrumentManager())
 {
     QGraphicsLayout::setInstantInvalidatePropagation(true);
@@ -292,7 +292,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
     display()->setLayer(guiElementsWidget, QnWorkbenchDisplay::MessageBoxLayer);
 
     /* Connect to display. */
-    mainWindow()->view()->addAction(action(action::FreespaceAction));
+    mainWindow()->view()->addAction(action(menu::FreespaceAction));
     m_connections << connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
         &WorkbenchUi::at_display_widgetChanged);
 
@@ -300,18 +300,18 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
     m_connections << connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
         &WorkbenchUi::updateViewportMarginsAnimated, Qt::QueuedConnection);
 
-    m_connections << connect(action(action::FreespaceAction), &QAction::triggered, this,
+    m_connections << connect(action(menu::FreespaceAction), &QAction::triggered, this,
         &WorkbenchUi::at_freespaceAction_triggered);
-    m_connections << connect(action(action::FullscreenResourceAction), &QAction::triggered, this,
+    m_connections << connect(action(menu::FullscreenResourceAction), &QAction::triggered, this,
         &WorkbenchUi::at_fullscreenResourceAction_triggered);
-    m_connections << connect(action(action::EffectiveMaximizeAction), &QAction::triggered, this,
+    m_connections << connect(action(menu::EffectiveMaximizeAction), &QAction::triggered, this,
         [this, windowedTitleShadow]()
         {
             if (m_inFreespace)
                 at_freespaceAction_triggered();
 
             windowedTitleShadow->setVisible(
-                !action(action::EffectiveMaximizeAction)->isChecked());
+                !action(menu::EffectiveMaximizeAction)->isChecked());
         });
 
     /* Init fields. */
@@ -361,7 +361,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
             }
         });
 
-    m_connections << connect(action(action::ShowTimeLineOnVideowallAction), &QAction::triggered,
+    m_connections << connect(action(menu::ShowTimeLineOnVideowallAction), &QAction::triggered,
         this, [this] { updateControlsVisibility(false); });
 
     appContext()->clientStateHandler()->registerDelegate(
@@ -380,7 +380,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
         this,
         &WorkbenchUi::updateAutoFpsLimit);
 
-    m_connections << connect(action(ui::action::SearchResourcesAction), &QAction::triggered, this,
+    m_connections << connect(action(menu::SearchResourcesAction), &QAction::triggered, this,
         [this]()
         {
             setLeftPanelVisible(/*visible*/ true, /*animate*/ false);
@@ -490,12 +490,12 @@ bool WorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
     return false;
 }
 
-action::ActionScope WorkbenchUi::currentScope() const
+menu::ActionScope WorkbenchUi::currentScope() const
 {
     if (m_leftPanel && m_leftPanel->isFocused())
     {
         if (qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
-            return action::TreeScope;
+            return menu::TreeScope;
 
         if (auto lp = qobject_cast<LeftWorkbenchPanel*>(m_leftPanel))
             return lp->currentScope();
@@ -503,24 +503,24 @@ action::ActionScope WorkbenchUi::currentScope() const
 
     QGraphicsItem *focusItem = mainWindow()->scene()->focusItem();
     if (focusItem == m_timeline->item)
-        return action::TimelineScope;
+        return menu::TimelineScope;
 
     /* We should not handle any button as an action while the item was focused. */
     if (dynamic_cast<GraphicsWebEngineView*>(focusItem))
-        return action::InvalidScope;
+        return menu::InvalidScope;
 
     if (mainWindow()->scene()->hasFocus())
-        return action::SceneScope;
+        return menu::SceneScope;
 
-    return action::MainScope;
+    return menu::MainScope;
 }
 
-action::Parameters WorkbenchUi::currentParameters(action::ActionScope scope) const
+menu::Parameters WorkbenchUi::currentParameters(menu::ActionScope scope) const
 {
     /* Get items. */
     switch (scope)
     {
-        case action::TreeScope:
+        case menu::TreeScope:
         {
             if (auto tree = qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
                 return tree->widget->currentParameters(scope);
@@ -528,10 +528,10 @@ action::Parameters WorkbenchUi::currentParameters(action::ActionScope scope) con
                 return lp->currentParameters(scope);
         }
 
-        case action::TimelineScope:
+        case menu::TimelineScope:
             return navigator()->currentWidget();
 
-        case action::SceneScope:
+        case menu::SceneScope:
         {
             auto selectedItems = mainWindow()->scene()->selectedItems();
             if (selectedItems.empty())
@@ -540,13 +540,13 @@ action::Parameters WorkbenchUi::currentParameters(action::ActionScope scope) con
                 if (focused)
                     selectedItems.append(focused);
             }
-            return action::ParameterTypes::widgets(selectedItems);
+            return menu::ParameterTypes::widgets(selectedItems);
         }
 
         default:
             break;
     }
-    return action::Parameters();
+    return menu::Parameters();
 }
 
 
@@ -566,7 +566,7 @@ void WorkbenchUi::updateControlsVisibility(bool animate)
     const bool timelineVisible =
         (allowedByLayout && calculateTimelineVisible(navigator()->currentWidget()));
 
-    if (action(action::ToggleShowreelModeAction)->isChecked())
+    if (action(menu::ToggleShowreelModeAction)->isChecked())
     {
         setTimelineVisible(false, animate);
         setLeftPanelVisible(false, animate);
@@ -574,8 +574,6 @@ void WorkbenchUi::updateControlsVisibility(bool animate)
         setNotificationsVisible(false, animate);
         return;
     }
-
-    const bool notificationsAllowed = context()->user() != nullptr;
 
     if (qnRuntime->isVideoWallMode())
     {
@@ -588,6 +586,8 @@ void WorkbenchUi::updateControlsVisibility(bool animate)
         setNotificationsVisible(false, false);
         return;
     }
+
+    const bool notificationsAllowed = !system()->user().isNull();
 
     if (m_inactive)
     {
@@ -779,7 +779,7 @@ void WorkbenchUi::at_freespaceAction_triggered()
     if (!NX_ASSERT(!qnRuntime->isAcsMode(), "This function must not be called in ActiveX mode."))
         return;
 
-    QAction *fullScreenAction = action(action::EffectiveMaximizeAction);
+    QAction *fullScreenAction = action(menu::EffectiveMaximizeAction);
 
     bool isFullscreen = fullScreenAction->isChecked();
 
@@ -818,7 +818,7 @@ void WorkbenchUi::at_fullscreenResourceAction_triggered()
     if (!NX_ASSERT(!qnRuntime->isAcsMode(), "This function must not be called in ActiveX mode."))
         return;
 
-    QAction *fullScreenAction = action(action::EffectiveMaximizeAction);
+    QAction *fullScreenAction = action(menu::EffectiveMaximizeAction);
 
     bool isFullscreen = fullScreenAction->isChecked();
 
@@ -1580,7 +1580,7 @@ void WorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
     m_connections << connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &WorkbenchUi::updateControlsVisibilityAnimated);
 
-    m_connections << connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
+    m_connections << connect(action(menu::ToggleShowreelModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
             /// If tour mode is going to be turned on, focus should be forced to main window
@@ -1589,7 +1589,7 @@ void WorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
                 mainWindowWidget()->setFocus();
         });
 
-    m_connections << connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
+    m_connections << connect(action(menu::ToggleShowreelModeAction), &QAction::toggled, this,
         [this](){ updateControlsVisibility(false); });
 }
 
@@ -1628,7 +1628,7 @@ void WorkbenchUi::createDebugWidget()
     }
     updateDebugGeometry();
 
-    m_connections << connect(action(action::ShowDebugOverlayAction), &QAction::toggled, this,
+    m_connections << connect(action(menu::ShowDebugOverlayAction), &QAction::toggled, this,
         [&](bool toggled) { m_debugOverlayLabel->setVisible(toggled); });
 }
 
@@ -1649,7 +1649,7 @@ void WorkbenchUi::setFpsVisible(bool fpsVisible)
     m_fpsItem->setVisible(fpsVisible);
     m_fpsItem->setText(QString());
 
-    action(action::ShowFpsAction)->setChecked(fpsVisible);
+    action(menu::ShowFpsAction)->setChecked(fpsVisible);
     appContext()->performanceMonitor()->setVisible(fpsVisible);
 }
 
@@ -1691,7 +1691,7 @@ void WorkbenchUi::createFpsWidget()
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
     display()->setLayer(m_fpsItem, QnWorkbenchDisplay::MessageBoxLayer);
 
-    m_connections << connect(action(action::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setFpsVisible);
+    m_connections << connect(action(menu::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setFpsVisible);
     m_connections << connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
 
     setDebugInfoVisible(ini().developerMode);

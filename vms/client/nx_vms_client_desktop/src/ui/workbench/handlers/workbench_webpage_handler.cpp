@@ -12,12 +12,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/webpage_dialog.h>
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr*/):
     base_type(parent),
@@ -32,24 +31,24 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 webPage->setStatus(nx::vms::api::ResourceStatus::online);
         });
 
-    connect(action(action::AddProxiedWebPageAction), &QAction::triggered,
+    connect(action(menu::AddProxiedWebPageAction), &QAction::triggered,
         this, [this] { addNewWebPage(nx::vms::api::WebPageSubtype::none); });
 
-    connect(action(action::NewWebPageAction), &QAction::triggered,
+    connect(action(menu::NewWebPageAction), &QAction::triggered,
         this, [this] { addNewWebPage(nx::vms::api::WebPageSubtype::none); });
 
-    connect(action(action::WebPageSettingsAction), &QAction::triggered,
+    connect(action(menu::WebPageSettingsAction), &QAction::triggered,
         this, &QnWorkbenchWebPageHandler::editWebPage);
 
     if (ini().webPagesAndIntegrations)
     {
-        connect(action(action::IntegrationSettingsAction), &QAction::triggered,
+        connect(action(menu::IntegrationSettingsAction), &QAction::triggered,
             this, &QnWorkbenchWebPageHandler::editWebPage);
 
-        connect(action(action::AddProxiedIntegrationAction), &QAction::triggered,
+        connect(action(menu::AddProxiedIntegrationAction), &QAction::triggered,
             this, [this] { addNewWebPage(nx::vms::api::WebPageSubtype::clientApi); });
 
-        connect(action(action::NewIntegrationAction), &QAction::triggered,
+        connect(action(menu::NewIntegrationAction), &QAction::triggered,
             this, [this] { addNewWebPage(nx::vms::api::WebPageSubtype::clientApi); });
     }
 }
@@ -85,8 +84,8 @@ void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subty
     webPage->setCertificateCheckEnabled(dialog->isCertificateCheckEnabled());
 
     qnResourcesChangesManager->saveWebPage(webPage);
-    menu()->trigger(action::SelectNewItemAction, webPage);
-    menu()->trigger(action::DropResourcesAction, webPage);
+    menu()->trigger(menu::SelectNewItemAction, webPage);
+    menu()->trigger(menu::DropResourcesAction, webPage);
 }
 
 void QnWorkbenchWebPageHandler::editWebPage()

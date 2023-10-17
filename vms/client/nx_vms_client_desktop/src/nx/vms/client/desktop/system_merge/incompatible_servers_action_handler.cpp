@@ -16,10 +16,10 @@
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/system_merge/connect_to_current_system_tool.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/merge_systems_dialog.h>
 #include <nx/vms/license/remote_licenses.h>
 #include <ui/dialogs/common/input_dialog.h>
@@ -37,9 +37,9 @@ IncompatibleServersActionHandler::IncompatibleServersActionHandler(
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(ui::action::ConnectToCurrentSystem), &QAction::triggered, this,
+    connect(action(menu::ConnectToCurrentSystem), &QAction::triggered, this,
         &IncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered);
-    connect(action(ui::action::MergeSystems), &QAction::triggered, this,
+    connect(action(menu::MergeSystems), &QAction::triggered, this,
         &IncompatibleServersActionHandler::at_mergeSystemsAction_triggered);
 }
 
@@ -88,7 +88,8 @@ void IncompatibleServersActionHandler::connectToCurrentSystem(
     if (target.isNull())
         return;
 
-    auto delegate = createConnectionUserInteractionDelegate(mainWindowWidget());
+    auto delegate = createConnectionUserInteractionDelegate(
+        [this]() { return mainWindowWidget(); });
     m_connectTool = new ConnectToCurrentSystemTool(this, std::move(delegate));
 
     auto progressDialog = new ProgressDialog(mainWindowWidget());
@@ -139,7 +140,8 @@ void IncompatibleServersActionHandler::at_mergeSystemsAction_triggered()
         statisticsModule()->certificates()->beginScenario(
             QnCertificateStatisticsModule::Scenario::mergeFromDialog);
 
-    auto delegate = createConnectionUserInteractionDelegate(mainWindowWidget());
+    auto delegate = createConnectionUserInteractionDelegate(
+        [this]() { return mainWindowWidget(); });
     m_mergeDialog = new MergeSystemsDialog(mainWindowWidget(), std::move(delegate));
     connect(m_mergeDialog.data(), &QDialog::finished, this,
         [this, mergeScenario]()

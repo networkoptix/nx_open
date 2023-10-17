@@ -16,7 +16,7 @@ namespace nx::vms::client::desktop {
 
 class EventLogModelData;
 
-class EventLogModel: public QAbstractItemModel, public QnWorkbenchContextAware
+class EventLogModel: public QAbstractItemModel, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QAbstractItemModel;
@@ -33,7 +33,7 @@ public:
         ColumnCount
     };
 
-    EventLogModel(QObject* parent = nullptr);
+    EventLogModel(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~EventLogModel();
 
     void setEvents(nx::vms::api::rules::EventLogRecordList&& records);

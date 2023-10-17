@@ -13,7 +13,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-CommonParamsWidget::CommonParamsWidget(QnWorkbenchContext* context, QWidget* parent):
+CommonParamsWidget::CommonParamsWidget(WindowContext* context, QWidget* parent):
     ParamsWidget(context, parent)
 {
 }
@@ -32,7 +32,7 @@ void CommonParamsWidget::onDescriptorSet()
         if (!fieldDescriptor.properties.value("visible", true).toBool())
             continue;
 
-        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, context(), this);
+        PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor, windowContext(), this);
         if (picker == nullptr)
             continue;
 

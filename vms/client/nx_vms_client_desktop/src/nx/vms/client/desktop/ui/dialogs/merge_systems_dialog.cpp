@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -29,7 +30,6 @@
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/system_merge/merge_systems_tool.h>
 #include <nx/vms/client/desktop/system_merge/merge_systems_validator.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <ui/workbench/workbench_context.h>
@@ -119,7 +119,7 @@ void MergeSystemsDialog::updateKnownSystems()
     ui->urlComboBox->clear();
 
     std::multimap<QString, QString> labelUrlMap;
-    for (const auto& server: resourcePool()->getIncompatibleServers())
+    for (const auto& server: system()->resourcePool()->getIncompatibleServers())
     {
         QString url = server->getApiUrl().toString();
         QString label = QnResourceDisplayInfo(server).toString(
@@ -140,7 +140,7 @@ void MergeSystemsDialog::updateKnownSystems()
     ui->urlComboBox->setCurrentText(QString());
 
     const QString displayName = nx::utils::elideString(
-        systemSettings()->systemName(), kMaxSystemNameLength);
+        system()->globalSettings()->systemName(), kMaxSystemNameLength);
 
     ui->currentSystemLabel->setText(
         tr("You are about to merge the current System %1 with System")
@@ -182,7 +182,7 @@ void MergeSystemsDialog::at_urlComboBox_editingFinished()
 
 void MergeSystemsDialog::at_testConnectionButton_clicked()
 {
-    if (!NX_ASSERT(context()->user()->isAdministrator()))
+    if (!NX_ASSERT(system()->user()->isAdministrator()))
         return;
 
     m_mergeContextId = QnUuid();
@@ -215,7 +215,8 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
             ? helpers::kFactorySystemPassword.toStdString()
             : password.toStdString());
 
-    m_mergeContextId = m_mergeTool->pingSystem(currentServer(), m_url, m_remoteOwnerCredentials);
+    m_mergeContextId = m_mergeTool->pingSystem(
+        system()->currentServer(), m_url, m_remoteOwnerCredentials);
     ui->credentialsGroupBox->setEnabled(false);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
@@ -226,7 +227,7 @@ void MergeSystemsDialog::at_mergeButton_clicked()
         return;
 
     const bool ownSettings = ui->currentSystemRadioButton->isChecked();
-    const QString currentSystemName = systemSettings()->systemName();
+    const QString currentSystemName = system()->globalSettings()->systemName();
     const QString targetSystemName = ui->remoteSystemRadioButton->text();
 
     auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
@@ -245,7 +246,7 @@ void MergeSystemsDialog::at_mergeButton_clicked()
     m_mergeButton->setEnabled(false);
 
     if (!ownSettings)
-        context()->instance<ContextCurrentUserWatcher>()->setReconnectOnPasswordChange(false);
+        workbenchContext()->instance<ContextCurrentUserWatcher>()->setReconnectOnPasswordChange(false);
 
     if (m_mergeTool->mergeSystem(m_mergeContextId, ownerSessionToken->value, ownSettings))
         ui->buttonBox->showProgress(tr("Merging Systems..."));
@@ -264,8 +265,8 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
 
     if (mergeStatus == MergeSystemsStatus::ok)
     {
-        mergeStatus =
-            MergeSystemsValidator::checkCloudCompatibility(currentServer(), moduleInformation);
+        mergeStatus = MergeSystemsValidator::checkCloudCompatibility(
+            system()->currentServer(), moduleInformation);
     }
 
     if (!allowsToMerge(mergeStatus))
@@ -278,11 +279,11 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
         return;
     }
 
-    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+    const auto server = system()->resourcePool()->getResourceById<QnMediaServerResource>(
         moduleInformation.id);
     if (server
         && server->getStatus() == nx::vms::api::ResourceStatus::online
-        && helpers::serverBelongsToCurrentSystem(moduleInformation, systemContext()))
+        && helpers::serverBelongsToCurrentSystem(moduleInformation, system()))
     {
         if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
         {
@@ -365,13 +366,13 @@ void MergeSystemsDialog::at_mergeTool_mergeFinished(
             // Current admin credentials are replaced by target admin credentials at this point.
             // But it is not known which credentials should be updated (digest or token).
             // Therefore just trigger reconnect.
-            context()->instance<ContextCurrentUserWatcher>()->setReconnectOnPasswordChange(true);
-            menu()->trigger(ui::action::ReconnectAction);
+            workbenchContext()->instance<ContextCurrentUserWatcher>()->setReconnectOnPasswordChange(true);
+            menu()->trigger(menu::ReconnectAction);
         }
     }
     else
     {
-        context()->instance<ContextCurrentUserWatcher>()->setReconnectOnPasswordChange(true);
+        workbenchContext()->instance<ContextCurrentUserWatcher>()->setReconnectOnPasswordChange(true);
 
         QString message = errorText.isEmpty()
             ? MergeSystemsTool::getErrorMessage(mergeStatus, moduleInformation)

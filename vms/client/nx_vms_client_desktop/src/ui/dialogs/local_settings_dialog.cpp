@@ -9,23 +9,22 @@
 
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/local_settings/advanced_settings_widget.h>
 #include <ui/widgets/local_settings/general_preferences_widget.h>
 #include <ui/widgets/local_settings/look_and_feel_preferences_widget.h>
 #include <ui/widgets/local_settings/popup_settings_widget.h>
 #include <ui/widgets/local_settings/recording_settings_widget.h>
-#include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
@@ -65,8 +64,10 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     auto updateRecorderSettings =
         [this]
         {
-            if (auto desktopCamera = context()->findInstance<QnWorkbenchDesktopCameraWatcher>())
-                desktopCamera->forcedUpdate();
+            // Desktop camera will be reinitialized here. Actually this code must be removed as
+            // soon as 2-way audio is reimplemented, so method will be called only on "Push my
+            // screen" action.
+            system()->initializeDesktopCamera();
         };
 
     auto generalPageWidget = new QnGeneralPreferencesWidget(this);
@@ -76,7 +77,7 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
 
     addPage(LookAndFeelPage, m_lookAndFeelWidget, tr("Look and Feel"));
 
-    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(menu::ToggleScreenRecordingAction);
     if (screenRecordingAction)
     {
         auto recordingSettingsWidget = new RecordingSettingsWidget(this);
@@ -176,5 +177,5 @@ void QnLocalSettingsDialog::executeWithRestartCheck(Callback function) const
     function();
 
     if (restartQueued)
-        menu()->trigger(action::QueueAppRestartAction);
+        menu()->trigger(menu::QueueAppRestartAction);
 }

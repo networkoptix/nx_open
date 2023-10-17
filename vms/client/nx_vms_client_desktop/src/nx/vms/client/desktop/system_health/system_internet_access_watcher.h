@@ -19,6 +19,8 @@ public:
     explicit SystemInternetAccessWatcher(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~SystemInternetAccessWatcher() override;
 
+    void start();
+
     bool systemHasInternetAccess() const;
 
 signals:

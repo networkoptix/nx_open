@@ -4,8 +4,9 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <ui/graphics/instruments/drag_processing_instrument.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
+
+#include "drag_processing_instrument.h"
 
 class FixedArSelectionItem;
 class ZoomOverlayWidget;
@@ -17,14 +18,15 @@ class QnMediaResourceWidget;
 
 class ZoomWindowInstrument:
     public DragProcessingInstrument,
-    public QnWorkbenchContextAware
+    public nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
-
     using base_type = DragProcessingInstrument;
 
 public:
-    ZoomWindowInstrument(QObject *parent = nullptr);
+    ZoomWindowInstrument(
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QObject *parent = nullptr);
     virtual ~ZoomWindowInstrument();
 
 signals:

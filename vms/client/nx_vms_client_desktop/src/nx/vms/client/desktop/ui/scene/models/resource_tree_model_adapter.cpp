@@ -32,8 +32,9 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_state.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -105,7 +106,7 @@ struct ResourceTreeModelAdapter::Private
     std::unique_ptr<ResourceTreeInteractionHandler> interactionHandler;
     QStack<QVector<QPersistentModelIndex>> states;
 
-    QnWorkbenchContext* context = nullptr;
+    WindowContext* context = nullptr;
     bool localFilesMode = true;
 
     FilterType filterType = FilterType::noFilter;
@@ -181,7 +182,7 @@ struct ResourceTreeModelAdapter::Private
 
     void updateLocalFilesMode()
     {
-        const bool newLocalFilesMode = !context || !context->user();
+        const bool newLocalFilesMode = !context || !context->workbenchContext()->user();
         if (localFilesMode == newLocalFilesMode)
             return;
 
@@ -301,12 +302,13 @@ ResourceTreeModelAdapter::~ResourceTreeModelAdapter()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-QnWorkbenchContext* ResourceTreeModelAdapter::context() const
+WindowContext* ResourceTreeModelAdapter::context() const
 {
     return d->context;
 }
 
-void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
+// TODO: #sivanov This class is tightly bound to a single System Context.
+void ResourceTreeModelAdapter::setContext(WindowContext* context)
 {
     if (d->context == context)
         return;
@@ -317,8 +319,8 @@ void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
     if (d->context)
     {
         d->resourceTreeComposer = std::make_unique<entity_resource_tree::ResourceTreeComposer>(
-            d->context->systemContext(),
-            d->context->resourceTreeSettings());
+            d->context->system(),
+            d->context->workbenchContext()->resourceTreeSettings());
 
         connect(d->resourceTreeComposer.get(), &entity_resource_tree::ResourceTreeComposer::saveExpandedState,
             this, &ResourceTreeModelAdapter::saveExpandedState);
@@ -327,9 +329,9 @@ void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
             this, &ResourceTreeModelAdapter::restoreExpandedState);
 
         d->dragDropDecoratorModel.reset(new ResourceTreeDragDropDecoratorModel(
-            d->context->resourcePool(),
+            d->context->system()->resourcePool(),
             d->context->menu(),
-            d->context->instance<ui::workbench::ActionHandler>()));
+            d->context->workbenchContext()->instance<ui::workbench::ActionHandler>()));
 
         d->dragDropDecoratorModel->setSourceModel(d->resourceTreeModel.get());
 
@@ -339,10 +341,10 @@ void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
 
         d->resourceTreeModel->setEditDelegate(ResourceTreeEditDelegate(context));
 
-        connect(d->context, &QnWorkbenchContext::userChanged, this,
+        connect(d->context->workbenchContext(), &QnWorkbenchContext::userChanged, this,
             [this]() { d->updateLocalFilesMode(); });
 
-        d->interactionHandler.reset(new ResourceTreeInteractionHandler(d->context));
+        d->interactionHandler.reset(new ResourceTreeInteractionHandler(d->context->workbenchContext()));
 
         connect(d->interactionHandler.get(), &ResourceTreeInteractionHandler::editRequested,
             this, &ResourceTreeModelAdapter::editRequested);
@@ -427,7 +429,7 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
                     const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                     if (resource && resource->hasFlags(Qn::server))
                     {
-                        const auto serverCount = d->context->resourcePool()
+                        const auto serverCount = d->context->system()->resourcePool()
                             ->getResources<QnMediaServerResource>().count();
 
                         return serverCount <= kMaxAutoExpandedServers;
@@ -470,8 +472,8 @@ bool ResourceTreeModelAdapter::isFilterRelevant(ResourceTree::FilterType type) c
     switch (type)
     {
         case ResourceTree::FilterType::servers:
-            return d->context->accessController()->hasPowerUserPermissions()
-                || d->context->systemSettings()->showServersInTreeForNonAdmins();
+            return d->context->workbenchContext()->accessController()->hasPowerUserPermissions()
+                || d->context->workbenchContext()->systemSettings()->showServersInTreeForNonAdmins();
 
         default:
             return true;
@@ -646,7 +648,7 @@ bool ResourceTreeModelAdapter::isExtraInfoRequired() const
     return appContext()->localSettings()->resourceInfoLevel() > Qn::RI_NameOnly;
 }
 
-ui::action::Parameters ResourceTreeModelAdapter::actionParameters(
+menu::Parameters ResourceTreeModelAdapter::actionParameters(
     const QModelIndex& index, const QModelIndexList& selection) const
 {
     return d->interactionHandler->actionParameters(index, selection);

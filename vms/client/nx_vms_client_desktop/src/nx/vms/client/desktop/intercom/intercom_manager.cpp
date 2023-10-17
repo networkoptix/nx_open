@@ -37,14 +37,16 @@ namespace nx::vms::client::desktop {
 // ------------------------------------------------------------------------------------------------
 // IntercomManager::Private
 
-struct IntercomManager::Private: public QObject
+struct IntercomManager::Private: public QObject, public SystemContextAware
 {
     IntercomManager* const q;
 
-    Private(IntercomManager* owner):
+    Private(SystemContext* context, IntercomManager* owner):
+        SystemContextAware(context),
         q(owner)
     {
-        const auto accessController = qobject_cast<CachingAccessController*>(q->accessController());
+        const auto accessController =
+            qobject_cast<CachingAccessController*>(this->accessController());
         NX_ASSERT(accessController);
 
         connect(accessController, &CachingAccessController::permissionsChanged, this,
@@ -57,8 +59,9 @@ struct IntercomManager::Private: public QObject
 
         tryCreateLayouts(getAllIntercomCameras());
 
-        const auto camerasListener = new core::SessionResourcesSignalListener<
-            QnVirtualCameraResource>(this);
+        const auto camerasListener =
+            new core::SessionResourcesSignalListener<QnVirtualCameraResource>(
+                systemContext(), this);
 
         camerasListener->setOnAddedHandler(
             [this](const QnVirtualCameraResourceList& cameras)
@@ -96,15 +99,15 @@ struct IntercomManager::Private: public QObject
 
     QnVirtualCameraResourceList getAllIntercomCameras() const
     {
-        const auto currentUser = q->accessController()->user();
+        const auto currentUser = accessController()->user();
         return currentUser
-            ? getIntercomCameras(q->resourcePool()->getAllCameras())
+            ? getIntercomCameras(resourcePool()->getAllCameras())
             : QnVirtualCameraResourceList{};
     }
 
     bool hasAccess(const QnVirtualCameraResourcePtr& camera)
     {
-        return q->accessController()->hasPermissions(camera,
+        return accessController()->hasPermissions(camera,
             Qn::ViewLivePermission | Qn::TwoWayAudioPermission);
     }
 
@@ -142,11 +145,11 @@ struct IntercomManager::Private: public QObject
             return;
 
         auto resourcePool = intercomCamera->resourcePool();
-        if (!NX_ASSERT(resourcePool == q->resourcePool()))
+        if (!NX_ASSERT(resourcePool == this->resourcePool()))
             return;
 
         const QnUuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercomCamera);
-        auto layoutResource = q->resourcePool()->getResourceById(intercomLayoutId);
+        auto layoutResource = resourcePool->getResourceById(intercomLayoutId);
 
         if (!layoutResource)
         {
@@ -166,7 +169,7 @@ struct IntercomManager::Private: public QObject
             return;
 
         auto resourcePool = intercomCamera->resourcePool();
-        if (!NX_ASSERT(resourcePool == q->resourcePool()))
+        if (!NX_ASSERT(resourcePool == this->resourcePool()))
             return;
 
         const QnUuid intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(intercomCamera);
@@ -190,13 +193,8 @@ struct IntercomManager::Private: public QObject
 // ------------------------------------------------------------------------------------------------
 // IntercomManager
 
-IntercomManager::IntercomManager(
-    nx::vms::client::desktop::SystemContext* systemContext,
-    QObject* parent)
-    :
-    base_type(parent),
-    nx::vms::client::desktop::SystemContextAware(systemContext),
-    d(new Private(this))
+IntercomManager::IntercomManager(SystemContext* systemContext):
+    d(new Private(systemContext, this))
 {
 }
 

@@ -100,7 +100,6 @@ public:
         const UnresolvedEntities& additionalUnresolvedEventTypes);
 };
 
-// TODO: #sivanov Move to System Context.
 class AnalyticsEventsSearchTreeBuilder: public QObject, public SystemContextAware
 {
     Q_OBJECT

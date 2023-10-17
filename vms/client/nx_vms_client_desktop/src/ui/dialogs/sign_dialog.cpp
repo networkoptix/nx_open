@@ -92,7 +92,8 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
     m_openGLWidget.reset(new QnSignDialogGlWidget(this));
     m_layout->addWidget(m_openGLWidget.data());
 
-    m_srcVideoInfo = new QnSignInfo();
+    m_srcVideoInfo = new QnSignInfo(this);
+    m_srcVideoInfo->setHidden(true);
 
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
 
@@ -230,6 +231,7 @@ void SignDialog::at_gotSignature(
     QByteArray calculatedSign, QByteArray signFromFrame)
 {
     m_layout->addWidget(m_srcVideoInfo);
+    m_srcVideoInfo->setHidden(false);
     m_openGLWidget->hide();
     m_srcVideoInfo->setDrawDetailTextMode(true);
 

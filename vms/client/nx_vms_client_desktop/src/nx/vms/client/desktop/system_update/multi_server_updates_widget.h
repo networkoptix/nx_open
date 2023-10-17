@@ -45,7 +45,6 @@ public:
     virtual ~MultiServerUpdatesWidget() override;
 
     virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
     virtual void discardChanges() override;
 
     /** Updates UI state to match internal state. */

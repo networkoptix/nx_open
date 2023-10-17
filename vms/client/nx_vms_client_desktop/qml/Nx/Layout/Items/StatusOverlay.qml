@@ -45,7 +45,7 @@ Item
     ResourceStatusHelper
     {
         id: helper
-        context: workbenchContext
+        context: windowContext
     }
 
     ScaleAdjuster

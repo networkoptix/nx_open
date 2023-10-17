@@ -11,9 +11,7 @@ namespace nx::vms::client::desktop::workbench::timeline {
 
 class SliderToolTip;
 
-class VolumeSlider:
-    public QSlider,
-    public QnWorkbenchContextAware
+class VolumeSlider: public QSlider
 {
     Q_OBJECT
     Q_PROPERTY(qreal muted READ isMute WRITE setMute)
@@ -21,7 +19,7 @@ class VolumeSlider:
     using base_type = QSlider;
 
 public:
-    explicit VolumeSlider(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    explicit VolumeSlider(WindowContext* context, QWidget* parent = nullptr);
     virtual ~VolumeSlider() override;
 
     bool isMute() const;

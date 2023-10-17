@@ -36,7 +36,7 @@ CameraLicensePanelWidget::CameraLicensePanelWidget(QWidget *parent):
     m_licenseUsageDisplay->setDisplayingWidget(ui->licenseUsageLabel);
 
     connect(ui->moreLicensesButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(ui::action::PreferencesLicensesTabAction); });
+        [this]() { emit actionRequested(menu::PreferencesLicensesTabAction); });
 }
 
 CameraLicensePanelWidget::~CameraLicensePanelWidget()

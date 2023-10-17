@@ -35,11 +35,12 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/event/events/poe_over_budget_event.h>
@@ -55,7 +56,6 @@
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
@@ -311,6 +311,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     ui->testRuleButton->setVisible(ini().developerMode);
 
+    connect(windowContext(), &WindowContext::systemChanged, this,
+        &QnBusinessRulesDialog::retranslateUi);
     retranslateUi();
 
     setWindowFlags(windowFlags()
@@ -414,8 +416,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->eventLogButton, &QPushButton::clicked, this,
         [this]
         {
-            context()->menu()->trigger(action::OpenBusinessLogAction,
-                action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this)));
+            menu()->trigger(menu::OpenBusinessLogAction,
+                menu::Parameters().withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this)));
         });
 
     connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
@@ -557,7 +559,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked()
 
 void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 {
-    if (!systemContext()->accessController()->hasPowerUserPermissions())
+    if (!system()->accessController()->hasPowerUserPermissions())
         return;
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
@@ -571,7 +573,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    if (auto connection = systemContext()->messageBusConnection())
+    if (auto connection = system()->messageBusConnection())
     {
         connection->getEventRulesManager(Qn::kSystemAccess)->resetBusinessRules(
             [](int /*requestId*/, ec2::ErrorCode) {});
@@ -657,7 +659,7 @@ void QnBusinessRulesDialog::createActions() {
 
 bool QnBusinessRulesDialog::hasEditPermissions() const
 {
-    return systemContext()->accessController()->hasPowerUserPermissions();
+    return system()->accessController()->hasPowerUserPermissions();
 }
 
 bool QnBusinessRulesDialog::hasChanges() const
@@ -670,7 +672,7 @@ bool QnBusinessRulesDialog::hasChanges() const
 
 bool QnBusinessRulesDialog::saveAll()
 {
-    auto connection = systemContext()->messageBusConnection();
+    auto connection = system()->messageBusConnection();
     if (!connection)
         return false;
 
@@ -727,13 +729,14 @@ void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel
             nx::vms::api::EventState toggleState,
             Callback callback)
         {
-            if (!connection())
+            const auto api = system()->connectedServerApi();
+            if (!api)
                 return;
 
             if (toggleState != nx::vms::api::EventState::undefined)
                 params.insert("state", nx::reflect::toString(toggleState));
 
-            connectedServerApi()->postJsonResult(
+            api->postJsonResult(
                 "/api/createEvent",
                 params,
                 /*body*/ {},
@@ -757,9 +760,9 @@ void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel
         };
 
     auto eventType = ruleModel->eventType();
-    const auto params = makeTestRuleParams(ruleModel, resourcePool());
+    const auto params = makeTestRuleParams(ruleModel, system()->resourcePool());
 
-    if (nx::vms::event::hasToggleState(eventType, ruleModel->eventParams(), systemContext()))
+    if (nx::vms::event::hasToggleState(eventType, ruleModel->eventParams(), system()))
     {
         sendRequest(params, nx::vms::api::EventState::active,
             [params, makeCallback, sendRequest](
@@ -821,7 +824,7 @@ void QnBusinessRulesDialog::retranslateUi()
 
     ui->filterLineEdit->lineEdit()->setPlaceholderText(
         QnDeviceDependentStrings::getDefaultNameFromSet(
-        resourcePool(),
+        system()->resourcePool(),
         tr("Filter by devices..."),
         tr("Filter by cameras...")
     ));

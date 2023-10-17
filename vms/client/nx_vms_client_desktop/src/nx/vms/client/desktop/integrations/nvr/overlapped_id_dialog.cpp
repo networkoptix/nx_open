@@ -6,8 +6,7 @@
 #include <QtWidgets/QWidget>
 
 #include <client/client_module.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "overlapped_id.h"
@@ -46,7 +45,7 @@ OverlappedIdDialog::Private::Private(OverlappedIdStore* store, OverlappedIdDialo
 
 OverlappedIdDialog::OverlappedIdDialog(OverlappedIdStore* store, QWidget* parent):
     QmlDialogWrapper(
-        qnClientCoreModule->mainQmlEngine(),
+        appContext()->qmlEngine(),
         QUrl("Nx/Dialogs/NvrOverlappedId/SelectOverlappedIdDialog.qml"),
         {},
         parent),

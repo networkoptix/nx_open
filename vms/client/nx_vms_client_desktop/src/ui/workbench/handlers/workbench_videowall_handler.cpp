@@ -47,6 +47,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
@@ -58,7 +59,6 @@
 #include <nx/vms/client/desktop/state/client_process_runner.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
@@ -454,7 +454,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     {
         /* Videowall reaction actions */
 
-        connect(action(action::DelayedOpenVideoWallItemAction), &QAction::triggered, this,
+        connect(action(menu::DelayedOpenVideoWallItemAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
         connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
@@ -474,45 +474,45 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
         /* Control videowall actions */
 
-        connect(action(action::NewVideoWallAction), &QAction::triggered, this,
+        connect(action(menu::NewVideoWallAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered);
-        connect(action(action::RemoveFromServerAction), &QAction::triggered, this,
+        connect(action(menu::RemoveFromServerAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered);
-        connect(action(action::AttachToVideoWallAction), &QAction::triggered, this,
+        connect(action(menu::AttachToVideoWallAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered);
-        connect(action(action::ClearVideoWallScreen), &QAction::triggered, this,
+        connect(action(menu::ClearVideoWallScreen), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered);
-        connect(action(action::DeleteVideoWallItemAction), &QAction::triggered, this,
+        connect(action(menu::DeleteVideoWallItemAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
-        connect(action(action::StartVideoWallAction), &QAction::triggered, this,
+        connect(action(menu::StartVideoWallAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
-        connect(action(action::StopVideoWallAction), &QAction::triggered, this,
+        connect(action(menu::StopVideoWallAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
-        connect(action(action::RenameVideowallEntityAction), &QAction::triggered, this,
+        connect(action(menu::RenameVideowallEntityAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
-        connect(action(action::IdentifyVideoWallAction), &QAction::triggered, this,
+        connect(action(menu::IdentifyVideoWallAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
-        connect(action(action::StartVideoWallControlAction), &QAction::triggered, this,
+        connect(action(menu::StartVideoWallControlAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
-        connect(action(action::OpenVideoWallReviewAction), &QAction::triggered, this,
+        connect(action(menu::OpenVideoWallReviewAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered);
-        connect(action(action::SaveCurrentVideoWallReviewAction), &QAction::triggered, this,
+        connect(action(menu::SaveCurrentVideoWallReviewAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered);
-        connect(action(action::SaveVideoWallReviewAction), &QAction::triggered, this,
+        connect(action(menu::SaveVideoWallReviewAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
-        connect(action(action::DropOnVideoWallItemAction), &QAction::triggered, this,
+        connect(action(menu::DropOnVideoWallItemAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
-        connect(action(action::PushMyScreenToVideowallAction), &QAction::triggered, this,
+        connect(action(menu::PushMyScreenToVideowallAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
-        connect(action(action::VideowallSettingsAction), &QAction::triggered, this,
+        connect(action(menu::VideowallSettingsAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
-        connect(action(action::SaveVideowallMatrixAction), &QAction::triggered, this,
+        connect(action(menu::SaveVideowallMatrixAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
-        connect(action(action::LoadVideowallMatrixAction), &QAction::triggered, this,
+        connect(action(menu::LoadVideowallMatrixAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
-        connect(action(action::DeleteVideowallMatrixAction), &QAction::triggered, this,
+        connect(action(menu::DeleteVideowallMatrixAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered);
-        connect(action(action::VideoWallScreenSettingsAction), &QAction::triggered, this,
+        connect(action(menu::VideoWallScreenSettingsAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_videoWallScreenSettingsAction_triggered);
 
         connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
@@ -554,7 +554,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(
         return;
 
     // Cloud layouts must be copied before placed on video wall.
-    if (!NX_ASSERT(layout->systemContext() == appContext()->currentSystemContext()))
+    if (!NX_ASSERT(layout->systemContext() == system()))
         return;
 
     layout->setCellSpacing(0.0);
@@ -566,7 +566,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(
         };
 
     const bool needToSave = !layout->isFile()
-        && (layout->hasFlags(Qn::local) || snapshotManager()->isModified(layout));
+        && (layout->hasFlags(Qn::local) || system()->layoutSnapshotManager()->isModified(layout));
 
     if (needToSave)
     {
@@ -579,7 +579,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(
                     reset(items, layout);
                 updateMode();
             };
-        snapshotManager()->save(layout, callback);
+        system()->layoutSnapshotManager()->save(layout, callback);
         resourcePropertyDictionary()->saveParamsAsync(layout->getId());
     }
     else
@@ -772,12 +772,12 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     workbench()->clear();
     // Action is disabled in videowall mode to make sure it is not displayed in the context menu.
     if (layout)
-        menu()->triggerForced(action::OpenInNewTabAction, layout);
+        menu()->triggerForced(menu::OpenInNewTabAction, layout);
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed()
 {
-    menu()->trigger(action::DelayedForcedExitAction);
+    menu()->trigger(menu::DelayedForcedExitAction);
 }
 
 void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& message, bool cached)
@@ -960,7 +960,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                 {
                     QPointF data = QJson::deserialized<QPointF>(value);
                     item->setData(role, data);
-                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+                    menu()->triggerIfPossible(menu::ShowTimeLineOnVideowallAction);
                     break;
                 }
                 case Qn::ItemRotationRole:
@@ -975,7 +975,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                     qreal data;
                     QJson::deserialize(value, &data);
                     item->setData(role, data);
-                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+                    menu()->triggerIfPossible(menu::ShowTimeLineOnVideowallAction);
                     break;
                 }
                 case Qn::ItemFlipRole:
@@ -990,7 +990,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                     bool data;
                     QJson::deserialize(value, &data);
                     item->setData(role, data);
-                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+                    menu()->triggerIfPossible(menu::ShowTimeLineOnVideowallAction);
                     break;
                 }
                 case Qn::ItemCheckedButtonsRole:
@@ -1011,7 +1011,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
                 {
                     QnTimePeriod data = QJson::deserialized<QnTimePeriod>(value);
                     item->setData(role, data);
-                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+                    menu()->triggerIfPossible(menu::ShowTimeLineOnVideowallAction);
                     break;
                 }
                 case Qn::ItemImageEnhancementRole:
@@ -1070,13 +1070,13 @@ void QnWorkbenchVideoWallHandler::handleMessage(
             const bool silent = QnLexical::deserialized<bool>(message[kSilentKey]);
             navigator()->setPosition(position);
             if (!silent)
-                menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+                menu()->triggerIfPossible(menu::ShowTimeLineOnVideowallAction);
             break;
         }
         case QnVideoWallControlMessage::NavigatorPlayingChanged:
         {
             navigator()->setPlaying(QnLexical::deserialized<bool>(message[valueKey]));
-            menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+            menu()->triggerIfPossible(menu::ShowTimeLineOnVideowallAction);
             break;
         }
         case QnVideoWallControlMessage::NavigatorSpeedChanged:
@@ -1084,7 +1084,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
             navigator()->setSpeed(message[speedKey].toDouble());
             if (message.contains(kPositionUsecKey))
                 navigator()->setPosition(message[kPositionUsecKey].toLongLong());
-            menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+            menu()->triggerIfPossible(menu::ShowTimeLineOnVideowallAction);
             break;
         }
         case QnVideoWallControlMessage::SynchronizationChanged:
@@ -1095,7 +1095,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(
             if (NX_ASSERT(success))
             {
                 workbench()->windowContext()->streamSynchronizer()->setState(state);
-                menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+                menu()->triggerIfPossible(menu::ShowTimeLineOnVideowallAction);
             }
             break;
         }
@@ -1149,9 +1149,9 @@ void QnWorkbenchVideoWallHandler::handleMessage(
             for (const auto& id: items)
                 layoutItems.push_back(LayoutItemIndex(layout, id));
 
-            ui::action::Parameters parameters(layoutItems);
+            menu::Parameters parameters(layoutItems);
             parameters.setArgument(Qn::ResolutionModeRole, mode);
-            menu()->trigger(ui::action::RadassAction, parameters);
+            menu()->trigger(menu::RadassAction, parameters);
             break;
         }
         default:
@@ -1228,7 +1228,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     QnWorkbenchLayout* layout = workbench()->currentLayout();
     if (active)
     {
-        connect(action(action::RadassAction), &QAction::triggered, this,
+        connect(action(menu::RadassAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_radassAction_triggered);
 
         connect(workbench(), &Workbench::itemChanged,
@@ -1261,7 +1261,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     }
     else
     {
-        action(action::RadassAction)->disconnect(this);
+        action(menu::RadassAction)->disconnect(this);
 
         disconnect(workbench(), &Workbench::itemChanged,
             this, &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
@@ -1519,7 +1519,7 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
     {
         // If request was successfully sent, remove layout from the pool at once to make sure we
         // will not try to remove it again.
-        if (menu()->triggerIfPossible(action::RemoveFromServerAction, layout))
+        if (menu()->triggerIfPossible(menu::RemoveFromServerAction, layout))
             resourcePool()->removeResource(layout);
     }
 }
@@ -1596,8 +1596,8 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
         {
             if (success)
             {
-                menu()->trigger(action::SelectNewItemAction, videoWall);
-                menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+                menu()->trigger(menu::SelectNewItemAction, videoWall);
+                menu()->trigger(menu::OpenVideoWallReviewAction, videoWall);
             }
             else
             {
@@ -1614,7 +1614,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallAction_triggered()
         .filtered<QnVideoWallResource>(
             [this](const QnResourcePtr& resource)
             {
-                return menu()->canTrigger(action::RemoveFromServerAction, resource);
+                return menu()->canTrigger(menu::RemoveFromServerAction, resource);
             });
 
     if (videowalls.isEmpty())
@@ -1657,7 +1657,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
 
     dialog->submitToResource(videoWall);
     qnResourcesChangesManager->saveVideoWall(videoWall);
-    menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+    menu()->trigger(menu::OpenVideoWallReviewAction, videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
@@ -1990,7 +1990,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
     for (const auto& indices: itemGroups)
         addItemToLayout(layout, indices);
 
-    menu()->trigger(action::OpenInNewTabAction, layout);
+    menu()->trigger(menu::OpenInNewTabAction, layout);
 
     // New layout should not be marked as changed, make sure it will be done after layout opening.
     executeDelayedParented(
@@ -2186,7 +2186,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
 
     for (const auto& index: videoWallItems)
     {
-        menu()->trigger(action::DropOnVideoWallItemAction, action::Parameters(desktopCamera)
+        menu()->trigger(menu::DropOnVideoWallItemAction, menu::Parameters(desktopCamera)
             .withArgument(Qn::VideoWallItemGuidRole, index.uuid()));
     }
 }
@@ -2355,7 +2355,7 @@ void QnWorkbenchVideoWallHandler::at_videoWallScreenSettingsAction_triggered()
         resetLayout(QnVideoWallItemIndexList() << index, layout);
     }
 
-    menu()->trigger(action::LayoutSettingsAction, layout);
+    menu()->trigger(menu::LayoutSettingsAction, layout);
 }
 
 void QnWorkbenchVideoWallHandler::at_radassAction_triggered()
@@ -2451,7 +2451,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
                 [this](const QnVideoWallResourcePtr& videoWall)
                 {
                     qnRuntime->setVideoWallWithTimeLine(videoWall->isTimelineEnabled());
-                    menu()->triggerIfPossible(action::ShowTimeLineOnVideowallAction);
+                    menu()->triggerIfPossible(menu::ShowTimeLineOnVideowallAction);
                 };
 
             connect(videoWall.get(), &QnVideoWallResource::timelineEnabledChanged, this,
@@ -3333,7 +3333,7 @@ void QnWorkbenchVideoWallHandler::updateControlLayout(
             if (layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>() == item.uuid)
                 layoutsToClose << layout.get();
         }
-        menu()->trigger(ui::action::CloseLayoutAction, layoutsToClose);
+        menu()->trigger(menu::CloseLayoutAction, layoutsToClose);
     }
 }
 
@@ -3483,7 +3483,7 @@ void QnWorkbenchVideoWallHandler::showLicensesErrorDialog(const QString& detail)
         mainWindowWidget());
     messageBox.setEscapeButton(QDialogButtonBox::Ok);
 
-    if (menu()->canTrigger(ui::action::PreferencesLicensesTabAction))
+    if (menu()->canTrigger(menu::PreferencesLicensesTabAction))
     {
         auto activateLicensesButton =
             messageBox.addButton(tr("Activate License..."), QDialogButtonBox::HelpRole);
@@ -3491,7 +3491,7 @@ void QnWorkbenchVideoWallHandler::showLicensesErrorDialog(const QString& detail)
             [this, &messageBox]
             {
                 messageBox.accept();
-                menu()->trigger(ui::action::PreferencesLicensesTabAction);
+                menu()->trigger(menu::PreferencesLicensesTabAction);
             });
     }
 

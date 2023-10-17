@@ -100,7 +100,8 @@ private:
             const auto name = resource->getName();
             if (isCamera)
             {
-                const auto baseText = QnDeviceDependentStrings::getNameFromSet(q->resourcePool(),
+                const auto baseText = QnDeviceDependentStrings::getNameFromSet(
+                    q->system()->resourcePool(),
                     QnCameraDeviceStringSet(tr("Selected device"), tr("Selected camera")),
                     camera);
 
@@ -128,7 +129,7 @@ private:
     SelectableTextButton* const m_areaButton;
 };
 
-SimpleMotionSearchWidget::SimpleMotionSearchWidget(QnWorkbenchContext* context, QWidget* parent):
+SimpleMotionSearchWidget::SimpleMotionSearchWidget(WindowContext* context, QWidget* parent):
     base_type(context, new SimpleMotionSearchListModel(context), parent),
     d(new Private(this))
 {
@@ -162,7 +163,7 @@ QString SimpleMotionSearchWidget::itemCounterText(int count) const
 bool SimpleMotionSearchWidget::calculateAllowance() const
 {
     // Panel is hidden for live viewers but should be visible when browsing local files offline.
-    return !model()->isOnline() || systemContext()->accessController()->isDeviceAccessRelevant(
+    return !model()->isOnline() || system()->accessController()->isDeviceAccessRelevant(
         nx::vms::api::AccessRight::viewArchive);
 }
 

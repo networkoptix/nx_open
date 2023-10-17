@@ -49,13 +49,13 @@ struct TimeMarker::Private
     const QmlProperty<int> mode{q->widget(), "mode"};
 };
 
-TimeMarker::TimeMarker(QnWorkbenchContext* context, QObject* parent):
+TimeMarker::TimeMarker(WindowContext* context, QObject* parent):
     TimeMarker(QUrl("Nx/Timeline/private/TimeMarker.qml"), context, parent)
 {
     setSuppressedOnMouseClick(false);
 }
 
-TimeMarker::TimeMarker(const QUrl& sourceUrl, QnWorkbenchContext* context, QObject* parent):
+TimeMarker::TimeMarker(const QUrl& sourceUrl, WindowContext* context, QObject* parent):
     base_type(context, sourceUrl, parent),
     d(new Private{this})
 {

@@ -28,6 +28,8 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
@@ -37,8 +39,6 @@
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/common/palette.h>
@@ -327,7 +327,7 @@ void QnAdvancedSettingsWidget::applyChanges()
                     appContext()->sharedMemoryManager()->requestToExit();
 
                     // Disconnect.
-                    menu()->trigger(ui::action::DisconnectAction);
+                    menu()->trigger(menu::DisconnectAction);
 
                     // Wait until all clients are closed or disconnected.
                     auto timer = new QTimer(box);

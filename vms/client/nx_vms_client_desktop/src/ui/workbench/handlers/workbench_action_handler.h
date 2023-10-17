@@ -18,9 +18,9 @@
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/image_correction_data.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
@@ -148,7 +148,7 @@ protected:
         int handle,
         const QnCameraListReply& reply);
 
-protected slots:
+protected:
     void at_context_userChanged(const QnUserResourcePtr &user);
 
     void at_workbench_cellSpacingChanged();
@@ -276,8 +276,8 @@ private:
     void deleteDialogs();
 
     void closeAllWindows();
-    void closeApplication(bool force = false);
-    void doCloseApplication(bool force, AppClosingMode mode);
+    void closeApplication();
+    void doCloseApplication(AppClosingMode mode);
 
     void renameLocalFile(const QnResourcePtr& resource, const QString &newName);
 
@@ -301,8 +301,8 @@ private:
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
     QPointer<AdvancedUpdateSettingsDialog> m_advancedUpdateSettingsDialog;
     QPointer<AdvancedSearchDialog> m_advancedSearchDialog;
-    QPointer<nx::vms::client::desktop::rules::RulesDialog> m_rulesDialog;
-    QPointer<experimental::MainWindow> m_mainWindow;
+    QPointer<rules::RulesDialog> m_rulesDialog;
+    std::unique_ptr<experimental::MainWindow> m_mainWindow;
 
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
@@ -329,7 +329,7 @@ private:
     QPointer<nx::vms::client::desktop::SceneBanner> m_layoutIsFullMessage;
     QPointer<nx::vms::client::desktop::SceneBanner> m_accessDeniedMessage;
 
-    QList<action::Parameters> m_queuedDropParameters;
+    QList<menu::Parameters> m_queuedDropParameters;
     bool m_inDropResourcesAction = false;
 };
 

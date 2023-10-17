@@ -9,6 +9,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <ui/common/notification_levels.h>
 #include <ui/workbench/workbench_context.h>
@@ -45,11 +46,10 @@ QPixmap progressDecoration(ProgressState progress)
 
 } // namespace
 
-LocalNotificationsListModel::LocalNotificationsListModel(QnWorkbenchContext* context, QObject* parent):
+LocalNotificationsListModel::LocalNotificationsListModel(WindowContext* context, QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(context),
-    m_notifications(
-        this->context()->instance<workbench::LocalNotificationsManager>()->notifications())
+    WindowContextAware(context),
+    m_notifications(context->localNotificationsManager()->notifications())
 {
     const auto added =
         [this](const QnUuid& notificationId)
@@ -93,7 +93,7 @@ LocalNotificationsListModel::LocalNotificationsListModel(QnWorkbenchContext* con
                 };
         };
 
-    auto manager = this->context()->instance<workbench::LocalNotificationsManager>();
+    auto manager = windowContext()->localNotificationsManager();
     connect(manager, &workbench::LocalNotificationsManager::added, this, added);
     connect(manager, &workbench::LocalNotificationsManager::removed, this, removed);
     connect(manager, &workbench::LocalNotificationsManager::progressChanged,
@@ -133,7 +133,7 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
         return QVariant();
     }
 
-    const auto manager = context()->instance<workbench::LocalNotificationsManager>();
+    const auto manager = windowContext()->localNotificationsManager();
     const auto& notificationId = m_notifications[index.row()];
 
     switch (role)
@@ -234,7 +234,7 @@ bool LocalNotificationsListModel::setData(const QModelIndex& index, const QVaria
         return false;
     }
 
-    context()->instance<workbench::LocalNotificationsManager>()->interact(
+    workbenchContext()->instance<workbench::LocalNotificationsManager>()->interact(
         m_notifications[index.row()]);
     return true;
 }
@@ -243,7 +243,8 @@ bool LocalNotificationsListModel::removeRows(int row, int count, const QModelInd
 {
     for (int i = row; i < row + count; ++i)
     {
-        context()->instance<workbench::LocalNotificationsManager>()->cancel(m_notifications[i]);
+        workbenchContext()->instance<workbench::LocalNotificationsManager>()->cancel(
+            m_notifications[i]);
     }
     return false;
 }

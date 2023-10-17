@@ -9,7 +9,6 @@
 #include <QtQml/QtQml>
 #include <QtQuick/private/qquickpixmapcache_p.h>
 
-#include <client_core/client_core_module.h>
 #include <common/common_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -22,6 +21,7 @@
 #include <nx/vms/client/core/thumbnails/local_media_async_image_request.h>
 #include <nx/vms/client/core/thumbnails/proxy_image_result.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_cache.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/thumbnails/fallback_image_result.h>
 
 namespace nx::vms::client::desktop {
@@ -309,7 +309,7 @@ void ResourceIdentificationThumbnail::setFallbackImage(const QUrl& imageUrl, qin
     if (newTimestamp < oldTimestamp)
         return;
 
-    const QQuickPixmap quickImage(qnClientCoreModule->mainQmlEngine(), imageUrl);
+    const QQuickPixmap quickImage(appContext()->qmlEngine(), imageUrl);
     d->fallbackImage = quickImage.image().transformed(QTransform().rotate(-rotationQuadrants * 90));
     AsyncImageResult::setTimestamp(d->fallbackImage, newTimestamp);
     update();

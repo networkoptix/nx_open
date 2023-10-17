@@ -38,8 +38,7 @@ namespace nx::utils { class PendingOperation; }
 namespace nx::vms::client::desktop {
 
 class AnalyticsSearchListModel::Private:
-    public AbstractAsyncSearchListModel::Private,
-    public core::RemoteConnectionAware
+    public AbstractAsyncSearchListModel::Private
 {
     Q_OBJECT
     using base_type = AbstractAsyncSearchListModel::Private;

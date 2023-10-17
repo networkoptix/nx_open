@@ -10,15 +10,14 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <ui/workbench/workbench_context.h>
 
 using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
-using ActionId = nx::vms::client::desktop::ui::action::IDType;
-using ActionParameters = nx::vms::client::desktop::ui::action::Parameters;
+using ActionId = nx::vms::client::desktop::menu::IDType;
+using ActionParameters = nx::vms::client::desktop::menu::Parameters;
 
 namespace {
 
@@ -139,17 +138,13 @@ ActionParameters getActionParameters(
 
 namespace nx::vms::client::desktop {
 
-ResourceTreeEditDelegate::ResourceTreeEditDelegate(QnWorkbenchContext* context):
-    m_context(context)
+ResourceTreeEditDelegate::ResourceTreeEditDelegate(WindowContext* context):
+    WindowContextAware(context)
 {
-    NX_ASSERT(m_context, "Edit delegate wasn't initialized");
 }
 
 bool ResourceTreeEditDelegate::operator()(const QModelIndex& index, const QVariant& value) const
 {
-    if (!NX_ASSERT(m_context, "Edit delegate wasn't initialized"))
-        return false;
-
     if (!NX_ASSERT(index.isValid(), "Invalid model index"))
         return false;
 
@@ -164,19 +159,19 @@ bool ResourceTreeEditDelegate::operator()(const QModelIndex& index, const QVaria
     const auto nodeType = nodeTypeData.value<ResourceTree::NodeType>();
 
     ActionId actionId = getActionId(nodeType);
-    if (actionId == ui::action::NoAction)
+    if (actionId == menu::NoAction)
         return false;
 
     ActionParameters parameters = getActionParameters(
         index,
         nodeType,
-        m_context->resourcePool());
+        system()->resourcePool());
     parameters.setArgument(Qn::ResourceNameRole, stringValue);
     parameters.setArgument(Qn::NodeTypeRole, nodeType);
 
     // View state should be updated before triggering any actions if item editor was closed by
     // interaction with tree view.
-    const auto actionManager = m_context->menu();
+    const auto actionManager = menu();
     QMetaObject::invokeMethod(
         actionManager,
         [actionManager, actionId, parameters] { actionManager->trigger(actionId, parameters); },

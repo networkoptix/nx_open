@@ -9,21 +9,23 @@
 // Squish does not handle forward declarations well, so resource_tree_squish_facade.h is included.
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_squish_facade.h>
 
-Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
+Q_MOC_INCLUDE("nx/vms/client/desktop/window_context.h")
 
 class QnResourceTreeSortProxyModel;
-class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
+
+class WindowContext;
 
 class ResourceTreeModelAdapter: public ScopedModelOperations<QIdentityProxyModel>
 {
     Q_OBJECT
-    Q_PROPERTY(QnWorkbenchContext* context READ context WRITE setContext NOTIFY contextChanged)
+    Q_PROPERTY(nx::vms::client::desktop::WindowContext* context
+        READ context WRITE setContext NOTIFY contextChanged)
     Q_PROPERTY(nx::vms::client::desktop::ResourceTree::FilterType filterType
         READ filterType WRITE setFilterType NOTIFY filterTypeChanged)
     Q_PROPERTY(QString filterText READ filterText WRITE setFilterText NOTIFY filterTextChanged)
@@ -42,8 +44,8 @@ public:
     ResourceTreeModelAdapter(QObject* parent = nullptr);
     virtual ~ResourceTreeModelAdapter() override;
 
-    QnWorkbenchContext* context() const;
-    void setContext(QnWorkbenchContext* context);
+    WindowContext* context() const;
+    void setContext(WindowContext* context);
 
     Q_INVOKABLE bool isFilterRelevant(nx::vms::client::desktop::ResourceTree::FilterType type) const;
 
@@ -70,7 +72,7 @@ public:
 
     bool isExtraInfoRequired() const;
 
-    ui::action::Parameters actionParameters(
+    menu::Parameters actionParameters(
         const QModelIndex& index, const QModelIndexList& selection) const;
 
     ResourceTree::FilterType filterType() const;

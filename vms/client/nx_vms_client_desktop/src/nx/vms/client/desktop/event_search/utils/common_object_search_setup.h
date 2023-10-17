@@ -12,12 +12,11 @@
 Q_MOC_INCLUDE("core/resource/camera_resource.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/text_filter_setup.h")
 
-class QnWorkbenchContext;
-
 namespace nx::vms::client::desktop {
 
 class AbstractSearchListModel;
 class TextFilterSetup;
+class WindowContext;
 
 class CommonObjectSearchSetup: public QObject
 {
@@ -49,8 +48,8 @@ public:
     AbstractSearchListModel* model() const;
     void setModel(AbstractSearchListModel* value);
 
-    QnWorkbenchContext* context() const;
-    void setContext(QnWorkbenchContext* value);
+    WindowContext* context() const;
+    void setContext(WindowContext* value);
 
     TextFilterSetup* textFilter() const;
 

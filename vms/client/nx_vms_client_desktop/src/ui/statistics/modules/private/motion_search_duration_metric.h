@@ -8,36 +8,34 @@
 #include <QtCore/QPointer>
 
 #include <statistics/base/time_duration_metric.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnResourceWidget;
 class QnMediaResourceWidget;
-class QnWorkbenchContext;
 
-class MotionSearchDurationMetric : public QObject
-    , public QnTimeDurationMetric
+class MotionSearchDurationMetric:
+    public QObject,
+    public QnTimeDurationMetric,
+    public QnWorkbenchContextAware
 {
     typedef QObject base_type;
 
 public:
-    MotionSearchDurationMetric(QnWorkbenchContext *context);
-
+    MotionSearchDurationMetric(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~MotionSearchDurationMetric();
 
 private:
     typedef QPointer<QnMediaResourceWidget> QnMediaResourceWidgetPtr;
 
-    void addWidget(QnResourceWidget *resourceWidget);
+    void addWidget(QnResourceWidget* resourceWidget);
 
-    void removeWidget(QnResourceWidget *resourceWidget);
+    void removeWidget(QnResourceWidget* resourceWidget);
 
     void updateCounterState();
 
-    bool isFromCurrentLayout(const QnMediaResourceWidgetPtr &widget);
+    bool isFromCurrentLayout(const QnMediaResourceWidgetPtr& widget);
 
 private:
-    typedef QPointer<QnWorkbenchContext> QnWorkbenchContextPtr;
     typedef std::set<QnMediaResourceWidgetPtr> WidgetsSet;
-
-    QnWorkbenchContextPtr m_context;
     WidgetsSet m_widgets;
 };

@@ -4,7 +4,6 @@
 
 #include <QtCore/QPointer>
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/utils/log/assert.h>
@@ -21,10 +20,12 @@ const auto kMinimumSupportedVersion = nx::utils::SoftwareVersion(5, 0);
 namespace nx::vms::client::core {
 
 ServerCertificateWatcher::ServerCertificateWatcher(
+    SystemContext* systemContext,
     CertificateVerifier* certificateVerifier,
     QObject* parent)
     :
-    base_type(parent)
+    base_type(parent),
+    SystemContextAware(systemContext)
 {
     auto pinCertificates =
         [certificateVerifier = QPointer<CertificateVerifier>(certificateVerifier)](
@@ -74,7 +75,9 @@ ServerCertificateWatcher::ServerCertificateWatcher(
             certificateVerifier->removeCertificatesFromCache(server->getId());
         };
 
-    auto serverListener = new SessionResourcesSignalListener<QnMediaServerResource>(this);
+    auto serverListener = new SessionResourcesSignalListener<QnMediaServerResource>(
+        systemContext,
+        this);
 
     serverListener->setOnAddedHandler(
         [pinCertificates](const QnMediaServerResourceList& servers)

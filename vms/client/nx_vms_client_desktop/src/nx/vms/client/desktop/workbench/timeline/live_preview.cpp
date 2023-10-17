@@ -37,7 +37,7 @@ struct LivePreview::Private
 };
 
 LivePreview::LivePreview(QnTimeSlider* slider, QObject* parent):
-    base_type(QUrl("Nx/Timeline/private/LivePreview.qml"), slider->context(), parent),
+    base_type(QUrl("Nx/Timeline/private/LivePreview.qml"), slider->windowContext(), parent),
     d(new Private{this, slider})
 {
     if (ini().debugDisableQmlTooltips)

@@ -23,11 +23,11 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -97,9 +97,7 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
     QnWorkbenchContextAware(parent),
     d(new Private())
 {
-    using namespace ui;
-
-    connect(action(action::OpenInAlarmLayoutAction), &QAction::triggered, this,
+    connect(action(menu::OpenInAlarmLayoutAction), &QAction::triggered, this,
         [this]
         {
             const auto parameters = menu()->currentParameters(sender());
@@ -266,8 +264,8 @@ void AlarmLayoutHandler::openCamerasInAlarmLayout(
     // stopping clears all existing workbench layouts.
     if (switchToLayoutNeeded)
     {
-        if (action(ui::action::ToggleShowreelModeAction)->isChecked())
-            menu()->trigger(ui::action::ToggleShowreelModeAction);
+        if (action(menu::ToggleShowreelModeAction)->isChecked())
+            menu()->trigger(menu::ToggleShowreelModeAction);
     }
 
     auto alarmLayout = findOrCreateAlarmLayout();

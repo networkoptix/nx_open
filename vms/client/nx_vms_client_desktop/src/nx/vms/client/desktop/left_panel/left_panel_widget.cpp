@@ -12,15 +12,15 @@
 #include <QtWidgets/QToolTip>
 
 #include <client/client_globals.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_target_provider.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 
 #include "private/resource_browser_wrapper_p.h"
@@ -43,7 +43,8 @@ public:
     const QmlProperty<qreal> maximumWidth{&panel, "maximumWidth"};
     const QmlProperty<qreal> height{q, "height"};
     const QmlProperty<qreal> opacity{q, "opacity"};
-    const ResourceBrowserWrapper resourceBrowser{q->context(), QmlProperty<QQuickItem*>(&panel, "resourceBrowser"), q};
+    const ResourceBrowserWrapper resourceBrowser{q->windowContext(),
+        QmlProperty<QQuickItem*>(&panel, "resourceBrowser"), q};
 
     const QmlProperty<QQuickItem*> openCloseButton{q, "openCloseButton"};
     const QmlProperty<bool> openCloseButtonHovered{&openCloseButton, "hovered"};
@@ -57,7 +58,7 @@ public:
     QString toolTip() const
     {
         return openCloseButtonHovered()
-            ? q->action(ui::action::ToggleLeftPanelAction)->text()
+            ? q->action(menu::ToggleLeftPanelAction)->text()
             : QString();
     }
 };
@@ -65,9 +66,9 @@ public:
 // ------------------------------------------------------------------------------------------------
 // LeftPanelWidget
 
-LeftPanelWidget::LeftPanelWidget(QnWorkbenchContext* context, QWidget* parent):
-    base_type(qnClientCoreModule->mainQmlEngine(), parent),
-    QnWorkbenchContextAware(context),
+LeftPanelWidget::LeftPanelWidget(WindowContext* context, QWidget* parent):
+    base_type(appContext()->qmlEngine(), parent),
+    WindowContextAware(context),
     d(new Private(this))
 {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
@@ -77,8 +78,7 @@ LeftPanelWidget::LeftPanelWidget(QnWorkbenchContext* context, QWidget* parent):
     setAttribute(Qt::WA_AlwaysStackOnTop);
     setAttribute(Qt::WA_TranslucentBackground);
 
-    rootContext()->setContextProperty(
-        QnWorkbenchContextAware::kQmlWorkbenchContextPropertyName, this->context());
+    rootContext()->setContextProperty(WindowContext::kQmlPropertyName, context);
 
     rootContext()->setContextProperty("maxTextureSize",
         QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
@@ -96,7 +96,7 @@ LeftPanelWidget::LeftPanelWidget(QnWorkbenchContext* context, QWidget* parent):
 
     // Avoid shortcut ambiguity with Welcome Screen and other possible places.
     installEventHandler(this, {QEvent::Show, QEvent::Hide}, this,
-        [this]() { action(ui::action::SearchResourcesAction)->setEnabled(isVisible()); });
+        [this]() { action(menu::SearchResourcesAction)->setEnabled(isVisible()); });
 
     d->openCloseButtonChecked.connectNotifySignal([this]() { setToolTip(d->toolTip()); });
 
@@ -109,7 +109,7 @@ LeftPanelWidget::LeftPanelWidget(QnWorkbenchContext* context, QWidget* parent):
             setToolTip(d->toolTip());
         });
 
-    action(ui::action::SearchResourcesAction)->setEnabled(false);
+    action(menu::SearchResourcesAction)->setEnabled(false);
 
     installEventHandler(this, QEvent::Move, this, &LeftPanelWidget::positionChanged);
 
@@ -156,18 +156,18 @@ void LeftPanelWidget::setOpacity(qreal value)
     d->opacity = value;
 }
 
-ui::action::ActionScope LeftPanelWidget::currentScope() const
+menu::ActionScope LeftPanelWidget::currentScope() const
 {
     return d->currentTab == RightPanel::Tab::resources
-        ? ui::action::TreeScope
-        : ui::action::InvalidScope;
+        ? menu::TreeScope
+        : menu::InvalidScope;
 }
 
-ui::action::Parameters LeftPanelWidget::currentParameters(ui::action::ActionScope scope) const
+menu::Parameters LeftPanelWidget::currentParameters(menu::ActionScope scope) const
 {
-    return scope == ui::action::TreeScope
+    return scope == menu::TreeScope
         ? d->resourceBrowser.currentParameters()
-        : ui::action::Parameters();
+        : menu::Parameters();
 }
 
 QQuickItem* LeftPanelWidget::openCloseButton() const
@@ -190,12 +190,12 @@ LeftPanelWidget::Private::Private(LeftPanelWidget* main):
 
 void LeftPanelWidget::Private::initialize()
 {
-    static constexpr std::pair<ui::action::IDType, RightPanel::Tab> actions[] = {
-        {ui::action::ResourcesTabAction, RightPanel::Tab::resources},
-        {ui::action::MotionTabAction, RightPanel::Tab::motion},
-        {ui::action::BookmarksTabAction, RightPanel::Tab::bookmarks},
-        {ui::action::EventsTabAction, RightPanel::Tab::events},
-        {ui::action::ObjectsTabAction, RightPanel::Tab::analytics}};
+    static constexpr std::pair<menu::IDType, RightPanel::Tab> actions[] = {
+        {menu::ResourcesTabAction, RightPanel::Tab::resources},
+        {menu::MotionTabAction, RightPanel::Tab::motion},
+        {menu::BookmarksTabAction, RightPanel::Tab::bookmarks},
+        {menu::EventsTabAction, RightPanel::Tab::events},
+        {menu::ObjectsTabAction, RightPanel::Tab::analytics}};
 
     const auto setTabFunction =
         [this](RightPanel::Tab tab)
@@ -217,16 +217,16 @@ void LeftPanelWidget::Private::initialize()
     const auto updateOpenCloseButton =
         [this]()
         {
-            openCloseButtonChecked = q->action(ui::action::ToggleLeftPanelAction)->isChecked();
+            openCloseButtonChecked = q->action(menu::ToggleLeftPanelAction)->isChecked();
         };
 
     openCloseButtonChecked.connectNotifySignal(
         [this]()
         {
-            q->action(ui::action::ToggleLeftPanelAction)->setChecked(openCloseButtonChecked);
+            q->action(menu::ToggleLeftPanelAction)->setChecked(openCloseButtonChecked);
         });
 
-    connect(q->action(ui::action::ToggleLeftPanelAction), &QAction::toggled, this,
+    connect(q->action(menu::ToggleLeftPanelAction), &QAction::toggled, this,
         updateOpenCloseButton);
 
     updateOpenCloseButton();

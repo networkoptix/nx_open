@@ -9,6 +9,7 @@
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
@@ -25,7 +26,6 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <ui/workbench/workbench_context.h>
 
 namespace {
 
@@ -66,13 +66,12 @@ std::function<AbstractItemPtr(const QnResourcePtr&)> serverItemCreator()
 }
 
 QnMediaServerResourceList getAccessibleServers(
-    const QnUserResourcePtr& currentUser,
-    SystemContext* systemContext)
+    const QnUserResourcePtr& currentUser)
 {
-    const auto resourcePool = systemContext->resourcePool();
+    const auto systemContext = SystemContext::fromResource(currentUser);
     const auto accessManager = systemContext->resourceAccessManager();
 
-    return resourcePool->servers().filtered(
+    return systemContext->resourcePool()->servers().filtered(
         [currentUser, accessManager](const QnResourcePtr& resource) -> bool
         {
             return accessManager->hasPermission(currentUser, resource, Qn::ViewContentPermission);
@@ -93,10 +92,9 @@ AbstractEntityPtr createServersEntity(
 
 namespace nx::vms::client::desktop {
 
-using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::entity_item_model;
 
-struct ServerSelectionDialog::Private: public QObject
+struct ServerSelectionDialog::Private: public QObject, public SystemContextAware
 {
     Private(
         const ServerSelectionDialog* owner,
@@ -107,7 +105,6 @@ struct ServerSelectionDialog::Private: public QObject
     void onItemClicked(const QModelIndex& index);
 
     const ServerSelectionDialog* q = nullptr;
-    const QnUserResourcePtr currentUser;
     QnUuidSet selectedServersIds;
     ServerSelectionDialog::ServerFilter filterFunctor;
 
@@ -122,15 +119,14 @@ ServerSelectionDialog::Private::Private(
     const QnUuidSet& selectedServersIds,
     ServerSelectionDialog::ServerFilter filterFunctor)
     :
+    SystemContextAware(owner->system()),
     q(owner),
-    currentUser(q->context()->user()),
     filterFunctor(filterFunctor),
     entityModel(new EntityItemModel(resource_selection_view::ColumnCount)),
     iconDecoratorModel(new ResourceTreeIconDecoratorModel())
 
 {
-    const auto serversList =
-        q->resourcePool()->getResourcesByIds(selectedServersIds);
+    const auto serversList = resourcePool()->getResourcesByIds(selectedServersIds);
 
     selectionDecoratorModel.reset(new ResourceSelectionDecoratorModel());
     selectionDecoratorModel->setSelectedResources(
@@ -139,8 +135,8 @@ ServerSelectionDialog::Private::Private(
     iconDecoratorModel->setSourceModel(entityModel.get());
     selectionDecoratorModel->setSourceModel(iconDecoratorModel.get());
 
-    serversEntity = createServersEntity(getAccessibleServers(currentUser, q->systemContext())
-        .filtered(filterFunctor), q->resourcePool());
+    serversEntity = createServersEntity(getAccessibleServers(systemContext()->user())
+        .filtered(filterFunctor), resourcePool());
     entityModel->setRootEntity(serversEntity.get());
 
     connect(q->ui->filteredResourceSelectionWidget, &FilteredResourceViewWidget::itemClicked,

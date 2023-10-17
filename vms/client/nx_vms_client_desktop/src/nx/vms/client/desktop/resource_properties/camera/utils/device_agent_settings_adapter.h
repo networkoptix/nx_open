@@ -10,21 +10,20 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_types.h>
-
-class QnWorkbenchContext;
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class CameraSettingsDialogStore;
 
-class DeviceAgentSettingsAdapter: public QObject
+class DeviceAgentSettingsAdapter: public QObject, public WindowContextAware
 {
     using base_type = QObject;
 
 public:
     DeviceAgentSettingsAdapter(
         CameraSettingsDialogStore* store,
-        QnWorkbenchContext* context,
+        WindowContext* context,
         QWidget* parent = nullptr);
 
     virtual ~DeviceAgentSettingsAdapter() override;

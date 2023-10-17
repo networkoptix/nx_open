@@ -18,7 +18,7 @@ class Self::Private: public QnWorkbenchContextAware
 {
 public:
     Private(Self* q, QnWorkbenchItem* item, QObject* parent):
-        QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::qmlContext),
+        QnWorkbenchContextAware(parent),
         q(q),
         m_item(item)
     {

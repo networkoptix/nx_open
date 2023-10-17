@@ -33,12 +33,12 @@
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/ui/server_certificate_viewer.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/read_only.h>
@@ -48,7 +48,6 @@
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
@@ -264,7 +263,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
             emit hasChangesChanged();
         });
 
-    connect(ui->failoverPriorityButton, &QPushButton::clicked, action(action::OpenFailoverPriorityAction), &QAction::trigger);
+    connect(ui->failoverPriorityButton, &QPushButton::clicked, action(menu::OpenFailoverPriorityAction), &QAction::trigger);
 
     connect(ui->webCamerasDiscoveryCheckBox, &QCheckBox::stateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
@@ -640,7 +639,7 @@ void QnServerSettingsWidget::at_pingButton_clicked()
         return;
 
     /* We must always ping the same address that is displayed in the visible field. */
-    menu()->trigger(action::PingAction, {Qn::TextRole, ui->ipAddressLineEdit->text()});
+    menu()->trigger(menu::PingAction, {Qn::TextRole, ui->ipAddressLineEdit->text()});
 }
 
 void QnServerSettingsWidget::showServerCertificate(const QString& id)

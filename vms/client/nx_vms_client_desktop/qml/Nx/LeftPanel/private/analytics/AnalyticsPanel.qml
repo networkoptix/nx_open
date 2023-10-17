@@ -117,7 +117,7 @@ Item
                 width: parent.width
                 bottomPadding: 16
 
-                model: workbenchContext.systemContext.taxonomyManager()
+                model: windowContext.systemContext.taxonomyManager()
                     .createFilterModel(analyticsPanel)
 
                 Connections
@@ -258,7 +258,7 @@ Item
             {
                 id: eventModel
 
-                context: workbenchContext
+                context: windowContext
                 type: { return RightPanelModel.Type.analytics }
                 previewsEnabled: analyticsPanel.showThumbnails
 

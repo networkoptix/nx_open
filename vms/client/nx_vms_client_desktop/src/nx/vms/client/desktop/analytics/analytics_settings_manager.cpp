@@ -2,13 +2,12 @@
 
 #include "analytics_settings_manager.h"
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/analytics/device_agent_active_setting_changed_response.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>
-#include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
 namespace nx::vms::client::desktop {
@@ -40,10 +39,14 @@ AnalyticsSettingsListener::AnalyticsSettingsListener(
 
 //--------------------------------------------------------------------------------------------------
 
-class AnalyticsSettingsManager::Private: public QObject
+struct AnalyticsSettingsManager::Private
 {
-public:
-    void setContext(QnResourcePool* resourcePool, QnCommonMessageProcessor* messageProcessor);
+    AnalyticsSettingsManager* const q;
+    AnalyticsSettingsServerInterfacePtr serverInterface;
+    QList<rest::Handle> pendingRefreshRequests;
+    QList<rest::Handle> pendingApplyRequests;
+
+    void start();
 
     void refreshSettings(const DeviceAgentId& agentId);
     void handleListenerDeleted(const DeviceAgentId& id);
@@ -66,27 +69,20 @@ public:
 
     auto toResources(const DeviceAgentId& agentId)
     {
-        if (!NX_ASSERT(m_resourcePool))
-            return std::make_pair(QnVirtualCameraResourcePtr(), AnalyticsEngineResourcePtr());
-
         return std::make_pair(
-            m_resourcePool->getResourceById<QnVirtualCameraResource>(agentId.device),
-            m_resourcePool->getResourceById<AnalyticsEngineResource>(agentId.engine)
+            q->resourcePool()->getResourceById<QnVirtualCameraResource>(agentId.device),
+            q->resourcePool()->getResourceById<AnalyticsEngineResource>(agentId.engine)
         );
     }
 
     QString toString(const DeviceAgentId& agentId)
     {
-        if (!NX_ASSERT(m_resourcePool))
-            return QString();
-
         auto [device, engine] = toResources(agentId);
         return QString("%1 - %2").arg(
             device ? device->getName() : "Deleted device",
             engine ? engine->getName() : "Deleted engine");
     };
 
-public:
     struct SettingsData: DeviceAgentData
     {
         std::weak_ptr<AnalyticsSettingsListener> listener;
@@ -108,28 +104,14 @@ public:
     {
         return subscriptionByDeviceId[id.device].settingsByEngineId[id.engine];
     }
-
-    AnalyticsSettingsServerInterfacePtr serverInterface;
-    QList<rest::Handle> pendingRefreshRequests;
-    QList<rest::Handle> pendingApplyRequests;
-
-private:
-    QPointer<QnResourcePool> m_resourcePool;
 };
 
-void AnalyticsSettingsManager::Private::setContext(
-    QnResourcePool* resourcePool,
-    QnCommonMessageProcessor* messageProcessor)
+void AnalyticsSettingsManager::Private::start()
 {
-    m_resourcePool = resourcePool;
-    if (!NX_ASSERT(resourcePool))
-        return;
-
     auto engineManifestChangesListener =
         new core::SessionResourcesSignalListener<AnalyticsEngineResource>(
-            resourcePool,
-            messageProcessor,
-            this);
+            q->systemContext(),
+            q);
 
     auto updateEngineSettings =
         [this](const AnalyticsEngineResourcePtr& engine)
@@ -321,22 +303,18 @@ void AnalyticsSettingsManager::Private::loadResponseData(
 //-------------------------------------------------------------------------------------------------
 
 AnalyticsSettingsManager::AnalyticsSettingsManager(
+    SystemContext* systemContext,
     QObject* parent)
     :
     QObject(parent),
-    d(new Private())
+    SystemContextAware(systemContext),
+    d(new Private{.q=this})
 {
+    d->start();
 }
 
 AnalyticsSettingsManager::~AnalyticsSettingsManager()
 {
-}
-
-void AnalyticsSettingsManager::setContext(
-    QnResourcePool* resourcePool,
-    QnCommonMessageProcessor* messageProcessor)
-{
-    d->setContext(resourcePool, messageProcessor);
 }
 
 void AnalyticsSettingsManager::setServerInterface(
@@ -423,7 +401,7 @@ AnalyticsSettingsListenerPtr AnalyticsSettingsManager::getListener(const DeviceA
     NX_DEBUG(this, "New listener created for %1", d->toString(agentId));
     AnalyticsSettingsListenerPtr listener(new AnalyticsSettingsListener(agentId, this));
     data.listener = listener;
-    connect(listener.get(), &QObject::destroyed, d.data(),
+    connect(listener.get(), &QObject::destroyed, this,
         [this, agentId]() { d->handleListenerDeleted(agentId); });
     d->refreshSettings(agentId);
 

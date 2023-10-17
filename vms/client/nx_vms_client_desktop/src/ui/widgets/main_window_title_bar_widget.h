@@ -5,7 +5,7 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 class QnLayoutTabBar;
 class QnMainWindowTitleBarWidgetPrivate;
@@ -15,7 +15,9 @@ class ToolButton;
 class MainWindowTitleBarStateStore;
 } // namespace nx::vms::client::desktop
 
-class QnMainWindowTitleBarWidget: public QWidget, public QnWorkbenchContextAware
+class QnMainWindowTitleBarWidget:
+    public QWidget,
+    public nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
     Q_PROPERTY(int y READ y WRITE setY NOTIFY yChanged)
@@ -29,7 +31,7 @@ public:
     static constexpr int kFullTitleBarHeight = kSystemBarHeight + kLayoutBarHeight;
 
     explicit QnMainWindowTitleBarWidget(
-        QnWorkbenchContext* context,
+        nx::vms::client::desktop::WindowContext* windowContext,
         QWidget* parent = nullptr);
     virtual ~QnMainWindowTitleBarWidget() override;
 
@@ -65,17 +67,17 @@ protected:
 
 private:
     nx::vms::client::desktop::ToolButton* newActionButton(
-        nx::vms::client::desktop::ui::action::IDType actionId,
+        nx::vms::client::desktop::menu::IDType actionId,
         const QIcon& icon,
         int helpTopicId = nx::vms::client::desktop::HelpTopic::Id::Empty);
 
     nx::vms::client::desktop::ToolButton* newActionButton(
-        nx::vms::client::desktop::ui::action::IDType actionId,
+        nx::vms::client::desktop::menu::IDType actionId,
         int helpTopicId = nx::vms::client::desktop::HelpTopic::Id::Empty,
         const QSize& fixedSize = QSize());
 
     nx::vms::client::desktop::ToolButton* newActionButton(
-        nx::vms::client::desktop::ui::action::IDType actionId,
+        nx::vms::client::desktop::menu::IDType actionId,
         const QSize& fixedSize = QSize());
 
     /** Creates Screen Recording indicator. Returns nullptr if the recording is not avaliable. */

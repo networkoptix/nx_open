@@ -155,8 +155,8 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     base_type(settings, parentGraphicsWidget, parent),
     backgroundItem(new QnControlBackgroundWidget(parentGraphicsWidget)),
     xAnimator(new VariantAnimator(this)),
-    m_showButton(newBlinkingShowHideButton(parentGraphicsWidget, context(),
-        action::ToggleNotificationsAction)),
+    m_showButton(newBlinkingShowHideButton(parentGraphicsWidget, windowContext(),
+        menu::ToggleNotificationsAction)),
     m_opacityAnimatorGroup(new AnimatorGroup(this)),
     m_baseWidget(new BaseWidget(parentWidget)),
     m_eventPanelHoverProcessor(new HoverFocusProcessor(backgroundItem))
@@ -169,9 +169,9 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
     setHelpTopic(m_widget, HelpTopic::Id::NotificationsPanel);
 
-    action(action::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    action(menu::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setTransform(QTransform::fromScale(-1, 1)); // Achtung! Flips button horizontally.
-    connect(action(action::ToggleNotificationsAction), &QAction::toggled,
+    connect(action(menu::ToggleNotificationsAction), &QAction::toggled,
         this, [this](bool opened) { if (!m_blockAction) setOpened(opened); });
 
     xAnimator->setTimer(animationTimer());
@@ -223,7 +223,7 @@ bool NotificationsWorkbenchPanel::isPinned() const
 
 bool NotificationsWorkbenchPanel::isOpened() const
 {
-    return action(action::ToggleNotificationsAction)->isChecked();
+    return action(menu::ToggleNotificationsAction)->isChecked();
 }
 
 void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -232,7 +232,7 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 
     ensureAnimationAllowed(&animate);
 
-    auto toggleAction = action(action::ToggleNotificationsAction);
+    auto toggleAction = action(menu::ToggleNotificationsAction);
     m_blockAction = true;
     toggleAction->setChecked(opened);
     m_blockAction = false;
@@ -347,7 +347,7 @@ void NotificationsWorkbenchPanel::updateControlsGeometry()
 void NotificationsWorkbenchPanel::initEventPanel()
 {
     m_baseWidget->setLayout(new QVBoxLayout());
-    m_widget = new EventPanel(context(), m_baseWidget);
+    m_widget = new EventPanel(windowContext(), m_baseWidget);
     m_baseWidget->layout()->addWidget(m_widget);
     m_baseWidget->setMinimumSize(m_widget->size());
 

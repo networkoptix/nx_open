@@ -33,9 +33,10 @@
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/utils/context_utils.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -53,7 +54,7 @@ namespace nx::vms::client::desktop {
 
 NotificationListWidget::Private::Private(NotificationListWidget* q):
     QObject(),
-    QnWorkbenchContextAware(q),
+    WindowContextAware(utils::windowContextFromObject(q)),
     q(q),
     m_mainLayout(new QVBoxLayout(q)),
     m_headerWidget(new QWidget(q)),
@@ -62,7 +63,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
     m_ribbonContainer(new QWidget(q)),
     m_filterSystemsButton(new SelectableTextButton(q)),
     m_eventRibbon(new EventRibbon(m_ribbonContainer)),
-    m_model(new NotificationTabModel(context(), this)),
+    m_model(new NotificationTabModel(windowContext(), this)),
     m_filterModel(new QSortFilterProxyModel(q))
 {
     m_headerWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -132,7 +133,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         };
 
     connect(m_eventRibbon, &EventRibbon::countChanged, this, updateCountLabel);
-    connect(context(), &QnWorkbenchContext::userChanged, this,
+    connect(workbenchContext(), &QnWorkbenchContext::userChanged, this,
         [this] { changeFilterVisibilityIfNeeded(); });
 
     NX_ASSERT(qnCloudStatusWatcher, "Cloud status watcher is not ready");
@@ -211,9 +212,9 @@ void NotificationListWidget::Private::changeFilterVisibilityIfNeeded()
 {
     using namespace nx::vms::common;
 
-    if (auto user = context()->user();
+    if (auto user = system()->user();
         user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1
-        && (saas::saasServicesOperational(systemContext()) || rules::ini().enableCSNwithoutSaaS))
+        && (saas::saasServicesOperational(system()) || rules::ini().enableCSNwithoutSaaS))
     {
         m_headerWidget->show();
         m_separatorLine->show();

@@ -12,7 +12,7 @@ namespace nx::vms::client::desktop::rules {
 class StreamQualityPicker: public DropdownTextPickerWidgetBase<vms::rules::StreamQualityField>
 {
 public:
-    StreamQualityPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    StreamQualityPicker(SystemContext* context, CommonParamsWidget* parent):
         DropdownTextPickerWidgetBase<vms::rules::StreamQualityField>(context, parent)
     {
         QSignalBlocker blocker{m_comboBox};

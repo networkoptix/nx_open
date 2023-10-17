@@ -5,29 +5,30 @@
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
 
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 
 namespace nx::vms::client::desktop {
+namespace menu {
 
-RadassActionFactory::RadassActionFactory(QObject* parent):
+RadassActionFactory::RadassActionFactory(Manager* parent):
     base_type(parent)
 {
 }
 
-QList<QAction*> RadassActionFactory::newActions(const ui::action::Parameters& parameters,
+QList<QAction*> RadassActionFactory::newActions(const Parameters& parameters,
     QObject* parent)
 {
     auto actionGroup = new QActionGroup(parent);
     actionGroup->setExclusive(true);
 
-    const auto manager = context()->instance<RadassResourceManager>();
+    const auto manager = workbenchContext()->instance<RadassResourceManager>();
 
     // If no layout items are provided, using current layout.
     auto items = parameters.layoutItems();
@@ -46,9 +47,9 @@ QList<QAction*> RadassActionFactory::newActions(const ui::action::Parameters& pa
             connect(action, &QAction::triggered, this,
                 [this, items, mode]
                 {
-                    ui::action::Parameters parameters(items);
+                    Parameters parameters(items);
                     parameters.setArgument(Qn::ResolutionModeRole, (int)mode);
-                    menu()->trigger(ui::action::RadassAction, parameters);
+                    menu()->trigger(RadassAction, parameters);
                 });
             actionGroup->addAction(action);
         };
@@ -63,4 +64,5 @@ QList<QAction*> RadassActionFactory::newActions(const ui::action::Parameters& pa
     return actionGroup->actions();
 }
 
+} // namespace menu
 } // namespace nx::vms::client::desktop

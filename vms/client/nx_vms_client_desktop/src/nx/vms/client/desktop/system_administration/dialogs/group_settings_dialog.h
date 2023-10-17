@@ -8,6 +8,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 #include "../models/members_model.h"
@@ -81,7 +82,8 @@ public:
 
 class NX_VMS_CLIENT_DESKTOP_API GroupSettingsDialog:
     public QmlDialogWithState<GroupSettingsDialogState, QnUuid>,
-    SystemContextAware
+    SystemContextAware,
+    WindowContextAware
 {
     using base_type = QmlDialogWithState<GroupSettingsDialogState, QnUuid>;
 
@@ -97,7 +99,8 @@ public:
 public:
     GroupSettingsDialog(
         DialogType dialogType,
-        nx::vms::client::desktop::SystemContext* systemContext,
+        SystemContext* systemContext,
+        WindowContext* windowContext,
         QWidget* parent = nullptr);
 
     ~GroupSettingsDialog();
@@ -109,7 +112,7 @@ public:
     Q_INVOKABLE bool isOkClicked() const { return acceptOnSuccess(); }
 
     static void removeGroups(
-        nx::vms::client::desktop::SystemContext* context,
+        SystemContext* context,
         const QSet<QnUuid>& idsToRemove,
         nx::utils::MoveOnlyFunc<void(bool, const QString&)> callback = {});
 

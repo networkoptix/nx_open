@@ -16,11 +16,10 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/resource/data_loaders/camera_data_loader_fwd.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <recording/time_period.h>
 #include <ui/common/speed_range.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -50,8 +49,8 @@ class TimelineCalendarWidget;
 
 class QnWorkbenchNavigator:
     public QObject,
-    public QnWorkbenchContextAware,
-    public nx::vms::client::desktop::ui::action::TargetProvider
+    public nx::vms::client::desktop::WindowContextAware,
+    public nx::vms::client::desktop::menu::TargetProvider
 {
     Q_OBJECT;
 
@@ -71,8 +70,8 @@ public:
     };
     Q_DECLARE_FLAGS(WidgetFlags, WidgetFlag);
 
-    QnWorkbenchNavigator(QObject *parent = nullptr);
-    virtual ~QnWorkbenchNavigator();
+    explicit QnWorkbenchNavigator(nx::vms::client::desktop::WindowContext* context);
+    virtual ~QnWorkbenchNavigator() override;
 
     // TODO: #sivanov Move time slider & time scrollbar out.
     QnTimeSlider *timeSlider() const;
@@ -143,9 +142,9 @@ public:
     void fastForward();
     void rewind(bool jumpToPreviousChunk = false);
 
-    virtual nx::vms::client::desktop::ui::action::ActionScope currentScope() const override;
-    virtual nx::vms::client::desktop::ui::action::Parameters currentParameters(
-        nx::vms::client::desktop::ui::action::ActionScope scope) const override;
+    virtual nx::vms::client::desktop::menu::ActionScope currentScope() const override;
+    virtual nx::vms::client::desktop::menu::Parameters currentParameters(
+        nx::vms::client::desktop::menu::ActionScope scope) const override;
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 

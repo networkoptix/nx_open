@@ -45,7 +45,7 @@ struct IMenuActionFactory
     /**
      * Called during actions factory initialization.
      */
-    virtual void registerActions(ui::action::MenuFactory* factory) = 0;
+    virtual void registerActions(menu::MenuFactory* factory) = 0;
 };
 
 /**

@@ -7,9 +7,9 @@
 #include <nx/vms/client/desktop/event_search/models/simple_motion_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -20,7 +20,7 @@ using nx::vms::client::core::MotionSelection;
 namespace nx::vms::client::desktop {
 
 MotionSearchSynchronizer::MotionSearchSynchronizer(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     CommonObjectSearchSetup* commonSetup,
     SimpleMotionSearchListModel* model,
     QObject* parent)
@@ -74,8 +74,8 @@ MotionSearchSynchronizer::MotionSearchSynchronizer(
             setTimeContentDisplayed(Qn::MotionContent, isActive);
 
             const auto action = isActive
-                ? ui::action::StartSmartSearchAction
-                : ui::action::StopSmartSearchAction;
+                ? menu::StartSmartSearchAction
+                : menu::StopSmartSearchAction;
 
             menu()->triggerIfPossible(action, display()->widgets());
         };

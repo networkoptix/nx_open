@@ -41,6 +41,7 @@ QnClientCoreModule::QnClientCoreModule(
     SystemContext* systemContext)
     :
     base_type(),
+    SystemContextAware(systemContext),
     d(new Private())
 {
     if (s_instance)
@@ -76,7 +77,7 @@ void QnClientCoreModule::initializeNetworking(
     Qn::SerializationFormat serializationFormat)
 {
     d->networkModule = std::make_unique<NetworkModule>(
-        d->commonModule.get(),
+        systemContext(),
         peerType,
         serializationFormat);
 
@@ -94,11 +95,6 @@ NetworkModule* QnClientCoreModule::networkModule() const
     return d->networkModule.get();
 }
 
-QnResourcePool* QnClientCoreModule::resourcePool() const
-{
-    return d->commonModule->resourcePool();
-}
-
 QnCommonModule* QnClientCoreModule::commonModule() const
 {
     return d->commonModule.get();
@@ -107,11 +103,6 @@ QnCommonModule* QnClientCoreModule::commonModule() const
 QnDataProviderFactory* QnClientCoreModule::dataProviderFactory() const
 {
     return d->resourceDataProviderFactory.get();
-}
-
-QQmlEngine* QnClientCoreModule::mainQmlEngine() const
-{
-    return appContext()->qmlEngine();
 }
 
 SessionTokenTerminator* QnClientCoreModule::sessionTokenTerminator() const

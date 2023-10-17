@@ -2,8 +2,8 @@
 
 #include "timeline_calendar_widget.h"
 
-#include <client_core/client_core_module.h>
 #include <nx/vms/client/core/media/time_period_storage.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -41,7 +41,7 @@ void TimelineCalendarWidget::Private::updateEmpty()
 }
 
 TimelineCalendarWidget::TimelineCalendarWidget(QWidget* parent):
-    QQuickWidget(qnClientCoreModule->mainQmlEngine(), parent),
+    QQuickWidget(appContext()->qmlEngine(), parent),
     d(new Private{.q = this})
 {
     // For semi-transparency:

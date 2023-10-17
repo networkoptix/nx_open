@@ -24,7 +24,6 @@ public:
     virtual ~ShowreelActionsHandler() override;
 
     virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
 
     QnUuid runningShowreel() const;
 

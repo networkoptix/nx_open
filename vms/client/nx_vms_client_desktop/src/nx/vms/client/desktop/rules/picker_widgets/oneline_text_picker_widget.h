@@ -32,7 +32,7 @@ class OnelineTextPickerWidgetBase: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    OnelineTextPickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    OnelineTextPickerWidgetBase(SystemContext* context, CommonParamsWidget* parent):
         PlainFieldPickerWidget<F>(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
@@ -64,7 +64,7 @@ class OnelineTextPickerWidgetCommon: public OnelineTextPickerWidgetBase<F>
     using base = OnelineTextPickerWidgetBase<F>;
 
 public:
-    OnelineTextPickerWidgetCommon(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    OnelineTextPickerWidgetCommon(SystemContext* context, CommonParamsWidget* parent):
         OnelineTextPickerWidgetBase<F>(context, parent)
     {
         if (std::is_same<F, vms::rules::PasswordField>())

@@ -15,7 +15,7 @@ class PlainPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    PlainPickerWidget(QnWorkbenchContext* context, CommonParamsWidget* parent);
+    PlainPickerWidget(SystemContext* context, CommonParamsWidget* parent);
 
     void setReadOnly(bool value) override;
 

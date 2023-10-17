@@ -3,15 +3,15 @@
 #include "interactive_settings_test_dialog.h"
 #include "ui_interactive_settings_test_dialog.h"
 
+#include <QtCore/QFile>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtCore/QFile>
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 
-#include <client_core/client_core_module.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop {
 InteractiveSettingsTestDialog::InteractiveSettingsTestDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::InteractiveSettingsTestDialog()),
-    m_settingsWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this))
+    m_settingsWidget(new QQuickWidget(appContext()->qmlEngine(), this))
 {
     ui->setupUi(this);
     ui->valuesTableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);

@@ -7,12 +7,12 @@
 #include <nx/vms/api/types/event_rule_types.h>
 
 class QnAbstractBusinessParamsWidget;
-class QnWorkbenchContext;
+namespace nx::vms::client::desktop { class WindowContext; }
 
 class QnBusinessActionWidgetFactory {
 public:
     static QnAbstractBusinessParamsWidget* createWidget(
         nx::vms::api::ActionType actionType,
-        QnWorkbenchContext* context,
+        nx::vms::client::desktop::WindowContext* context,
         QWidget* parent = nullptr);
 };

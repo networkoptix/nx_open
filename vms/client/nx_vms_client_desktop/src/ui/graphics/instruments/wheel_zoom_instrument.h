@@ -1,10 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_WHEEL_ZOOM_INSTRUMENT_H
-#define QN_WHEEL_ZOOM_INSTRUMENT_H
+#pragma once
+
+#include <QtCore/QPointer>
+#include <QtWidgets/QWidget>
 
 #include <ui/processors/kinetic_processor.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include "instrument.h"
 
@@ -13,8 +14,10 @@
  *
  * It is to be installed after a scene forwarding instrument.
  */
-class WheelZoomInstrument: public Instrument, protected KineticProcessHandler, public QnWorkbenchContextAware {
+class WheelZoomInstrument: public Instrument, protected KineticProcessHandler
+{
     Q_OBJECT
+
 public:
     WheelZoomInstrument(QObject *parent);
     virtual ~WheelZoomInstrument();
@@ -34,5 +37,3 @@ private:
     QPointer<QWidget> m_currentViewport;
     QPoint m_viewportAnchor;
 };
-
-#endif // QN_WHEEL_ZOOM_INSTRUMENT_H

@@ -18,6 +18,10 @@
 #define COMMA ,
 #define ID(x) x
 
+/**
+ * Dialog that will be closed if user is disconnected from the system.
+ * Note: class is WindowContextAware.
+ */
 template<class Base>
 class QnSessionAware: public Base, public QnSessionAwareDelegate
 {
@@ -33,16 +37,6 @@ public:
             base_type::hide();
         return true;
     }
-
-    /** Forcibly update dialog contents. Default behavior is - simply close dialog. */
-    virtual void forcedUpdate() override
-    {
-        retranslateUi();
-        tryClose(true);
-    }
-
-protected:
-    virtual void retranslateUi() {}
 };
 
 #undef ID
@@ -53,8 +47,8 @@ using QnSessionAwareDialog = QnSessionAware<QnDialog>;
 using QnSessionAwareFileDialog = QnSessionAware<QnCustomFileDialog>;
 
 /**
- * Button box dialog that will be closed if we are disconnected from server.
- * Warning: class is QnWorkbenchContextAware
+ * Button box dialog that will be closed if user is disconnected from the system.
+ * Note: class is WindowContextAware.
  */
 class QnSessionAwareButtonBoxDialog: public QnButtonBoxDialog, public QnSessionAwareDelegate
 {
@@ -65,17 +59,11 @@ public:
     QnSessionAwareButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlags = {});
 
     virtual bool tryClose(bool force) override;
-
-    /** Forcibly update dialog contents. Default behavior: simply close the dialog. */
-    virtual void forcedUpdate() override;
-
-protected:
-    virtual void retranslateUi() {}
 };
 
 /**
- * Tabbed dialog that will be closed if we are disconnected from server.
- * Warning: class is QnWorkbenchContextAware
+ * Tabbed dialog that will be closed if user is disconnected from the system.
+ * Note: class is WindowContextAware.
  */
 class QnSessionAwareTabbedDialog:
     public nx::vms::client::desktop::AbstractPreferencesDialog,
@@ -88,7 +76,4 @@ public:
     QnSessionAwareTabbedDialog(QWidget* parent, Qt::WindowFlags windowFlags = {});
 
     virtual bool tryClose(bool force) override;
-
-    /** Forcibly update dialog contents. */
-    virtual void forcedUpdate() override;
 };

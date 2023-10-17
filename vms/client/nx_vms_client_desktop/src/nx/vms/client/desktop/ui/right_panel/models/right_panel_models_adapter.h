@@ -14,22 +14,23 @@
 
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/analytics_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/common_object_search_setup.h")
-Q_MOC_INCLUDE("ui/workbench/workbench_context.h")
+Q_MOC_INCLUDE("nx/vms/client/desktop/window_context.h")
 
-class QnWorkbenchContext;
 namespace nx::analytics::db { struct ObjectTrack; }
 
 namespace nx::vms::client::desktop {
 
 class AnalyticsSearchSetup;
 class CommonObjectSearchSetup;
+class WindowContext;
 
 class RightPanelModelsAdapter: public QIdentityProxyModel
 {
     Q_OBJECT
     Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
-    Q_PROPERTY(QnWorkbenchContext* context READ context WRITE setContext NOTIFY contextChanged)
+    Q_PROPERTY(nx::vms::client::desktop::WindowContext* context
+        READ context WRITE setContext NOTIFY contextChanged)
     Q_PROPERTY(bool isOnline READ isOnline NOTIFY isOnlineChanged)
 
     Q_PROPERTY(bool isAllowed READ isAllowed NOTIFY allowanceChanged)
@@ -72,8 +73,8 @@ public:
     RightPanelModelsAdapter(QObject* parent = nullptr);
     virtual ~RightPanelModelsAdapter() override;
 
-    QnWorkbenchContext* context() const;
-    void setContext(QnWorkbenchContext* value);
+    WindowContext* context() const;
+    void setContext(WindowContext* value);
 
     enum class Type
     {

@@ -9,10 +9,10 @@
 #include <nx/audio/audiodevice.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -130,8 +130,8 @@ void WorkbenchActionExecutor::execute(const ActionPtr& action)
                     qnSyncTime->currentTimePoint() - enterFullscreenAction->playbackTime();
 
                 menu()->triggerIfPossible(
-                    ui::action::JumpToTimeAction,
-                    ui::action::Parameters().withArgument(
+                    menu::JumpToTimeAction,
+                    menu::Parameters().withArgument(
                         Qn::TimestampRole, navigationTime));
             }
         }
@@ -186,14 +186,14 @@ void WorkbenchActionExecutor::execute(const ActionPtr& action)
         if (!layout)
             return;
 
-        menu()->trigger(ui::action::OpenInNewTabAction, layout);
+        menu()->trigger(menu::OpenInNewTabAction, layout);
         if (layoutAction->playbackTime().count() > 0)
         {
             const auto navigationTime = qnSyncTime->currentTimePoint()
                 - layoutAction->playbackTime();
 
-            menu()->triggerIfPossible(ui::action::JumpToTimeAction,
-                ui::action::Parameters().withArgument(Qn::TimestampRole, navigationTime));
+            menu()->triggerIfPossible(menu::JumpToTimeAction,
+                menu::Parameters().withArgument(Qn::TimestampRole, navigationTime));
         }
     }
     else

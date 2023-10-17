@@ -2,23 +2,22 @@
 
 #include "client_webserver.h"
 
+#include <QtHttpReply.h>
+#include <QtHttpRequest.h>
+#include <QtHttpServer.h>
+
 #include <QtCore/QBuffer>
 #include <QtCore/QFile>
 #include <QtCore/QJsonObject>
 #include <QtCore/QMimeDatabase>
 #include <QtCore/QUrlQuery>
 
-#include <QtHttpServer.h>
-#include <QtHttpRequest.h>
-#include <QtHttpReply.h>
-
-#include <nx/vms/client/desktop/director/director_json_interface.h>
-#include <nx/vms/client/desktop/testkit/testkit.h>
+#include <nx/branding.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/app_info.h>
-
-#include <nx/branding.h>
+#include <nx/vms/client/desktop/director/director_json_interface.h>
+#include <nx/vms/client/desktop/testkit/testkit.h>
 
 namespace {
 
@@ -52,10 +51,10 @@ QJsonDocument convertHttpToJsonRequest(const QtHttpRequest& request)
 
 namespace nx::vms::client::desktop {
 
-DirectorWebserver::DirectorWebserver(QObject* parent):
+DirectorWebserver::DirectorWebserver(Director* director, QObject* parent):
     QObject(parent),
     m_server(new QtHttpServer(this)),
-    m_directorInterface(new DirectorJsonInterface(this))
+    m_directorInterface(new DirectorJsonInterface(director, this))
 {
     m_server->setServerName(kServerName);
     connect(m_server.data(), &QtHttpServer::started,

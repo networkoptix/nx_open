@@ -4,23 +4,21 @@
 
 #include <QtGui/QAction>
 
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.h>
-#include <nx/vms/client/desktop/utils/parameter_helper.h>
-
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
-
 
 namespace nx::vms::client::desktop {
 
 WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObject* parent):
     base_type(parent)
 {
-    connect(action(ui::action::AddDeviceManuallyAction), &QAction::triggered, this,
+    connect(action(menu::AddDeviceManuallyAction), &QAction::triggered, this,
         [this]()
         {
             const auto params = menu()->currentParameters(sender());
@@ -47,7 +45,7 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
             connect(m_deviceAdditionDialog, &QDialog::finished, this, removeOnClose);
         });
 
-    connect(action(ui::action::MainMenuAddDeviceManuallyAction), &QAction::triggered, this,
+    connect(action(menu::MainMenuAddDeviceManuallyAction), &QAction::triggered, this,
         [this]()
         {
             const auto servers =
@@ -58,8 +56,8 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
                 return;
             }
 
-            menu()->triggerForced(ui::action::AddDeviceManuallyAction,
-                ui::action::Parameters(servers.first()));
+            menu()->triggerForced(menu::AddDeviceManuallyAction,
+                menu::Parameters(servers.first()));
         });
 }
 

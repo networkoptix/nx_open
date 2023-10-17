@@ -2,19 +2,21 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/ui/actions/action_factories.h>
+#include <nx/vms/client/desktop/menu/action_factories.h>
 
 namespace nx::vms::client::desktop {
+namespace menu {
 
-class RadassActionFactory: public ui::action::Factory
+class RadassActionFactory: public Factory
 {
     Q_OBJECT
-    using base_type = ui::action::Factory;
+    using base_type = Factory;
 
 public:
-    RadassActionFactory(QObject* parent);
-    virtual QList<QAction*> newActions(const ui::action::Parameters& parameters,
+    RadassActionFactory(Manager* parent);
+    virtual QList<QAction*> newActions(const Parameters& parameters,
         QObject* parent) override;
 };
 
+} // namespace menu
 } // namespace nx::vms::client::desktop

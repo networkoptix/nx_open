@@ -8,7 +8,7 @@
 #include <QtWebEngineCore/QWebEngineDownloadRequest>
 
 #include <nx/utils/uuid.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::client::desktop {
 namespace utils {
@@ -17,7 +17,7 @@ namespace utils {
  * Enables saving and downloading QQuickWebEngineDownloadItem
  * and reports download progress in right panel.
  */
-class WebDownloader: public QObject, public QnWorkbenchContextAware
+class WebDownloader: public QObject, public WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -30,13 +30,17 @@ class WebDownloader: public QObject, public QnWorkbenchContextAware
         Failed
     };
 
-    WebDownloader(QObject* parent, const QString& filePath, QObject* item);
+    WebDownloader(
+        WindowContext* windowContext,
+        QObject* parent,
+        const QString& filePath,
+        QObject* item);
 
     virtual ~WebDownloader();
 
 public:
     // Handle download from QWebEngine-based browser.
-    static bool download(QObject* item, QnWorkbenchContext* context);
+    static bool download(QObject* item, WindowContext* context);
 
     static QString selectFile(const QString& suggestedName, QWidget* widget);
 

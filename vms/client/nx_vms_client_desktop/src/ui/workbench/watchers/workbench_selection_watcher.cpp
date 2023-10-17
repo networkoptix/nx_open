@@ -4,12 +4,11 @@
 
 #include <QtGui/QAction>
 
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
-
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <utils/common/delayed.h>
 
-using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -20,11 +19,11 @@ namespace {
 QnWorkbenchSelectionWatcher::QnWorkbenchSelectionWatcher(QObject *parent /*= nullptr*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_scope(action::TreeScope | action::SceneScope),
+    m_scope(menu::TreeScope | menu::SceneScope),
     m_selectionUpdatePending(false),
-    m_lastScope(action::InvalidScope)
+    m_lastScope(menu::InvalidScope)
 {
-    connect(action(action::SelectionChangeAction), &QAction::triggered, this,
+    connect(action(menu::SelectionChangeAction), &QAction::triggered, this,
         [this]()
         {
             if (m_selectionUpdatePending)
@@ -41,11 +40,11 @@ QnWorkbenchSelectionWatcher::~QnWorkbenchSelectionWatcher() {
 }
 
 
-action::ActionScopes QnWorkbenchSelectionWatcher::scope() const {
+menu::ActionScopes QnWorkbenchSelectionWatcher::scope() const {
     return m_scope;
 }
 
-void QnWorkbenchSelectionWatcher::setScope(action::ActionScopes value) {
+void QnWorkbenchSelectionWatcher::setScope(menu::ActionScopes value) {
     m_scope = value;
 }
 
@@ -65,7 +64,7 @@ void QnWorkbenchSelectionWatcher::updateFromSelection() {
     else
         m_lastScope = currentScope;
 
-    if (currentScope == action::InvalidScope)
+    if (currentScope == menu::InvalidScope)
         return;
 
     auto resources = provider->currentParameters(currentScope).resources();

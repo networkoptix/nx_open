@@ -3,10 +3,7 @@
 #include "encrypted_archive_password_dialog.h"
 #include "ui_encrypted_archive_password_dialog.h"
 
-#include <algorithm>
-#include <array>
-#include <initializer_list>
-#include <tuple>
+#include <vector>
 
 #include <QtGui/QFont>
 #include <QtWidgets/QPushButton>
@@ -19,6 +16,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/crypt/crypt.h>
 #include <ui/common/palette.h>
 
@@ -60,7 +58,7 @@ EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(QWidget* parent):
                     accept();
                 });
 
-            auto api = connectedServerApi();
+            auto api = system()->connectedServerApi();
             if (NX_ASSERT(api))
             {
                 api->setStorageEncryptionPassword(

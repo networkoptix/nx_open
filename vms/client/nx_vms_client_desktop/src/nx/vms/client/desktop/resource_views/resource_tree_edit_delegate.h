@@ -2,9 +2,10 @@
 
 #pragma once
 
-class QnWorkbenchContext;
 class QModelIndex;
 class QVariant;
+
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -12,10 +13,10 @@ namespace nx::vms::client::desktop {
  * Functional object which encapsulates actions performed on committing user input in a tree view
  * with Resource Tree model as source model.
  */
-class ResourceTreeEditDelegate
+class ResourceTreeEditDelegate: public WindowContextAware
 {
 public:
-    ResourceTreeEditDelegate(QnWorkbenchContext* context);
+    ResourceTreeEditDelegate(WindowContext* context);
 
     /**
      * Function call operator with the same parameters as in <tt>QAbstractItemModel::setData()</tt>
@@ -25,9 +26,6 @@ public:
      * composition and not supposed to modify data or hold any business logic.
      */
     bool operator()(const QModelIndex& index, const QVariant& value) const;
-
-private:
-    QnWorkbenchContext* m_context;
 };
 
 } // namespace nx::vms::client::desktop

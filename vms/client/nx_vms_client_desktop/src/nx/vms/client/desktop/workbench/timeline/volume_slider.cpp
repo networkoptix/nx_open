@@ -28,9 +28,8 @@ static constexpr int kTooltipYShift = -5;
 
 } // namespace
 
-VolumeSlider::VolumeSlider(QnWorkbenchContext* context, QWidget* parent):
+VolumeSlider::VolumeSlider(WindowContext* context, QWidget* parent):
     base_type(Qt::Horizontal, parent),
-    QnWorkbenchContextAware(context),
     m_tooltip(new SliderToolTip(context))
 {
     setRange(0, 100);

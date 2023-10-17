@@ -9,12 +9,12 @@
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
@@ -346,7 +346,7 @@ void ShowreelExecutor::restoreWorkbenchState(const QnUuid& tourId)
     const bool validState = !workbench()->layouts().empty()
         && workbench()->currentLayout()->resource();
     if (!NX_ASSERT(validState))
-        menu()->trigger(ui::action::OpenNewTabAction);
+        menu()->trigger(menu::OpenNewTabAction);
 }
 
 void ShowreelExecutor::setHintVisible(bool visible)

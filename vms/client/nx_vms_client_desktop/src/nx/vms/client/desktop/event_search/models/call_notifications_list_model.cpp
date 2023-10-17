@@ -21,7 +21,7 @@ QString getStatisticsAlias(const QString& postfix)
 
 } // namespace
 
-CallNotificationsListModel::CallNotificationsListModel(QnWorkbenchContext* context, QObject* parent):
+CallNotificationsListModel::CallNotificationsListModel(WindowContext* context, QObject* parent):
     base_type(context, parent),
     d(new Private(this))
 {
@@ -38,7 +38,7 @@ bool CallNotificationsListModel::defaultAction(const QModelIndex& index)
         return false;
 
     const auto& event = getEvent(index.row());
-    if (event.actionId != ui::action::NoAction)
+    if (event.actionId != menu::NoAction)
     {
         statisticsModule()->controls()->registerClick(
             getStatisticsAlias(QnLexical::serialized(event.actionId)));

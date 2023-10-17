@@ -6,11 +6,12 @@
 #include <QtWidgets/QLabel>
 
 #include <nx/utils/thread/mutex.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include "export/sign_helper.h"
 
 // TODO: #sivanov Not a dialog, a label. Move to widgets.
-class QnSignInfo: public QLabel
+class QnSignInfo: public QLabel, public QnWorkbenchContextAware
 {
     Q_OBJECT
     Q_PROPERTY(bool signIsMatched READ signIsMatched)

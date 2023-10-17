@@ -11,7 +11,7 @@ namespace nx::vms::client::desktop::workbench::timeline {
 
 class VolumeSlider;
 
-class ControlWidget: public QWidget, public QnWorkbenchContextAware
+class ControlWidget: public QWidget, public WindowContextAware
 {
     Q_OBJECT
 
@@ -20,7 +20,7 @@ class ControlWidget: public QWidget, public QnWorkbenchContextAware
     using CustomPaintedButton = CustomPainted<QPushButton>;
 
 public:
-    explicit ControlWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    explicit ControlWidget(WindowContext* context, QWidget* parent = nullptr);
 
     void setTooltipsVisible(bool enabled);
 
@@ -30,7 +30,7 @@ signals:
 private:
     void initButton(
         CustomPaintedButton* button,
-        ui::action::IDType actionType,
+        menu::IDType actionType,
         const QString& iconPath,
         const QString& checkedIconPath = "",
         bool connectToAction = true);

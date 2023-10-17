@@ -7,8 +7,8 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 
 #include "device.h"
 
@@ -49,8 +49,8 @@ public:
 
 signals:
     void actionReady(
-        nx::vms::client::desktop::ui::action::IDType id,
-        const nx::vms::client::desktop::ui::action::Parameters& parameters);
+        nx::vms::client::desktop::menu::IDType id,
+        const nx::vms::client::desktop::menu::Parameters& parameters);
 
 private:
     struct Private;

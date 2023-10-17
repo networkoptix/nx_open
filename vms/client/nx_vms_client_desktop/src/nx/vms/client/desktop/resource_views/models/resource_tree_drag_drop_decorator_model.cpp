@@ -12,10 +12,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 
@@ -74,7 +74,7 @@ namespace nx::vms::client::desktop {
 
 ResourceTreeDragDropDecoratorModel::ResourceTreeDragDropDecoratorModel(
     QnResourcePool* resourcePool,
-    ui::action::Manager* actionManager,
+    menu::Manager* actionManager,
     ui::workbench::ActionHandler* actionHandler)
     :
     base_type(nullptr),
@@ -131,7 +131,7 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
 
     QSet<QnUuid> entities;
     QSet<QnResourcePtr> resources;
-    ui::action::Parameters::ArgumentHash arguments;
+    menu::Parameters::ArgumentHash arguments;
 
     for (const auto& index: indexes)
     {
@@ -254,7 +254,7 @@ bool ResourceTreeDragDropDecoratorModel::canDropMimeData(const QMimeData* mimeDa
 bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
     Qt::DropAction action, int row, int column, const QModelIndex& parent)
 {
-    using namespace ui::action;
+    using namespace menu;
     using NodeType = ResourceTree::NodeType;
 
     if (!sourceModel())
@@ -398,7 +398,7 @@ void ResourceTreeDragDropDecoratorModel::moveCustomGroup(
     if (sourceResources.isEmpty())
         return;
 
-    using namespace ui::action;
+    using namespace menu;
 
     if (dragGroupId.isEmpty())
     {
@@ -558,7 +558,7 @@ QnResourcePool* ResourceTreeDragDropDecoratorModel::resourcePool() const
     return m_resourcePool;
 }
 
-ui::action::Manager* ResourceTreeDragDropDecoratorModel::actionManager() const
+menu::Manager* ResourceTreeDragDropDecoratorModel::actionManager() const
 {
     return m_actionManager;
 }

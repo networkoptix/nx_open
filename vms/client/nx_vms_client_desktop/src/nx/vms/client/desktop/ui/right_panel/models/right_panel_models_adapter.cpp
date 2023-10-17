@@ -52,10 +52,12 @@
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
@@ -164,8 +166,8 @@ class RightPanelModelsAdapter::Private: public QObject
 public:
     Private(RightPanelModelsAdapter* q);
 
-    QnWorkbenchContext* context() const { return m_context; }
-    void setContext(QnWorkbenchContext* value);
+    WindowContext* context() const { return m_context; }
+    void setContext(WindowContext* value);
 
     Type type() const { return m_type; }
     void setType(Type value);
@@ -247,7 +249,7 @@ private:
 private:
     CommonObjectSearchSetup* const m_commonSetup = new CommonObjectSearchSetup(this);
 
-    QnWorkbenchContext* m_context = nullptr;
+    WindowContext* m_context = nullptr;
     Type m_type = Type::invalid;
 
     bool m_active = false;
@@ -335,12 +337,12 @@ RightPanelModelsAdapter::~RightPanelModelsAdapter()
     // Required here for forward-declared pointer destruction.
 }
 
-QnWorkbenchContext* RightPanelModelsAdapter::context() const
+WindowContext* RightPanelModelsAdapter::context() const
 {
     return d->context();
 }
 
-void RightPanelModelsAdapter::setContext(QnWorkbenchContext* value)
+void RightPanelModelsAdapter::setContext(WindowContext* value)
 {
     d->setContext(value);
 }
@@ -586,11 +588,11 @@ void RightPanelModelsAdapter::addCameraToLayout()
     if (!CameraSelectionDialog::selectCameras<Policy>(chosenIds, d->context()->mainWindowWidget()))
         return;
 
-    const auto cameras = d->context()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-        chosenIds);
+    const auto cameras = d->context()->system()->resourcePool()
+        ->getResourcesByIds<QnVirtualCameraResource>(chosenIds);
 
     if (!cameras.empty())
-        d->context()->menu()->trigger(ui::action::DropResourcesAction, cameras);
+        d->context()->menu()->trigger(menu::DropResourcesAction, cameras);
 }
 
 void RightPanelModelsAdapter::showOnLayout(int row)
@@ -598,7 +600,7 @@ void RightPanelModelsAdapter::showOnLayout(int row)
     if (!NX_ASSERT(row >= 0))
         return;
 
-    d->context()->action(ui::action::ObjectsTabAction)->trigger();
+    d->context()->menu()->action(menu::ObjectsTabAction)->trigger();
 
     // Bring main window to front, event from minimized state.
     const auto mainWindow = d->context()->mainWindowWidget();
@@ -625,7 +627,7 @@ void RightPanelModelsAdapter::showOnLayout(int row)
 void RightPanelModelsAdapter::showEventLog()
 {
     if (NX_ASSERT(d->context()))
-        d->context()->menu()->trigger(ui::action::OpenBusinessLogAction);
+        d->context()->menu()->trigger(menu::OpenBusinessLogAction);
 }
 
 void RightPanelModelsAdapter::setHighlightedTimestamp(microseconds value)
@@ -853,7 +855,7 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
         q, &RightPanelModelsAdapter::allowanceChanged);
 }
 
-void RightPanelModelsAdapter::Private::setContext(QnWorkbenchContext* value)
+void RightPanelModelsAdapter::Private::setContext(WindowContext* value)
 {
     if (m_context == value)
         return;
@@ -868,8 +870,10 @@ void RightPanelModelsAdapter::Private::setContext(QnWorkbenchContext* value)
         TileInteractionHandler::install(q);
 
         m_contextConnections << connect(
-            m_context->accessController(), &core::AccessController::permissionsMaybeChanged,
-                q, &RightPanelModelsAdapter::allowanceChanged);
+            m_context->workbenchContext()->accessController(),
+            &core::AccessController::permissionsMaybeChanged,
+            q,
+            &RightPanelModelsAdapter::allowanceChanged);
     }
 
     recreateSourceModel();
@@ -895,7 +899,7 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
     if (!m_context)
         return false;
 
-    const auto accessController = m_context->accessController();
+    const auto accessController = m_context->workbenchContext()->accessController();
     switch (m_type)
     {
         case Type::motion:
@@ -926,7 +930,7 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
                 return false;
 
             std::vector<AbstractObjectType*> objectTypes;
-            const auto state = m_context->systemContext()->analyticsTaxonomyState();
+            const auto state = m_context->system()->analyticsTaxonomyState();
             if (state)
                 objectTypes = state->rootObjectTypes();
 
@@ -1034,7 +1038,7 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
 
             m_analyticsEvents.reset(
                 new AnalyticsEventModel(
-                    m_context->findInstance<AnalyticsEventsSearchTreeBuilder>(),
+                    m_context->system()->analyticsEventsSearchTreeBuilder(),
                     q->sourceModel()));
 
             break;
@@ -1049,7 +1053,7 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
             q->setSourceModel(analyticsModel);
 
             m_modelConnections << connect(
-                m_context->systemContext()->analyticsTaxonomyStateWatcher(),
+                m_context->system()->analyticsTaxonomyStateWatcher(),
                 qOverload<>(&nx::analytics::taxonomy::AbstractStateWatcher::stateChanged),
                 q,
                 &RightPanelModelsAdapter::allowanceChanged);

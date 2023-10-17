@@ -10,8 +10,12 @@ class QWidget;
 
 namespace nx::vms::client::desktop {
 
-/** Create and initialize remote connection user interaction delegate. */
+/**
+ * Create and initialize remote connection user interaction delegate.
+ *
+ * Passed function must return widget, which will be the parent for the modal dialogs.
+ */
 std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
-    createConnectionUserInteractionDelegate(QPointer<QWidget> mainWindow);
+    createConnectionUserInteractionDelegate(std::function<QWidget*()> parentWidget);
 
 } // namespace nx::vms::client::desktop

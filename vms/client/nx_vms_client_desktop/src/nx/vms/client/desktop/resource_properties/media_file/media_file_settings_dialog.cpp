@@ -11,8 +11,8 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QVBoxLayout>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/media_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -40,7 +40,7 @@ struct MediaFileSettingsDialog::Private
 
     FisheyePreviewController* const fisheyePreviewController = new FisheyePreviewController(q);
     LocalMediaThumbnail* const mediaPreview = new LocalMediaThumbnail(q);
-    QQuickWidget* const quickWidget = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), q);
+    QQuickWidget* const quickWidget = new QQuickWidget(appContext()->qmlEngine(), q);
 
     QPointer<QQuickItem> rootObject;
 };
@@ -79,7 +79,7 @@ MediaFileSettingsDialog::MediaFileSettingsDialog(QWidget* parent):
     if (!NX_ASSERT(d->rootObject = d->quickWidget->rootObject()))
         return;
 
-    qnClientCoreModule->mainQmlEngine()->setObjectOwnership(d->mediaPreview,
+    appContext()->qmlEngine()->setObjectOwnership(d->mediaPreview,
         QQmlEngine::CppOwnership);
 
     d->rootObject->setProperty("previewSource", QVariant::fromValue(d->mediaPreview));

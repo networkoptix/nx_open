@@ -25,7 +25,7 @@ public:
 
 class WorkbenchLayoutInfo:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QnLayoutResource* currentLayout READ currentLayout NOTIFY currentLayoutChanged)
@@ -45,7 +45,7 @@ class WorkbenchLayoutInfo:
     Q_PROPERTY(bool isShowreelReviewLayout READ isShowreelReviewLayout CONSTANT)
 
 public:
-    WorkbenchLayoutInfo(QnWorkbenchContext* context, QObject* parent = nullptr);
+    WorkbenchLayoutInfo(WindowContext* context, QObject* parent = nullptr);
 
     QnLayoutResource* currentLayout() const;
     QnResource* currentResource() const;

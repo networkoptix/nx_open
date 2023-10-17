@@ -1,14 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "webview_window.h"
-#include "webview_controller.h"
 
-#include <QtWidgets/QVBoxLayout>
+#include <QtCore/QVariant>
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
-#include <QtCore/QVariant>
+#include <QtWidgets/QVBoxLayout>
 
-#include <client_core/client_core_module.h>
+#include <nx/vms/client/desktop/application_context.h>
+
+#include "webview_controller.h"
 
 namespace nx::vms::client::desktop {
 
@@ -21,7 +22,7 @@ struct WebViewWindow::Private
 };
 
 WebViewWindow::Private::Private(WebViewWindow* webViewWindow):
-    quickWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), webViewWindow)),
+    quickWidget(new QQuickWidget(appContext()->qmlEngine(), webViewWindow)),
     controller(new WebViewController(webViewWindow))
 {
 }

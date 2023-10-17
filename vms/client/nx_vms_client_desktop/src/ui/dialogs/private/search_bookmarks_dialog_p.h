@@ -49,10 +49,10 @@ private:
 
     void customContextMenuRequested();
 
-    void openInNewLayout(const nx::vms::client::desktop::ui::action::Parameters& params,
+    void openInNewLayout(const nx::vms::client::desktop::menu::Parameters& params,
         const QnTimePeriod &window);
 
-    bool fillActionParameters(nx::vms::client::desktop::ui::action::Parameters &params, QnTimePeriod &window);
+    bool fillActionParameters(nx::vms::client::desktop::menu::Parameters &params, QnTimePeriod &window);
 
     void applyModelChanges();
 

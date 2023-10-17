@@ -59,13 +59,12 @@
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/joystick/joystick_settings_action_handler.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/window_controller.h>
 #include <nx/vms/client/desktop/state/window_geometry_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <statistics/statistics_manager.h>
@@ -73,7 +72,6 @@
 #include <ui/statistics/modules/session_restore_statistics_module.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/combobox_wheel_filter.h>
-#include <ui/workbench/workbench_context.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
@@ -200,8 +198,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     auto applicationContext = std::make_unique<ApplicationContext>(applicationMode, startupParams);
 
-    // TODO: #sivanov Move QnClientModule contents to Application Context.
-    QnClientModule client(startupParams);
+    // TODO: #sivanov Move QnClientModule contents to Application Context and System Context.
+    QnClientModule client(applicationContext->currentSystemContext(), startupParams);
 
     NX_INFO(NX_SCOPE_TAG, "IniConfig iniFilesDir: %1",  nx::kit::IniConfig::iniFilesDir());
 
@@ -233,11 +231,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     ComboboxWheelFilter wheelFilter;
     qApp->installEventFilter(&wheelFilter);
 
-    /* Create workbench context. */
-    auto workbenchContext = std::make_unique<QnWorkbenchContext>(client.systemContext());
-
-    // TODO: #sivanov Invert dependency. Workbench context should depend on Window context.
-    auto windowContext = std::make_unique<WindowContext>(workbenchContext.get());
+    auto windowContext = std::make_unique<WindowContext>();
     applicationContext->addWindowContext(windowContext.get());
 
     #if defined(Q_OS_LINUX)
@@ -261,11 +255,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     /* Create main window. */
 
     QScopedPointer<MainWindow> mainWindow(
-        new MainWindow(workbenchContext.get(), /*parent*/ nullptr, calculateWindowFlags()));
+        new MainWindow(windowContext.get(), /*parent*/ nullptr, calculateWindowFlags()));
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
-
-    auto hidJoystickManager = std::make_unique<joystick::JoystickSettingsActionHandler>(
-        workbenchContext.get());
 
     #if defined(Q_OS_LINUX)
         qunsetenv("RESOURCE_NAME");
@@ -307,7 +298,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
 
-    workbenchContext->handleStartupParameters(startupParams);
+    windowContext->handleStartupParameters(startupParams);
 
     int result = application->exec();
 

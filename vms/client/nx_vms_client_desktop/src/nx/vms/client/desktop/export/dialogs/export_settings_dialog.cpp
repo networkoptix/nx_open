@@ -30,6 +30,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -100,7 +101,6 @@ ExportSettingsDialog::ExportSettingsDialog(
     QWidget* parent)
     :
     base_type(parent),
-    QnSessionAwareDelegate(parent),
     d(new Private(bookmark, kPreviewSize, watermark)),
     ui(new ::Ui::ExportSettingsDialog),
     isFileNameValid(isFileNameValid),
@@ -256,6 +256,9 @@ ExportSettingsDialog::ExportSettingsDialog(
     d->dispatch(Reducer::setTimePeriod, timePeriod);
     d->dispatch(Reducer::setTimestampFont, ui->mediaPreviewWidget->font());
     d->subscribe([this](const State&){ renderState(); });
+
+    connect(windowContext(), &WindowContext::systemChanged,
+        this, &ExportSettingsDialog::forcedUpdate);
 }
 
 int ExportSettingsDialog::exec()
@@ -442,11 +445,6 @@ ExportSettingsDialog::~ExportSettingsDialog()
 {
     d->subscribe(nullptr);
     d->disconnect(this);
-}
-
-bool ExportSettingsDialog::tryClose(bool /*force*/)
-{
-    return close();
 }
 
 void ExportSettingsDialog::forcedUpdate()

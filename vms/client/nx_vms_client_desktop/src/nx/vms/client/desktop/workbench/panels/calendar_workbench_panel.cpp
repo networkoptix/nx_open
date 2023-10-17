@@ -12,8 +12,6 @@
 
 namespace nx::vms::client::desktop {
 
-using namespace ui;
-
 CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     const QnPaneSettings& settings,
     QWidget* parentWidget,
@@ -29,7 +27,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
 
     navigator()->setCalendar(m_widget);
 
-    const auto toggleCalendarAction = action(action::ToggleCalendarAction);
+    const auto toggleCalendarAction = action(menu::ToggleCalendarAction);
     toggleCalendarAction->setChecked(settings.state == Qn::PaneState::Opened);
     connect(toggleCalendarAction, &QAction::toggled, this,
         [this](bool checked)
@@ -45,7 +43,7 @@ TimelineCalendarWidget* CalendarWorkbenchPanel::widget() const
 
 bool CalendarWorkbenchPanel::isEnabled() const
 {
-    return action(action::ToggleCalendarAction)->isEnabled();
+    return action(menu::ToggleCalendarAction)->isEnabled();
 }
 
 void CalendarWorkbenchPanel::setEnabled(bool enabled, bool animated)
@@ -53,7 +51,7 @@ void CalendarWorkbenchPanel::setEnabled(bool enabled, bool animated)
     if (isEnabled() == enabled)
         return;
 
-    action(action::ToggleCalendarAction)->setEnabled(enabled);
+    action(menu::ToggleCalendarAction)->setEnabled(enabled);
     if (!isOpened())
         return;
 
@@ -84,14 +82,14 @@ bool CalendarWorkbenchPanel::isPinned() const
 
 bool CalendarWorkbenchPanel::isOpened() const
 {
-    return action(action::ToggleCalendarAction)->isChecked();
+    return action(menu::ToggleCalendarAction)->isChecked();
 }
 
 void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
 {
     ensureAnimationAllowed(&animate);
 
-    action(action::ToggleCalendarAction)->setChecked(opened);
+    action(menu::ToggleCalendarAction)->setChecked(opened);
 
     setVisible(opened && isEnabled(), animate);
 

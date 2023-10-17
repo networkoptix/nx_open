@@ -9,10 +9,10 @@
 
 #include <client/client_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/palette.h>
 
@@ -97,7 +97,7 @@ void SpecialLayoutPanelWidget::handleResourceDataChanged(int role)
 void SpecialLayoutPanelWidget::updateButtons()
 {
     const auto actions = m_layoutResource->data(Qn::CustomPanelActionsRole)
-        .value<QList<action::IDType>>();
+        .value<QList<menu::IDType>>();
 
     for (const auto& actionId: actions)
     {

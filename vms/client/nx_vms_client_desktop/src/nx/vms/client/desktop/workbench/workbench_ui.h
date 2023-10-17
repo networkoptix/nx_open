@@ -11,9 +11,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <nx/vms/client/desktop/menu/action_target_provider.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_pane_settings.h>
 
 class QGraphicsWidget;
@@ -38,8 +38,8 @@ namespace ui::workbench { class SpecialLayoutPanel; }
 
 class WorkbenchUi:
     public QObject,
-    public QnWorkbenchContextAware,
-    public ui::action::TargetProvider
+    public WindowContextAware,
+    public menu::TargetProvider
 {
     Q_OBJECT
     Q_ENUMS(Flags Flag)
@@ -70,12 +70,12 @@ public:
     };
     Q_DECLARE_FLAGS(Panels, Panel)
 
-    WorkbenchUi(QObject *parent = nullptr);
+    WorkbenchUi(WindowContext* windowContext, QObject *parent = nullptr);
     virtual ~WorkbenchUi() override;
 
-    virtual ui::action::ActionScope currentScope() const override;
-    virtual ui::action::Parameters currentParameters(
-        ui::action::ActionScope scope) const override;
+    virtual menu::ActionScope currentScope() const override;
+    virtual menu::Parameters currentParameters(
+        menu::ActionScope scope) const override;
 
     Flags flags() const;
 

@@ -10,14 +10,14 @@
 #include <QtCore/QStringList>
 
 #include <nx/reflect/instrument.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/utils/serialization/qt_core_types.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 
 namespace nx::vms::client::desktop {
 namespace joystick {
 
-static const ui::action::IDType kModifierActionId = ui::action::RaiseCurrentItemAction;
+static const menu::IDType kModifierActionId = menu::RaiseCurrentItemAction;
 
 /**
  * Describes location of field bits in HID report.
@@ -36,7 +36,7 @@ using FieldLocation = QString;
 struct ActionDescriptor
 {
     /** Action ID. */
-    ui::action::IDType id = ui::action::IDType::NoAction;
+    menu::IDType id = menu::IDType::NoAction;
 
     /** Configurable action parameters. */
     std::map<QString, QString> parameters;

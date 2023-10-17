@@ -41,6 +41,15 @@ void LdapStatusWatcher::refresh()
         return;
     }
 
+    auto api = connectedServerApi();
+    if (!api)
+    {
+        NX_VERBOSE(this, "Client is not connected to any system.");
+        setStatus({});
+        emit refreshFinished();
+        return;
+    }
+
     const auto statusCallback = nx::utils::guarded(this,
         [this](
             bool /*success*/, int handle, rest::ErrorOrData<api::LdapStatus> errorOrData)
@@ -68,7 +77,7 @@ void LdapStatusWatcher::refresh()
             emit refreshFinished();
         });
 
-    m_refreshHandle = connectedServerApi()->getLdapStatusAsync(statusCallback, thread());
+    m_refreshHandle = api->getLdapStatusAsync(statusCallback, thread());
 }
 
 void LdapStatusWatcher::setStatus(const api::LdapStatus& status)

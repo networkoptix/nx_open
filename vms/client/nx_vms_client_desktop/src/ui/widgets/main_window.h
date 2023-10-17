@@ -8,8 +8,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/widgets/common/emulated_frame_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 class QBoxLayout;
 class QStackedLayout;
@@ -26,7 +26,7 @@ class ScreenManager;
 class WelcomeScreen;
 class MainWindowTitleBarStateStore;
 
-class MainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware
+class MainWindow: public QnEmulatedFrameWidget, public WindowContextAware
 {
     Q_OBJECT
 
@@ -39,7 +39,7 @@ public:
     Q_DECLARE_FLAGS(Options, Option)
 
     MainWindow(
-        QnWorkbenchContext *context,
+        WindowContext *context,
         QWidget *parent = nullptr,
         Qt::WindowFlags flags = Qt::Window);
 

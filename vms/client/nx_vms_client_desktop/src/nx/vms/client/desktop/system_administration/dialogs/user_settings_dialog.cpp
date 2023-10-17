@@ -32,7 +32,6 @@
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -42,15 +41,16 @@
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
@@ -448,13 +448,15 @@ struct UserSettingsDialog::Private
 
 UserSettingsDialog::UserSettingsDialog(
     DialogType dialogType,
-    nx::vms::common::SystemContext* systemContext,
+    SystemContext* systemContext,
+    WindowContext* windowContext,
     QWidget* parent)
     :
     base_type(parent, dialogType == EditUser
         ? "Nx/Dialogs/UserManagement/UserEditDialog.qml"
         : "Nx/Dialogs/UserManagement/UserCreateDialog.qml"),
     SystemContextAware(systemContext),
+    WindowContextAware(windowContext),
     d(new Private(this, dialogType))
 {
     d->self = this;
@@ -468,14 +470,15 @@ UserSettingsDialog::UserSettingsDialog(
             {
                 reject();
             });
-
-        connect(d->sessionNotifier, &SessionNotifier::forcedUpdateRequested, this,
-            [this]
-            {
-                if (d->user || d->dialogType == CreateUser)
-                    updateStateFrom(d->user);
-            });
     }
+
+    // FIXME: #sivanov Looks very suspicious.
+    connect(windowContext, &WindowContext::systemChanged, this,
+        [this]
+        {
+            if (d->user || d->dialogType == CreateUser)
+                updateStateFrom(d->user);
+        });
 
     if (dialogType == EditUser)
     {
@@ -630,8 +633,8 @@ QString UserSettingsDialog::validateLogin(const QString& login)
 
 void UserSettingsDialog::onAddGroupRequested()
 {
-    d->sessionNotifier->actionManager()->trigger(ui::action::UserGroupsAction,
-        ui::action::Parameters().withArgument(Qn::ParentWidgetRole, QPointer(window())));
+    menu()->trigger(menu::UserGroupsAction,
+        menu::Parameters().withArgument(Qn::ParentWidgetRole, QPointer(window())));
 }
 
 void UserSettingsDialog::onDeleteRequested()
@@ -671,9 +674,9 @@ void UserSettingsDialog::onAuditTrailRequested()
 
     const QnTimePeriod period(timestampInPastMs, durationMs);
 
-    d->sessionNotifier->actionManager()->trigger(
-        ui::action::OpenAuditLogAction,
-        ui::action::Parameters()
+    menu()->trigger(
+        menu::OpenAuditLogAction,
+        menu::Parameters()
             .withArgument(Qn::TextRole, currentState().login)
             .withArgument(Qn::TimePeriodRole, period)
             .withArgument(Qn::FocusTabRole, (int) QnAuditLogDialog::sessionTabIndex)

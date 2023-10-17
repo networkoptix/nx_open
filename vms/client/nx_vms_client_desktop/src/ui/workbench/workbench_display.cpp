@@ -38,12 +38,12 @@
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/client/desktop/workbench/resource/resource_widget_factory.h>
@@ -76,8 +76,6 @@
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/view/graphics_view.h>
-#include <ui/workbench/handlers/workbench_action_handler.h> //< TODO: #sivanov Remove this include.
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <utils/common/aspect_ratio.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
@@ -290,25 +288,25 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
                 && dynamic_cast<GraphicsWebEngineView*>(m_scene->focusItem());
 
             for (auto actionId: {
-                action::NotificationsTabAction, //< N
-                action::ResourcesTabAction, //< C
-                action::MotionTabAction, //< M
-                action::BookmarksTabAction, //< B
-                action::EventsTabAction, //< E
-                action::ObjectsTabAction, //< O
-                action::JumpToLiveAction, //< L
-                action::ToggleMuteAction, //< U
-                action::ToggleSyncAction, //< S
-                action::JumpToEndAction,  //< X
-                action::JumpToStartAction,//< Z
-                action::ToggleInfoAction, //< I
+                menu::NotificationsTabAction, //< N
+                menu::ResourcesTabAction, //< C
+                menu::MotionTabAction, //< M
+                menu::BookmarksTabAction, //< B
+                menu::EventsTabAction, //< E
+                menu::ObjectsTabAction, //< O
+                menu::JumpToLiveAction, //< L
+                menu::ToggleMuteAction, //< U
+                menu::ToggleSyncAction, //< S
+                menu::JumpToEndAction,  //< X
+                menu::JumpToStartAction,//< Z
+                menu::ToggleInfoAction, //< I
 
                 /* "Delete" button */
-                action::DeleteVideowallMatrixAction,
-                action::RemoveLayoutItemAction,
-                action::RemoveLayoutItemFromSceneAction,
-                action::RemoveFromServerAction,
-                action::RemoveShowreelAction})
+                menu::DeleteVideowallMatrixAction,
+                menu::RemoveLayoutItemAction,
+                menu::RemoveLayoutItemFromSceneAction,
+                menu::RemoveFromServerAction,
+                menu::RemoveShowreelAction})
             {
                 action(actionId)->setEnabled(!isWebView);
             }
@@ -333,14 +331,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_viewportAnimator, SIGNAL(finished()), this, SLOT(at_viewportAnimator_finished()));
 
     // Connect to context.
-    connect(context()->instance<QnWorkbenchNotificationsHandler>(),
-        &QnWorkbenchNotificationsHandler::notificationAdded,
-        this, &QnWorkbenchDisplay::at_notificationAdded);
-
-    connect(context()->instance<NotificationActionExecutor>(),
-        &NotificationActionExecutor::notificationActionReceived,
-        this, &QnWorkbenchDisplay::at_notificationAction);
-
     connect(&appContext()->localSettings()->playAudioForAllItems,
         &nx::utils::property_storage::BaseProperty::changed,
         this,
@@ -437,8 +427,8 @@ void QnWorkbenchDisplay::deinitialize()
     m_instrumentManager->unregisterScene(m_scene);
 
     m_scene->disconnect(this);
-    m_scene->disconnect(context()->action(action::SelectionChangeAction));
-    action(action::SelectionChangeAction)->disconnect(this);
+    m_scene->disconnect(action(menu::SelectionChangeAction));
+    action(menu::SelectionChangeAction)->disconnect(this);
 
     /* Clear curtain. */
     if (!m_curtainItem.isNull())
@@ -532,11 +522,11 @@ void QnWorkbenchDisplay::initialize(QGraphicsScene* scene, QGraphicsView* view)
     connect(m_scene, &QGraphicsScene::selectionChanged, this,
         [this]
         {
-            context()->menu()->trigger(action::SelectionChangeAction);
+            menu()->trigger(menu::SelectionChangeAction);
         });
     connect(m_scene, SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
 
-    connect(action(action::SelectionChangeAction), &QAction::triggered, this, &QnWorkbenchDisplay::updateSelectionFromTree);
+    connect(action(menu::SelectionChangeAction), &QAction::triggered, this, &QnWorkbenchDisplay::updateSelectionFromTree);
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -1079,7 +1069,7 @@ void QnWorkbenchDisplay::updateSelectionFromTree()
         return;
 
     auto scope = provider->currentScope();
-    if (scope != action::TreeScope)
+    if (scope != menu::TreeScope)
         return;
 
     /* Just deselect all items for now. See #4480. */
@@ -1298,7 +1288,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     }
 
     emit widgetAdded(widget);
-    context()->menu()->trigger(action::WidgetAddedEvent, action::Parameters(widget));
+    menu()->trigger(menu::WidgetAddedEvent, menu::Parameters(widget));
 
     for (int i = 0; i < Qn::ItemRoleCount; i++)
     {
@@ -2469,7 +2459,8 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
     fitInView(false);
 }
 
-void QnWorkbenchDisplay::at_notificationAdded(const vms::event::AbstractActionPtr& businessAction)
+void QnWorkbenchDisplay::showNotificationSplash(
+    const QnResourceList& resources, QnNotificationLevel::Value level)
 {
     if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
         return;
@@ -2480,82 +2471,13 @@ void QnWorkbenchDisplay::at_notificationAdded(const vms::event::AbstractActionPt
     if (workbench()->currentLayout()->isShowreelReviewLayout())
         return;
 
-    /*
-     * We are displaying notifications in the two use cases:
-     * on ShowOnAlarmLayoutAction and on ShowPopupAction (including prolonged PlaySoundAction
-     * as its subtype) / ShowIntercomInformer.
-     * In first case we got at_notificationsHandler_businessActionAdded called once for each camera, that
-     * should be displayed on the alarm layout (including source cameras and custom cameras if required).
-     * In second case we should manually collect resources from event sources.
-     */
-    QSet<QnResourcePtr> targetResources;
-    vms::api::ActionType actionType = businessAction->actionType();
-    if (actionType == vms::api::ActionType::showOnAlarmLayoutAction)
-    {
-        if (QnResourcePtr resource = resourcePool()->getResourceById(businessAction->getParams().actionResourceId))
-            targetResources.insert(resource);
-    }
-    else
-    {
-        NX_ASSERT(actionType == vms::api::ActionType::showPopupAction
-            || actionType == vms::api::ActionType::playSoundAction
-            || actionType == vms::api::ActionType::showIntercomInformer);
-        vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
-        if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
-            targetResources.insert(resource);
-        if (eventParams.eventType >= vms::api::EventType::userDefinedEvent)
-        {
-            QnResourceList cameras = resourcePool()->getCamerasByFlexibleIds(eventParams.metadata.cameraRefs);
-            targetResources.unite({cameras.cbegin(), cameras.cend()});
-        }
-    }
-
-    for (const QnResourcePtr &resource : targetResources)
+    for (const QnResourcePtr& resource: resources)
     {
         const auto callback =
-            [this, resource, level = QnNotificationLevel::valueOf(businessAction)]
+            [this, resource, level]
             {
                 showSplashOnResource(resource, level);
             };
-
-        for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
-            executeDelayedParented(callback, timeMs, this);
-    }
-}
-
-void QnWorkbenchDisplay::at_notificationAction(
-    const QSharedPointer<nx::vms::rules::NotificationActionBase>& action)
-{
-    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoNotifications))
-        return;
-
-    if (workbench()->currentLayout()->isPreviewSearchLayout())
-        return;
-
-    if (workbench()->currentLayout()->isShowreelReviewLayout())
-        return;
-
-    QSet<QnResourcePtr> targetResources;
-
-    if (!action->deviceIds().empty())
-    {
-        targetResources = nx::utils::toQSet(
-            resourcePool()->getResourcesByIds(action->deviceIds()));
-    }
-    else
-    {
-        targetResources.insert(resourcePool()->getResourceById(action->serverId()));
-    }
-
-    targetResources.remove({});
-
-    for (const QnResourcePtr& resource: targetResources)
-    {
-        const auto callback =
-            [this, resource, level = QnNotificationLevel::convert(action->level())]
-        {
-            showSplashOnResource(resource, level);
-        };
 
         for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
             executeDelayedParented(callback, timeMs, this);

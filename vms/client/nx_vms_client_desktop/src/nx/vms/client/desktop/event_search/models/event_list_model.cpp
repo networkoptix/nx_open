@@ -3,7 +3,7 @@
 #include "event_list_model.h"
 
 #include <core/resource/camera_resource.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 
 #include "private/event_list_model_p.h"
 
@@ -16,7 +16,7 @@ QnUuid EventListModel::EventData::sourceId() const
     return source ? source->getId() : QnUuid();
 }
 
-EventListModel::EventListModel(QnWorkbenchContext* context, QObject* parent):
+EventListModel::EventListModel(WindowContext* context, QObject* parent):
     base_type(context, parent),
     d(new Private(this))
 {
@@ -180,7 +180,7 @@ bool EventListModel::removeRows(int row, int count, const QModelIndex& parent)
 bool EventListModel::defaultAction(const QModelIndex& index)
 {
     const auto& event = getEvent(index.row());
-    if (event.actionId == ui::action::NoAction)
+    if (event.actionId == menu::NoAction)
         return false;
 
     menu()->triggerIfPossible(event.actionId, event.actionParameters);

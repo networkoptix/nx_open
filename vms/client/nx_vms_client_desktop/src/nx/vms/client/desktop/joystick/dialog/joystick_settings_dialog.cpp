@@ -5,9 +5,6 @@
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QWidget>
 
-#include <client/client_module.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -15,6 +12,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/utils/qml_property.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
@@ -25,6 +23,7 @@
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -35,12 +34,14 @@
 #include "joystick_button_settings_model.h"
 #include "layout_intermediate_model.h"
 
-namespace nx::vms::client::desktop::joystick {
+namespace nx::vms::client::desktop {
 
 using namespace entity_item_model;
 using namespace entity_resource_tree;
+using namespace joystick;
 
 using nx::vms::client::core::AccessController;
+using Manager = joystick::Manager;
 
 struct JoystickSettingsDialog::Private
 {
@@ -66,7 +67,7 @@ struct JoystickSettingsDialog::Private
     bool initModel(bool initWithDefaults = false);
 
     QString getButtonName(int row) const;
-    ui::action::IDType getActionId(int row, int column) const;
+    menu::IDType getActionId(int row, int column) const;
 
     nx::utils::ScopedConnections connections;
 
@@ -76,12 +77,15 @@ struct JoystickSettingsDialog::Private
 JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager* manager):
     q(owner),
     manager(manager),
-    treeEntityBuilder(new ResourceTreeEntityBuilder(q->systemContext())),
-    buttonSettingsModel(new JoystickButtonSettingsModel(&filterModel, owner)),
-    buttonBaseActionChoiceModel(new JoystickButtonActionChoiceModel(true, owner)),
-    buttonModifiedActionChoiceModel(new JoystickButtonActionChoiceModel(false, owner))
+    treeEntityBuilder(new ResourceTreeEntityBuilder(q->system())),
+    buttonSettingsModel(new JoystickButtonSettingsModel(
+        owner->windowContext(), &filterModel, owner)),
+    buttonBaseActionChoiceModel(new JoystickButtonActionChoiceModel(
+        q->windowContext(), true, owner)),
+    buttonModifiedActionChoiceModel(new JoystickButtonActionChoiceModel(
+        q->windowContext(), false, owner))
 {
-    treeEntityBuilder->setUser(q->systemContext()->accessController()->user());
+    treeEntityBuilder->setUser(q->system()->accessController()->user());
     layoutsEntity = treeEntityBuilder->createDialogAllLayoutsEntity();
     layoutModel.setRootEntity(layoutsEntity.get());
     iconDecoratorModel.setSourceModel(&layoutModel);
@@ -92,21 +96,21 @@ JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager*
     QObject::connect(buttonSettingsModel.get(), &JoystickButtonSettingsModel::modelReset,
         [this]
         {
-            QHash<QString, ui::action::IDType> baseActionButtons;
+            QHash<QString, menu::IDType> baseActionButtons;
             for (int row = 0; row < buttonSettingsModel->rowCount(); ++row)
             {
                 const QString buttonName = getButtonName(row);
-                const ui::action::IDType actionId =
+                const menu::IDType actionId =
                     getActionId(row, JoystickButtonSettingsModel::BaseActionColumn);
 
                 baseActionButtons[buttonName] = actionId;
             }
 
-            QHash<QString, ui::action::IDType> modifiedActionButtons;
+            QHash<QString, menu::IDType> modifiedActionButtons;
             for (int row = 0; row < buttonSettingsModel->rowCount(); ++row)
             {
                 const QString buttonName = getButtonName(row);
-                const ui::action::IDType actionId =
+                const menu::IDType actionId =
                     getActionId(row, JoystickButtonSettingsModel::ModifiedActionColumn);
 
                 modifiedActionButtons[buttonName] = actionId;
@@ -133,7 +137,7 @@ JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager*
                     && bottomRight.column() >= JoystickButtonSettingsModel::BaseActionColumn)
                 {
                     const QString buttonName = getButtonName(row);
-                    const ui::action::IDType actionId =
+                    const menu::IDType actionId =
                         getActionId(row, JoystickButtonSettingsModel::BaseActionColumn);
 
                     buttonBaseActionChoiceModel->setActionButton(actionId, buttonName);
@@ -144,7 +148,7 @@ JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager*
                     && bottomRight.column() >= JoystickButtonSettingsModel::ModifiedActionColumn)
                 {
                     const QString buttonName = getButtonName(row);
-                    const ui::action::IDType actionId =
+                    const menu::IDType actionId =
                         getActionId(row, JoystickButtonSettingsModel::ModifiedActionColumn);
 
                     buttonBaseActionChoiceModel->setActionButton(actionId, buttonName, true);
@@ -205,9 +209,10 @@ bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
                 = stick[Device::zIndex] != 0;
         }));
 
-    const bool openLayoutChoiceEnabled = !q->currentServer().isNull();
+    const auto currentServer = q->workbenchContext()->currentServer();
+    const bool openLayoutChoiceEnabled = !currentServer.isNull();
     const bool openLayoutChoiceVisible =
-        !q->currentServer().isNull() || buttonSettingsModel->openLayoutActionIsSet();
+        !currentServer.isNull() || buttonSettingsModel->openLayoutActionIsSet();
 
     buttonBaseActionChoiceModel->setOpenLayoutChoiceEnabled(openLayoutChoiceEnabled);
     buttonBaseActionChoiceModel->setOpenLayoutChoiceVisible(openLayoutChoiceVisible);
@@ -225,20 +230,24 @@ QString JoystickSettingsDialog::Private::getButtonName(int row) const
     return buttonSettingsModel->data(buttonNameIndex, Qt::DisplayRole).toString();
 };
 
-ui::action::IDType JoystickSettingsDialog::Private::getActionId(int row, int column) const
+menu::IDType JoystickSettingsDialog::Private::getActionId(int row, int column) const
 {
     const QModelIndex actionIndex = buttonSettingsModel->index(row, column);
-    return (ui::action::IDType)buttonSettingsModel->data(
+    return (menu::IDType)buttonSettingsModel->data(
         actionIndex, JoystickButtonSettingsModel::ActionIdRole).toInt();
 };
 
-JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent):
+JoystickSettingsDialog::JoystickSettingsDialog(
+    Manager* manager,
+    WindowContext* windowContext,
+    QWidget* parent)
+    :
     base_type(
-        qnClientCoreModule->mainQmlEngine(),
+        appContext()->qmlEngine(),
         QUrl("Nx/Dialogs/JoystickSettings/JoystickSettingsDialog.qml"),
         {},
         parent),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     d(new Private(this, manager))
 {
     QmlProperty<bool>(rootObjectHolder(), "joystickIsSupported") = d->initModel();
@@ -255,9 +264,10 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
 
     QmlProperty<QObject*>(rootObjectHolder(), "layoutModel") = &d->filterModel;
 
-    QmlProperty<bool>(rootObjectHolder(), "connectedToServer") = !context()->user().isNull();
+    QmlProperty<bool>(rootObjectHolder(), "connectedToServer") =
+        !workbenchContext()->user().isNull();
 
-    d->connections << connect(context(),
+    d->connections << connect(workbenchContext(),
         &QnWorkbenchContext::userChanged,
         this,
         [this](const QnUserResourcePtr& user)
@@ -279,10 +289,11 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
                 openLayoutChoiceVisible);
         });
 
-    d->connections << connect(systemContext()->accessController(), &AccessController::userChanged,
+    d->connections << connect(system()->accessController(),
+        &AccessController::userChanged,
         [this]
         {
-            d->treeEntityBuilder->setUser(systemContext()->accessController()->user());
+            d->treeEntityBuilder->setUser(system()->accessController()->user());
             auto layoutsEntity = d->treeEntityBuilder->createDialogAllLayoutsEntity();
             d->layoutModel.setRootEntity(layoutsEntity.get());
             d->layoutsEntity = std::move(layoutsEntity);
@@ -322,4 +333,4 @@ void JoystickSettingsDialog::initWithCurrentActiveJoystick()
     d->initModel(false);
 }
 
-} // namespace nx::vms::client::desktop::joystick
+} // namespace nx::vms::client::desktop

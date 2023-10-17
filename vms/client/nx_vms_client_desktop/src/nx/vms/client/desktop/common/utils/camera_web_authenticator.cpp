@@ -15,13 +15,12 @@
 namespace nx::vms::client::desktop {
 
 CameraWebAuthenticator::CameraWebAuthenticator(
-    SystemContext* systemContext,
     QnVirtualCameraResourcePtr camera,
     QUrl settingsUrl,
     QString login,
     QString password)
     :
-    SystemContextAware(systemContext),
+    SystemContextAware(camera->systemContext()),
     m_camera(camera),
     m_settingsUrl(std::move(settingsUrl)),
     m_login(std::move(login)),
@@ -40,7 +39,7 @@ void CameraWebAuthenticator::requestAuth(const QUrl& url)
         return;
     }
 
-    if (!m_camera || m_camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
+    if (m_camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
     {
         emit authReady({});
         return;

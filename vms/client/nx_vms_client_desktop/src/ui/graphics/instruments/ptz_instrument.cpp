@@ -20,10 +20,11 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/ui/common/keyboard_modifiers_watcher.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/ptz_promo_overlay.h>
@@ -253,7 +254,10 @@ void PtzInstrument::MovementFilter::setMovementSpeed(const Vector& speed)
 // -------------------------------------------------------------------------- //
 // PtzInstrument
 // -------------------------------------------------------------------------- //
-PtzInstrument::PtzInstrument(QObject *parent):
+PtzInstrument::PtzInstrument(
+    nx::vms::client::desktop::WindowContext* windowContext,
+    QObject *parent)
+    :
     base_type(
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
@@ -265,13 +269,13 @@ PtzInstrument::PtzInstrument(QObject *parent):
             QEvent::GraphicsSceneMouseRelease),
         parent
     ),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(Workbench::kUnitSize / 5.0),
     m_movement(NoMovement),
     m_wheelZoomTimer(new QTimer(this))
 {
-    connect(resourcePool(), &QnResourcePool::statusChanged, this,
+    connect(system()->resourcePool(), &QnResourcePool::statusChanged, this,
         [this](const QnResourcePtr& resource, Qn::StatusChangeReason /*reason*/)
         {
             if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
@@ -578,11 +582,11 @@ bool PtzInstrument::ensurePtzRedirectedCameraIsOnLayout(
     }
 
     // Drop it as near to source camera as possible.
-    ui::action::Parameters parameters(dynamicSensor);
+    menu::Parameters parameters(dynamicSensor);
     parameters.setArgument(Qn::ItemPositionRole,
         QVariant::fromValue(QRectF(staticSensor->item()->geometry()).center()));
 
-    return menu()->triggerIfPossible(ui::action::OpenInCurrentLayoutAction, parameters);
+    return menu()->triggerIfPossible(menu::OpenInCurrentLayoutAction, parameters);
 }
 
 bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEvent* event)
@@ -1623,7 +1627,7 @@ void PtzInstrument::at_display_widgetAboutToBeChanged(Qn::ItemRole role)
         // Forcefully stop ptz movement on a camera.
         if (mediaWidget->item()->layout())
         {
-            menu()->triggerIfPossible(ui::action::PtzContinuousMoveAction, ui::action::Parameters()
+            menu()->triggerIfPossible(menu::PtzContinuousMoveAction, menu::Parameters()
                 .withArgument(Qn::ItemDataRole::PtzSpeedRole, QVariant::fromValue(QVector3D()))
                 .withArgument(Qn::ItemDataRole::ForceRole, true));
         }

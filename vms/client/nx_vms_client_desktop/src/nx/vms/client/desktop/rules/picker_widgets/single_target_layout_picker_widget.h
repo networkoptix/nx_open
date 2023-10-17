@@ -17,7 +17,7 @@ class SingleTargetLayoutPicker:
     Q_OBJECT
 
 public:
-    SingleTargetLayoutPicker(QnWorkbenchContext* context, CommonParamsWidget* parent);
+    SingleTargetLayoutPicker(SystemContext* context, CommonParamsWidget* parent);
 
     void updateUi() override;
     void onSelectButtonClicked() override;

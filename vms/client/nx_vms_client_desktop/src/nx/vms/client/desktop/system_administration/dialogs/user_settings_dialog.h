@@ -7,6 +7,8 @@
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 #include "../globals/user_settings_global.h"
@@ -99,7 +101,8 @@ public:
 
 class NX_VMS_CLIENT_DESKTOP_API UserSettingsDialog:
     public QmlDialogWithState<UserSettingsDialogState, QnUserResourcePtr>,
-    SystemContextAware
+    SystemContextAware,
+    WindowContextAware
 {
     using base_type = QmlDialogWithState<UserSettingsDialogState, QnUserResourcePtr>;
     Q_OBJECT
@@ -124,7 +127,8 @@ public:
 public:
     UserSettingsDialog(
         DialogType dialogType,
-        nx::vms::common::SystemContext* systemContext,
+        SystemContext* systemContext,
+        WindowContext* windowContext,
         QWidget* parent = nullptr);
 
     virtual ~UserSettingsDialog() override;

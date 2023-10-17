@@ -29,6 +29,8 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -37,8 +39,7 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_administration/dialogs/user_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <recording/time_period.h>
 #include <ui/common/palette.h>
 #include <ui/delegates/audit_item_delegate.h>
@@ -54,7 +55,6 @@
 #include <utils/math/color_transformations.h>
 
 using namespace nx::vms::client::desktop;
-using namespace ui;
 
 namespace {
 
@@ -90,11 +90,13 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     m_descriptionColumnIndex(-1)
 {
     ui->setupUi(this);
-    retranslateUi();
-
     setWindowFlags(windowFlags()
         | Qt::WindowMaximizeButtonHint
         | Qt::MaximizeUsingFullscreenGeometryHint);
+
+    connect(windowContext(), &WindowContext::systemChanged, this,
+        &QnAuditLogDialog::retranslateUi);
+    retranslateUi();
 
     setWarningStyle(ui->warningLabel);
 
@@ -689,7 +691,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     {
         bool archiveExist = archiveData.size() > i && archiveData[i] == '1';
         i++;
-        QnResourcePtr res = resourcePool()->getResourceById(id);
+        QnResourcePtr res = system()->resourcePool()->getResourceById(id);
         if (res && archiveExist)
             resList << res;
     }
@@ -704,7 +706,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     period.startTimeMs = record->rangeStartSec * 1000ll;
     period.durationMs = (record->rangeEndSec - record->rangeStartSec) * 1000ll;
 
-    action::Parameters params(resList);
+    menu::Parameters params(resList);
     params.setArgument(Qn::ItemTimeRole, period.startTimeMs);
     if (period.durationMs > 0)
         params.setArgument(Qn::TimePeriodRole, period);
@@ -758,13 +760,13 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
-    menu()->trigger(action::OpenInNewTabAction, layout);
+    menu()->trigger(menu::OpenInNewTabAction, layout);
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType actionId,
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, menu::IDType actionId,
     int selectedPage)
 {
-    QnResourceList resList = resourcePool()->getResourcesByIds(record->resources);
+    QnResourceList resList = system()->resourcePool()->getResourcesByIds(record->resources);
     if (record->eventType == Qn::AR_StorageInsert || record->eventType == Qn::AR_StorageUpdate)
     {
         for (int i = 0; i < resList.size(); ++i)
@@ -777,17 +779,17 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType
         const auto count = static_cast<int>(record->resources.size());
         switch (actionId)
         {
-            case action::CameraSettingsAction:
+            case menu::CameraSettingsAction:
                 QnMessageBox::warning(this, QnDeviceDependentStrings::getDefaultNameFromSet(
-                    resourcePool(),
+                    system()->resourcePool(),
                     tr("These devices are removed from System", "", count),
                     tr("These cameras are removed from System", "", count)));
                 break;
-            case action::ServerSettingsAction:
+            case menu::ServerSettingsAction:
                 QnMessageBox::warning(this, tr("These servers are removed from System",
                     "", count));
                 break;
-            case action::UserSettingsAction:
+            case menu::UserSettingsAction:
                 QnMessageBox::warning(this, tr("These users are removed from System",
                     "", count));
                 break;
@@ -800,10 +802,10 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType
         return;
     }
 
-    action::Parameters params(resList);
+    menu::Parameters params(resList);
     params.setArgument(Qn::ItemTimeRole, record->rangeStartSec * 1000ll);
     params.setArgument(Qn::FocusTabRole, selectedPage);
-    context()->menu()->trigger(actionId, params);
+    menu()->trigger(actionId, params);
 }
 
 void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
@@ -817,23 +819,23 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
     switch (record->eventType)
     {
         case Qn::AR_UserUpdate:
-            triggerAction(record, action::UserSettingsAction, UserSettingsDialog::GeneralTab);
+            triggerAction(record, menu::UserSettingsAction, UserSettingsDialog::GeneralTab);
             break;
 
         case Qn::AR_ServerUpdate:
-            triggerAction(record, action::ServerSettingsAction,
+            triggerAction(record, menu::ServerSettingsAction,
                 QnServerSettingsDialog::SettingsPage);
             break;
 
         case Qn::AR_StorageUpdate:
         case Qn::AR_StorageInsert:
-            triggerAction(record, action::ServerSettingsAction,
+            triggerAction(record, menu::ServerSettingsAction,
                 QnServerSettingsDialog::StorageManagmentPage);
             break;
 
         case Qn::AR_CameraUpdate:
         case Qn::AR_CameraInsert:
-            triggerAction(record, action::CameraSettingsAction,
+            triggerAction(record, menu::CameraSettingsAction,
                 static_cast<int>(CameraSettingsTab::general));
             break;
 
@@ -902,7 +904,8 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     m_sessionModel->clearData();
     m_camerasModel->clearData();
 
-    if (!connection())
+    const auto api = system()->connectedServerApi();
+    if (!api)
         return;
 
     auto callback = nx::utils::guarded(this,
@@ -914,10 +917,11 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
             at_gotdata(success, handle, result.deserialized<QnAuditRecordList>());
         });
 
-    const auto onlineServers = resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online);
+    const auto onlineServers = system()->resourcePool()->getAllServers(
+        nx::vms::api::ResourceStatus::online);
     for (const QnMediaServerResourcePtr& server: onlineServers)
     {
-        auto handle = connectedServerApi()->getAuditLogRecords(
+        auto handle = api->getAuditLogRecords(
             std::chrono::milliseconds(fromMsec),
             std::chrono::milliseconds(toMsec),
             callback,
@@ -1016,14 +1020,14 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
     if (idx.isValid())
     {
         QnResourcePtr resource = gridMaster->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
-        auto manager = context()->menu();
+        auto manager = this->menu();
 
         if (resource)
         {
-            action::Parameters parameters(resource);
+            menu::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
 
-            menu.reset(manager->newMenu(action::TreeScope, this, parameters));
+            menu.reset(manager->newMenu(menu::TreeScope, this, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -1062,12 +1066,12 @@ void QnAuditLogDialog::retranslateUi()
     enum { kDevicesTabIndex = 1 };
     ui->mainTabWidget->setTabText(kDevicesTabIndex,
         QnDeviceDependentStrings::getDefaultNameFromSet(
-            resourcePool(),
+            system()->resourcePool(),
             tr("Devices"),
             tr("Cameras")
         ));
     ui->checkBoxCameras->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-        resourcePool(),
+        system()->resourcePool(),
         tr("Device actions"),
         tr("Camera actions")
     ));

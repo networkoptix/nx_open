@@ -21,7 +21,7 @@ class AnalyticsSearchListModel: public AbstractAsyncSearchListModel
     using base_type = AbstractAsyncSearchListModel;
 
 public:
-    explicit AnalyticsSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit AnalyticsSearchListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~AnalyticsSearchListModel() override = default;
 
     QRectF filterRect() const;

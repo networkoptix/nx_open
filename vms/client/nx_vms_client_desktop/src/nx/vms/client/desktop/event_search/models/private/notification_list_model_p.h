@@ -25,7 +25,7 @@ namespace nx::vms::client::desktop {
 
 class NotificationListModel::Private:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;

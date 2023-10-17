@@ -7,9 +7,9 @@
 #include <QtQml/QQmlComponent>
 #include <QtWidgets/QWidget>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -110,7 +110,7 @@ bool QmlDialogWrapper::Private::eventFilter(QObject* /*object*/, QEvent* event)
 //-------------------------------------------------------------------------------------------------
 
 QmlDialogWrapper::QmlDialogWrapper():
-    QmlDialogWrapper(qnClientCoreModule->mainQmlEngine(), QUrl(), {}, (QWindow*) nullptr)
+    QmlDialogWrapper(appContext()->qmlEngine(), QUrl(), {}, (QWindow*) nullptr)
 {
 }
 
@@ -136,7 +136,7 @@ QmlDialogWrapper::QmlDialogWrapper(QQmlEngine* engine,
 
 QmlDialogWrapper::QmlDialogWrapper(
     const QUrl& sourceUrl, const QVariantMap& initialProperties, QWindow* parent):
-    QmlDialogWrapper(qnClientCoreModule->mainQmlEngine(), sourceUrl, initialProperties, parent)
+    QmlDialogWrapper(appContext()->qmlEngine(), sourceUrl, initialProperties, parent)
 {
 }
 

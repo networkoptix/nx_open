@@ -23,21 +23,22 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/message_bar.h>
-#include <nx/vms/client/desktop/settings/message_bar_settings.h>
-
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/client_update_manager.h>
 #include <nx/vms/client/desktop/system_update/version_selection_dialog.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
@@ -60,7 +61,6 @@
 #include "server_updates_model.h"
 #include "workbench_update_watcher.h"
 
-using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::common;
 
 namespace {
@@ -195,11 +195,12 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
 
     m_showDebugData = ini().massSystemUpdateDebugInfo;
 
-    auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
+    auto watcher =
+        workbenchContext()->findInstance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
     m_serverUpdateTool = watcher->getServerUpdateTool();
     NX_ASSERT(m_serverUpdateTool);
 
-    m_clientUpdateTool.reset(new ClientUpdateTool(systemContext(), this));
+    m_clientUpdateTool.reset(new ClientUpdateTool(system(), this));
     m_updateCheck = watcher->takeUpdateCheck();
 
     m_stateTracker = m_serverUpdateTool->getStateTracker();
@@ -397,7 +398,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             }
         });
 
-    connect(context(), &QnWorkbenchContext::userChanged, this,
+    connect(system()->userWatcher(), &nx::vms::client::core::UserWatcher::userChanged, this,
         [this](const QnUserResourcePtr &user)
         {
             // This prevents widget from recalculating update report for each server removed from
@@ -471,7 +472,10 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(m_stateCheckTimer.get(), &QTimer::timeout,
         this, &MultiServerUpdatesWidget::atUpdateCurrentState);
 
-    if (const auto connection = systemContext()->messageBusConnection())
+    connect(windowContext(), &WindowContext::systemChanged, this,
+        [this]() { checkForInternetUpdates(); });
+
+    if (const auto connection = system()->messageBusConnection())
     {
         const nx::vms::api::ModuleInformation& moduleInformation = connection->moduleInformation();
 
@@ -482,7 +486,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
                 .expectedServerId = moduleInformation.id,
                 .expectedServerVersion = moduleInformation.version,
             },
-            systemContext()->certificateVerifier());
+            system()->certificateVerifier());
         //m_clientUpdateTool->requestRemoteUpdateInfo();
     }
     // Force update when we open dialog.
@@ -749,8 +753,8 @@ bool MultiServerUpdatesWidget::checkSpaceRequirements(const UpdateContents& cont
 void MultiServerUpdatesWidget::openAdvancedSettings()
 {
     const bool advancedMode = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-    menu()->trigger(ui::action::AdvancedUpdateSettingsAction,
-        ui::action::Parameters()
+    menu()->trigger(menu::AdvancedUpdateSettingsAction,
+        menu::Parameters()
             .withArgument(Qn::AdvancedModeRole, advancedMode)
             .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>{this}));
 }
@@ -988,12 +992,6 @@ bool MultiServerUpdatesWidget::tryClose(bool /*force*/)
     return true;
 }
 
-void MultiServerUpdatesWidget::forcedUpdate()
-{
-    NX_VERBOSE(this) << "forcedUpdate()";
-    checkForInternetUpdates();
-}
-
 void MultiServerUpdatesWidget::clearUpdateInfo()
 {
     NX_INFO(this, "clearUpdateInfo()");
@@ -1064,7 +1062,7 @@ void MultiServerUpdatesWidget::checkForInternetUpdates(bool initial)
     {
         // WorkbenchUpdateWatcher checks for updates periodically. We could reuse its update
         // info, if there is any.
-        auto watcher = context()->instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
+        auto watcher = workbenchContext()->findInstance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
         auto contents = watcher->getUpdateContents();
         auto installedVersions = m_clientUpdateTool->getInstalledClientVersions();
         if (!contents.isEmpty()
@@ -2154,7 +2152,7 @@ void MultiServerUpdatesWidget::completeClientInstallation(bool clientUpdated)
         NX_INFO(this, "completeInstallation() - servers %1 have new protocol. Forcing reconnect",
             incompatibleServers);
 
-        menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
+        menu()->trigger(menu::DisconnectAction, {Qn::ForceRole, true});
     }
 
     if (clientUpdated)
@@ -2270,7 +2268,7 @@ void MultiServerUpdatesWidget::setTargetState(
             case WidgetUpdateState::downloading:
                 if (m_rightPanelDownloadProgress.isNull() && ini().systemUpdateProgressInformers)
                 {
-                    auto manager = context()->instance<workbench::LocalNotificationsManager>();
+                    auto manager = windowContext()->localNotificationsManager();
                     // TODO: We should show 'Pushing updates...'
                     m_rightPanelDownloadProgress =
                         manager->addProgress(tr("Downloading updates..."));
@@ -2341,7 +2339,7 @@ void MultiServerUpdatesWidget::closePanelNotifications()
 {
     if (m_rightPanelDownloadProgress.isNull())
         return;
-    auto manager = context()->instance<workbench::LocalNotificationsManager>();
+    auto manager = windowContext()->localNotificationsManager();
     manager->remove(m_rightPanelDownloadProgress);
     m_rightPanelDownloadProgress = QnUuid();
 }
@@ -2594,7 +2592,7 @@ void MultiServerUpdatesWidget::syncProgress()
 
     if (!m_rightPanelDownloadProgress.isNull())
     {
-        auto manager = context()->instance<workbench::LocalNotificationsManager>();
+        auto manager = windowContext()->localNotificationsManager();
         qreal progress = info.max > 0 ? info.current/qreal(info.max) : -1.0;
         manager->setProgress(m_rightPanelDownloadProgress, progress);
     }

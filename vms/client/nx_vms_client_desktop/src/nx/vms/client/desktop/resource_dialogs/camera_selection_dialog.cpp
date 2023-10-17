@@ -57,7 +57,7 @@ CameraSelectionDialog::CameraSelectionDialog(
         [this, resourceFilter](const entity_resource_tree::ResourceTreeEntityBuilder* builder)
         {
             return builder->createDialogAllCamerasEntity(
-                shouldDisplayServersInTree(context()), resourceFilter);
+                shouldDisplayServersInTree(workbenchContext()), resourceFilter);
         };
 
     m_resourceSelectionWidget = new ResourceSelectionWidget(
@@ -69,7 +69,7 @@ CameraSelectionDialog::CameraSelectionDialog(
 
     allCamerasSwitch->setVisible(true);
     allCamerasSwitch->setText(
-        QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+        QnDeviceDependentStrings::getDefaultNameFromSet(system()->resourcePool(),
             tr("Show all devices"),
             tr("Show all cameras")));
 
@@ -79,12 +79,12 @@ CameraSelectionDialog::CameraSelectionDialog(
             if (mode == ResourceSelectionMode::MultiSelection)
             {
                 setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
-                    resourcePool(), tr("Select Devices"), tr("Select Cameras")));
+                    system()->resourcePool(), tr("Select Devices"), tr("Select Cameras")));
             }
             else
             {
                 setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
-                    resourcePool(), tr("Select Device"), tr("Select Camera")));
+                    system()->resourcePool(), tr("Select Device"), tr("Select Camera")));
             }
         };
 

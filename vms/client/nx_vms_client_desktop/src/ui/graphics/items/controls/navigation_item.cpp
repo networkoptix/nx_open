@@ -13,6 +13,7 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/utils/context_utils.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_panel.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/framed_widget.h>
@@ -30,7 +31,6 @@
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
@@ -44,7 +44,7 @@ static constexpr QSizeF kZoomButtonSize = {38, 42};
 
 QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent->toGraphicsObject())
+    WindowContextAware(utils::windowContextFromObject(parent->toGraphicsObject()))
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
@@ -69,7 +69,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(m_controlWidgetPlaceholder, &GraphicsWidget::geometryChanged,
         this, &QnNavigationItem::emitControlGeometryChanged);
 
-    m_timeSlider = new QnTimeSlider(context(), this, parent);
+    m_timeSlider = new QnTimeSlider(windowContext(), this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
 
     GraphicsLabel* timelinePlaceholder = new QnTimelinePlaceholder(this, m_timeSlider);

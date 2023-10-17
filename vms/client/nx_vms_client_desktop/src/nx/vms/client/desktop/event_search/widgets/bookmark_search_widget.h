@@ -14,7 +14,7 @@ class BookmarkSearchWidget: public AbstractSearchWidget
     using base_type = AbstractSearchWidget;
 
 public:
-    BookmarkSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    BookmarkSearchWidget(WindowContext* context, QWidget* parent = nullptr);
     virtual ~BookmarkSearchWidget() override;
 
     virtual void resetFilters() override;

@@ -8,15 +8,17 @@
 #include <QtQml/QtQml>
 
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
 ScreenRecordingWatcher::ScreenRecordingWatcher():
-    m_screenRecordingAction(appContext()->mainWindowContext()->workbenchContext()->action(
-        ui::action::ToggleScreenRecordingAction))
+    m_screenRecordingAction(appContext()->mainWindowContext()->menu()->action(
+        menu::ToggleScreenRecordingAction))
 {
     if (!m_screenRecordingAction)
         return;

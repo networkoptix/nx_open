@@ -13,7 +13,7 @@ class PresetPickerWidget: public PlainPickerWidget
     Q_OBJECT
 
 public:
-    PresetPickerWidget(QnWorkbenchContext* context, CommonParamsWidget* parent);
+    PresetPickerWidget(SystemContext* context, CommonParamsWidget* parent);
 
     void updateUi() override;
 

@@ -2,6 +2,8 @@
 
 #include "system_context_aware.h"
 
+#include <QtCore/QObject>
+
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 
@@ -21,6 +23,16 @@ SystemContextAware::SystemContextAware(SystemContext* systemContext):
 {
     NX_CRITICAL(systemContext);
     d->systemContext = systemContext;
+
+    if (auto qobject = dynamic_cast<const QObject*>(this))
+    {
+        QObject::connect(systemContext, &QObject::destroyed, qobject,
+            [this]()
+            {
+                NX_ASSERT(false,
+                    "Context-aware object must be destroyed before the corresponding context is.");
+            });
+    }
 }
 
 SystemContextAware::SystemContextAware(std::unique_ptr<SystemContextInitializer> initializer):
@@ -32,7 +44,8 @@ SystemContextAware::SystemContextAware(std::unique_ptr<SystemContextInitializer>
 SystemContextAware::~SystemContextAware()
 {
     // Make sure context was not ever initialized or still exists.
-    NX_ASSERT(d->delayedInitializer || d->systemContext);
+    NX_ASSERT(d->delayedInitializer || d->systemContext,
+        "Context-aware object must be destroyed before the corresponding context is.");
 }
 
 SystemContext* SystemContextAware::systemContext() const
@@ -44,6 +57,17 @@ SystemContext* SystemContextAware::systemContext() const
             d->systemContext = d->delayedInitializer->systemContext();
             d->delayedInitializer.reset();
             NX_ASSERT(d->systemContext, "Initialization failed");
+
+            if (auto qobject = dynamic_cast<const QObject*>(this))
+            {
+                QObject::connect(d->systemContext.get(), &QObject::destroyed, qobject,
+                    [this]()
+                    {
+                        NX_ASSERT(false,
+                            "Context-aware object must be destroyed before the corresponding "
+                            "context is.");
+                    });
+            }
         }
     }
     return d->systemContext.data();

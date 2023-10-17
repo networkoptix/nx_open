@@ -5,6 +5,7 @@
 
 #include <QtCore/QModelIndex>
 
+#include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>

@@ -21,15 +21,17 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/progress_state.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
@@ -38,7 +40,6 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 
 // TODO: #vkutin Dialogs are included just for tab identifiers. Needs refactoring to avoid it.
@@ -71,8 +72,6 @@ std::optional<QString> overusedSaasServiceType(MessageType messageType)
 } // namespace
 
 namespace nx::vms::client::desktop {
-
-using namespace ui;
 
 //-------------------------------------------------------------------------------------------------
 // SystemHealthListModel::Private::Item definition.
@@ -108,14 +107,14 @@ bool SystemHealthListModel::Private::Item::operator<(const Item& other) const
 
 SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     base_type(),
-    QnWorkbenchContextAware(q),
+    WindowContextAware(q),
     q(q),
-    m_helper(new nx::vms::event::StringsHelper(systemContext())),
+    m_helper(new nx::vms::event::StringsHelper(system())),
     m_popupSystemHealthFilter(appContext()->localSettings()->popupSystemHealth())
 {
     // Handle system health state.
 
-    const auto systemHealthState = context()->instance<SystemHealthState>();
+    const auto systemHealthState = system()->systemHealthState();
     connect(systemHealthState, &SystemHealthState::stateChanged, this, &Private::toggleItem);
     connect(systemHealthState, &SystemHealthState::dataChanged, this, &Private::updateItem);
 
@@ -125,7 +124,9 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
             doAddItem(index, {}, true /*initial*/);
     }
 
-    auto usernameChangesListener = new core::SessionResourcesSignalListener<QnUserResource>(this);
+    auto usernameChangesListener = new core::SessionResourcesSignalListener<QnUserResource>(
+        system(),
+        this);
     usernameChangesListener->addOnSignalHandler(
         &QnUserResource::nameChanged,
         [this](const QnUserResourcePtr& user)
@@ -136,7 +137,7 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     usernameChangesListener->start();
 
     const auto cameraNameChangesListener =
-        new core::SessionResourcesSignalListener<QnVirtualCameraResource>(this);
+        new core::SessionResourcesSignalListener<QnVirtualCameraResource>(system(), this);
     cameraNameChangesListener->addOnSignalHandler(
         &QnVirtualCameraResource::nameChanged,
         [this](const QnVirtualCameraResourcePtr& camera)
@@ -148,13 +149,13 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
 
     // Handle system health notifications.
 
-    const auto notificationHandler = context()->instance<QnWorkbenchNotificationsHandler>();
-    connect(notificationHandler, &QnWorkbenchNotificationsHandler::cleared, this, &Private::clear);
+    const auto notificationHandler = windowContext()->notificationActionHandler();
+    connect(notificationHandler, &NotificationActionHandler::cleared, this, &Private::clear);
 
-    connect(notificationHandler, &QnWorkbenchNotificationsHandler::systemHealthEventAdded,
+    connect(notificationHandler, &NotificationActionHandler::systemHealthEventAdded,
         this, &Private::addItem);
 
-    connect(notificationHandler, &QnWorkbenchNotificationsHandler::systemHealthEventRemoved,
+    connect(notificationHandler, &NotificationActionHandler::systemHealthEventRemoved,
         this, &Private::removeItem);
 
     connect(&appContext()->localSettings()->popupSystemHealth,
@@ -163,14 +164,13 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
         [this]()
         {
             const auto filter = appContext()->localSettings()->popupSystemHealth();
-            const auto systemHealthState = context()->instance<SystemHealthState>();
 
             for (const auto index: common::system_health::allVisibleMessageTypes())
             {
                 const bool wasVisible = m_popupSystemHealthFilter.contains(index);
                 const bool isVisible = filter.contains(index);
                 if (wasVisible != isVisible)
-                    toggleItem(index, isVisible && systemHealthState->state(index));
+                    toggleItem(index, isVisible && system()->systemHealthState()->state(index));
             }
 
             m_popupSystemHealthFilter = filter;
@@ -338,7 +338,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
 
     if (const auto serviceType = overusedSaasServiceType(item.message))
     {
-        const auto serviceManager = systemContext()->saasServiceManager();
+        const auto serviceManager = system()->saasServiceManager();
         const auto issueExpirationDate =
             serviceManager->serviceStatus(*serviceType).issueExpirationDate.date();
         const auto formatter = nx::vms::time::Formatter::system();
@@ -359,7 +359,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
     {
         using namespace nx::vms::common;
 
-        const auto serviceManager = systemContext()->saasServiceManager();
+        const auto serviceManager = system()->saasServiceManager();
 
         QStringList tooltipLines;
 
@@ -431,12 +431,12 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
             connect(action.data(), &QAction::triggered, this,
                 [this]
                 {
-                    const auto parameters = action::Parameters(
+                    const auto parameters = menu::Parameters(
                         getSortedResourceList(MessageType::defaultCameraPasswords))
                             .withArgument(Qn::ForceShowCamerasList, true);
 
                     menu()->triggerIfPossible(
-                        action::ChangeDefaultCameraPasswordAction, parameters);
+                        menu::ChangeDefaultCameraPasswordAction, parameters);
                 });
 
             return action;
@@ -448,8 +448,8 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
             connect(action.data(), &QAction::triggered, this,
                 [this, resource = item.resource]
                 {
-                    const auto parameters = action::Parameters(resource);
-                    menu()->triggerIfPossible(action::UndoReplaceCameraAction, parameters);
+                    const auto parameters = menu::Parameters(resource);
+                    menu()->triggerIfPossible(menu::UndoReplaceCameraAction, parameters);
                 });
 
             return action;
@@ -460,25 +460,25 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
     }
 }
 
-action::IDType SystemHealthListModel::Private::action(int index) const
+menu::IDType SystemHealthListModel::Private::action(int index) const
 {
     const auto message = messageType(index);
     switch (message)
     {
         case MessageType::emailIsEmpty:
-            return action::UserSettingsAction;
+            return menu::UserSettingsAction;
 
         case MessageType::noLicenses:
-            return action::PreferencesLicensesTabAction;
+            return menu::PreferencesLicensesTabAction;
 
         case MessageType::smtpIsNotSet:
-            return action::PreferencesSmtpTabAction;
+            return menu::PreferencesSmtpTabAction;
 
         case MessageType::usersEmailIsEmpty:
-            return action::UserSettingsAction;
+            return menu::UserSettingsAction;
 
         case MessageType::emailSendError:
-            return action::PreferencesSmtpTabAction;
+            return menu::PreferencesSmtpTabAction;
             break;
 
         case MessageType::backupStoragesNotConfigured:
@@ -487,32 +487,32 @@ action::IDType SystemHealthListModel::Private::action(int index) const
         case MessageType::archiveRebuildCanceled:
         case MessageType::metadataStorageNotSet:
         case MessageType::metadataOnSystemStorage:
-            return action::ServerSettingsAction;
+            return menu::ServerSettingsAction;
 
         case MessageType::noInternetForTimeSync:
-            return action::SystemAdministrationAction;
+            return menu::SystemAdministrationAction;
 
         case MessageType::cloudPromo:
-            return action::PreferencesCloudTabAction;
+            return menu::PreferencesCloudTabAction;
 
         case MessageType::cameraRecordingScheduleIsInvalid:
-            return action::CameraSettingsAction;
+            return menu::CameraSettingsAction;
 
         case MessageType::remoteArchiveSyncError:
-            return action::OpenImportFromDevices;
+            return menu::OpenImportFromDevices;
 
         default:
-            return action::NoAction;
+            return menu::NoAction;
     }
 }
 
-action::Parameters SystemHealthListModel::Private::parameters(int index) const
+menu::Parameters SystemHealthListModel::Private::parameters(int index) const
 {
     const auto message = messageType(index);
     switch (message)
     {
         case MessageType::emailIsEmpty:
-            return action::Parameters(context()->user())
+            return menu::Parameters(workbenchContext()->user())
                 // TODO: Support `FocusElementRole` in the new dialog.
                 .withArgument(Qn::FocusElementRole, lit("email"))
                 .withArgument(Qn::FocusTabRole, UserSettingsDialog::GeneralTab);
@@ -523,14 +523,14 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
             if (!NX_ASSERT(!users.empty()))
                 return {};
 
-            return action::Parameters(users.front())
+            return menu::Parameters(users.front())
                 // TODO: Support `FocusElementRole` in the new dialog.
                 .withArgument(Qn::FocusElementRole, lit("email"))
                 .withArgument(Qn::FocusTabRole, UserSettingsDialog::GeneralTab);
         }
 
         case MessageType::noInternetForTimeSync:
-            return action::Parameters()
+            return menu::Parameters()
                 .withArgument(Qn::FocusElementRole, lit("syncWithInternet"))
                 .withArgument(Qn::FocusTabRole,
                     int(QnSystemAdministrationDialog::TimeServerSelection));
@@ -544,14 +544,14 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
             if (!NX_ASSERT(!servers.empty()))
                 return {};
 
-            return action::Parameters(servers.front())
+            return menu::Parameters(servers.front())
                 .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
         }
 
         case MessageType::archiveRebuildFinished:
         case MessageType::archiveRebuildCanceled:
         {
-            return action::Parameters(m_items[index].resource)
+            return menu::Parameters(m_items[index].resource)
                 .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
         }
 
@@ -561,12 +561,12 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
             if (!NX_ASSERT(!cameras.empty()))
                 return {};
 
-            return action::Parameters(cameras.front())
+            return menu::Parameters(cameras.front())
                 .withArgument(Qn::FocusTabRole, CameraSettingsTab::recording);
         }
 
         default:
-            return action::Parameters();
+            return menu::Parameters();
     }
 }
 
@@ -585,8 +585,7 @@ void SystemHealthListModel::Private::addItem(
 QSet<QnResourcePtr> SystemHealthListModel::Private::getResourceSet(
     MessageType message) const
 {
-    const auto systemHealthState = context()->instance<SystemHealthState>();
-    return systemHealthState->data(message).value<QSet<QnResourcePtr>>();
+    return system()->systemHealthState()->data(message).value<QSet<QnResourcePtr>>();
 }
 
 QnResourceList SystemHealthListModel::Private::getSortedResourceList(
@@ -640,9 +639,10 @@ void SystemHealthListModel::Private::doAddItem(
         {
             const auto runtimeParameters = action->getRuntimeParams();
             resource = runtimeParameters.metadata.cameraRefs.empty()
-                ? resourcePool()->getResourceById(runtimeParameters.eventResourceId)
-                : static_cast<QnResourcePtr>(camera_id_helper::findCameraByFlexibleId(resourcePool(),
-                    runtimeParameters.metadata.cameraRefs[0]));
+                ? system()->resourcePool()->getResourceById(runtimeParameters.eventResourceId)
+                : static_cast<QnResourcePtr>(
+                    camera_id_helper::findCameraByFlexibleId(system()->resourcePool(),
+                        runtimeParameters.metadata.cameraRefs[0]));
         }
     }
 

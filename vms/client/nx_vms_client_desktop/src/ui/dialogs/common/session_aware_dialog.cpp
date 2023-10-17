@@ -4,6 +4,10 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/vms/client/desktop/window_context.h>
+
+using namespace nx::vms::client::desktop;
+
 //-------------------------------------------------------------------------------------------------
 // QnSessionAwareButtonBoxDialog
 
@@ -24,12 +28,6 @@ bool QnSessionAwareButtonBoxDialog::tryClose(bool force)
     return true;
 }
 
-void QnSessionAwareButtonBoxDialog::forcedUpdate()
-{
-    retranslateUi();
-    tryClose(true);
-}
-
 //-------------------------------------------------------------------------------------------------
 // QnSessionAwareTabbedDialog
 
@@ -40,6 +38,8 @@ QnSessionAwareTabbedDialog::QnSessionAwareTabbedDialog(
     base_type(parent, windowFlags),
     QnSessionAwareDelegate(parent)
 {
+    connect(windowContext(), &WindowContext::systemChanged, this,
+        &QnSessionAwareTabbedDialog::loadDataToUi);
 }
 
 bool QnSessionAwareTabbedDialog::tryClose(bool force)
@@ -51,9 +51,4 @@ bool QnSessionAwareTabbedDialog::tryClose(bool force)
     }
 
     return closeDialogWithConfirmation();
-}
-
-void QnSessionAwareTabbedDialog::forcedUpdate()
-{
-    loadDataToUi();
 }

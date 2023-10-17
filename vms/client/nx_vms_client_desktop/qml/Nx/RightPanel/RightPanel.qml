@@ -32,7 +32,7 @@ TabControl
                 anchors.fill: parent
                 model: RightPanelModel
                 {
-                    context: workbenchContext
+                    context: windowContext
                     type: { return RightPanelModel.Type.notifications }
                 }
             }
@@ -62,7 +62,7 @@ TabControl
                 anchors.fill: parent
                 model: RightPanelModel
                 {
-                    context: workbenchContext
+                    context: windowContext
                     type: { return RightPanelModel.Type.motion }
                 }
             }
@@ -91,7 +91,7 @@ TabControl
                 anchors.fill: parent
                 model: RightPanelModel
                 {
-                    context: workbenchContext
+                    context: windowContext
                     type: { return RightPanelModel.Type.bookmarks }
                 }
             }
@@ -120,7 +120,7 @@ TabControl
                 anchors.fill: parent
                 model: RightPanelModel
                 {
-                    context: workbenchContext
+                    context: windowContext
                     type: { return RightPanelModel.Type.events }
                 }
             }
@@ -149,7 +149,7 @@ TabControl
                 anchors.fill: parent
                 model: RightPanelModel
                 {
-                    context: workbenchContext
+                    context: windowContext
                     type: { return RightPanelModel.Type.analytics }
                 }
             }

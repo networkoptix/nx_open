@@ -122,7 +122,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         auto eventFrameLayout = new QVBoxLayout{eventFrame};
         eventFrameLayout->setSpacing(0);
-        m_eventTypePicker = new EventTypePickerWidget{systemContext()};
+        m_eventTypePicker = new EventTypePickerWidget{this->systemContext()};
         connect(
             m_eventTypePicker,
             &EventTypePickerWidget::eventTypePicked,
@@ -165,7 +165,7 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         auto actionFrameLayout = new QVBoxLayout{actionFrame};
         actionFrameLayout->setSpacing(0);
-        m_actionTypePicker = new ActionTypePickerWidget{systemContext()};
+        m_actionTypePicker = new ActionTypePickerWidget{this->systemContext()};
         connect(
             m_actionTypePicker,
             &ActionTypePickerWidget::actionTypePicked,
@@ -273,7 +273,7 @@ void EditVmsRuleDialog::displayActionEditor(const QString& actionType)
         return;
 
     auto actionEditorWidget =
-        ActionEditorFactory::createWidget(actionDescriptor.value(), context());
+        ActionEditorFactory::createWidget(actionDescriptor.value(), windowContext());
     if (!NX_ASSERT(actionEditorWidget))
         return;
 
@@ -297,7 +297,7 @@ void EditVmsRuleDialog::displayEventEditor(const QString& eventType)
         return;
 
     auto eventEditorWidget =
-        EventEditorFactory::createWidget(eventDescriptor.value(), context());
+        EventEditorFactory::createWidget(eventDescriptor.value(), windowContext());
     if (!NX_ASSERT(eventEditorWidget))
         return;
 

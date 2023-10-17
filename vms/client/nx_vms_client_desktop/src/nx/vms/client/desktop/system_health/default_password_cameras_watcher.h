@@ -10,7 +10,6 @@
 
 namespace nx::vms::client::desktop {
 
-// TODO: #sivanov Move to System Context.
 class DefaultPasswordCamerasWatcher:
     public QObject,
     public SystemContextAware

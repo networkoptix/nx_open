@@ -23,9 +23,10 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <ui/dialogs/common/message_box.h>
@@ -289,7 +290,7 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
 }
 
 void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     RemoteConnectionError error,
     const nx::vms::api::ModuleInformation& moduleInformation,
     const nx::utils::SoftwareVersion& engineVersion,
@@ -371,7 +372,7 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
         okButton->setText(tr("Log In..."));
         connect(okButton,
             &QPushButton::clicked,
-            [context]() { context->menu()->trigger(ui::action::LoginToCloud); });
+            [context]() { context->menu()->trigger(menu::LoginToCloud); });
 
         msgBox->exec();
         msgBox->deleteLater();
@@ -392,9 +393,9 @@ void QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
         [context](const QString& link)
         {
             if (link == "#cloud")
-                context->menu()->trigger(ui::action::LoginToCloud);
+                context->menu()->trigger(menu::LoginToCloud);
             else if (link == "#cloud_account_security")
-                context->menu()->trigger(ui::action::OpenCloudAccountSecurityUrl);
+                context->menu()->trigger(menu::OpenCloudAccountSecurityUrl);
         });
 
     msgBox.exec();

@@ -9,14 +9,12 @@
 namespace nx::vms::client::desktop {
 
 AbstractSearchSynchronizer::AbstractSearchSynchronizer(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(context)
+    WindowContextAware(context)
 {
-    NX_CRITICAL(this->context());
-
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this,
         [this]() { emit mediaWidgetAboutToBeChanged(mediaWidget(), QPrivateSignal()); });
 

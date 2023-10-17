@@ -16,7 +16,7 @@ class TitledPickerWidget: public PickerWidget
     Q_OBJECT
 
 public:
-    TitledPickerWidget(QnWorkbenchContext* context, CommonParamsWidget* parent);
+    TitledPickerWidget(SystemContext* context, CommonParamsWidget* parent);
 
     void setCheckBoxEnabled(bool value);
     void setChecked(bool value);

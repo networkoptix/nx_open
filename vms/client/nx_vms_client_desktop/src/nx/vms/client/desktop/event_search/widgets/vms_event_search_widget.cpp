@@ -115,9 +115,9 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
                 }
         };
 
-    connect(q->resourcePool(), &QnResourcePool::resourcesAdded,
+    connect(q->system()->resourcePool(), &QnResourcePool::resourcesAdded,
         this, updateServerEventsMenuIfNeeded);
-    connect(q->resourcePool(), &QnResourcePool::resourcesRemoved,
+    connect(q->system()->resourcePool(), &QnResourcePool::resourcesRemoved,
         this, updateServerEventsMenuIfNeeded);
 
     const auto updateAnalyticsMenuIfEventModelIsOnline =
@@ -131,7 +131,7 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
         this,
         updateAnalyticsMenuIfEventModelIsOnline);
 
-    connect(q->context()->findInstance<AnalyticsEventsSearchTreeBuilder>(),
+    connect(q->system()->analyticsEventsSearchTreeBuilder(),
         &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         this,
         updateAnalyticsMenuIfEventModelIsOnline);
@@ -156,7 +156,7 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
                 resetType();
         });
 
-    connect(q->systemContext()->accessController(), &AccessController::globalPermissionsChanged,
+    connect(q->system()->accessController(), &AccessController::globalPermissionsChanged,
         q, &VmsEventSearchWidget::updateAllowance);
 
     connect(q->model(), &AbstractSearchListModel::isOnlineChanged,
@@ -176,7 +176,7 @@ void VmsEventSearchWidget::Private::setupTypeSelection()
         qnSkin->icon("text_buttons/event_rules_20.svg", kIconSubstitutions));
 
     auto eventFilterMenu =
-        createEventGroupMenu(q->systemContext()->vmsRulesEngine()->eventGroups());
+        createEventGroupMenu(q->system()->vmsRulesEngine()->eventGroups());
     auto defaultAction = eventFilterMenu->actions()[0];
 
     m_typeSelectionButton->setMenu(eventFilterMenu);
@@ -200,7 +200,7 @@ QMenu* VmsEventSearchWidget::Private::createEventGroupMenu(const Group& group)
         {kServerIssueEventGroup, tr("Server events")},
     };
 
-    const auto stringHelper = rules::utils::StringHelper(q->systemContext());
+    const auto stringHelper = rules::utils::StringHelper(q->system());
     auto result = q->createDropdownMenu();
 
     addMenuAction(result, group.name, QString::fromStdString(group.id));
@@ -282,7 +282,7 @@ void VmsEventSearchWidget::Private::updateServerEventsMenu()
     NX_ASSERT(m_serverEventsSubmenuAction);
     auto serverMenu = m_serverEventsSubmenuAction->menu();
 
-    const auto eventGroups = q->systemContext()->vmsRulesEngine()->eventGroups();
+    const auto eventGroups = q->system()->vmsRulesEngine()->eventGroups();
     const auto serverGroup = eventGroups.findGroup(kServerIssueEventGroup);
     NX_ASSERT(serverGroup);
 
@@ -350,10 +350,7 @@ void VmsEventSearchWidget::Private::updateAnalyticsMenu()
 
     if (NX_ASSERT(analyticsMenu))
     {
-        auto analyticsEventsSearchTreeBuilder =
-            q->context()->findInstance<AnalyticsEventsSearchTreeBuilder>();
-
-        const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
+        const auto root = q->system()->analyticsEventsSearchTreeBuilder()->eventTypesTree();
 
         WidgetUtils::clearMenu(analyticsMenu);
 
@@ -377,7 +374,7 @@ void VmsEventSearchWidget::Private::updateAnalyticsMenu()
 // ------------------------------------------------------------------------------------------------
 // VmsEventSearchWidget
 
-VmsEventSearchWidget::VmsEventSearchWidget(QnWorkbenchContext* context, QWidget* parent):
+VmsEventSearchWidget::VmsEventSearchWidget(WindowContext* context, QWidget* parent):
     base_type(context, new VmsEventSearchListModel(context), parent),
     d(new Private(this))
 {
@@ -411,8 +408,8 @@ bool VmsEventSearchWidget::calculateAllowance() const
 {
     return nx::vms::rules::ini().fullSupport
         && model()->isOnline()
-        && systemContext()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs)
-        && systemContext()->vmsRulesEngine()->isEnabled();
+        && system()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs)
+        && system()->vmsRulesEngine()->isEnabled();
 }
 
 } // namespace nx::vms::client::desktop

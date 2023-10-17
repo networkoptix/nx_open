@@ -13,7 +13,7 @@ class CallNotificationsListModel: public EventListModel
     using base_type = EventListModel;
 
 public:
-    explicit CallNotificationsListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit CallNotificationsListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~CallNotificationsListModel() override;
 
 protected:

@@ -5,8 +5,8 @@
 #include <utility>
 
 #include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include <nx/metrics/application_metrics_storage.h>
 #include <nx/utils/log/log.h>
@@ -83,26 +83,26 @@ pair<qint64, bool> treatAsInt(const QJsonValue& value, qint64 defaultValue)
 
 // Command parsers & executors.
 // Quit command
-QJsonDocument executeQuit(QJsonObject request)
+QJsonDocument executeQuit(Director* director, QJsonObject request)
 {
     auto [force, isOK] = treatAsBool(request.value("force"), true);
     if (request.contains("force") && !isOK)
         return QJsonDocument(formResponseBase(DirectorJsonInterface::BadParameters,
             "Incorrect \"force\" parameter value."));
 
-    Director::instance()->quit(force);
+    director->quit(force);
     return QJsonDocument(formResponseBase(DirectorJsonInterface::Ok));
 }
 
 // Return frame stats command
-QJsonDocument executeGetFrameTimePoints(QJsonObject request)
+QJsonDocument executeGetFrameTimePoints(Director* director, QJsonObject request)
 {
     auto [from, isOK] = treatAsInt(request.value("from"), 0);
     if (request.contains("from") && !isOK)
         return QJsonDocument(formResponseBase(DirectorJsonInterface::BadParameters,
             "Incorrect \"from\" parameter value."));
 
-    const auto framePoints = Director::instance()->getFrameTimePoints();
+    const auto framePoints = director->getFrameTimePoints();
     QJsonArray jsonFramePoints;
     for (auto timePoint: framePoints)
     {
@@ -146,14 +146,14 @@ QJsonDocument execute(QJsonObject request)
 
 namespace nx::vms::client::desktop {
 
-DirectorJsonInterface::DirectorJsonInterface(QObject* parent)
+DirectorJsonInterface::DirectorJsonInterface(Director* director, QObject* parent):
+    QObject(parent),
+    m_director(director)
 {
 }
 
 QJsonDocument DirectorJsonInterface::process(const QJsonDocument& jsonRequest)
 {
-    NX_ASSERT(Director::instance(), "Director's life cycle must be greater than the current class");
-
     const auto& jsonObject = jsonRequest.object();
     const auto command = jsonObject.value("command").toString();
     if (command.isEmpty())
@@ -161,9 +161,9 @@ QJsonDocument DirectorJsonInterface::process(const QJsonDocument& jsonRequest)
 
     // Main command dispatcher.
     if (command == "quit")
-        return executeQuit(jsonObject);
+        return executeQuit(m_director, jsonObject);
     if (command == "getFrameTimePoints")
-        return executeGetFrameTimePoints(jsonObject);
+        return executeGetFrameTimePoints(m_director, jsonObject);
     if (command == "execute")
         return execute(jsonObject);
     if (command == "statistics/requests")

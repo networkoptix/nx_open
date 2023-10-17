@@ -4,7 +4,7 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 class QQmlEngine;
 
@@ -12,13 +12,13 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace experimental {
 
-class MainWindow: public QWidget, public QnWorkbenchContextAware
+class MainWindow: public QWidget, public WindowContextAware
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
-    MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget* parent = nullptr);
+    MainWindow(QQmlEngine* engine, WindowContext* context, QWidget* parent = nullptr);
     virtual ~MainWindow() override;
 
 protected:

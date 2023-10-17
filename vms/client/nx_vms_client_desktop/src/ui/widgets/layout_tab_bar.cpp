@@ -21,12 +21,12 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/indents.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -35,7 +35,6 @@
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
@@ -85,9 +84,12 @@ QPalette doubleLevelPalette(QWidget* widget)
 
 } // namespace
 
-QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
+QnLayoutTabBar::QnLayoutTabBar(
+    nx::vms::client::desktop::WindowContext* windowContext,
+    QWidget* parent)
+    :
     QTabBar(parent),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     m_submit(false),
     m_update(false),
     m_midClickedTab(-1)
@@ -110,7 +112,7 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget* parent):
     connect(this, &QTabBar::tabCloseRequested, this,
         [this](int index)
         {
-            menu()->trigger(action::CloseLayoutAction,
+            menu()->trigger(menu::CloseLayoutAction,
                 QnWorkbenchLayoutList() << m_layouts[index]);
         });
 
@@ -163,15 +165,15 @@ void QnLayoutTabBar::checkInvariants() const
     }
 }
 
-action::ActionScope QnLayoutTabBar::currentScope() const
+menu::ActionScope QnLayoutTabBar::currentScope() const
 {
-    return action::TitleBarScope;
+    return menu::TitleBarScope;
 }
 
-action::Parameters QnLayoutTabBar::currentParameters(action::ActionScope scope) const
+menu::Parameters QnLayoutTabBar::currentParameters(menu::ActionScope scope) const
 {
-    if (scope != action::TitleBarScope)
-        return action::Parameters();
+    if (scope != menu::TitleBarScope)
+        return menu::Parameters();
 
     QnWorkbenchLayoutList result;
     int currentIndex = this->currentIndex();
@@ -238,7 +240,8 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallInstanceGuid.isNull())
     {
-        QnVideoWallItemIndex idx = resourcePool()->getVideoWallItemByUuid(videoWallInstanceGuid);
+        QnVideoWallItemIndex idx =
+            system()->resourcePool()->getVideoWallItemByUuid(videoWallInstanceGuid);
         if (!idx.isNull())
             baseName = idx.item().name;
     }
@@ -273,7 +276,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallInstanceGuid.isNull())
     {
-        QnVideoWallItemIndex idx = resourcePool()->getVideoWallItemByUuid(videoWallInstanceGuid);
+        QnVideoWallItemIndex idx = system()->resourcePool()->getVideoWallItemByUuid(videoWallInstanceGuid);
         if (idx.isNull())
             return QIcon();
 
@@ -281,7 +284,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
         {
             if (idx.item().runtimeStatus.controlledBy.isNull())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
-            if (idx.item().runtimeStatus.controlledBy == peerId())
+            if (idx.item().runtimeStatus.controlledBy == system()->peerId())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
             return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
         }
@@ -358,19 +361,13 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event)
     if (qnRuntime->isVideoWallMode())
         return;
 
-    if (!context() || !context()->menu())
-    {
-        NX_ASSERT(false, "Requesting context menu for a layout tab bar while no menu manager instance is available.");
-        return;
-    }
-
     QnWorkbenchLayoutList target;
     int index = tabAt(event->pos());
     if (index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
 
-    QScopedPointer<QMenu> menu(context()->menu()->newMenu(
-        action::TitleBarScope, mainWindowWidget(), target));
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(
+        menu::TitleBarScope, mainWindowWidget(), target));
     if (menu->isEmpty())
         return;
 

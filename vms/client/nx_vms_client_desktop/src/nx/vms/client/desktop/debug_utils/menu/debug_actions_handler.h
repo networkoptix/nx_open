@@ -4,17 +4,18 @@
 
 #include <QtCore/QObject>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class DebugActionsHandler: public QObject, public QnWorkbenchContextAware
+class DebugActionsHandler: public QObject, public WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    explicit DebugActionsHandler(QObject* parent = nullptr);
+    DebugActionsHandler(WindowContext* windowContext, QObject* parent = nullptr);
     virtual ~DebugActionsHandler() override;
 
 private:
@@ -24,6 +25,10 @@ private:
 
     void at_debugIncrementCounterAction_triggered();
     void at_debugDecrementCounterAction_triggered();
+
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

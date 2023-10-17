@@ -7,7 +7,8 @@
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <nx/utils/metatypes.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <ui/common/notification_levels.h>
 #include <utils/common/delayed.h>
 
@@ -25,7 +26,7 @@ constexpr int kMaxInvalidScheduleTooltipWidth = 320;
 
 using MessageType = nx::vms::common::system_health::MessageType;
 
-SystemHealthListModel::SystemHealthListModel(QnWorkbenchContext* context, QObject* parent):
+SystemHealthListModel::SystemHealthListModel(WindowContext* context, QObject* parent):
     base_type(context, parent),
     d(new Private(this))
 {
@@ -111,13 +112,13 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
 bool SystemHealthListModel::defaultAction(const QModelIndex& index)
 {
     const auto action = d->action(index.row());
-    if (action == ui::action::NoAction)
+    if (action == menu::NoAction)
         return false;
 
     menu()->triggerIfPossible(action, d->parameters(index.row()));
 
     if (d->message(index.row()) == MessageType::cloudPromo)
-        menu()->trigger(ui::action::HideCloudPromoAction);
+        showOnceSettings()->cloudPromo = true;
 
     return true;
 }
@@ -131,7 +132,7 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
     {
         if (d->message(row + i) == MessageType::cloudPromo)
         {
-            executeLater([this]() { menu()->trigger(ui::action::HideCloudPromoAction); }, this);
+            executeLater([this]() { showOnceSettings()->cloudPromo = true; }, this);
             break;
         }
     }

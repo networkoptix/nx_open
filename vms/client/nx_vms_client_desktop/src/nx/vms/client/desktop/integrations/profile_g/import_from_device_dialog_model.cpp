@@ -3,13 +3,10 @@
 #include "import_from_device_dialog_model.h"
 
 #include <client/client_globals.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/time/formatter.h>
 
@@ -70,7 +67,6 @@ struct ImportFromDeviceDialogModel::Private
 
     std::map<QnUuid, DeviceData> deviceData;
 
-    FilteredResourceProxyModel* const resourceModel = nullptr;
     QnResourceIconCache* const resourceIconCache = nullptr;
 
 public:
@@ -87,7 +83,6 @@ public:
 
 ImportFromDeviceDialogModel::Private::Private(ImportFromDeviceDialogModel* parent):
     q(parent),
-    resourceModel(resourceModel),
     resourceIconCache(qnResIconCache)
 {
 }
@@ -217,7 +212,6 @@ QColor ImportFromDeviceDialogModel::Private::getCellColor(const QModelIndex& ind
 
 ImportFromDeviceDialogModel::ImportFromDeviceDialogModel(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     d(new ImportFromDeviceDialogModel::Private(this))
 {
 }

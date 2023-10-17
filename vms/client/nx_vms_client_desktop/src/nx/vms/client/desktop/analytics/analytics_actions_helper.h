@@ -12,11 +12,11 @@
 #include <nx/vms/client/desktop/common/utils/abstract_web_authenticator.h>
 
 class QWidget;
-class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
 class AbstractWebAuthenticator;
+class WindowContext;
 
 class AnalyticsActionsHelper
 {
@@ -31,7 +31,7 @@ public:
      */
     static void processResult(
         const AnalyticsActionResult& result,
-        QnWorkbenchContext* context = nullptr,
+        WindowContext* context = nullptr,
         const QnResourcePtr& proxyResource = {},
         std::shared_ptr<AbstractWebAuthenticator> authenticator = nullptr,
         QWidget* parent = nullptr);

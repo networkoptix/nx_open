@@ -85,12 +85,6 @@ RemoteSession::~RemoteSession()
     }
 }
 
-std::shared_ptr<RemoteSession> RemoteSession::instance()
-{
-    return std::dynamic_pointer_cast<RemoteSession>(
-        appContext()->currentSystemContext()->session());
-}
-
 SessionId RemoteSession::sessionId() const
 {
     return m_sessionId;

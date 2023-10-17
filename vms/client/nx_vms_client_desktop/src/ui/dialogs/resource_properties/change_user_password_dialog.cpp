@@ -7,15 +7,14 @@
 
 #include <core/resource/user_resource.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
-#include <ui/workbench/workbench_context.h>
-
 #include <nx/vms/client/desktop/common/widgets/password_strength_indicator.h>
+#include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
 
 QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::lazy),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::ChangeUserPasswordDialog())
 {
     ui->setupUi(this);

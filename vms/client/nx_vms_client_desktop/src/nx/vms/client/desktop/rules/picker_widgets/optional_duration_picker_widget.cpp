@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-OptionalDurationPicker::OptionalDurationPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+OptionalDurationPicker::OptionalDurationPicker(SystemContext* context, CommonParamsWidget* parent):
      TitledFieldPickerWidget<vms::rules::OptionalTimeField>(context, parent)
 {
     auto mainLayout = new QHBoxLayout;

@@ -115,9 +115,13 @@ public:
      */
     ec2::AbstractECConnectionPtr messageBusConnection() const;
 
+    /** Message processor, cast to actual class. */
+    QnClientMessageProcessor* clientMessageProcessor() const;
+
     QnPtzControllerPool* ptzControllerPool() const;
 
     UserWatcher* userWatcher() const;
+    QnUserResourcePtr user() const;
 
     WatermarkWatcher* watermarkWatcher() const;
 
@@ -129,6 +133,13 @@ public:
 
 signals:
     void remoteIdChanged(const QnUuid& id);
+
+    /**
+     * Signal which sent when current user of this system context is changed. Actual only while
+     * legacy system context architecture is in action, when there is only one active system
+     * context, and new remote connection clears everything in it and fills it again.
+     */
+    void userChanged(const QnUserResourcePtr& user);
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

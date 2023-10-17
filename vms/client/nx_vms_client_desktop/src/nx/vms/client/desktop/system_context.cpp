@@ -9,15 +9,19 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_data_manager.h>
 #include <client/client_message_processor.h>
+#include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
 #include <nx/branding.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
@@ -25,11 +29,15 @@
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
+#include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
+#include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
+#include <nx/vms/client/desktop/videowall/desktop_camera_initializer.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <server/server_storage_manager.h>
 
@@ -59,6 +67,7 @@ struct SystemContext::Private
     std::unique_ptr<StatisticsSender> statisticsSender;
     std::unique_ptr<VirtualCameraManager> virtualCameraManager;
     std::unique_ptr<VideoCache> videoCache;
+    std::unique_ptr<LocalResourcesInitializer> localResourcesInitializer;
     std::unique_ptr<LayoutSnapshotManager> layoutSnapshotManager;
     std::unique_ptr<ShowreelStateManager> showreelStateManager;
     std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
@@ -68,6 +77,11 @@ struct SystemContext::Private
     std::unique_ptr<DelayedDataLoader> delayedDataLoader;
     std::unique_ptr<analytics::TaxonomyManager> taxonomyManager;
     std::unique_ptr<NonEditableUsersAndGroups> nonEditableUsersAndGroups;
+    std::unique_ptr<DefaultPasswordCamerasWatcher> defaultPasswordCamerasWatcher;
+    std::unique_ptr<DesktopCameraInitializer> desktopCameraInitializer;
+    std::unique_ptr<IntercomManager> intercomManager;
+    std::unique_ptr<AnalyticsEventsSearchTreeBuilder> analyticsEventsSearchTreeBuilder;
+    std::unique_ptr<SystemHealthState> systemHealthState;
 
     void initLocalRuntimeInfo()
     {
@@ -81,7 +95,6 @@ struct SystemContext::Private
         runtimeData.videoWallInstanceGuid = appContext()->videoWallInstanceId();
         q->runtimeInfoManager()->updateLocalItem(runtimeData);
     }
-
 };
 
 SystemContext::SystemContext(
@@ -112,6 +125,9 @@ SystemContext::SystemContext(
             d->statisticsSender = std::make_unique<StatisticsSender>(this);
             d->virtualCameraManager = std::make_unique<VirtualCameraManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
+            // LocalResourcesInitializer must be created before LayoutSnapshotManager to avoid
+            // modifying layouts after they are opened.
+            d->localResourcesInitializer = std::make_unique<LocalResourcesInitializer>(this);
             d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
             d->showreelStateManager = std::make_unique<ShowreelStateManager>(this);
             d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(this);
@@ -123,6 +139,8 @@ SystemContext::SystemContext(
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->ldapStatusWatcher = std::make_unique<LdapStatusWatcher>(this);
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
+            d->defaultPasswordCamerasWatcher = std::make_unique<DefaultPasswordCamerasWatcher>(
+                this);
             break;
 
         case Mode::crossSystem:
@@ -141,6 +159,13 @@ SystemContext::SystemContext(
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             break;
     }
+
+    connect(this, &SystemContext::userChanged, this,
+        [this](const QnUserResourcePtr& user)
+        {
+            if (d->virtualCameraManager)
+                d->virtualCameraManager->setCurrentUser(user);
+        });
 }
 
 SystemContext::~SystemContext()
@@ -159,6 +184,21 @@ SystemContext* SystemContext::fromResource(const QnResourcePtr& resource)
         return {};
 
     return dynamic_cast<SystemContext*>(resource->systemContext());
+}
+
+void SystemContext::initializeDesktopCamera()
+{
+    d->desktopCameraInitializer = std::make_unique<DesktopCameraInitializer>(this);
+}
+
+std::shared_ptr<RemoteSession> SystemContext::session() const
+{
+    return std::dynamic_pointer_cast<RemoteSession>(base_type::session());
+}
+
+AnalyticsEventsSearchTreeBuilder* SystemContext::analyticsEventsSearchTreeBuilder() const
+{
+    return d->analyticsEventsSearchTreeBuilder.get();
 }
 
 VideoWallOnlineScreensWatcher* SystemContext::videoWallOnlineScreensWatcher() const
@@ -253,6 +293,16 @@ common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const
     return d->restApiHelper->getSessionTokenHelper();
 }
 
+DefaultPasswordCamerasWatcher* SystemContext::defaultPasswordCamerasWatcher() const
+{
+    return d->defaultPasswordCamerasWatcher.get();
+}
+
+SystemHealthState* SystemContext::systemHealthState() const
+{
+    return d->systemHealthState.get();
+}
+
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     base_type::setMessageProcessor(messageProcessor);
@@ -266,6 +316,13 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     d->incompatibleServerWatcher->setMessageProcessor(clientMessageProcessor);
     d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
     d->logsManagementWatcher->setMessageProcessor(clientMessageProcessor);
+    d->intercomManager = std::make_unique<IntercomManager>(this);
+    d->analyticsEventsSearchTreeBuilder = std::make_unique<AnalyticsEventsSearchTreeBuilder>(this);
+    d->systemHealthState = std::make_unique<SystemHealthState>(this);
+
+    // Desktop camera must work in the normal mode only.
+    if (appContext()->runtimeSettings()->isDesktopMode())
+        initializeDesktopCamera();
 }
 
 } // namespace nx::vms::client::desktop

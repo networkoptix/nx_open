@@ -6,9 +6,11 @@
 
 #include "../interfaces.h"
 
-class QnWorkbenchContext;
+namespace nx::vms::client::desktop {
 
-namespace nx::vms::client::desktop::integrations {
+class WindowContext;
+
+namespace integrations {
 
 class OverlappedIdStore;
 
@@ -28,13 +30,14 @@ public:
     virtual ~OverlappedIdIntegration() override;
 
 public:
-    virtual void registerActions(ui::action::MenuFactory* factory) override;
+    virtual void registerActions(menu::MenuFactory* factory) override;
 
 private:
-    void openOverlappedIdDialog(QnWorkbenchContext* context);
+    void openOverlappedIdDialog(WindowContext* context);
 
 private:
     std::shared_ptr<OverlappedIdStore> m_store;
 };
 
-} // namespace nx::vms::client::desktop::integrations
+} // namespace integrations
+} // namespace nx::vms::client::desktop

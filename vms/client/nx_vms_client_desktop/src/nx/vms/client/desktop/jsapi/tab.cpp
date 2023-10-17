@@ -4,6 +4,7 @@
 
 #include <QtCore/QJsonDocument>
 
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -14,7 +15,7 @@
 namespace nx::vms::client::desktop::jsapi {
 
 Tab::Tab(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QObject* parent)
     :
     base_type(parent),

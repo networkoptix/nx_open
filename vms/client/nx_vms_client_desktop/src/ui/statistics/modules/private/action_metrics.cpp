@@ -1,17 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "action_metrics.h"
 
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <statistics/base/metrics_container.h>
 #include <statistics/base/time_duration_metric.h>
 
-#include <nx/fusion/model_functions.h>
-
-using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::client::desktop;
 
 namespace
 {
@@ -21,7 +19,7 @@ namespace
         return QPointer<Type>(value);
     }
 
-    QString aliasByActionId(action::IDType id)
+    QString aliasByActionId(menu::IDType id)
     {
         return QnLexical::serialized(id);
     }
@@ -58,13 +56,13 @@ namespace
     {
         typedef QnTimeDurationMetric base_type;
     public:
-        ActionDurationMetric(action::Action* action);
+        ActionDurationMetric(menu::Action* action);
 
         virtual ~ActionDurationMetric();
     private:
     };
 
-    ActionDurationMetric::ActionDurationMetric(action::Action* action)
+    ActionDurationMetric::ActionDurationMetric(menu::Action* action)
         : base_type()
         , QObject()
     {
@@ -95,7 +93,7 @@ namespace
 
 //
 
-AbstractActionsMetrics::AbstractActionsMetrics(const action::ManagerPtr& actionManager)
+AbstractActionsMetrics::AbstractActionsMetrics(const menu::ManagerPtr& actionManager)
     : base_type()
     , QnStatisticsValuesProvider()
 {
@@ -103,7 +101,7 @@ AbstractActionsMetrics::AbstractActionsMetrics(const action::ManagerPtr& actionM
         return;
 
     const auto guard = makePointer(this);
-    const auto addAction = [this, guard, actionManager](action::IDType id)
+    const auto addAction = [this, guard, actionManager](menu::IDType id)
     {
         if (!guard)
             return;
@@ -115,7 +113,7 @@ AbstractActionsMetrics::AbstractActionsMetrics(const action::ManagerPtr& actionM
         addActionMetric(action);
     };
 
-    connect(actionManager.data(), &action::Manager::actionRegistered, this, addAction);
+    connect(actionManager.data(), &menu::Manager::actionRegistered, this, addAction);
 }
 
 AbstractActionsMetrics::~AbstractActionsMetrics()
@@ -123,7 +121,7 @@ AbstractActionsMetrics::~AbstractActionsMetrics()
 
 //
 
-ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(const action::ManagerPtr& actionManager)
+ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(const menu::ManagerPtr& actionManager)
     : base_type(actionManager)
     , m_values()
 {
@@ -134,7 +132,7 @@ ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(const action::Manager
         addActionMetric(action);
 }
 
-void ActionsTriggeredCountMetrics::addActionMetric(action::Action *action)
+void ActionsTriggeredCountMetrics::addActionMetric(menu::Action *action)
 {
     const auto id = action->id();
     const auto guard = makePointer(this);
@@ -161,7 +159,7 @@ QnStatisticValuesHash ActionsTriggeredCountMetrics::values() const
     QnStatisticValuesHash result;
     for (auto it = m_values.cbegin(); it != m_values.end(); ++it)
     {
-        const auto actionId = static_cast<action::IDType>(it.key());
+        const auto actionId = static_cast<menu::IDType>(it.key());
         const auto alias = aliasByActionId(actionId);
 
         const auto &countByParams = it.value();
@@ -184,7 +182,7 @@ void ActionsTriggeredCountMetrics::reset()
 
 //
 
-ActionCheckedTimeMetric::ActionCheckedTimeMetric(const action::ManagerPtr& actionManager)
+ActionCheckedTimeMetric::ActionCheckedTimeMetric(const menu::ManagerPtr& actionManager)
     : base_type(actionManager)
     , m_metrics(new QnMetricsContainer())
 {
@@ -198,7 +196,7 @@ ActionCheckedTimeMetric::ActionCheckedTimeMetric(const action::ManagerPtr& actio
 ActionCheckedTimeMetric::~ActionCheckedTimeMetric()
 {}
 
-void ActionCheckedTimeMetric::addActionMetric(action::Action *action)
+void ActionCheckedTimeMetric::addActionMetric(menu::Action *action)
 {
     if (!action)
         return;

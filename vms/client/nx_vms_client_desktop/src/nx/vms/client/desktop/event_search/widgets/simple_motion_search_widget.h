@@ -21,7 +21,7 @@ class SimpleMotionSearchWidget: public AbstractSearchWidget
     using MotionSelection = nx::vms::client::core::MotionSelection;
 
 public:
-    SimpleMotionSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    SimpleMotionSearchWidget(WindowContext* context, QWidget* parent = nullptr);
     virtual ~SimpleMotionSearchWidget() override;
 
     SimpleMotionSearchListModel* motionModel() const;

@@ -3,7 +3,7 @@
 #include "abstract_workbench_panel.h"
 
 #include <client/client_runtime_settings.h>
-
+#include <nx/vms/client/desktop/utils/context_utils.h>
 #include <ui/animation/animation_timer.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/workbench/workbench_display.h>
@@ -17,7 +17,7 @@ AbstractWorkbenchPanel::AbstractWorkbenchPanel(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(utils::windowContextFromObject(parent)),
     m_parentWidget(parentWidget),
     m_masterOpacity(kOpaque)
 {

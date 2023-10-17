@@ -16,7 +16,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-PtzPresetPicker::PtzPresetPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+PtzPresetPicker::PtzPresetPicker(SystemContext* context, CommonParamsWidget* parent):
     DropdownTextPickerWidgetBase<vms::rules::PtzPresetField>(context, parent)
 {
 }

@@ -21,7 +21,7 @@ AccessController* SystemContextAware::accessController() const
 
 QnClientMessageProcessor* SystemContextAware::clientMessageProcessor() const
 {
-    return static_cast<QnClientMessageProcessor*>(this->messageProcessor());
+    return systemContext()->clientMessageProcessor();
 }
 
 QnUuid SystemContextAware::currentServerId() const

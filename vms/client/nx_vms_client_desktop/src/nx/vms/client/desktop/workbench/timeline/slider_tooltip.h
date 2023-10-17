@@ -11,7 +11,7 @@ class SliderToolTip: public BubbleToolTip
     Q_OBJECT
 
 public:
-    explicit SliderToolTip(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit SliderToolTip(WindowContext* context, QObject* parent = nullptr);
 
 protected:
     using BubbleToolTip::BubbleToolTip;

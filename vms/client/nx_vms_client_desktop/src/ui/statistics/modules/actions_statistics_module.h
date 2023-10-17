@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/ui/actions/action_fwd.h>
+#include <nx/vms/client/desktop/menu/action_fwd.h>
 #include <statistics/abstract_statistics_module.h>
 #include <statistics/base/base_fwd.h>
 
@@ -19,7 +19,7 @@ public:
 
     virtual ~QnActionsStatisticsModule();
 
-    void setActionManager(const nx::vms::client::desktop::ui::action::ManagerPtr& manager);
+    void setActionManager(const nx::vms::client::desktop::menu::ManagerPtr& manager);
 
     QnStatisticValuesHash values() const override;
 
@@ -28,6 +28,6 @@ public:
 private:
     typedef QList<QnStatisticsValuesProviderPtr> ModulesList;
 
-    nx::vms::client::desktop::ui::action::ManagerPtr m_actionManager;
+    nx::vms::client::desktop::menu::ManagerPtr m_actionManager;
     ModulesList m_modules;
 };

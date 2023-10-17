@@ -146,12 +146,12 @@ struct LookupListActionHandler::Private
 LookupListActionHandler::LookupListActionHandler(QObject* parent):
     base_type(parent), QnWorkbenchContextAware(parent), d(new Private{.q = this})
 {
-    connect(action(ui::action::OpenListsManagementAction),
+    connect(action(menu::OpenListsManagementAction),
         &QAction::triggered,
         this,
         &LookupListActionHandler::openLookupListsManagementDialog);
 
-    connect(action(ui::action::OpenLookupListsDialogAction), &QAction::triggered, this,
+    connect(action(menu::OpenLookupListsDialogAction), &QAction::triggered, this,
         &LookupListActionHandler::openLookupListsDialog);
 
     connect(lookupListManager(), &common::LookupListManager::initialized, this,

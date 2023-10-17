@@ -7,16 +7,19 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <nx/utils/string.h>
-#include <ui/models/resource/resource_list_model.h>
-#include <nx/vms/client/desktop/common/utils/aligner.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <ui/models/resource/resource_list_model.h>
 
 using namespace nx::vms::client::desktop;
 
-QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(QWidget* parent, const QnMediaServerResourcePtr& selectedServer):
+QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(
+    QWidget* parent, const QnMediaServerResourcePtr& selectedServer)
+    :
     base_type(parent),
     ui(new Ui::NewVirtualCameraDialog)
 {
@@ -29,12 +32,13 @@ QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(QWidget* parent, const QnMedi
     //setHelpTopic(, Qn::);
 
     /* Set up combobox. */
-    QnResourceList servers = resourcePool()->servers();
-    auto nameLess = [](const QnResourcePtr& l, const QnResourcePtr& r) { return l->getName() < r->getName(); };
+    QnResourceList servers = systemContext()->resourcePool()->servers();
+    auto nameLess =
+        [](const QnResourcePtr& l, const QnResourcePtr& r) { return l->getName() < r->getName(); };
     std::sort(servers.begin(), servers.end(), nameLess);
     auto selectedServerIndex = servers.indexOf(selectedServer);
     if (selectedServerIndex == -1)
-        selectedServerIndex = servers.indexOf(currentServer());
+        selectedServerIndex = servers.indexOf(systemContext()->currentServer());
 
     m_model = new QnResourceListModel(this);
     m_model->setHasCheckboxes(false);
@@ -54,7 +58,7 @@ QnNewVirtualCameraDialog::QnNewVirtualCameraDialog(QWidget* parent, const QnMedi
 
     /* Set up name edit. */
     QStringList usedNames;
-    for (const auto& camera: resourcePool()->getAllCameras())
+    for (const auto& camera: systemContext()->resourcePool()->getAllCameras())
         usedNames.push_back(camera->getName());
 
     QString name = nx::utils::generateUniqueString(

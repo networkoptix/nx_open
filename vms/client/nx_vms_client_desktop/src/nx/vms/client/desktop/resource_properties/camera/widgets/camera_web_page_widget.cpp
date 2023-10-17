@@ -198,7 +198,6 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
 
     d->webWidget->controller()->setAuthenticator(
         std::make_shared<CameraWebAuthenticator>(
-            systemContext(),
             camera,
             targetUrl,
             state.credentials.login.valueOr(QString{}),
