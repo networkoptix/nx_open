@@ -72,7 +72,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             "objectTypeId": "nx.stub.hiddenDerivedObjectTypeWithOwnAttributes",
             "attributes":
             [
-                "Attribute of a hidden derived Object Type"
+                "Own Attribute of a hidden derived Object Type"
             ]
         },
         {
@@ -348,7 +348,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
                 [
                     {
                         "type": "String",
-                        "name": "Attribute of a hidden derived Object Type"
+                        "name": "Own Attribute of a hidden derived Object Type"
                     }
                 ]
             },
