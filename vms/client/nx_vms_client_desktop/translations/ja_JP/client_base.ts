@@ -1362,7 +1362,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
       <translation>
-        <numerusform>%n ライセンスの %1 を無効化することはできません</numerusform>
+        <numerusform>%1 / %n ライセンスを無効化できません</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5099,7 +5099,7 @@ to %1</source>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation>ライセンスが不足しています</translation>
+      <translation>ライセンス不足</translation>
     </message>
     <message>
       <source>OFFLINE</source>
