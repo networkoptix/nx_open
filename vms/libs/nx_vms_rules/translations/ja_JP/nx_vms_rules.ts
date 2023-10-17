@@ -647,11 +647,11 @@
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>%1のストレージエラー</translation>
+      <translation>%1のストレージ障害</translation>
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation>ストレージエラー</translation>
+      <translation>ストレージ障害</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>

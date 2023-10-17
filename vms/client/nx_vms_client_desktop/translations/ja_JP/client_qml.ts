@@ -1206,7 +1206,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation>ライセンスが足りません</translation>
+      <translation>ライセンスが不足しています</translation>
     </message>
     <message>
       <source>Server unavailable</source>
