@@ -1,9 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <QtQml/QtQml>
-
 #include "session_aware_attached.h"
 
+#include <QtQml/QtQml>
+
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 namespace nx::vms::client::desktop {
@@ -13,9 +14,11 @@ struct SessionAwareAttached::Private: public QnSessionAwareDelegate
     using base_type = QnSessionAwareDelegate;
 
     Private(SessionAwareAttached* sessionAwareAttached, QObject* parent):
-        base_type(parent, InitializationMode::qmlContext),
+        base_type(parent),
         q(sessionAwareAttached)
     {
+        QObject::connect(windowContext(), &WindowContext::systemChanged, q,
+            [this] {emit q->forcedUpdate(); } );
     }
 
     bool tryClose(bool force) override
@@ -27,11 +30,6 @@ struct SessionAwareAttached::Private: public QnSessionAwareDelegate
         emit q->tryClose(&closeEvent);
 
         return closeEvent.accepted;
-    }
-
-    void forcedUpdate() override
-    {
-        emit q->forcedUpdate();
     }
 
     SessionAwareAttached* const q;

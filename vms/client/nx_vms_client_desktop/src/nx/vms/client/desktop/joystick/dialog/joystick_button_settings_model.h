@@ -5,7 +5,7 @@
 #include <QtCore/QAbstractTableModel>
 
 #include <nx/utils/impl_ptr.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 #include "../settings/device.h"
 
@@ -17,7 +17,7 @@ namespace joystick {
 
 struct JoystickDescriptor;
 
-class JoystickButtonSettingsModel: public QAbstractTableModel, public QnWorkbenchContextAware
+class JoystickButtonSettingsModel: public QAbstractTableModel, public WindowContextAware
 {
     Q_OBJECT
 
@@ -69,7 +69,8 @@ public:
     Q_ENUM(ColumnType)
 
 public:
-    explicit JoystickButtonSettingsModel(
+    JoystickButtonSettingsModel(
+        WindowContext* windowContext,
         FilteredResourceProxyModel* resourceModel,
         QObject* parent);
     virtual ~JoystickButtonSettingsModel() override;

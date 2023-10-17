@@ -37,10 +37,9 @@ QnVirtualCameraResourcePtr findCameraByName(QnResourcePool* resourcePool, const 
 
 } // namespace
 
-struct External::Private: public QObject
+struct External::Private: public QObject, public WindowContextAware
 {
     Private(
-        QnWorkbenchContext* context,
         External* q,
         QnWorkbenchItem* item);
 
@@ -49,19 +48,17 @@ struct External::Private: public QObject
         std::chrono::milliseconds timestamp);
 
     External* const q;
-    QnWorkbenchContext* const context;
     const QPointer<QnWorkbenchLayout> layout;
     const QPointer<QnWorkbenchItem> widgetItem;
 };
 
 External::Private::Private(
-    QnWorkbenchContext* context,
     External* q,
     QnWorkbenchItem* item)
     :
+    WindowContextAware(item->layout()),
     q(q),
-    context(context),
-    layout(context->workbench()->currentLayout()),
+    layout(item->layout()),
     widgetItem(item)
 {
 }
@@ -135,34 +132,33 @@ void External::Private::resetC2pLayout(
 
     if (!activeItemId.isNull())
     {
-        context->workbench()->setItem(
+        workbench()->setItem(
             Qn::CentralRole,
-            context->workbench()->currentLayout()->item(activeItemId));
+            workbench()->currentLayout()->item(activeItemId));
     }
 
     // If at least one camera is opened, navigate to the given time.
-    if (!context->navigator()->isPlayingSupported())
+    if (!navigator()->isPlayingSupported())
         return;
 
     // Forcefully enable sync.
     std::chrono::microseconds timestampUs = timestamp;
-    auto streamSynchronizer = context->workbench()->windowContext()->streamSynchronizer();
+    auto streamSynchronizer = windowContext()->streamSynchronizer();
     streamSynchronizer->start(/*timeUSec*/ timestampUs.count(), /*speed*/ 0.0);
 
-    context->navigator()->setPlaying(false);
-    context->navigator()->setLive(false);
-    context->navigator()->setPosition(timestampUs.count());
+    navigator()->setPlaying(false);
+    navigator()->setLive(false);
+    navigator()->setPosition(timestampUs.count());
 }
 
 //-------------------------------------------------------------------------------------------------
 
 External::External(
-    QnWorkbenchContext* context,
     QnWorkbenchItem* item,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(context, this, item))
+    d(new Private(this, item))
 {
 }
 
@@ -173,7 +169,7 @@ External::~External()
 void External::c2pplayback(const QString& cameraNames, int timestampSec)
 {
     QnVirtualCameraResourceList cameras;
-    const auto pool = d->context->resourcePool();
+    const auto pool = d->system()->resourcePool();
 
     const auto names = cameraNames.split(',', Qt::SkipEmptyParts);
     for (auto name: names)

@@ -12,12 +12,12 @@ class QPoint;
 
 namespace nx::vms::client::desktop {
 
-namespace ui::action {
+namespace menu {
 
 class Manager;
 class Parameters;
 
-} // namespace ui::action
+} // namespace menu
 
 namespace ResourceTree { enum class ActivationType; }
 
@@ -27,7 +27,7 @@ class ResourceTreeInteractionHandler: public QObject, public QnWorkbenchContextA
     using base_type = QObject;
 
 public:
-    using ActionManager = nx::vms::client::desktop::ui::action::Manager;
+    using ActionManager = nx::vms::client::desktop::menu::Manager;
 
     explicit ResourceTreeInteractionHandler(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~ResourceTreeInteractionHandler() override;
@@ -66,14 +66,14 @@ public:
     void activateSearchResults(const QModelIndexList& indexes, Qt::KeyboardModifiers modifiers);
 
     /**
-     * Method exposed only for QnResourceBrowserWidget implementation of ui::action::TargetProvider
+     * Method exposed only for QnResourceBrowserWidget implementation of menu::TargetProvider
      * interface.
      * @note Probably it will be removed in the future.
      * @param index Item view's current index.
      * @param selection Item view model indexes of currently selected items.
      * @returns Action parameters for given item view state.
      */
-    ui::action::Parameters actionParameters(const QModelIndex& index,
+    menu::Parameters actionParameters(const QModelIndex& index,
         const QModelIndexList& selection);
 
 signals:

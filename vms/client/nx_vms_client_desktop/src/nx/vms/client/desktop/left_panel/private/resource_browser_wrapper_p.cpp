@@ -15,10 +15,11 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../left_panel_widget.h"
@@ -62,7 +63,7 @@ public:
         if (!flags.testFlag(ClientStateDelegate::Substate::systemSpecificParameters))
             return false;
 
-        q->context()->resourceTreeSettings()->setShowServersInTree(
+        q->workbenchContext()->resourceTreeSettings()->setShowServersInTree(
             state.value(kShowServersInTreeKey).toBool(/*default value*/ true));
 
         if (!NX_ASSERT(q->resourceBrowser))
@@ -103,7 +104,7 @@ public:
         q->tree.model()->setAutoExpandedNodes(nodeIds);
 
         reportStatistics("left_panel_servers_visible",
-            q->context()->resourceTreeSettings()->showServersInTree());
+            q->workbenchContext()->resourceTreeSettings()->showServersInTree());
 
         return true;
     }
@@ -113,7 +114,8 @@ public:
         if (!flags.testFlag(ClientStateDelegate::Substate::systemSpecificParameters))
             return;
 
-        (*state)[kShowServersInTreeKey] = q->context()->resourceTreeSettings()->showServersInTree();
+        (*state)[kShowServersInTreeKey] = q->workbenchContext()->resourceTreeSettings()
+            ->showServersInTree();
 
         if (!NX_ASSERT(q->resourceBrowser))
             return;
@@ -137,11 +139,11 @@ public:
 };
 
 ResourceBrowserWrapper::ResourceBrowserWrapper(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QmlProperty<QQuickItem*> resourceBrowser,
     QWidget* focusScope)
     :
-    QnWorkbenchContextAware(context),
+    WindowContextAware(context),
     resourceBrowser(resourceBrowser),
     m_layoutInfo(new WorkbenchLayoutInfo(context, this)),
     m_focusScope(focusScope)
@@ -149,21 +151,21 @@ ResourceBrowserWrapper::ResourceBrowserWrapper(
     appContext()->clientStateHandler()->registerDelegate(
         kResourceBrowserStateDelegateId, std::make_unique<StateDelegate>(this));
 
-    connect(action(ui::action::SearchResourcesAction), &QAction::triggered, this,
+    connect(action(menu::SearchResourcesAction), &QAction::triggered, this,
         [this]()
         {
             if (m_focusScope)
                 m_focusScope->setFocus(Qt::ShortcutFocusReason);
-            action(ui::action::ResourcesTabAction)->trigger();
+            action(menu::ResourcesTabAction)->trigger();
             invokeQmlMethod<void>(this->resourceBrowser, "focusSearchField");
         });
 
-    connect(action(ui::action::EditResourceInTreeAction), &QAction::triggered, this,
+    connect(action(menu::EditResourceInTreeAction), &QAction::triggered, this,
         [this]()
         {
             if (m_focusScope)
                 m_focusScope->setFocus(Qt::ShortcutFocusReason);
-            action(ui::action::ResourcesTabAction)->trigger();
+            action(menu::ResourcesTabAction)->trigger();
             tree.startEditing();
         });
 
@@ -174,28 +176,28 @@ ResourceBrowserWrapper::ResourceBrowserWrapper(
                 return;
 
             QScopedValueRollback<bool> guard(m_inSelection, true);
-            action(ui::action::SelectionChangeAction)->trigger();
+            action(menu::SelectionChangeAction)->trigger();
         });
 
-    connect(action(ui::action::SelectionChangeAction), &QAction::triggered,
+    connect(action(menu::SelectionChangeAction), &QAction::triggered,
         this, &ResourceBrowserWrapper::clearResourceSelection);
 
-    connect(action(ui::action::SelectNewItemAction), &QAction::triggered,
+    connect(action(menu::SelectNewItemAction), &QAction::triggered,
         this, &ResourceBrowserWrapper::handleNewResourceItemAction);
 
-    connect(action(ui::action::CreateNewCustomGroupAction), &QAction::triggered,
+    connect(action(menu::CreateNewCustomGroupAction), &QAction::triggered,
         this, &ResourceBrowserWrapper::beforeGroupProcessing);
 
-    connect(action(ui::action::RenameCustomGroupAction), &QAction::triggered,
+    connect(action(menu::RenameCustomGroupAction), &QAction::triggered,
         this, &ResourceBrowserWrapper::beforeGroupProcessing);
 
-    connect(action(ui::action::NewCustomGroupCreatedEvent), &QAction::triggered, this,
-        [this]() { afterGroupProcessing(ui::action::NewCustomGroupCreatedEvent); });
+    connect(action(menu::NewCustomGroupCreatedEvent), &QAction::triggered, this,
+        [this]() { afterGroupProcessing(menu::NewCustomGroupCreatedEvent); });
 
-    connect(action(ui::action::CustomGroupRenamedEvent), &QAction::triggered, this,
-        [this]() { afterGroupProcessing(ui::action::CustomGroupRenamedEvent); });
+    connect(action(menu::CustomGroupRenamedEvent), &QAction::triggered, this,
+        [this]() { afterGroupProcessing(menu::CustomGroupRenamedEvent); });
 
-    connect(action(ui::action::SelectAllAction), &QAction::triggered,
+    connect(action(menu::SelectAllAction), &QAction::triggered,
         this, &ResourceBrowserWrapper::handleSelectAllAction);
 
     // Initialization after the QML component is loaded.
@@ -219,10 +221,10 @@ ResourceBrowserWrapper::~ResourceBrowserWrapper()
     appContext()->clientStateHandler()->unregisterDelegate(kResourceBrowserStateDelegateId);
 }
 
-ui::action::Parameters ResourceBrowserWrapper::currentParameters() const
+menu::Parameters ResourceBrowserWrapper::currentParameters() const
 {
     if (!tree)
-        return ui::action::Parameters();
+        return menu::Parameters();
 
     return tree.model.value()->actionParameters(
         tree.currentIndex,
@@ -270,13 +272,13 @@ void ResourceBrowserWrapper::handleNewResourceItemAction()
         1,
         Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
 
-    action(ui::action::ResourcesTabAction)->trigger();
+    action(menu::ResourcesTabAction)->trigger();
     tree.setSelection(indexes);
 }
 
 void ResourceBrowserWrapper::handleSelectAllAction()
 {
-    if (menu()->targetProvider()->currentScope() != ui::action::TreeScope || !tree)
+    if (menu()->targetProvider()->currentScope() != menu::TreeScope || !tree)
         return;
 
     const auto currentIndex = tree.currentIndex.value();
@@ -339,7 +341,7 @@ void ResourceBrowserWrapper::beforeGroupProcessing()
     saveGroupExpandedState(selection);
 }
 
-void ResourceBrowserWrapper::afterGroupProcessing(ui::action::IDType eventType)
+void ResourceBrowserWrapper::afterGroupProcessing(menu::IDType eventType)
 {
     const auto cleanupGuard = nx::utils::makeScopeGuard(
         [this]()
@@ -351,9 +353,9 @@ void ResourceBrowserWrapper::afterGroupProcessing(ui::action::IDType eventType)
     if (!tree || !NX_ASSERT(m_nestedResourceIndex.isValid()))
         return;
 
-    if (eventType == ui::action::NewCustomGroupCreatedEvent)
+    if (eventType == menu::NewCustomGroupCreatedEvent)
         ++m_nestedResourceLevel;
-    else if (!NX_ASSERT(eventType == ui::action::CustomGroupRenamedEvent))
+    else if (!NX_ASSERT(eventType == menu::CustomGroupRenamedEvent))
         return;
 
     QModelIndex index = m_nestedResourceIndex;
@@ -367,7 +369,7 @@ void ResourceBrowserWrapper::afterGroupProcessing(ui::action::IDType eventType)
 
         restoreGroupExpandedState(index);
 
-        if (eventType == ui::action::NewCustomGroupCreatedEvent)
+        if (eventType == menu::NewCustomGroupCreatedEvent)
             tree.startEditing();
     }
 }

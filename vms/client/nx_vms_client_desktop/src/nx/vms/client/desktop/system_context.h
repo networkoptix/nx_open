@@ -17,17 +17,22 @@ class QnServerStorageManager;
 
 namespace nx::vms::client::desktop {
 
+class AnalyticsEventsSearchTreeBuilder;
+class DefaultPasswordCamerasWatcher;
 class LayoutSnapshotManager;
 class LdapStatusWatcher;
 class LogsManagementWatcher;
+class NonEditableUsersAndGroups;
+class RemoteSession;
 class RestApiHelper;
 class ShowreelStateManager;
 class ServerRuntimeEventConnector;
+class SystemInternetAccessWatcher;
+class SystemHealthState;
 class SystemSpecificLocalSettings;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
-class NonEditableUsersAndGroups;
 
 namespace analytics { class TaxonomyManager; }
 
@@ -59,6 +64,21 @@ public:
     static void registerQmlType();
     static SystemContext* fromResource(const QnResourcePtr& resource);
 
+    /**
+     * This method should be called only when user clicks "Push my screen", but until 2-way audio
+     * is reimplemented, we should initialize camera as soon as possible.
+     * TODO: #sivanov Fix QnLocalSettingsDialog also when it is done.
+     */
+    void initializeDesktopCamera();
+
+    /**
+     * Overload of the corresponding function from core context.
+     *
+     * Remote session this context belongs to (if any).
+     */
+    std::shared_ptr<RemoteSession> session() const;
+
+    AnalyticsEventsSearchTreeBuilder* analyticsEventsSearchTreeBuilder() const;
     VideoWallOnlineScreensWatcher* videoWallOnlineScreensWatcher() const;
     LdapStatusWatcher* ldapStatusWatcher() const;
     NonEditableUsersAndGroups* nonEditableUsersAndGroups() const;
@@ -77,6 +97,8 @@ public:
     QnUuid localSystemId() const;
     Q_INVOKABLE nx::vms::client::desktop::analytics::TaxonomyManager* taxonomyManager() const;
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;
+    DefaultPasswordCamerasWatcher* defaultPasswordCamerasWatcher() const;
+    SystemHealthState* systemHealthState() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

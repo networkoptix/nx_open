@@ -59,7 +59,7 @@ NxObject
     {
         id: popup
 
-        viewport: workbenchContext.mainWindow
+        viewport: windowContext.mainWindow
 
         visible: bubble.visible
 

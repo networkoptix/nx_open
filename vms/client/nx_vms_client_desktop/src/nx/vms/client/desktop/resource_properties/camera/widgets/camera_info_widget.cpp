@@ -77,16 +77,16 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
         [this]() { ClipboardButton::setClipboardText(ui->cameraIdLabel->text()); });
 
     connect(ui->pingButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(ui::action::PingAction); });
+        [this]() { emit actionRequested(menu::PingAction); });
 
     connect(ui->eventLogButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(ui::action::CameraIssuesAction); });
+        [this]() { emit actionRequested(menu::CameraIssuesAction); });
 
     connect(ui->cameraRulesButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(ui::action::CameraBusinessRulesAction); });
+        [this]() { emit actionRequested(menu::CameraBusinessRulesAction); });
 
     connect(ui->showOnLayoutButton, &QPushButton::clicked, this,
-        [this]() { emit actionRequested(ui::action::OpenInNewTabAction); });
+        [this]() { emit actionRequested(menu::OpenInNewTabAction); });
 }
 
 CameraInfoWidget::~CameraInfoWidget()

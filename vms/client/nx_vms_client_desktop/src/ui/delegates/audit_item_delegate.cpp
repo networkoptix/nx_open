@@ -436,7 +436,7 @@ void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, 
     /* Get date and time strings: */
 
     // TODO: #sivanov Actualize used system context.
-    const auto serverTimeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
+    const auto serverTimeWatcher = system()->serverTimeWatcher();
     QDateTime dateTime = serverTimeWatcher->displayTime(dateTimeSecs * 1000ll);
     QString dateStr = nx::vms::time::toString(dateTime.date()) + lit(" ");
     QString timeStr = nx::vms::time::toString(dateTime.time());
@@ -477,8 +477,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
         case Qn::AR_ExportVideo:
         {
             // TODO: #sivanov Actualize used system context.
-            const auto serverTimeWatcher =
-                appContext()->currentSystemContext()->serverTimeWatcher();
+            const auto serverTimeWatcher = system()->serverTimeWatcher();
             const auto rangeStartTime = nx::vms::time::toString(serverTimeWatcher->displayTime(
                 record->rangeStartSec * 1000ll));
             const auto rangeEndTime = nx::vms::time::toString(serverTimeWatcher->displayTime(

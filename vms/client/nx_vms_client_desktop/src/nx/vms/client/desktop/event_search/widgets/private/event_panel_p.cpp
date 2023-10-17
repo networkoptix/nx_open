@@ -38,14 +38,15 @@
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/variant_animator.h>
@@ -181,9 +182,9 @@ private:
 
 EventPanel::Private::Private(EventPanel* q):
     QObject(q),
-    QnWorkbenchContextAware(q),
+    WindowContextAware(q),
     q(q),
-    m_tooltip(new ThumbnailTooltip(q->context()))
+    m_tooltip(new ThumbnailTooltip(q->windowContext()))
 {
     if (ini().newPanelsLayout)
     {
@@ -212,21 +213,22 @@ EventPanel::Private::Private(EventPanel* q):
         m_tabs = new AnimatedCompactTabWidget(compactTabBar, q);
         m_tabs->setStyleSheet("QTabWidget::tab-bar { left: -1px; } ");
 
+        const auto context = windowContext();
         m_notificationsTab = new NotificationListWidget(m_tabs);
         m_counterLabel = new NotificationCounterLabel(m_tabs->tabBar());
-        m_motionTab = new SimpleMotionSearchWidget(context(), m_tabs);
-        m_bookmarksTab = new OverlappableSearchWidget(new BookmarkSearchWidget(context()), m_tabs);
-        m_eventsTab = new OverlappableSearchWidget(new EventSearchWidget(context()), m_tabs);
-        m_vmsEventsTab = new OverlappableSearchWidget(new VmsEventSearchWidget(context()), m_tabs);
-        m_analyticsTab = new OverlappableSearchWidget(new AnalyticsSearchWidget(context()), m_tabs);
+        m_motionTab = new SimpleMotionSearchWidget(context, m_tabs);
+        m_bookmarksTab = new OverlappableSearchWidget(new BookmarkSearchWidget(context), m_tabs);
+        m_eventsTab = new OverlappableSearchWidget(new EventSearchWidget(context), m_tabs);
+        m_vmsEventsTab = new OverlappableSearchWidget(new VmsEventSearchWidget(context), m_tabs);
+        m_analyticsTab = new OverlappableSearchWidget(new AnalyticsSearchWidget(context), m_tabs);
 
         m_synchronizers = {
             {m_motionTab, m_motionTab, new MotionSearchSynchronizer(
-                context(), m_motionTab->commonSetup(), m_motionTab->motionModel(), this)},
+                context, m_motionTab->commonSetup(), m_motionTab->motionModel(), this)},
             {m_bookmarksTab, m_bookmarksTab->searchWidget(), new BookmarkSearchSynchronizer(
-                context(), m_bookmarksTab->searchWidget()->commonSetup(), this)},
+                context, m_bookmarksTab->searchWidget()->commonSetup(), this)},
             {m_analyticsTab, m_analyticsTab->searchWidget(), new AnalyticsSearchSynchronizer(
-                context(),
+                context,
                 m_analyticsTab->searchWidget()->commonSetup(),
                 static_cast<AnalyticsSearchWidget*>(m_analyticsTab->searchWidget())->analyticsSetup(),
                 this)}};
@@ -295,13 +297,13 @@ EventPanel::Private::Private(EventPanel* q):
                     m_tabIds.value(m_lastTab), EventPanel::QPrivateSignal());
             });
 
-        connect(action(ui::action::NotificationsTabAction), &QAction::triggered, this,
+        connect(action(menu::NotificationsTabAction), &QAction::triggered, this,
             [this] { setCurrentTab(Tab::notifications); });
 
-        connect(action(ui::action::MotionTabAction), &QAction::triggered, this,
+        connect(action(menu::MotionTabAction), &QAction::triggered, this,
             [this] { setCurrentTab(Tab::motion); });
 
-        connect(action(ui::action::SwitchMotionTabAction), &QAction::triggered, this,
+        connect(action(menu::SwitchMotionTabAction), &QAction::triggered, this,
             [this]
             {
                 if (currentTab() == Tab::motion)
@@ -310,14 +312,14 @@ EventPanel::Private::Private(EventPanel* q):
                     setCurrentTab(Tab::motion);
             });
 
-        connect(action(ui::action::BookmarksTabAction), &QAction::triggered, this,
+        connect(action(menu::BookmarksTabAction), &QAction::triggered, this,
             [this] { setCurrentTab(Tab::bookmarks); });
 
         // TODO: #amalov Support new vms events tab.
-        connect(action(ui::action::EventsTabAction), &QAction::triggered, this,
+        connect(action(menu::EventsTabAction), &QAction::triggered, this,
             [this] { setCurrentTab(Tab::events); });
 
-        connect(action(ui::action::ObjectsTabAction), &QAction::triggered, this,
+        connect(action(menu::ObjectsTabAction), &QAction::triggered, this,
             [this] { setCurrentTab(Tab::analytics); });
 
         connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
@@ -565,9 +567,9 @@ void EventPanel::Private::showContextMenu(const QPoint& pos)
 {
     QMenu contextMenu;
     const auto actions = {
-        ui::action::OpenBusinessLogAction,
-        ui::action::BusinessEventsAction,
-        ui::action::PreferencesNotificationTabAction};
+        menu::OpenBusinessLogAction,
+        menu::BusinessEventsAction,
+        menu::PreferencesNotificationTabAction};
 
     for (const auto actionId: actions)
     {

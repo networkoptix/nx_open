@@ -6,16 +6,16 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/action_types.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/action_types.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/common/help_topic_queryable.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class QmlResourceBrowserWidget:
     public QQuickWidget,
-    public QnWorkbenchContextAware,
+    public WindowContextAware,
     public HelpTopicQueryable
 {
     Q_OBJECT
@@ -23,7 +23,7 @@ class QmlResourceBrowserWidget:
     using base_type = QQuickWidget;
 
 public:
-    QmlResourceBrowserWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    QmlResourceBrowserWidget(WindowContext* context, QWidget* parent = nullptr);
     virtual ~QmlResourceBrowserWidget() override;
 
     /** A horizontal position controlled by open/closed panel transitions. */
@@ -33,7 +33,7 @@ public:
     qreal opacity() const;
     void setOpacity(qreal value);
 
-    ui::action::Parameters currentParameters(ui::action::ActionScope scope) const;
+    menu::Parameters currentParameters(menu::ActionScope scope) const;
 
 signals:
     void positionChanged();

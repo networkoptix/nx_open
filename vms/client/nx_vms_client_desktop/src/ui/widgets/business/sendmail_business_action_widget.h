@@ -7,8 +7,7 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui { class SendmailBusinessActionWidget; }
-
-class QnWorkbenchContext;
+namespace nx::vms::client::desktop { class WindowContext; }
 
 class QnSendmailBusinessActionWidget : public QnAbstractBusinessParamsWidget
 {
@@ -17,7 +16,7 @@ class QnSendmailBusinessActionWidget : public QnAbstractBusinessParamsWidget
 
 public:
     explicit QnSendmailBusinessActionWidget(
-        QnWorkbenchContext* context,
+        nx::vms::client::desktop::WindowContext* context,
         QWidget* parent = nullptr);
     ~QnSendmailBusinessActionWidget();
 

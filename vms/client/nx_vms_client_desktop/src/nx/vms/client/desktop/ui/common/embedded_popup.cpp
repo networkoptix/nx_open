@@ -11,16 +11,16 @@
 
 #include <QtCore/QMarginsF>
 #include <QtCore/QPointer>
-#include <QtWidgets/QWidget>
-#include <QtQuickWidgets/QQuickWidget>
 #include <QtQml/QtQml>
+#include <QtQuickWidgets/QQuickWidget>
+#include <QtWidgets/QWidget>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
+#include <utils/common/event_processors.h>
 
 namespace nx::vms::client::desktop {
 
@@ -47,7 +47,7 @@ struct EmbeddedPopup::Private
 
     std::unique_ptr<QQuickWidget> quickWidget{ini().debugDisableQmlTooltips
         ? (QQuickWidget*) nullptr
-        : new QQuickWidget(qnClientCoreModule->mainQmlEngine(), nullptr)};
+        : new QQuickWidget(appContext()->qmlEngine(), nullptr)};
 
     std::unique_ptr<QObject> viewportEventHandler;
 

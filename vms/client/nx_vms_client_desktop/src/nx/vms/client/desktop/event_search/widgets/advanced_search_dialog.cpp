@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "advanced_search_dialog.h"
-#include "private/advanced_search_dialog_p.h"
 
 #include <memory>
 
@@ -11,13 +10,14 @@
 #include <QtQuick/QQuickWindow>
 #include <QtWidgets/QWidget>
 
-#include <common/common_module.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
+
+#include "private/advanced_search_dialog_p.h"
 
 template<>
 nx::vms::client::desktop::AdvancedSearchDialog::StateDelegate*
@@ -45,7 +45,8 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget* parent) :
         parent),
     QnSessionAwareDelegate(parent)
 {
-    rootObjectHolder()->object()->setProperty("workbenchContext", QVariant::fromValue(context()));
+    rootObjectHolder()->object()->setProperty(
+        "workbenchContext", QVariant::fromValue(workbenchContext()));
 
     connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,
         this, &QObject::deleteLater);
@@ -143,10 +144,6 @@ bool AdvancedSearchDialog::tryClose(bool /*force*/)
 {
     reject();
     return true;
-}
-
-void AdvancedSearchDialog::forcedUpdate()
-{
 }
 
 // ------------------------------------------------------------------------------------------------

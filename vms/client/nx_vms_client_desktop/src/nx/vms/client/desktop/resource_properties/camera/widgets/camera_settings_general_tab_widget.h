@@ -8,7 +8,7 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 
 namespace Ui { class CameraSettingsGeneralTabWidget; }
 
@@ -34,7 +34,7 @@ public:
     virtual ~CameraSettingsGeneralTabWidget() override;
 
 signals:
-    void actionRequested(nx::vms::client::desktop::ui::action::IDType action);
+    void actionRequested(nx::vms::client::desktop::menu::IDType action);
 
 private:
     void loadState(const CameraSettingsDialogState& state);

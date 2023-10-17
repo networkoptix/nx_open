@@ -13,19 +13,17 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/hidpi_workarounds.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
 
 // TODO: #dklychkov Uncomment when cloud login is implemented
 //#define DIRECT_CLOUD_CONNECT
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 using nx::vms::client::core::CloudStatusWatcher;
 
 namespace {
@@ -58,9 +56,12 @@ public:
     QIcon offlineIcon;      /*< User is logged in, but cloud is unreachable. */
 };
 
-QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
+QnCloudStatusPanel::QnCloudStatusPanel(
+    nx::vms::client::desktop::WindowContext* windowContext,
+    QWidget* parent)
+    :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     d_ptr(new QnCloudStatusPanelPrivate(this))
 {
     Q_D(QnCloudStatusPanel);
@@ -80,34 +81,35 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher,
         &CloudStatusWatcher::updateSystems);
 
-    auto showMenu = [this, d]
-    {
-        if (qnCloudStatusWatcher->status() == CloudStatusWatcher::LoggedOut)
+    auto showMenu =
+        [this, d]
         {
-            context()->menu()->trigger(action::LoginToCloud);
-            return;
-        }
-
-        const auto menu =
-            [d]() -> QMenu*
+            if (qnCloudStatusWatcher->status() == CloudStatusWatcher::LoggedOut)
             {
-                switch (qnCloudStatusWatcher->status())
+                this->windowContext()->menu()->trigger(menu::LoginToCloud);
+                return;
+            }
+
+            const auto menu =
+                [d]() -> QMenu*
                 {
-                    case CloudStatusWatcher::Online:
-                        return d->loggedInMenu;
-                    case CloudStatusWatcher::Offline:
-                        return d->offlineMenu;
-                    default:
-                        return nullptr;
-                }
-            }();
+                    switch (qnCloudStatusWatcher->status())
+                    {
+                        case CloudStatusWatcher::Online:
+                            return d->loggedInMenu;
+                        case CloudStatusWatcher::Offline:
+                            return d->offlineMenu;
+                        default:
+                            return nullptr;
+                    }
+                }();
 
-        if (!menu)
-            return;
+            if (!menu)
+                return;
 
-        QnHiDpiWorkarounds::showMenu(menu,
-            QnHiDpiWorkarounds::safeMapToGlobal(this, rect().bottomLeft()));
-    };
+            QnHiDpiWorkarounds::showMenu(menu,
+                QnHiDpiWorkarounds::safeMapToGlobal(this, rect().bottomLeft()));
+        };
 
     connect(this, &QnCloudStatusPanel::clicked, this, showMenu);
 
@@ -153,9 +155,9 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
 {
     Q_Q(QnCloudStatusPanel);
     loggedInMenu->setWindowFlags(loggedInMenu->windowFlags());
-    loggedInMenu->addAction(q->action(action::OpenCloudMainUrl));
-    loggedInMenu->addAction(q->action(action::OpenCloudManagementUrl));
-    loggedInMenu->addAction(q->action(action::LogoutFromCloud));
+    loggedInMenu->addAction(q->action(menu::OpenCloudMainUrl));
+    loggedInMenu->addAction(q->action(menu::OpenCloudManagementUrl));
+    loggedInMenu->addAction(q->action(menu::LogoutFromCloud));
 
     auto offlineAction = new QAction(this);
     offlineAction->setText(QnCloudStatusPanel::tr("Cannot connect to %1",
@@ -165,7 +167,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
     offlineMenu->setWindowFlags(offlineMenu->windowFlags());
     offlineMenu->addAction(offlineAction);
     offlineMenu->addSeparator();
-    offlineMenu->addAction(q->action(action::LogoutFromCloud));
+    offlineMenu->addAction(q->action(menu::LogoutFromCloud));
 
     connect(qnCloudStatusWatcher, &CloudStatusWatcher::statusChanged, this,
         &QnCloudStatusPanelPrivate::updateUi);

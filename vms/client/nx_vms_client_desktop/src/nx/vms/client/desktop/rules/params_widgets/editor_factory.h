@@ -6,7 +6,7 @@
 
 #include "params_widget.h"
 
-class QnWorkbenchContext;
+class WindowContext;
 
 namespace nx::vms::client::desktop::rules {
 
@@ -15,7 +15,7 @@ class EventEditorFactory
 public:
     static ParamsWidget* createWidget(
         const vms::rules::ItemDescriptor& descriptor,
-        QnWorkbenchContext* context,
+        WindowContext* context,
         QWidget* parent = nullptr);
 };
 
@@ -24,7 +24,7 @@ class ActionEditorFactory
 public:
     static ParamsWidget* createWidget(
         const vms::rules::ItemDescriptor& descriptor,
-        QnWorkbenchContext* context,
+        WindowContext* context,
         QWidget* parent = nullptr);
 };
 

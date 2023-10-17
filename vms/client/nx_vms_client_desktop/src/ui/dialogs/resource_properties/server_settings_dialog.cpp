@@ -8,7 +8,6 @@
 #include <QtWidgets/QPushButton>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_state.h>
@@ -31,7 +31,6 @@
 #include <nx/vms/client/desktop/resource_properties/server/widgets/backup_settings_widget.h>
 #include <nx/vms/client/desktop/resource_properties/server/widgets/server_plugins_settings_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/widgets/properties/server_settings_widget.h>
 #include <ui/widgets/properties/storage_analytics_widget.h>
@@ -41,7 +40,6 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 struct QnServerSettingsDialog::Private
 {
@@ -71,7 +69,7 @@ struct QnServerSettingsDialog::Private
         storagesPage(new QnStorageConfigWidget(q)),
         poeSettingsPage(new PoeSettingsWidget(q)),
         pluginsPage(ini().pluginInformationInServerSettings
-            ? new ServerPluginsSettingsWidget(store, qnClientCoreModule->mainQmlEngine(), q)
+            ? new ServerPluginsSettingsWidget(store, appContext()->qmlEngine(), q)
             : nullptr),
         backupPage(new BackupSettingsWidget(store, q)),
         webPageLink(new QLabel(q))
@@ -126,7 +124,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
 
     setupShowWebServerLink();
 
-    connect(resourcePool(), &QnResourcePool::resourcesRemoved, this,
+    connect(system()->resourcePool(), &QnResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
         {
             if (resources.contains(d->server))
@@ -174,7 +172,7 @@ void QnServerSettingsDialog::setupShowWebServerLink()
     buttonsLayout->insertWidget(0, d->webPageLink);
     setHelpTopic(d->webPageLink, HelpTopic::Id::ServerSettings_WebClient);
     connect(d->webPageLink, &QLabel::linkActivated, this,
-        [this] { menu()->trigger(action::WebAdminAction, d->server); });
+        [this] { menu()->trigger(menu::WebAdminAction, d->server); });
 }
 
 QnMediaServerResourcePtr QnServerSettingsDialog::server() const
@@ -229,7 +227,7 @@ void QnServerSettingsDialog::retranslateUi()
     base_type::retranslateUi();
     if (d->server)
     {
-        const bool readOnly = !systemContext()->accessController()->hasPermissions(d->server,
+        const bool readOnly = !system()->accessController()->hasPermissions(d->server,
             Qn::WritePermission | Qn::SavePermission);
 
         setWindowTitle(readOnly

@@ -12,8 +12,6 @@
 #include <api/runtime_info_manager.h>
 #include <client/client_runtime_settings.h>
 #include <client/forgotten_systems_manager.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
 #include <finders/systems_finder.h>
@@ -38,12 +36,12 @@
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
@@ -80,9 +78,9 @@ namespace nx::vms::client::desktop {
 
 using core::CloudStatusWatcher;
 
-WelcomeScreen::WelcomeScreen(QWidget* parent):
-    base_type(qnClientCoreModule->mainQmlEngine(), parent),
-    QnWorkbenchContextAware(parent)
+WelcomeScreen::WelcomeScreen(WindowContext* context, QWidget* parent):
+    base_type(appContext()->qmlEngine(), parent),
+    WindowContextAware(context)
 {
     NX_ASSERT(qnRuntime->isDesktopMode());
 
@@ -163,7 +161,7 @@ void WelcomeScreen::showEvent(QShowEvent* event)
 {
     base_type::showEvent(event);
 
-    action(ui::action::EscapeHotkeyAction)->setEnabled(false);
+    action(menu::EscapeHotkeyAction)->setEnabled(false);
     emit gridEnabledChanged();
 }
 
@@ -173,7 +171,7 @@ void WelcomeScreen::hideEvent(QHideEvent* event)
 
     setGlobalPreloaderVisible(false); //< Auto toggle off preloader
 
-    action(ui::action::EscapeHotkeyAction)->setEnabled(true);
+    action(menu::EscapeHotkeyAction)->setEnabled(true);
     emit gridEnabledChanged();
 }
 
@@ -371,22 +369,7 @@ void WelcomeScreen::abortConnectionProcess()
 {
     NX_ASSERT(!m_connectingSystemId.isEmpty());
     m_connectingSystemId.clear();
-    menu()->trigger(ui::action::DisconnectAction, {Qn::ForceRole, true});
-}
-
-bool WelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)
-{
-    return !extractResources(urls, resourcePool()).isEmpty();
-}
-
-void WelcomeScreen::makeDrop(const QList<QUrl>& urls)
-{
-    const auto resources = extractResources(urls, resourcePool());
-    if (resources.isEmpty())
-        return;
-
-    if (menu()->triggerIfPossible(ui::action::DropResourcesAction, resources))
-        action(ui::action::ResourcesModeAction)->setChecked(true);
+    menu()->trigger(menu::DisconnectAction, {Qn::ForceRole, true});
 }
 
 void WelcomeScreen::connectToLocalSystem(
@@ -565,8 +548,8 @@ void WelcomeScreen::connectToSystemInternal(
 
             setConnectingToSystem(systemId);
 
-            menu()->trigger(ui::action::ConnectAction,
-                ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
+            menu()->trigger(menu::ConnectAction,
+                menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
         };
 
     // We have to use delayed execution to prevent client crash when stopping server that we are
@@ -581,13 +564,13 @@ void WelcomeScreen::connectToCloudSystem(const QString& systemId)
 
     setConnectingToSystem(systemId);
     CloudSystemConnectData connectData{systemId, ConnectScenario::connectFromTile};
-    menu()->trigger(ui::action::ConnectToCloudSystemAction,
-        ui::action::Parameters().withArgument(Qn::CloudSystemConnectDataRole, connectData));
+    menu()->trigger(menu::ConnectToCloudSystemAction,
+        menu::Parameters().withArgument(Qn::CloudSystemConnectDataRole, connectData));
 }
 
 void WelcomeScreen::connectToAnotherSystem()
 {
-    menu()->trigger(ui::action::OpenLoginDialogAction);
+    menu()->trigger(menu::OpenLoginDialogAction);
 }
 
 void WelcomeScreen::testSystemOnline(const QString& serverUrl)
@@ -663,22 +646,22 @@ void WelcomeScreen::setupFactorySystem(
 
 void WelcomeScreen::logoutFromCloud()
 {
-    menu()->trigger(ui::action::LogoutFromCloud);
+    menu()->trigger(menu::LogoutFromCloud);
 }
 
 void WelcomeScreen::manageCloudAccount()
 {
-    menu()->trigger(ui::action::OpenCloudManagementUrl);
+    menu()->trigger(menu::OpenCloudManagementUrl);
 }
 
 void WelcomeScreen::loginToCloud()
 {
-    menu()->trigger(ui::action::LoginToCloud);
+    menu()->trigger(menu::LoginToCloud);
 }
 
 void WelcomeScreen::createAccount()
 {
-    menu()->trigger(ui::action::OpenCloudRegisterUrl);
+    menu()->trigger(menu::OpenCloudRegisterUrl);
 }
 
 void WelcomeScreen::deleteSystem(const QString& systemId, const QString& localSystemId)

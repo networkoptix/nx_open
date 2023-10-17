@@ -21,12 +21,12 @@
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <recording/time_period.h>
@@ -46,7 +46,6 @@ using std::chrono::microseconds;
 using std::chrono::milliseconds;
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
@@ -59,21 +58,21 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(action::AddCameraBookmarkAction),     &QAction::triggered, this,
+    connect(action(menu::AddCameraBookmarkAction),     &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
-    connect(action(action::EditCameraBookmarkAction),    &QAction::triggered, this,
+    connect(action(menu::EditCameraBookmarkAction),    &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
-    connect(action(action::RemoveBookmarkAction),  &QAction::triggered, this,
+    connect(action(menu::RemoveBookmarkAction),  &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
-    connect(action(action::RemoveBookmarksAction),       &QAction::triggered, this,
+    connect(action(menu::RemoveBookmarksAction),       &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered);
-    connect(action(action::BookmarksModeAction),         &QAction::toggled,   this,
+    connect(action(menu::BookmarksModeAction),         &QAction::toggled,   this,
         &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
 
     const auto getActionParamsFunc =
-        [this](const QnCameraBookmark &bookmark) -> action::Parameters
+        [this](const QnCameraBookmark &bookmark) -> menu::Parameters
         {
-            return navigator()->currentParameters(action::TimelineScope)
+            return navigator()->currentParameters(menu::TimelineScope)
                 .withArgument(Qn::CameraBookmarkRole, bookmark);
         };
 
@@ -83,7 +82,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
             statisticsModule()->controls()->registerClick("bookmark_tooltip_edit");
-            menu()->triggerIfPossible(action::EditCameraBookmarkAction,
+            menu()->triggerIfPossible(menu::EditCameraBookmarkAction,
                 getActionParamsFunc(bookmark));
         });
 
@@ -91,7 +90,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
             statisticsModule()->controls()->registerClick("bookmark_tooltip_delete");
-            menu()->triggerIfPossible(action::RemoveBookmarkAction,
+            menu()->triggerIfPossible(menu::RemoveBookmarkAction,
                 getActionParamsFunc(bookmark));
         });
 
@@ -99,7 +98,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
             statisticsModule()->controls()->registerClick("bookmark_tooltip_export");
-            menu()->triggerIfPossible(action::ExportBookmarkAction, getActionParamsFunc(bookmark));
+            menu()->triggerIfPossible(menu::ExportBookmarkAction, getActionParamsFunc(bookmark));
         });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
@@ -125,8 +124,8 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = nu
         [this, bookmarksViewer](const QString &tag)
         {
             statisticsModule()->controls()->registerClick("bookmark_tooltip_tag");
-            menu()->triggerIfPossible(action::OpenBookmarksSearchAction,
-                ui::action::Parameters().withArgument(Qn::BookmarkTagRole, tag));
+            menu()->triggerIfPossible(menu::OpenBookmarksSearchAction,
+                menu::Parameters().withArgument(Qn::BookmarkTagRole, tag));
         });
 }
 
@@ -163,7 +162,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
 
     SystemContext::fromResource(camera)->cameraBookmarksManager()->addCameraBookmark(bookmark);
 
-    action(action::BookmarksModeAction)->setChecked(true);
+    action(menu::BookmarksModeAction)->setChecked(true);
 }
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
@@ -247,5 +246,5 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
 
 void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
 {
-    navigator()->setBookmarksModeEnabled(action(action::BookmarksModeAction)->isChecked());
+    navigator()->setBookmarksModeEnabled(action(menu::BookmarksModeAction)->isChecked());
 }

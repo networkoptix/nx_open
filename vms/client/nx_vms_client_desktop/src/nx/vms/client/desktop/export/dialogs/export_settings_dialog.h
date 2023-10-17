@@ -11,8 +11,7 @@
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/settings/types/export_mode.h>
-#include <ui/dialogs/common/button_box_dialog.h>
-#include <ui/workbench/workbench_state_manager.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui { class ExportSettingsDialog; }
 
@@ -35,10 +34,10 @@ struct ExportLayoutSettings;
  * camera is provided (e.g. bookmark or audit trail export). Valid time period must be provided in
  * both cases.
  */
-class ExportSettingsDialog: public QnButtonBoxDialog, public QnSessionAwareDelegate
+class ExportSettingsDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
-    using base_type = QnButtonBoxDialog;
+    using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
     using FileNameValidator = std::function<bool (const Filename& fileName, bool quiet)>;
@@ -51,8 +50,8 @@ public:
 
     virtual ~ExportSettingsDialog() override;
 
-    virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
+    /** Forcibly update the dialog data. */
+    void forcedUpdate();
 
     ExportMode mode() const;
     ExportMediaSettings exportMediaSettings() const;

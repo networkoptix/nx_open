@@ -10,7 +10,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::common { struct Credentials; }
 namespace nx::utils { class Url; }
@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop {
 
 class ConnectTilesProxyModel;
 
-class WelcomeScreen: public QQuickWidget, public QnWorkbenchContextAware
+class WelcomeScreen: public QQuickWidget, public WindowContextAware
 {
     Q_OBJECT
     using base_type = QQuickWidget;
@@ -61,7 +61,7 @@ class WelcomeScreen: public QQuickWidget, public QnWorkbenchContextAware
     Q_PROPERTY(bool richTextEnabled READ richTextEnabled CONSTANT)
 
 public:
-    WelcomeScreen(QWidget* parent = nullptr);
+    WelcomeScreen(WindowContext* context, QWidget* parent = nullptr);
     virtual ~WelcomeScreen() override;
 
     void connectionToSystemEstablished(const QnUuid& systemId);
@@ -119,10 +119,6 @@ public:
     void setupFactorySystem(const nx::network::SocketAddress& address, const QnUuid& serverId);
 
 public slots:
-    bool isAcceptableDrag(const QList<QUrl>& urls);
-
-    void makeDrop(const QList<QUrl>& urls);
-
     /** QML overload. */
     void setupFactorySystem(
         const QString& systemId,

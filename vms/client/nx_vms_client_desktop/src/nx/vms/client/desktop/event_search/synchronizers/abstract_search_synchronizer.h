@@ -18,14 +18,14 @@ namespace nx::vms::client::desktop {
  */
 class AbstractSearchSynchronizer:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
 
     using base_type = QObject;
 
 public:
-    AbstractSearchSynchronizer(QnWorkbenchContext* context, QObject* parent = nullptr);
+    AbstractSearchSynchronizer(WindowContext* context, QObject* parent = nullptr);
     virtual ~AbstractSearchSynchronizer() override = default;
 
     bool active() const;

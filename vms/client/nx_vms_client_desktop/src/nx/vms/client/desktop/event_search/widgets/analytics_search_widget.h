@@ -18,7 +18,7 @@ class AnalyticsSearchWidget: public AbstractSearchWidget
     using base_type = AbstractSearchWidget;
 
 public:
-    AnalyticsSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    AnalyticsSearchWidget(WindowContext* context, QWidget* parent = nullptr);
     virtual ~AnalyticsSearchWidget() override;
 
     virtual void resetFilters() override;

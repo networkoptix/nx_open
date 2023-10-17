@@ -32,7 +32,7 @@ class DropdownIdPickerWidgetBase: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    DropdownIdPickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    DropdownIdPickerWidgetBase(SystemContext* context, CommonParamsWidget* parent):
         base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;
@@ -80,7 +80,7 @@ class AnalyticsEnginePicker:
     public DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>
 {
 public:
-    AnalyticsEnginePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    AnalyticsEnginePicker(SystemContext* context, CommonParamsWidget* parent):
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>(context, parent)
     {
         m_pluginDiagnosticEventModel = new ui::PluginDiagnosticEventModel(this);
@@ -139,7 +139,7 @@ class AnalyticsEventTypePicker: public DropdownIdPickerWidgetBase<vms::rules::An
     Q_OBJECT
 
 public:
-    AnalyticsEventTypePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    AnalyticsEventTypePicker(SystemContext* context, CommonParamsWidget* parent):
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>(context, parent)
     {
         m_analyticsSdkEventModel = new ui::AnalyticsSdkEventModel(systemContext() ,this);

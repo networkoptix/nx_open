@@ -4,7 +4,6 @@
 
 #include <QtCore/QTimer>
 #include <QtGui/QAction>
-#include <QtWidgets/QPushButton>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -19,11 +18,12 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/style/webview_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
@@ -39,7 +39,6 @@
 using namespace std::chrono;
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::common;
 
 namespace {
@@ -54,33 +53,42 @@ namespace nx::vms::client::desktop {
 
 struct WorkbenchUpdateWatcher::Private
 {
+    workbench::LocalNotificationsManager* notificationsManager = nullptr;
     UpdateContents updateContents;
     std::future<UpdateContents> updateCheck;
     QPointer<ServerUpdateTool> serverUpdateTool;
 };
 
-WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
+WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(WindowContext* windowContext, QObject* parent):
     QObject(parent),
-    QnSessionAwareDelegate(parent),
+    WindowContextAware(windowContext),
     m_updateStateTimer(this),
     m_checkLatestUpdateTimer(this),
     m_notifiedVersion(),
-    m_notificationsManager(
-        context()->findInstance<workbench::LocalNotificationsManager>()),
     m_updateAction(new QAction(tr("Updates"))),
     m_skipAction(new QAction(qnSkin->pixmap("events/skip.svg"), "Skip version")),
     m_private(new Private())
 {
-    NX_CRITICAL(m_notificationsManager);
-    m_private->serverUpdateTool = context()->findInstance<ServerUpdateTool>();
+    m_private->notificationsManager = windowContext->localNotificationsManager();
+    NX_CRITICAL(m_private->notificationsManager);
+
+    // FIXME: #amalov Recreate on system context change.
+    m_private->serverUpdateTool = workbenchContext()->findInstance<ServerUpdateTool>();
     NX_ASSERT(m_private->serverUpdateTool);
 
-    m_autoChecksEnabled = systemSettings()->isUpdateNotificationsEnabled();
+    connect(windowContext, &WindowContext::beforeSystemChanged, this,
+        [this]
+        {
+            if (m_private->serverUpdateTool)
+                m_private->serverUpdateTool->onDisconnectFromSystem();
+        });
 
-    connect(systemSettings(), &SystemSettings::updateNotificationsChanged, this,
+    m_autoChecksEnabled = system()->globalSettings()->isUpdateNotificationsEnabled();
+
+    connect(system()->globalSettings(), &SystemSettings::updateNotificationsChanged, this,
         [this]()
         {
-            m_autoChecksEnabled = systemSettings()->isUpdateNotificationsEnabled();
+            m_autoChecksEnabled = system()->globalSettings()->isUpdateNotificationsEnabled();
             syncState();
         });
 
@@ -97,12 +105,12 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
 
     m_checkLatestUpdateTimer.setInterval(checkInterval);
 
-    connect(m_notificationsManager,
+    connect(m_private->notificationsManager,
         &workbench::LocalNotificationsManager::cancelRequested,
         this,
         [this]()
         {
-            m_notificationsManager->remove(updateNotificationId);
+            m_private->notificationsManager->remove(updateNotificationId);
             updateNotificationId = {};
         });
 
@@ -111,9 +119,9 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
         this,
         [this]()
         {
-            m_notificationsManager->remove(updateNotificationId);
+            m_private->notificationsManager->remove(updateNotificationId);
             updateNotificationId = {};
-            menu()->trigger(action::SystemUpdateAction);
+            menu()->trigger(menu::SystemUpdateAction);
         });
 
     connect(m_skipAction.data(),
@@ -121,9 +129,23 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
         this,
         [this]()
         {
-            systemContext()->localSettings()->ignoredUpdateVersion = m_notifiedVersion;
-            m_notificationsManager->remove(updateNotificationId);
+            system()->localSettings()->ignoredUpdateVersion = m_notifiedVersion;
+            m_private->notificationsManager->remove(updateNotificationId);
             updateNotificationId = {};
+        });
+
+    connect(windowContext, &WindowContext::systemChanged, this,
+        [this]()
+        {
+            if (!m_private->serverUpdateTool)
+                return;
+
+            auto systemId = system()->globalSettings()->localSystemId();
+            if (systemId.isNull())
+                systemId = system()->localSystemId();
+
+            if (!systemId.isNull())
+                m_private->serverUpdateTool->onConnectToSystem(systemId);
         });
 }
 
@@ -150,7 +172,6 @@ void WorkbenchUpdateWatcher::syncState()
 
 void WorkbenchUpdateWatcher::atUpdateCurrentState()
 {
-    NX_ASSERT(m_private);
     if (m_private->updateCheck.valid()
         && m_private->updateCheck.wait_for(kWaitForUpdateCheckFuture) == std::future_status::ready)
     {
@@ -160,33 +181,12 @@ void WorkbenchUpdateWatcher::atUpdateCurrentState()
 
 ServerUpdateTool* WorkbenchUpdateWatcher::getServerUpdateTool()
 {
-    NX_ASSERT(m_private);
     return m_private->serverUpdateTool;
 }
 
 std::future<UpdateContents> WorkbenchUpdateWatcher::takeUpdateCheck()
 {
-    NX_ASSERT(m_private);
     return std::move(m_private->updateCheck);
-}
-
-void WorkbenchUpdateWatcher::forcedUpdate()
-{
-    if (!m_private->serverUpdateTool)
-        return;
-
-    auto systemId = systemSettings()->localSystemId();
-    if (systemId.isNull())
-        systemId = systemContext()->localSystemId();
-    m_private->serverUpdateTool->onConnectToSystem(systemId);
-}
-
-bool WorkbenchUpdateWatcher::tryClose(bool /*force*/)
-{
-    if (m_private->serverUpdateTool)
-        m_private->serverUpdateTool->onDisconnectFromSystem();
-
-    return true;
 }
 
 void WorkbenchUpdateWatcher::atStartCheckUpdate()
@@ -215,7 +215,7 @@ void WorkbenchUpdateWatcher::atStartCheckUpdate()
 
 void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& contents)
 {
-    if (!systemSettings()->isUpdateNotificationsEnabled())
+    if (!system()->globalSettings()->isUpdateNotificationsEnabled())
         return;
 
     m_private->updateContents = contents;
@@ -230,7 +230,7 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
     NX_VERBOSE(this, "atCheckerUpdateAvailable(%1)", contents.info.version.toString());
 
     // We have no access rights.
-    if (!menu()->canTrigger(action::SystemUpdateAction))
+    if (!menu()->canTrigger(menu::SystemUpdateAction))
         return;
 
     auto targetVersion = contents.info.version;
@@ -243,11 +243,11 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
         return;
 
     // User is not interested in this update.
-    if (systemContext()->localSettings()->ignoredUpdateVersion() >= targetVersion)
+    if (system()->localSettings()->ignoredUpdateVersion() >= targetVersion)
         return;
 
     // Administrator disabled update notifications globally.
-    if (!systemSettings()->isUpdateNotificationsEnabled())
+    if (!system()->globalSettings()->isUpdateNotificationsEnabled())
         return;
 
     // Do not show notifications near the end of the week or on our holidays.
@@ -260,7 +260,7 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
     // Maximum days for release delivery.
     const int releaseDeliveryDays = contents.info.releaseDeliveryDays;
 
-    const UpdateDeliveryInfo oldUpdateInfo = systemContext()->localSettings()->updateDeliveryInfo();
+    const UpdateDeliveryInfo oldUpdateInfo = system()->localSettings()->updateDeliveryInfo();
     if (nx::utils::SoftwareVersion(oldUpdateInfo.version) != targetVersion
         || oldUpdateInfo.releaseDateMs != releaseDate
         || oldUpdateInfo.releaseDeliveryDays != releaseDeliveryDays)
@@ -276,12 +276,12 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
         constexpr int kHoursPerDay = 24;
         const milliseconds timeToDeliver = hours{
             nx::utils::random::number(0, releaseDeliveryDays * kHoursPerDay)};
-        systemContext()->localSettings()->updateDeliveryDate = (releaseDate + timeToDeliver).count();
+        system()->localSettings()->updateDeliveryDate = (releaseDate + timeToDeliver).count();
     }
-    systemContext()->localSettings()->updateDeliveryInfo = contents.getUpdateDeliveryInfo();
+    system()->localSettings()->updateDeliveryInfo = contents.getUpdateDeliveryInfo();
 
     auto currentTimeFromEpoch = QDateTime::currentMSecsSinceEpoch();
-    auto updateDeliveryDate = systemContext()->localSettings()->updateDeliveryDate();
+    auto updateDeliveryDate = system()->localSettings()->updateDeliveryDate();
     // Update is postponed
     if (updateDeliveryDate > currentTimeFromEpoch)
         return;
@@ -297,7 +297,7 @@ void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
     if (!updateNotificationId.isNull())
         return;
 
-    if (!accessController()->hasPowerUserPermissions())
+    if (!system()->accessController()->hasPowerUserPermissions())
         return;
 
     NX_VERBOSE(this, "Showing a notification about Workbench update feature.");
@@ -324,25 +324,25 @@ void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
         </html>
         )").arg(extras.join(common::html::kLineBreak));
 
-    updateNotificationId = m_notificationsManager->add(
+    updateNotificationId = m_private->notificationsManager->add(
         tr("%1 Version is available").arg(toString(targetVersion)),
         tr("%1").arg(html),
         true);
 
-    m_notificationsManager->setLevel(
+    m_private->notificationsManager->setLevel(
         updateNotificationId,
         majorVersionChange
             ? QnNotificationLevel::Value::ImportantNotification
             : QnNotificationLevel::Value::CommonNotification);
 
-    m_notificationsManager->setIcon(
+    m_private->notificationsManager->setIcon(
         updateNotificationId,
         majorVersionChange
             ? qnSkin->pixmap("events/update_auto_1_major.svg")
             : qnSkin->pixmap("events/update_auto_1.svg"));
 
-    m_notificationsManager->setAction(updateNotificationId, m_updateAction);
-    m_notificationsManager->setAdditionalAction(updateNotificationId, m_skipAction);
+    m_private->notificationsManager->setAction(updateNotificationId, m_updateAction);
+    m_private->notificationsManager->setAdditionalAction(updateNotificationId, m_skipAction);
 }
 
 const UpdateContents& WorkbenchUpdateWatcher::getUpdateContents() const

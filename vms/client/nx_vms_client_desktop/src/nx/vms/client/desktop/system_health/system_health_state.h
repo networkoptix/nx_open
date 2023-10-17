@@ -3,21 +3,21 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QScopedPointer>
 
+#include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/common/system_health/message_type.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class SystemHealthState:
     public QObject,
-    public QnWorkbenchContextAware
+    public SystemContextAware
 {
     Q_OBJECT
 
 public:
-    SystemHealthState(QObject* parent = nullptr);
+    SystemHealthState(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~SystemHealthState() override;
 
     using SystemHealthIndex = common::system_health::MessageType;
@@ -31,7 +31,7 @@ signals:
 
 private:
     class Private;
-    const QScopedPointer<Private> d;
+    const nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

@@ -68,6 +68,8 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
@@ -82,7 +84,6 @@
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/analytics_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
@@ -140,7 +141,6 @@ using namespace std::chrono;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::analytics;
 using namespace nx::vms::api;
-using namespace ui;
 
 namespace ptz = nx::vms::common::ptz;
 namespace html = nx::vms::common::html;
@@ -221,9 +221,9 @@ bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &o
     }
 }
 
-bool tourIsRunning(QnWorkbenchContext* context)
+bool tourIsRunning(WindowContext* context)
 {
-    return context->action(action::ToggleShowreelModeAction)->isChecked();
+    return context->menu()->action(menu::ToggleShowreelModeAction)->isChecked();
 }
 
 void drawCrosshair(QPainter* painter, const QRectF& rect)
@@ -422,7 +422,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
             });
     }
 
-    connect(action(action::ToggleSyncAction), &QAction::triggered, this,
+    connect(action(menu::ToggleSyncAction), &QAction::triggered, this,
         &QnMediaResourceWidget::handleSyncStateChanged);
 
     updateDewarpingParams();
@@ -460,7 +460,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
         &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
 
     // Update buttons for single Showreel start/stop.
-    connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
+    connect(action(menu::ToggleShowreelModeAction), &QAction::toggled, this,
         &QnMediaResourceWidget::updateButtonsVisibility);
 
     m_recordingStatusHelper->setCamera(d->camera);
@@ -677,9 +677,9 @@ void QnMediaResourceWidget::initStatusOverlayController()
      const auto changeCameraPassword =
          [this](const QnVirtualCameraResourceList& cameras, bool forceShowCamerasList)
          {
-             auto parameters = action::Parameters(cameras);
+             auto parameters = menu::Parameters(cameras);
              parameters.setArgument(Qn::ForceShowCamerasList, forceShowCamerasList);
-             menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
+             menu()->trigger(menu::ChangeDefaultCameraPasswordAction, parameters);
          };
 
      const auto controller = statusOverlayController();
@@ -714,9 +714,13 @@ void QnMediaResourceWidget::initStatusOverlayController()
      connect(controller, &QnStatusOverlayController::customButtonClicked, this,
          [this, changeCameraPassword]()
          {
-             const auto passwordWatcher = windowContext()->workbenchContext()
-                 ->findInstance<DefaultPasswordCamerasWatcher>();
-             changeCameraPassword(passwordWatcher->camerasWithDefaultPassword().values(), true);
+             auto systemContext = SystemContext::fromResource(d->camera);
+             if (NX_ASSERT(systemContext))
+             {
+                 const auto watcher = systemContext->defaultPasswordCamerasWatcher();
+                 if (NX_ASSERT(watcher))
+                     changeCameraPassword(watcher->camerasWithDefaultPassword().values(), true);
+             }
          });
 }
 
@@ -867,12 +871,16 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     if (!accessController()->hasPowerUserPermissions())
         return QString();
 
-    const auto watcher = windowContext()->workbenchContext()
-        ->findInstance<DefaultPasswordCamerasWatcher>();
-    const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
-    return camerasCount > 1
-        ? tr("Set for all %n Cameras", nullptr, camerasCount)
-        : QString();
+    auto systemContext = SystemContext::fromResource(d->camera);
+    if (NX_ASSERT(systemContext))
+    {
+        const auto watcher = systemContext->defaultPasswordCamerasWatcher();
+        const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
+        return camerasCount > 1
+            ? tr("Set for all %n Cameras", nullptr, camerasCount)
+            : QString();
+    }
+    return QString();
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -972,7 +980,7 @@ void QnMediaResourceWidget::createButtons()
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this,
             [this]
             {
-                menu()->trigger(action::TakeScreenshotAction, action::Parameters(this)
+                menu()->trigger(menu::TakeScreenshotAction, menu::Parameters(this)
                     .withArgument<QString>(Qn::FileNameRole, "_DEBUG_SCREENSHOT_KEY_"));
             });
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
@@ -1005,7 +1013,7 @@ void QnMediaResourceWidget::createButtons()
 
     const auto objectSearchLocalAction = createActionAndButton(
         "item/object.svg",
-        action(action::ObjectSearchModeAction)->isChecked(),
+        action(menu::ObjectSearchModeAction)->isChecked(),
         {},
         tooltipText(tr("Object Search"), "Alt+O"),
         /*helpTopic*/ {},
@@ -1013,7 +1021,7 @@ void QnMediaResourceWidget::createButtons()
         "media_widget_object_search",
         /*executor*/ {});
 
-    // Here `action(action::ObjectSearchModeAction)` is a global internal action that doesn't
+    // Here `action(menu::ObjectSearchModeAction)` is a global internal action that doesn't
     // check any conditions and has semantics of switching the Right Panel in or out of the
     // Object Search mode: current tab is "Objects", camera selection is "Current camera".
     // And `objectSearchLocalAction` is a local action bound to this media widget, with a local
@@ -1032,10 +1040,10 @@ void QnMediaResourceWidget::createButtons()
                 selectThisWidget(true);
 
             setProperty(Qn::NoHandScrollOver, on);
-            action(action::ObjectSearchModeAction)->setChecked(on);
+            action(menu::ObjectSearchModeAction)->setChecked(on);
         });
 
-    connect(action(action::ObjectSearchModeAction),
+    connect(action(menu::ObjectSearchModeAction),
         &QAction::toggled,
         titleBar()->rightButtonsBar()->button(Qn::ObjectSearchButton),
         &QnImageButtonWidget::setChecked);
@@ -1910,7 +1918,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
                 && overlayWidgetVisibility(m_ioModuleOverlayWidget) == OverlayVisibility::Visible);
         };
 
-    if (action(action::ToggleShowreelModeAction)->isChecked())
+    if (action(menu::ToggleShowreelModeAction)->isChecked())
         return HelpTopic::Id::MainWindow_Scene_TourInProgress;
 
     const Qn::ResourceStatusOverlay statusOverlay = statusOverlayController()->statusOverlay();
@@ -2319,7 +2327,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         const Qn::Permissions permissions = ResourceAccessManager::permissions(layoutResource());
         if (permissions.testFlag(Qn::WritePermission)
             && permissions.testFlag(Qn::AddRemoveItemsPermission)
-            && !tourIsRunning(windowContext()->workbenchContext()))
+            && !tourIsRunning(windowContext()))
         {
             result |= Qn::ZoomWindowButton;
         }
@@ -2389,7 +2397,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
                     ? Qn::ViewLivePermission
                     : Qn::ViewFootagePermission;
 
-                const auto screenRecordingAction = action(ui::action::ToggleScreenRecordingAction);
+                const auto screenRecordingAction = action(menu::ToggleScreenRecordingAction);
                 if (screenRecordingAction && screenRecordingAction->isChecked())
                     requiredPermissions |= Qn::ExportPermission;
 
@@ -2555,7 +2563,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         case Qn::OldFirmwareOverlay:
         case Qn::OfflineOverlay:
         {
-            return menu()->canTrigger(action::CameraDiagnosticsAction, d->camera)
+            return menu()->canTrigger(menu::CameraDiagnosticsAction, d->camera)
                 ? Qn::ResourceOverlayButton::Diagnostics
                 : Qn::ResourceOverlayButton::Empty;
         }
@@ -2666,7 +2674,7 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()
 {
-    menu()->trigger(action::TakeScreenshotAction, this);
+    menu()->trigger(menu::TakeScreenshotAction, this);
 }
 
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
@@ -2847,7 +2855,7 @@ void QnMediaResourceWidget::updateTimelineVisibility()
 {
     if (options().testFlag(FullScreenMode))
     {
-        action(action::ToggleTimelineAction)->setChecked(
+        action(menu::ToggleTimelineAction)->setChecked(
             isAnalyticsObjectsVisibleForcefully() || isMotionSearchModeEnabled());
     }
 }
@@ -2858,7 +2866,7 @@ void QnMediaResourceWidget::processDiagnosticsRequest()
         "resource_status_overlay_diagnostics");
 
     if (d->camera)
-        menu()->trigger(action::CameraDiagnosticsAction, d->camera);
+        menu()->trigger(menu::CameraDiagnosticsAction, d->camera);
 }
 
 void QnMediaResourceWidget::processEnableLicenseRequest()
@@ -2888,7 +2896,7 @@ void QnMediaResourceWidget::processSettingsRequest()
         return;
 
     //TODO: #sivanov Check if may be provided without static cast.
-    menu()->trigger(action::CameraSettingsAction, action::Parameters(d->camera)
+    menu()->trigger(menu::CameraSettingsAction, menu::Parameters(d->camera)
         .withArgument(Qn::FocusTabRole, int(CameraSettingsTab::general)));
 }
 
@@ -2897,7 +2905,7 @@ void QnMediaResourceWidget::processMoreLicensesRequest()
     statisticsModule()->controls()->registerClick(
         "resource_status_overlay_more_licenses");
 
-    menu()->trigger(action::PreferencesLicensesTabAction);
+    menu()->trigger(menu::PreferencesLicensesTabAction);
 }
 
 void QnMediaResourceWidget::processEncryptedArchiveUnlockRequst()
@@ -3022,7 +3030,7 @@ void QnMediaResourceWidget::setPtzMode(bool value)
     titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, ptzEnabled);
 
     if (ptzEnabled)
-        menu()->trigger(action::JumpToLiveAction, this);
+        menu()->trigger(menu::JumpToLiveAction, this);
 
     setOption(ControlPtz, ptzEnabled);
     item()->setControlPtz(ptzEnabled);
@@ -3122,11 +3130,9 @@ bool QnMediaResourceWidget::isAnalyticsModeEnabled() const
 
 bool QnMediaResourceWidget::canDisplayHotspots() const
 {
-    const auto workbenchContext = windowContext()->workbenchContext();
-
     return ini().enableCameraHotspotsFeature
         && d->camera
-        && !tourIsRunning(workbenchContext);
+        && !tourIsRunning(windowContext());
 }
 
 bool QnMediaResourceWidget::hotspotsVisible() const

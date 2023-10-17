@@ -10,6 +10,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 class QQmlEngine;
 
@@ -27,7 +28,9 @@ class SystemContext;
 
 } // namespace nx::vms::client::core
 
-class NX_VMS_CLIENT_CORE_API QnClientCoreModule: public QObject
+class NX_VMS_CLIENT_CORE_API QnClientCoreModule:
+    public QObject,
+    public nx::vms::client::core::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -44,15 +47,9 @@ public:
 
     nx::vms::client::core::NetworkModule* networkModule() const;
 
-    /**
-     * Main Resource Pool of the client.
-     */
-    QnResourcePool* resourcePool() const;
     QnCommonModule* commonModule() const;
     QnDataProviderFactory* dataProviderFactory() const;
     nx::vms::client::core::SessionTokenTerminator* sessionTokenTerminator() const;
-
-    QQmlEngine* mainQmlEngine() const;
 
 private:
     struct Private;

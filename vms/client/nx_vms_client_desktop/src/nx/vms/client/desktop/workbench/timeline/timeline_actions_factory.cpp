@@ -16,14 +16,15 @@
 using StorageLocation = nx::vms::api::StorageLocation;
 
 namespace nx::vms::client::desktop {
+namespace menu {
 
-ChunksFilterActionFactory::ChunksFilterActionFactory(QObject* parent):
+ChunksFilterActionFactory::ChunksFilterActionFactory(Manager* parent):
     base_type(parent)
 {
 }
 
 QList<QAction*> ChunksFilterActionFactory::newActions(
-    const ui::action::Parameters& parameters,
+    const Parameters& parameters,
     QObject* parent)
 {
     auto actionGroup = new QActionGroup(parent);
@@ -45,7 +46,8 @@ QList<QAction*> ChunksFilterActionFactory::newActions(
                 [this, mode, cameraDataManager]
                 {
                     cameraDataManager->setStorageLocation(mode);
-                    context()->instance<StorageLocationCameraController>()->setStorageLocation(mode);
+                    workbenchContext()->instance<StorageLocationCameraController>()
+                        ->setStorageLocation(mode);
                 });
             actionGroup->addAction(action);
         };
@@ -57,4 +59,5 @@ QList<QAction*> ChunksFilterActionFactory::newActions(
     return actionGroup->actions();
 }
 
+} // namespace menu {
 } // namespace nx::vms::client::desktop

@@ -319,18 +319,24 @@ AnalyticsEventsSearchTreeBuilder::AnalyticsEventsSearchTreeBuilder(
                 updateEventTypesTree();
         };
 
-    auto genericResourceListener = new core::SessionResourcesSignalListener<QnResource>(this);
+    auto genericResourceListener = new core::SessionResourcesSignalListener<QnResource>(
+        systemContext,
+        this);
     genericResourceListener->setOnAddedHandler(notifyAboutResourceListChanges);
     genericResourceListener->setOnRemovedHandler(notifyAboutResourceListChanges);
     genericResourceListener->start();
 
-    auto camerasListener = new core::SessionResourcesSignalListener<QnVirtualCameraResource>(this);
+    auto camerasListener = new core::SessionResourcesSignalListener<QnVirtualCameraResource>(
+        systemContext,
+        this);
     camerasListener->addOnCustomSignalHandler(
         &QnVirtualCameraResource::compatibleEventTypesMaybeChanged,
         [this]() { updateEventTypesTree(); });
     camerasListener->start();
 
-    auto serversListener = new core::SessionResourcesSignalListener<QnMediaServerResource>(this);
+    auto serversListener = new core::SessionResourcesSignalListener<QnMediaServerResource>(
+        systemContext,
+        this);
     serversListener->addOnCustomSignalHandler(
         &QnMediaServerResource::analyticsDescriptorsChanged,
         [this]() { updateEventTypesTree(); });
@@ -420,18 +426,24 @@ AnalyticsObjectsSearchTreeBuilder::AnalyticsObjectsSearchTreeBuilder(
                 emit objectTypesTreeChanged();
         };
 
-    auto genericResourceListener = new core::SessionResourcesSignalListener<QnResource>(this);
+    auto genericResourceListener = new core::SessionResourcesSignalListener<QnResource>(
+        systemContext,
+        this);
     genericResourceListener->setOnAddedHandler(notifyAboutResourceListChanges);
     genericResourceListener->setOnRemovedHandler(notifyAboutResourceListChanges);
     genericResourceListener->start();
 
-    auto camerasListener = new core::SessionResourcesSignalListener<QnVirtualCameraResource>(this);
+    auto camerasListener = new core::SessionResourcesSignalListener<QnVirtualCameraResource>(
+        systemContext,
+        this);
     camerasListener->addOnSignalHandler(
         &QnVirtualCameraResource::compatibleObjectTypesMaybeChanged,
         [this](auto /*param*/) { emit objectTypesTreeChanged(); });
     camerasListener->start();
 
-    auto serversListener = new core::SessionResourcesSignalListener<QnMediaServerResource>(this);
+    auto serversListener = new core::SessionResourcesSignalListener<QnMediaServerResource>(
+        systemContext,
+        this);
     serversListener->addOnSignalHandler(
         &QnMediaServerResource::analyticsDescriptorsChanged,
         [this](auto /*param*/) { emit objectTypesTreeChanged(); });

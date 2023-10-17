@@ -4,19 +4,21 @@
 
 #include <QtCore/QPointer>
 
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 
 class QAction;
 class QWidget;
 
+class QnWorkbenchContext;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 
 namespace nx::vms::client::desktop {
 
-namespace ui::action { class Manager; }
+namespace menu { class Manager; }
 
 class MainWindow;
+class SystemContext;
 class WindowContext;
 class Workbench;
 
@@ -24,20 +26,30 @@ class WindowContextAware
 {
 public:
     WindowContextAware(WindowContext* windowContext);
-    ~WindowContextAware();
+    WindowContextAware(WindowContextAware* windowContextAware);
+
+    /**
+     * Virtual destructor.
+     * We do dynamic_casts to WindowContextAware, so this class must have a vtable.
+     */
+    virtual ~WindowContextAware();
 
     WindowContext* windowContext() const;
 
-protected:
+    /** System Context, which is selected as current in the given window. */
+    SystemContext* system() const;
+
+    QnWorkbenchContext* workbenchContext() const;
+
     Workbench* workbench() const;
 
     QnWorkbenchDisplay* display() const;
 
     QnWorkbenchNavigator* navigator() const;
 
-    ui::action::Manager* menu() const;
+    menu::Manager* menu() const;
 
-    QAction* action(const ui::action::IDType id) const;
+    QAction* action(const menu::IDType id) const;
 
     MainWindow* mainWindow() const;
 

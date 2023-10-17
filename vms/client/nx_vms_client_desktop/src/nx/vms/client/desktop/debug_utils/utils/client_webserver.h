@@ -13,6 +13,7 @@ class QtHttpRequest;
 
 namespace nx::vms::client::desktop {
 
+class Director;
 class DirectorJsonInterface;
 
 /**
@@ -27,7 +28,7 @@ class DirectorWebserver: public QObject
 
     static constexpr int kDefaultPort = 7012;
 public:
-    explicit DirectorWebserver(QObject* parent);
+    explicit DirectorWebserver(Director* director, QObject* parent = nullptr);
     virtual ~DirectorWebserver();
 
     /** Changes listen address for the server.*/

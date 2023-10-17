@@ -6,18 +6,18 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class UserEmailsWatcher:
     public QObject,
-    public QnWorkbenchContextAware
+    public SystemContextAware
 {
     Q_OBJECT
 
 public:
-    explicit UserEmailsWatcher(QObject* parent = nullptr);
+    explicit UserEmailsWatcher(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~UserEmailsWatcher();
 
     QnUserResourceSet usersWithInvalidEmail() const;

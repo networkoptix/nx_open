@@ -7,11 +7,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_conditions.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/menu_factory.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/menu_factory.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 
@@ -20,20 +21,19 @@
 #include "overlapped_id_state.h"
 #include "overlapped_id_store.h"
 
-using namespace nx::vms::client::desktop::ui::action;
+using namespace nx::vms::client::desktop::menu;
 
 namespace nx::vms::client::desktop::integrations {
 
 class IsNvrNodeCondition: public Condition
 {
 public:
-    virtual ActionVisibility check(
-        const Parameters& parameters, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const Parameters& parameters, WindowContext* context) override;
 };
 
 ActionVisibility IsNvrNodeCondition::check(
     const Parameters& parameters,
-    QnWorkbenchContext* context)
+    WindowContext* context)
 {
     bool isNvr = false;
     QString groupId;
@@ -74,9 +74,9 @@ OverlappedIdIntegration::~OverlappedIdIntegration()
 {
 }
 
-void OverlappedIdIntegration::registerActions(ui::action::MenuFactory* factory)
+void OverlappedIdIntegration::registerActions(menu::MenuFactory* factory)
 {
-    using namespace ui::action;
+    using namespace menu;
 
     const auto action = factory->registerAction()
         .mode(DesktopMode)
@@ -90,10 +90,10 @@ void OverlappedIdIntegration::registerActions(ui::action::MenuFactory* factory)
         .action();
 
     connect(action, &QAction::triggered, this,
-        [this, context = action->context()] { openOverlappedIdDialog(context); });
+        [this, context = action->windowContext()] { openOverlappedIdDialog(context); });
 }
 
-void OverlappedIdIntegration::openOverlappedIdDialog(QnWorkbenchContext* context)
+void OverlappedIdIntegration::openOverlappedIdDialog(WindowContext* context)
 {
     const auto parameters = context->menu()->currentParameters(sender());
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
@@ -110,7 +110,7 @@ void OverlappedIdIntegration::openOverlappedIdDialog(QnWorkbenchContext* context
     connect(dialog.get(), &OverlappedIdDialog::accepted,
         [this, context, groupId, cameras]()
         {
-            auto connection = context->systemContext()->connectedServerApi();
+            auto connection = context->system()->connectedServerApi();
             if (!connection)
                 return;
 
@@ -123,11 +123,11 @@ void OverlappedIdIntegration::openOverlappedIdDialog(QnWorkbenchContext* context
                     if (!success)
                         NX_WARNING(this, "Overlapped id is not set.");
 
-                    context->navigator()->reopenPlaybackConnection(cameras);
-                    context->navigator()->setPlaying(true);
+                    context->workbenchContext()->navigator()->reopenPlaybackConnection(cameras);
+                    context->workbenchContext()->navigator()->setPlaying(true);
                 });
 
-            context->navigator()->setPlaying(false);
+            context->workbenchContext()->navigator()->setPlaying(false);
             connection->setOverlappedId(
                 groupId,
                 m_store->state().currentId,
@@ -135,7 +135,7 @@ void OverlappedIdIntegration::openOverlappedIdDialog(QnWorkbenchContext* context
                 thread());
         });
 
-    OverlappedIdLoader loader(context->systemContext(), groupId, m_store, this);
+    OverlappedIdLoader loader(context->system(), groupId, m_store, this);
     loader.start();
 
     dialog->exec();

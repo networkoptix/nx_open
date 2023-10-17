@@ -23,11 +23,11 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <server/server_storage_manager.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -40,7 +40,6 @@
 #include <utils/common/event_processors.h>
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 using namespace nx::core;
 
 namespace {
@@ -422,15 +421,15 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
 
     if (!selectedResources.empty())
     {
-        action::Parameters parameters(selectedResources);
+        menu::Parameters parameters(selectedResources);
         parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
-        auto manager = context()->menu();
+        auto manager = this->menu();
         menu.reset(manager->newMenu(
-            action::TreeScope,
+            menu::TreeScope,
             this,
             parameters,
-            action::Manager::CreationOptions(),
-            {action::IDType::CameraSettingsAction}));
+            menu::Manager::CreationOptions(),
+            {menu::IDType::CameraSettingsAction}));
 
         for (auto action: menu->actions())
             action->setShortcut({});

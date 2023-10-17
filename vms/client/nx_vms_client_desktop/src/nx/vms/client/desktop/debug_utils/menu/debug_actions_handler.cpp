@@ -3,6 +3,7 @@
 #include "debug_actions_handler.h"
 
 #include <QtGui/QAction>
+#include <QtQml/QQmlEngine>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QPushButton>
 
@@ -13,12 +14,13 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/rules/action_builder_fields/substitution.h>
@@ -52,7 +54,6 @@
 namespace {
 
 using namespace nx::vms::rules;
-using namespace nx::vms::client::desktop::ui;
 
 class DebugEventConnector: public EventConnector
 {
@@ -112,26 +113,42 @@ public:
 //------------------------------------------------------------------------------------------------
 // DebugActionsHandler
 
-DebugActionsHandler::DebugActionsHandler(QObject *parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent)
+struct DebugActionsHandler::Private
 {
-    connect(action(ui::action::DebugControlPanelAction), &QAction::triggered, this,
+    Private(WindowContext* windowContext)
+    {
+        if (const int port = ini().clientWebServerPort; port > 0 && port < 65536)
+        {
+            // FIXME: #amalov Some parts of the director may go to the app context.
+            director = std::make_unique<Director>(windowContext);
+            director->setupJSEngine(appContext()->qmlEngine());
+
+            directorServer = std::make_unique<DirectorWebserver>(director.get());
+
+            QString host = ini().clientWebServerHost;
+            directorServer->setListenAddress(host, port);
+
+            bool started = directorServer->start();
+            if (!started)
+                NX_ERROR(this, "Cannot start client webserver - port %1 already occupied?", port);
+        }
+    }
+
+    std::unique_ptr<Director> director;
+    std::unique_ptr<DirectorWebserver> directorServer;
+};
+
+DebugActionsHandler::DebugActionsHandler(WindowContext* windowContext, QObject *parent):
+    base_type(parent),
+    WindowContextAware(windowContext),
+    d(new Private(windowContext))
+{
+    connect(action(menu::DebugControlPanelAction), &QAction::triggered, this,
         [this]
         {
             auto dialog(new DebugControlPanelDialog(mainWindowWidget()));
             dialog->show();
         });
-
-    if (const int port = ini().clientWebServerPort; port > 0 && port < 65536)
-    {
-        auto director = context()->instance<DirectorWebserver>();
-        QString host = ini().clientWebServerHost;
-        director->setListenAddress(host, port);
-        bool started = director->start();
-        if (!started)
-            NX_ERROR(this, "Cannot start client webserver - port %1 already occupied?", port);
-    }
 
     registerDebugCounterActions();
     registerDebugAction("Crash the Client", [](auto) { NX_CRITICAL(false); });
@@ -156,18 +173,21 @@ DebugActionsHandler::DebugActionsHandler(QObject *parent):
         JoystickInvestigationWizardDialog::registerAction();
 #endif
 
-    connect(action(action::DebugToggleSecurityForPowerUsersAction), &QAction::triggered,
+    connect(action(menu::DebugToggleSecurityForPowerUsersAction), &QAction::triggered,
         this, &DebugActionsHandler::enableSecurityForPowerUsers);
 
     const auto updateSecurityForPowerUsers =
         [this]()
         {
-            action(action::DebugToggleSecurityForPowerUsersAction)->setChecked(
-                globalSettings()->securityForPowerUsers());
+            action(menu::DebugToggleSecurityForPowerUsersAction)->setChecked(
+                system()->globalSettings()->securityForPowerUsers());
         };
 
-    connect(globalSettings(), &nx::vms::common::SystemSettings::securityForPowerUsersChanged,
-        this, updateSecurityForPowerUsers);
+    connect(
+        system()->globalSettings(),
+        &nx::vms::common::SystemSettings::securityForPowerUsersChanged,
+        this,
+        updateSecurityForPowerUsers);
 
     updateSecurityForPowerUsers();
 }
@@ -179,34 +199,34 @@ DebugActionsHandler::~DebugActionsHandler()
 
 void DebugActionsHandler::registerDebugCounterActions()
 {
-    connect(action(ui::action::DebugIncrementCounterAction), &QAction::triggered, this,
+    connect(action(menu::DebugIncrementCounterAction), &QAction::triggered, this,
         &DebugActionsHandler::at_debugIncrementCounterAction_triggered);
 
-    connect(action(ui::action::DebugDecrementCounterAction), &QAction::triggered, this,
+    connect(action(menu::DebugDecrementCounterAction), &QAction::triggered, this,
         &DebugActionsHandler::at_debugDecrementCounterAction_triggered);
 
     s_debugEventConnector = std::make_unique<DebugEventConnector>();
-    appContext()->currentSystemContext()->vmsRulesEngine()->addEventConnector(
+    system()->vmsRulesEngine()->addEventConnector(
         s_debugEventConnector.get());
 
     registerDebugAction(
         "Debug counter ++",
-        [](QnWorkbenchContext* context)
+        [this](QnWorkbenchContext* context)
         {
-            context->menu()->trigger(ui::action::DebugIncrementCounterAction);
+            menu()->trigger(menu::DebugIncrementCounterAction);
         });
 
     registerDebugAction(
         "Debug counter --",
-        [](QnWorkbenchContext* context)
+        [this](QnWorkbenchContext* context)
         {
-            context->menu()->trigger(ui::action::DebugDecrementCounterAction);
+            menu()->trigger(menu::DebugDecrementCounterAction);
         });
 }
 
 void DebugActionsHandler::enableSecurityForPowerUsers(bool value)
 {
-    const auto api = systemContext()->connectedServerApi();
+    const auto api = system()->connectedServerApi();
     if (!api)
         return;
 
@@ -223,7 +243,7 @@ void DebugActionsHandler::enableSecurityForPowerUsers(bool value)
             }
             else
             {
-                action(action::DebugToggleSecurityForPowerUsersAction)->setChecked(oldValue);
+                action(menu::DebugToggleSecurityForPowerUsersAction)->setChecked(oldValue);
 
                 QnMessageBox::critical(mainWindowWidget(),
                     nx::format("Failed to %1 security settings for Power Users",
@@ -232,7 +252,7 @@ void DebugActionsHandler::enableSecurityForPowerUsers(bool value)
         };
 
     const auto request = QString("/rest/v3/system/settings/securityForPowerUsers");
-    const auto tokenHelper = systemContext()->restApiHelper()->getSessionTokenHelper();
+    const auto tokenHelper = system()->restApiHelper()->getSessionTokenHelper();
     const auto paramValue = value ? "true" : "false";
 
     api->putRest(

@@ -25,7 +25,7 @@ class SingleTargetDevicePicker:
     public ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>
 {
 public:
-    SingleTargetDevicePicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    SingleTargetDevicePicker(SystemContext* context, CommonParamsWidget* parent):
         ResourcePickerWidgetBase<vms::rules::TargetSingleDeviceField>(context, parent)
     {
         if (!Policy::canUseSourceCamera())

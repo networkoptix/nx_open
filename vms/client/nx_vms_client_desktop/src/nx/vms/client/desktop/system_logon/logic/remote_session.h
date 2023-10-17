@@ -25,12 +25,6 @@ public:
         QObject* parent = nullptr);
     virtual ~RemoteSession() override;
 
-    /**
-     * In the current version there only one Remote Session instance. When multiple sessions are
-     * supported, accessor will be changed.
-     */
-    static std::shared_ptr<RemoteSession> instance();
-
     SessionId sessionId() const;
 
     /**

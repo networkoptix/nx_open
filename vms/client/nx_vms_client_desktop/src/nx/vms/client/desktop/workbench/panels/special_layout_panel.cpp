@@ -11,7 +11,7 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace workbench {
 
-class SpecialLayoutPanelPrivate: public QObject, public QnWorkbenchContextAware
+class SpecialLayoutPanelPrivate: public QObject
 {
     using base_type = QObject;
 
@@ -21,8 +21,8 @@ class SpecialLayoutPanelPrivate: public QObject, public QnWorkbenchContextAware
 public:
     SpecialLayoutPanelPrivate(
         QGraphicsWidget* parentWidget,
-        QObject* objectParent,
-        SpecialLayoutPanel* parent);
+        QObject* parent,
+        SpecialLayoutPanel* q);
 
     QGraphicsWidget* panelWidget() const;
 
@@ -40,17 +40,16 @@ private:
 
 SpecialLayoutPanelPrivate::SpecialLayoutPanelPrivate(
     QGraphicsWidget* parentWidget,
-    QObject* objectParent,
-    SpecialLayoutPanel* parent)
+    QObject* parent,
+    SpecialLayoutPanel* q)
     :
-    base_type(),
-    QnWorkbenchContextAware(objectParent),
-    q_ptr(parent),
+    base_type(parent),
+    q_ptr(q),
     m_parentWidget(parentWidget)
 {
-    handleCurrentLayoutChanged(workbench()->currentLayout());
-    connect(workbench(), &Workbench::currentLayoutChanged, this,
-        [this](){ handleCurrentLayoutChanged(workbench()->currentLayout());});
+    handleCurrentLayoutChanged(q_ptr->workbench()->currentLayout());
+    connect(q->workbench(), &Workbench::currentLayoutChanged, this,
+        [this](){ handleCurrentLayoutChanged(q_ptr->workbench()->currentLayout());});
 }
 
 void SpecialLayoutPanelPrivate::handleCurrentLayoutChanged(QnWorkbenchLayout* layout)

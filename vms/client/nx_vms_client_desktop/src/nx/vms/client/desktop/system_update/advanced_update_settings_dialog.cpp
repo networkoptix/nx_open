@@ -26,7 +26,7 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
     QnSessionAwareDelegate(parent)
 {
     QmlProperty<ClientUpdateManager*>(rootObjectHolder(), "clientUpdateManager") =
-        context()->findInstance<ClientUpdateManager>();
+        workbenchContext()->findInstance<ClientUpdateManager>();
     QmlProperty<bool> notifyAboutUpdates(rootObjectHolder(), "notifyAboutUpdates");
 
     notifyAboutUpdates = systemSettings()->isUpdateNotificationsEnabled();
@@ -46,7 +46,7 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
                     m_currentRequest = 0;
                 };
 
-            m_currentRequest = systemContext()->connectedServerApi()->patchSystemSettings(
+            m_currentRequest = connectedServerApi()->patchSystemSettings(
                 systemContext()->getSessionTokenHelper(),
                 api::SaveableSystemSettings{.updateNotificationsEnabled = notifyAboutUpdates},
                 callback,
@@ -64,16 +64,12 @@ AdvancedUpdateSettingsDialog::AdvancedUpdateSettingsDialog(QWidget* parent):
 
 bool AdvancedUpdateSettingsDialog::tryClose(bool /*force*/)
 {
-    if (auto api = systemContext()->connectedServerApi(); api && m_currentRequest > 0)
+    if (auto api = connectedServerApi(); api && m_currentRequest > 0)
         api->cancelRequest(m_currentRequest);
     m_currentRequest = 0;
 
     reject();
     return true;
-}
-
-void AdvancedUpdateSettingsDialog::forcedUpdate()
-{
 }
 
 } // namespace nx::vms::client::desktop

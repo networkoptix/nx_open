@@ -14,7 +14,7 @@ class CustomizableIconPicker:
     public DropdownTextPickerWidgetBase<vms::rules::CustomizableIconField, IconComboBox>
 {
 public:
-    CustomizableIconPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    CustomizableIconPicker(SystemContext* context, CommonParamsWidget* parent):
         DropdownTextPickerWidgetBase<vms::rules::CustomizableIconField, IconComboBox>(context, parent)
     {
         constexpr auto kDropdownIconSize = 40;

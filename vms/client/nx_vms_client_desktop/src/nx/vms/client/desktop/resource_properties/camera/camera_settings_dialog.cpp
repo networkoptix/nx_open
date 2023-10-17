@@ -9,9 +9,6 @@
 #include <QtCore/QSharedPointer>
 #include <QtWidgets/QPushButton>
 
-#include <client/client_module.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
@@ -22,13 +19,13 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/common/read_only.h>
@@ -153,8 +150,8 @@ struct CameraSettingsDialog::Private: public QObject
                 if (server->metadataStorageId().isNull())
                 {
                     // We need to choose analytics storage locations.
-                    q->workbench()->context()->menu()->triggerIfPossible(
-                        ui::action::ConfirmAnalyticsStorageAction);
+                    q->menu()->triggerIfPossible(
+                        menu::ConfirmAnalyticsStorageAction);
                             //< TODO: #spanasenko Specify the server ID?
                 }
             }
@@ -204,49 +201,49 @@ struct CameraSettingsDialog::Private: public QObject
         cameraResourceAccessWatcher->setCamera(singleCamera);
     }
 
-    void handleAction(ui::action::IDType action)
+    void handleAction(menu::IDType action)
     {
         switch (action)
         {
-            case ui::action::PingAction:
+            case menu::PingAction:
                 NX_ASSERT(store);
-                q->menu()->trigger(ui::action::PingAction,
+                q->menu()->trigger(menu::PingAction,
                     {Qn::TextRole, store->state().singleCameraProperties.ipAddress});
                 break;
 
-            case ui::action::CameraIssuesAction:
-            case ui::action::CameraBusinessRulesAction:
-            case ui::action::OpenInNewTabAction:
+            case menu::CameraIssuesAction:
+            case menu::CameraBusinessRulesAction:
+            case menu::OpenInNewTabAction:
                 q->menu()->trigger(action, cameras);
                 break;
 
-            case ui::action::UploadVirtualCameraFileAction:
-            case ui::action::UploadVirtualCameraFolderAction:
-            case ui::action::CancelVirtualCameraUploadsAction:
+            case menu::UploadVirtualCameraFileAction:
+            case menu::UploadVirtualCameraFolderAction:
+            case menu::CancelVirtualCameraUploadsAction:
                 NX_ASSERT(cameras.size() == 1
                     && cameras.front()->hasFlags(Qn::virtual_camera));
                 if (cameras.size() == 1)
                     q->menu()->trigger(action, cameras.front());
                 break;
 
-            case ui::action::CopyRecordingScheduleAction:
+            case menu::CopyRecordingScheduleAction:
             {
                 if (NX_ASSERT(store && store->state().recording.schedule.hasValue()))
                     q->menu()->trigger(action);
                 break;
             }
 
-            case ui::action::PreferencesLicensesTabAction:
+            case menu::PreferencesLicensesTabAction:
                 q->menu()->trigger(action);
                 break;
 
-            case ui::action::ChangeDefaultCameraPasswordAction:
+            case menu::ChangeDefaultCameraPasswordAction:
             {
                 const auto cameras =
                     QnVirtualCameraResourceList(q->ui->defaultPasswordAlert->cameras().values());
-                const auto parameters = ui::action::Parameters(cameras).withArgument(
+                const auto parameters = menu::Parameters(cameras).withArgument(
                     Qn::ForceShowCamerasList, q->ui->defaultPasswordAlert->useMultipleForm());
-                q->menu()->trigger(ui::action::ChangeDefaultCameraPasswordAction, parameters);
+                q->menu()->trigger(menu::ChangeDefaultCameraPasswordAction, parameters);
                 break;
             }
 
@@ -257,8 +254,7 @@ struct CameraSettingsDialog::Private: public QObject
 
     void handleCamerasWithDefaultPasswordChanged()
     {
-        const auto defaultPasswordWatcher =
-            q->context()->findInstance<DefaultPasswordCamerasWatcher>();
+        const auto defaultPasswordWatcher = q->systemContext()->defaultPasswordCamerasWatcher();
         const auto troublesomeCameras = defaultPasswordWatcher->camerasWithDefaultPassword()
             .intersect(nx::utils::toQSet(cameras));
 
@@ -290,11 +286,14 @@ struct CameraSettingsDialog::Private: public QObject
     }
 };
 
-CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
+CameraSettingsDialog::CameraSettingsDialog(SystemContext* systemContext, QWidget* parent):
     base_type(parent),
     ui(new Ui::CameraSettingsDialog()),
     d(new Private(this))
 {
+    NX_ASSERT(systemContext == this->system(),
+        "Camera settings for cross-system cameras is not supported yet.");
+
     ui->setupUi(this);
     d->store = new CameraSettingsDialogStore(this);
 
@@ -305,33 +304,33 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->cameraPropertyWatcher = new CameraSettingsRemoteChangesWatcher(d->store, this);
     d->cameraPtzCapabilitiesWatcher = new CameraSettingsPtzCapabilitiesWatcher(d->store, this);
     d->cameraResourceAccessWatcher = new CameraSettingsResourceAccessWatcher(
-        d->store, systemContext(), this);
+        d->store, systemContext, this);
 
     d->licenseUsageHelper = new nx::vms::license::CamLicenseUsageHelper(
-        systemContext(),
+        systemContext,
         /* considerOnlineServersOnly */ false,
         this);
 
-    d->deviceAgentSettingsAdapter = new DeviceAgentSettingsAdapter(d->store, context(), this);
+    d->deviceAgentSettingsAdapter = new DeviceAgentSettingsAdapter(d->store, windowContext(), this);
 
     d->fisheyePreviewController = new FisheyePreviewController(this);
 
     new CameraSettingsGlobalSettingsWatcher(d->store, this);
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
-    new CameraSettingsSaasStateWatcher(d->store, systemContext(), this);
-    new CameraSettingsEngineLicenseWatcher(d->store, systemContext(), this);
+    new CameraSettingsSaasStateWatcher(d->store, systemContext, this);
+    new CameraSettingsEngineLicenseWatcher(d->store, systemContext, this);
 
     auto generalTab = new CameraSettingsGeneralTabWidget(
         d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, this,
-        [this](ui::action::IDType action) { d->handleAction(action); });
+        [this](menu::IDType action) { d->handleAction(action); });
 
     auto recordingTab = new CameraScheduleWidget(
         d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
-        [this](ui::action::IDType action) { d->handleAction(action); });
+        [this](menu::IDType action) { d->handleAction(action); });
 
     GenericTabbedDialog::addPage(
         int(CameraSettingsTab::general),
@@ -356,12 +355,12 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     GenericTabbedDialog::addPage(
         int(CameraSettingsTab::dewarping),
         new CameraDewarpingSettingsWidget(d->store, d->cameraPreview,
-            qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
+            appContext()->qmlEngine(), ui->tabWidget),
         tr("Dewarping"));
 
     GenericTabbedDialog::addPage(
         int(CameraSettingsTab::hotspots),
-        new CameraHotspotsSettingsWidget(systemContext()->resourcePool(), d->store,
+        new CameraHotspotsSettingsWidget(systemContext->resourcePool(), d->store,
             d->cameraPreview),
         tr("Hotspots"));
 
@@ -374,7 +373,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         d->advancedSettingsWidget,
         tr("Advanced"));
 
-    auto cameraWebPage = new CameraWebPageWidget(systemContext(), d->store, ui->tabWidget);
+    auto cameraWebPage = new CameraWebPageWidget(systemContext, d->store, ui->tabWidget);
     connect(this, &QDialog::finished, cameraWebPage, &CameraWebPageWidget::cleanup);
     GenericTabbedDialog::addPage(
         int(CameraSettingsTab::web),
@@ -384,7 +383,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     GenericTabbedDialog::addPage(
         int(CameraSettingsTab::analytics),
         new CameraAnalyticsSettingsWidget(
-            systemContext(), d->store, qnClientCoreModule->mainQmlEngine(), ui->tabWidget),
+            systemContext, d->store, appContext()->qmlEngine(), ui->tabWidget),
         ini().enableMetadataApi ? tr("Integrations") : tr("Plugins"));
 
     GenericTabbedDialog::addPage(
@@ -430,9 +429,9 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         });
 
     connect(ui->defaultPasswordAlert, &DefaultPasswordAlertBar::changeDefaultPasswordRequest, this,
-        [this]() { d->handleAction(ui::action::ChangeDefaultCameraPasswordAction); });
+        [this]() { d->handleAction(menu::ChangeDefaultCameraPasswordAction); });
 
-    const auto defaultPasswordWatcher = context()->findInstance<DefaultPasswordCamerasWatcher>();
+    const auto defaultPasswordWatcher = systemContext->defaultPasswordCamerasWatcher();
     connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraSetChanged, this,
         [this]() { d->handleCamerasWithDefaultPasswordChanged(); });
 

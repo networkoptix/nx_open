@@ -22,6 +22,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -31,7 +32,6 @@
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/layout/layout_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/workbench/managers/settings_dialog_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -44,7 +44,6 @@
 #include <utils/camera/camera_bitrate_calculator.h>
 
 using namespace nx::vms::client::desktop;
-using namespace ui;
 
 namespace {
 
@@ -66,21 +65,21 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(action::CameraSettingsAction), &QAction::triggered, this,
+    connect(action(menu::CameraSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
-    connect(action(action::ServerSettingsAction), &QAction::triggered, this,
+    connect(action(menu::ServerSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
-    connect(action(action::NewUserAction), &QAction::triggered, this,
+    connect(action(menu::NewUserAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered);
-    connect(action(action::UserSettingsAction), &QAction::triggered, this,
+    connect(action(menu::UserSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered);
-    connect(action(action::UserGroupsAction), &QAction::triggered, this,
+    connect(action(menu::UserGroupsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered);
-    connect(action(action::LayoutSettingsAction), &QAction::triggered, this,
+    connect(action(menu::LayoutSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered);
-    connect(action(action::CurrentLayoutSettingsAction), &QAction::triggered, this,
+    connect(action(menu::CurrentLayoutSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_triggered);
-    connect(action(action::CopyRecordingScheduleAction), &QAction::triggered, this,
+    connect(action(menu::CopyRecordingScheduleAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_triggered);
 
     registerDebugAction(
@@ -117,7 +116,8 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
 
     QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
-        m_cameraSettingsDialog, parent);
+        m_cameraSettingsDialog,
+        [this, parent] { return new CameraSettingsDialog(systemContext(), parent); });
 
     dialogConstructor.disableAutoFocus();
 
@@ -340,5 +340,5 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
         if (auto wlayout = workbench()->layout(layout))
             wlayout->centralizeItems();
     }
-    menu()->triggerIfPossible(action::SaveLayoutAction, layout);
+    menu()->triggerIfPossible(menu::SaveLayoutAction, layout);
 }

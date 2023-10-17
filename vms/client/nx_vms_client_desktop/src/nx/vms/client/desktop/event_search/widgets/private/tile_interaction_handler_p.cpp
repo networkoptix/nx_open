@@ -44,14 +44,16 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
+#include <nx/vms/client/desktop/utils/context_utils.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/text/human_readable.h>
@@ -69,7 +71,7 @@
 namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
-using namespace ui::action;
+using namespace menu;
 
 namespace {
 
@@ -86,7 +88,7 @@ TileInteractionHandler::~TileInteractionHandler()
 
 TileInteractionHandler* TileInteractionHandler::install(EventRibbon* ribbon)
 {
-    return doInstall(QnWorkbenchContextAware(ribbon).context(), ribbon);
+    return doInstall(utils::windowContextFromObject(ribbon), ribbon);
 }
 
 TileInteractionHandler* TileInteractionHandler::install(RightPanelModelsAdapter* adapter)
@@ -96,7 +98,7 @@ TileInteractionHandler* TileInteractionHandler::install(RightPanelModelsAdapter*
 
 template<typename T>
 TileInteractionHandler* TileInteractionHandler::doInstall(
-    QnWorkbenchContext* context, T* tileInteractionSource)
+    WindowContext* context, T* tileInteractionSource)
 {
     if (!NX_ASSERT(context && tileInteractionSource))
         return nullptr;
@@ -141,9 +143,9 @@ TileInteractionHandler* TileInteractionHandler::doInstall(
     return handler;
 }
 
-TileInteractionHandler::TileInteractionHandler(QnWorkbenchContext* context, QObject* parent):
+TileInteractionHandler::TileInteractionHandler(WindowContext* context, QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(context),
+    WindowContextAware(context),
     m_showPendingMessages(new nx::utils::PendingOperation())
 {
     if (!NX_ASSERT(context))
@@ -337,10 +339,13 @@ void TileInteractionHandler::executePluginAction(
     const nx::analytics::db::ObjectTrack& track,
     const QnVirtualCameraResourcePtr& camera) const
 {
-    if (!connection())
+    const auto systemContext = SystemContext::fromResource(camera);
+    const auto api = systemContext->connectedServerApi();
+
+    if (!api)
         return;
 
-    const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext());
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext);
     const auto actionDescriptor = descriptorManager.descriptor(actionTypeId);
     if (!actionDescriptor)
         return;
@@ -380,26 +385,29 @@ void TileInteractionHandler::executePluginAction(
             if (!success)
                 return;
 
+            const auto systemContext = SystemContext::fromResource(camera);
+            if (!systemContext)
+                return;
+
             const auto reply = result.deserialized<AnalyticsActionResult>();
             AnalyticsActionsHelper::processResult(
                 reply,
-                workbench()->context(),
-                resourcePool()->getResourceById(engineId),
+                windowContext(),
+                systemContext->resourcePool()->getResourceById(engineId),
                 /*authenticator*/ {},
                 mainWindowWidget());
         };
 
-    connectedServerApi()->executeAnalyticsAction(
+    api->executeAnalyticsAction(
         actionData, nx::utils::guarded(this, resultCallback), thread());
 }
 
 void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
 {
     auto displayTime =
-        [](qint64 msecsSinceEpoch)
+        [this](qint64 msecsSinceEpoch)
         {
-            // TODO: #sivanov Actualize used system context.
-            const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
+            const auto timeWatcher = system()->serverTimeWatcher();
             return nx::vms::time::toString(timeWatcher->displayTime(msecsSinceEpoch));
         };
 
@@ -458,7 +466,7 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
 
                         case HeaderItem::camera:
                         {
-                            cellValue = systemContext()->cameraNamesWatcher()->getCameraName(
+                            cellValue = system()->cameraNamesWatcher()->getCameraName(
                                 bookmark.cameraId);
                             break;
                         }
@@ -486,7 +494,7 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
 
                         case HeaderItem::creator:
                             cellValue =
-                                getBookmarkCreatorName(bookmark.creatorId, systemContext());
+                                getBookmarkCreatorName(bookmark.creatorId, system());
                             break;
 
                         case HeaderItem::tags:
@@ -521,12 +529,12 @@ TileInteractionHandler::ActionSupport TileInteractionHandler::checkActionSupport
     if (cloudSystemId.isEmpty())
         return ActionSupport::supported;
 
-    const auto actionType = index.data(Qn::ActionIdRole).value<ui::action::IDType>();
+    const auto actionType = index.data(Qn::ActionIdRole).value<menu::IDType>();
 
-    if (actionType == ui::action::BrowseUrlAction)
+    if (actionType == menu::BrowseUrlAction)
         return ActionSupport::unsupported;
 
-    if (actionType != ui::action::NoAction)
+    if (actionType != menu::NoAction)
     {
         const auto previewResource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 

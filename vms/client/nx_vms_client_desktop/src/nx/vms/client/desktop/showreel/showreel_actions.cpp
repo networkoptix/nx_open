@@ -5,9 +5,12 @@
 #include <QtGui/QAction>
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/workbench/workbench_context.h>
@@ -17,8 +20,7 @@
 #include "showreel_actions_handler.h"
 
 namespace nx::vms::client::desktop {
-namespace ui {
-namespace action {
+namespace menu {
 
 namespace
 {
@@ -28,9 +30,9 @@ QnUuid showreelId(const Parameters& parameters)
     return parameters.argument(Qn::UuidRole).value<QnUuid>();
 }
 
-bool showreelIsRunning(QnWorkbenchContext* context)
+bool showreelIsRunning(WindowContext* context)
 {
-    return context->action(ToggleShowreelModeAction)->isChecked();
+    return context->menu()->action(ToggleShowreelModeAction)->isChecked();
 }
 
 class ShowreelIsRunningCondition: public Condition
@@ -41,7 +43,7 @@ public:
     }
 
     virtual ActionVisibility check(const Parameters& /*parameters*/,
-        QnWorkbenchContext* context) override
+        WindowContext* context) override
     {
         return showreelIsRunning(context)
             ? EnabledAction
@@ -53,7 +55,7 @@ class CanToggleShowreelCondition: public Condition
 {
 public:
     virtual ActionVisibility check(const Parameters& parameters,
-        QnWorkbenchContext* context) override
+        WindowContext* context) override
     {
         const auto id = showreelId(parameters);
         if (id.isNull())
@@ -63,7 +65,7 @@ public:
         }
         else
         {
-            const auto showreel = context->systemContext()->showreelManager()->showreel(id);
+            const auto showreel = context->system()->showreelManager()->showreel(id);
             if (showreel.isValid() && showreel.items.size() > 0)
                 return EnabledAction;
         }
@@ -79,12 +81,11 @@ ShowreelTextFactory::ShowreelTextFactory(QObject* parent):
 {
 }
 
-QString ShowreelTextFactory::text(const Parameters& parameters,
-    QnWorkbenchContext* context) const
+QString ShowreelTextFactory::text(const Parameters& parameters, WindowContext* context) const
 {
     if (showreelIsRunning(context))
     {
-        auto runningTourId = context->instance<ShowreelActionsHandler>()->runningShowreel();
+        auto runningTourId = context->showreelActionsHandler()->runningShowreel();
         if (runningTourId.isNull())
             return tr("Stop Tour");
         return tr("Stop Showreel");
@@ -119,6 +120,5 @@ ConditionWrapper canStartShowreel()
 
 } // namespace condition
 
-} // namespace action
-} // namespace ui
+} // namespace menu
 } // namespace nx::vms::client::desktop

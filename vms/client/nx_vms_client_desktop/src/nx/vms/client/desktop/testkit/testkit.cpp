@@ -10,9 +10,9 @@
 #include <QtQml/QQmlEngine>
 #include <QtWidgets/QApplication>
 
-#include <client_core/client_core_module.h>
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 
 #include "highlighter.h"
@@ -536,7 +536,7 @@ QJSValue TestKit::pick(int x, int y)
 
 TestKit* TestKit::instance()
 {
-    auto engine = qnClientCoreModule->mainQmlEngine();
+    auto engine = appContext()->qmlEngine();
 
     return qobject_cast<testkit::TestKit*>(
             engine->globalObject().property(testkit::TestKit::kName).toQObject());

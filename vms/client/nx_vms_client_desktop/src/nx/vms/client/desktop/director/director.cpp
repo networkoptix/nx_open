@@ -10,20 +10,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/from_string.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <utils/common/delayed.h>
 
-template<>
-nx::vms::client::desktop::Director* Singleton<nx::vms::client::desktop::Director>::s_instance =
-    nullptr;
-
 namespace nx::vms::client::desktop {
-
-using namespace vms::client::desktop::ui;
 
 namespace {
 
@@ -83,9 +77,9 @@ QVariant dumpQObject(const QObject* object, bool withChildren = false)
 
 } // namespace
 
-Director::Director(QObject* parent):
+Director::Director(WindowContext* windowContext, QObject* parent):
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    WindowContextAware(windowContext)
 {
     NX_ASSERT_HEAVY_CONDITION(
         []
@@ -105,26 +99,23 @@ Director::~Director()
 
 void Director::quit(bool force)
 {
-    NX_ASSERT(context());
-
     if (force)
     {
         executeDelayedParented(
-            [this] { context()->menu()->trigger(action::DelayedForcedExitAction); },
+            [this] { menu()->trigger(menu::DelayedForcedExitAction); },
             kQuitDelay, this);
     }
     else
     {
         executeDelayedParented(
-            [this] { context()->menu()->trigger(action::ExitAction); },
+            [this] { menu()->trigger(menu::ExitAction); },
             kQuitDelay, this);
     }
 }
 
 std::vector<qint64> Director::getFrameTimePoints()
 {
-    NX_ASSERT(context());
-    return context()->display()->frameTimePointsInstrument()->getFrameTimePoints();
+    return display()->frameTimePointsInstrument()->getFrameTimePoints();
 }
 
 void Director::setupJSEngine(QJSEngine* engine)
@@ -132,20 +123,20 @@ void Director::setupJSEngine(QJSEngine* engine)
     m_engine = engine;
     m_engine->installExtensions(QJSEngine::ConsoleExtension);
 
-    QJSValue actionEnumValue = m_engine->newQMetaObject(&action::staticMetaObject);
+    QJSValue actionEnumValue = m_engine->newQMetaObject(&menu::staticMetaObject);
     m_engine->globalObject().setProperty("action", actionEnumValue);
     m_engine->globalObject().setProperty("director", m_engine->newQObject(this));
 }
 
-void Director::subscribe(action::IDType action, QJSValue callback)
+void Director::subscribe(menu::IDType actionId, QJSValue callback)
 {
-    connect(context()->action(action), &QAction::triggered, this,
+    connect(action(actionId), &QAction::triggered, this,
         [this, callback]() mutable
         {
             if (!callback.isCallable())
                 return;
 
-            const auto actionParameters = context()->menu()->currentParameters(sender());
+            const auto actionParameters = menu()->currentParameters(sender());
 
             QJSValue param = m_engine->newObject();
 
@@ -190,12 +181,12 @@ void Director::subscribe(action::IDType action, QJSValue callback)
         });
 }
 
-void Director::trigger(action::IDType action, QJSValue parameters)
+void Director::trigger(menu::IDType action, QJSValue parameters)
 {
     if (!parameters.isObject())
         return;
 
-    action::Parameters actionParameters;
+    menu::Parameters actionParameters;
 
     // Gather js object own properties and map them to roles:
     //   "TextRole": value   ->   setArgument(Qn::TextRole, QVariant(value))
@@ -220,12 +211,12 @@ void Director::trigger(action::IDType action, QJSValue parameters)
         actionParameters.setArgument(role, it.value().toVariant());
     }
 
-    context()->menu()->trigger(action, actionParameters);
+    menu()->trigger(action, actionParameters);
 }
 
 QJSValue Director::getResources() const
 {
-    const auto resources = context()->resourcePool()->getResources();
+    const auto resources = system()->resourcePool()->getResources();
 
     QVariantList result;
     for (const auto resource: resources)

@@ -28,7 +28,7 @@ struct LayoutSettingsDialog::Private
     QPointer<LayoutSettingsDialogStore> store;
     QnLayoutResourcePtr layout;
     QPointer<LayoutBackgroundSettingsWidget> backgroundTab;
-    LayoutLogicalIdsWatcher* logicalIdsWatcher = nullptr;
+    std::unique_ptr<LayoutLogicalIdsWatcher> logicalIdsWatcher;
 
     void resetChanges()
     {
@@ -76,12 +76,6 @@ LayoutSettingsDialog::LayoutSettingsDialog(QWidget* parent):
     connect(d->store, &LayoutSettingsDialogStore::stateChanged, this,
         &LayoutSettingsDialog::loadState);
 
-    d->logicalIdsWatcher = new LayoutLogicalIdsWatcher(
-        d->store.data(),
-        resourcePool(),
-        messageProcessor(),
-        this);
-
     connect(d->backgroundTab, &LayoutBackgroundSettingsWidget::newImageUploadedSuccessfully, this,
         [this]
         {
@@ -96,8 +90,17 @@ LayoutSettingsDialog::~LayoutSettingsDialog()
 
 bool LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 {
+    d->logicalIdsWatcher.reset();
     d->layout = layout;
-    d->logicalIdsWatcher->setExcludedLayout(layout);
+
+    if (layout && NX_ASSERT(layout->systemContext()))
+    {
+        d->logicalIdsWatcher = std::make_unique<LayoutLogicalIdsWatcher>(
+            d->store.data(),
+            layout,
+            this);
+    }
+
     d->resetChanges();
     return true;
 }

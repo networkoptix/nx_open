@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
@@ -47,8 +48,8 @@ public:
     AbstractSearchListModel* model() const { return m_model; }
     void setModel(AbstractSearchListModel* value);
 
-    QnWorkbenchContext* context() const { return m_context; }
-    void setContext(QnWorkbenchContext* value);
+    WindowContext* context() const { return m_context; }
+    void setContext(WindowContext* value);
 
     RightPanel::TimeSelection timeSelection() const { return m_timeSelection; }
     void setTimeSelection(RightPanel::TimeSelection value);
@@ -68,7 +69,7 @@ private:
     QPointer<AbstractSearchListModel> m_model;
     nx::utils::ScopedConnections m_modelConnections;
 
-    QnWorkbenchContext* m_context = nullptr;
+    WindowContext* m_context = nullptr;
     nx::utils::ScopedConnections m_contextConnections;
 
     RightPanel::TimeSelection m_timeSelection = RightPanel::TimeSelection::anytime;
@@ -107,12 +108,12 @@ void CommonObjectSearchSetup::setModel(AbstractSearchListModel* value)
     d->setModel(value);
 }
 
-QnWorkbenchContext* CommonObjectSearchSetup::context() const
+WindowContext* CommonObjectSearchSetup::context() const
 {
     return d->context();
 }
 
-void CommonObjectSearchSetup::setContext(QnWorkbenchContext* value)
+void CommonObjectSearchSetup::setContext(WindowContext* value)
 {
     d->setContext(value);
 }
@@ -182,8 +183,7 @@ int CommonObjectSearchSetup::cameraCount() const
 
 bool CommonObjectSearchSetup::mixedDevices() const
 {
-    return context()
-        && context()->resourcePool()->containsIoModules();
+    return context() && context()->system()->resourcePool()->containsIoModules();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -198,8 +198,7 @@ CommonObjectSearchSetup::Private::Private(CommonObjectSearchSetup* q):
             if (!context())
                 return;
 
-            // TODO: #sivanov Actualize used system context.
-            const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
+            const auto timeWatcher = context()->system()->serverTimeWatcher();
             setCurrentDate(timeWatcher->displayTime(qnSyncTime->currentMSecsSinceEpoch()));
         });
 
@@ -226,7 +225,7 @@ CommonObjectSearchSetup::Private::Private(CommonObjectSearchSetup* q):
         });
 }
 
-void CommonObjectSearchSetup::Private::setContext(QnWorkbenchContext* value)
+void CommonObjectSearchSetup::Private::setContext(WindowContext* value)
 {
     if (m_context == value)
         return;
@@ -240,18 +239,20 @@ void CommonObjectSearchSetup::Private::setContext(QnWorkbenchContext* value)
     if (!m_context)
         return;
 
-    m_contextConnections
-        << connect(m_context->navigator(), &QnWorkbenchNavigator::timeSelectionChanged, this,
-            [this](const QnTimePeriod& selection)
-            {
-                m_timelineSelection = selection;
+    m_contextConnections << connect(
+        m_context->workbenchContext()->navigator(),
+        &QnWorkbenchNavigator::timeSelectionChanged,
+        this,
+        [this](const QnTimePeriod& selection)
+        {
+            m_timelineSelection = selection;
 
-                // If selection was cleared update immediately, otherwise update after small delay.
-                if (m_timelineSelection.isNull())
-                    m_applyTimelineSelectionOperation.fire();
-                else
-                    m_applyTimelineSelectionOperation.requestOperation();
-            });
+            // If selection was cleared update immediately, otherwise update after small delay.
+            if (m_timelineSelection.isNull())
+                m_applyTimelineSelectionOperation.fire();
+            else
+                m_applyTimelineSelectionOperation.requestOperation();
+        });
 
     const auto camerasUpdaterFor =
         [this](RightPanel::CameraSelection mode)
@@ -268,9 +269,11 @@ void CommonObjectSearchSetup::Private::setContext(QnWorkbenchContext* value)
 
     updateRelevantCameras();
 
-    m_contextConnections
-        << connect(m_context->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-            this, camerasUpdaterFor(RightPanel::CameraSelection::current));
+    m_contextConnections << connect(
+        m_context->workbenchContext()->navigator(),
+        &QnWorkbenchNavigator::currentResourceChanged,
+        this,
+        camerasUpdaterFor(RightPanel::CameraSelection::current));
 
     m_contextConnections << connect(m_context->workbench(), &Workbench::currentLayoutChanged,
         this, camerasUpdaterFor(RightPanel::CameraSelection::layout));
@@ -329,7 +332,7 @@ void CommonObjectSearchSetup::Private::setTimeSelection(RightPanel::TimeSelectio
     m_timeSelection = value;
 
     if (m_context && m_timeSelection != RightPanel::TimeSelection::selection)
-        m_context->navigator()->clearTimelineSelection();
+        m_context->workbenchContext()->navigator()->clearTimelineSelection();
 
     updateRelevantTimePeriod();
     emit q->timeSelectionChanged();
@@ -364,7 +367,8 @@ void CommonObjectSearchSetup::Private::updateRelevantCameras()
 
         case RightPanel::CameraSelection::current:
             m_model->cameraSet()->setSingleCamera(
-                m_context->navigator()->currentResource().dynamicCast<QnVirtualCameraResource>());
+                m_context->workbenchContext()->navigator()->currentResource()
+                    .dynamicCast<QnVirtualCameraResource>());
             break;
 
         case RightPanel::CameraSelection::custom:
@@ -395,8 +399,8 @@ bool CommonObjectSearchSetup::Private::chooseCustomCameras()
     }
 
     const auto cameras = nx::utils::toQSet(
-        m_context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            chosenIds));
+        m_context->system()->resourcePool()
+            ->getResourcesByIds<QnVirtualCameraResource>(chosenIds));
 
     if (cameras.empty())
         return false; //< Cancel, if user didn't select any camera.

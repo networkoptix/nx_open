@@ -23,7 +23,7 @@ Window
 {
     id: dialog
 
-    property WorkbenchContext workbenchContext: null
+    property WindowContext windowContext: null
 
     modality: Qt.NonModal
 
@@ -448,7 +448,7 @@ Window
                 {
                     id: eventModel
 
-                    context: workbenchContext
+                    context: windowContext
                     type: { return RightPanelModel.Type.analytics }
                     previewsEnabled: counterBlock.showThumbnails
                     active: true
@@ -676,8 +676,8 @@ Window
 
         property var analyticsFiltersByEngine: ({})
 
-        property var filterModel: workbenchContext
-            ? workbenchContext.systemContext.taxonomyManager().createFilterModel(dialog)
+        property var filterModel: windowContext
+            ? windowContext.systemContext.taxonomyManager().createFilterModel(dialog)
             : emptyFilterModel
 
         readonly property Analytics.Engine selectedAnalyticsEngine:

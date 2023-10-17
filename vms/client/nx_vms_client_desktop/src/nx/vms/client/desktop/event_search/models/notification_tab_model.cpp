@@ -1,14 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "notification_tab_model.h"
-#include "notification_list_model.h"
-#include "local_notifications_list_model.h"
-#include "system_health_list_model.h"
-#include "call_notifications_list_model.h"
-
-#include <ui/models/sort_filter_list_model.h>
 
 #include <nx/vms/client/desktop/common/models/subset_list_model.h>
+#include <ui/models/sort_filter_list_model.h>
+
+#include "call_notifications_list_model.h"
+#include "local_notifications_list_model.h"
+#include "notification_list_model.h"
+#include "system_health_list_model.h"
 
 namespace nx::vms::client::desktop {
 
@@ -96,7 +96,7 @@ struct NotificationTabModel::Private
     }
 };
 
-NotificationTabModel::NotificationTabModel(QnWorkbenchContext* context, QObject* parent):
+NotificationTabModel::NotificationTabModel(WindowContext* context, QObject* parent):
     base_type(parent),
     d(new Private{
         new NotificationListModel(context, this),

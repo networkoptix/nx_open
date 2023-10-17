@@ -10,9 +10,12 @@
 
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 
 #include "action_factory.h"
 #include "descriptors.h"
@@ -75,7 +78,6 @@ Manager* Manager::create(QObject* parent)
 
 Manager::Manager(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     m_mutex(nx::Mutex::Recursive),
     d(new Private{
         .q = this,
@@ -337,10 +339,11 @@ void Manager::initializeDevice(const DevicePtr& device, const JoystickDescriptor
             });
 
     d->deviceConnections[device->path()] <<
-        connect(factory.get(), &ActionFactory::actionReady, menu(),
-            [this](ui::action::IDType id, const ui::action::Parameters& parameters)
+        connect(factory.get(), &ActionFactory::actionReady, this,
+            [this](menu::IDType id, const menu::Parameters& parameters)
             {
-                menu()->triggerIfPossible(id, parameters);
+                if (auto context = appContext()->mainWindowContext())
+                    context->menu()->triggerIfPossible(id, parameters);
             });
 
     d->actionFactories[device->path()] = factory;

@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::desktop::rules {
 
-class LookupListsModel: public QAbstractListModel, public QnWorkbenchContextAware
+class LookupListsModel: public QAbstractListModel, public SystemContextAware
 {
     Q_OBJECT
 
@@ -19,7 +19,7 @@ public:
     };
     Q_ENUM(Roles)
 
-    LookupListsModel(QnWorkbenchContext* context, QObject* parent);
+    LookupListsModel(SystemContext* context, QObject* parent);
 
     std::optional<QString> objectTypeId() const;
     void setObjectTypeId(const QString& type);

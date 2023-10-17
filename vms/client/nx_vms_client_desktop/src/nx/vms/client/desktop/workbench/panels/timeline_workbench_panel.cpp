@@ -9,7 +9,7 @@
 
 #include <client/client_runtime_settings.h>
 #include <nx/utils/math/math.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/control_widget.h>
 #include <nx/vms/client/desktop/workbench/timeline/navigation_widget.h>
@@ -73,12 +73,12 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_resizing(false),
     m_updateResizerGeometryLater(false),
     m_autoHideHeight(0),
-    m_navigationWidget(new workbench::timeline::NavigationWidget(context(), mainWindow()->view())),
-    m_controlWidget(new workbench::timeline::ControlWidget(context(), mainWindow()->view())),
-    m_pinButton(newPinTimelineButton(parentWidget, context(),
-        ui::action::PinTimelineAction)),
-    m_showButton(newShowHideButton(parentWidget, context(),
-        ui::action::ToggleTimelineAction)),
+    m_navigationWidget(new workbench::timeline::NavigationWidget(windowContext(), mainWindow()->view())),
+    m_controlWidget(new workbench::timeline::ControlWidget(windowContext(), mainWindow()->view())),
+    m_pinButton(newPinTimelineButton(parentWidget, windowContext(),
+        menu::PinTimelineAction)),
+    m_showButton(newShowHideButton(parentWidget, windowContext(),
+        menu::ToggleTimelineAction)),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
     m_showWidget(new GraphicsWidget(parentWidget)),
     m_autoHideTimer(nullptr),
@@ -149,9 +149,9 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_pinButton->setZValue(ControlItemZOrder);
     m_pinButton->setVisible(false);
 
-    action(ui::action::ToggleTimelineAction)->setData(settings.state == Qn::PaneState::Opened);
+    action(menu::ToggleTimelineAction)->setData(settings.state == Qn::PaneState::Opened);
 
-    connect(action(ui::action::ToggleTimelineAction), &QAction::toggled, this,
+    connect(action(menu::ToggleTimelineAction), &QAction::toggled, this,
         [this](bool checked)
         {
             if (!isPinned())
@@ -164,7 +164,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
                 setOpened(checked, true);
         });
 
-    connect(action(ui::action::PinTimelineAction), &QAction::triggered, this,
+    connect(action(menu::PinTimelineAction), &QAction::triggered, this,
         [this]
         {
             m_isPinnedManually = true;
@@ -235,10 +235,10 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
             if (!zoomedMotionSearch && !isPinned() && isOpened() && !menu()->isMenuVisible())
                 setOpened(false); // TODO: #sivanov Process handlers.
         });
-    connect(menu(), &nx::vms::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
+    connect(menu(), &nx::vms::client::desktop::menu::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
 
-    connect(action(ui::action::ToggleThumbnailsAction), &QAction::toggled, this,
+    connect(action(menu::ToggleThumbnailsAction), &QAction::toggled, this,
         [this](bool checked)
         {
             setThumbnailsVisible(checked);
@@ -292,7 +292,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::TopEdge, kShadowThickness);
     shadow->setZValue(ShadowItemZOrder);
 
-    connect(action(ui::action::ResourcesModeAction), &QAction::toggled,
+    connect(action(menu::ResourcesModeAction), &QAction::toggled,
         this, &TimelineWorkbenchPanel::updateTooltipVisibility);
 
     updateGeometry();
@@ -354,7 +354,7 @@ bool TimelineWorkbenchPanel::isPinnedManually() const
 
 bool TimelineWorkbenchPanel::isOpened() const
 {
-    return action(ui::action::ToggleTimelineAction)->isChecked();
+    return action(menu::ToggleTimelineAction)->isChecked();
 }
 
 void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -370,7 +370,7 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     QScopedValueRollback<bool> guard(m_ignoreClickEvent, true);
-    action(ui::action::ToggleTimelineAction)->setChecked(opened);
+    action(menu::ToggleTimelineAction)->setChecked(opened);
 
     m_yAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(m_yAnimator, opened
@@ -409,7 +409,7 @@ void TimelineWorkbenchPanel::updateTooltipVisibility()
 {
     const bool tooltipsVisible = isOpened()
         && m_visible
-        && action(ui::action::ResourcesModeAction)->isChecked()
+        && action(menu::ResourcesModeAction)->isChecked()
         && !qnRuntime->isVideoWallMode();
 
     item->timeSlider()->setTooltipVisible(tooltipsVisible);
@@ -543,7 +543,7 @@ void TimelineWorkbenchPanel::setThumbnailsVisible(bool visible)
 
     // Fix Y coordinate.
     setOpened(/*opened*/ true, /*animate*/ false);
-    action(ui::action::ToggleThumbnailsAction)->setChecked(visible);
+    action(menu::ToggleThumbnailsAction)->setChecked(visible);
 }
 
 void TimelineWorkbenchPanel::setThumbnailsState(bool visible, qreal lastThumbnailsHeight)
@@ -558,7 +558,7 @@ void TimelineWorkbenchPanel::setThumbnailsState(bool visible, qreal lastThumbnai
     geometry.setHeight(height);
     item->setGeometry(geometry);
 
-    action(ui::action::ToggleThumbnailsAction)->setChecked(visible);
+    action(menu::ToggleThumbnailsAction)->setChecked(visible);
 }
 
 qreal TimelineWorkbenchPanel::thumbnailsHeight() const
@@ -706,7 +706,7 @@ void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
     }
 
     updateResizerGeometry();
-    action(ui::action::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
+    action(menu::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
 }
 
 void TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent(QObject* /*target*/, QEvent* event)

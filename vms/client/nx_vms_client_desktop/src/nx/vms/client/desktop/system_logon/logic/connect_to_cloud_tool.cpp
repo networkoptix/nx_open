@@ -17,8 +17,10 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/settings/show_once_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/ui/oauth_login_dialog.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
@@ -54,19 +56,15 @@ bool ConnectToCloudTool::tryClose(bool /*force*/)
     return true;
 }
 
-void ConnectToCloudTool::forcedUpdate()
-{
-}
-
 bool ConnectToCloudTool::start()
 {
-    if (!NX_ASSERT(resourcePool()->getAdministrator()))
+    if (!NX_ASSERT(system()->resourcePool()->getAdministrator()))
     {
         showFailure(tr("Local System owner is absent or disabled."));
         return false;
     }
 
-    if (!resourcePool()->masterCloudSyncServer())
+    if (!system()->resourcePool()->masterCloudSyncServer())
     {
         showFailure(tr("None of your Servers has connection to %1.",
             "%1 is the short cloud name (like Cloud)")
@@ -90,7 +88,7 @@ void ConnectToCloudTool::cancel()
 
 void ConnectToCloudTool::showSuccess(const QString& /*cloudLogin*/)
 {
-    menu()->trigger(ui::action::HideCloudPromoAction);
+    showOnceSettings()->cloudPromo = true;
 
     QnSessionAwareMessageBox::success(getTopWidget(),
         tr("System connected to %1", "%1 is the cloud name (like Nx Cloud)")
@@ -153,7 +151,7 @@ void ConnectToCloudTool::onCloudAuthDataReady()
     m_cloudConnection->setCredentials(m_cloudAuthData.credentials);
 
     SystemRegistrationData sysRegistrationData;
-    sysRegistrationData.name = systemSettings()->systemName().toStdString();
+    sysRegistrationData.name = system()->globalSettings()->systemName().toStdString();
     sysRegistrationData.customization = nx::branding::customization().toStdString();
 
     const auto handler =
@@ -251,8 +249,12 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
     if (!NX_ASSERT(!localToken.empty()))
         return;
 
-    if (!NX_ASSERT(connection()))
+    const auto api = system()->connectedServerApi();
+    if (!api)
+    {
+        cancel();
         return;
+    }
 
     auto handleReply = nx::utils::guarded(this,
         [this](bool, rest::Handle, rest::ErrorOrEmpty reply)
@@ -275,7 +277,8 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
             showFailure(errorMessage);
         });
 
-    connectedServerApi()->bindSystemToCloud(QString::fromStdString(m_systemData.id),
+    api->bindSystemToCloud(
+        QString::fromStdString(m_systemData.id),
         QString::fromStdString(m_systemData.authKey),
         QString::fromStdString(m_cloudAuthData.credentials.username),
         localToken.value,

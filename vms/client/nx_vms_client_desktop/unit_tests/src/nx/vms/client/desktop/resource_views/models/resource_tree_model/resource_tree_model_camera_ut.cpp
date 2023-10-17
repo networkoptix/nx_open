@@ -925,7 +925,7 @@ TEST_F(ResourceTreeModelTest, cameraNodeProvidesResource)
         cameraIndex));
 }
 
-// TODO: #vbreus setData() is no-op due to absence of action::Manager instance
+// TODO: #vbreus setData() is no-op due to absence of menu::Manager instance
 // within QnResourceTreeModel instance.
 TEST_F(ResourceTreeModelTest, resourceEditActionAffectsTree)
 {

@@ -7,7 +7,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/ui/scene/models/resource_tree_model_adapter.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -64,7 +64,7 @@ public:
 
 class ResourceBrowserWrapper:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
 public:
     Q_OBJECT
@@ -73,13 +73,14 @@ public:
     const ResourceTreeWrapper tree{&resourceBrowser, "tree"};
 
 public:
-    ResourceBrowserWrapper(QnWorkbenchContext* context,
+    ResourceBrowserWrapper(
+        WindowContext* context,
         QmlProperty<QQuickItem*> resourceBrowser,
         QWidget* focusScope);
 
     virtual ~ResourceBrowserWrapper() override;
 
-    ui::action::Parameters currentParameters() const;
+    menu::Parameters currentParameters() const;
 
 signals:
     void resourceSelectionChanged();
@@ -89,7 +90,7 @@ private:
     void handleNewResourceItemAction();
     void handleSelectAllAction();
     void beforeGroupProcessing();
-    void afterGroupProcessing(ui::action::IDType eventType);
+    void afterGroupProcessing(menu::IDType eventType);
     void acquireClientState();
 
     std::pair<QModelIndex, int /*depth*/> findResourceIndex(const QModelIndex& parent) const;

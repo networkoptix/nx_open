@@ -19,7 +19,7 @@ class ObjectLookupPicker: public TitledFieldPickerWidget<vms::rules::ObjectLooku
     Q_OBJECT
 
 public:
-    ObjectLookupPicker(QnWorkbenchContext* context, CommonParamsWidget* parent);
+    ObjectLookupPicker(SystemContext* context, CommonParamsWidget* parent);
 
 protected:
     void onDescriptorSet() override;

@@ -3,9 +3,10 @@
 #include "user_emails_watcher.h"
 
 #include <core/resource/user_resource.h>
-#include <nx/vms/client/core/resource/session_resources_signal_listener.h>
-#include <utils/email/email.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <utils/email/email.h>
 
 namespace nx::vms::client::desktop {
 
@@ -21,11 +22,13 @@ bool userHasInvalidEmail(const QnUserResourcePtr& user)
 
 } // namespace
 
-UserEmailsWatcher::UserEmailsWatcher(QObject* parent):
+UserEmailsWatcher::UserEmailsWatcher(SystemContext* systemContext, QObject* parent):
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    SystemContextAware(systemContext)
 {
-    auto userChangesListener = new core::SessionResourcesSignalListener<QnUserResource>(this);
+    auto userChangesListener = new core::SessionResourcesSignalListener<QnUserResource>(
+        systemContext,
+        this);
 
     const auto checkUser =
         [this](const QnUserResourcePtr& user)

@@ -6,8 +6,8 @@
 
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 
 namespace
 {

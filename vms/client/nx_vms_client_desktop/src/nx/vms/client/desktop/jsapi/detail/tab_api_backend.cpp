@@ -8,11 +8,11 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/controls/time_slider.h>
@@ -72,7 +72,7 @@ Error cantFindItemResult()
 struct TabApiBackend::Private: public QObject
 {
     TabApiBackend* const q;
-    QnWorkbenchContext* const context;
+    WindowContext* const context;
     QnWorkbenchLayout* const layout;
     QnWorkbenchDisplay* const display;
     QnWorkbenchNavigator* const navigator;
@@ -84,7 +84,7 @@ struct TabApiBackend::Private: public QObject
 
     Private(
         TabApiBackend* q,
-        QnWorkbenchContext* context,
+        WindowContext* context,
         QnWorkbenchLayout* layout);
 
     void updateLayoutItemData(
@@ -123,14 +123,14 @@ struct TabApiBackend::Private: public QObject
 
 TabApiBackend::Private::Private(
     TabApiBackend* q,
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QnWorkbenchLayout* layout)
     :
     q(q),
     context(context),
     layout(layout),
-    display(context->display()),
-    navigator(context->navigator())
+    display(context->workbenchContext()->display()),
+    navigator(context->workbenchContext()->navigator())
 {
     const auto handleItemAdded =
         [this, q](QnWorkbenchItem* item)
@@ -475,7 +475,7 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
 
 QnResourceWidget* TabApiBackend::Private::focusedMediaWidget() const
 {
-    const auto widgets = context->display()->widgets();
+    const auto widgets = context->workbenchContext()->display()->widgets();
     const auto it = std::find_if(widgets.cbegin(), widgets.cend(),
         [this](const QnResourceWidget* widget)
         {
@@ -499,7 +499,7 @@ bool TabApiBackend::Private::isFocusedWidget(const QnResourceWidget* widget) con
         {
             // We suppose item is focused in the inactive state only if
             // there is no other active and focused item.
-            const auto widgets = context->display()->widgets();
+            const auto widgets = context->workbenchContext()->display()->widgets();
             return !std::any_of(widgets.cbegin(), widgets.cend(),
                 [this](const QnResourceWidget* widget)
                 {
@@ -632,7 +632,7 @@ bool TabApiBackend::Private::hasPermissions(
 //-------------------------------------------------------------------------------------------------
 
 TabApiBackend::TabApiBackend(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QnWorkbenchLayout* layout,
     QObject* parent)
     :
@@ -689,8 +689,8 @@ ItemResult TabApiBackend::addItem(const ResourceUniqueId& resourceId, const Item
     if (!d->hasPermissions(resource, Qn::ViewContentPermission))
         return d->itemOperationResult(Error::denied());
 
-    const auto actionParams = ui::action::Parameters(resource);
-    if (!d->context->menu()->canTrigger(ui::action::OpenInCurrentLayoutAction, actionParams))
+    const auto actionParams = menu::Parameters(resource);
+    if (!d->context->menu()->canTrigger(menu::OpenInCurrentLayoutAction, actionParams))
     {
         return d->itemOperationResult(
             Error::failed(tr("Cannot add the resource to the layout")));
@@ -746,7 +746,7 @@ Error TabApiBackend::syncWith(const QUuid& itemId)
     if (!item)
         return cantFindItemResult();
 
-    const auto widget = d->context->display()->widget(item);
+    const auto widget = d->context->workbenchContext()->display()->widget(item);
     if (!widget)
         return Error::failed(tr("Cannot find a widget corresponding to the specified item."));
 
@@ -802,7 +802,7 @@ Error TabApiBackend::saveLayout()
 
     const auto layoutResource = d->layout->resource();
     const auto menu = d->context->menu();
-    const bool success = menu->triggerIfPossible(ui::action::SaveLayoutAction, layoutResource);
+    const bool success = menu->triggerIfPossible(menu::SaveLayoutAction, layoutResource);
     return success
         ? Error::success()
         : Error::failed();

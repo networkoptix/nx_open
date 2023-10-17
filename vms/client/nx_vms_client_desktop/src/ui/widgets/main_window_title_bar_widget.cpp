@@ -26,12 +26,12 @@
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/common/palette.h>
@@ -46,7 +46,6 @@
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
@@ -171,11 +170,11 @@ void QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick()
 }
 
 QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
-    QnWorkbenchContext* context,
+    WindowContext* windowContext,
     QWidget* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(context),
+    WindowContextAware(windowContext),
     d_ptr(new QnMainWindowTitleBarWidgetPrivate(this))
 {
     Q_D(QnMainWindowTitleBarWidget);
@@ -191,16 +190,16 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     setPaletteColor(this, QPalette::Window, windowColor);
 
     d->mainMenuButton = newActionButton(
-        action::MainMenuAction,
+        menu::MainMenuAction,
         qnSkin->icon("titlebar/main_menu.svg", "", nullptr, Style::kTitleBarSubstitutions),
         HelpTopic::Id::MainWindow_TitleBar_MainMenu);
     connect(d->mainMenuButton, &ToolButton::justPressed, this,
         [this]()
         {
-            menu()->trigger(action::MainMenuAction);
+            menu()->trigger(menu::MainMenuAction);
         });
 
-    connect(action(action::MainMenuAction), &QAction::triggered, this,
+    connect(action(menu::MainMenuAction), &QAction::triggered, this,
         [this]()
         {
             Q_D(QnMainWindowTitleBarWidget);
@@ -212,7 +211,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             QScopedValueRollback<bool> guard(d->isMenuOpened, true);
 
             static const QPoint kVerticalOffset(0, 2);
-            d->mainMenuHolder.reset(menu()->newMenu(action::MainScope, mainWindowWidget()));
+            d->mainMenuHolder.reset(menu()->newMenu(menu::MainScope, mainWindowWidget()));
             d->mainMenuButton->setDown(true);
             executeButtonMenu(d->mainMenuButton, d->mainMenuHolder.data(), kVerticalOffset);
         },
@@ -225,25 +224,25 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
                                // TODO: #vkutin #gdm #ynikitenkov Lift this limitation in the
                                // future
 
-    d->layoutBar = new QnLayoutTabBar(this);
+    d->layoutBar = new QnLayoutTabBar(windowContext, this);
     d->layoutBar->setFocusPolicy(Qt::NoFocus);
     d->layoutBar->setFixedHeight(kLayoutBarHeight);
     connect(d->layoutBar, &QnLayoutTabBar::tabCloseRequested, d,
         &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
 
-    d->cloudPanel = new QnCloudStatusPanel(this);
+    d->cloudPanel = new QnCloudStatusPanel(windowContext, this);
     d->cloudPanel->setFocusPolicy(Qt::NoFocus);
 
     const QString styleSheet = QString("QToolButton:hover { background-color: %1 }")
         .arg(core::colorTheme()->color("dark8").name());
     d->newTabButton = newActionButton(
-        action::OpenNewTabAction,
+        menu::OpenNewTabAction,
         HelpTopic::Id::MainWindow_TitleBar_NewLayout,
         kTabBarButtonSize);
     d->newTabButton->setStyleSheet(styleSheet);
 
     d->currentLayoutsButton = newActionButton(
-        action::OpenCurrentUserLayoutMenu,
+        menu::OpenCurrentUserLayoutMenu,
         kTabBarButtonSize);
     d->currentLayoutsButton->setStyleSheet(styleSheet);
     connect(d->currentLayoutsButton, &ToolButton::justPressed, this,
@@ -256,8 +255,8 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             QScopedValueRollback<bool> guard(d->isMenuOpened, true);
 
             QScopedPointer<QMenu> layoutsMenu(menu()->newMenu(
-                action::OpenCurrentUserLayoutMenu,
-                action::TitleBarScope,
+                menu::OpenCurrentUserLayoutMenu,
+                menu::TitleBarScope,
                 mainWindowWidget()));
 
             executeButtonMenu(d->currentLayoutsButton, layoutsMenu.data());
@@ -327,7 +326,7 @@ void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
     d->layoutBar->setVisible(visible);
     d->newTabButton->setVisible(visible);
     d->currentLayoutsButton->setVisible(visible);
-    action(action::OpenNewTabAction)->setEnabled(visible);
+    action(menu::OpenNewTabAction)->setEnabled(visible);
 }
 
 void QnMainWindowTitleBarWidget::setHomeTabActive(bool isActive)
@@ -386,7 +385,7 @@ void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
         return;
     }
 
-    menu()->trigger(action::EffectiveMaximizeAction);
+    menu()->trigger(menu::EffectiveMaximizeAction);
     event->accept();
 #endif
 }
@@ -425,20 +424,24 @@ void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
     if (d->mimeData->isEmpty())
         return;
 
-    const auto showreels = systemContext()->showreelManager()->showreels(d->mimeData->entities());
+    const auto systemContext = system();
+    if (!systemContext)
+        return;
+
+    const auto showreels = systemContext->showreelManager()->showreels(d->mimeData->entities());
     for (const auto& showreel: showreels)
-        menu()->trigger(action::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
+        menu()->trigger(menu::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
 
-    resourcePool()->addNewResources(d->mimeData->resources());
+    systemContext->resourcePool()->addNewResources(d->mimeData->resources());
 
-    menu()->triggerIfPossible(action::OpenInNewTabAction, d->mimeData->resources());
+    menu()->triggerIfPossible(menu::OpenInNewTabAction, d->mimeData->resources());
 
     d->mimeData.reset();
     event->acceptProposedAction();
 }
 
 ToolButton *QnMainWindowTitleBarWidget::newActionButton(
-    action::IDType actionId,
+    menu::IDType actionId,
     const QIcon& icon,
     int helpTopicId)
 {
@@ -458,7 +461,7 @@ ToolButton *QnMainWindowTitleBarWidget::newActionButton(
 }
 
 ToolButton* QnMainWindowTitleBarWidget::newActionButton(
-    action::IDType actionId,
+    menu::IDType actionId,
     int helpTopicId,
     const QSize& fixedSize)
 {
@@ -477,7 +480,7 @@ ToolButton* QnMainWindowTitleBarWidget::newActionButton(
 }
 
 ToolButton* QnMainWindowTitleBarWidget::newActionButton(
-    action::IDType actionId,
+    menu::IDType actionId,
     const QSize& fixedSize)
 {
     return newActionButton(actionId, HelpTopic::Id::Empty, fixedSize);
@@ -485,7 +488,7 @@ ToolButton* QnMainWindowTitleBarWidget::newActionButton(
 
 QWidget* QnMainWindowTitleBarWidget::newRecordingIndicator(const QSize& fixedSize)
 {
-    auto screenRecordingAction = action(ui::action::ToggleScreenRecordingAction);
+    auto screenRecordingAction = action(menu::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
         return nullptr;
 
@@ -498,7 +501,7 @@ QWidget* QnMainWindowTitleBarWidget::newRecordingIndicator(const QSize& fixedSiz
     connect(indicator, &QAbstractButton::clicked, this,
         [this]
         {
-            menu()->trigger(ui::action::ToggleScreenRecordingAction);
+            menu()->trigger(menu::ToggleScreenRecordingAction);
         });
 
     indicator->setFixedSize(fixedSize);
@@ -545,16 +548,16 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
         d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     }
     d->systemLayout->addWidget(newActionButton(
-        action::WhatsThisAction,
+        menu::WhatsThisAction,
         HelpTopic::Id::MainWindow_ContextHelp,
         kControlButtonSize));
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     d->systemLayout->addWidget(newActionButton(
-        action::MinimizeAction,
+        menu::MinimizeAction,
         kControlButtonSize));
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));
     d->systemLayout->addWidget(newActionButton(
-        action::EffectiveMaximizeAction,
+        menu::EffectiveMaximizeAction,
         HelpTopic::Id::MainWindow_Fullscreen,
         kControlButtonSize));
     d->systemLayout->addWidget(newVLine("dark8", "dark6"));
@@ -565,7 +568,7 @@ void QnMainWindowTitleBarWidget::initMultiSystemTabBar()
             { QnIcon::Active, {{ background, "red_d1" }}},
             { QnIcon::Pressed, {{ background, "red_d1" }}}};
         QIcon icon = qnSkin->icon("titlebar/window_close.svg", "", nullptr, colorSubs);
-        d->systemLayout->addWidget(newActionButton(action::ExitAction, icon));
+        d->systemLayout->addWidget(newActionButton(menu::ExitAction, icon));
     }
     d->widgetsToTransfer << d->layoutBar;
     d->tabLayout->addWidget(d->layoutBar);
@@ -626,23 +629,23 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
         layout->addWidget(indicator);
 #ifdef ENABLE_LOGIN_TO_ANOTHER_SYSTEM_BUTTON
     layout->addWidget(newActionButton(
-        action::OpenLoginDialogAction,
+        menu::OpenLoginDialogAction,
         HelpTopic::Id::Login,
         kControlButtonSize));
 #else
     layout->addSpacing(8);
 #endif
     layout->addWidget(newActionButton(
-        action::WhatsThisAction,
+        menu::WhatsThisAction,
         HelpTopic::Id::MainWindow_ContextHelp,
         kControlButtonSize));
     layout->addWidget(newVLine("dark8", "dark6"));
     layout->addWidget(newActionButton(
-        action::MinimizeAction,
+        menu::MinimizeAction,
         kControlButtonSize));
     layout->addWidget(newVLine("dark8", "dark6"));
     layout->addWidget(newActionButton(
-        action::EffectiveMaximizeAction,
+        menu::EffectiveMaximizeAction,
         HelpTopic::Id::MainWindow_Fullscreen,
         kControlButtonSize));
     layout->addWidget(newVLine("dark8", "dark6"));
@@ -656,7 +659,7 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
             /*checkedName*/ "",
             /*suffixes*/ nullptr,
             /*svgColorSubstitutions*/ colorSubs);
-        layout->addWidget(newActionButton(action::ExitAction, icon));
+        layout->addWidget(newActionButton(menu::ExitAction, icon));
     }
 }
 

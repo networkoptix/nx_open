@@ -9,7 +9,7 @@
 
 #include <api/model/audit/audit_record.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnAuditLogMasterModel;
@@ -91,14 +91,14 @@ private:
         const QColor& activeColor,
         Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord* record);
-    void triggerAction(const QnAuditRecord* record, nx::vms::client::desktop::ui::action::IDType ActionId, int selectedPage);
+    void triggerAction(const QnAuditRecord* record, nx::vms::client::desktop::menu::IDType ActionId, int selectedPage);
     QnAuditRecordRefList applyFilter();
     void makeSessionData();
     void makeCameraData();
     void setupContextMenu(nx::vms::client::desktop::TableView* gridMaster);
     nx::vms::client::desktop::TableView* currentGridView() const;
 
-    virtual void retranslateUi() override;
+    void retranslateUi();
 
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;

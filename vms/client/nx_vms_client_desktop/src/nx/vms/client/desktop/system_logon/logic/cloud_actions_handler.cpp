@@ -2,8 +2,8 @@
 
 #include "cloud_actions_handler.h"
 
-#include <QtGui/QDesktopServices>
 #include <QtGui/QAction>
+#include <QtGui/QDesktopServices>
 
 #include <client/client_globals.h>
 #include <core/resource/user_resource.h>
@@ -14,8 +14,8 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/connection_diagnostics_helper.h>
 
@@ -27,9 +27,9 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(ui::action::LoginToCloud), &QAction::triggered, this,
+    connect(action(menu::LoginToCloud), &QAction::triggered, this,
         &CloudActionsHandler::at_loginToCloudAction_triggered);
-    connect(action(ui::action::LogoutFromCloud), &QAction::triggered, this,
+    connect(action(menu::LogoutFromCloud), &QAction::triggered, this,
         &CloudActionsHandler::at_logoutFromCloudAction_triggered);
 
     auto openUrl =
@@ -42,19 +42,19 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
         nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
         nx::vms::utils::SystemUri::ReferralContext::CloudMenu);
 
-    connect(action(ui::action::OpenCloudMainUrl), &QAction::triggered, this,
+    connect(action(menu::OpenCloudMainUrl), &QAction::triggered, this,
         openUrl(urlHelper.mainUrl()));
 
-    connect(action(ui::action::OpenCloudViewSystemUrl), &QAction::triggered, this,
+    connect(action(menu::OpenCloudViewSystemUrl), &QAction::triggered, this,
         openUrl(urlHelper.viewSystemUrl()));
 
-    connect(action(ui::action::OpenCloudManagementUrl), &QAction::triggered, this,
+    connect(action(menu::OpenCloudManagementUrl), &QAction::triggered, this,
         openUrl(urlHelper.accountManagementUrl()));
 
-    connect(action(ui::action::OpenCloudRegisterUrl), &QAction::triggered, this,
+    connect(action(menu::OpenCloudRegisterUrl), &QAction::triggered, this,
         openUrl(urlHelper.createAccountUrl()));
 
-    connect(action(ui::action::OpenCloudAccountSecurityUrl), &QAction::triggered, this,
+    connect(action(menu::OpenCloudAccountSecurityUrl), &QAction::triggered, this,
         openUrl(urlHelper.accountSecurityUrl()));
 
     // Forcing logging out if found 'logged out' status.
@@ -76,7 +76,7 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
                 logoutFromCloud();
 
                 if (context()->user() && context()->user()->isCloud())
-                    menu()->trigger(ui::action::DisconnectAction, {Qn::ForceRole, true});
+                    menu()->trigger(menu::DisconnectAction, {Qn::ForceRole, true});
             }
         });
 }
@@ -112,7 +112,7 @@ void CloudActionsHandler::at_logoutFromCloudAction_triggered()
 void CloudActionsHandler::at_logout()
 {
     QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
-        context(),
+        windowContext(),
         nx::vms::client::core::RemoteConnectionErrorCode::cloudSessionExpired,
         /*moduleInformation*/ {},
         appContext()->version());
@@ -120,10 +120,10 @@ void CloudActionsHandler::at_logout()
 
 void CloudActionsHandler::at_forcedLogout()
 {
-    menu()->trigger(ui::action::LogoutFromCloud);
+    menu()->trigger(menu::LogoutFromCloud);
 
     QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
-        context(),
+        windowContext(),
         nx::vms::client::core::RemoteConnectionErrorCode::cloudSessionExpired,
         /*moduleInformation*/ {},
         appContext()->version());

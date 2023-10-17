@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::desktop::joystick {
 
-class JoystickButtonActionChoiceModel: public QAbstractListModel, public QnWorkbenchContextAware
+class JoystickButtonActionChoiceModel: public QAbstractListModel, public WindowContextAware
 {
     Q_OBJECT
 
@@ -18,13 +18,13 @@ class JoystickButtonActionChoiceModel: public QAbstractListModel, public QnWorkb
     struct ActionInfo
     {
         bool isSeparator = true;
-        ui::action::IDType id = ui::action::NoAction;
+        menu::IDType id = menu::NoAction;
         QString name;
 
         ActionInfo()
         {}
 
-        ActionInfo(ui::action::IDType actionId, const QString& name):
+        ActionInfo(menu::IDType actionId, const QString& name):
             isSeparator(false),
             id(actionId),
             name(name)
@@ -49,19 +49,20 @@ public:
     Q_ENUM(Roles)
 
 public:
-    explicit JoystickButtonActionChoiceModel(bool withModifier, QObject* parent = nullptr);
+    JoystickButtonActionChoiceModel(
+        WindowContext* windowContext, bool withModifier, QObject* parent = nullptr);
     virtual ~JoystickButtonActionChoiceModel() override;
 
     void initButtons(
-        const QHash<QString, ui::action::IDType>& baseActions,
-        const QHash<QString, ui::action::IDType>& modifiedActions);
+        const QHash<QString, menu::IDType>& baseActions,
+        const QHash<QString, menu::IDType>& modifiedActions);
 
     void setOpenLayoutChoiceEnabled(bool enabled);
     void setOpenLayoutChoiceVisible(bool visible);
 
     Q_INVOKABLE int getRow(const QVariant& actionId) const;
     Q_INVOKABLE void setActionButton(
-        ui::action::IDType actionId,
+        menu::IDType actionId,
         const QString& buttonName,
         bool withModifier = false);
 

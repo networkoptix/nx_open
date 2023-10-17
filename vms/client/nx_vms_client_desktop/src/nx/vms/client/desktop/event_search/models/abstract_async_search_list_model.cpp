@@ -1,16 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "abstract_async_search_list_model.h"
-#include "private/abstract_async_search_list_model_p.h"
 
 #include <core/resource/camera_resource.h>
-
 #include <nx/utils/log/log.h>
+
+#include "private/abstract_async_search_list_model_p.h"
 
 namespace nx::vms::client::desktop {
 
 AbstractAsyncSearchListModel::AbstractAsyncSearchListModel(
-    QnWorkbenchContext* context, CreatePrivate dCreator, QObject* parent)
+    WindowContext* context, CreatePrivate dCreator, QObject* parent)
     :
     base_type(context, parent),
     d(dCreator())

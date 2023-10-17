@@ -10,9 +10,8 @@
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_state_reducer.h>
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_properties/layout/watchers/layout_logical_ids_watcher.h>
-#include <nx/vms/common/system_context.h>
-#include <nx/vms/common/test_support/api/message_processor_mock.h>
-#include <nx/vms/common/test_support/test_context.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -201,7 +200,7 @@ class LayoutSettingsDialogStateReducerBackgroundTest:
 {
 };
 
-class LayoutSettingsDialogStateInteractionTest: public nx::vms::common::test::ContextBasedTest
+class LayoutSettingsDialogStateInteractionTest: public ContextBasedTest
 {
 protected:
     Store& store() { return *m_store; }
@@ -210,7 +209,7 @@ protected:
     void loadLayout(const QnLayoutResourcePtr& layout)
     {
         m_store->loadLayout(layout);
-        m_logicalIdsWatcher->setExcludedLayout(layout);
+        m_logicalIdsWatcher.reset(new LayoutLogicalIdsWatcher(m_store.get(), layout));
     }
 
     QnLayoutResourcePtr addLayout(const QString& name, int logicalId = 0)
@@ -230,16 +229,7 @@ protected:
     {
         Reducer::setTracingEnabled(true);
         Reducer::setScreenAspectRatio({16, 9});
-
-        auto messageProcessor = createMessageProcessor();
-
         m_store.reset(new Store());
-        m_logicalIdsWatcher.reset(new LayoutLogicalIdsWatcher(
-            m_store.get(),
-            systemContext()->resourcePool(),
-            systemContext()->messageProcessor()));
-
-        messageProcessor->emulateConnectionEstablished();
     }
 
     /**

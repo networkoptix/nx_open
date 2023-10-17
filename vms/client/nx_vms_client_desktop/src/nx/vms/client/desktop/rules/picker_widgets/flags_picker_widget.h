@@ -27,7 +27,7 @@ class FlagsPicker: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    FlagsPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    FlagsPicker(SystemContext* context, CommonParamsWidget* parent):
         base(context, parent)
     {
         auto flagsLayout = new QHBoxLayout;

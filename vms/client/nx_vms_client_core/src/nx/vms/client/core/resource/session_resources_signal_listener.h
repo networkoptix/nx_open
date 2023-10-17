@@ -4,14 +4,11 @@
 
 #include <functional>
 
-#include <api/common_message_processor.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/common/system_context.h>
+#include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::core {
 
@@ -24,15 +21,11 @@ namespace nx::vms::client::core {
  * need to update notification state each time when a user is added or removed, and also each time
  * when any user's e-mail is changed and when any user is enabled or disabled.
  *
- * After listener is set, `start()` method should be called manually. It is required to maintain
- * correctness if the class instance is constructed when the system connection is ready and active.
- * This method will do nothing if the client is not connected yet.
- *
- * Connection closing should be handled using a separate handler as the listener breaks all
- * resources pool connections instantly. There will be no separate `onRemoved()` call.
+ * After listener is set, `start()` method should be called manually to make sure all handlers are
+ * ready.
  */
 template<typename ResourceClass>
-class SessionResourcesSignalListener: public QObject
+class SessionResourcesSignalListener: public QObject, public SystemContextAware
 {
     using base_type = QObject;
     using ResourcePtr = QnSharedResourcePointer<ResourceClass>;
@@ -43,50 +36,27 @@ class SessionResourcesSignalListener: public QObject
 
 public:
     SessionResourcesSignalListener(
-        QnResourcePool* resourcePool,
-        QnCommonMessageProcessor* messageProcessor,
+        SystemContext* systemContext,
         QObject* parent = nullptr)
         :
         base_type(parent),
-        m_resourcePool(resourcePool),
-        m_messageProcessor(messageProcessor)
-    {
-        NX_ASSERT(resourcePool);
-        NX_ASSERT(messageProcessor);
-
-        connect(messageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this,
-            &SessionResourcesSignalListener::establishResourcePoolConnections);
-
-        connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,
-            [this]()
-            {
-                m_connections.reset();
-                // TODO: #sivanov This code must be re-enabled after setOnConnectionClosedHandler()
-                // is repaired.
-                //if (m_onConnectionClosedHandler)
-                //    m_onConnectionClosedHandler();
-            });
-    }
-
-    SessionResourcesSignalListener(QObject* parent = nullptr):
-        SessionResourcesSignalListener(
-            qnClientCoreModule->resourcePool(),
-            qnClientCoreModule->commonModule()->messageProcessor(),
-            parent)
+        SystemContextAware(systemContext)
     {
     }
 
     /**
-     * Should be called after all handlers are set. If the client is already connected to the
-     * system, `onAdded` handler will be called immediately. Otherwise handlers will be called as
-     * soon as connection is established.
+     * Should be called after all handlers are set. If there are corresponding resources in the
+     * resources pool, `onAdded` handler will be called immediately.
      */
     void start()
     {
-        // TODO: #sivanov More correct check is to verify RemoteSession state to ensure we did not
-        // receive `initialResourcesReceived` yet.
-        if (m_messageProcessor->connection())
-            establishResourcePoolConnections();
+        establishResourcePoolConnections();
+    }
+
+    /** Stop handling resources changes. */
+    void stop()
+    {
+        m_connections.reset();
     }
 
     void setOnAddedHandler(ResourceListHandler handler)
@@ -98,13 +68,6 @@ public:
     {
         m_onRemovedHandler = handler;
     }
-
-    // TODO: #sivanov Here it is necessary to carefully consider all scenarios when the connection can
-    // be closed.
-    //void setOnConnectionClosedHandler(ConnectionClosedHandler handler)
-    //{
-    //    m_onConnectionClosedHandler = handler;
-    //}
 
     template<typename ResourceSignalClass>
     void addOnSignalHandler(ResourceSignalClass signal, ResourceHandler handler)
@@ -164,9 +127,6 @@ private:
 
     void establishResourcePoolConnections()
     {
-        if (!NX_ASSERT(m_resourcePool))
-            return;
-
         m_connections.reset();
 
         auto processAddedResources =
@@ -189,12 +149,12 @@ private:
                 }
             };
 
-        processAddedResources(m_resourcePool->getResources());
+        processAddedResources(resourcePool()->getResources());
 
-        m_connections << connect(m_resourcePool.data(), &QnResourcePool::resourcesAdded, this,
+        m_connections << connect(resourcePool(), &QnResourcePool::resourcesAdded, this,
             processAddedResources);
 
-        m_connections << connect(m_resourcePool.data(), &QnResourcePool::resourcesRemoved, this,
+        m_connections << connect(resourcePool(), &QnResourcePool::resourcesRemoved, this,
             [this](const QnResourceList& resources)
             {
                 for (const auto& resource: resources)
@@ -210,8 +170,6 @@ private:
     }
 
 private:
-    QPointer<QnResourcePool> m_resourcePool;
-    QPointer<QnCommonMessageProcessor> m_messageProcessor;
     nx::utils::ScopedConnections m_connections;
 
     ResourceListHandler m_onAddedHandler;

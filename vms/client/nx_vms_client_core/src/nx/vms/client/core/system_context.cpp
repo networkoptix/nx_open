@@ -119,7 +119,6 @@ SystemContext::SystemContext(
         case Mode::unitTests:
             break;
     }
-
     resetAccessController(new AccessController(this));
 
     if (d->userWatcher)
@@ -129,6 +128,7 @@ SystemContext::SystemContext(
             {
                 if (d->accessController)
                     d->accessController->setUser(user);
+                emit userChanged(user);
             });
     }
 }
@@ -231,6 +231,11 @@ ec2::AbstractECConnectionPtr SystemContext::messageBusConnection() const
     return {};
 }
 
+QnClientMessageProcessor* SystemContext::clientMessageProcessor() const
+{
+    return static_cast<QnClientMessageProcessor*>(this->messageProcessor());
+}
+
 QnPtzControllerPool* SystemContext::ptzControllerPool() const
 {
     return d->ptzControllerPool.get();
@@ -239,6 +244,11 @@ QnPtzControllerPool* SystemContext::ptzControllerPool() const
 UserWatcher* SystemContext::userWatcher() const
 {
     return d->userWatcher.get();
+}
+
+QnUserResourcePtr SystemContext::user() const
+{
+    return userWatcher()->user();
 }
 
 WatermarkWatcher* SystemContext::watermarkWatcher() const

@@ -14,6 +14,7 @@ namespace nx::vms::client::desktop {
 
 class AnalyticsSearchSetup;
 class CommonObjectSearchSetup;
+class WindowContext;
 
 /**
  * An utility class to synchronize Right Panel analytics tab state with current media widget
@@ -24,7 +25,8 @@ class AnalyticsSearchSynchronizer: public AbstractSearchSynchronizer
     Q_OBJECT
 
 public:
-    AnalyticsSearchSynchronizer(QnWorkbenchContext* context,
+    AnalyticsSearchSynchronizer(
+        WindowContext* windowContext,
         CommonObjectSearchSetup* commonSetup,
         AnalyticsSearchSetup* analyticsSetup,
         QObject* parent = nullptr);

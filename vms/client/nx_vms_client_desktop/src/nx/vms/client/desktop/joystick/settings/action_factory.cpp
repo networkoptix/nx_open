@@ -18,7 +18,7 @@ namespace {
 // QString.toInt() could autodetect integer base by their format (0x... for hex numbers, etc.).
 constexpr int kAutoDetectBase = 0;
 
-using namespace nx::vms::client::desktop::ui::action;
+using namespace nx::vms::client::desktop::menu;
 
 struct ParsedAction
 {

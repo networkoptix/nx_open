@@ -40,11 +40,11 @@
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
@@ -68,8 +68,8 @@
 #include <utils/common/util.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
-#include "nx/vms/client/desktop/ui/actions/action_conditions.h"
-#include "nx/vms/client/desktop/ui/actions/actions.h"
+#include "nx/vms/client/desktop/menu/action_conditions.h"
+#include "nx/vms/client/desktop/menu/actions.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
 #include "workbench_context.h"
 #include "workbench_display.h"
@@ -78,7 +78,6 @@
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 using namespace std::chrono;
 
 namespace {
@@ -127,9 +126,9 @@ bool resourceIsVmax(const QnMediaResourcePtr& resource)
 
 } //namespace
 
-QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
+QnWorkbenchNavigator::QnWorkbenchNavigator(WindowContext* context):
+    base_type(context),
+    WindowContextAware(context),
     m_lastSpeedRange(0.0, 0.0),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
@@ -142,17 +141,19 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 {
     m_updateSliderTimer.restart();
 
-    connect(appContext(),
-        &ApplicationContext::systemContextAdded,
-        this,
+    connect(appContext(), &ApplicationContext::systemContextAdded, this,
         &QnWorkbenchNavigator::connectToContext);
-    connectToContext(appContext()->currentSystemContext());
+    for (auto systemContext: appContext()->systemContexts())
+        connectToContext(systemContext);
 
-    connect(this, &QnWorkbenchNavigator::currentWidgetChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
-    connect(this, &QnWorkbenchNavigator::isRecordingChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
-    connect(this, &QnWorkbenchNavigator::hasArchiveChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
+    connect(this, &QnWorkbenchNavigator::currentWidgetChanged, this,
+        &QnWorkbenchNavigator::updateTimelineRelevancy);
+    connect(this, &QnWorkbenchNavigator::isRecordingChanged, this,
+        &QnWorkbenchNavigator::updateTimelineRelevancy);
+    connect(this, &QnWorkbenchNavigator::hasArchiveChanged, this,
+        &QnWorkbenchNavigator::updateTimelineRelevancy);
 
-    connect(resourcePool(), &QnResourcePool::statusChanged, this,
+    connect(system()->resourcePool(), &QnResourcePool::statusChanged, this,
         [this](const QnResourcePtr& resource)
         {
             auto cam = resource.dynamicCast<QnSecurityCamResource>();
@@ -165,11 +166,12 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
                 updateFootageState();
         });
 
-    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraHistoryInvalidated, this, [this](const QnSecurityCamResourcePtr &camera)
-    {
-        if (hasWidgetWithCamera(camera))
-            updateHistoryForCamera(camera);
-    });
+    connect(system()->cameraHistoryPool(), &QnCameraHistoryPool::cameraHistoryInvalidated, this,
+        [this](const QnSecurityCamResourcePtr &camera)
+        {
+            if (hasWidgetWithCamera(camera))
+                updateHistoryForCamera(camera);
+        });
 
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i)
     {
@@ -232,9 +234,9 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
             updateSyncedPeriods();
         });
 
-    connect(action(ui::action::FastForwardAction), &QAction::triggered, this,
+    connect(action(menu::FastForwardAction), &QAction::triggered, this,
         &QnWorkbenchNavigator::fastForward);
-    connect(action(ui::action::RewindAction), &QAction::triggered, this,
+    connect(action(menu::RewindAction), &QAction::triggered, this,
         &QnWorkbenchNavigator::rewind);
 }
 
@@ -309,7 +311,7 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar)
     }
 }
 
-nx::vms::client::desktop::TimelineCalendarWidget *QnWorkbenchNavigator::calendar() const
+TimelineCalendarWidget *QnWorkbenchNavigator::calendar() const
 {
     return m_calendar;
 }
@@ -371,15 +373,18 @@ void QnWorkbenchNavigator::initialize()
     connect(workbench(), &Workbench::currentLayoutChanged,
         this, &QnWorkbenchNavigator::updateSliderOptions);
 
-    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged, this,
+    connect(system()->cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged, this,
         [this](const QnSecurityCamResourcePtr & /* camera */)
         {
             updateFootageState();
         });
 
-    connect(display(), SIGNAL(widgetChanged(Qn::ItemRole)), this, SLOT(at_display_widgetChanged(Qn::ItemRole)));
-    connect(display(), SIGNAL(widgetAdded(QnResourceWidget *)), this, SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(display(), SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this, SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
+        &QnWorkbenchNavigator::at_display_widgetChanged);
+    connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
+        &QnWorkbenchNavigator::at_display_widgetAdded);
+    connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
+        &QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved);
     connect(display()->beforePaintInstrument(), QnSignalingInstrumentActivated, this,
         [this](){ updateSliderFromReader(); });
 
@@ -429,16 +434,16 @@ void QnWorkbenchNavigator::initialize()
         this, [this]() { updateTimeSliderWindowFromCalendar(); });
 
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
+    const auto timeWatcher = system()->serverTimeWatcher();
     connect(timeWatcher, &nx::vms::client::core::ServerTimeWatcher::displayOffsetsChanged,
         this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),
+    connect(workbenchContext()->instance<QnWorkbenchUserInactivityWatcher>(),
         &QnWorkbenchUserInactivityWatcher::stateChanged,
         this,
         &QnWorkbenchNavigator::updateAutoPaused);
 
-    connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
+    connect(action(menu::ToggleShowreelModeAction), &QAction::toggled, this,
         &QnWorkbenchNavigator::updateAutoPaused);
 
     updateLines();
@@ -450,7 +455,7 @@ void QnWorkbenchNavigator::initialize()
 
 void QnWorkbenchNavigator::deinitialize()
 {
-    NX_ASSERT(isValid(), "we should definitely be valid here");
+    NX_ASSERT(isValid(), "Instance should be still valid here.");
     if (!isValid())
         return;
 
@@ -468,27 +473,27 @@ void QnWorkbenchNavigator::deinitialize()
     m_calendar->disconnect(this);
 
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
+    const auto timeWatcher = system()->serverTimeWatcher();
     timeWatcher->disconnect(this);
 
     m_currentWidget = nullptr;
     m_currentWidgetFlags = {};
 }
 
-action::ActionScope QnWorkbenchNavigator::currentScope() const
+menu::ActionScope QnWorkbenchNavigator::currentScope() const
 {
-    return action::TimelineScope;
+    return menu::TimelineScope;
 }
 
-action::Parameters QnWorkbenchNavigator::currentParameters(action::ActionScope scope) const
+menu::Parameters QnWorkbenchNavigator::currentParameters(menu::ActionScope scope) const
 {
-    if (scope != action::TimelineScope)
-        return action::Parameters();
+    if (scope != menu::TimelineScope)
+        return menu::Parameters();
 
     QnResourceWidgetList result;
     if (m_currentWidget)
         result.push_back(m_currentWidget);
-    return action::Parameters(result);
+    return menu::Parameters(result);
 }
 
 bool QnWorkbenchNavigator::isLiveSupported() const
@@ -2298,7 +2303,7 @@ void QnWorkbenchNavigator::updateSyncIsForced()
 void QnWorkbenchNavigator::updateThumbnailsLoader()
 {
     using ThumbnailLoadingManager =
-        nx::vms::client::desktop::workbench::timeline::ThumbnailLoadingManager;
+        workbench::timeline::ThumbnailLoadingManager;
 
     if (!m_timeSlider)
         return;
@@ -2375,8 +2380,8 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy()
 
 void QnWorkbenchNavigator::updateAutoPaused()
 {
-    const bool noActivity = context()->instance<QnWorkbenchUserInactivityWatcher>()->state();
-    const bool isTourRunning = action(action::ToggleShowreelModeAction)->isChecked();
+    const bool noActivity = workbenchContext()->instance<QnWorkbenchUserInactivityWatcher>()->state();
+    const bool isTourRunning = action(menu::ToggleShowreelModeAction)->isChecked();
 
     const bool autoPaused = noActivity && !isTourRunning;
 
@@ -2414,7 +2419,7 @@ void QnWorkbenchNavigator::updateAutoPaused()
     }
 
     m_autoPaused = autoPaused;
-    action(action::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
+    action(menu::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
 }
 
 // -------------------------------------------------------------------------- //
@@ -2444,13 +2449,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     if (qnRuntime->isVideoWallMode())
         return;
 
-    if (!context() || !context()->menu())
-    {
-        NX_ASSERT(false, "Requesting context menu for a time slider while no menu manager instance is available.");
-        return;
-    }
-
-    auto manager = context()->menu();
+    auto manager = this->menu();
 
     QnTimePeriod selection;
     if (m_timeSlider->isSelectionValid())
@@ -2458,27 +2457,27 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     milliseconds position = m_timeSlider->timeFromPosition(pos);
 
-    auto parameters = currentParameters(action::TimelineScope);
+    auto parameters = currentParameters(menu::TimelineScope);
     parameters.setArgument(Qn::TimePeriodRole, selection);
     // TODO: #sivanov Move this out into global scope.
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent));
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
 
-    const auto watcher = context()->instance<QnTimelineBookmarksWatcher>();
+    const auto watcher = workbenchContext()->instance<QnTimelineBookmarksWatcher>();
     QnCameraBookmarkList bookmarks = watcher->bookmarksAtPosition(position);
     if (!bookmarks.isEmpty())
         parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
     QScopedPointer<QMenu> menu(manager->newMenu(
-        action::TimelineScope, mainWindowWidget(), parameters));
+        menu::TimelineScope, mainWindowWidget(), parameters));
     if (menu->isEmpty())
         return;
 
     /* Add slider-local actions to the menu. */
     bool selectionEditable = m_timeSlider->options().testFlag(QnTimeSlider::SelectionEditable);
-    manager->redirectAction(menu.data(), action::StartTimeSelectionAction, selectionEditable ? m_startSelectionAction : nullptr);
-    manager->redirectAction(menu.data(), action::EndTimeSelectionAction, selectionEditable ? m_endSelectionAction : nullptr);
-    manager->redirectAction(menu.data(), action::ClearTimeSelectionAction, selectionEditable ? m_clearSelectionAction : nullptr);
+    manager->redirectAction(menu.data(), menu::StartTimeSelectionAction, selectionEditable ? m_startSelectionAction : nullptr);
+    manager->redirectAction(menu.data(), menu::EndTimeSelectionAction, selectionEditable ? m_endSelectionAction : nullptr);
+    manager->redirectAction(menu.data(), menu::ClearTimeSelectionAction, selectionEditable ? m_clearSelectionAction : nullptr);
 
     /* Run menu. */
     QAction *action = QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
@@ -2498,7 +2497,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     {
         m_timeSlider->setSelectionValid(false);
     }
-    else if (action == context()->action(action::ZoomToTimeSelectionAction))
+    else if (action == this->action(menu::ZoomToTimeSelectionAction))
     {
         if (!m_timeSlider->isSelectionValid())
             return;
@@ -2533,7 +2532,7 @@ bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& c
     if (!NX_ASSERT(systemContext))
         return false;
 
-    if (!accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
+    if (!systemContext->accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
         return false;
 
     auto footageServers = systemContext->cameraHistoryPool()->getCameraFootageData(camera, true);

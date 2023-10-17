@@ -7,16 +7,19 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
-class InvalidRecordingScheduleWatcher: public QObject
+class InvalidRecordingScheduleWatcher: public QObject, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    explicit InvalidRecordingScheduleWatcher(QObject* parent = nullptr);
+    explicit InvalidRecordingScheduleWatcher(
+        SystemContext* systemContext,
+        QObject* parent = nullptr);
     virtual ~InvalidRecordingScheduleWatcher() override;
 
     QnVirtualCameraResourceSet camerasWithInvalidSchedule() const;

@@ -21,9 +21,9 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
+#include <nx/vms/client/desktop/menu/action_conditions.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/ui/actions/action_conditions.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/messages/ptz_messages.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
@@ -293,10 +293,10 @@ bool QnPtzManageDialog::isValid() const
 
 void QnPtzManageDialog::updateCanSaveCurrentPosition()
 {
-    const auto condition = action::condition::canSavePtzPosition();
-    const auto parameters = action::Parameters(m_widget.data());
+    const auto condition = menu::condition::canSavePtzPosition();
+    const auto parameters = menu::Parameters(m_widget.data());
     ui->savePositionButton->setEnabled(isValid()
-        && condition->check(parameters, context()) == action::EnabledAction);
+        && condition->check(parameters, windowContext()) == menu::EnabledAction);
 }
 
 bool QnPtzManageDialog::savePresets()

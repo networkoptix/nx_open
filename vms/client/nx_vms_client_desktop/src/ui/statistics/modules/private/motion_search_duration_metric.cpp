@@ -10,22 +10,20 @@
 
 using namespace nx::vms::client::desktop;
 
-MotionSearchDurationMetric::MotionSearchDurationMetric(QnWorkbenchContext *context)
-    : base_type()
-    , QnTimeDurationMetric()
-    , m_context(context)
-    , m_widgets()
+MotionSearchDurationMetric::MotionSearchDurationMetric(
+    QnWorkbenchContext* context,
+    QObject* parent)
+    :
+    base_type(parent),
+    QnWorkbenchContextAware(context)
 {
-    if (!m_context)
-        return;
+    connect(display(), &QnWorkbenchDisplay::widgetAdded,
+        this, &MotionSearchDurationMetric::addWidget);
+    connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved,
+        this, &MotionSearchDurationMetric::removeWidget);
 
-    connect(m_context->display(), &QnWorkbenchDisplay::widgetAdded
-        , this, &MotionSearchDurationMetric::addWidget);
-    connect(m_context->display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved
-        , this, &MotionSearchDurationMetric::removeWidget);
-
-    connect(m_context->workbench(), &Workbench::currentLayoutChanged
-        , this, &MotionSearchDurationMetric::updateCounterState);
+    connect(workbench(), &Workbench::currentLayoutChanged,
+        this, &MotionSearchDurationMetric::updateCounterState);
 }
 
 MotionSearchDurationMetric::~MotionSearchDurationMetric()
@@ -41,14 +39,14 @@ void MotionSearchDurationMetric::addWidget(QnResourceWidget *resourceWidget)
     const QPointer<MotionSearchDurationMetric> guard(this);
     const auto widgetOptionsChangedHandler =
         [this, guard, mediaWidget]()
-    {
-        if (!guard || !mediaWidget)
-            return;
-    };
+        {
+            if (!guard || !mediaWidget)
+                return;
+        };
 
     m_widgets.insert(mediaWidget);
-    connect(mediaWidget, &QnResourceWidget::optionsChanged
-        , this, &MotionSearchDurationMetric::updateCounterState);
+    connect(mediaWidget, &QnResourceWidget::optionsChanged,
+        this, &MotionSearchDurationMetric::updateCounterState);
 
     if (isFromCurrentLayout(mediaWidget) && !isCounterActive())
         updateCounterState();
@@ -70,26 +68,23 @@ void MotionSearchDurationMetric::removeWidget(QnResourceWidget *resourceWidget)
 
 void MotionSearchDurationMetric::updateCounterState()
 {
-    const bool activate = std::any_of(m_widgets.begin(), m_widgets.end()
-        , [this](const QnMediaResourceWidgetPtr &mediaWidget)
-    {
-        return (mediaWidget && isFromCurrentLayout(mediaWidget)
-            && (mediaWidget->options().testFlag(QnResourceWidget::DisplayMotion)));
-    });
+    const bool activate = std::any_of(m_widgets.begin(), m_widgets.end(),
+        [this](const QnMediaResourceWidgetPtr &mediaWidget)
+        {
+            return (mediaWidget && isFromCurrentLayout(mediaWidget)
+                && (mediaWidget->options().testFlag(QnResourceWidget::DisplayMotion)));
+        });
 
     setCounterActive(activate);
 }
 
 bool MotionSearchDurationMetric::isFromCurrentLayout(const QnMediaResourceWidgetPtr &widget)
 {
-    if (!m_context)
-        return false;
-
     const auto item = widget->item();
     if (!item)
         return false;
 
     const auto widgetLayout = item->layout();
-    const auto currentLayout = m_context->workbench()->currentLayout();
+    const auto currentLayout = workbench()->currentLayout();
     return (currentLayout == widgetLayout);
 }

@@ -23,7 +23,6 @@ public:
     class StateDelegate;
 
     virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
 
 private:
     QScreen* defaultScreen() const;

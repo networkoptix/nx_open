@@ -14,6 +14,8 @@ class QnCommonModule;
 
 namespace nx::vms::client::desktop::test {
 
+class MessageProcessorMock;
+
 class Context
 {
 public:
@@ -33,6 +35,9 @@ class ContextBasedTest: public nx::vms::common::test::GenericContextBasedTest<Co
 {
 public:
     QnCommonModule* commonModule() const { return context()->commonModule(); }
+
+    /** Create and install dummy message processor. */
+    MessageProcessorMock* createMessageProcessor();
 };
 
 } // namespace nx::vms::client::desktop::test

@@ -26,7 +26,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/animation/opacity_animator.h>
@@ -49,7 +49,6 @@
 #include <utils/math/linear_combination.h>
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 using nx::vms::client::core::Geometry;
 
 namespace {
@@ -109,9 +108,8 @@ QnVideowallItemWidget::QnVideowallItemWidget(
             executeLater(
                 [this]
                 {
-                    auto context = m_widget->windowContext()->workbenchContext();
-                    context->menu()->triggerIfPossible(
-                        action::StartVideoWallControlAction,
+                    m_widget->menu()->triggerIfPossible(
+                        menu::StartVideoWallControlAction,
                         m_indices);
                 }, this);
         });
@@ -301,11 +299,9 @@ void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent* /*event*
 
 void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    auto context = m_widget->windowContext()->workbenchContext();
+    menu::Parameters parameters;
 
-    action::Parameters parameters;
-
-    const auto videoWallItems = context->resourcePool()->getVideoWallItemsByUuid(
+    const auto videoWallItems = m_widget->resourcePool()->getVideoWallItemsByUuid(
         m_mimeData->entities());
     if (!videoWallItems.isEmpty())
     {
@@ -314,13 +310,13 @@ void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event)
     else
     {
         parameters = m_mimeData->resources();
-        context->resourcePool()->addNewResources(m_mimeData->resources());
+        m_widget->resourcePool()->addNewResources(m_mimeData->resources());
     }
 
     parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
     parameters.setArgument(Qn::KeyboardModifiersRole, event->modifiers());
 
-    context->menu()->trigger(action::DropOnVideoWallItemAction, parameters);
+    m_widget->menu()->trigger(menu::DropOnVideoWallItemAction, parameters);
 
     m_mimeData.reset();
     event->acceptProposedAction();
@@ -374,10 +370,9 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event)
     if (event->button() != Qt::RightButton)
         return;
 
-    auto context = m_widget->windowContext()->workbenchContext();
-    QScopedPointer<QMenu> popupMenu(context->menu()->newMenu(
-        action::SceneScope,
-        context->mainWindowWidget(),
+    QScopedPointer<QMenu> popupMenu(m_widget->menu()->newMenu(
+        menu::SceneScope,
+        m_widget->mainWindowWidget(),
         m_indices));
 
     if (popupMenu->isEmpty())
@@ -398,9 +393,8 @@ void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePt
 
 void QnVideowallItemWidget::updateLayout()
 {
-    auto context = m_widget->windowContext()->workbenchContext();
     QnVideoWallItem item = m_videowall->items()->getItem(m_itemUuid);
-    auto layout = context->resourcePool()->getResourceById<QnLayoutResource>(item.layout);
+    auto layout = m_widget->resourcePool()->getResourceById<QnLayoutResource>(item.layout);
     if (m_layout == layout)
         return;
 

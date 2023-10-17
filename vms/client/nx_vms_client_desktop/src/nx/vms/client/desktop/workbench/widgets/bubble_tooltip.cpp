@@ -8,8 +8,8 @@
 #include <QtQuick/QQuickWindow>
 #include <QtQuickWidgets/QQuickWidget>
 
-#include <client_core/client_core_module.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/mouse_spy.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
@@ -28,7 +28,7 @@ struct BubbleToolTip::Private
 
     std::unique_ptr<QQuickWidget> widget{ini().debugDisableQmlTooltips
         ? (QQuickWidget*) nullptr
-        : new QQuickWidget(qnClientCoreModule->mainQmlEngine(), /*parent*/ nullptr)};
+        : new QQuickWidget(appContext()->qmlEngine(), /*parent*/ nullptr)};
 
     QRectF targetRect;
     QRectF enclosingRect;
@@ -47,18 +47,18 @@ struct BubbleToolTip::Private
     void setState(State value);
 };
 
-BubbleToolTip::BubbleToolTip(QnWorkbenchContext* context, QObject* parent):
+BubbleToolTip::BubbleToolTip(WindowContext* context, QObject* parent):
     BubbleToolTip(context, QUrl("qrc:/qml/Nx/Controls/Bubble.qml"), parent)
 {
 }
 
 BubbleToolTip::BubbleToolTip(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     const QUrl& componentUrl,
     QObject* parent)
     :
     QObject(parent),
-    QnWorkbenchContextAware(context),
+    WindowContextAware(context),
     d(new Private{.q = this})
 {
     connect(MouseSpy::instance(), &MouseSpy::mouseMove, this,
@@ -106,7 +106,7 @@ void BubbleToolTip::show()
 {
     if (d->widget)
     {
-        d->widget->setParent(context()->mainWindowWidget());
+        d->widget->setParent(mainWindowWidget());
         invokeQmlMethod<void>(d->widget->rootObject(), "show");
         d->widget->raise();
     }

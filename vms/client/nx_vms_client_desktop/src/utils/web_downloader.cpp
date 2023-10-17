@@ -17,15 +17,16 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <platform/environment.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/workbench/workbench_context.h>
 
 #include "reply_read_timeout.h"
 
@@ -121,31 +122,22 @@ QString fixupIllegalFileName(const QString& filename)
 } // namespace
 
 WebDownloader::WebDownloader(
+    WindowContext* windowContext,
     QObject* parent,
     const QString& filePath,
     QObject* item)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     m_fileInfo(filePath),
     m_item(item)
 {
     startDownload();
 }
 
-class ContextHelper: public QnWorkbenchContextAware
-{
-    using base_type = QnWorkbenchContextAware;
-
-public:
-    ContextHelper(QObject* parent): base_type(parent) {}
-
-    QWidget* windowWidget() const { return mainWindowWidget(); }
-};
-
 WebDownloader::~WebDownloader()
 {
-    context()->instance<workbench::LocalNotificationsManager>()->remove(m_notificationId);
+    windowContext()->localNotificationsManager()->remove(m_notificationId);
 
     if (m_state == State::Completed)
         return;
@@ -157,12 +149,10 @@ WebDownloader::~WebDownloader()
     }
 }
 
-bool WebDownloader::download(QObject* item, QnWorkbenchContext* context)
+bool WebDownloader::download(QObject* item, WindowContext* context)
 {
     const auto suggestedName =
         fixupIllegalFileName(item->property("downloadFileName").toString());
-
-    ContextHelper contextHelper(context);
 
     // Determine parent widget for showing the Save dialog.
     const auto view = item->property("view").value<QObject*>();
@@ -178,7 +168,7 @@ bool WebDownloader::download(QObject* item, QnWorkbenchContext* context)
     }
 
     if (!parentWidget)
-        parentWidget = contextHelper.windowWidget();
+        parentWidget = context->mainWindowWidget();
 
     QString path = selectFile(suggestedName, parentWidget);
     if (path.isEmpty())
@@ -188,7 +178,8 @@ bool WebDownloader::download(QObject* item, QnWorkbenchContext* context)
     item->setProperty("downloadDirectory", file.absolutePath());
     item->setProperty("downloadFileName", file.fileName());
 
-    new WebDownloader(context->instance<workbench::LocalNotificationsManager>(), path, item);
+    // Downloader will be destroyed when current system connection is broken.
+    new WebDownloader(context, context->localNotificationsManager(), path, item);
 
     return true;
 }
@@ -262,7 +253,7 @@ QString WebDownloader::selectFile(const QString& suggestedName, QWidget* widget)
 
 void WebDownloader::startDownload()
 {
-    auto notificationsManager = context()->instance<workbench::LocalNotificationsManager>();
+    auto notificationsManager = windowContext()->localNotificationsManager();
     m_notificationId = notificationsManager->addProgress(
         tr("Downloading file..."), m_fileInfo.fileName(), /*cancellable*/ true);
     setState(State::Downloading);
@@ -285,15 +276,15 @@ void WebDownloader::startDownload()
             this->deleteLater();
         });
 
-    auto deleteIfDisconnected = [this] {
-        if (qnClientMessageProcessor->connectionStatus()->state()
-            == QnConnectionState::Disconnected)
+    auto messageProcessor = system()->clientMessageProcessor();
+    auto deleteIfDisconnected =
+        [this, messageProcessor]
         {
-            this->deleteLater();
-        }
-    };
+            if (messageProcessor->connectionStatus()->state() == QnConnectionState::Disconnected)
+                this->deleteLater();
+        };
 
-    connect(qnClientMessageProcessor->connectionStatus(),
+    connect(messageProcessor->connectionStatus(),
         &QnClientConnectionStatus::stateChanged,
         this,
         deleteIfDisconnected);
@@ -310,14 +301,15 @@ void WebDownloader::startDownload()
 
             const QStringList files{m_fileInfo.absoluteFilePath()};
 
+            // TODO: #sivanov Use local files system context in the future.
             const auto resources = QnFileProcessor::createResourcesForFiles(
                 QnFileProcessor::findAcceptedFiles(files),
-                resourcePool());
+                system()->resourcePool());
 
             if (resources.isEmpty())
                 return;
 
-            context()->menu()->trigger(ui::action::DropResourcesAction, resources);
+            menu()->trigger(menu::DropResourcesAction, resources);
         });
 
     connect(notificationsManager,
@@ -371,7 +363,7 @@ void WebDownloader::setState(State state)
     const auto prevState = m_state;
     m_state = state;
 
-    auto progressManager = context()->instance<workbench::LocalNotificationsManager>();
+    auto progressManager = windowContext()->localNotificationsManager();
 
     switch (state)
     {
@@ -426,7 +418,7 @@ void WebDownloader::onStateChanged(QWebEngineDownloadRequest::DownloadState stat
 
 void WebDownloader::onDownloadProgress(qint64 bytesRead, qint64 bytesTotal)
 {
-    auto progressManager = context()->instance<workbench::LocalNotificationsManager>();
+    auto progressManager = windowContext()->localNotificationsManager();
     if (m_state != State::Downloading)
         return;
 

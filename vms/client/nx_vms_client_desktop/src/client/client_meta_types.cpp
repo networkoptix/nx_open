@@ -38,6 +38,8 @@
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_action_choice_model.h>
 #include <nx/vms/client/desktop/joystick/dialog/joystick_button_settings_model.h>
 #include <nx/vms/client/desktop/lookup_lists/lookup_lists_dialog.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_status_helper.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
@@ -54,7 +56,6 @@
 #include <nx/vms/client/desktop/rules/model_view/rules_table_model.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
-#include <nx/vms/client/desktop/system_administration/models/custom_access_summary_model.h>
 #include <nx/vms/client/desktop/system_administration/models/global_permissions_model.h>
 #include <nx/vms/client/desktop/system_administration/models/ldap_filters_model.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
@@ -68,8 +69,6 @@
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
 #include <nx/vms/client/desktop/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/desktop/thumbnails/roi_camera_thumbnail.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/context_help.h>
 #include <nx/vms/client/desktop/ui/common/cursor_override.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursor.h>
@@ -94,9 +93,10 @@
 #include <nx/vms/client/desktop/utils/server_file_cache.h>
 #include <nx/vms/client/desktop/utils/session_aware_attached.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_payload.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_payload.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_state.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/timeline/archive_frame_extractor.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
@@ -185,8 +185,8 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<workbench::timeline::ThumbnailPtr>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaType<Qn::ImageBehavior>();
-    qRegisterMetaType<ui::action::IDType>("ui::action::IDType");
-    qRegisterMetaType<ui::action::Parameters>();
+    qRegisterMetaType<menu::IDType>("menu::IDType");
+    qRegisterMetaType<menu::Parameters>();
     qRegisterMetaType<ThumbnailsSearchState>();
 
     qRegisterMetaType<Qn::LightModeFlags>();
@@ -255,7 +255,6 @@ void QnClientMetaTypes::registerQmlTypes()
     ItemGrabber::registerQmlType();
     DragAndDrop::registerQmlType();
     ResourceAccessRightsModel::registerQmlTypes();
-    CustomAccessSummaryModel::registerQmlTypes();
     LimitedModel::registerQmlType();
     GlobalPermissionsModel::registerQmlTypes();
     ResourceIdentificationThumbnail::registerQmlType();
@@ -279,6 +278,7 @@ void QnClientMetaTypes::registerQmlTypes()
     SessionAware::registerQmlType();
     KeyboardModifiers::registerQmlType();
     DateValidator::registerQmlType();
+    WindowContext::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");

@@ -26,7 +26,7 @@ class MultilineTextPickerWidget: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    MultilineTextPickerWidget(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    MultilineTextPickerWidget(SystemContext* context, CommonParamsWidget* parent):
         base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

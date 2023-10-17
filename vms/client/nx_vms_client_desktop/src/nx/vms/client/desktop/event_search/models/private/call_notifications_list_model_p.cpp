@@ -13,32 +13,30 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/strings_helper.h>
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
-#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
-
-using namespace ui;
 
 using nx::vms::api::ActionType;
 
 CallNotificationsListModel::Private::Private(CallNotificationsListModel* q):
     base_type(),
-    QnWorkbenchContextAware(q),
+    WindowContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(systemContext()))
+    m_helper(new vms::event::StringsHelper(system()))
 {
-    const auto handler = context()->instance<QnWorkbenchNotificationsHandler>();
+    const auto handler = windowContext()->notificationActionHandler();
 
-    connect(handler, &QnWorkbenchNotificationsHandler::cleared, q, &EventListModel::clear);
+    connect(handler, &NotificationActionHandler::cleared, q, &EventListModel::clear);
 
-    connect(handler, &QnWorkbenchNotificationsHandler::notificationAdded,
+    connect(handler, &NotificationActionHandler::notificationAdded,
         this, &Private::addNotification);
-    connect(handler, &QnWorkbenchNotificationsHandler::notificationRemoved,
+    connect(handler, &NotificationActionHandler::notificationRemoved,
         this, &Private::removeNotification);
 }
 
@@ -59,7 +57,7 @@ void CallNotificationsListModel::Private::addNotification(
 
     const auto& params = action->getRuntimeParams();
 
-    const QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
+    const QnResourcePtr resource = system()->resourcePool()->getResourceById(params.eventResourceId);
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
     EventData eventData;
@@ -77,10 +75,10 @@ void CallNotificationsListModel::Private::addNotification(
     // Id is fixed and equal to intercom id, so this informer will be removed
     // when another client instance via changing toogle state.
     eventData.id = action->getParams().actionResourceId;
-    eventData.actionId = action::OpenIntercomLayoutAction;
+    eventData.actionId = menu::OpenIntercomLayoutAction;
     eventData.title = tr("Calling...");
     const auto intercomLayoutId = nx::vms::common::calculateIntercomLayoutId(camera);
-    eventData.actionParameters = resourcePool()->getResourceById(intercomLayoutId);
+    eventData.actionParameters = system()->resourcePool()->getResourceById(intercomLayoutId);
     eventData.actionParameters.setArgument(Qn::ActionDataRole, action);
     eventData.previewCamera = camera;
     eventData.removable = false;

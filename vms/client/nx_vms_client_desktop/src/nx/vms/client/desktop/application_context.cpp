@@ -53,6 +53,7 @@
 #include <nx/vms/client/desktop/cross_system/cross_system_layouts_watcher.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -359,6 +360,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QnQtbugWorkaround> qtBugWorkarounds;
     std::unique_ptr<core::DesktopResourceSearcher> desktopResourceSearcher;
     std::unique_ptr<core::SystemsVisibilityManager> systemsVisibilityManager;
+    std::unique_ptr<nx::vms::client::desktop::joystick::Manager> joystickManager;
 
     // Network modules
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
@@ -742,6 +744,7 @@ ApplicationContext::ApplicationContext(
             d->cloudGateway = std::make_unique<nx::cloud::gateway::VmsGatewayEmbeddable>();
             d->localProxyServer = std::make_unique<LocalProxyServer>();
             d->systemsVisibilityManager = std::make_unique<core::SystemsVisibilityManager>();
+            d->joystickManager.reset(joystick::Manager::create());
             break;
         }
     }
@@ -1020,5 +1023,9 @@ nx::cloud::gateway::VmsGatewayEmbeddable* ApplicationContext::cloudGateway() con
     return d->cloudGateway.get();
 }
 
+joystick::Manager* ApplicationContext::joystickManager() const
+{
+    return d->joystickManager.get();
+}
 
 } // namespace nx::vms::client::desktop

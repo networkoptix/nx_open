@@ -2,23 +2,21 @@
 
 #include "gl_checker_instrument.h"
 
+#include <QtGui/QAction>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
-#include <QtGui/QAction>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 
+#include <nx/branding.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/software_version.h>
-#include <ui/workbench/workbench_display.h>
-#include <ui/graphics/opengl/gl_functions.h>
-#include <ui/graphics/instruments/instrument_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/opengl/gl_functions.h>
+#include <ui/workbench/workbench_display.h>
 
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-
-#include <nx/branding.h>
-
-using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -30,7 +28,7 @@ namespace {
 class FglrxFullScreenWorkaround
 {
 public:
-    FglrxFullScreenWorkaround(action::Manager* manager):
+    FglrxFullScreenWorkaround(menu::Manager* manager):
         m_manager(manager)
     {
     }
@@ -48,11 +46,11 @@ public:
         m_fglrxMode = fglrxMode;
 
         if (m_fglrxMode)
-            m_manager->registerAlias(action::EffectiveMaximizeAction, action::MaximizeAction);
+            m_manager->registerAlias(menu::EffectiveMaximizeAction, menu::MaximizeAction);
     }
 
 private:
-    action::Manager* const m_manager;
+    menu::Manager* const m_manager;
     bool m_fglrxMode = false;
 };
 
@@ -62,7 +60,7 @@ private:
 
 struct QnGLCheckerInstrument::Private
 {
-    Private(action::Manager* manager):
+    Private(menu::Manager* manager):
         fglrxWorkaround(manager)
     {
     }

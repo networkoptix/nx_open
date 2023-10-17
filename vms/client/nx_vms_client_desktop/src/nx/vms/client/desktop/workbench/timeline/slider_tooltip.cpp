@@ -4,7 +4,7 @@
 
 namespace nx::vms::client::desktop::workbench::timeline {
 
-SliderToolTip::SliderToolTip(QnWorkbenchContext* context, QObject* parent):
+SliderToolTip::SliderToolTip(WindowContext* context, QObject* parent):
     BubbleToolTip(context, QUrl("Nx/Timeline/private/SliderToolTip.qml"), parent)
 {
     setOrientation(Qt::Vertical);

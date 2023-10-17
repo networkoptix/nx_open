@@ -100,9 +100,7 @@ QnUuid RemoteConnectionAware::serverId() const
 
 QnMediaServerResourcePtr RemoteConnectionAware::currentServer() const
 {
-    return qnClientCoreModule->commonModule()->systemContext()
-        ->resourcePool()
-        ->getResourceById<QnMediaServerResource>(serverId());
+    return qnClientCoreModule->resourcePool()->getResourceById<QnMediaServerResource>(serverId());
 }
 
 } // namespace nx::vms::client::core

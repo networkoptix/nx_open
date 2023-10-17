@@ -109,8 +109,8 @@ ListenerNotifier::ListenerNotifier(const AnalyticsSettingsListenerPtr& listener)
 void AnalyticsSettingsTestFixture::SetUp()
 {
     m_serverInterfaceMock = std::make_shared<AnalyticsSettingsMockApiInterface>();
-    m_manager.reset(new AnalyticsSettingsManager());
-    m_manager->setContext(resourcePool(), createMessageProcessor());
+    createMessageProcessor();
+    m_manager.reset(new AnalyticsSettingsManager(systemContext()));
     m_manager->setServerInterface(m_serverInterfaceMock);
 }
 

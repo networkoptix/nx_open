@@ -12,6 +12,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 #include "analytics_settings_types.h"
 
@@ -93,7 +94,7 @@ using AnalyticsSettingsListenerPtr = std::shared_ptr<AnalyticsSettingsListener>;
  * these changes to the server and notifies other listeners about it. When changes are received from
  * the server (using special transaction), actual values are re-requested.
  */
-class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsManager: public QObject
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsManager: public QObject, public SystemContextAware
 {
     Q_OBJECT
 
@@ -104,10 +105,8 @@ public:
         busy,
     };
 
-    AnalyticsSettingsManager(QObject* parent = nullptr);
+    AnalyticsSettingsManager(SystemContext* systemContext, QObject* parent = nullptr);
     virtual ~AnalyticsSettingsManager() override;
-
-    void setContext(QnResourcePool* resourcePool, QnCommonMessageProcessor* messageProcessor);
 
     /**
      * Server interface should be passed to send actual requests to the media server. Ownership will
@@ -141,7 +140,7 @@ public:
     Error applyChanges(const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId);
 
 private:
-    class Private;
+    struct Private;
     nx::utils::ImplPtr<Private> d;
 
     friend class AnalyticsSettingsListener;

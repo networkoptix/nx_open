@@ -4,9 +4,9 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/common/test_support/resource/camera_resource_stub.h>
 
@@ -54,7 +54,7 @@ TEST_F(MimeDataTest, mimeDataConversionsAreCorrect)
         QnUuid::createUuid(),
         QnUuid::createUuid()});
 
-    ui::action::Parameters::ArgumentHash arguments({
+    menu::Parameters::ArgumentHash arguments({
         {0, 9000},
         {1, QString("9000")},
         {2, QUuid::createUuid()}});

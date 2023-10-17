@@ -1,17 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "actions_statistics_module.h"
 
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <ui/statistics/modules/private/action_metrics.h>
 
-using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::client::desktop;
 
 namespace
 {
     template<typename MetricsType>
-    QSharedPointer<MetricsType> createMetrics(action::ManagerPtr manager)
+    QSharedPointer<MetricsType> createMetrics(menu::ManagerPtr manager)
     {
         return QSharedPointer<MetricsType>(new MetricsType(manager));
     }
@@ -29,7 +28,7 @@ QnActionsStatisticsModule::~QnActionsStatisticsModule()
 }
 
 void QnActionsStatisticsModule::setActionManager(
-    const action::ManagerPtr& manager)
+    const menu::ManagerPtr& manager)
 {
     if (m_actionManager == manager)
         return;

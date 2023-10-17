@@ -19,7 +19,7 @@ class CommonParamsWidget: public ParamsWidget
     Q_OBJECT
 
 public:
-    CommonParamsWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    CommonParamsWidget(WindowContext* context, QWidget* parent = nullptr);
 
 private:
     virtual void onDescriptorSet() override;

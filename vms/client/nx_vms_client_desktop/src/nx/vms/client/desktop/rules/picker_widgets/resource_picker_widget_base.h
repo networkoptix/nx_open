@@ -5,8 +5,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
-#include "picker_widget_utils.h"
 #include "field_picker_widget.h"
+#include "picker_widget_utils.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -16,7 +16,7 @@ class ResourcePickerWidgetBase: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    explicit ResourcePickerWidgetBase(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    explicit ResourcePickerWidgetBase(SystemContext* context, CommonParamsWidget* parent):
         base(context, parent)
     {
         auto contentLayout = new QVBoxLayout;

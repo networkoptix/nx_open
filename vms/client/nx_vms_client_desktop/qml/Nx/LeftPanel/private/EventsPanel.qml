@@ -217,7 +217,7 @@ Item
             {
                 id: eventModel
 
-                context: workbenchContext
+                context: windowContext
                 type: { return RightPanelModel.Type.events }
                 previewsEnabled: eventsPanel.showThumbnails
 

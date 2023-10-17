@@ -17,12 +17,12 @@ namespace nx::vms::client::desktop::rules {
  * Base class for the action and event parameters widgets. Represents a set of data pickers
  * according to the ItemDescriptor.
  */
-class ParamsWidget: public QWidget, public QnWorkbenchContextAware
+class ParamsWidget: public QWidget, public WindowContextAware
 {
     Q_OBJECT
 
 public:
-    explicit ParamsWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    explicit ParamsWidget(WindowContext* context, QWidget* parent = nullptr);
 
     /** Sets descriptor the widget customization is depends on. */
     void setDescriptor(const vms::rules::ItemDescriptor& value);

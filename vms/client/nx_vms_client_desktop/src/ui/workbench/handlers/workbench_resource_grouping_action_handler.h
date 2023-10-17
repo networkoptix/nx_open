@@ -7,11 +7,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
-namespace ui {
-
-namespace action { class Manager; }
-
-namespace workbench {
 
 class ResourceGroupingActionHandler: public QObject, public QnWorkbenchContextAware
 {
@@ -29,11 +24,6 @@ private:
     void removeCustomResourceTreeGroup() const;
 
     void showMaximumDepthWarning() const;
-
-private:
-    action::Manager* menu() const;
 };
 
-} // namespace workbench
-} // namespace ui
 } // namespace nx::vms::client::desktop

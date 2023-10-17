@@ -41,7 +41,7 @@ struct JoystickButtonActionChoiceModel::Private
     bool openLayoutChoiceEnabled = true;
     bool openLayoutChoiceVisible = true;
     QVector<ActionInfo> info;
-    QMap<ui::action::IDType, QSet<ButtonInfo>> actionToButtons;
+    QMap<menu::IDType, QSet<ButtonInfo>> actionToButtons;
 
     Private(JoystickButtonActionChoiceModel* parent, bool withModifier):
         q(parent),
@@ -72,13 +72,13 @@ QVector<JoystickButtonActionChoiceModel::ActionInfo>
     JoystickButtonActionChoiceModel::itemsBeforeOpenLayoutItem()
 {
     return {
-        {ui::action::NoAction, QString("- %1 -").arg(tr("No Action"))},
+        {menu::NoAction, QString("- %1 -").arg(tr("No Action"))},
         separator(),
-        {ui::action::PtzFocusInAction, tr("Focus Near")},
-        {ui::action::PtzFocusOutAction, tr("Focus Far")},
-        {ui::action::PtzFocusAutoAction, tr("Autofocus")},
+        {menu::PtzFocusInAction, tr("Focus Near")},
+        {menu::PtzFocusOutAction, tr("Focus Far")},
+        {menu::PtzFocusAutoAction, tr("Autofocus")},
         separator(),
-        {ui::action::PtzActivateByHotkeyAction, tr("Go to PTZ Position")}
+        {menu::PtzActivateByHotkeyAction, tr("Go to PTZ Position")}
     };
 }
 
@@ -87,7 +87,7 @@ QVector<JoystickButtonActionChoiceModel::ActionInfo>
 {
     return {
         separator(),
-        {ui::action::OpenInNewTabAction, tr("Open Layout")}
+        {menu::OpenInNewTabAction, tr("Open Layout")}
     };
 }
 
@@ -96,10 +96,10 @@ QVector<JoystickButtonActionChoiceModel::ActionInfo>
 {
     return {
         separator(),
-        {ui::action::FullscreenResourceAction, tr("Set to Fullscreen")},
+        {menu::FullscreenResourceAction, tr("Set to Fullscreen")},
         separator(),
-        {ui::action::GoToNextItemAction, tr("Next Camera on Layout")},
-        {ui::action::GoToPreviousItemAction, tr("Previous Camera on Layout")}
+        {menu::GoToNextItemAction, tr("Next Camera on Layout")},
+        {menu::GoToPreviousItemAction, tr("Previous Camera on Layout")}
     };
 }
 
@@ -108,13 +108,15 @@ QVector<JoystickButtonActionChoiceModel::ActionInfo>
 {
     return {
         separator(),
-        {ui::action::RaiseCurrentItemAction, tr("Modifier")}
+        {menu::RaiseCurrentItemAction, tr("Modifier")}
     };
 }
 
-JoystickButtonActionChoiceModel::JoystickButtonActionChoiceModel(bool withModifier, QObject* parent):
+JoystickButtonActionChoiceModel::JoystickButtonActionChoiceModel(
+    WindowContext* windowContext, bool withModifier, QObject* parent)
+    :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     d(new Private(this, withModifier))
 {
     d->formContent();
@@ -125,17 +127,17 @@ JoystickButtonActionChoiceModel::~JoystickButtonActionChoiceModel()
 }
 
 void JoystickButtonActionChoiceModel::initButtons(
-    const QHash<QString, ui::action::IDType>& baseActions,
-    const QHash<QString, ui::action::IDType>& modifiedActions)
+    const QHash<QString, menu::IDType>& baseActions,
+    const QHash<QString, menu::IDType>& modifiedActions)
 {
     d->actionToButtons.clear();
 
     auto addButton = [this]
-        (const QHash<QString, ui::action::IDType>& buttonsToActions, bool withModifier)
+        (const QHash<QString, menu::IDType>& buttonsToActions, bool withModifier)
         {
             for (auto iter = buttonsToActions.begin(); iter != buttonsToActions.end(); ++iter)
             {
-                if (iter.value() != ui::action::NoAction)
+                if (iter.value() != menu::NoAction)
                     d->actionToButtons[iter.value()].insert({iter.key(), withModifier});
             }
         };
@@ -181,7 +183,7 @@ void JoystickButtonActionChoiceModel::setOpenLayoutChoiceVisible(bool visible)
 
 int JoystickButtonActionChoiceModel::getRow(const QVariant& actionId) const
 {
-    const auto actionIdValue = actionId.value<ui::action::IDType>();
+    const auto actionIdValue = actionId.value<menu::IDType>();
     for (int i = 0; i < d->info.size(); ++i)
     {
         const auto& actionInfo = d->info[i];
@@ -193,7 +195,7 @@ int JoystickButtonActionChoiceModel::getRow(const QVariant& actionId) const
 }
 
 void JoystickButtonActionChoiceModel::setActionButton(
-    ui::action::IDType actionId,
+    menu::IDType actionId,
     const QString& buttonName,
     bool withModifier)
 {
@@ -213,7 +215,7 @@ void JoystickButtonActionChoiceModel::setActionButton(
     if (actionIter != d->actionToButtons.end())
         actionIter->remove({buttonName, withModifier});
 
-    if (actionId != ui::action::NoAction)
+    if (actionId != menu::NoAction)
         d->actionToButtons[actionId].insert({buttonName, withModifier});
 }
 
@@ -256,7 +258,7 @@ QVariant JoystickButtonActionChoiceModel::data(const QModelIndex& index, int rol
         case IsSeparatorRole:
             return actionInfo.isSeparator;
         case IsEnabledRole:
-            return actionInfo.id != ui::action::OpenInNewTabAction || d->openLayoutChoiceEnabled;
+            return actionInfo.id != menu::OpenInNewTabAction || d->openLayoutChoiceEnabled;
     }
 
     return QVariant();

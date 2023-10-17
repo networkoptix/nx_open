@@ -7,23 +7,21 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
-using namespace ui;
-
 namespace {
 
-QString alias(action::Action* action)
+QString alias(menu::Action* action)
 {
     return QnLexical::serialized(action->id());
 }
@@ -51,8 +49,8 @@ const core::SvgIconColorer::IconSubstitutions kSlideIconSubstitutions = {
 
 QnImageButtonWidget* newActionButton(
     QGraphicsItem *parent,
-    QnWorkbenchContext* context,
-    action::IDType actionId,
+    WindowContext* context,
+    menu::IDType actionId,
     int helpTopicId)
 {
     NX_ASSERT(context);
@@ -76,8 +74,8 @@ QnImageButtonWidget* newActionButton(
 template<class T>
 T* newCustomShowHideButton(
     QGraphicsItem* parent,
-    QnWorkbenchContext* context,
-    action::IDType actionId)
+    WindowContext* context,
+    menu::IDType actionId)
 {
     NX_ASSERT(context);
     const auto action = context->menu()->action(actionId);
@@ -105,24 +103,24 @@ T* newCustomShowHideButton(
 
 QnImageButtonWidget* newShowHideButton(
     QGraphicsItem* parent,
-    QnWorkbenchContext* context,
-    action::IDType actionId)
+    WindowContext* context,
+    menu::IDType actionId)
 {
     return newCustomShowHideButton<QnImageButtonWidget>(parent, context, actionId);
 }
 
 QnBlinkingImageButtonWidget* newBlinkingShowHideButton(
     QGraphicsItem* parent,
-    QnWorkbenchContext* context,
-    action::IDType actionId)
+    WindowContext* context,
+    menu::IDType actionId)
 {
     return newCustomShowHideButton<QnBlinkingImageButtonWidget>(parent, context, actionId);
 }
 
 QnImageButtonWidget* newPinTimelineButton(
     QGraphicsItem* parent,
-    QnWorkbenchContext* context,
-    action::IDType actionId)
+    WindowContext* context,
+    menu::IDType actionId)
 {
     NX_ASSERT(context);
     const auto action = context->menu()->action(actionId);

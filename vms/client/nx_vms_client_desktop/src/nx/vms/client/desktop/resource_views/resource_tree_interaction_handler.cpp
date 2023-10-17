@@ -23,14 +23,14 @@
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
@@ -233,18 +233,18 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
     {
     }
 
-    ui::action::Parameters actionParameters(
+    menu::Parameters actionParameters(
         const QModelIndex& index, const QModelIndexList& selection) const
     {
         if (!index.isValid())
-            return ui::action::Parameters{Qn::NodeTypeRole, ResourceTree::NodeType::root};
+            return menu::Parameters{Qn::NodeTypeRole, ResourceTree::NodeType::root};
 
         // TODO: #sivanov #vkutin #vbreus Refactor to a simple switch by node type.
 
         const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
 
         const auto withNodeType =
-            [nodeType](ui::action::Parameters parameters)
+            [nodeType](menu::Parameters parameters)
             {
                 return parameters.withArgument(Qn::NodeTypeRole, nodeType);
             };
@@ -264,7 +264,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
             {
                 const auto systemId = index.data(Qn::CloudSystemIdRole).toString();
                 CloudSystemConnectData connectData{systemId, ConnectScenario::connectFromTree};
-                const auto parameters = ui::action::Parameters()
+                const auto parameters = menu::Parameters()
                     .withArgument(Qn::CloudSystemIdRole, systemId)
                     .withArgument(Qn::CloudSystemConnectDataRole, connectData);
 
@@ -275,7 +275,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
                 break;
         }
 
-        ui::action::Parameters result(selectedResources(selection));
+        menu::Parameters result(selectedResources(selection));
 
         // For working with shared layout links we must know owning user resource.
         const auto parentIndex = index.parent();
@@ -451,18 +451,18 @@ void ResourceTreeInteractionHandler::showContextMenu(
         return;
 
     const std::shared_ptr<QMenu> contextMenu(menu()->newMenu(
-        ui::action::TreeScope,
+        menu::TreeScope,
         parent,
         d->actionParameters(index, selection)));
 
     if (contextMenu->isEmpty())
         return;
 
-    static const QSet<ui::action::IDType> renameActions = {
-        ui::action::RenameResourceAction,
-        ui::action::RenameVideowallEntityAction,
-        ui::action::RenameShowreelAction,
-        ui::action::RenameCustomGroupAction};
+    static const QSet<menu::IDType> renameActions = {
+        menu::RenameResourceAction,
+        menu::RenameVideowallEntityAction,
+        menu::RenameShowreelAction,
+        menu::RenameCustomGroupAction};
 
     for (auto id: renameActions)
         menu()->redirectAction(contextMenu.get(), id, d->renameAction.get());
@@ -475,7 +475,7 @@ void ResourceTreeInteractionHandler::showContextMenu(
         this);
 }
 
-ui::action::Parameters ResourceTreeInteractionHandler::actionParameters(
+menu::Parameters ResourceTreeInteractionHandler::actionParameters(
     const QModelIndex& index, const QModelIndexList& selection)
 {
     return d->actionParameters(index, selection);
@@ -489,7 +489,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
     if (activationType == ResourceTree::ActivationType::middleClick)
     {
         const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        menu()->trigger(ui::action::OpenInNewTabAction, resource);
+        menu()->trigger(menu::OpenInNewTabAction, resource);
         return;
     }
 
@@ -503,7 +503,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
 
             // System Administration window opens on double-click if current user is a member of
             // Administrator or Power Users group.
-            menu()->trigger(ui::action::SystemAdministrationAction);
+            menu()->trigger(menu::SystemAdministrationAction);
             break;
         }
 
@@ -513,7 +513,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
                 return;
 
             // Opens User Settings window for current user.
-            menu()->trigger(ui::action::UserSettingsAction, {context()->user()});
+            menu()->trigger(menu::UserSettingsAction, {context()->user()});
             break;
         }
 
@@ -525,7 +525,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
                     CloudSystemConnectData connectData =
                         {cloudSystemId, ConnectScenario::connectFromTree};
 
-                    menu()->trigger(ui::action::ConnectToCloudSystemAction,
+                    menu()->trigger(menu::ConnectToCloudSystemAction,
                         {Qn::CloudSystemConnectDataRole, connectData});
                 };
 
@@ -548,7 +548,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
         case ResourceTree::NodeType::cloudSystemStatus:
         {
             const auto systemId = index.data(Qn::CloudSystemIdRole).toString();
-            menu()->trigger(ui::action::ConnectToCloudSystemWithUserInteractionAction,
+            menu()->trigger(menu::ConnectToCloudSystemWithUserInteractionAction,
                 {Qn::CloudSystemIdRole, systemId});
 
             break;
@@ -560,14 +560,14 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
                 resourcePool()->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
 
             menu()->triggerIfPossible(
-                ui::action::StartVideoWallControlAction, QnVideoWallItemIndexList() << item);
+                menu::StartVideoWallControlAction, QnVideoWallItemIndexList() << item);
 
             break;
         }
 
         case ResourceTree::NodeType::showreel:
         {
-            menu()->triggerIfPossible(ui::action::ReviewShowreelAction,
+            menu()->triggerIfPossible(menu::ReviewShowreelAction,
                 {Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>()});
             break;
         }
@@ -587,7 +587,7 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
                     resources.push_back(resource);
             }
 
-            menu()->trigger(ui::action::DropResourcesAction, resources);
+            menu()->trigger(menu::DropResourcesAction, resources);
             break;
         }
 
@@ -610,8 +610,8 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
                 workbench()->currentLayout()->isShowreelReviewLayout();
 
             const auto actionId = isShowreelReviewLayout || modifiers == Qt::ControlModifier
-                ? ui::action::OpenInNewTabAction
-                : ui::action::DropResourcesAction;
+                ? menu::OpenInNewTabAction
+                : menu::DropResourcesAction;
 
             if (activationType == ResourceTree::ActivationType::enterKey)
                 menu()->trigger(actionId, d->actionParameters(index, selection));
@@ -663,8 +663,8 @@ void ResourceTreeInteractionHandler::activateSearchResults(
     if (!resources.isEmpty())
     {
         const auto action = modifiers.testFlag(Qt::ControlModifier)
-            ? ui::action::OpenInNewTabAction
-            : ui::action::OpenInCurrentLayoutAction;
+            ? menu::OpenInNewTabAction
+            : menu::OpenInCurrentLayoutAction;
 
         menu()->trigger(action, {resources});
     }
@@ -673,10 +673,10 @@ void ResourceTreeInteractionHandler::activateSearchResults(
         return;
 
     for (const auto& videowallResource: videowalls)
-        menu()->triggerIfPossible(ui::action::OpenVideoWallReviewAction, videowallResource);
+        menu()->triggerIfPossible(menu::OpenVideoWallReviewAction, videowallResource);
 
     for (const auto& showreelId: showreels)
-        menu()->triggerIfPossible(ui::action::ReviewShowreelAction, {Qn::UuidRole, showreelId});
+        menu()->triggerIfPossible(menu::ReviewShowreelAction, {Qn::UuidRole, showreelId});
 }
 
 } // namespace nx::vms::client::desktop

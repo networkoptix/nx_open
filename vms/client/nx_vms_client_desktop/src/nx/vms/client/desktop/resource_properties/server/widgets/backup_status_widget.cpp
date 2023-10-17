@@ -69,7 +69,7 @@ bool hasBackupStorageIssue(const QnMediaServerResourcePtr& server)
     if (!server)
         return false;
 
-    const auto runtimeInfoManager = qnClientCoreModule->commonModule()->runtimeInfoManager();
+    const auto runtimeInfoManager = qnClientCoreModule->runtimeInfoManager();
     if (runtimeInfoManager->hasItem(server->getId()))
     {
         const auto runtimeFlags = runtimeInfoManager->item(server->getId()).data.flags;
@@ -111,7 +111,7 @@ BackupStatusWidget::BackupStatusWidget(QWidget* parent):
     ui->skipQueueHintButton->addHintLine(tr(
         "Applies only to the cameras connected to current server."));
 
-    const auto runtimeInfoManager = qnClientCoreModule->commonModule()->runtimeInfoManager();
+    const auto runtimeInfoManager = qnClientCoreModule->runtimeInfoManager();
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo& runtimeInfo)
         {

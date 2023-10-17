@@ -2,9 +2,9 @@
 
 #include "webview_widget.h"
 
-#include <client_core/client_core_module.h>
+#include <nx/vms/client/desktop/application_context.h>
 
-using namespace nx::vms::client::desktop;
+namespace nx::vms::client::desktop {
 
 struct WebViewWidget::Private
 {
@@ -12,7 +12,7 @@ struct WebViewWidget::Private
 };
 
 WebViewWidget::WebViewWidget(QWidget* parent, QQmlEngine* engine):
-    base_type(engine ? engine : qnClientCoreModule->mainQmlEngine(), parent),
+    base_type(engine ? engine : appContext()->qmlEngine(), parent),
     d(new Private())
 {
     d->controller.reset(new WebViewController(this));
@@ -27,3 +27,5 @@ WebViewController* WebViewWidget::controller() const
 WebViewWidget::~WebViewWidget()
 {
 }
+
+} // namespace nx::vms::client::desktop

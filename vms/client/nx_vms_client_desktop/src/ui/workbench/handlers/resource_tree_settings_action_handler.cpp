@@ -5,9 +5,9 @@
 #include <QtGui/QAction>
 
 #include <core/resource/user_resource.h>
-#include <ui/workbench/workbench_context.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -24,30 +24,30 @@ ResourceTreeSettingsActionHandler::ResourceTreeSettingsActionHandler(QObject* pa
     // there are would be many possible scenarios when checked state may became out of sync with
     // actual Resource Tree representation.
 
-    connect(action(action::ShowServersInTreeAction), &QAction::triggered,
+    connect(action(menu::ShowServersInTreeAction), &QAction::triggered,
         this, &ResourceTreeSettingsActionHandler::showServersInResourceTree);
 
-    connect(action(action::HideServersInTreeAction), &QAction::triggered,
+    connect(action(menu::HideServersInTreeAction), &QAction::triggered,
         this, &ResourceTreeSettingsActionHandler::hideServersInResourceTree);
 
     const ResourceTreeSettings* settings = context()->resourceTreeSettings();
 
-    connect(action(action::ToggleProxiedResources), &QAction::triggered,
+    connect(action(menu::ToggleProxiedResources), &QAction::triggered,
         settings, &ResourceTreeSettings::setShowProxiedResourcesInServerTree);
 
     connect(settings, &ResourceTreeSettings::showProxiedResourcesInServerTreeChanged,
-        action(ui::action::ToggleProxiedResources), &QAction::setChecked);
+        action(menu::ToggleProxiedResources), &QAction::setChecked);
 }
 
 void ResourceTreeSettingsActionHandler::showServersInResourceTree()
 {
-    action(action::ShowServersInTreeAction)->setChecked(false); //< Keep unchecked state.
+    action(menu::ShowServersInTreeAction)->setChecked(false); //< Keep unchecked state.
     context()->resourceTreeSettings()->setShowServersInTree(true);
 }
 
 void ResourceTreeSettingsActionHandler::hideServersInResourceTree()
 {
-    action(action::HideServersInTreeAction)->setChecked(true); //< Keep checked state.
+    action(menu::HideServersInTreeAction)->setChecked(true); //< Keep checked state.
     context()->resourceTreeSettings()->setShowServersInTree(false);
 }
 

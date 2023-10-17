@@ -9,7 +9,7 @@
 
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
@@ -49,11 +49,11 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     QObject* parent)
     :
     base_type(settings, parentGraphicsWidget, parent),
-    widget(new QmlResourceBrowserWidget(context(), parentWidget)),
+    widget(new QmlResourceBrowserWidget(windowContext(), parentWidget)),
     m_resizerWidget(new QnResizerWidget(Qt::Horizontal, parentGraphicsWidget)),
     xAnimator(new VariantAnimator(widget)),
     m_backgroundItem(new QnControlBackgroundWidget(parentGraphicsWidget)),
-    m_showButton(newShowHideButton(parentGraphicsWidget, context(), action::ToggleTreeAction)),
+    m_showButton(newShowHideButton(parentGraphicsWidget, windowContext(), menu::ToggleTreeAction)),
     m_opacityAnimatorGroup(new AnimatorGroup(widget))
 {
     const auto updateGeometries =
@@ -73,9 +73,9 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_backgroundItem->setFrameBorders(Qt::RightEdge);
     m_backgroundItem->setZValue(BackgroundItemZOrder);
 
-    action(action::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    action(menu::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
 
-    connect(action(action::ToggleTreeAction), &QAction::toggled,
+    connect(action(menu::ToggleTreeAction), &QAction::toggled,
         this, [this](bool opened) { if (!m_blockAction) setOpened(opened); });
 
     m_resizerWidget->setProperty(Qn::NoHandScrollOver, true);
@@ -159,7 +159,7 @@ bool ResourceTreeWorkbenchPanel::isPinned() const
 
 bool ResourceTreeWorkbenchPanel::isOpened() const
 {
-    return action(action::ToggleTreeAction)->isChecked();
+    return action(menu::ToggleTreeAction)->isChecked();
 }
 
 void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -168,7 +168,7 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 
     ensureAnimationAllowed(&animate);
 
-    auto toggleAction = action(action::ToggleTreeAction);
+    auto toggleAction = action(menu::ToggleTreeAction);
     m_blockAction = true;
     toggleAction->setChecked(opened);
     m_blockAction = false;

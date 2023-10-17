@@ -7,8 +7,8 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 #include "../notification_list_widget.h"
 
@@ -23,7 +23,7 @@ class SelectableTextButton;
 
 class NotificationListWidget::Private:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
 

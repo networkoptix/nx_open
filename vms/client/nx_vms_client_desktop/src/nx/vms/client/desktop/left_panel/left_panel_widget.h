@@ -6,10 +6,10 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/action_types.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/action_types.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <ui/common/help_topic_queryable.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop {
  */
 class LeftPanelWidget:
     public QQuickWidget,
-    public QnWorkbenchContextAware,
+    public WindowContextAware,
     public HelpTopicQueryable
 {
     Q_OBJECT
@@ -30,7 +30,7 @@ class LeftPanelWidget:
     using base_type = QQuickWidget;
 
 public:
-    LeftPanelWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
+    LeftPanelWidget(WindowContext* context, QWidget* parent = nullptr);
     virtual ~LeftPanelWidget() override;
 
     /** A horizontal position controlled by open/closed panel transitions. */
@@ -49,8 +49,8 @@ public:
     qreal opacity() const;
     void setOpacity(qreal value);
 
-    ui::action::ActionScope currentScope() const;
-    ui::action::Parameters currentParameters(ui::action::ActionScope scope) const;
+    menu::ActionScope currentScope() const;
+    menu::Parameters currentParameters(menu::ActionScope scope) const;
 
     QQuickItem* openCloseButton() const;
 

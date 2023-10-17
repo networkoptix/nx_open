@@ -6,9 +6,9 @@
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QPushButton>
 
-#include <client_core/client_core_module.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../../utils/debug_custom_actions.h"
@@ -18,7 +18,7 @@ namespace nx::vms::client::desktop {
 
 JoystickInvestigationWizardDialog::JoystickInvestigationWizardDialog(QWidget* parent):
     QmlDialogWrapper(
-        qnClientCoreModule->mainQmlEngine(),
+        appContext()->qmlEngine(),
         QUrl("Nx/JoystickInvestigationWizard/JoystickInvestigationWizard.qml"),
         {},
         parent),

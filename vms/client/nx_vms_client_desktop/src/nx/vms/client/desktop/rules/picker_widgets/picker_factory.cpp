@@ -2,6 +2,7 @@
 
 #include "picker_factory.h"
 
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/actions/builtin_actions.h>
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
@@ -42,7 +43,7 @@ namespace nx::vms::client::desktop::rules {
 
 namespace {
 
-PickerWidget* createSourceCameraPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
+PickerWidget* createSourceCameraPicker(SystemContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::AnalyticsEvent>())
         return new SourceCameraPicker<QnCameraAnalyticsPolicy>(context, parent);
@@ -59,7 +60,7 @@ PickerWidget* createSourceCameraPicker(QnWorkbenchContext* context, CommonParams
     return new SourceCameraPicker<QnAllowAnyCameraPolicy>(context, parent);;
 }
 
-PickerWidget* createSourceServerPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
+PickerWidget* createSourceServerPicker(SystemContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::PoeOverBudgetEvent>())
         return new SourceServerPicker<QnPoeOverBudgetPolicy>(context, parent);
@@ -71,7 +72,7 @@ PickerWidget* createSourceServerPicker(QnWorkbenchContext* context, CommonParams
     return {};
 }
 
-PickerWidget* createTargetDevicePicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
+PickerWidget* createTargetDevicePicker(SystemContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::BookmarkAction>())
         return new TargetCameraPicker<QnBookmarkActionPolicy>(context, parent);
@@ -98,7 +99,7 @@ PickerWidget* createTargetDevicePicker(QnWorkbenchContext* context, CommonParams
     return new TargetCameraPicker<QnAllowAnyCameraPolicy>(context, parent);
 }
 
-PickerWidget* createTargetServerPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
+PickerWidget* createTargetServerPicker(SystemContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::BuzzerAction>())
         return new TargetServerPicker<QnBuzzerPolicy>(context, parent);
@@ -107,7 +108,7 @@ PickerWidget* createTargetServerPicker(QnWorkbenchContext* context, CommonParams
     return {};
 }
 
-PickerWidget* createSingleTargetCameraPicker(QnWorkbenchContext* context, CommonParamsWidget* parent)
+PickerWidget* createSingleTargetCameraPicker(SystemContext* context, CommonParamsWidget* parent)
 {
     if (parent->descriptor().id == vms::rules::utils::type<vms::rules::EnterFullscreenAction>())
         return new SingleTargetDevicePicker<QnFullscreenCameraPolicy>(context, parent);
@@ -125,10 +126,11 @@ using nx::vms::rules::fieldMetatype;
 
 PickerWidget* PickerFactory::createWidget(
     const vms::rules::FieldDescriptor& descriptor,
-    QnWorkbenchContext* context,
+    WindowContext* windowContext,
     CommonParamsWidget* parent)
 {
     PickerWidget* pickerWidget{};
+    const auto context = windowContext->system();
 
     // Event field based pickers.
     if (descriptor.id == fieldMetatype<nx::vms::rules::AnalyticsEventLevelField>())
@@ -201,7 +203,7 @@ PickerWidget* PickerFactory::createWidget(
     else if (descriptor.id == fieldMetatype<vms::rules::TargetSingleDeviceField>())
         pickerWidget = createSingleTargetCameraPicker(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::SoundField>())
-        pickerWidget = new SoundPicker(context, parent);
+        pickerWidget = new SoundPicker(windowContext, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::TargetUserField>())
         pickerWidget = new TargetUserPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::TextWithFields>())
@@ -209,7 +211,7 @@ PickerWidget* PickerFactory::createWidget(
     else if (descriptor.id == fieldMetatype<nx::vms::rules::TimeField>())
         pickerWidget = new DurationPicker<nx::vms::rules::TimeField>(context, parent);
     else if (descriptor.id == fieldMetatype<vms::rules::VolumeField>())
-        pickerWidget = new VolumePicker(context, parent);
+        pickerWidget = new VolumePicker(windowContext, parent);
 
     if (pickerWidget != nullptr)
         pickerWidget->setDescriptor(descriptor);

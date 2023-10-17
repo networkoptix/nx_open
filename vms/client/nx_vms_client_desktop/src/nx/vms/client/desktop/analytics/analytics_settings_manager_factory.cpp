@@ -11,7 +11,7 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/server_runtime_event_data.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/delayed.h>
 
 #include "analytics_settings_manager.h"
@@ -24,12 +24,14 @@ namespace {
 
 class AnalyticsSettingsServerRestApiInterface:
     public AnalyticsSettingsServerInterface,
-    public core::RemoteConnectionAware
+    public SystemContextAware
 {
 public:
-    AnalyticsSettingsServerRestApiInterface(QObject* owner):
+    AnalyticsSettingsServerRestApiInterface(SystemContext* systemContext, QObject* owner):
+        SystemContextAware(systemContext),
         m_owner(owner)
-    {}
+    {
+    }
 
     virtual rest::Handle getSettings(
         const QnVirtualCameraResourcePtr& device,
@@ -110,18 +112,17 @@ private:
 } // namespace
 
 std::unique_ptr<AnalyticsSettingsManager>
-AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
-    QnResourcePool* resourcePool,
-    QnCommonMessageProcessor* messageProcessor)
+AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(SystemContext* systemContext)
 {
-    auto manager = std::make_unique<AnalyticsSettingsManager>();
-    manager->setContext(resourcePool, messageProcessor);
+    auto manager = std::make_unique<AnalyticsSettingsManager>(systemContext);
 
-    auto serverInterface = std::make_shared<AnalyticsSettingsServerRestApiInterface>(manager.get());
+    auto serverInterface = std::make_shared<AnalyticsSettingsServerRestApiInterface>(
+        systemContext,
+        manager.get());
     manager->setServerInterface(serverInterface);
 
     QObject::connect(
-        messageProcessor,
+        systemContext->messageProcessor(),
         &QnCommonMessageProcessor::serverRuntimeEventOccurred,
         manager.get(),
         [managerPtr = manager.get()](const ServerRuntimeEventData& eventData)

@@ -5,9 +5,9 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/common/models/concatenation_list_model.h>
 
-class QnWorkbenchContext;
-
 namespace nx::vms::client::desktop {
+
+class WindowContext;
 
 class NotificationTabModel: public ConcatenationListModel
 {
@@ -15,7 +15,7 @@ class NotificationTabModel: public ConcatenationListModel
     using base_type = ConcatenationListModel;
 
 public:
-    explicit NotificationTabModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit NotificationTabModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~NotificationTabModel() override;
 
 private:

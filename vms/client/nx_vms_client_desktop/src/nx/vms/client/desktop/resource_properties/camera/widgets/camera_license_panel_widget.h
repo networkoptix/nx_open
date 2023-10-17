@@ -7,7 +7,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/common/widgets/panel.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 
 namespace Ui { class CameraLicensePanelWidget; }
 
@@ -30,7 +30,7 @@ public:
     void init(LicenseUsageProvider* licenseUsageProvider, CameraSettingsDialogStore* store);
 
 signals:
-    void actionRequested(nx::vms::client::desktop::ui::action::IDType action);
+    void actionRequested(nx::vms::client::desktop::menu::IDType action);
 
 private:
     void loadState(const CameraSettingsDialogState& state);

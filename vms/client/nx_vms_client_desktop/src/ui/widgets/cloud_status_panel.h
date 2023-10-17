@@ -3,19 +3,21 @@
 #pragma once
 
 #include <nx/vms/client/desktop/common/widgets/tool_button.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 class QnCloudStatusPanelPrivate;
 
 class QnCloudStatusPanel:
     public nx::vms::client::desktop::ToolButton,
-    public QnWorkbenchContextAware
+    public nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
     using base_type = nx::vms::client::desktop::ToolButton;
 
 public:
-    explicit QnCloudStatusPanel(QWidget* parent = nullptr);
+    QnCloudStatusPanel(
+        nx::vms::client::desktop::WindowContext* windowContext,
+        QWidget* parent = nullptr);
     ~QnCloudStatusPanel();
 
     virtual QSize minimumSizeHint() const override;

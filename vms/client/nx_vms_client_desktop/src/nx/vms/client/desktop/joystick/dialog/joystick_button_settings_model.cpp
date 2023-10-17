@@ -13,11 +13,11 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <ui/workbench/workbench_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "../settings/action_factory.h"
 #include "../settings/descriptors.h"
@@ -179,19 +179,19 @@ public:
         q(parent),
         resourceModel(resourceModel),
         resourceIconCache(qnResIconCache),
-        connectedToServer(q->context()->user())
+        connectedToServer(q->system()->user())
     {
-        scopedConnections.add(connect(q->context(),
-            &QnWorkbenchContext::userChanged,
+        scopedConnections.add(connect(q->system(),
+            &SystemContext::userChanged,
             [this](const QnUserResourcePtr& user)
             {
                 connectedToServer = !user.isNull();
 
                 for (int row = 0; row < q->rowCount(); ++row)
                 {
-                    const ui::action::IDType baseActionId = qvariant_cast<ui::action::IDType>(
+                    const menu::IDType baseActionId = qvariant_cast<menu::IDType>(
                         q->data(q->index(row, BaseActionColumn), ActionIdRole));
-                    if (baseActionId == ui::action::OpenInNewTabAction)
+                    if (baseActionId == menu::OpenInNewTabAction)
                     {
                         emit q->dataChanged(
                             q->index(row, BaseActionColumn),
@@ -199,9 +199,9 @@ public:
                             {IsEnabledRole, Qt::DisplayRole});
                     }
 
-                    const ui::action::IDType modifiedActionId = qvariant_cast<ui::action::IDType>(
+                    const menu::IDType modifiedActionId = qvariant_cast<menu::IDType>(
                         q->data(q->index(row, ModifiedActionColumn), ActionIdRole));
-                    if (modifiedActionId == ui::action::OpenInNewTabAction)
+                    if (modifiedActionId == menu::OpenInNewTabAction)
                     {
                         emit q->dataChanged(
                             q->index(row, ModifiedActionColumn),
@@ -216,9 +216,9 @@ public:
             {
                 for (int row = 0; row < q->rowCount(); ++row)
                 {
-                    const ui::action::IDType baseActionId = qvariant_cast<ui::action::IDType>(
+                    const menu::IDType baseActionId = qvariant_cast<menu::IDType>(
                         q->data(q->index(row, BaseActionColumn), ActionIdRole));
-                    if (baseActionId == ui::action::OpenInNewTabAction)
+                    if (baseActionId == menu::OpenInNewTabAction)
                     {
                         emit q->dataChanged(
                             q->index(row, BaseActionParameterColumn),
@@ -226,9 +226,9 @@ public:
                             {Qt::DisplayRole, LayoutLogicalIdRole, LayoutUuidRole});
                     }
 
-                    const ui::action::IDType modifiedActionId = qvariant_cast<ui::action::IDType>(
+                    const menu::IDType modifiedActionId = qvariant_cast<menu::IDType>(
                         q->data(q->index(row, ModifiedActionColumn), ActionIdRole));
-                    if (modifiedActionId == ui::action::OpenInNewTabAction)
+                    if (modifiedActionId == menu::OpenInNewTabAction)
                     {
                         emit q->dataChanged(
                             q->index(row, ModifiedActionParameterColumn),
@@ -244,13 +244,13 @@ public:
     }
 
     void initDeviceData(const Device* device);
-    void overwriteAction(const QModelIndex& index, ui::action::IDType newActionId);
+    void overwriteAction(const QModelIndex& index, menu::IDType newActionId);
     void resetPrevModifierButtonAction();
     void setModifierAction(const QModelIndex& index, ButtonDescriptor* buttonDescription);
     void setAnotherAction(
         const QModelIndex& index,
         ActionDescriptor* actionDescription,
-        ui::action::IDType newActionId);
+        menu::IDType newActionId);
 
     QModelIndex getResourceByLogicalId(int logicalId) const;
     QModelIndex getResourceByUuid(const QString& uuid) const;
@@ -317,7 +317,7 @@ void JoystickButtonSettingsModel::Private::initDeviceData(const Device* device)
 
 void JoystickButtonSettingsModel::Private::overwriteAction(
     const QModelIndex& index,
-    ui::action::IDType newActionId)
+    menu::IDType newActionId)
 {
     const int actionListIndex = (index.column() == BaseActionColumn) ? 0 : 1;
 
@@ -348,7 +348,7 @@ void JoystickButtonSettingsModel::Private::resetPrevModifierButtonAction()
             && prevButtonDescription.actions[0].id == kModifierActionId)
         {
             for (auto& actionDescription: prevButtonDescription.actions)
-                actionDescription.id = ui::action::NoAction;
+                actionDescription.id = menu::NoAction;
 
             emit q->dataChanged(
                 q->index(i, FirstColumn),
@@ -380,14 +380,14 @@ void JoystickButtonSettingsModel::Private::setModifierAction(
 void JoystickButtonSettingsModel::Private::setAnotherAction(
     const QModelIndex& index,
     ActionDescriptor* actionDescription,
-    ui::action::IDType newActionId)
+    menu::IDType newActionId)
 {
     actionDescription->id = newActionId;
 
     actionDescription->parameters.clear();
-    if (actionDescription->id == ui::action::PtzActivateByHotkeyAction)
+    if (actionDescription->id == menu::PtzActivateByHotkeyAction)
         actionDescription->parameters[ActionFactory::kHotkeyParameterName] = "0";
-    else if (actionDescription->id == ui::action::OpenInNewTabAction)
+    else if (actionDescription->id == menu::OpenInNewTabAction)
         actionDescription->parameters[ActionFactory::kLayoutLogicalIdParameterName] = "0";
 
     emit q->dataChanged(
@@ -442,11 +442,12 @@ void JoystickButtonSettingsModel::Private::setModifierButtonName(const QString& 
 }
 
 JoystickButtonSettingsModel::JoystickButtonSettingsModel(
+    WindowContext* windowContext,
     FilteredResourceProxyModel* resourceModel,
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     d(new Private(this, resourceModel))
 {
     NX_ASSERT(resourceModel);
@@ -519,13 +520,13 @@ bool JoystickButtonSettingsModel::openLayoutActionIsSet() const
             if (buttonDescription.actions.isEmpty())
                 return false;
 
-            if (buttonDescription.actions[0].id == ui::action::OpenInNewTabAction)
+            if (buttonDescription.actions[0].id == menu::OpenInNewTabAction)
                 return true;
 
             if (buttonDescription.actions.size() < 2)
                 return false;
 
-            if (buttonDescription.actions[1].id == ui::action::OpenInNewTabAction)
+            if (buttonDescription.actions[1].id == menu::OpenInNewTabAction)
                 return true;
 
             return false;
@@ -565,9 +566,9 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
 
     const int actionIndex = index.column() >= ModifiedActionColumn ? 1 : 0;
 
-    const ui::action::IDType actionId = buttonDescription.actions.size() > actionIndex
+    const menu::IDType actionId = buttonDescription.actions.size() > actionIndex
         ? buttonDescription.actions[actionIndex].id
-        : ui::action::NoAction;
+        : menu::NoAction;
 
     switch (role)
     {
@@ -577,7 +578,7 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
                 return formButtonName(buttonDescription.name);
             else if ((index.column() == BaseActionParameterColumn
                 || index.column() == ModifiedActionParameterColumn)
-                && actionId == ui::action::OpenInNewTabAction)
+                && actionId == menu::OpenInNewTabAction)
             {
                 if (!d->connectedToServer)
                     return offlineLayoutSelectedText();
@@ -610,7 +611,7 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
             if (index.column() == BaseActionParameterColumn
                 || index.column() == ModifiedActionParameterColumn)
             {
-                if (actionId != ui::action::OpenInNewTabAction)
+                if (actionId != menu::OpenInNewTabAction)
                     return QVariant();
 
                 const auto layoutLogicalId = getLayoutLogicalId(buttonDescription, actionIndex);
@@ -634,9 +635,9 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
 
             switch (actionId)
             {
-                case ui::action::PtzActivateByHotkeyAction:
+                case menu::PtzActivateByHotkeyAction:
                     return HotkeyParameter;
-                case ui::action::OpenInNewTabAction:
+                case menu::OpenInNewTabAction:
                     return LayoutParameter;
                 default:
                     return NoParameter;
@@ -652,9 +653,9 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
         {
             if (index.column() >= ModifiedActionColumn)
             {
-                const ui::action::IDType firstActionId = !buttonDescription.actions.isEmpty()
+                const menu::IDType firstActionId = !buttonDescription.actions.isEmpty()
                     ? buttonDescription.actions[0].id
-                    : ui::action::NoAction;
+                    : menu::NoAction;
 
                 if (firstActionId == kModifierActionId)
                     return false;
@@ -663,7 +664,7 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
             if (d->connectedToServer)
                 return true;
 
-            if (actionId == ui::action::OpenInNewTabAction
+            if (actionId == menu::OpenInNewTabAction
                 && (index.column() == BaseActionParameterColumn
                 || index.column() == ModifiedActionParameterColumn))
             {
@@ -676,7 +677,7 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
         {
             if ((index.column() == BaseActionParameterColumn
                 || index.column() == ModifiedActionParameterColumn)
-                && actionId == ui::action::OpenInNewTabAction)
+                && actionId == menu::OpenInNewTabAction)
             {
                 return getLayoutLogicalId(buttonDescription, actionIndex);
             }
@@ -687,7 +688,7 @@ QVariant JoystickButtonSettingsModel::data(const QModelIndex& index, int role) c
         {
             if ((index.column() == BaseActionParameterColumn
                 || index.column() == ModifiedActionParameterColumn)
-                && actionId == ui::action::OpenInNewTabAction)
+                && actionId == menu::OpenInNewTabAction)
             {
                 const auto layoutUuid = getLayoutUuid(buttonDescription, actionIndex);
 
@@ -728,7 +729,7 @@ bool JoystickButtonSettingsModel::setData(
         {
             if (index.column() == BaseActionColumn || index.column() == ModifiedActionColumn)
             {
-                d->overwriteAction(index, (ui::action::IDType) value.toInt());
+                d->overwriteAction(index, (menu::IDType) value.toInt());
 
                 emit dataChanged(
                     index,
@@ -763,10 +764,10 @@ bool JoystickButtonSettingsModel::setData(
 
                  switch (actionDescription.id)
                  {
-                     case ui::action::PtzActivateByHotkeyAction:
+                     case menu::PtzActivateByHotkeyAction:
                          actionDescription.parameters["hotkey"] = value.toString();
                          break;
-                     case ui::action::OpenInNewTabAction:
+                     case menu::OpenInNewTabAction:
                          roles += setOpenLayoutParameter(&actionDescription, role, value);
                          break;
                      default:

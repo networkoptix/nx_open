@@ -9,12 +9,12 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/indents.h>
@@ -86,7 +86,7 @@ SystemTabBar::SystemTabBar(QWidget *parent):
         &Workbench::currentSystemChanged,
         this,
         &SystemTabBar::at_currentSystemChanged);
-    connect(action(ui::action::RemoveSystemFromTabBarAction),
+    connect(action(menu::RemoveSystemFromTabBarAction),
         &QAction::triggered,
         this,
         &SystemTabBar::at_systemDisconnected);
@@ -201,8 +201,8 @@ void SystemTabBar::at_currentTabChanged(int index)
         {
             auto logonData = modelIndex.data(Qn::LogonDataRole).value<LogonData>();
             logonData.storePassword = true;
-            menu()->trigger(ui::action::ConnectAction,
-                ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
+            menu()->trigger(menu::ConnectAction,
+                menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
         }
     }
 }
@@ -246,7 +246,7 @@ void SystemTabBar::addClosableTab(const QString& text,
         [this, systemDescription, index]()
         {
             if (currentIndex() == index)
-                menu()->trigger(ui::action::DisconnectAction, {Qn::ForceRole, true});
+                menu()->trigger(menu::DisconnectAction, {Qn::ForceRole, true});
             else
                 workbench()->removeSystem(systemDescription);
     });

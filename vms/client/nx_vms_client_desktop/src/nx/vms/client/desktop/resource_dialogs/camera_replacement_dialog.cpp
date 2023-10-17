@@ -255,7 +255,7 @@ CameraReplacementDialog::CameraReplacementDialog(
     d->resourceSelectionWidget->setDetailsPanelHidden(true);
     d->resourceSelectionWidget->setSelectionMode(ResourceSelectionMode::ExclusiveSelection);
     d->resourceSelectionWidget->setTreeEntityFactoryFunction(
-        treeEntityCreationFunction(cameraToBeReplaced, showServersInTree(context())));
+        treeEntityCreationFunction(cameraToBeReplaced, showServersInTree(workbenchContext())));
 
     ui->refreshButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
 
@@ -284,7 +284,7 @@ CameraReplacementDialog::CameraReplacementDialog(
         {
             d->resourceSelectionWidget->setSelectedResource({});
             d->resourceSelectionWidget->setTreeEntityFactoryFunction(
-                treeEntityCreationFunction(d->cameraToBeReplaced, showServersInTree(context())));
+                treeEntityCreationFunction(d->cameraToBeReplaced, showServersInTree(workbenchContext())));
             d->resourceSelectionWidget->resourceViewWidget()->makeRequiredItemsVisible();
         });
 

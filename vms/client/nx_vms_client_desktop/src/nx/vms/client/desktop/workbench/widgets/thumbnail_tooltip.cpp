@@ -2,20 +2,20 @@
 
 #include "thumbnail_tooltip.h"
 
-#include <QtWidgets/QVBoxLayout>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickTextDocument>
+#include <QtWidgets/QVBoxLayout>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/thumbnails/generic_image_store.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
-#include <nx/vms/client/desktop/utils/qml_property.h>
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/image_provider.h>
-#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
+#include <nx/vms/client/desktop/utils/qml_property.h>
 
 namespace nx::vms::client::desktop {
 
@@ -124,7 +124,7 @@ struct ThumbnailTooltip::Private
     }
 };
 
-ThumbnailTooltip::ThumbnailTooltip(QnWorkbenchContext* context):
+ThumbnailTooltip::ThumbnailTooltip(WindowContext* context):
     BubbleToolTip(context, QUrl("qrc:/qml/Nx/RightPanel/private/ThumbnailTooltip.qml")),
     d(new Private{this})
 {

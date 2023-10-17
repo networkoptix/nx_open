@@ -16,12 +16,12 @@
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/graphics/instruments/instrument_manager.h>
@@ -72,8 +72,6 @@ QRect createItemGrid(int itemCount)
 
 namespace nx::vms::client::desktop {
 
-namespace action = ui::action;
-
 ShowreelReviewController::ShowreelReviewController(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -82,7 +80,7 @@ ShowreelReviewController::ShowreelReviewController(QObject* parent):
         [this]
         {
             for (const auto& id: m_saveShowreelsQueue)
-                menu()->trigger(action::SaveShowreelAction, {Qn::UuidRole, id});
+                menu()->trigger(menu::SaveShowreelAction, {Qn::UuidRole, id});
             m_saveShowreelsQueue.clear();
         };
     m_saveShowreelsOperation =
@@ -98,19 +96,19 @@ ShowreelReviewController::ShowreelReviewController(QObject* parent):
     connect(systemContext()->showreelManager(), &common::ShowreelManager::showreelRemoved, this,
         &ShowreelReviewController::handleShowreelRemoved);
 
-    connect(action(action::ReviewShowreelAction), &QAction::triggered, this,
+    connect(action(menu::ReviewShowreelAction), &QAction::triggered, this,
         &ShowreelReviewController::at_reviewShowreelAction_triggered);
 
-    connect(action(action::DropResourcesAction), &QAction::triggered, this,
+    connect(action(menu::DropResourcesAction), &QAction::triggered, this,
         &ShowreelReviewController::at_dropResourcesAction_triggered);
 
-    connect(action(action::StartCurrentShowreelAction), &QAction::triggered, this,
+    connect(action(menu::StartCurrentShowreelAction), &QAction::triggered, this,
         &ShowreelReviewController::at_startCurrentShowreelAction_triggered);
 
-    connect(action(action::SaveCurrentShowreelAction), &QAction::triggered, this,
+    connect(action(menu::SaveCurrentShowreelAction), &QAction::triggered, this,
         &ShowreelReviewController::at_saveCurrentShowreelAction_triggered);
 
-    connect(action(action::RemoveCurrentShowreelAction), &QAction::triggered, this,
+    connect(action(menu::RemoveCurrentShowreelAction), &QAction::triggered, this,
         &ShowreelReviewController::at_removeCurrentShowreelAction_triggered);
 
     connect(workbench(), &Workbench::currentLayoutAboutToBeChanged, this,
@@ -160,7 +158,7 @@ void ShowreelReviewController::handleShowreelRemoved(const QnUuid& showreelId)
     {
         workbench()->removeLayout(reviewLayout);
         if (workbench()->layouts().empty())
-            menu()->trigger(action::OpenNewTabAction);
+            menu()->trigger(menu::OpenNewTabAction);
     }
 }
 
@@ -190,12 +188,12 @@ void ShowreelReviewController::reviewShowreel(const nx::vms::api::ShowreelData& 
 
     if (auto layout = m_reviewLayouts.value(showreel.id))
     {
-        menu()->trigger(action::OpenInNewTabAction, layout);
+        menu()->trigger(menu::OpenInNewTabAction, layout);
         updateItemsLayout();
         return;
     }
 
-    const QList<action::IDType> actions{action::StartCurrentShowreelAction};
+    const QList<menu::IDType> actions{menu::StartCurrentShowreelAction};
 
     static const float kCellAspectRatio{16.0f / 9.0f};
 
@@ -222,7 +220,7 @@ void ShowreelReviewController::reviewShowreel(const nx::vms::api::ShowreelData& 
 
     resetReviewLayout(layout, showreel.items);
 
-    menu()->trigger(action::OpenInNewTabAction, layout);
+    menu()->trigger(menu::OpenInNewTabAction, layout);
 }
 
 QnUuid ShowreelReviewController::currentShowreelId() const
@@ -246,7 +244,7 @@ void ShowreelReviewController::connectToLayout(QnWorkbenchLayout* layout)
                 return;
 
             // Saving must go before layout updating to make sure item order will be correct.
-            menu()->trigger(action::SaveCurrentShowreelAction);
+            menu()->trigger(menu::SaveCurrentShowreelAction);
             m_updateItemsLayoutOperation->requestOperation();
         };
 
@@ -281,7 +279,7 @@ void ShowreelReviewController::updateButtons(const LayoutResourcePtr& layout)
         return;
 
     // Using he fact that dataChanged will be sent even if action list was not changed.
-    const QList<action::IDType> actions{action::StartCurrentShowreelAction};
+    const QList<menu::IDType> actions{menu::StartCurrentShowreelAction};
     layout->setData(Qn::CustomPanelActionsRole, QVariant::fromValue(actions));
 }
 
@@ -565,7 +563,7 @@ void ShowreelReviewController::at_dropResourcesAction_triggered()
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
     addResourcesToReviewLayout(reviewLayout, parameters.resources(), position);
     const auto showreel = systemContext()->showreelManager()->showreel(currentShowreelId());
-    menu()->trigger(action::SaveCurrentShowreelAction);
+    menu()->trigger(menu::SaveCurrentShowreelAction);
 }
 
 void ShowreelReviewController::at_startCurrentShowreelAction_triggered()
@@ -573,10 +571,10 @@ void ShowreelReviewController::at_startCurrentShowreelAction_triggered()
     NX_ASSERT_HEAVY_CONDITION(isShowreelReviewMode());
     const auto showreel = systemContext()->showreelManager()->showreel(currentShowreelId());
     NX_ASSERT(showreel.isValid());
-    const auto startTourAction = action(action::ToggleShowreelModeAction);
+    const auto startTourAction = action(menu::ToggleShowreelModeAction);
     NX_ASSERT(!startTourAction->isChecked());
     if (!startTourAction->isChecked())
-        menu()->trigger(action::ToggleShowreelModeAction, {Qn::UuidRole, showreel.id});
+        menu()->trigger(menu::ToggleShowreelModeAction, {Qn::UuidRole, showreel.id});
 }
 
 void ShowreelReviewController::at_saveCurrentShowreelAction_triggered()
@@ -608,7 +606,7 @@ void ShowreelReviewController::at_saveCurrentShowreelAction_triggered()
 void ShowreelReviewController::at_removeCurrentShowreelAction_triggered()
 {
     NX_ASSERT_HEAVY_CONDITION(isShowreelReviewMode());
-    menu()->trigger(action::RemoveShowreelAction, {Qn::UuidRole, currentShowreelId()});
+    menu()->trigger(menu::RemoveShowreelAction, {Qn::UuidRole, currentShowreelId()});
 }
 
 } // namespace nx::vms::client::desktop

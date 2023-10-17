@@ -8,21 +8,19 @@
 #include <nx/utils/data_structures/keyed_list.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
-#include <ui/workbench/workbench_context_aware.h>
-
-class QnWorkbenchContext;
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class LocalNotificationsListModel:
     public ScopedModelOperations<QAbstractListModel>,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
    Q_OBJECT
    using base_type = ScopedModelOperations<QAbstractListModel>;
 
 public:
-    LocalNotificationsListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    LocalNotificationsListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~LocalNotificationsListModel() override = default;
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

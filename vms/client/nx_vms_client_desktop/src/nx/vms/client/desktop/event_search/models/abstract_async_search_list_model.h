@@ -28,7 +28,7 @@ protected:
     nx::utils::ImplPtr<Private> d;
 
     explicit AbstractAsyncSearchListModel(
-        QnWorkbenchContext* context, CreatePrivate dCreator, QObject* parent = nullptr);
+        WindowContext* context, CreatePrivate dCreator, QObject* parent = nullptr);
 public:
     virtual ~AbstractAsyncSearchListModel() override;
 

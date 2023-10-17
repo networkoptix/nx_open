@@ -74,7 +74,7 @@ TreeView
     {
         id: resourceTreeModel
 
-        context: workbenchContext
+        context: windowContext
 
         onEditRequested:
             resourceTree.startEditing()

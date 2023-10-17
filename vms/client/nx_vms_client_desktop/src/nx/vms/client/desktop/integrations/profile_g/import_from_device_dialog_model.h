@@ -9,11 +9,10 @@
 
 #include <api/server_rest_connection.h>
 #include <nx/utils/impl_ptr.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop::integrations {
 
-class ImportFromDeviceDialogModel: public QAbstractProxyModel, public QnWorkbenchContextAware
+class ImportFromDeviceDialogModel: public QAbstractProxyModel
 {
     Q_OBJECT
 

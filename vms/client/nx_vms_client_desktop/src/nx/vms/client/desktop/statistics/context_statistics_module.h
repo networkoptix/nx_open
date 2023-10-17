@@ -4,7 +4,6 @@
 
 #include <nx/utils/impl_ptr.h>
 
-class QnActionsStatisticsModule;
 class QnCertificateStatisticsModule;
 class QnControlsStatisticsModule;
 class QnStatisticsManager;

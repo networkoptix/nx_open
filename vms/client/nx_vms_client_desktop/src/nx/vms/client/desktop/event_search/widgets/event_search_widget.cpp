@@ -123,9 +123,9 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
                 updateServerEventsMenu();
         };
 
-    connect(q->resourcePool(), &QnResourcePool::resourceAdded,
+    connect(q->system()->resourcePool(), &QnResourcePool::resourceAdded,
         this, updateServerEventsMenuIfNeeded);
-    connect(q->resourcePool(), &QnResourcePool::resourceRemoved,
+    connect(q->system()->resourcePool(), &QnResourcePool::resourceRemoved,
         this, updateServerEventsMenuIfNeeded);
 
     const auto updateAnalyticsMenuIfEventModelIsOnline =
@@ -139,7 +139,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
         this,
         updateAnalyticsMenuIfEventModelIsOnline);
 
-    connect(q->context()->findInstance<AnalyticsEventsSearchTreeBuilder>(),
+    connect(q->system()->analyticsEventsSearchTreeBuilder(),
         &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
         this,
         updateAnalyticsMenuIfEventModelIsOnline);
@@ -164,7 +164,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
                 resetType();
         });
 
-    connect(q->systemContext()->accessController(), &AccessController::globalPermissionsChanged,
+    connect(q->system()->accessController(), &AccessController::globalPermissionsChanged,
         q, &EventSearchWidget::updateAllowance);
 
     connect(q->model(), &AbstractSearchListModel::isOnlineChanged,
@@ -188,7 +188,7 @@ void EventSearchWidget::Private::setupTypeSelection()
 
     analyticsEventsMenu->setTitle(tr("Analytics events"));
 
-    StringsHelper helper(q->systemContext());
+    StringsHelper helper(q->system());
 
     auto defaultAction = addMenuAction(
         eventFilterMenu, tr("Any event"), EventType::undefinedEvent);
@@ -274,7 +274,7 @@ QMenu* EventSearchWidget::Private::createDeviceIssuesMenu(QWidget* parent) const
 
     menu->addSeparator();
 
-    nx::vms::event::StringsHelper stringsHelper(q->systemContext());
+    nx::vms::event::StringsHelper stringsHelper(q->system());
     for (const auto type: nx::vms::event::childEvents(EventType::anyCameraEvent))
         addMenuAction(menu, stringsHelper.eventName(type), type);
 
@@ -293,9 +293,9 @@ QMenu* EventSearchWidget::Private::createServerEventsMenu(QWidget* parent) const
     menu->addSeparator();
 
     const auto accessibleServerEvents = NvrEventsActionsAccess::removeInacessibleNvrEvents(
-        nx::vms::event::childEvents(EventType::anyServerEvent), q->resourcePool());
+        nx::vms::event::childEvents(EventType::anyServerEvent), q->system()->resourcePool());
 
-    nx::vms::event::StringsHelper stringsHelper(q->systemContext());
+    nx::vms::event::StringsHelper stringsHelper(q->system());
     for (const auto type: accessibleServerEvents)
         addMenuAction(menu, stringsHelper.eventName(type), type);
 
@@ -363,10 +363,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     {
         using namespace nx::vms::event;
 
-        auto analyticsEventsSearchTreeBuilder =
-            q->context()->findInstance<AnalyticsEventsSearchTreeBuilder>();
-
-        const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
+        const auto root = q->system()->analyticsEventsSearchTreeBuilder()->eventTypesTree();
 
         WidgetUtils::clearMenu(analyticsMenu);
 
@@ -394,7 +391,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
 // ------------------------------------------------------------------------------------------------
 // EventSearchWidget
 
-EventSearchWidget::EventSearchWidget(QnWorkbenchContext* context, QWidget* parent):
+EventSearchWidget::EventSearchWidget(WindowContext* context, QWidget* parent):
     base_type(context, new EventSearchListModel(context), parent),
     d(new Private(this))
 {
@@ -427,8 +424,8 @@ QString EventSearchWidget::itemCounterText(int count) const
 bool EventSearchWidget::calculateAllowance() const
 {
     return model()->isOnline()
-        && systemContext()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs)
-        && systemContext()->vmsRulesEngine()->isOldEngineEnabled();
+        && system()->accessController()->hasGlobalPermissions(GlobalPermission::viewLogs)
+        && system()->vmsRulesEngine()->isOldEngineEnabled();
 }
 
 } // namespace nx::vms::client::desktop

@@ -5,23 +5,22 @@
 #include <QtGui/QAction>
 
 #include <core/resource/camera_resource.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
+#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
+#include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 
-#include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
-#include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
-#include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-
 namespace nx::vms::client::desktop {
 
 BookmarkSearchSynchronizer::BookmarkSearchSynchronizer(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     CommonObjectSearchSetup* searchSetup,
     QObject* parent)
     :
@@ -47,7 +46,7 @@ BookmarkSearchSynchronizer::BookmarkSearchSynchronizer(
 
 QAction* BookmarkSearchSynchronizer::bookmarksAction() const
 {
-    return action(ui::action::BookmarksModeAction);
+    return action(menu::BookmarksModeAction);
 }
 
 void BookmarkSearchSynchronizer::updateTimelineBookmarks()
@@ -68,10 +67,10 @@ void BookmarkSearchSynchronizer::updateTimelineBookmarks()
         ? m_searchSetup->textFilter()->text()
         : QString();
 
-    if (auto watcher = context()->instance<QnTimelineBookmarksWatcher>())
+    if (auto watcher = workbenchContext()->instance<QnTimelineBookmarksWatcher>())
         watcher->setTextFilter(relevant ? filterText : QString());
 
-    if (auto watcher = context()->instance<QnWorkbenchItemBookmarksWatcher>())
+    if (auto watcher = workbenchContext()->instance<QnWorkbenchItemBookmarksWatcher>())
         watcher->setDisplayFilter(cameras, filterText);
 };
 

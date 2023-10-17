@@ -9,6 +9,7 @@
 
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/desktop/style/style.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/timeline/slider_tooltip.h>
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <ui/animation/variant_animator.h>
@@ -51,9 +52,8 @@ inline qreal positionToSpeed(qint64 position, qreal minimalStep)
 
 } // namespace
 
-SpeedSlider::SpeedSlider(QnWorkbenchContext* context, QWidget* parent):
+SpeedSlider::SpeedSlider(WindowContext* context, QWidget* parent):
     base_type(Qt::Horizontal, parent),
-    QnWorkbenchContextAware(context),
     m_animator(new VariantAnimator(this)),
     m_tooltip(new SliderToolTip(context))
 {
@@ -66,7 +66,7 @@ SpeedSlider::SpeedSlider(QnWorkbenchContext* context, QWidget* parent):
     m_animator->setAccessor(new PropertyAccessor("value"));
     m_animator->setTimeLimit(500);
     m_animator->setSpeed(5000.0);
-    m_animator->setTimer(display()->instrumentManager()->animationTimer());
+    m_animator->setTimer(context->display()->instrumentManager()->animationTimer());
 
     connect(this, &QSlider::sliderReleased, this, &SpeedSlider::restartSpeedAnimation);
 

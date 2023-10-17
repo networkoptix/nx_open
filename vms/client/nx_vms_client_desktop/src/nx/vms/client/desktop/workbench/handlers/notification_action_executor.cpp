@@ -18,6 +18,7 @@
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 
 namespace nx::vms::client::desktop {
 
@@ -71,6 +72,24 @@ void NotificationActionExecutor::execute(const ActionPtr& action)
         return;
 
     emit notificationActionReceived(notificationAction, {});
+
+    // Show splash.
+    QSet<QnResourcePtr> targetResources;
+
+    if (!notificationAction->deviceIds().empty())
+    {
+        targetResources = nx::utils::toQSet(
+            resourcePool()->getResourcesByIds(notificationAction->deviceIds()));
+    }
+    else
+    {
+        targetResources.insert(resourcePool()->getResourceById(notificationAction->serverId()));
+    }
+
+    targetResources.remove({});
+
+    display()->showNotificationSplash(
+        targetResources.values(), QnNotificationLevel::convert(notificationAction->level()));
 }
 
 } // namespace nx::vms::client::desktop

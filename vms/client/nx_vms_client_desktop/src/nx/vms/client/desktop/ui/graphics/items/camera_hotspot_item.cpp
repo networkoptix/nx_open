@@ -19,9 +19,9 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/camera_hotspots/camera_hotspots_display_utils.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameter_types.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/widgets/thumbnail_tooltip.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -72,7 +72,7 @@ struct CameraHotspotItem::Private
     ThumbnailTooltip* createTooltip() const;
 
     // Interactive actions.
-    ui::action::Parameters::ArgumentHash itemPlaybackParameters() const;
+    menu::Parameters::ArgumentHash itemPlaybackParameters() const;
     void openItem();
     void opemItemInNewLayout();
     void openItemInPlace();
@@ -173,7 +173,7 @@ ThumbnailTooltip* CameraHotspotItem::Private::createTooltip() const
     if (!imageRequest.camera)
         return nullptr;
 
-    const auto tooltip = new ThumbnailTooltip(q->windowContext()->workbenchContext());
+    const auto tooltip = new ThumbnailTooltip(q->windowContext());
     tooltip->setTooltipOffset(kTooltipOffset);
     tooltip->setEnclosingRect(q->scene()->views().first()->window()->geometry());
     tooltip->setText(tooltipText());
@@ -186,9 +186,9 @@ ThumbnailTooltip* CameraHotspotItem::Private::createTooltip() const
     return tooltip;
 }
 
-ui::action::Parameters::ArgumentHash CameraHotspotItem::Private::itemPlaybackParameters() const
+menu::Parameters::ArgumentHash CameraHotspotItem::Private::itemPlaybackParameters() const
 {
-    ui::action::Parameters::ArgumentHash result;
+    menu::Parameters::ArgumentHash result;
 
     const auto playbackSpeed = mediaResourceWidget()->speed();
     const auto positionMs = mediaResourceWidget()->position();
@@ -212,7 +212,7 @@ void CameraHotspotItem::Private::openItem()
             if (q->workbench()->item(Qn::ZoomedRole))
                 q->workbench()->setItem(Qn::ZoomedRole, nullptr);
 
-            actionManager->trigger(ui::action::GoToLayoutItemAction, ui::action::Parameters()
+            actionManager->trigger(menu::GoToLayoutItemAction, menu::Parameters()
                 .withArgument(Qn::ItemUuidRole, item->uuid()));
 
             if (!q->navigator()->syncEnabled())
@@ -230,25 +230,25 @@ void CameraHotspotItem::Private::openItem()
         }
     }
 
-    auto parameters = ui::action::Parameters(hotspotCamera());
+    auto parameters = menu::Parameters(hotspotCamera());
     if (!q->navigator()->syncEnabled())
         parameters.setArguments(itemPlaybackParameters());
 
-    actionManager->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
+    actionManager->trigger(menu::OpenInCurrentLayoutAction, parameters);
 }
 
 void CameraHotspotItem::Private::opemItemInNewLayout()
 {
-    auto parameters = ui::action::Parameters(hotspotCamera());
+    auto parameters = menu::Parameters(hotspotCamera());
     if (!q->navigator()->syncEnabled())
         parameters.setArguments(itemPlaybackParameters());
 
-    q->menu()->trigger(ui::action::OpenInNewTabAction, parameters);
+    q->menu()->trigger(menu::OpenInNewTabAction, parameters);
 }
 
 void CameraHotspotItem::Private::openItemInPlace()
 {
-    auto parameters = ui::action::Parameters(mediaResourceWidget())
+    auto parameters = menu::Parameters(mediaResourceWidget())
         .withArgument(Qn::ResourceRole, hotspotCamera());
 
     if (!q->navigator()->syncEnabled()
@@ -257,7 +257,7 @@ void CameraHotspotItem::Private::openItemInPlace()
         parameters.setArguments(itemPlaybackParameters());
     }
 
-    q->menu()->trigger(ui::action::ReplaceLayoutItemAction, parameters);
+    q->menu()->trigger(menu::ReplaceLayoutItemAction, parameters);
 }
 
 void CameraHotspotItem::Private::setDevicePixelRatio(qreal value)

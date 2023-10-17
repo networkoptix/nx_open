@@ -4,7 +4,7 @@
 
 #include <QtCore/QObject>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 class AnimationTimer;
 class QGraphicsWidget;
@@ -12,7 +12,7 @@ struct QnPaneSettings;
 
 namespace nx::vms::client::desktop {
 
-class AbstractWorkbenchPanel: public QObject, public QnWorkbenchContextAware
+class AbstractWorkbenchPanel: public QObject, public WindowContextAware
 {
     using base_type = QObject;
 
@@ -21,7 +21,7 @@ public:
     AbstractWorkbenchPanel(
         const QnPaneSettings& settings,
         QGraphicsWidget* parentWidget,
-        QObject* parent = nullptr);
+        QObject* parent);
 
     virtual bool isPinned() const = 0;
 

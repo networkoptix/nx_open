@@ -25,8 +25,9 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/tools.h>
@@ -135,8 +136,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
     restartAction(new QAction(tr("Restart Client"))),
     settingsAction(new QAction(tr("Updates Settings"))),
     clientUpdateTool(new ClientUpdateTool(systemContext(), this)),
-    notificationsManager(
-        context()->findInstance<desktop::workbench::LocalNotificationsManager>()),
+    notificationsManager(windowContext()->localNotificationsManager()),
     checkForUpdateTimer(new QTimer(this)),
     checkUpdateTimeTimer(new QTimer(this))
 {
@@ -182,7 +182,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
         [this]()
         {
             disableClientAutoUpdateNofitication();
-            menu()->trigger(ui::action::AdvancedUpdateSettingsAction);
+            menu()->trigger(menu::AdvancedUpdateSettingsAction);
         });
 
     connect(notificationsManager,
@@ -209,7 +209,7 @@ ClientUpdateManager::Private::Private(ClientUpdateManager* q):
                 || notificationId == installationNotificationId)
             {
                 disableClientAutoUpdateNofitication();
-                menu()->trigger(ui::action::AdvancedUpdateSettingsAction);
+                menu()->trigger(menu::AdvancedUpdateSettingsAction);
             }
         });
 }

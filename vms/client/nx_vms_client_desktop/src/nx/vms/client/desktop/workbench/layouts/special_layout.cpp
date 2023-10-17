@@ -11,7 +11,7 @@ namespace ui {
 namespace workbench {
 
 SpecialLayout::SpecialLayout(WindowContext* windowContext, const LayoutResourcePtr& resource):
-    base_type(resource),
+    base_type(windowContext, resource),
     m_panelWidget(new SpecialLayoutPanelWidget(windowContext, resource, this))
 {
     setFlags(flags() | QnLayoutFlag::SpecialBackground);

@@ -16,11 +16,11 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource_views/views/fake_resource_list_view.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/common/palette.h>
@@ -75,7 +75,7 @@ DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     initializeControls();
 
     auto urlChangeListener =
-        new core::SessionResourcesSignalListener<QnVirtualCameraResource>(this);
+        new core::SessionResourcesSignalListener<QnVirtualCameraResource>(system(), this);
 
     urlChangeListener->setOnAddedHandler(
         [this](const QnVirtualCameraResourceList& cameras)
@@ -259,8 +259,8 @@ void DeviceAdditionDialog::initializeControls()
         &CommonMessageBar::linkActivated,
         [this]()
         {
-            menu()->trigger(ui::action::SystemAdministrationAction,
-                ui::action::Parameters().withArgument(
+            menu()->trigger(menu::SystemAdministrationAction,
+                menu::Parameters().withArgument(
                     Qn::FocusTabRole, QnSystemAdministrationDialog::SecurityPage));
         });
 }
@@ -599,6 +599,10 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     if (!server || server->getStatus() != nx::vms::api::ResourceStatus::online || !m_model)
         return;
 
+    const auto api = system()->connectedServerApi();
+    if (!api)
+        return;
+
     const bool checkSelection = ui->foundDevicesTable->getCheckedCount();
     const int rowsCount = m_model->rowCount();
     for (int row = 0; row != rowsCount; ++row)
@@ -622,10 +626,10 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
         m_model->setData(stateIndex.siblingAtColumn(FoundDevicesModel::checkboxColumn),
             Qt::Unchecked, Qt::CheckStateRole);
 
-        connectedServerApi()->addCamera(
+        api->addCamera(
             server->getId(),
             device,
-            systemContext()->getSessionTokenHelper(),
+            system()->getSessionTokenHelper(),
             /*callback*/ {});
     }
 }
@@ -762,7 +766,7 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     ui->searchButton->setVisible(!showSearchProgressControls);
     ui->stopSearchButton->setVisible(showSearchProgressControls);
     ui->searchProgressBar->setVisible(showSearchProgressControls);
-    ui->httpsOnlyBar->setVisible(m_currentSearch && systemSettings()->useHttpsOnlyForCameras()
+    ui->httpsOnlyBar->setVisible(m_currentSearch && system()->globalSettings()->useHttpsOnlyForCameras()
         && messageBarSettings()->httpsOnlyBarInfo.value());
 
     if (!m_currentSearch)

@@ -9,9 +9,9 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
@@ -70,7 +70,7 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
             const auto systemId = d->crossSystemCamera->systemId();
 
             menu()->trigger(
-                nx::vms::client::desktop::ui::action::ConnectToCloudSystemWithUserInteractionAction,
+                nx::vms::client::desktop::menu::ConnectToCloudSystemWithUserInteractionAction,
                 {Qn::CloudSystemIdRole, systemId});
         });
 

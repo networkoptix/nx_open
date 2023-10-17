@@ -11,7 +11,7 @@
 
 namespace nx::vms::client::desktop {
 
-AnalyticsSearchListModel::AnalyticsSearchListModel(QnWorkbenchContext* context, QObject* parent):
+AnalyticsSearchListModel::AnalyticsSearchListModel(WindowContext* context, QObject* parent):
     base_type(context, [this]() { return new Private(this); }, parent),
     d(qobject_cast<Private*>(base_type::d.data()))
 {
@@ -120,7 +120,7 @@ void AnalyticsSearchListModel::setLiveTimestampGetter(LiveTimestampGetter value)
 
 bool AnalyticsSearchListModel::hasAccessRights() const
 {
-    return systemContext()->accessController()->isDeviceAccessRelevant(
+    return system()->accessController()->isDeviceAccessRelevant(
         nx::vms::api::AccessRight::viewArchive);
 }
 

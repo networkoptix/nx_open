@@ -22,8 +22,9 @@
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/models/camera_list_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/utils/table_export_helper.h>
@@ -32,7 +33,6 @@
 
 using namespace std::chrono;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 
 struct QnCameraListDialog::Private
 {
@@ -104,10 +104,9 @@ QnCameraListDialog::QnCameraListDialog(QWidget* parent):
     connect(ui->addDeviceButton, &QPushButton::clicked, this,
         [this]
         {
-            const auto parameters =
-                action::Parameters(currentServer())
-                    .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this));
-            menu()->trigger(action::AddDeviceManuallyAction, parameters);
+            const auto parameters = menu::Parameters(system()->currentServer())
+                .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this));
+            menu()->trigger(menu::AddDeviceManuallyAction, parameters);
         });
 
     connect(d->clipboardAction, &QAction::triggered,
@@ -169,17 +168,18 @@ void QnCameraListDialog::updateWindowTitle()
         {
             if (server())
             {
-                return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+                return QnDeviceDependentStrings::getDefaultNameFromSet(system()->resourcePool(),
                     tr("Devices List for %1", "%1 will be substituted with a server name"),
                     tr("Cameras List for %1", "%1 will be substituted with a server name"))
                         .arg(QnResourceDisplayInfo(d->model->server()).toString(Qn::RI_WithUrl));
             }
 
-            return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+            return QnDeviceDependentStrings::getDefaultNameFromSet(system()->resourcePool(),
                 tr("Devices List"), tr("Cameras List"));
         }();
 
-    const QString titleCamerasPart = QnDeviceDependentStrings::getNameFromSet(resourcePool(),
+    const QString titleCamerasPart = QnDeviceDependentStrings::getNameFromSet(
+        system()->resourcePool(),
         QnCameraDeviceStringSet(
             tr("%n devices found",      "", cameras.size()),
             tr("%n cameras found",      "", cameras.size()),
@@ -204,7 +204,7 @@ void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex& index)
         return;
 
     if (const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
-        context()->menu()->trigger(action::CameraSettingsAction, resource);
+        menu()->trigger(menu::CameraSettingsAction, resource);
 }
 
 void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint& /*point*/)
@@ -219,12 +219,12 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint&
     QScopedPointer<QMenu> menu;
     if (!resources.isEmpty())
     {
-        action::Parameters parameters(resources);
+        menu::Parameters parameters(resources);
         parameters.setArgument(Qn::NodeTypeRole, ResourceTree::NodeType::resource);
 
         // We'll be changing hotkeys, so we cannot reuse global actions.
-        menu.reset(context()->menu()->newMenu(
-            action::TableScope, this, parameters, action::Manager::DontReuseActions));
+        menu.reset(this->menu()->newMenu(
+            menu::TableScope, this, parameters, menu::Manager::DontReuseActions));
 
         for (const auto action: menu->actions())
             action->setShortcut({});
@@ -247,7 +247,7 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint&
 
 void QnCameraListDialog::at_exportAction_triggered()
 {
-    const auto caption = QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+    const auto caption = QnDeviceDependentStrings::getDefaultNameFromSet(system()->resourcePool(),
         tr("Export selected devices to a file."),
         tr("Export selected cameras to a file."));
 

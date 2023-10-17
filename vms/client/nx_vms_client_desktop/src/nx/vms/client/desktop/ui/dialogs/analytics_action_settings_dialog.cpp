@@ -30,10 +30,6 @@ bool AnalyticsActionSettingsDialog::tryClose(bool /*force*/)
     return true;
 }
 
-void AnalyticsActionSettingsDialog::forcedUpdate()
-{
-}
-
 std::optional<QJsonObject> AnalyticsActionSettingsDialog::request(
     const QJsonObject& settingsModel,
     QWidget* parent)

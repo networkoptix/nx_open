@@ -14,7 +14,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/event_search/dialogs/event_log_dialog.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/workbench/workbench_context.h>
@@ -121,10 +121,10 @@ VmsRulesActionHandler::VmsRulesActionHandler(QObject* parent):
             dialog->exec(Qt::NonModal);
         });
 
-    connect(action(ui::action::OpenVmsRulesDialogAction), &QAction::triggered,
+    connect(action(menu::OpenVmsRulesDialogAction), &QAction::triggered,
         this, &VmsRulesActionHandler::openVmsRulesDialog);
 
-    connect(action(ui::action::OpenEventLogAction), &QAction::triggered,
+    connect(action(menu::OpenEventLogAction), &QAction::triggered,
         this, &VmsRulesActionHandler::openEventLogDialog);
 }
 
@@ -145,7 +145,9 @@ void VmsRulesActionHandler::openVmsRulesDialog()
 
 void VmsRulesActionHandler::openEventLogDialog()
 {
-    QnNonModalDialogConstructor<EventLogDialog> dialogConstructor(d->eventLogDialog, mainWindowWidget());
+    QnNonModalDialogConstructor<EventLogDialog> dialogConstructor(
+        d->eventLogDialog,
+        [this] { return new EventLogDialog(mainWindowWidget()); });
 
     const auto parameters = menu()->currentParameters(sender());
     const auto eventType = parameters.argument(Qn::EventTypeRole, QString());

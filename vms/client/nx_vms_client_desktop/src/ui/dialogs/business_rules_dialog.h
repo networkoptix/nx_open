@@ -40,11 +40,11 @@ protected:
 
     virtual void showEvent(QShowEvent *event) override;
 
-public Q_SLOTS:
+public:
     virtual void accept() override;
     virtual void reject() override;
 
-private slots:
+private:
     void at_message_ruleDeleted(const QnUuid &id);
 
     void at_newRuleButton_clicked();
@@ -63,13 +63,12 @@ private slots:
 
     void updateFilter();
 
-    virtual void retranslateUi() override;
-
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog);
 
     using Column = QnBusinessRuleViewModel::Column;
 
+    void retranslateUi();
     void createActions();
 
     inline bool hasEditPermissions() const;

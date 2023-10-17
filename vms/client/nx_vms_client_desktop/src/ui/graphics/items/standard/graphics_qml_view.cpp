@@ -30,8 +30,8 @@
 
 #include <qt_graphics_items/graphics_utils.h>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
 #include <ui/workaround/gl_native_painting.h>
@@ -291,7 +291,7 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
 
     d->ensureOffscreen();
 
-    d->qmlEngine = qnClientCoreModule->mainQmlEngine();
+    d->qmlEngine = appContext()->qmlEngine();
     d->resetComponent();
 
     setAcceptHoverEvents(true);

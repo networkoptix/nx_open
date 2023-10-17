@@ -12,7 +12,7 @@ class BookmarkSearchListModel: public AbstractAsyncSearchListModel
     using base_type = AbstractAsyncSearchListModel;
 
 public:
-    explicit BookmarkSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit BookmarkSearchListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~BookmarkSearchListModel() override = default;
 
     virtual TextFilterSetup* textFilter() const override;

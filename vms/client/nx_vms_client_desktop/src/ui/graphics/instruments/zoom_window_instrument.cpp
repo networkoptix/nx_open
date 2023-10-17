@@ -12,9 +12,9 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/style/style.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/animation/opacity_animator.h>
@@ -35,7 +35,6 @@
 #include "selection_item.h"
 
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::ui;
 using nx::vms::client::core::Geometry;
 
 namespace {
@@ -449,7 +448,10 @@ QRectF ZoomWindowWidget::constrainedGeometry(
 // -------------------------------------------------------------------------- //
 // ZoomWindowInstrument
 // -------------------------------------------------------------------------- //
-ZoomWindowInstrument::ZoomWindowInstrument(QObject* parent):
+ZoomWindowInstrument::ZoomWindowInstrument(
+    nx::vms::client::desktop::WindowContext* windowContext,
+    QObject* parent)
+    :
     base_type(
         makeSet(QEvent::MouseButtonPress, QEvent::MouseMove),
         makeSet(),
@@ -460,7 +462,7 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject* parent):
             QEvent::GraphicsSceneMouseMove),
         parent
     ),
-    QnWorkbenchContextAware(parent),
+    WindowContextAware(windowContext),
     m_zoomWindowStartedEmitted(false)
 {
     dragProcessor()->setStartDragTime(0);
@@ -1034,8 +1036,8 @@ void ZoomWindowInstrument::at_resizing(
     if (!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target())
         return;
 
-    auto action = menu()->action(action::CreateZoomWindowAction);
-    if (!action || action->checkCondition(action->scope(), newTargetWidget) != action::EnabledAction)
+    auto action = menu()->action(menu::CreateZoomWindowAction);
+    if (!action || action->checkCondition(action->scope(), newTargetWidget) != menu::EnabledAction)
         return;
 
     auto widget = windowTarget()->zoomWidget();

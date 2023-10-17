@@ -25,7 +25,7 @@ class RightPanelModelsAdapter;
 
 class TileInteractionHandler:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -37,7 +37,7 @@ public:
     static TileInteractionHandler* install(RightPanelModelsAdapter* adapter);
 
 private:
-    TileInteractionHandler(QnWorkbenchContext* context, QObject* parent = nullptr);
+    TileInteractionHandler(WindowContext* context, QObject* parent = nullptr);
 
     void handleClick(
         const QModelIndex& index,
@@ -90,7 +90,7 @@ signals:
 
 private:
     template<typename T>
-    static TileInteractionHandler* doInstall(QnWorkbenchContext* context, T* tileInteractionSource);
+    static TileInteractionHandler* doInstall(WindowContext* context, T* tileInteractionSource);
 
 private:
     const QScopedPointer<nx::utils::PendingOperation> m_showPendingMessages;

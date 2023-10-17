@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/action_types.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/action_types.h>
 
 #include "abstract_workbench_panel.h"
 
@@ -54,8 +54,8 @@ public:
     virtual void stopAnimations() override;
     virtual void setPanelSize(qreal /*size*/) override {}
 
-    ui::action::ActionScope currentScope() const;
-    ui::action::Parameters currentParameters(ui::action::ActionScope scope) const;
+    menu::ActionScope currentScope() const;
+    menu::Parameters currentParameters(menu::ActionScope scope) const;
 
 private:
     void updateControlsGeometry();

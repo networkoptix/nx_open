@@ -10,14 +10,17 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/ui/actions/action.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <ui/workbench/workbench_context.h>
+#include <nx/vms/client/desktop/menu/action.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 
 #include "sign_dialog.h"
 
+using namespace nx::vms::client::desktop;
+
 QnSignInfo::QnSignInfo(QWidget* parent):
     QLabel(parent),
+    QnWorkbenchContextAware(parent),
     m_signHelper()
 {
     m_finished = false;
@@ -37,17 +40,10 @@ void QnSignInfo::at_gotSignature(
         m_signFromFrame = signFromFrame;
         m_signIsMatched = (m_sign == m_signFromFrame);
     }
-    auto contextAware = dynamic_cast<QnWorkbenchContextAware*>(
-        qnClientCoreModule->mainQmlEngine()->rootContext()->contextProperty("context")
-        .value<QObject*>());
 
-    if (contextAware)
-    {
-        nx::vms::client::desktop::ui::action::Parameters actionParameters;
-        actionParameters.setArgument(Qn::ValidRole, m_signIsMatched);
-        contextAware->context()->menu()->trigger(
-            nx::vms::client::desktop::ui::action::WatermarkCheckedEvent, actionParameters);
-    }
+    menu::Parameters actionParameters;
+    actionParameters.setArgument(Qn::ValidRole, m_signIsMatched);
+    menu()->trigger(menu::WatermarkCheckedEvent, actionParameters);
 
     update();
 }

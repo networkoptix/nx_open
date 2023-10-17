@@ -10,7 +10,7 @@
 #include <core/misc/schedule_task.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 
 namespace Ui { class CameraScheduleWidget; }
 
@@ -35,7 +35,7 @@ public:
     virtual ~CameraScheduleWidget() override;
 
 signals:
-    void actionRequested(nx::vms::client::desktop::ui::action::IDType action);
+    void actionRequested(nx::vms::client::desktop::menu::IDType action);
 
 private:
     void setupUi();

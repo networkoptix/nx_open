@@ -9,13 +9,14 @@
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
+#include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/combo_box_field.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/common/widgets/text_edit_field.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
-#include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::common;
 
@@ -162,8 +163,8 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
                 ? reasonField->text().split("\n")
                 : QStringList(reasonComboBox->text());
 
-            const auto systemName = systemSettings()->systemName();
-            const auto userName = context()->user()->getName();
+            const auto systemName = system()->globalSettings()->systemName();
+            const auto userName = system()->user()->getName();
             m_info = nx::vms::client::desktop::license::RequestInfo({
                 nameField->text(), emailField->text(), reasonText, systemName, userName});
         });

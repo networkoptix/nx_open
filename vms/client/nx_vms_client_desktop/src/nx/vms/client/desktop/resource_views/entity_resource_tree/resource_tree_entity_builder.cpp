@@ -312,12 +312,12 @@ ResourceTreeEntityBuilder::ResourceTreeEntityBuilder(SystemContext* systemContex
     m_itemKeySourcePool(new ResourceTreeItemKeySourcePool(
         systemContext, m_cameraResourceIndex.get(), m_userLayoutResourceIndex.get()))
 {
+    // TODO: #sivanov There should be more elegant way to handle unit tests limitations.
     // Message processor does not exist in unit tests.
-    if (auto messageProcessor = this->messageProcessor())
+    if (messageProcessor())
     {
         auto userWatcher = new core::SessionResourcesSignalListener<QnUserResource>(
-            resourcePool(),
-            messageProcessor,
+            systemContext,
             this);
         userWatcher->setOnRemovedHandler(
             [this](const QnUserResourceList& users)

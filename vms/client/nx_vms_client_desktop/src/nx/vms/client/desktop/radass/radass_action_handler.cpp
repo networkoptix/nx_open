@@ -10,13 +10,13 @@
 #include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
@@ -63,7 +63,7 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
     d->manager = context()->instance<RadassResourceManager>();
     d->manager->setCacheDirectory(getCacheDirectory());
 
-    connect(action(ui::action::RadassAction), &QAction::triggered, this,
+    connect(action(menu::RadassAction), &QAction::triggered, this,
         &RadassActionHandler::at_radassAction_triggered);
 
     connect(d->manager, &RadassResourceManager::modeChanged, this,

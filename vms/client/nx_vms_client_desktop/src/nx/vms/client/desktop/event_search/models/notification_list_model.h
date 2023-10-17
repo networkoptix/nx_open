@@ -13,7 +13,7 @@ class NotificationListModel: public EventListModel
     using base_type = EventListModel;
 
 public:
-    explicit NotificationListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit NotificationListModel(WindowContext* context, QObject* parent = nullptr);
     virtual ~NotificationListModel() override;
 
     int maximumCount() const;

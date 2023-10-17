@@ -61,33 +61,35 @@
     #include <ui/workaround/mac_utils.h>
 #endif
 
-using namespace nx::vms::client;
-using namespace nx::vms::client::desktop;
+namespace nx::vms::client::desktop {
 
 static QnClientModule* s_instance = nullptr;
 
 struct QnClientModule::Private
 {
-    void initLicensesModule()
+    void initLicensesModule(SystemContext* systemContext)
     {
         using namespace nx::vms::license;
 
-        videoWallLicenseUsageHelper =
-            std::make_unique<VideoWallLicenseUsageHelper>(appContext()->currentSystemContext());
+        videoWallLicenseUsageHelper = std::make_unique<VideoWallLicenseUsageHelper>(systemContext);
         videoWallLicenseUsageHelper->setCustomValidator(
-            std::make_unique<license::VideoWallLicenseValidator>(
-                appContext()->currentSystemContext()));
+            std::make_unique<license::VideoWallLicenseValidator>(systemContext));
     }
 
     const QnStartupParameters startupParameters;
     std::unique_ptr<AnalyticsSettingsManager> analyticsSettingsManager;
-    std::unique_ptr<nx::vms::client::desktop::analytics::AttributeHelper> analyticsAttributeHelper;
+    std::unique_ptr<analytics::AttributeHelper> analyticsAttributeHelper;
     std::unique_ptr<nx::vms::license::VideoWallLicenseUsageHelper> videoWallLicenseUsageHelper;
     std::unique_ptr<DebugInfoStorage> debugInfoStorage;
 };
 
-QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QObject* parent):
+QnClientModule::QnClientModule(
+    SystemContext* systemContext,
+    const QnStartupParameters& startupParameters,
+    QObject* parent)
+    :
     QObject(parent),
+    SystemContextAware(systemContext),
     d(new Private{.startupParameters = startupParameters})
 {
     if (s_instance)
@@ -102,12 +104,10 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
     core::appContext()->knownServerConnectionsWatcher()->start();
 
     d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
-        appContext()->currentSystemContext()->resourcePool(),
-        appContext()->currentSystemContext()->messageProcessor());
+        systemContext);
 
-    d->analyticsAttributeHelper = std::make_unique<
-        nx::vms::client::desktop::analytics::AttributeHelper>(
-            appContext()->currentSystemContext()->analyticsTaxonomyStateWatcher());
+    d->analyticsAttributeHelper = std::make_unique<analytics::AttributeHelper>(
+        systemContext->analyticsTaxonomyStateWatcher());
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
@@ -116,12 +116,12 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParameters, QOb
     integrations::initialize(this);
 
     m_licenseHealthWatcher.reset(new LicenseHealthWatcher(
-        appContext()->currentSystemContext()->licensePool()));
+        systemContext->licensePool()));
 
     d->debugInfoStorage = std::make_unique<DebugInfoStorage>();
 
-    d->initLicensesModule();
-    appContext()->moduleDiscoveryManager()->start(systemContext()->resourcePool());
+    d->initLicensesModule(systemContext);
+    appContext()->moduleDiscoveryManager()->start(systemContext->resourcePool());
 
     initSurfaceFormat();
 }
@@ -224,11 +224,6 @@ QnClientCoreModule* QnClientModule::clientCoreModule() const
     return appContext()->clientCoreModule();
 }
 
-SystemContext* QnClientModule::systemContext() const
-{
-    return appContext()->currentSystemContext();
-}
-
 QnStartupParameters QnClientModule::startupParameters() const
 {
     return d->startupParameters;
@@ -239,12 +234,12 @@ nx::vms::license::VideoWallLicenseUsageHelper* QnClientModule::videoWallLicenseU
     return d->videoWallLicenseUsageHelper.get();
 }
 
-nx::vms::client::desktop::analytics::TaxonomyManager* QnClientModule::taxonomyManager() const
+analytics::TaxonomyManager* QnClientModule::taxonomyManager() const
 {
     return systemContext()->taxonomyManager();
 }
 
-nx::vms::client::desktop::analytics::AttributeHelper*
+analytics::AttributeHelper*
     QnClientModule::analyticsAttributeHelper() const
 {
     return d->analyticsAttributeHelper.get();
@@ -264,3 +259,5 @@ void QnClientModule::registerResourceDataProviders()
         factory->registerResourceType<WindowsDesktopResource>();
     #endif
 }
+
+} // namespace nx::vms::client::desktop

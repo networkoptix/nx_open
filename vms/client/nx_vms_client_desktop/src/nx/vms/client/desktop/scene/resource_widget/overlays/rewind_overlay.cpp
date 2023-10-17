@@ -8,18 +8,15 @@
 #include <qt_graphics_items/graphics_widget.h>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_widget.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_context.h>
-
-#include <nx/vms/client/desktop/workbench/workbench.h>
-#include <ui/workbench/workbench_context.h>
-
 
 namespace nx::vms::client::desktop {
 
@@ -115,8 +112,8 @@ RewindOverlay::RewindOverlay(WindowContext* windowContext, QGraphicsItem* parent
             }
         };
 
-    connect(action(ui::action::FastForwardAction), &QAction::triggered, this, fastForward);
-    connect(action(ui::action::RewindAction), &QAction::triggered, this, rewind);
+    connect(action(menu::FastForwardAction), &QAction::triggered, this, fastForward);
+    connect(action(menu::RewindAction), &QAction::triggered, this, rewind);
 }
 
 RewindOverlay::~RewindOverlay()

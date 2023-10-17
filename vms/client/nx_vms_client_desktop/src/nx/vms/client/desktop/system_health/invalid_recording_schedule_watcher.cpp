@@ -2,10 +2,10 @@
 
 #include "invalid_recording_schedule_watcher.h"
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -60,11 +60,17 @@ struct InvalidRecordingScheduleWatcher::Private
     QnVirtualCameraResourceSet camerasWithInvalidSchedule;
 };
 
-InvalidRecordingScheduleWatcher::InvalidRecordingScheduleWatcher(QObject* parent):
+InvalidRecordingScheduleWatcher::InvalidRecordingScheduleWatcher(
+    SystemContext* systemContext,
+    QObject* parent)
+    :
     base_type(parent),
+    SystemContextAware(systemContext),
     d(new Private(this))
 {
-    auto camerasListener = new core::SessionResourcesSignalListener<QnVirtualCameraResource>(this);
+    auto camerasListener = new core::SessionResourcesSignalListener<QnVirtualCameraResource>(
+        systemContext,
+        this);
 
     camerasListener->setOnAddedHandler(
         [this](const QnVirtualCameraResourceList& cameras)

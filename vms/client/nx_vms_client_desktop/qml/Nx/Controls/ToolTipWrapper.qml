@@ -9,7 +9,7 @@ EmbeddedPopup
 {
     id: toolTipPopup
 
-    viewport: workbenchContext.mainWindow
+    viewport: windowContext.mainWindow
 
     // Align either to top of the parent or using both parent and child vertical centers.
     property bool vcenter: true

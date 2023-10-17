@@ -12,28 +12,30 @@
 namespace nx::vms::client::desktop {
 
 std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
-    createConnectionUserInteractionDelegate(QPointer<QWidget> mainWindow)
+    createConnectionUserInteractionDelegate(std::function<QWidget*()> parentWidget)
 {
     const auto validateToken =
-        [mainWindow](const nx::network::http::Credentials& credentials)
+        [parentWidget](const nx::network::http::Credentials& credentials)
         {
-            if (!mainWindow)
+            auto parent = parentWidget();
+            if (!parent)
                 return false;
 
             return OauthLoginDialog::validateToken(
-                mainWindow, OauthLoginDialog::tr("Connect to System"), credentials);
+                parent, OauthLoginDialog::tr("Connect to System"), credentials);
         };
 
     const auto askToAcceptCertificate =
-        [mainWindow](const nx::vms::api::ModuleInformation& target,
+        [parentWidget](const nx::vms::api::ModuleInformation& target,
             const nx::network::SocketAddress& primaryAddress,
             const nx::network::ssl::CertificateChain& chain,
             core::CertificateWarning::Reason warningType)
         {
-            if (!mainWindow)
+            auto parent = parentWidget();
+            if (!parent)
                 return false;
 
-            ServerCertificateWarning warning(target, primaryAddress, chain, warningType, mainWindow);
+            ServerCertificateWarning warning(target, primaryAddress, chain, warningType, parent);
             warning.exec();
 
             // Dialog uses both standard and custom buttons. Check button role instead of result code.
@@ -41,14 +43,15 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
         };
 
     const auto showCertificateError =
-        [mainWindow](const nx::vms::api::ModuleInformation& target,
+        [parentWidget](const nx::vms::api::ModuleInformation& target,
             const nx::network::SocketAddress& primaryAddress,
             const nx::network::ssl::CertificateChain& chain)
         {
-            if (!mainWindow)
+            auto parent = parentWidget();
+            if (!parent)
                 return;
 
-            ServerCertificateError msg(target, primaryAddress, chain, mainWindow);
+            ServerCertificateError msg(target, primaryAddress, chain, parent);
             msg.exec();
         };
 

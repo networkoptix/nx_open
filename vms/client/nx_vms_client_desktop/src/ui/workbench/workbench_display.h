@@ -274,6 +274,8 @@ public:
 
     QTimer* playbackPositionBlinkTimer() const;
 
+    void showNotificationSplash(const QnResourceList& resources, QnNotificationLevel::Value level);
+
 public slots:
     void fitInView(bool animate);
 
@@ -365,9 +367,6 @@ protected slots:
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
 
-    void at_notificationAdded(const nx::vms::event::AbstractActionPtr& businessAction);
-    void at_notificationAction(
-        const QSharedPointer<nx::vms::rules::NotificationActionBase>& notificationAction);
     void showSplashOnResource(const QnResourcePtr& resource, QnNotificationLevel::Value level);
 
     bool canShowLayoutBackground() const;

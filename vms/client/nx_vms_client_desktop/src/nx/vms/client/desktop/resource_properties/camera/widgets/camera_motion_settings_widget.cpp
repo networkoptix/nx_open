@@ -10,11 +10,11 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QButtonGroup>
 
-#include <client_core/client_core_module.h>
 #include <nx/vms/client/core/media/media_player.h>
 #include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_button.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -49,7 +49,7 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     ui(new Ui::CameraMotionSettingsWidget()),
     m_motionHelper(new core::CameraMotionHelper()),
     m_sensitivityButtons(new QButtonGroup(this)),
-    m_motionWidget(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this))
+    m_motionWidget(new QQuickWidget(appContext()->qmlEngine(), this))
 {
     ui->setupUi(this);
 

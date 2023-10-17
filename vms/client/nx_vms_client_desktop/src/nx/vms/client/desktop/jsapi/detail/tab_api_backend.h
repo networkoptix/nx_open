@@ -12,7 +12,11 @@
 class QnWorkbenchLayout;
 class QnWorkbenchContext;
 
-namespace nx::vms::client::desktop::jsapi::detail {
+namespace nx::vms::client::desktop {
+
+class WindowContext;
+
+namespace jsapi::detail {
 
 /** Class implements management functions for the opened tab. */
 class TabApiBackend: public QObject
@@ -28,7 +32,7 @@ public:
      * @param layout Layout to be watched for.
      */
     TabApiBackend(
-        QnWorkbenchContext* context,
+        WindowContext* context,
         QnWorkbenchLayout* layout,
         QObject* parent = nullptr);
 
@@ -82,4 +86,5 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::desktop::jsapi::detail
+} // namespace jsapi::detail
+} // namespace nx::vms::client::desktop

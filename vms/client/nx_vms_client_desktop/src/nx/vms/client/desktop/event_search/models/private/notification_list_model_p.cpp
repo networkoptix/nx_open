@@ -21,16 +21,18 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
+#include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/aggregation_info.h>
@@ -44,14 +46,11 @@
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 #include <utils/media/audio_player.h>
 
 namespace nx::vms::client::desktop {
-
-using namespace ui;
 
 using nx::vms::api::EventType;
 using nx::vms::api::ActionType;
@@ -205,15 +204,15 @@ void fillEventData(
 } // namespace
 
 NotificationListModel::Private::Private(NotificationListModel* q):
-    QnWorkbenchContextAware(q),
+    WindowContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(systemContext()))
+    m_helper(new vms::event::StringsHelper(system()))
 {
-    const auto handler = context()->instance<QnWorkbenchNotificationsHandler>();
-    connect(handler, &QnWorkbenchNotificationsHandler::cleared, q, &EventListModel::clear);
-    connect(handler, &QnWorkbenchNotificationsHandler::notificationAdded,
+    const auto handler = windowContext()->notificationActionHandler();
+    connect(handler, &NotificationActionHandler::cleared, q, &EventListModel::clear);
+    connect(handler, &NotificationActionHandler::notificationAdded,
         this, &Private::addNotification);
-    connect(handler, &QnWorkbenchNotificationsHandler::notificationRemoved,
+    connect(handler, &NotificationActionHandler::notificationRemoved,
         this, &Private::removeNotification);
 
     connect(q, &EventListModel::modelReset, this,
@@ -228,7 +227,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(q, &EventListModel::rowsAboutToBeRemoved,
         this, &Private::onRowsAboutToBeRemoved);
 
-    const auto serverNotificationCache = context()->instance<ServerNotificationCache>();
+    const auto serverNotificationCache = workbenchContext()->instance<ServerNotificationCache>();
     connect(serverNotificationCache,
         &ServerNotificationCache::fileDownloaded, this,
         [this, serverNotificationCache]
@@ -244,7 +243,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
             m_itemsByLoadingSound.remove(fileName);
         });
 
-    connect(context()->instance<NotificationActionExecutor>(),
+    connect(workbenchContext()->instance<NotificationActionExecutor>(),
         &NotificationActionExecutor::notificationActionReceived,
         this, &NotificationListModel::Private::onNotificationActionBase);
 
@@ -405,7 +404,7 @@ void NotificationListModel::Private::onRepeatSoundAction(
 
         const auto soundUrl = action->sound();
         if (!m_itemsByLoadingSound.contains(soundUrl))
-            context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
+            workbenchContext()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
 
         m_itemsByLoadingSound.insert(soundUrl, eventData.id);
 
@@ -435,11 +434,11 @@ void NotificationListModel::Private::onAlarmLayoutAction(
     eventData.icon = qnSkin->icon("events/alarm_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
     eventData.sourceName = action->sourceName();
     eventData.previewCamera =
-        resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->eventDeviceIds())
+        system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->eventDeviceIds())
             .value(0);
     eventData.cameras =
-        resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->deviceIds());
-    eventData.actionId = action::OpenInAlarmLayoutAction;
+        system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->deviceIds());
+    eventData.actionId = menu::OpenInAlarmLayoutAction;
     eventData.actionParameters = eventData.cameras;
 
     fillEventData(action.get(), eventData);
@@ -469,14 +468,14 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     NX_VERBOSE(this, "Received action: %1, id: %2", actionType, actionId);
 
-    QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
+    QnResourcePtr resource = system()->resourcePool()->getResourceById(params.eventResourceId);
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto server = resource.dynamicCast<QnMediaServerResource>();
 
     auto title = caption(params, camera);
     const microseconds timestamp(params.eventTimestampUsec);
 
-    auto alarmCameras = getAlarmCameras(action.get(), systemContext());
+    auto alarmCameras = getAlarmCameras(action.get(), system());
 
     if (actionType == ActionType::showOnAlarmLayoutAction)
     {
@@ -522,13 +521,13 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     {
         const auto soundUrl = action->getParams().url;
         if (!m_itemsByLoadingSound.contains(soundUrl))
-            context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
+            workbenchContext()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
 
         m_itemsByLoadingSound.insert(soundUrl, eventData.id);
     }
     else if (actionType == ActionType::showOnAlarmLayoutAction)
     {
-        eventData.actionId = action::OpenInAlarmLayoutAction;
+        eventData.actionId = menu::OpenInAlarmLayoutAction;
         eventData.actionParameters = alarmCameras;
         eventData.previewCamera = camera;
         eventData.cameras = alarmCameras;
@@ -536,7 +535,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     else if (actionType == ActionType::showPopupAction)
     {
         const bool hasViewPermission = resource &&
-            systemContext()->accessController()->hasPermissions(resource, Qn::ViewContentPermission);
+            system()->accessController()->hasPermissions(resource, Qn::ViewContentPermission);
 
         switch (params.eventType)
         {
@@ -544,8 +543,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             case EventType::fanErrorEvent:
             {
                 NX_ASSERT(hasViewPermission);
-                eventData.actionId = action::ServerSettingsAction;
-                eventData.actionParameters = action::Parameters(resource);
+                eventData.actionId = menu::ServerSettingsAction;
+                eventData.actionParameters = menu::Parameters(resource);
                 eventData.actionParameters.setArgument(Qn::FocusTabRole, QnServerSettingsDialog::PoePage);
                 break;
             }
@@ -574,7 +573,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             case EventType::networkIssueEvent:
             {
                 NX_ASSERT(hasViewPermission);
-                eventData.actionId = action::CameraSettingsAction;
+                eventData.actionId = menu::CameraSettingsAction;
                 eventData.actionParameters = camera;
                 eventData.previewCamera = camera;
                 break;
@@ -587,7 +586,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             case EventType::serverCertificateError:
             {
                 NX_ASSERT(hasViewPermission);
-                eventData.actionId = action::ServerSettingsAction;
+                eventData.actionId = menu::ServerSettingsAction;
                 eventData.actionParameters = server;
                 break;
             }
@@ -595,24 +594,24 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             case EventType::cameraIpConflictEvent:
             {
                 const auto& webPageAddress = params.caption;
-                eventData.actionId = action::BrowseUrlAction;
+                eventData.actionId = menu::BrowseUrlAction;
                 eventData.actionParameters = {Qn::UrlRole, webPageAddress};
                 break;
             }
 
             case EventType::licenseIssueEvent:
             {
-                eventData.actionId = action::PreferencesLicensesTabAction;
+                eventData.actionId = menu::PreferencesLicensesTabAction;
                 break;
             }
 
             case EventType::userDefinedEvent:
             {
                 const auto sourceCameras = camera_id_helper::findCamerasByFlexibleId(
-                    resourcePool(), params.metadata.cameraRefs).filtered(
+                    system()->resourcePool(), params.metadata.cameraRefs).filtered(
                         [this](const auto& camera)
                         {
-                            return systemContext()->accessController()->hasPermissions(camera,
+                            return system()->accessController()->hasPermissions(camera,
                                 Qn::ViewContentPermission);
                         });
 
@@ -673,25 +672,25 @@ void NotificationListModel::Private::setupClientAction(
             break;
 
         case ClientAction::poeSettings:
-            eventData.actionId = action::ServerSettingsAction;
-            eventData.actionParameters = action::Parameters(server);
+            eventData.actionId = menu::ServerSettingsAction;
+            eventData.actionParameters = menu::Parameters(server);
             eventData.actionParameters
                 .setArgument(Qn::FocusTabRole, QnServerSettingsDialog::PoePage);
             break;
 
         case ClientAction::cameraSettings:
-            eventData.actionId = action::CameraSettingsAction;
+            eventData.actionId = menu::CameraSettingsAction;
             eventData.actionParameters = camera;
             eventData.previewCamera = camera;
             break;
 
         case ClientAction::serverSettings:
-            eventData.actionId = action::ServerSettingsAction;
+            eventData.actionId = menu::ServerSettingsAction;
             eventData.actionParameters = server;
             break;
 
         case ClientAction::licensesSettings:
-            eventData.actionId = action::PreferencesLicensesTabAction;
+            eventData.actionId = menu::PreferencesLicensesTabAction;
             break;
 
         case ClientAction::previewCamera:
@@ -706,7 +705,7 @@ void NotificationListModel::Private::setupClientAction(
             break;
 
         case ClientAction::browseUrl:
-            eventData.actionId = action::BrowseUrlAction;
+            eventData.actionId = menu::BrowseUrlAction;
             eventData.actionParameters = {Qn::UrlRole, action->url()};
             break;
 
@@ -774,8 +773,8 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     if (!NX_ASSERT(!cameraId.isNull()))
         return;
 
-    const auto camera = resourcePool()->getResourceById(cameraId);
-    if (!camera || !systemContext()->accessController()->hasPermissions(camera,
+    const auto camera = system()->resourcePool()->getResourceById(cameraId);
+    if (!camera || !system()->accessController()->hasPermissions(camera,
         Qn::ManageBookmarksPermission))
     {
         return;
@@ -802,12 +801,12 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         [this, cameraId, action]()
         {
             // TODO: FIXME! Could permissions have changed by this moment?
-            action::Parameters params;
-            const auto camera = resourcePool()->getResourceById(cameraId);
+            menu::Parameters params;
+            const auto camera = system()->resourcePool()->getResourceById(cameraId);
             if (camera && camera->systemContext() && !camera->hasFlags(Qn::removed))
                 params.setResources({camera});
             params.setArgument(Qn::ActionDataRole, action);
-            menu()->trigger(action::AcknowledgeEventAction, params);
+            menu()->trigger(menu::AcknowledgeEventAction, params);
         };
 
     connect(eventData.extraAction.data(), &QAction::triggered,
@@ -873,9 +872,9 @@ QString NotificationListModel::Private::tooltip(const vms::event::AbstractAction
         for (const auto id: nx::vms::event::LicenseIssueEvent::decodeCameras(params))
         {
             NX_ASSERT(!id.isNull());
-            if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
+            if (auto camera = system()->resourcePool()->getResourceById<QnVirtualCameraResource>(id))
             {
-                if (systemContext()->accessController()->hasPermissions(camera,
+                if (system()->accessController()->hasPermissions(camera,
                     Qn::ViewContentPermission))
                 {
                     tooltip << QnResourceDisplayInfo(camera).toString(resourceInfoLevel);
@@ -916,7 +915,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
     if (params.eventType >= EventType::userDefinedEvent)
     {
         const auto camList = camera_id_helper::findCamerasByFlexibleId(
-            resourcePool(),
+            system()->resourcePool(),
             params.metadata.cameraRefs);
         return camList.isEmpty()
             ? qnSkin->icon("events/alert_20.svg", kIconSubstitutions).pixmap(QSize(20, 20))
@@ -930,7 +929,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         case EventType::analyticsSdkEvent:
         case EventType::analyticsSdkObjectDetected:
         {
-            const auto resource = resourcePool()->getResourceById(params.eventResourceId);
+            const auto resource = system()->resourcePool()->getResourceById(params.eventResourceId);
             return toPixmap(resource
                 ? qnResIconCache->icon(resource)
                 : qnResIconCache->icon(QnResourceIconCache::Camera));

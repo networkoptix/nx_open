@@ -15,14 +15,10 @@ class SessionNotifier: public QObject, public QnSessionAwareDelegate
 public:
     SessionNotifier(QObject* parent): QObject(parent), base_type(parent) {};
 
-    ui::action::Manager* actionManager() const { return menu(); }
-
     virtual bool tryClose(bool /*force*/) override { emit closeRequested(); return true; }
-    virtual void forcedUpdate() override { emit forcedUpdateRequested(); }
 
 signals:
     void closeRequested();
-    void forcedUpdateRequested();
 };
 
 } // namespace nx::vms::client::desktop

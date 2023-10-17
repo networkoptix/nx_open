@@ -29,9 +29,10 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/delegates/resource_item_delegate.h>
@@ -58,7 +59,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
     ui->servers->setItemDelegateForColumn(
         QnResourceListModel::NameColumn, new QnResourceItemDelegate(this));
     ui->servers->setItemDelegateForColumn(
-        QnResourceListModel::CheckColumn, makeVersionStatusDelegate(context(), this));
+        QnResourceListModel::CheckColumn, makeVersionStatusDelegate(workbenchContext(), this));
 
     m_serverListModel = new QnResourceListModel(this);
     m_serverListModel->setHasStatus(true);
@@ -80,13 +81,14 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
-    connect(systemSettings(), &SystemSettings::emailSettingsChanged, this,
+    connect(system()->globalSettings(), &SystemSettings::emailSettingsChanged, this,
         &QnAboutDialog::retranslateUi);
-    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(),
+    connect(workbenchContext()->instance<QnWorkbenchVersionMismatchWatcher>(),
         &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged,
         this,
         &QnAboutDialog::retranslateUi);
 
+    connect(windowContext(), &WindowContext::systemChanged, this, &QnAboutDialog::retranslateUi);
     retranslateUi();
 }
 
@@ -106,13 +108,13 @@ void QnAboutDialog::generateServersReport()
 {
     using namespace nx::vms::common;
 
-    const bool isAdmin = systemContext()->accessController()->hasPowerUserPermissions();
+    const bool isAdmin = system()->accessController()->hasPowerUserPermissions();
     QnMediaServerResourceList servers;
     QStringList report;
 
     if (isAdmin)
     {
-        const auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
+        const auto watcher = workbenchContext()->instance<QnWorkbenchVersionMismatchWatcher>();
         for (const auto& data: watcher->components())
         {
             if (data.component != QnWorkbenchVersionMismatchWatcher::Component::server)
@@ -179,7 +181,7 @@ void QnAboutDialog::retranslateUi()
     gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL max texture size")).arg(maxTextureSize);
     ui->gpuLabel->setText(gpu.join(html::kLineBreak));
 
-    CustomerSupport customerSupport(systemContext());
+    CustomerSupport customerSupport(system());
 
     ui->customerSupportTitleLabel->setText(customerSupport.systemContact.company);
     const bool isValidLink = QUrl(customerSupport.systemContact.address.rawData).isValid();

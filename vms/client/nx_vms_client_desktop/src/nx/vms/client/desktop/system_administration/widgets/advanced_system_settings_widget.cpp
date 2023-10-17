@@ -10,11 +10,11 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QStackedWidget>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_administration/widgets/logs_management_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
@@ -51,7 +51,7 @@ AdvancedSystemSettingsWidget::Private::Private(AdvancedSystemSettingsWidget* q):
     QObject(q),
     q(q)
 {
-    m_menu = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), q);
+    m_menu = new QQuickWidget(appContext()->qmlEngine(), q);
     m_menu->setClearColor(q->palette().window().color());
     m_menu->setResizeMode(QQuickWidget::SizeRootObjectToView);
     m_menu->setSource(QUrl("Nx/Dialogs/SystemSettings/AdvancedSettingsMenu.qml"));

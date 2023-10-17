@@ -12,11 +12,11 @@
 #include <nx/vms/auth/auth_result.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/password_input_field.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
 #include <nx/vms/utils/system_uri.h>
 #include <ui/workbench/workbench_context.h>
@@ -66,7 +66,7 @@ SessionRefreshDialog::SessionRefreshDialog(
     setInformativeText(infoText);
     setWindowFlags(windowFlags() | flags);
 
-    if (context()->user()->isTemporary())
+    if (system()->user()->isTemporary())
     {
         auto loginLabel = new QLabel(tr("Access Link"), this);
         addCustomWidget(loginLabel);
@@ -93,7 +93,7 @@ SessionRefreshDialog::SessionRefreshDialog(
 
         auto loginField = new InputField(this);
         loginField->setEnabled(false);
-        loginField->setText(QString::fromStdString(systemContext()->connectionCredentials().username));
+        loginField->setText(QString::fromStdString(system()->connectionCredentials().username));
         addCustomWidget(loginField);
 
         // Password input and label.
@@ -149,15 +149,15 @@ void SessionRefreshDialog::refreshSession()
             {
                 NX_DEBUG(this, "Received token with length: %1", session->token.length());
 
-                if (context()->user()->isTemporary() && context()->user()->getId() != session->id)
+                if (system()->user()->isTemporary() && system()->user()->getId() != session->id)
                 {
                     desktop::LogonData logonData;
                     logonData.address = m_address;
                     logonData.credentials = {session->username.toStdString(), m_token};
                     logonData.userType = nx::vms::api::UserType::temporaryLocal;
                     logonData.storeSession = false;
-                    menu()->trigger(ui::action::ConnectAction,
-                        ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
+                    menu()->trigger(menu::ConnectAction,
+                        menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
                     base_type::reject();
                 }
                 else if (NX_ASSERT(!session->token.empty()))
@@ -185,7 +185,7 @@ void SessionRefreshDialog::refreshSession()
             validationResultReady();
         });
 
-    if (context()->user()->isTemporary())
+    if (system()->user()->isTemporary())
     {
 
         const auto uri = nx::vms::utils::SystemUri::fromTemporaryUserLink(m_linkField->text());
@@ -202,7 +202,7 @@ void SessionRefreshDialog::refreshSession()
         m_token = uri.credentials.authToken;
 
         lockUi(true);
-        if (auto api = connectedServerApi(); NX_ASSERT(api, "No Server connection"))
+        if (auto api = system()->connectedServerApi(); NX_ASSERT(api, "No Server connection"))
             api->loginAsync(loginRequest, std::move(callback), thread());
         else
             base_type::reject();
@@ -211,14 +211,14 @@ void SessionRefreshDialog::refreshSession()
     {
         nx::vms::api::LoginSessionRequest loginRequest;
         loginRequest.username = QString::fromStdString(
-            systemContext()->connectionCredentials().username);
+            system()->connectionCredentials().username);
         loginRequest.password = m_passwordField->text();
 
         lockUi(true);
 
         if (m_passwordValidationMode)
             validatePassword(loginRequest);
-        else if (auto api = connectedServerApi(); NX_ASSERT(api, "No Server connection"))
+        else if (auto api = system()->connectedServerApi(); NX_ASSERT(api, "No Server connection"))
             api->loginAsync(loginRequest, std::move(callback), thread());
         else
             base_type::reject();
@@ -228,7 +228,7 @@ void SessionRefreshDialog::refreshSession()
 void SessionRefreshDialog::validatePassword(const nx::vms::api::LoginSessionRequest& loginRequest)
 {
     const nx::network::http::AuthToken currentToken =
-        systemContext()->connectionCredentials().authToken;
+        system()->connectionCredentials().authToken;
 
     NX_ASSERT(currentToken.isPassword());
     if (loginRequest.password == currentToken.value)

@@ -281,7 +281,7 @@ QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool s
         return QString();
 
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
+    const auto timeWatcher = system()->serverTimeWatcher();
     QDateTime dateTime = timeWatcher->displayTime(timestampSecs * 1000ll);
     return formatDateTime(dateTime, showDate, showTime);
 }
@@ -854,7 +854,7 @@ bool QnAuditLogModel::skipDate(const QnAuditRecord *record, int row) const
         return false;
 
     // TODO: #sivanov Actualize used system context.
-    const auto timeWatcher = appContext()->currentSystemContext()->serverTimeWatcher();
+    const auto timeWatcher = system()->serverTimeWatcher();
     QDate d1 = timeWatcher->displayTime(record->createdTimeSec * 1000).date();
     QDate d2 = timeWatcher->displayTime(m_index->at(row - 1)->createdTimeSec * 1000).date();
     return d1 == d2;

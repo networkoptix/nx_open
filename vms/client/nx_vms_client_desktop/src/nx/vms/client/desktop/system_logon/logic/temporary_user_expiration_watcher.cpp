@@ -10,6 +10,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
@@ -43,7 +44,7 @@ TemporaryUserExpirationWatcher::TemporaryUserExpirationWatcher(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    m_notificationManager = context()->instance<workbench::LocalNotificationsManager>();
+    m_notificationManager = windowContext()->localNotificationsManager();
     connect(systemContext()->userWatcher(),
         &nx::vms::client::core::UserWatcher::userChanged,
         this,

@@ -7,6 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -27,8 +28,12 @@ SystemInternetAccessWatcher::SystemInternetAccessWatcher(
     QObject(parent),
     SystemContextAware(systemContext)
 {
+}
+
+void SystemInternetAccessWatcher::start()
+{
     auto serverChangesListener =
-        new core::SessionResourcesSignalListener<QnMediaServerResource>(this);
+        new core::SessionResourcesSignalListener<QnMediaServerResource>(systemContext(), this);
 
     auto recalculateAll =
         [this]() { setHasInternetAccess(haveInternetAccess(resourcePool()->servers())); };

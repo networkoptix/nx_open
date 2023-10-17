@@ -6,14 +6,13 @@
 #include <QtQuick/QQuickItem>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/analytics/analytics_engines_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -43,7 +42,7 @@ bool isEngineVisible(const AnalyticsEngineInfo& info)
 
 AnalyticsSettingsWidget::Private::Private(AnalyticsSettingsWidget* q):
     q(q),
-    view(new QQuickWidget(qnClientCoreModule->mainQmlEngine(), q)),
+    view(new QQuickWidget(appContext()->qmlEngine(), q)),
     enginesWatcher(new AnalyticsEnginesWatcher(this))
 {
     view->setClearColor(q->palette().window().color());
@@ -391,7 +390,7 @@ void AnalyticsSettingsWidget::Private::activeElementChanged(
                         .messageToUser = result.messageToUser,
                         .useProxy = result.useProxy,
                         .useDeviceCredentials = result.useDeviceCredentials},
-                    q->context(),
+                    q->windowContext(),
                     engine,
                     /*authenticator*/ {},
                     /*parent*/ q);

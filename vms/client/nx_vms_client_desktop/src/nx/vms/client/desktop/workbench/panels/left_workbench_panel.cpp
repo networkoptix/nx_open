@@ -4,37 +4,36 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
+#include <QtGui/QAction>
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QApplication>
-#include <QtGui/QAction>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QTreeView>
 
 #include <core/resource/resource.h>
+#include <nx/build_info.h>
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/left_panel/left_panel_widget.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/utils/qml_property.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/resizer_widget.h>
-#include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/processors/hover_processor.h>
-#include <nx/vms/client/core/skin/skin.h>
-#include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>
+#include <ui/workbench/workbench_ui_globals.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
-
-#include <nx/build_info.h>
-#include <nx/vms/client/desktop/left_panel/left_panel_widget.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/utils/qml_property.h>
 
 #include "../workbench_animations.h"
 #include "buttons.h"
@@ -50,7 +49,7 @@ LeftWorkbenchPanel::LeftWorkbenchPanel(
     QObject* parent)
     :
     base_type(settings, parentGraphicsWidget, parent),
-    widget(new LeftPanelWidget(context(), parentWidget)),
+    widget(new LeftPanelWidget(windowContext(), parentWidget)),
     xAnimator(new VariantAnimator(widget)),
     m_backgroundItem(new QnControlBackgroundWidget(parentGraphicsWidget)),
     m_opacityAnimatorGroup(new AnimatorGroup(widget))
@@ -69,9 +68,9 @@ LeftWorkbenchPanel::LeftWorkbenchPanel(
     m_backgroundItem->setFrameBorders({});
     m_backgroundItem->setZValue(BackgroundItemZOrder);
 
-    action(action::ToggleLeftPanelAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    action(menu::ToggleLeftPanelAction)->setChecked(settings.state == Qn::PaneState::Opened);
 
-    connect(action(action::ToggleLeftPanelAction), &QAction::toggled, this,
+    connect(action(menu::ToggleLeftPanelAction), &QAction::toggled, this,
         [this](bool opened)
         {
             if (!m_blockAction)
@@ -118,7 +117,7 @@ bool LeftWorkbenchPanel::isPinned() const
 
 bool LeftWorkbenchPanel::isOpened() const
 {
-    return action(action::ToggleLeftPanelAction)->isChecked();
+    return action(menu::ToggleLeftPanelAction)->isChecked();
 }
 
 void LeftWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -126,7 +125,7 @@ void LeftWorkbenchPanel::setOpened(bool opened, bool animate)
     using namespace ui::workbench;
     ensureAnimationAllowed(&animate);
 
-    auto toggleAction = action(action::ToggleLeftPanelAction);
+    auto toggleAction = action(menu::ToggleLeftPanelAction);
     m_blockAction = true;
     toggleAction->setChecked(opened);
     m_blockAction = false;
@@ -256,12 +255,12 @@ int LeftWorkbenchPanel::effectiveWidth() const
     return geometry.width() - (button ? button->width() : 0);
 }
 
-ui::action::ActionScope LeftWorkbenchPanel::currentScope() const
+menu::ActionScope LeftWorkbenchPanel::currentScope() const
 {
     return widget->currentScope();
 }
 
-ui::action::Parameters LeftWorkbenchPanel::currentParameters(ui::action::ActionScope scope) const
+menu::Parameters LeftWorkbenchPanel::currentParameters(menu::ActionScope scope) const
 {
     return widget->currentParameters(scope);
 }

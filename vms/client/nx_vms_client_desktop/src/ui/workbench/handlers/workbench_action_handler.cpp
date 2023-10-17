@@ -88,6 +88,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/profile_g/import_from_device_dialog.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -116,7 +117,6 @@
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/system_update/advanced_update_settings_dialog.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/main_window.h>
 #include <nx/vms/client/desktop/ui/messages/local_files_messages.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
@@ -162,7 +162,7 @@
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/widgets/views/resource_list_view.h>
-#include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -183,9 +183,6 @@
 #if defined(Q_OS_MACX)
     #include <utils/mac_utils.h>
 #endif
-
-// TODO: #sivanov remove this include
-#include "../extensions/workbench_stream_synchronizer.h"
 
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionSelection;
@@ -222,17 +219,22 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &ActionHandler::at_context_userChanged);
 
-    connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
+    connect(workbench(), &Workbench::itemChanged, this,
+        &ActionHandler::at_workbench_itemChanged);
+    connect(workbench(), &Workbench::cellSpacingChanged, this,
+        &ActionHandler::at_workbench_cellSpacingChanged);
 
-    connect(action(action::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
+    connect(action(menu::AboutAction), &QAction::triggered, this,
+        &ActionHandler::at_aboutAction_triggered);
 
-    connect(action(action::UserManualAction), &QAction::triggered, this,
+    connect(action(menu::UserManualAction), &QAction::triggered, this,
         [] { HelpHandler::openHelpTopic(HelpTopic::Id::MainWindow_Scene); },
         Qt::QueuedConnection);
 
-    connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
-    connect(action(action::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
+    connect(action(menu::OpenFileAction), &QAction::triggered, this,
+        &ActionHandler::at_openFileAction_triggered);
+    connect(action(menu::OpenFolderAction), &QAction::triggered, this,
+        &ActionHandler::at_openFolderAction_triggered);
 
     connect(globalSettings(), &SystemSettings::maxSceneItemsChanged, this,
         [this]
@@ -241,39 +243,39 @@ ActionHandler::ActionHandler(QObject *parent) :
         });
 
     // local settings
-    connect(action(action::PreferencesGeneralTabAction), &QAction::triggered, this,
+    connect(action(menu::PreferencesGeneralTabAction), &QAction::triggered, this,
         [this] { openLocalSettingsDialog(QnLocalSettingsDialog::GeneralPage); },
         Qt::QueuedConnection);
-    connect(action(action::PreferencesNotificationTabAction), &QAction::triggered, this,
+    connect(action(menu::PreferencesNotificationTabAction), &QAction::triggered, this,
         [this] { openLocalSettingsDialog(QnLocalSettingsDialog::NotificationsPage); },
         Qt::QueuedConnection);
 
     // System administration.
-    connect(action(action::SystemAdministrationAction), &QAction::triggered,
+    connect(action(menu::SystemAdministrationAction), &QAction::triggered,
         this, &ActionHandler::at_systemAdministrationAction_triggered);
 
-    connect(action(action::AdvancedUpdateSettingsAction), &QAction::triggered,
+    connect(action(menu::AdvancedUpdateSettingsAction), &QAction::triggered,
         this, &ActionHandler::at_advancedUpdateSettingsAction_triggered);
 
     // TODO: #vkutin #sivanov Remove these actions, use FocusTabRole in action parameters instead.
-    connect(action(action::PreferencesLicensesTabAction), &QAction::triggered, this,
+    connect(action(menu::PreferencesLicensesTabAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::LicensesPage); });
-    connect(action(action::PreferencesSmtpTabAction), &QAction::triggered, this,
+    connect(action(menu::PreferencesSmtpTabAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::MailSettingsPage); });
-    connect(action(action::PreferencesCloudTabAction), &QAction::triggered, this,
+    connect(action(menu::PreferencesCloudTabAction), &QAction::triggered, this,
         [this]{ openSystemAdministrationDialog(QnSystemAdministrationDialog::CloudManagement); });
-    connect(action(action::SystemUpdateAction), &QAction::triggered, this,
+    connect(action(menu::SystemUpdateAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UpdatesPage); });
-    connect(action(action::UserManagementAction), &QAction::triggered, this,
+    connect(action(menu::UserManagementAction), &QAction::triggered, this,
         [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UserManagement); });
-    connect(action(action::LogsManagementAction), &QAction::triggered, this,
+    connect(action(menu::LogsManagementAction), &QAction::triggered, this,
         [this]
         {
             openSystemAdministrationDialog(
                 QnSystemAdministrationDialog::Advanced,
                 AdvancedSystemSettingsWidget::urlFor(AdvancedSystemSettingsWidget::Subpage::logs));
         });
-    connect(action(action::AnalyticsEngineSettingsAction), &QAction::triggered, this,
+    connect(action(menu::AnalyticsEngineSettingsAction), &QAction::triggered, this,
         [this]
         {
             QUrl url;
@@ -287,78 +289,106 @@ ActionHandler::ActionHandler(QObject *parent) :
             openSystemAdministrationDialog(QnSystemAdministrationDialog::Analytics, url);
         });
 
-    connect(action(action::BusinessEventsAction), SIGNAL(triggered()), this, SLOT(at_businessEventsAction_triggered()));
-    connect(action(action::OpenBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_openBusinessRulesAction_triggered()));
-    connect(action(action::OpenFailoverPriorityAction), &QAction::triggered, this, &ActionHandler::openFailoverPriorityDialog);
-    connect(action(action::OpenBookmarksSearchAction), SIGNAL(triggered()), this, SLOT(at_openBookmarksSearchAction_triggered()));
-    connect(action(action::OpenBusinessLogAction), SIGNAL(triggered()), this, SLOT(at_openBusinessLogAction_triggered()));
-    connect(action(action::OpenAuditLogAction), SIGNAL(triggered()), this, SLOT(at_openAuditLogAction_triggered()));
-    connect(action(action::CameraListAction), SIGNAL(triggered()), this, SLOT(at_cameraListAction_triggered()));
-    connect(action(action::CameraListByServerAction), SIGNAL(triggered()), this, SLOT(at_cameraListAction_triggered()));
+    connect(action(menu::BusinessEventsAction), &QAction::triggered, this,
+        &ActionHandler::at_businessEventsAction_triggered);
+    connect(action(menu::OpenBusinessRulesAction), &QAction::triggered, this,
+        &ActionHandler::at_openBusinessRulesAction_triggered);
+    connect(action(menu::OpenFailoverPriorityAction), &QAction::triggered, this,
+        &ActionHandler::openFailoverPriorityDialog);
+    connect(action(menu::OpenBookmarksSearchAction), &QAction::triggered, this,
+        &ActionHandler::at_openBookmarksSearchAction_triggered);
+    connect(action(menu::OpenBusinessLogAction), &QAction::triggered, this,
+        &ActionHandler::at_openBusinessLogAction_triggered);
+    connect(action(menu::OpenAuditLogAction), &QAction::triggered, this,
+        &ActionHandler::at_openAuditLogAction_triggered);
+    connect(action(menu::CameraListAction), &QAction::triggered, this
+        , &ActionHandler::at_cameraListAction_triggered);
+    connect(action(menu::CameraListByServerAction), &QAction::triggered, this,
+        &ActionHandler::at_cameraListAction_triggered);
 
-    connect(action(action::WebClientAction), &QAction::triggered, this,
+    connect(action(menu::WebClientAction), &QAction::triggered, this,
         &ActionHandler::at_webClientAction_triggered);
-    connect(action(action::WebAdminAction), &QAction::triggered, this,
+    connect(action(menu::WebAdminAction), &QAction::triggered, this,
         &ActionHandler::at_webAdminAction_triggered);
 
-    connect(action(action::NextLayoutAction), &QAction::triggered, this,
+    connect(action(menu::NextLayoutAction), &QAction::triggered, this,
         &ActionHandler::at_nextLayoutAction_triggered);
-    connect(action(action::PreviousLayoutAction), &QAction::triggered, this,
+    connect(action(menu::PreviousLayoutAction), &QAction::triggered, this,
         &ActionHandler::at_previousLayoutAction_triggered);
 
-    connect(action(action::OpenInLayoutAction), SIGNAL(triggered()), this, SLOT(at_openInLayoutAction_triggered()));
-    connect(action(action::OpenInCurrentLayoutAction), SIGNAL(triggered()), this, SLOT(at_openInCurrentLayoutAction_triggered()));
+    connect(action(menu::OpenInLayoutAction), &QAction::triggered, this,
+        &ActionHandler::at_openInLayoutAction_triggered);
+    connect(action(menu::OpenInCurrentLayoutAction), &QAction::triggered, this,
+        &ActionHandler::at_openInCurrentLayoutAction_triggered);
 
-    connect(action(action::OpenInNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openInNewWindowAction_triggered()));
+    connect(action(menu::OpenInNewWindowAction), &QAction::triggered, this,
+        &ActionHandler::at_openInNewWindowAction_triggered);
 
-    connect(action(action::OpenCurrentLayoutInNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
-    connect(action(action::OpenNewWindowAction), SIGNAL(triggered()),
-        this, SLOT(at_openNewWindowAction_triggered()));
-    connect(action(action::OpenWelcomeScreenAction), &QAction::triggered,
+    connect(action(menu::OpenCurrentLayoutInNewWindowAction), &QAction::triggered, this,
+        &ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered);
+    connect(action(menu::OpenNewWindowAction), &QAction::triggered,
+        this, &ActionHandler::at_openNewWindowAction_triggered);
+    connect(action(menu::OpenWelcomeScreenAction), &QAction::triggered,
         this, &ActionHandler::at_openWelcomeScreenAction_triggered);
-    connect(action(action::ReviewShowreelInNewWindowAction), &QAction::triggered, this,
+    connect(action(menu::ReviewShowreelInNewWindowAction), &QAction::triggered, this,
         &ActionHandler::at_reviewShowreelInNewWindowAction_triggered);
 
-    connect(action(action::ChangeDefaultCameraPasswordAction), &QAction::triggered,
+    connect(action(menu::ChangeDefaultCameraPasswordAction), &QAction::triggered,
         this, &ActionHandler::at_changeDefaultCameraPassword_triggered);
 
-    connect(action(action::MediaFileSettingsAction), &QAction::triggered, this, &ActionHandler::at_mediaFileSettingsAction_triggered);
-    connect(action(action::ReplaceCameraAction), &QAction::triggered,
+    connect(action(menu::MediaFileSettingsAction), &QAction::triggered, this,
+        &ActionHandler::at_mediaFileSettingsAction_triggered);
+    connect(action(menu::ReplaceCameraAction), &QAction::triggered,
         this, &ActionHandler::replaceCameraActionTriggered);
-    connect(action(action::UndoReplaceCameraAction), &QAction::triggered,
+    connect(action(menu::UndoReplaceCameraAction), &QAction::triggered,
         this, &ActionHandler::undoReplaceCameraActionTriggered);
-    connect(action(action::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
-    connect(action(action::CameraBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_cameraBusinessRulesAction_triggered()));
-    connect(action(action::CameraDiagnosticsAction), SIGNAL(triggered()), this, SLOT(at_cameraDiagnosticsAction_triggered()));
-    connect(action(action::PingAction), SIGNAL(triggered()), this, SLOT(at_pingAction_triggered()));
-    connect(action(action::ServerLogsAction), SIGNAL(triggered()), this, SLOT(at_serverLogsAction_triggered()));
-    connect(action(action::ServerIssuesAction), SIGNAL(triggered()), this, SLOT(at_serverIssuesAction_triggered()));
-    connect(action(action::OpenInFolderAction), SIGNAL(triggered()), this, SLOT(at_openInFolderAction_triggered()));
-    connect(action(action::DeleteFromDiskAction), SIGNAL(triggered()), this, SLOT(at_deleteFromDiskAction_triggered()));
-    connect(action(action::RemoveFromServerAction), SIGNAL(triggered()), this, SLOT(at_removeFromServerAction_triggered()));
-    connect(action(action::RenameResourceAction), &QAction::triggered, this,
+    connect(action(menu::CameraIssuesAction), &QAction::triggered, this,
+        &ActionHandler::at_cameraIssuesAction_triggered);
+    connect(action(menu::CameraBusinessRulesAction), &QAction::triggered, this,
+        &ActionHandler::at_cameraBusinessRulesAction_triggered);
+    connect(action(menu::CameraDiagnosticsAction), &QAction::triggered, this,
+        &ActionHandler::at_cameraDiagnosticsAction_triggered);
+    connect(action(menu::PingAction), &QAction::triggered, this,
+        &ActionHandler::at_pingAction_triggered);
+    connect(action(menu::ServerLogsAction), &QAction::triggered, this,
+        &ActionHandler::at_serverLogsAction_triggered);
+    connect(action(menu::ServerIssuesAction), &QAction::triggered, this,
+        &ActionHandler::at_serverIssuesAction_triggered);
+    connect(action(menu::OpenInFolderAction), &QAction::triggered, this,
+        &ActionHandler::at_openInFolderAction_triggered);
+    connect(action(menu::DeleteFromDiskAction), &QAction::triggered, this,
+        &ActionHandler::at_deleteFromDiskAction_triggered);
+    connect(action(menu::RemoveFromServerAction), &QAction::triggered, this,
+        &ActionHandler::at_removeFromServerAction_triggered);
+    connect(action(menu::RenameResourceAction), &QAction::triggered, this,
         &ActionHandler::at_renameAction_triggered);
-    connect(action(action::DropResourcesAction), SIGNAL(triggered()), this, SLOT(at_dropResourcesAction_triggered()));
+    connect(action(menu::DropResourcesAction), &QAction::triggered, this,
+        &ActionHandler::at_dropResourcesAction_triggered);
 
-    connect(action(action::MoveCameraAction), SIGNAL(triggered()), this, SLOT(at_moveCameraAction_triggered()));
-    connect(action(action::AdjustVideoAction), SIGNAL(triggered()), this, SLOT(at_adjustVideoAction_triggered()));
+    connect(action(menu::MoveCameraAction), &QAction::triggered, this,
+        &ActionHandler::at_moveCameraAction_triggered);
+    connect(action(menu::AdjustVideoAction), &QAction::triggered, this,
+        &ActionHandler::at_adjustVideoAction_triggered);
 
-    connect(action(action::SaveSessionState), &QAction::triggered, this, &ActionHandler::at_saveSessionState_triggered);
-    connect(action(action::RestoreSessionState), &QAction::triggered, this, &ActionHandler::at_restoreSessionState_triggered);
-    connect(action(action::DeleteSessionState), &QAction::triggered, this, &ActionHandler::at_deleteSessionState_triggered);
+    connect(action(menu::SaveSessionState), &QAction::triggered, this,
+        &ActionHandler::at_saveSessionState_triggered);
+    connect(action(menu::RestoreSessionState), &QAction::triggered, this,
+        &ActionHandler::at_restoreSessionState_triggered);
+    connect(action(menu::DeleteSessionState), &QAction::triggered, this,
+        &ActionHandler::at_deleteSessionState_triggered);
 
-    connect(action(action::CloseAllWindowsAction), &QAction::triggered, this,
+    connect(action(menu::CloseAllWindowsAction), &QAction::triggered, this,
         [this]()
         {
-            if (auto session = RemoteSession::instance())
+            if (auto session = system()->session())
                 session->autoTerminateIfNeeded();
             closeAllWindows();
         });
 
-    connect(action(action::ExitAction), &QAction::triggered, this,
+    connect(action(menu::ExitAction), &QAction::triggered, this,
         [this]()
         {
-            if (auto session = RemoteSession::instance())
+            if (auto session = system()->session())
                 session->autoTerminateIfNeeded();
             closeApplication();
         });
@@ -368,34 +398,36 @@ ActionHandler::ActionHandler(QObject *parent) :
         &nx::vms::client::desktop::SharedMemoryManager::clientCommandRequested,
         this,
         &ActionHandler::at_clientCommandRequested);
-    connect(action(action::ThumbnailsSearchAction), SIGNAL(triggered()), this, SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(action::CreateZoomWindowAction), SIGNAL(triggered()), this, SLOT(at_createZoomWindowAction_triggered()));
+    connect(action(menu::ThumbnailsSearchAction), &QAction::triggered, this,
+        &ActionHandler::at_thumbnailsSearchAction_triggered);
+    connect(action(menu::CreateZoomWindowAction), &QAction::triggered, this,
+        &ActionHandler::at_createZoomWindowAction_triggered);
 
-    connect(action(action::SetCurrentLayoutItemSpacingNoneAction), &QAction::triggered, this,
+    connect(action(menu::SetCurrentLayoutItemSpacingNoneAction), &QAction::triggered, this,
         [this]
         {
             setCurrentLayoutCellSpacing(Qn::CellSpacing::None);
         });
 
-    connect(action(action::SetCurrentLayoutItemSpacingSmallAction), &QAction::triggered, this,
+    connect(action(menu::SetCurrentLayoutItemSpacingSmallAction), &QAction::triggered, this,
         [this]
         {
             setCurrentLayoutCellSpacing(Qn::CellSpacing::Small);
         });
 
-    connect(action(action::SetCurrentLayoutItemSpacingMediumAction), &QAction::triggered, this,
+    connect(action(menu::SetCurrentLayoutItemSpacingMediumAction), &QAction::triggered, this,
         [this]
         {
             setCurrentLayoutCellSpacing(Qn::CellSpacing::Medium);
         });
 
-    connect(action(action::SetCurrentLayoutItemSpacingLargeAction), &QAction::triggered, this,
+    connect(action(menu::SetCurrentLayoutItemSpacingLargeAction), &QAction::triggered, this,
         [this]
         {
             setCurrentLayoutCellSpacing(Qn::CellSpacing::Large);
         });
 
-    connect(action(action::RotateToAction), &QAction::triggered, this,
+    connect(action(menu::RotateToAction), &QAction::triggered, this,
         [this]
         {
             const auto params = menu()->currentParameters(sender());
@@ -403,40 +435,51 @@ ActionHandler::ActionHandler(QObject *parent) :
             rotateItems(rotation);
         });
 
-    connect(action(action::SetAsBackgroundAction), SIGNAL(triggered()), this, SLOT(at_setAsBackgroundAction_triggered()));
-    connect(action(action::WhatsThisAction), SIGNAL(triggered()), this, SLOT(at_whatsThisAction_triggered()));
-    connect(action(action::EscapeHotkeyAction), SIGNAL(triggered()), this, SLOT(at_escapeHotkeyAction_triggered()));
-    connect(action(action::BrowseUrlAction), SIGNAL(triggered()), this, SLOT(at_browseUrlAction_triggered()));
-    connect(action(action::VersionMismatchMessageAction), &QAction::triggered, this, &ActionHandler::at_versionMismatchMessageAction_triggered);
-    connect(action(action::BetaVersionMessageAction), SIGNAL(triggered()), this, SLOT(at_betaVersionMessageAction_triggered()));
-    connect(action(action::ConfirmAnalyticsStorageAction), &QAction::triggered, this, [this] { confirmAnalyticsStorageLocation(); });
+    connect(action(menu::SetAsBackgroundAction), &QAction::triggered, this,
+        &ActionHandler::at_setAsBackgroundAction_triggered);
+    connect(action(menu::WhatsThisAction), &QAction::triggered, this,
+        &ActionHandler::at_whatsThisAction_triggered);
+    connect(action(menu::EscapeHotkeyAction), &QAction::triggered, this,
+        &ActionHandler::at_escapeHotkeyAction_triggered);
+    connect(action(menu::BrowseUrlAction), &QAction::triggered, this,
+        &ActionHandler::at_browseUrlAction_triggered);
+    connect(action(menu::VersionMismatchMessageAction), &QAction::triggered, this,
+        &ActionHandler::at_versionMismatchMessageAction_triggered);
+    connect(action(menu::BetaVersionMessageAction), &QAction::triggered, this,
+        &ActionHandler::at_betaVersionMessageAction_triggered);
+    connect(action(menu::ConfirmAnalyticsStorageAction), &QAction::triggered, this,
+        &ActionHandler::confirmAnalyticsStorageLocation);
 
-    connect(action(action::QueueAppRestartAction), SIGNAL(triggered()), this, SLOT(at_queueAppRestartAction_triggered()));
-    connect(action(action::SelectTimeServerAction), SIGNAL(triggered()), this, SLOT(at_selectTimeServerAction_triggered()));
+    connect(action(menu::QueueAppRestartAction), &QAction::triggered, this,
+        &ActionHandler::at_queueAppRestartAction_triggered);
+    connect(action(menu::SelectTimeServerAction), &QAction::triggered, this,
+        &ActionHandler::at_selectTimeServerAction_triggered);
 
-    connect(action(action::BetaUpgradeWarningAction), &QAction::triggered,
-        this, &ActionHandler::handleBetaUpdateWarning);
+    connect(action(menu::BetaUpgradeWarningAction), &QAction::triggered, this,
+        &ActionHandler::handleBetaUpdateWarning);
 
-    connect(action(action::JumpToTimeAction), &QAction::triggered,
+    connect(action(menu::JumpToTimeAction), &QAction::triggered,
         this, &ActionHandler::at_jumpToTimeAction_triggered);
 
-    connect(action(action::GoToLayoutItemAction), &QAction::triggered,
+    connect(action(menu::GoToLayoutItemAction), &QAction::triggered,
         this, &ActionHandler::at_goToLayoutItemAction_triggered);
 
-    /* Connect through lambda to handle forced parameter. */
-    connect(action(action::DelayedForcedExitAction), &QAction::triggered, this, [this] {  closeApplication(true);    }, Qt::QueuedConnection);
+    connect(action(menu::DelayedForcedExitAction), &QAction::triggered, this,
+        &ActionHandler::closeApplication, Qt::QueuedConnection);
 
-    connect(action(action::BeforeExitAction), &QAction::triggered, this, &ActionHandler::at_beforeExitAction_triggered);
+    connect(action(menu::BeforeExitAction), &QAction::triggered, this,
+        &ActionHandler::at_beforeExitAction_triggered);
 
-    connect(action(action::OpenNewSceneAction), &QAction::triggered, this, &ActionHandler::at_openNewScene_triggered);
+    connect(action(menu::OpenNewSceneAction), &QAction::triggered, this,
+        &ActionHandler::at_openNewScene_triggered);
 
-    connect(action(action::OpenAdvancedSearchDialog), &QAction::triggered,
+    connect(action(menu::OpenAdvancedSearchDialog), &QAction::triggered,
         this, &ActionHandler::at_openAdvancedSearchDialog_triggered);
 
-    connect(action(action::OpenImportFromDevices), &QAction::triggered,
+    connect(action(menu::OpenImportFromDevices), &QAction::triggered,
         this, &ActionHandler::at_openImportFromDevicesDialog_triggered);
 
-    connect(action(action::ReplaceLayoutItemAction), &QAction::triggered,
+    connect(action(menu::ReplaceLayoutItemAction), &QAction::triggered,
         this, &ActionHandler::replaceLayoutItemActionTriggered);
 }
 
@@ -658,16 +701,16 @@ void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
             switch (spacing)
             {
                 case Qn::CellSpacing::None:
-                    return action::SetCurrentLayoutItemSpacingNoneAction;
+                    return menu::SetCurrentLayoutItemSpacingNoneAction;
                 case Qn::CellSpacing::Small:
-                    return action::SetCurrentLayoutItemSpacingSmallAction;
+                    return menu::SetCurrentLayoutItemSpacingSmallAction;
                 case Qn::CellSpacing::Medium:
-                    return action::SetCurrentLayoutItemSpacingMediumAction;
+                    return menu::SetCurrentLayoutItemSpacingMediumAction;
                 case Qn::CellSpacing::Large:
-                    return action::SetCurrentLayoutItemSpacingLargeAction;
+                    return menu::SetCurrentLayoutItemSpacingLargeAction;
             }
             NX_ASSERT(false);
-            return action::SetCurrentLayoutItemSpacingSmallAction;
+            return menu::SetCurrentLayoutItemSpacingSmallAction;
         };
 
     if (auto layout = workbench()->currentLayoutResource(); NX_ASSERT(layout))
@@ -708,18 +751,18 @@ void ActionHandler::at_workbench_cellSpacingChanged()
     qreal value = workbench()->currentLayout()->cellSpacing();
 
     if (qFuzzyIsNull(value))
-        action(action::SetCurrentLayoutItemSpacingNoneAction)->setChecked(true);
+        action(menu::SetCurrentLayoutItemSpacingNoneAction)->setChecked(true);
     else if (qFuzzyCompare(LayoutResource::cellSpacingValue(Qn::CellSpacing::Medium), value))
-        action(action::SetCurrentLayoutItemSpacingMediumAction)->setChecked(true);
+        action(menu::SetCurrentLayoutItemSpacingMediumAction)->setChecked(true);
     else if (qFuzzyCompare(LayoutResource::cellSpacingValue(Qn::CellSpacing::Large), value))
-        action(action::SetCurrentLayoutItemSpacingLargeAction)->setChecked(true);
+        action(menu::SetCurrentLayoutItemSpacingLargeAction)->setChecked(true);
     else
-        action(action::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true); //default value
+        action(menu::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true); //default value
 }
 
 void ActionHandler::at_nextLayoutAction_triggered()
 {
-    if (action(action::ToggleShowreelModeAction)->isChecked())
+    if (action(menu::ToggleShowreelModeAction)->isChecked())
         return;
 
     const auto total = workbench()->layouts().size();
@@ -731,7 +774,7 @@ void ActionHandler::at_nextLayoutAction_triggered()
 
 void ActionHandler::at_previousLayoutAction_triggered()
 {
-    if (action(action::ToggleShowreelModeAction)->isChecked())
+    if (action(menu::ToggleShowreelModeAction)->isChecked())
         return;
 
     const auto total = workbench()->layouts().size();
@@ -905,7 +948,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
                 if (NX_ASSERT(targetLayout))
                     workbench()->setCurrentLayout(targetLayout);
 
-                menu()->trigger(ui::action::OpenInCurrentLayoutAction, parameters);
+                menu()->trigger(menu::OpenInCurrentLayoutAction, parameters);
             };
 
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245).
@@ -1085,7 +1128,7 @@ void ActionHandler::replaceLayoutItemActionTriggered()
 
     const auto actionParams = menu()->currentParameters(sender());
 
-    const auto layoutItemIndex = action::ParameterTypes::layoutItem(actionParams.widget());
+    const auto layoutItemIndex = menu::ParameterTypes::layoutItem(actionParams.widget());
     if (layoutItemIndex.isNull())
         return;
 
@@ -1141,7 +1184,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
         connection.reset(connect(workbench()->currentLayout(), &QnWorkbenchLayout::itemAdded, this,
             [this, &connection](const QnWorkbenchItem* item)
             {
-                menu()->trigger(action::GoToLayoutItemAction, action::Parameters()
+                menu()->trigger(menu::GoToLayoutItemAction, menu::Parameters()
                     .withArgument(Qn::ItemUuidRole, item->uuid()));
 
                 connection.reset();
@@ -1155,7 +1198,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
     }
 
     parameters.setArgument(Qn::LayoutResourceRole, currentLayout->resource());
-    menu()->trigger(action::OpenInLayoutAction, parameters);
+    menu()->trigger(menu::OpenInLayoutAction, parameters);
 }
 
 void ActionHandler::at_openInNewWindowAction_triggered()
@@ -1165,7 +1208,7 @@ void ActionHandler::at_openInNewWindowAction_triggered()
     QnResourceList filtered;
     for (const auto& resource: parameters.resources())
     {
-        if (menu()->canTrigger(action::OpenInNewWindowAction, resource))
+        if (menu()->canTrigger(menu::OpenInNewWindowAction, resource))
             filtered << resource;
     }
     if (filtered.isEmpty())
@@ -1176,7 +1219,7 @@ void ActionHandler::at_openInNewWindowAction_triggered()
 
 void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 {
-    menu()->trigger(action::OpenInNewWindowAction, workbench()->currentLayout()->resource());
+    menu()->trigger(menu::OpenInNewWindowAction, workbench()->currentLayout()->resource());
 }
 
 void ActionHandler::at_openNewWindowAction_triggered()
@@ -1317,12 +1360,10 @@ void ActionHandler::at_openNewScene_triggered()
 {
     if (!m_mainWindow)
     {
-        m_mainWindow = new experimental::MainWindow(
-            qnClientCoreModule->mainQmlEngine(), context());
+        m_mainWindow = std::make_unique<experimental::MainWindow>(
+            appContext()->qmlEngine(),
+            windowContext());
         m_mainWindow->resize(mainWindowWidget()->size());
-
-        connect(qApp, &QApplication::aboutToQuit, this,
-            [this]() { delete m_mainWindow; });
     }
 
     m_mainWindow->show();
@@ -1537,7 +1578,7 @@ void ActionHandler::at_moveCameraAction_triggered() {
 void ActionHandler::at_dropResourcesAction_triggered()
 {
     // Showreel Handler will process this action itself.
-    if (context()->workbench()->currentLayout()->isShowreelReviewLayout())
+    if (workbench()->currentLayout()->isShowreelReviewLayout())
         return;
 
     // This method can be called only from the GUI thread.
@@ -1563,7 +1604,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
             resources.removeOne(r);
 
         if (!workbench()->currentLayout()->resource())
-            menu()->trigger(action::OpenNewTabAction);
+            menu()->trigger(menu::OpenNewTabAction);
 
         NX_ASSERT(workbench()->currentLayout()->resource());
 
@@ -1604,15 +1645,15 @@ void ActionHandler::at_dropResourcesAction_triggered()
         {
             if (parameters.widgets().isEmpty()) //< Triggered by resources tree view
                 parameters.setResources(resources);
-            if (!menu()->triggerIfPossible(action::OpenInCurrentLayoutAction, parameters))
-                menu()->triggerIfPossible(action::OpenInNewTabAction, parameters);
+            if (!menu()->triggerIfPossible(menu::OpenInCurrentLayoutAction, parameters))
+                menu()->triggerIfPossible(menu::OpenInNewTabAction, parameters);
         }
 
         if (!layouts.empty())
-            menu()->trigger(action::OpenInNewTabAction, layouts);
+            menu()->trigger(menu::OpenInNewTabAction, layouts);
 
         for (const auto& videoWall: videowalls)
-            menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+            menu()->trigger(menu::OpenVideoWallReviewAction, videoWall);
 
     } while (!m_queuedDropParameters.empty());
 }
@@ -1639,7 +1680,7 @@ void ActionHandler::at_openFileAction_triggered()
         QnCustomFileDialog::fileDialogOptions());
 
     if (!files.isEmpty())
-        menu()->trigger(action::DropResourcesAction, addToResourcePool(files));
+        menu()->trigger(menu::DropResourcesAction, addToResourcePool(files));
 }
 
 void ActionHandler::at_openFolderAction_triggered() {
@@ -1649,7 +1690,7 @@ void ActionHandler::at_openFolderAction_triggered() {
         QnCustomFileDialog::directoryDialogOptions());
 
     if (!dirName.isEmpty())
-        menu()->trigger(action::DropResourcesAction, addToResourcePool(dirName));
+        menu()->trigger(menu::DropResourcesAction, addToResourcePool(dirName));
 }
 
 void ActionHandler::openFailoverPriorityDialog() {
@@ -1796,7 +1837,7 @@ void ActionHandler::at_aboutAction_triggered() {
 }
 
 void ActionHandler::at_businessEventsAction_triggered() {
-    menu()->trigger(action::OpenBusinessRulesAction);
+    menu()->trigger(menu::OpenBusinessRulesAction);
 }
 
 void ActionHandler::at_openBusinessRulesAction_triggered()
@@ -1828,7 +1869,7 @@ void ActionHandler::at_webClientAction_triggered()
 
     if (isCloudServer(server))
     {
-        menu()->trigger(action::OpenCloudViewSystemUrl);
+        menu()->trigger(menu::OpenCloudViewSystemUrl);
     }
     else
     {
@@ -2230,7 +2271,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
     NX_ASSERT(layout->isPreviewSearchLayout());
-    menu()->trigger(action::OpenInNewTabAction, action::Parameters(layout)
+    menu()->trigger(menu::OpenInNewTabAction, menu::Parameters(layout)
         .withArgument(Qn::LayoutSyncStateRole, QVariant::fromValue<StreamSynchronizationState>({}))
     );
 }
@@ -2330,13 +2371,13 @@ void ActionHandler::undoReplaceCameraActionTriggered()
 
 void ActionHandler::at_cameraIssuesAction_triggered()
 {
-    menu()->trigger(action::OpenBusinessLogAction,
+    menu()->trigger(menu::OpenBusinessLogAction,
         menu()->currentParameters(sender())
         .withArgument(Qn::EventTypeRole, vms::api::EventType::anyCameraEvent));
 }
 
 void ActionHandler::at_cameraBusinessRulesAction_triggered() {
-    menu()->trigger(action::OpenBusinessRulesAction,
+    menu()->trigger(menu::OpenBusinessRulesAction,
         menu()->currentParameters(sender()));
 }
 
@@ -2362,7 +2403,7 @@ void ActionHandler::at_serverLogsAction_triggered()
 
 void ActionHandler::at_serverIssuesAction_triggered()
 {
-    menu()->trigger(action::OpenBusinessLogAction,
+    menu()->trigger(menu::OpenBusinessLogAction,
         {Qn::EventTypeRole, vms::api::EventType::anyServerEvent});
 }
 
@@ -2525,8 +2566,6 @@ void ActionHandler::at_renameAction_triggered()
     {
         if (layout->isFile())
             renameLocalFile(layout, name);
-        else
-            context()->instance<LayoutsHandler>()->renameLayout(layout, name);
     }
     else if (nodeType == NodeType::recorder)
     {
@@ -2596,7 +2635,7 @@ void ActionHandler::at_removeFromServerAction_triggered()
     resources = resources.filtered(
         [this](const QnResourcePtr& resource)
         {
-            return menu()->canTrigger(action::RemoveFromServerAction, resource)
+            return menu()->canTrigger(menu::RemoveFromServerAction, resource)
                 && !resource->hasFlags(Qn::layout)
                 && !resource->hasFlags(Qn::videowall);
         });
@@ -2657,12 +2696,12 @@ void ActionHandler::showSessionSavedBanner()
 
 void ActionHandler::closeAllWindows()
 {
-    doCloseApplication(/*force*/ false, AppClosingMode::CloseAll);
+    doCloseApplication(AppClosingMode::CloseAll);
 }
 
-void ActionHandler::closeApplication(bool force)
+void ActionHandler::closeApplication()
 {
-    doCloseApplication(force, AppClosingMode::Exit);
+    doCloseApplication(AppClosingMode::Exit);
 }
 
 void ActionHandler::at_clientCommandRequested(
@@ -2685,9 +2724,9 @@ void ActionHandler::at_clientCommandRequested(
         }
         case SharedMemoryData::Command::exit:
         {
-            if (auto session = RemoteSession::instance())
+            if (auto session = system()->session())
                 session->autoTerminateIfNeeded();
-            doCloseApplication(/*force*/ true, AppClosingMode::External);
+            doCloseApplication(AppClosingMode::External);
             break;
         }
         default:
@@ -2695,7 +2734,7 @@ void ActionHandler::at_clientCommandRequested(
     }
 }
 
-void ActionHandler::doCloseApplication(bool force, AppClosingMode mode)
+void ActionHandler::doCloseApplication(AppClosingMode mode)
 {
     if (mode == AppClosingMode::CloseAll)
         appContext()->clientStateHandler()->sharedMemoryManager()->requestToExit();
@@ -2708,14 +2747,8 @@ void ActionHandler::doCloseApplication(bool force, AppClosingMode mode)
         appContext()->clientStateHandler()->storeSystemIndependentState();
     }
 
-    menu()->trigger(action::BeforeExitAction);
-
-    // Try close, if force - exit anyway.
-    // The tryClose() method may return false (when a user rejects closing). So any disconnecting
-    // and closing actions that affect the current client state must be performed after this
-    // statement (i.e. closing is confirmed).
-    if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force) && !force)
-        return;
+    // User will be forcefully disconnected from the system here.
+    menu()->trigger(menu::BeforeExitAction);
 
     context()->setClosingDown(true);
     mainWindowWidget()->hide();
@@ -2884,8 +2917,8 @@ void ActionHandler::at_workbench_itemChanged(Qn::ItemRole role)
 {
     if (role == Qn::CentralRole && adjustVideoDialog() && adjustVideoDialog()->isVisible())
     {
-        QnWorkbenchItem *item = context()->workbench()->item(Qn::CentralRole);
-        QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*> (context()->display()->widget(item));
+        QnWorkbenchItem *item = workbench()->item(Qn::CentralRole);
+        QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*> (display()->widget(item));
         if (widget)
             adjustVideoDialog()->setWidget(widget);
     }
@@ -2996,7 +3029,7 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
         showOnceSettings()->versionMismatch = true;
 
     if (messageBox->clickedButton() == updateButton)
-        menu()->trigger(action::SystemUpdateAction);
+        menu()->trigger(menu::SystemUpdateAction);
 }
 
 void ActionHandler::handleBetaUpdateWarning()
@@ -3188,7 +3221,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
         QnConnectionDiagnosticsHelper::failedRestartClientMessage(mainWindowWidget());
         return;
     }
-    menu()->trigger(action::DelayedForcedExitAction);
+    menu()->trigger(menu::DelayedForcedExitAction);
 }
 
 void ActionHandler::at_selectTimeServerAction_triggered()
@@ -3376,6 +3409,9 @@ void ActionHandler::deleteDialogs() {
 
     if (systemAdministrationDialog())
         delete systemAdministrationDialog();
+
+    if (m_advancedSearchDialog)
+        delete m_advancedSearchDialog.data();
 }
 
 } // namespace workbench

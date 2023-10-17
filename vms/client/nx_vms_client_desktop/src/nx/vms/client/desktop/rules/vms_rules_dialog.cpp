@@ -82,7 +82,7 @@ void VmsRulesDialog::duplicateRule(QnUuid id)
     if (auto uniqueIdField = clone->eventFilters().at(0)->fieldByType<vms::rules::UniqueIdField>())
         uniqueIdField->setId(QnUuid::createUuid()); //< Fix field uniqueness after cloning. TODO: #mmalofeev fix this workaround.
 
-    EditVmsRuleDialog editVmsRuleDialog{m_parentWidget};
+    EditVmsRuleDialog editVmsRuleDialog(m_parentWidget);
 
     editVmsRuleDialog.setRule(clone);
 
@@ -100,7 +100,7 @@ void VmsRulesDialog::editRule(QnUuid id)
     if (!NX_ASSERT(clone))
         return;
 
-    EditVmsRuleDialog editVmsRuleDialog{m_parentWidget};
+    EditVmsRuleDialog editVmsRuleDialog(m_parentWidget);
 
     editVmsRuleDialog.setRule(clone);
 
@@ -132,7 +132,7 @@ void VmsRulesDialog::resetToDefaults()
 
 void VmsRulesDialog::openEventLogDialog()
 {
-    action(ui::action::OpenEventLogAction)->trigger();
+    action(menu::OpenEventLogAction)->trigger();
 }
 
 void VmsRulesDialog::deleteRuleImpl(QnUuid id)

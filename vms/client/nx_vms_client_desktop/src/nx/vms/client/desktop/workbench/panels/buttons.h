@@ -2,34 +2,35 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 
 class QnImageButtonWidget;
 class QnBlinkingImageButtonWidget;
 class QGraphicsItem;
-class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
+class WindowContext;
+
 QnImageButtonWidget* newActionButton(
     QGraphicsItem *parent,
-    QnWorkbenchContext* context,
-    nx::vms::client::desktop::ui::action::IDType actionId,
+    WindowContext* context,
+    menu::IDType actionId,
     int helpTopicId);
 
 QnImageButtonWidget* newShowHideButton(
     QGraphicsItem* parent,
-    QnWorkbenchContext* context,
-    nx::vms::client::desktop::ui::action::IDType actionId);
+    WindowContext* context,
+    menu::IDType actionId);
 
 QnBlinkingImageButtonWidget* newBlinkingShowHideButton(
     QGraphicsItem* parent,
-    QnWorkbenchContext* context,
-    nx::vms::client::desktop::ui::action::IDType actionId);
+    WindowContext* context,
+    menu::IDType actionId);
 
 QnImageButtonWidget* newPinTimelineButton(
     QGraphicsItem* parent,
-    QnWorkbenchContext* context,
-    nx::vms::client::desktop::ui::action::IDType actionId);
+    WindowContext* context,
+    menu::IDType actionId);
 
 } //namespace nx::vms::client::desktop

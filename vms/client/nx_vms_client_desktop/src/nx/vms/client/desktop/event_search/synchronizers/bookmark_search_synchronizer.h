@@ -19,8 +19,10 @@ class CommonObjectSearchSetup;
 class BookmarkSearchSynchronizer: public AbstractSearchSynchronizer
 {
 public:
-    BookmarkSearchSynchronizer(QnWorkbenchContext* context,
-        CommonObjectSearchSetup* searchSetup, QObject* parent = nullptr);
+    BookmarkSearchSynchronizer(
+        WindowContext* context,
+        CommonObjectSearchSetup* searchSetup,
+        QObject* parent = nullptr);
 
 private:
     QAction* bookmarksAction() const;

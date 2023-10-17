@@ -7,9 +7,9 @@
 
 namespace nx::vms::client::desktop::rules {
 
-LookupListsModel::LookupListsModel(QnWorkbenchContext* context, QObject* parent):
+LookupListsModel::LookupListsModel(SystemContext* context, QObject* parent):
     QAbstractListModel{parent},
-    QnWorkbenchContextAware{context}
+    SystemContextAware{context}
 {
     const auto lookupListManager = systemContext()->lookupListManager();
 

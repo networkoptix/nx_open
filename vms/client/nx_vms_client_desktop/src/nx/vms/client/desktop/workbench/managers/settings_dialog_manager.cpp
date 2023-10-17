@@ -69,7 +69,10 @@ void SettingsDialogManager::editUser(const QnUuid& userId, int tab, QWidget* par
     if (!d->userSettingsDialog)
     {
         d->userSettingsDialog = new UserSettingsDialog(
-            UserSettingsDialog::DialogType::EditUser, systemContext(), parent);
+            UserSettingsDialog::DialogType::EditUser,
+            systemContext(),
+            windowContext(),
+            parent);
         d->userSettingsDialog->setRestoreLastPositionWhenOpened();
         connect(d->userSettingsDialog.get(), &UserSettingsDialog::done, this,
             [this]() { setCurrentEditedUserId({}); });
@@ -95,7 +98,10 @@ bool SettingsDialogManager::isEditUserDialogVisible() const
 void SettingsDialogManager::createUser(QWidget* parent)
 {
     auto dialog = std::make_unique<UserSettingsDialog>(
-        UserSettingsDialog::DialogType::CreateUser, systemContext(), parent);
+        UserSettingsDialog::DialogType::CreateUser,
+        systemContext(),
+        windowContext(),
+        parent);
     dialog->setUser({});
     dialog->exec(Qt::ApplicationModal);
 }
@@ -135,7 +141,10 @@ void SettingsDialogManager::editGroup(const QnUuid& groupId, QWidget* parent)
     if (!d->groupSettingsDialog)
     {
         d->groupSettingsDialog = new GroupSettingsDialog(
-            GroupSettingsDialog::editGroup, systemContext(), parent);
+            GroupSettingsDialog::editGroup,
+            systemContext(),
+            windowContext(),
+            parent);
         d->groupSettingsDialog->setRestoreLastPositionWhenOpened();
         connect(d->groupSettingsDialog.get(), &GroupSettingsDialog::done, this,
             [this]() { setCurrentEditedGroupId({}); });
@@ -158,7 +167,10 @@ bool SettingsDialogManager::isEditGroupDialogVisible() const
 void SettingsDialogManager::createGroup(QWidget* parent)
 {
     auto dialog = std::make_unique<GroupSettingsDialog>(
-        GroupSettingsDialog::createGroup, systemContext(), parent);
+        GroupSettingsDialog::createGroup,
+        systemContext(),
+        windowContext(),
+        parent);
     dialog->setGroup({});
     dialog->exec(Qt::ApplicationModal);
 }

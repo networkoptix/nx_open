@@ -12,6 +12,7 @@
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/test_support/message_processor_mock.h>
 
 namespace nx::vms::client::desktop::test {
 
@@ -32,6 +33,9 @@ Context::Context():
 
 Context::~Context()
 {
+    if (systemContext()->messageProcessor())
+        systemContext()->deleteMessageProcessor();
+
     QCoreApplication::setOrganizationName(QString());
     QCoreApplication::setApplicationName(QString());
 }
@@ -49,6 +53,11 @@ QnClientCoreModule* Context::clientCoreModule() const
 SystemContext* Context::systemContext() const
 {
     return d->appContext->currentSystemContext();
+}
+
+MessageProcessorMock* ContextBasedTest::createMessageProcessor()
+{
+    return systemContext()->createMessageProcessor<MessageProcessorMock>();
 }
 
 } // namespace nx::vms::client::desktop::test

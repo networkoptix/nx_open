@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/camera_resource_index.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -44,13 +45,14 @@ CameraResourceSource::CameraResourceSource(
                     emit resourceRemoved(camera);
             });
 
-        NX_CRITICAL(m_server->systemContext());
+        auto systemContext = SystemContext::fromResource(m_server);
+        NX_CRITICAL(systemContext);
+        // TODO: #sivanov There should be more elegant way to handle unit tests limitations.
         // Message processor does not exist in unit tests.
-        if (auto messageProcessor = m_server->systemContext()->messageProcessor())
+        if (systemContext->messageProcessor())
         {
             auto serverWatcher = new core::SessionResourcesSignalListener<QnMediaServerResource>(
-                m_server->systemContext()->resourcePool(),
-                messageProcessor,
+                systemContext,
                 this);
             serverWatcher->setOnRemovedHandler(
                 [this](const QnMediaServerResourceList& servers)

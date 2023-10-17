@@ -11,9 +11,9 @@
 #include <nx/vms/client/desktop/common/utils/abstract_web_authenticator.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 
-class QnWorkbenchContext;
-
 namespace nx::vms::client::desktop {
+
+class WindowContext;
 
 class WebWidget;
 
@@ -38,8 +38,8 @@ public:
      */
     int showUrl(
         const QUrl& url,
-        bool enableClientApi = false,
-        QnWorkbenchContext* context = nullptr,
+        bool enableClientApi,
+        WindowContext* context,
         const QnResourcePtr& resource = {},
         std::shared_ptr<AbstractWebAuthenticator> authenticator = nullptr,
         bool checkCertificate = true);

@@ -32,7 +32,7 @@ class AnimatedCompactTabWidget;
 
 class EventPanel::Private:
     public QObject,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
 

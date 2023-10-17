@@ -87,7 +87,7 @@ void truncate(
 VmsEventSearchListModel::Private::Private(VmsEventSearchListModel* q):
     base_type(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(q->systemContext())),
+    m_helper(new vms::event::StringsHelper(q->system())),
     m_liveUpdateTimer(new QTimer())
 {
     connect(m_liveUpdateTimer.data(), &QTimer::timeout, this, &Private::fetchLive);
@@ -152,8 +152,8 @@ QVariant VmsEventSearchListModel::Private::data(
     if (!NX_ASSERT(index.row() < m_data.size()))
         return {};
 
-    const auto& event = m_data[index.row()].event(q->systemContext());
-    const auto& details = event->details(q->systemContext());
+    const auto& event = m_data[index.row()].event(q->system());
+    const auto& details = event->details(q->system());
     handled = true;
 
     switch (role)
@@ -212,7 +212,7 @@ QVariant VmsEventSearchListModel::Private::data(
                 sourceId.isValid())
             {
                 if (const auto resource =
-                    q->resourcePool()->getResourceById(sourceId.value<QnUuid>()))
+                    q->system()->resourcePool()->getResourceById(sourceId.value<QnUuid>()))
                 {
                     return QVariant::fromValue(QnResourceList({resource}));
                 }
@@ -230,7 +230,7 @@ QVariant VmsEventSearchListModel::Private::data(
                 return {};
 
             return QVariant::fromValue<QnResourcePtr>(
-                q->resourcePool()->getResourceById<QnVirtualCameraResource>(
+                q->system()->resourcePool()->getResourceById<QnVirtualCameraResource>(
                     details.value(rules::utils::kSourceIdDetailName).value<QnUuid>()));
         }
 
@@ -472,7 +472,7 @@ rest::Handle VmsEventSearchListModel::Private::getEvents(
             }
         };
 
-    auto systemContext = q->systemContext();
+    auto systemContext = q->system();
     if (q->cameraSet()->type() == ManagedCameraSet::Type::single
         && !q->cameras().empty())
     {
@@ -509,7 +509,7 @@ QPixmap VmsEventSearchListModel::Private::iconPixmap(
     QnResourceList devices;
     if (needIconDevices(icon))
     {
-        devices = q->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+        devices = q->system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
             rules::utils::getDeviceIds(AggregatedEventPtr::create(event)));
     }
 

@@ -2,6 +2,9 @@
 
 #include "logs_management_watcher.h"
 
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
+
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtGui/QAction>
@@ -19,19 +22,17 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/zip/extractor.h>
-#include <quazip/quazip.h>
-#include <quazip/quazipfile.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
 
@@ -801,8 +802,8 @@ struct LogsManagementWatcher::Private
         if (notificationManager)
             return;
 
-        const auto context = appContext()->mainWindowContext()->workbenchContext();
-        notificationManager = context->instance<workbench::LocalNotificationsManager>();
+        const auto context = appContext()->mainWindowContext();
+        notificationManager = context->localNotificationsManager();;
 
         q->connect(
             notificationManager, &workbench::LocalNotificationsManager::cancelRequested, q,
@@ -814,13 +815,13 @@ struct LogsManagementWatcher::Private
 
         q->connect(
             notificationManager, &workbench::LocalNotificationsManager::interactionRequested, q,
-            [this, context](const QnUuid& notificationId)
+            [this](const QnUuid& notificationId)
             {
                 if (notificationId == clientLogLevelWarning
                     || notificationId == serverLogLevelWarning
                     || notificationId == logsDownloadNotification)
                 {
-                    context->menu()->trigger(ui::action::LogsManagementAction);
+                    appContext()->mainWindowContext()->menu()->trigger(menu::LogsManagementAction);
                 }
             });
     }

@@ -7,7 +7,7 @@
 #include <QtCore/QAbstractListModel>
 
 #include <nx/utils/scoped_model_operations.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -16,13 +16,13 @@ namespace nx::vms::client::desktop {
  */
 class AbstractEventListModel:
     public ScopedModelOperations<QAbstractListModel>,
-    public QnWorkbenchContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractListModel>;
 
 public:
-    explicit AbstractEventListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
+    explicit AbstractEventListModel(WindowContext* context, QObject* parent = nullptr);
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;

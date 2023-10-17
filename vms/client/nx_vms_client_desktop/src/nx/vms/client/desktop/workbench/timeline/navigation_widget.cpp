@@ -4,13 +4,12 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QAction>
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
@@ -56,9 +55,9 @@ static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColor
 
 } // namespace
 
-NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent):
+NavigationWidget::NavigationWidget(WindowContext* context, QWidget* parent):
     QWidget(parent),
-    QnWorkbenchContextAware(context),
+    WindowContextAware(context),
     m_speedSlider(new SpeedSlider(context, this)),
     m_jumpBackwardButton(new CustomPaintedButton(this)),
     m_stepBackwardButton(new CustomPaintedButton(this)),
@@ -72,15 +71,15 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
     installEventHandler({this}, {QEvent::Resize, QEvent::Move},
         this, &NavigationWidget::geometryChanged);
 
-    initButton(m_jumpBackwardButton, ui::action::JumpToStartAction,
+    initButton(m_jumpBackwardButton, menu::JumpToStartAction,
         "slider/navigation/rewind_backward_32.svg");
-    initButton(m_stepBackwardButton, ui::action::PreviousFrameAction,
+    initButton(m_stepBackwardButton, menu::PreviousFrameAction,
         "slider/navigation/step_backward_32.svg");
-    initButton(m_playButton, ui::action::PlayPauseAction,
+    initButton(m_playButton, menu::PlayPauseAction,
         "slider/navigation/play_32.svg", "slider/navigation/pause_32.svg");
-    initButton(m_stepForwardButton, ui::action::NextFrameAction,
+    initButton(m_stepForwardButton, menu::NextFrameAction,
         "slider/navigation/step_forward_32.svg");
-    initButton(m_jumpForwardButton, ui::action::JumpToEndAction,
+    initButton(m_jumpForwardButton, menu::JumpToEndAction,
         "slider/navigation/rewind_forward_32.svg");
 
     auto mainLayout = new QVBoxLayout();
@@ -127,25 +126,25 @@ NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent)
             showMessage(m_rewindDisabledText);
         });
 
-    connect(action(ui::action::ToggleSyncAction), &QAction::toggled, this,
+    connect(action(menu::ToggleSyncAction), &QAction::toggled, this,
         [this]
         {
             updateBackwardButtonEnabled();
         },
         Qt::QueuedConnection);
-    connect(action(ui::action::PreviousFrameAction), &QAction::triggered,
+    connect(action(menu::PreviousFrameAction), &QAction::triggered,
         this, &NavigationWidget::at_stepBackwardButton_clicked);
-    connect(action(ui::action::NextFrameAction), &QAction::triggered,
+    connect(action(menu::NextFrameAction), &QAction::triggered,
         this, &NavigationWidget::at_stepForwardButton_clicked);
-    connect(action(ui::action::JumpToStartAction), &QAction::triggered,
+    connect(action(menu::JumpToStartAction), &QAction::triggered,
         navigator(), &QnWorkbenchNavigator::jumpBackward);
-    connect(action(ui::action::JumpToEndAction), &QAction::triggered,
+    connect(action(menu::JumpToEndAction), &QAction::triggered,
         navigator(), &QnWorkbenchNavigator::jumpForward);
-    connect(action(ui::action::PlayPauseAction), &QAction::toggled,
+    connect(action(menu::PlayPauseAction), &QAction::toggled,
         navigator(), &QnWorkbenchNavigator::setPlaying);
-    connect(action(ui::action::PlayPauseAction), &QAction::toggled,
+    connect(action(menu::PlayPauseAction), &QAction::toggled,
         this, &NavigationWidget::updateSpeedSliderParametersFromNavigator);
-    connect(action(ui::action::PlayPauseAction), &QAction::toggled, this,
+    connect(action(menu::PlayPauseAction), &QAction::toggled, this,
         [this]
         {
             updatePlaybackButtonsIcons();
@@ -192,7 +191,7 @@ void NavigationWidget::setTooltipsVisible(bool enabled)
 
 void NavigationWidget::initButton(
     CustomPaintedButton* button,
-    ui::action::IDType actionType,
+    menu::IDType actionType,
     const QString& iconPath,
     const QString& checkedIconPath)
 {
@@ -305,10 +304,10 @@ void NavigationWidget::updateJumpButtonsTooltips()
 {
     bool hasPeriods = navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsPeriods;
 
-    action(ui::action::JumpToStartAction)->setText(hasPeriods ? tr("Previous Chunk") : tr("To Start"));
-    m_jumpBackwardButton->setToolTip(action(ui::action::JumpToStartAction)->toolTip());
-    action(ui::action::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
-    m_jumpForwardButton->setToolTip(action(ui::action::JumpToEndAction)->toolTip());
+    action(menu::JumpToStartAction)->setText(hasPeriods ? tr("Previous Chunk") : tr("To Start"));
+    m_jumpBackwardButton->setToolTip(action(menu::JumpToStartAction)->toolTip());
+    action(menu::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
+    m_jumpForwardButton->setToolTip(action(menu::JumpToEndAction)->toolTip());
 
     // TODO: #sivanov Remove this once buttonwidget <-> action enabled sync is implemented. OR when
     // we disable actions and not buttons.
@@ -390,18 +389,18 @@ void NavigationWidget::updatePlaybackButtonsTooltips()
 
     if (!m_stepBackwardButton->isEnabled())
     {
-        action(ui::action::PreviousFrameAction)->setText(m_rewindDisabledText);
+        action(menu::PreviousFrameAction)->setText(m_rewindDisabledText);
         m_stepBackwardButton->setToolTip(m_rewindDisabledText);
     }
     else
     {
-        action(ui::action::PreviousFrameAction)->setText(
+        action(menu::PreviousFrameAction)->setText(
             playing ? tr("Speed Down") : tr("Previous Frame"));
-        m_stepBackwardButton->setToolTip(action(ui::action::PreviousFrameAction)->toolTip());
+        m_stepBackwardButton->setToolTip(action(menu::PreviousFrameAction)->toolTip());
     }
 
-    action(ui::action::NextFrameAction)->setText(playing ? tr("Speed Up") : tr("Next Frame"));
-    m_stepForwardButton->setToolTip(action(ui::action::NextFrameAction)->toolTip());
+    action(menu::NextFrameAction)->setText(playing ? tr("Speed Up") : tr("Next Frame"));
+    m_stepForwardButton->setToolTip(action(menu::NextFrameAction)->toolTip());
 }
 
 void NavigationWidget::showMessage(const QString& text)

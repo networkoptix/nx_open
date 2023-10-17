@@ -13,6 +13,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 #include <nx/vms/client/desktop/workbench/layouts/workbench_layout_state.h>
 #include <utils/math/magnitude.h>
 #include <utils/rect_set.h>
@@ -44,7 +46,8 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutFlags)
  * Contains workbench items and information on their positions. Provides the
  * necessary functions for moving items around.
  */
-class QnWorkbenchLayout: public QObject, public nx::vms::client::core::CommonModuleAware
+class QnWorkbenchLayout: public QObject,
+    public nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QnLayoutResource* resource READ resourcePtr CONSTANT)
@@ -396,7 +399,9 @@ protected:
      * Constructor.
      * @param resource Layout resource that this layout will be in sync with.
      */
-    QnWorkbenchLayout(const LayoutResourcePtr& resource);
+    QnWorkbenchLayout(
+        nx::vms::client::desktop::WindowContext* windowContext,
+        const LayoutResourcePtr& resource);
 
 private:
     void moveItemInternal(QnWorkbenchItem* item, const QRect& geometry);

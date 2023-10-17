@@ -20,9 +20,7 @@ class External: public QObject
     using base_type = QObject;
 
 public:
-
     External(
-        QnWorkbenchContext* context,
         QnWorkbenchItem* item,
         QObject* parent = nullptr);
 

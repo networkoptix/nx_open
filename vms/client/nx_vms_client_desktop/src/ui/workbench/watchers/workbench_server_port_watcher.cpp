@@ -9,11 +9,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-using namespace nx::vms::client::desktop::ui;
+using namespace nx::vms::client::desktop;
 
 QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
     :

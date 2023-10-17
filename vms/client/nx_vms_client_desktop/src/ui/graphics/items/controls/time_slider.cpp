@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/graphics_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/timeline/live_preview.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
@@ -565,15 +566,15 @@ public:
 // QnTimeSlider
 // -------------------------------------------------------------------------- //
 QnTimeSlider::QnTimeSlider(
-    QnWorkbenchContext* context,
+    nx::vms::client::desktop::WindowContext* context,
     QGraphicsItem* parent,
     QGraphicsItem* tooltipParent)
     :
     base_type(Qt::Horizontal, parent),
-    QnWorkbenchContextAware(context),
-    m_view(context->mainWindow()->view()),
+    WindowContextAware(context),
+    m_view(mainWindow()->view()),
     m_tooltipParent(tooltipParent),
-    m_tooltip(new TimeMarker(context)),
+    m_tooltip(new TimeMarker(windowContext())),
     m_windowStart(0),
     m_windowEnd(0),
     m_minimalWindow(0),
@@ -601,13 +602,14 @@ QnTimeSlider::QnTimeSlider(
     m_pixmapCache(new QnTimeSliderPixmapCache(kNumTickmarkLevels, this)),
     m_localOffset(0),
     m_lastLineBarValue(),
-    m_bookmarksViewer(createBookmarksViewer(context->mainWindow()->view())),
+    m_bookmarksViewer(createBookmarksViewer(mainWindow()->view())),
     m_bookmarksVisible(false),
     m_bookmarksHelper(nullptr),
     m_liveSupported(false),
     m_selectionInitiated(false),
     m_livePreview(new LivePreview(this)),
-    m_useLivePreview(ini().enableTimelinePreview && systemSettings()->showMouseTimelinePreview()),
+    m_useLivePreview(ini().enableTimelinePreview
+        && system()->globalSettings()->showMouseTimelinePreview()),
     m_updatingValue(false),
     m_kineticZoomHandler(new KineticZoomHandler(this)),
     m_kineticScrollHandler(new KineticScrollHandler(this)),
@@ -732,11 +734,11 @@ QnTimeSlider::QnTimeSlider(
     connect(qApp, &QApplication::focusChanged, this,
         [this](QWidget* old, QWidget* /*now*/) { m_lastFocusedWidget = old; });
 
-    connect(systemSettings(), &SystemSettings::showMouseTimelinePreviewChanged,
+    connect(system()->globalSettings(), &SystemSettings::showMouseTimelinePreviewChanged,
         [this]
         {
             m_useLivePreview = ini().enableTimelinePreview
-                && systemSettings()->showMouseTimelinePreview();
+                && system()->globalSettings()->showMouseTimelinePreview();
         });
 }
 

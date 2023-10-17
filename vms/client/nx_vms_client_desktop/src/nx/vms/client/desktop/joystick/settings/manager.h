@@ -10,9 +10,7 @@
 #include <QtCore/QTimer>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/scoped_connections.h>
 #include <nx/utils/thread/mutex.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include "device.h"
 
@@ -29,12 +27,9 @@ using DeviceConfigs = QMap<QString, JoystickDescriptor>;
  * HID Manager is used to monitor human interface devices that are connected to user PC
  * and to organize further interaction with the supported ones.
  */
-class Manager:
-    public QObject,
-    public QnWorkbenchContextAware
+class Manager: public QObject
 {
     Q_OBJECT
-
     using base_type = QObject;
 
 public:

@@ -29,8 +29,8 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_manager.h>
-#include <nx/vms/client/desktop/utils/virtual_camera_state.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
+#include <nx/vms/client/desktop/virtual_camera/virtual_camera_state.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>

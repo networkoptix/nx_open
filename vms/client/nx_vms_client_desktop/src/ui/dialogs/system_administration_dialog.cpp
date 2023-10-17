@@ -54,8 +54,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     auto generalWidget = new QnGeneralSystemAdministrationWidget(&d->editableSystemSettings, this);
     addPage(GeneralPage, generalWidget, tr("General"));
 
-    auto userManagementWidget = new UserManagementTabWidget(
-        systemContext()->userGroupManager(), this);
+    auto userManagementWidget = new UserManagementTabWidget(system()->userGroupManager(), this);
     addPage(UserManagement, userManagementWidget, tr("User Management"));
 
     // This is a page for updating many servers in one run.
@@ -63,16 +62,16 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     addPage(UpdatesPage, multiUpdatesWidget, tr("Updates"));
 
     addPage(LicensesPage, new LicenseManagerWidget(this), tr("Licenses"));
-    addPage(SaasInfoPage, new SaasInfoWidget(systemContext(), this), tr("Services"));
+    addPage(SaasInfoPage, new SaasInfoWidget(system(), this), tr("Services"));
 
     const auto updateLicenseAndSaasInfoPagesVisibility =
         [this]
         {
-            const bool saasInitialized = nx::vms::common::saas::saasInitialized(systemContext());
+            const bool saasInitialized = nx::vms::common::saas::saasInitialized(system());
             setPageVisible(LicensesPage, !saasInitialized);
             setPageVisible(SaasInfoPage, saasInitialized);
         };
-    connect(systemContext()->saasServiceManager(),
+    connect(system()->saasServiceManager(),
         &nx::vms::common::saas::ServiceManager::dataChanged,
         this,
         updateLicenseAndSaasInfoPagesVisibility);
@@ -91,11 +90,15 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
             userManagementWidget->manageDigestUsers();
         });
 
-    connect(accessController(), &nx::vms::client::core::AccessController::globalPermissionsChanged,
-        this, &QnSystemAdministrationDialog::updateSecurity);
+    connect(system()->accessController(),
+        &nx::vms::client::core::AccessController::globalPermissionsChanged,
+        this,
+        &QnSystemAdministrationDialog::updateSecurity);
 
-    connect(globalSettings(), &nx::vms::common::SystemSettings::securityForPowerUsersChanged,
-        this, &QnSystemAdministrationDialog::updateSecurity);
+    connect(system()->globalSettings(),
+        &nx::vms::common::SystemSettings::securityForPowerUsersChanged,
+        this,
+        &QnSystemAdministrationDialog::updateSecurity);
 
     updateSecurity();
 
@@ -123,8 +126,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget* parent):
     connect(analyticsSettingsWidget, &AnalyticsSettingsWidget::visibilityUpdateRequested, this,
         updateAnalyticsSettingsWidgetVisibility);
 
-    auto advancedSettingsWidget = new AdvancedSystemSettingsWidget(
-        appContext()->currentSystemContext(), this);
+    auto advancedSettingsWidget = new AdvancedSystemSettingsWidget(system(), this);
     addPage(Advanced, advancedSettingsWidget, tr("Advanced"));
 
     loadDataToUi();
@@ -160,7 +162,7 @@ void QnSystemAdministrationDialog::applyChanges()
             updateButtonBox();
         };
 
-    d->currentRequest = systemContext()->connectedServerApi()->patchSystemSettings(
+    d->currentRequest = connectedServerApi()->patchSystemSettings(
         systemContext()->getSessionTokenHelper(),
         d->editableSystemSettings,
         callback,

@@ -18,7 +18,7 @@ class NumberPicker: public PlainFieldPickerWidget<F>
     using base = PlainFieldPickerWidget<F>;
 
 public:
-    NumberPicker(QnWorkbenchContext* context, CommonParamsWidget* parent):
+    NumberPicker(SystemContext* context, CommonParamsWidget* parent):
         base(context, parent)
     {
         auto contentLayout = new QHBoxLayout;

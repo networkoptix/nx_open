@@ -43,11 +43,11 @@ public:
     void setText(const QString& text);
 
 protected:
-    virtual void retranslateUi() override;
     virtual void showEvent(QShowEvent* event) override;
     virtual void hideEvent(QHideEvent* event) override;
 
 private:
+    void retranslateUi();
     void initEventsModel();
     void initActionsModel();
 

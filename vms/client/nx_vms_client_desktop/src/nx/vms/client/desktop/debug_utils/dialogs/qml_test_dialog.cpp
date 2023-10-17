@@ -20,8 +20,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/dialogs/common/message_box.h>
@@ -54,7 +54,7 @@ struct QmlTestDialog::Private
     QmlTestDialog* const q;
 
     QWidget* const header = new QWidget(q);
-    QQuickWidget* const qmlWidget = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), q);
+    QQuickWidget* const qmlWidget = new QQuickWidget(appContext()->qmlEngine(), q);
     QDialogButtonBox* const buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, q);
 
     QLabel* const label = new QLabel("Component path:", header);

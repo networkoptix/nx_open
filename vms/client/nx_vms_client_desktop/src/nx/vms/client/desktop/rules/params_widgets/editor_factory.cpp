@@ -8,7 +8,7 @@ namespace nx::vms::client::desktop::rules {
 
 ParamsWidget* EventEditorFactory::createWidget(
     const vms::rules::ItemDescriptor& descriptor,
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QWidget* parent)
 {
     ParamsWidget* picker = new CommonParamsWidget(context, parent);
@@ -20,7 +20,7 @@ ParamsWidget* EventEditorFactory::createWidget(
 
 ParamsWidget* ActionEditorFactory::createWidget(
     const vms::rules::ItemDescriptor& descriptor,
-    QnWorkbenchContext* context,
+    WindowContext* context,
     QWidget* parent)
 {
     ParamsWidget* picker = new CommonParamsWidget(context, parent);

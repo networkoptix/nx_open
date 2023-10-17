@@ -25,9 +25,7 @@ WheelZoomInstrument::WheelZoomInstrument(QObject* parent):
         makeSet(),
         makeSet(QEvent::GraphicsSceneWheel),
         makeSet(),
-        parent
-    ),
-    QnWorkbenchContextAware(parent)
+        parent)
 {
     KineticCuttingProcessor* processor = new KineticCuttingProcessor(QMetaType(QMetaType::QReal), this);
     processor->setHandler(this);

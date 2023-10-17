@@ -16,9 +16,9 @@
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/utils/text_filter_setup.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -46,7 +46,7 @@ QnMediaResourceWidget* asMediaWidget(QnResourceWidget* widget)
 } // namespace
 
 AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
-    QnWorkbenchContext* context,
+    WindowContext* context,
     CommonObjectSearchSetup* commonSetup,
     AnalyticsSearchSetup* analyticsSetup,
     QObject* parent)
@@ -76,7 +76,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         });
 
     m_analyticsSetup->setLiveTimestampGetter(
-        [this, context](const QnVirtualCameraResourcePtr& camera) -> milliseconds
+        [this](const QnVirtualCameraResourcePtr& camera) -> milliseconds
         {
             static constexpr auto kMaxTimestamp = std::numeric_limits<milliseconds>::max();
 
@@ -84,7 +84,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             if (widgets.empty())
                 return kMaxTimestamp;
 
-            auto streamSynchronizer = context->workbench()->windowContext()->streamSynchronizer();
+            auto streamSynchronizer = windowContext()->streamSynchronizer();
             // In sync mode analyze only the first widget.
             if (streamSynchronizer->isRunning())
                 widgets = decltype(widgets)({*widgets.cbegin()});
@@ -213,7 +213,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             widget->disconnect(this);
         });
 
-    connect(action(ui::action::ObjectSearchModeAction), &QAction::toggled, this,
+    connect(action(menu::ObjectSearchModeAction), &QAction::toggled, this,
         [this](bool on)
         {
             if (on)
@@ -340,7 +340,7 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
 
 void AnalyticsSearchSynchronizer::updateAction()
 {
-    action(ui::action::ObjectSearchModeAction)->setChecked(active()
+    action(menu::ObjectSearchModeAction)->setChecked(active()
         && m_commonSetup->cameraSelection() == RightPanel::CameraSelection::current);
 }
 

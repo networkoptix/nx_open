@@ -10,8 +10,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -29,71 +29,68 @@
 
 namespace nx::vms::client::desktop {
 
-namespace action = ui::action;
-
 ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
     base_type(parent),
     QnSessionAwareDelegate(parent),
     m_executor(new ShowreelExecutor(this)),
     m_reviewController(new ShowreelReviewController(this))
 {
-    connect(systemContext()->showreelManager(),
+    connect(system()->showreelManager(),
         &common::ShowreelManager::showreelChanged,
         m_executor,
         &ShowreelExecutor::updateShowreel);
 
-    connect(systemContext()->showreelManager(),
+    connect(system()->showreelManager(),
         &common::ShowreelManager::showreelRemoved,
         m_executor,
         &ShowreelExecutor::stopShowreel);
 
-    connect(action(action::NewShowreelAction), &QAction::triggered, this,
+    connect(action(menu::NewShowreelAction), &QAction::triggered, this,
         [this]()
         {
-            NX_ASSERT(context()->user());
-            if (!context()->user())
+            if (!NX_ASSERT(system()->user()))
                 return;
 
             QStringList usedNames;
-            for (const auto& showreel: systemContext()->showreelManager()->showreels())
+            for (const auto& showreel: system()->showreelManager()->showreels())
                 usedNames << showreel.name;
 
             nx::vms::api::ShowreelData showreel;
             showreel.id = QnUuid::createUuid();
-            showreel.parentId = context()->user()->getId();
+            showreel.parentId = system()->user()->getId();
             showreel.name = nx::utils::generateUniqueString(
                 usedNames, tr("Showreel"), tr("Showreel %1"));
-            systemContext()->showreelManager()->addOrUpdateShowreel(showreel);
+            system()->showreelManager()->addOrUpdateShowreel(showreel);
             saveShowreelToServer(showreel);
-            menu()->trigger(action::SelectNewItemAction, {Qn::UuidRole, showreel.id});
-            menu()->trigger(action::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
+            menu()->trigger(menu::SelectNewItemAction, {Qn::UuidRole, showreel.id});
+            menu()->trigger(menu::ReviewShowreelAction, {Qn::UuidRole, showreel.id});
         });
 
-    connect(action(action::MakeShowreelAction), &QAction::triggered, this,
+    connect(action(menu::MakeShowreelAction), &QAction::triggered, this,
         [this]()
         {
-            if (!menu()->triggerIfPossible(action::NewShowreelAction))
+            if (!menu()->triggerIfPossible(menu::NewShowreelAction))
                 return;
             const auto parameters = menu()->currentParameters(sender());
-            menu()->trigger(action::DropResourcesAction, parameters);
-            menu()->trigger(action::SaveCurrentShowreelAction);
+            menu()->trigger(menu::DropResourcesAction, parameters);
+            menu()->trigger(menu::SaveCurrentShowreelAction);
         });
 
-    connect(action(action::RenameShowreelAction), &QAction::triggered, this,
+    connect(action(menu::RenameShowreelAction), &QAction::triggered, this,
         [this]()
         {
             const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto showreel = systemContext()->showreelManager()->showreel(id);
+            auto showreel = system()->showreelManager()->showreel(id);
             if (!showreel.isValid())
                 return;
 
-            const auto userId = context()->user()->getId();
+            const auto userId = system()->user()->getId();
 
             const QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
 
             // Ask to override showreel with the same name (if any). Create local copy to avoid crash.
-            const auto showreels = systemContext()->showreelManager()->showreels();
+            const auto showreels = system()->showreelManager()->showreels();
             for (const auto& other: showreels)
             {
                 if (other.id == id)
@@ -107,24 +104,24 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
                     if (!ui::messages::Resources::overrideShowreel(mainWindowWidget()))
                         return;
 
-                    systemContext()->showreelManager()->removeShowreel(other.id);
+                    system()->showreelManager()->removeShowreel(other.id);
                     removeShowreelFromServer(other.id);
                 }
             }
 
             showreel.name = name;
-            systemContext()->showreelManager()->addOrUpdateShowreel(showreel);
+            system()->showreelManager()->addOrUpdateShowreel(showreel);
             saveShowreelToServer(showreel);
         });
 
-    connect(action(action::RemoveShowreelAction), &QAction::triggered, this,
+    connect(action(menu::RemoveShowreelAction), &QAction::triggered, this,
         [this]()
         {
             const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             NX_ASSERT(!id.isNull());
 
-            const auto showreel = systemContext()->showreelManager()->showreel(id);
+            const auto showreel = system()->showreelManager()->showreel(id);
             if (!showreel.name.isEmpty())
             {
                 QnSessionAwareMessageBox messageBox(mainWindowWidget());
@@ -137,11 +134,11 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
                     return;
             }
 
-            systemContext()->showreelManager()->removeShowreel(id);
+            system()->showreelManager()->removeShowreel(id);
             removeShowreelFromServer(id);
         });
 
-    connect(action(action::ToggleShowreelModeAction), &QAction::toggled, this,
+    connect(action(menu::ToggleShowreelModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
             const auto parameters = menu()->currentParameters(sender());
@@ -171,56 +168,56 @@ ShowreelActionsHandler::ShowreelActionsHandler(QObject* parent):
             else
             {
                 NX_ASSERT(toggled);
-                m_executor->startShowreel(systemContext()->showreelManager()->showreel(id));
+                m_executor->startShowreel(system()->showreelManager()->showreel(id));
                 //TODO: #spanasenko Is it necessary here?
-                //context()->instance<QnWorkbenchStateManager>()->saveState();
+                //windowContext()->workbenchStateManager()->saveState();
             }
-            context()->action(action::FullscreenAction)->setChecked(true);
+            action(menu::FullscreenAction)->setChecked(true);
         });
 
-    connect(action(action::PreviousLayoutAction), &QAction::triggered, this,
+    connect(action(menu::PreviousLayoutAction), &QAction::triggered, this,
         [this]
         {
-            if (action(action::ToggleShowreelModeAction)->isChecked())
+            if (action(menu::ToggleShowreelModeAction)->isChecked())
                 m_executor->prevShowreelStep();
         });
 
-    connect(action(action::NextLayoutAction), &QAction::triggered, this,
+    connect(action(menu::NextLayoutAction), &QAction::triggered, this,
         [this]
         {
-            if (action(action::ToggleShowreelModeAction)->isChecked())
+            if (action(menu::ToggleShowreelModeAction)->isChecked())
                 m_executor->nextShowreelStep();
         });
 
-    connect(action(action::SaveShowreelAction), &QAction::triggered, this,
+    connect(action(menu::SaveShowreelAction), &QAction::triggered, this,
         [this]
         {
             const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto showreel = systemContext()->showreelManager()->showreel(id);
+            auto showreel = system()->showreelManager()->showreel(id);
             if (!showreel.isValid())
                 return;
             saveShowreelToServer(showreel);
         });
 
-    connect(action(action::EscapeHotkeyAction), &QAction::triggered, this,
+    connect(action(menu::EscapeHotkeyAction), &QAction::triggered, this,
         [this]
         {
-            if (action(action::ToggleShowreelModeAction)->isChecked())
-                action(action::ToggleShowreelModeAction)->toggle();
+            if (action(menu::ToggleShowreelModeAction)->isChecked())
+                action(menu::ToggleShowreelModeAction)->toggle();
 
             // Just for safety
             NX_ASSERT(m_executor->runningShowreel().isNull());
             m_executor->stopCurrentShowreel();
         });
 
-    connect(action(action::SuspendCurrentShowreelAction), &QAction::triggered, this,
+    connect(action(menu::SuspendCurrentShowreelAction), &QAction::triggered, this,
         [this]
         {
             m_executor->suspendCurrentShowreel();
         });
 
-    connect(action(action::ResumeCurrentShowreelAction), &QAction::triggered, this,
+    connect(action(menu::ResumeCurrentShowreelAction), &QAction::triggered, this,
         [this]
         {
             m_executor->resumeCurrentShowreel();
@@ -237,11 +234,6 @@ bool ShowreelActionsHandler::tryClose(bool /*force*/)
     return true;
 }
 
-void ShowreelActionsHandler::forcedUpdate()
-{
-    // Do nothing
-}
-
 QnUuid ShowreelActionsHandler::runningShowreel() const
 {
     return m_executor->runningShowreel();
@@ -249,12 +241,12 @@ QnUuid ShowreelActionsHandler::runningShowreel() const
 
 void ShowreelActionsHandler::saveShowreelToServer(const nx::vms::api::ShowreelData& showreel)
 {
-    if (!NX_ASSERT(systemContext()->showreelManager()->showreel(showreel.id).isValid()))
+    if (!NX_ASSERT(system()->showreelManager()->showreel(showreel.id).isValid()))
         return;
 
-    auto stateManager = systemContext()->showreelStateManager();
+    auto stateManager = system()->showreelStateManager();
 
-    if (const auto connection = systemContext()->messageBusConnection())
+    if (const auto connection = system()->messageBusConnection())
     {
         int reqId = connection->getShowreelManager(Qn::kSystemAccess)->save(
             showreel,
@@ -280,7 +272,7 @@ void ShowreelActionsHandler::saveShowreelToServer(const nx::vms::api::ShowreelDa
 
 void ShowreelActionsHandler::removeShowreelFromServer(const QnUuid& showreelId)
 {
-    if (const auto connection = systemContext()->messageBusConnection())
+    if (const auto connection = system()->messageBusConnection())
     {
         connection->getShowreelManager(Qn::kSystemAccess)->remove(
             showreelId, [](int /*reqId*/, ec2::ErrorCode) {});

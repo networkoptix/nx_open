@@ -15,7 +15,7 @@ namespace nx::vms::client::desktop {
 
 void AnalyticsActionsHelper::processResult(
     const AnalyticsActionResult& result,
-    QnWorkbenchContext* context,
+    WindowContext* context,
     const QnResourcePtr& proxyResource,
     std::shared_ptr<AbstractWebAuthenticator> authenticator,
     QWidget* parent)

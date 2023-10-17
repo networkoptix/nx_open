@@ -18,7 +18,7 @@ CameraSettingsGlobalPermissionsWatcher::CameraSettingsGlobalPermissionsWatcher(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, InitializationMode::instant)
+    QnWorkbenchContextAware(parent)
 {
     NX_ASSERT(store);
 

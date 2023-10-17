@@ -29,6 +29,7 @@
 #include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
@@ -36,14 +37,12 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/time/formatter.h>
 #include <server/server_storage_manager.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/models/storage_list_model.h>
 #include <ui/models/storage_model_info.h>
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>

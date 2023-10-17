@@ -16,7 +16,6 @@ public:
     const QmlProperty<bool> advancedMode{rootObjectHolder(), "advancedMode"};
 
     virtual bool tryClose(bool force) override;
-    virtual void forcedUpdate() override;
 
 private:
     rest::Handle m_currentRequest = 0;

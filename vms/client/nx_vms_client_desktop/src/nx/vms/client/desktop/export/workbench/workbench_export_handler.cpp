@@ -32,15 +32,16 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <platform/environment.h>
@@ -65,7 +66,7 @@ namespace
 {
 
 QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
-    const ui::action::Parameters& parameters)
+    const menu::Parameters& parameters)
 {
     if (parameters.size() == 1)
     {
@@ -184,7 +185,7 @@ struct WorkbenchExportHandler::Private
         q(owner),
         exportManager(new ExportManager())
     {
-        const auto& manager = q->context()->instance<workbench::LocalNotificationsManager>();
+        const auto& manager = q->windowContext()->localNotificationsManager();
         NX_ASSERT(manager);
 
         connect(manager, &workbench::LocalNotificationsManager::interactionRequested, q,
@@ -208,7 +209,7 @@ struct WorkbenchExportHandler::Private
     QnUuid createExportContext(Settings settings,
         const QnResourcePtr& resource, bool saveExistingLayout, bool forceTranscoding)
     {
-        const auto& manager = q->context()->instance<workbench::LocalNotificationsManager>();
+        const auto& manager = q->windowContext()->localNotificationsManager();
         QString fullPath = fileName(settings).completeFileName();
 
         const auto exportProcessId = manager->addProgress(
@@ -228,7 +229,7 @@ struct WorkbenchExportHandler::Private
         connect(progressDialog, &ProgressDialog::canceled, exportManager.data(),
             [this, exportProcessId]
             {
-                q->context()->instance<workbench::LocalNotificationsManager>()->remove(exportProcessId);
+                q->windowContext()->localNotificationsManager()->remove(exportProcessId);
                 exportManager->stopExport(exportProcessId);
             });
 
@@ -316,28 +317,28 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
     connect(d->exportManager.get(), &ExportManager::processFinished, this,
         &WorkbenchExportHandler::exportProcessFinished);
 
-    connect(action(ui::action::ExportVideoAction), &QAction::triggered, this,
+    connect(action(menu::ExportVideoAction), &QAction::triggered, this,
         [this]()
         {
             const auto parameters = menu()->currentParameters(sender());
             handleExportVideoAction(parameters);
         });
 
-    connect(action(ui::action::ExportBookmarkAction), &QAction::triggered, this,
+    connect(action(menu::ExportBookmarkAction), &QAction::triggered, this,
         [this]()
         {
             const auto parameters = menu()->currentParameters(sender());
             handleExportBookmarkAction(parameters);
         });
 
-    connect(action(ui::action::ExportBookmarksAction), &QAction::triggered, this,
+    connect(action(menu::ExportBookmarksAction), &QAction::triggered, this,
         &WorkbenchExportHandler::handleExportBookmarksAction);
 
-    connect(action(ui::action::ExportStandaloneClientAction), &QAction::triggered, this,
+    connect(action(menu::ExportStandaloneClientAction), &QAction::triggered, this,
         &WorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
 
     // from legacy::WorkbenchExportHandler
-    connect(action(ui::action::SaveLocalLayoutAction), &QAction::triggered, this,
+    connect(action(menu::SaveLocalLayoutAction), &QAction::triggered, this,
         &WorkbenchExportHandler::at_saveLocalLayoutAction_triggered);
 }
 
@@ -363,7 +364,7 @@ void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
         dialog->setValue(info.progressValue);
     }
 
-    context()->instance<workbench::LocalNotificationsManager>()->setProgress(info.id,
+    windowContext()->localNotificationsManager()->setProgress(info.id,
         qreal(info.progressValue - info.rangeStart) / (info.rangeEnd - info.rangeStart));
 }
 
@@ -373,7 +374,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
         return;
 
     const auto exportContext = d->runningExports.take(info.id);
-    context()->instance<workbench::LocalNotificationsManager>()->remove(info.id);
+    windowContext()->localNotificationsManager()->remove(info.id);
 
     d->startingExportMessageBox.reset(); //< Close "Starting Export..." messagebox if exists.
 
@@ -395,8 +396,8 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
                 if (NX_ASSERT(systemContext))
                     systemContext->layoutSnapshotManager()->store(layout);
             }
-            context()->menu()->trigger(ui::action::ExportFinishedEvent,
-                ui::action::Parameters().withArgument(
+            menu()->trigger(menu::ExportFinishedEvent,
+                menu::Parameters().withArgument(
                     Qn::FileNameRole, fileName.completeFileName()));
             if (!exportContext.saveExistingLayout)
                 QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
@@ -430,7 +431,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     }
 }
 
-void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameters& parameters)
+void WorkbenchExportHandler::handleExportVideoAction(const menu::Parameters& parameters)
 {
     // Extracting parameters as fast as we can.
     //const auto parameters = menu()->currentParameters(sender());
@@ -491,7 +492,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameter
     runExport(std::move(exportToolInstance));
 }
 
-void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parameters& parameters)
+void WorkbenchExportHandler::handleExportBookmarkAction(const menu::Parameters& parameters)
 {
     const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
     NX_ASSERT(bookmark.isValid());
