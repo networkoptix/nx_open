@@ -23,6 +23,7 @@ public:
 
     QList<QString> attributeNames() const;
     void setAttributeNames(QList<QString> value);
+    QList<int> setFilter(const QString& filterText, int resultLimit) const;
 
     nx::vms::api::LookupListData& rawData() { return m_data; }
 

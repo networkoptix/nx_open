@@ -259,7 +259,11 @@ Dialog
                         }
                     }
                     Item { Layout.fillWidth: true }
-                    SearchField { }
+                    SearchField
+                    {
+                        property var numOfResultOnPage: 20
+                        onTextChanged: entriesModel.setFilter(text, numOfResultOnPage)
+                    }
                 }
             }
 

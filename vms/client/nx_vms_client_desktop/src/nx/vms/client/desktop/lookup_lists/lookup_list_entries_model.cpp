@@ -11,7 +11,7 @@
 #include <ui/utils/table_export_helper.h>
 
 // TODO: @pprivalov this is an entrance point when you start to deal with validate
-//#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+// #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 
 namespace nx::vms::client::desktop {
 
@@ -27,8 +27,15 @@ QString attribute(const nx::vms::api::LookupListData& list, int column)
 
 } // namespace
 
+struct LookupListEntriesModel::Private
+{
+    QPointer<LookupListModel> data;
+    std::optional<QList<int>> rowsIndexesToShow;
+};
+
 LookupListEntriesModel::LookupListEntriesModel(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    d(new Private())
 {
 }
 
@@ -39,43 +46,48 @@ LookupListEntriesModel::~LookupListEntriesModel()
 QVariant LookupListEntriesModel::headerData(
     int section, Qt::Orientation orientation, int role) const
 {
-    if (!NX_ASSERT(m_data))
+    if (!NX_ASSERT(d->data))
         return {};
 
     if (orientation != Qt::Orientation::Horizontal)
         return QVariant();
 
     if (role == Qt::DisplayRole)
-        return attribute(m_data->rawData(), section);
+        return attribute(d->data->rawData(), section);
 
     return QVariant();
 }
 
 int LookupListEntriesModel::rowCount(const QModelIndex& parent) const
 {
-    return m_data ? (int) m_data->rawData().entries.size() : 0;
+    if (!NX_ASSERT(d->data))
+        return 0;
+
+    return d->rowsIndexesToShow ? d->rowsIndexesToShow->size() : d->data->rawData().entries.size();
 }
 
 int LookupListEntriesModel::columnCount(const QModelIndex& parent) const
 {
     // Reserve one for checkbox column.
-    return m_data ? (int) m_data->rawData().attributeNames.size() : 0;
+    return d->data ? (int) d->data->rawData().attributeNames.size() : 0;
 }
 
 QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
 {
-    if (!NX_ASSERT(m_data))
+    if (!NX_ASSERT(d->data))
         return {};
 
     switch (role)
     {
         case Qt::DisplayRole:
         {
-            const auto key = attribute(m_data->rawData(), index.column());
+            const auto key = attribute(d->data->rawData(), index.column());
             if (key.isEmpty())
                 return QString();
 
-            const auto& entry = m_data->rawData().entries[index.row()];
+            const int rowIdx =
+                d->rowsIndexesToShow ? d->rowsIndexesToShow->at(index.row()) : index.row();
+            const auto& entry = d->data->rawData().entries[rowIdx];
             const auto iter = entry.find(key);
             if (iter != entry.cend())
                 return iter->second;
@@ -84,12 +96,12 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
 
         case ObjectTypeIdRole:
         {
-            return m_data->rawData().objectTypeId;
+            return d->data->rawData().objectTypeId;
         }
 
         case AttributeNameRole:
         {
-            return attribute(m_data->rawData(), index.column());
+            return attribute(d->data->rawData(), index.column());
         }
     }
 
@@ -98,17 +110,17 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
 
 bool LookupListEntriesModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if (!NX_ASSERT(m_data))
+    if (!NX_ASSERT(d->data))
         return false;
     if (role != Qt::EditRole)
         return false;
 
 
-    const auto key = attribute(m_data->rawData(), index.column());
+    const auto key = attribute(d->data->rawData(), index.column());
     if (key.isEmpty())
         return false;
 
-    auto& entry = m_data->rawData().entries[index.row()];
+    auto& entry = d->data->rawData().entries[index.row()];
     auto iter = entry.find(key);
 
     const auto valueAsString = value.toString();
@@ -131,18 +143,18 @@ QHash<int, QByteArray> LookupListEntriesModel::roleNames() const
 
 LookupListModel* LookupListEntriesModel::listModel() const
 {
-    return m_data.data();
+    return d->data.data();
 }
 
 void LookupListEntriesModel::setListModel(LookupListModel* value)
 {
     beginResetModel();
-    m_data = value;
+    d->data = value;
     endResetModel();
 
     emit listModelChanged();
 
-    if (m_data)
+    if (d->data)
     {
         emit headerDataChanged(Qt::Orientation::Horizontal, 0, columnCount() - 1);
         emit rowCountChanged();
@@ -151,19 +163,19 @@ void LookupListEntriesModel::setListModel(LookupListModel* value)
 
 void LookupListEntriesModel::addEntry(const QVariantMap& values)
 {
-    if (!NX_ASSERT(m_data))
+    if (!NX_ASSERT(d->data))
         return;
 
     if (!NX_ASSERT(!values.empty()))
         return;
 
-    const int count = m_data->rawData().entries.size();
+    const int count = d->data->rawData().entries.size();
     beginInsertRows({}, count, count);
 
     nx::vms::api::LookupListEntry entry;
     for (const auto& [name, value]: nx::utils::constKeyValueRange(values))
         entry[name] = value.toString();
-    m_data->rawData().entries.push_back(std::move(entry));
+    d->data->rawData().entries.push_back(std::move(entry));
 
     endInsertRows();
     emit rowCountChanged();
@@ -171,7 +183,7 @@ void LookupListEntriesModel::addEntry(const QVariantMap& values)
 
 void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
 {
-    if (!NX_ASSERT(m_data))
+    if (!NX_ASSERT(d->data))
         return;
 
     if (!NX_ASSERT(!rows.empty()))
@@ -180,7 +192,7 @@ void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
     for (auto& index: rows | ranges::views::reverse)
     {
         beginRemoveRows({}, index, index);
-        m_data->rawData().entries.erase(m_data->rawData().entries.begin() + index);
+        d->data->rawData().entries.erase(d->data->rawData().entries.begin() + index);
         endRemoveRows();
         emit rowCountChanged();
     }
@@ -188,7 +200,7 @@ void LookupListEntriesModel::deleteEntries(const QVector<int>& rows)
 
 void LookupListEntriesModel::exportEntries(const QSet<int>& selectedRows, QTextStream& outputCsv)
 {
-    if (!NX_ASSERT(m_data))
+    if (!NX_ASSERT(d->data))
         return;
 
     QModelIndexList indexes;
@@ -207,10 +219,10 @@ void LookupListEntriesModel::exportEntries(const QSet<int>& selectedRows, QTextS
 
 bool LookupListEntriesModel::updateHeaders(const QStringList& headers)
 {
-     if (!NX_ASSERT(m_data))
+     if (!NX_ASSERT(d->data))
         return false;
 
-    auto currentHeaders = m_data->attributeNames();
+    auto currentHeaders = d->data->attributeNames();
     bool differenceFound = false;
     int i = 0;
 
@@ -235,7 +247,7 @@ bool LookupListEntriesModel::updateHeaders(const QStringList& headers)
 
     if (differenceFound)
     {
-        m_data->setAttributeNames(currentHeaders);
+        d->data->setAttributeNames(currentHeaders);
         // TODO: @pprivalov Update data if nessessary. Do it when validate will be implemented.
     }
     return true;
@@ -255,6 +267,19 @@ bool LookupListEntriesModel::validate()
 
     }*/
     return true; //unparsed.empty();
+}
+
+void LookupListEntriesModel::setFilter(const QString& searchText, int resultLimit)
+{
+    if (!NX_ASSERT(d->data))
+        return;
+
+    beginResetModel();
+    if (searchText.isEmpty())
+        d->rowsIndexesToShow.reset();
+    else
+        d->rowsIndexesToShow = d->data->setFilter(searchText, resultLimit);
+    endResetModel();
 }
 
 } // namespace nx::vms::client::desktop

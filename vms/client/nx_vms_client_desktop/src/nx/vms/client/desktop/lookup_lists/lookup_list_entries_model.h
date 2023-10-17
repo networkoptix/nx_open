@@ -6,6 +6,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QStringList>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/lookup_list_data.h>
 
 #include "lookup_list_model.h"
@@ -60,13 +61,15 @@ public:
     void exportEntries(const QSet<int>& selectedRows, QTextStream& outputCsv);
     bool updateHeaders(const QStringList& headers);
     bool validate();
+    Q_INVOKABLE void setFilter(const QString& searchText, int resultLimit);
 
 signals:
     void listModelChanged();
     void rowCountChanged();
 
 private:
-    QPointer<LookupListModel> m_data;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

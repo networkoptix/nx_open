@@ -34,6 +34,9 @@ public:
 
     void addOrUpdate(nx::vms::api::LookupListData list);
     void remove(const QnUuid& id);
+    QList<int> filter(const nx::vms::api::LookupListData& list,
+        const QString& filterText,
+        int resultLimit) const;
 
 signals:
     void initialized();
