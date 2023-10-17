@@ -27,7 +27,7 @@ MouseArea
         id: menuLoader
     }
 
-    onClicked:
+    onClicked: mouse =>
     {
         if (!menuLoader.item)
         {

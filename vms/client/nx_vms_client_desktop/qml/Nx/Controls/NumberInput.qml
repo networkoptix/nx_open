@@ -30,7 +30,8 @@ FocusScope
 
     function setValue(value)
     {
-        textField.value = value
+        if (textField.value !== value)
+            textField.value = value
     }
 
     function clear()
@@ -210,4 +211,12 @@ FocusScope
 
     Component.onCompleted: textField.updateValidator()
     onModeChanged: textField.updateValidator()
+
+    onActiveFocusChanged:
+    {
+        if (textField.activeFocus !== activeFocus)
+            textField.focus = activeFocus
+        if (!activeFocus)
+            editingFinished()
+    }
 }
