@@ -4,6 +4,7 @@
 
 #include <core/resource/abstract_storage_resource.h>
 #include <nx/utils/crypt/encryptable.h>
+#include <nx/vms/api/data/storage_archive_mode.h>
 #include <nx/vms/api/data/storage_flags.h>
 
 class QnAbstractMediaStreamDataProvider;
@@ -43,6 +44,9 @@ public:
 
     void setPersistentStatusFlags(nx::vms::api::StoragePersistentFlags flags);
     nx::vms::api::StoragePersistentFlags persistentStatusFlags() const;
+
+    void setStorageArchiveMode(nx::vms::api::StorageArchiveMode mode);
+    nx::vms::api::StorageArchiveMode storageArchiveMode() const;
 
     static QString urlToPath(const QString &url);
     static QString urlWithoutCredentials(const QString& url);
