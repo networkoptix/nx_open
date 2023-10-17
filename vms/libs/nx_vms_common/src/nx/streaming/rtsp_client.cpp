@@ -361,7 +361,7 @@ bool QnRtspClient::parseSDP(const QByteArray& response)
 
     // At this moment we do not support different transport for streams, so use first.
     if (m_sdp.media.size() > 0 && m_sdp.media[0].connectionAddress.isMulticast())
-        m_transport = nx::vms::api::RtpTransportType::multicast;
+        m_actualTransport = m_transport = nx::vms::api::RtpTransportType::multicast;
 
     for (const auto& media: m_sdp.media)
     {
