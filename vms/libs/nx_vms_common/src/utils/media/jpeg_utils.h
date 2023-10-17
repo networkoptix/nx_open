@@ -1,18 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-extern "C"
-{
+extern "C" {
 #include <libavutil/pixfmt.h>
 }
-
 
 #include <functional>
 
 #include <QtCore/QString>
 
-
-namespace nx_jpg
+namespace nx::media::jpeg
 {
+
     struct ImageInfo
     {
         int precision = -1;
@@ -39,7 +37,7 @@ namespace nx_jpg
         /*!
             \param markerLength Length of marker, including 2-byte marker length field, but not including entropy-coded data
             \param currentOffset Offset of start of marker (points to 0xff)
-            If handler returns \a false, parsing stops and \a JpegParser::parse returns \a nx_jpg::interrupted
+            If handler returns \a false, parsing stops and \a JpegParser::parse returns \a nx::media::jpeg::interrupted
         */
         typedef bool ParseHandlerFuncType( int, size_t, size_t );
         //!void( int error, size_t currentOffset )
@@ -90,4 +88,5 @@ namespace nx_jpg
         const quint8* data,
         size_t size,
         ImageInfo* const imgInfo);
-}
+
+} // namespace nx::media::jpeg

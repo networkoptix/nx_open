@@ -148,8 +148,8 @@ void QnFfmpegTranscoder::setFormatOption(const QString& option, const QString& v
 
 AVPixelFormat QnFfmpegTranscoder::getPixelFormatJpeg(const QnConstCompressedVideoDataPtr& video)
 {
-    nx_jpg::ImageInfo info;
-    if (!nx_jpg::readJpegImageInfo((const uint8_t*)video->data(), video->dataSize(), &info) ||
+    nx::media::jpeg::ImageInfo info;
+    if (!nx::media::jpeg::readJpegImageInfo((const uint8_t*)video->data(), video->dataSize(), &info) ||
         info.pixelFormat == AV_PIX_FMT_NONE)
     {
         NX_DEBUG(this, "Failed to parse MJPEG header");
