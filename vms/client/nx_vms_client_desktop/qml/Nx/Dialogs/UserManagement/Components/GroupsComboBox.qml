@@ -624,6 +624,8 @@ Control
                                 id: groupCheckbox
 
                                 checked: model.isParent
+                                onCheckedChanged: model.isParent = checked
+
                                 enabled: model.canEditMembers
 
                                 Layout.alignment: Qt.AlignBaseline
