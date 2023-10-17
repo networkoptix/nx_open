@@ -12,6 +12,8 @@
 const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 const qint64 QnStorageResource::kThirdPartyStorageLimit = 10LL * 1024 * 1024 * 1024; // 10 gb
 
+const auto kStorageArchiveModeDefaultValue = nx::vms::api::StorageArchiveMode::undefined;
+
 QnStorageResource::~QnStorageResource()
 {
 }
@@ -245,4 +247,20 @@ nx::vms::api::StoragePersistentFlags QnStorageResource::persistentStatusFlags() 
         return nx::vms::api::StoragePersistentFlags();
 
     return nx::reflect::fromString<nx::vms::api::StoragePersistentFlags>(resultStr.toStdString());
+}
+
+void QnStorageResource::setStorageArchiveMode(nx::vms::api::StorageArchiveMode value)
+{
+    setProperty(ResourcePropertyKey::Server::kOwnArchiveDirectoryOnly,
+        value == kStorageArchiveModeDefaultValue
+            ? QString()
+            : QString::fromStdString(nx::reflect::toString(value))
+    );
+}
+
+nx::vms::api::StorageArchiveMode QnStorageResource::storageArchiveMode() const
+{
+    return nx::reflect::fromString<nx::vms::api::StorageArchiveMode>(
+        getProperty(ResourcePropertyKey::Server::kOwnArchiveDirectoryOnly).toStdString(),
+        kStorageArchiveModeDefaultValue);
 }
