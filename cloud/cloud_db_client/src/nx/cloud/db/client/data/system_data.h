@@ -103,14 +103,12 @@ NX_REFLECTION_INSTRUMENT(MergeRequest, MergeRequest_Fields)
 
 NX_REFLECTION_INSTRUMENT_ENUM(SystemAccessRole,
     none,
-    disabled,
     custom,
     liveViewer,
     viewer,
     advancedViewer,
     localAdmin,
     cloudAdmin,
-    maintenance,
     owner,
     system
 )
