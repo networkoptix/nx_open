@@ -445,8 +445,8 @@ public:
     QString licenseServerUrl() const;
     void setLicenseServerUrl(const QString& value);
 
-    QString channelPartnerServerUrl() const;
-    void setChannelPartnerServerUrl(const QString& value);
+    nx::utils::Url channelPartnerServerUrl() const;
+    void setChannelPartnerServerUrl(const nx::utils::Url& value);
 
     nx::utils::Url resourceFileUri() const;
 
@@ -677,7 +677,7 @@ private:
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* m_metadataStorageChangePolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::map<QString, int>>* m_specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_licenseServerUrlAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_channelPartnerServerUrlAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::utils::Url>* m_channelPartnerServerUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<nx::utils::Url>* m_resourceFileUriAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudNotificationsLanguageAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_additionalLocalFsTypesAdaptor = nullptr;
