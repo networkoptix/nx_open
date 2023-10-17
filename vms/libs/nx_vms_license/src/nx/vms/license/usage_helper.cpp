@@ -740,7 +740,7 @@ VideoWallLicenseUsageProposer::~VideoWallLicenseUsageProposer()
 
 const QString ChannelPartnerServer::baseUrl(common::SystemContext* context)
 {
-    auto result = context->globalSettings()->channelPartnerServerUrl();
+    auto result = context->globalSettings()->channelPartnerServerUrl().toString();
     result = result.trimmed();
     while (result.endsWith('/'))
         result.chop(1);

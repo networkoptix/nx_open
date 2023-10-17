@@ -566,7 +566,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::licenseServer, "https://licensing.vmsproxy.com", this,
         [] { return tr("License server"); });
 
-    m_channelPartnerServerUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
+    m_channelPartnerServerUrlAdaptor = new QnLexicalResourcePropertyAdaptor<utils::Url>(
         Names::channelPartnerServer, "https://partners.test.hdw.mx", this,
         [] { return tr("Channel partners service"); });
 
@@ -1923,12 +1923,12 @@ QString SystemSettings::licenseServerUrl() const
     return m_licenseServerUrlAdaptor->value();
 }
 
-void SystemSettings::setChannelPartnerServerUrl(const QString& value)
+void SystemSettings::setChannelPartnerServerUrl(const nx::utils::Url& value)
 {
     m_channelPartnerServerUrlAdaptor->setValue(value);
 }
 
-QString SystemSettings::channelPartnerServerUrl() const
+nx::utils::Url SystemSettings::channelPartnerServerUrl() const
 {
     return m_channelPartnerServerUrlAdaptor->value();
 }
