@@ -4,10 +4,9 @@
 
 #include <QtGui/QPainter>
 
-#include <utils/common/event_processors.h>
-
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <utils/common/event_processors.h>
 
 using nx::vms::client::core::Geometry;
 
@@ -87,8 +86,14 @@ public:
                 /* Do some sensible addition to font weight: */
                 int weight = m_effectiveFont.weight() + static_cast<int>(
                     (QFont::Bold - QFont::Normal) * (factor - 1.0));
-                // Qt allows to set weight only in range [0..99]
-                weight = qBound(0, weight, 99);
+
+                // These have changed in the past so be careful.
+                static_assert(QFont::Thin == 100 && QFont::Normal == 400
+                    && QFont ::Bold == 700 && QFont::Black == 900);
+                constexpr int kMinQFontWeight = 1;
+                constexpr int kMaxQFontWeight = 1'000;
+
+                weight = qBound(kMinQFontWeight, weight, kMaxQFontWeight);
                 m_effectiveFont.setWeight((QFont::Weight) weight);
             }
         }
