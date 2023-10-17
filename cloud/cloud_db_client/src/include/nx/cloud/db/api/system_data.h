@@ -190,20 +190,18 @@ NX_REFLECTION_INSTRUMENT(SystemDataList, (systems))
 enum class SystemAccessRole
 {
     none = 0,
-    disabled,
-    custom,
-    liveViewer,
-    viewer,
-    advancedViewer,
-    localAdmin,
-    cloudAdmin,
-    maintenance,
-    owner,
+    custom = 2,
+    liveViewer = 3,
+    viewer = 4,
+    advancedViewer = 5,
+    localAdmin = 6,
+    cloudAdmin = 7,
+    owner = 9,
 
     /**%apidoc This special value is used when the system is being requested using the system
-     * credentials (likely, by a mediaserver).
+     * credentials (likely, by a VMS server).
      */
-    system,
+    system = 10,
 };
 
 struct SystemSharing
