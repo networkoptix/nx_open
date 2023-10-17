@@ -2,6 +2,10 @@
 
 #include "lookup_list_model.h"
 
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/lookup_lists/lookup_list_manager.h>
+
 namespace nx::vms::client::desktop {
 
 LookupListModel::LookupListModel(QObject* parent):
@@ -33,6 +37,12 @@ void LookupListModel::setAttributeNames(QList<QString> value)
     for (const auto& v: value)
         m_data.attributeNames.push_back(v);
     emit attributeNamesChanged();
+}
+
+QList<int> LookupListModel::setFilter(const QString& filterText, int resultLimit) const
+{
+    return appContext()->currentSystemContext()->lookupListManager()->filter(
+        m_data, filterText, resultLimit);
 }
 
 } // namespace nx::vms::client::desktop
