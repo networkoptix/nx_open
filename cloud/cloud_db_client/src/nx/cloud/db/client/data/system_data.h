@@ -208,4 +208,8 @@ NX_REFLECTION_INSTRUMENT(SystemOffer, (fromAccount)(toAccount)(systemId)(systemN
 
 NX_REFLECTION_INSTRUMENT(SystemOfferPatch, (comment)(status))
 
+//-------------------------------------------------------------------------------------------------
+
+NX_REFLECTION_INSTRUMENT(SystemCredentials, (id)(authKey))
+
 } // namespace nx::cloud::db::api

@@ -461,4 +461,12 @@ struct SystemOfferPatch
     std::optional<OfferStatus> status;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+struct SystemCredentials
+{
+    std::string id;
+    std::string authKey;
+};
+
 } // namespace nx::cloud::db::api
