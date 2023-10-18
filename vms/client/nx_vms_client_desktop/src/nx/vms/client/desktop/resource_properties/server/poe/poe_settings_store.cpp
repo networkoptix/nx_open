@@ -2,11 +2,11 @@
 
 #include "poe_settings_store.h"
 
-#include "poe_settings_reducer.h"
-
-#include <nx/vms/client/desktop/node_view/details/node_view_store.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
+#include <nx/vms/client/desktop/node_view/details/node_view_store.h>
 #include <nx/vms/client/desktop/node_view/node_view/node_view_state_reducer.h>
+
+#include "poe_settings_reducer.h"
 
 class QnResourcePool;
 
@@ -134,6 +134,17 @@ void PoeSettingsStore::applyUserChanges()
 {
     PoeSettingsStatePatch patch;
     patch.blockPatch = node_view::NodeViewStateReducer::applyUserChangesPatch(
+        d->blockStore->state());
+
+    d->applyPatch(patch);
+}
+
+void PoeSettingsStore::resetUserChanges()
+{
+    PoeSettingsStatePatch patch;
+    patch.hasChanges = false;
+
+    patch.blockPatch = node_view::NodeViewStateReducer::resetUserChangesPatch(
         d->blockStore->state());
 
     d->applyPatch(patch);

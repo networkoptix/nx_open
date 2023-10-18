@@ -148,6 +148,7 @@ void PoeSettingsWidget::applyChanges()
 void PoeSettingsWidget::discardChanges()
 {
     d->controller.cancelRequest();
+    d->store.resetUserChanges();
 }
 
 bool PoeSettingsWidget::isNetworkRequestRunning() const
