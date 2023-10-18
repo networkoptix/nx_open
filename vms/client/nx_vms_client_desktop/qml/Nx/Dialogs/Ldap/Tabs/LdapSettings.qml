@@ -802,6 +802,8 @@ Rectangle
         {
             spacing: 0
 
+            Layout.fillHeight: false
+
             DialogBanner
             {
                 visible: !control.continuousSyncEditable
