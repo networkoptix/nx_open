@@ -12,8 +12,17 @@
 
 namespace nx::vms::utils {
 
-static Mutex g_resourceMutex;
 static QSet<QString> g_registeredDirectories;
+
+/**
+ * Avoid creating the mutex until other code needs it to allow ini tweaks to modify its
+ * implementation.
+ */
+Mutex* resourceMutex()
+{
+    static Mutex mutex;
+    return &mutex;
+}
 
 QDir externalResourcesDirectory()
 {
@@ -34,7 +43,7 @@ QDir externalResourcesDirectory()
 
 bool registerExternalResource(const QString& filename, const QString& mapRoot)
 {
-    NX_MUTEX_LOCKER lock(&g_resourceMutex);
+    NX_MUTEX_LOCKER lock(resourceMutex());
     const auto filePath = externalResourcesDirectory().absoluteFilePath(filename);
     NX_ASSERT(QFileInfo::exists(filePath), "Missing resource file %1", filePath);
     return QResource::registerResource(filePath, mapRoot);
@@ -42,7 +51,7 @@ bool registerExternalResource(const QString& filename, const QString& mapRoot)
 
 bool unregisterExternalResource(const QString& filename, const QString& mapRoot)
 {
-    NX_MUTEX_LOCKER lock(&g_resourceMutex);
+    NX_MUTEX_LOCKER lock(resourceMutex());
     g_registeredDirectories.remove(filename);
     const auto filePath = externalResourcesDirectory().absoluteFilePath(filename);
     NX_ASSERT(QFileInfo::exists(filePath), "Missing resource file %1", filePath);
@@ -51,7 +60,7 @@ bool unregisterExternalResource(const QString& filename, const QString& mapRoot)
 
 bool registerExternalResourceDirectory(const QString& directory)
 {
-    NX_MUTEX_LOCKER lock(&g_resourceMutex);
+    NX_MUTEX_LOCKER lock(resourceMutex());
     if (g_registeredDirectories.contains(directory))
         return true;
     g_registeredDirectories.insert(directory);

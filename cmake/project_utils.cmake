@@ -3,6 +3,15 @@
 option(enablePrecompiledHeaders "Enable precompiled headers support" ON)
 mark_as_advanced(enablePrecompiledHeaders)
 
+if(LINUX)
+    option(withTcmalloc "Build C/C++ components with TCMalloc instead of default malloc" OFF)
+    mark_as_advanced(withTcmalloc)
+endif()
+
+if(withTcmalloc)
+    find_package(gperftools REQUIRED)
+endif()
+
 set(nx_enable_werror OFF)
 
 include(${PROJECT_SOURCE_DIR}/cmake/windows_signing.cmake)
@@ -202,6 +211,10 @@ function(nx_add_target name type)
     endif()
 
     target_include_directories(${name} PUBLIC ${source_dir})
+
+    if(withTcmalloc)
+        target_link_libraries(${name} PRIVATE gperftools::gperftools)
+    endif()
 
     if(NX_PUBLIC_LIBS)
         target_link_libraries(${name} PUBLIC ${NX_PUBLIC_LIBS})
