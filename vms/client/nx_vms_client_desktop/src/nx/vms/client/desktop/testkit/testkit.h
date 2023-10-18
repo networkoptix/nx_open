@@ -128,8 +128,8 @@ public:
     /** Returns visible element with the smallest size at specified screen coordinates. */
     Q_INVOKABLE QJSValue pick(int x, int y);
 
-    /** Registers TestKit related debug actions. */
-    static void registerAction();
+    /** Enables hightlight for UI elements under cursor. */
+    void setHighlightEnabled(bool enabled = true);
 
     /** A pointer to created TestKit instance. */
     static TestKit* instance();
