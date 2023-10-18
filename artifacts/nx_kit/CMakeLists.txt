@@ -71,7 +71,7 @@ target_compile_definitions(nx_kit
 if(MSVC)
     # This block covers not only Visual Studio compiler but also clang-cl, which expands /W4 to
     # the -Wall flag, while -Wall itself, if passed directly, will be expanded to -Weverything.
-    add_compile_options(/W4 /WX)
+    add_compile_options(/W4 /WX /utf-8)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-Wall -Wextra -Werror)
 endif()
