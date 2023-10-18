@@ -21,7 +21,6 @@
 #include <nx/utils/trace/trace.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/debug_utils/components/performance_info.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -35,6 +34,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
+#include <nx/vms/client/desktop/ui/scene/widgets/performance_info_widget.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <ui/animation/animator_group.h>
@@ -1636,21 +1636,21 @@ void WorkbenchUi::createDebugWidget()
 
 #pragma region FpsWidget
 
-bool WorkbenchUi::isFpsVisible() const
+bool WorkbenchUi::isPerformanceInfoVisible() const
 {
-    return m_fpsItem->isVisible();
+    return m_performanceInfoWidget->isVisible();
 }
 
-void WorkbenchUi::setFpsVisible(bool fpsVisible)
+void WorkbenchUi::setPerformanceInfoVisible(bool performanceInfoVisible)
 {
-    if (fpsVisible == isFpsVisible())
+    if (performanceInfoVisible == isPerformanceInfoVisible())
         return;
 
-    m_fpsItem->setVisible(fpsVisible);
-    m_fpsItem->setText(QString());
+    m_performanceInfoWidget->setVisible(performanceInfoVisible);
+    m_performanceInfoWidget->setText({});
 
-    action(action::ShowFpsAction)->setChecked(fpsVisible);
-    appContext()->performanceMonitor()->setVisible(fpsVisible);
+    action(action::ShowFpsAction)->setChecked(performanceInfoVisible);
+    appContext()->performanceMonitor()->setVisible(performanceInfoVisible);
 }
 
 void WorkbenchUi::setDebugInfoVisible(bool debugInfoVisible)
@@ -1669,44 +1669,30 @@ void WorkbenchUi::updateFpsGeometry()
         : QRectF();
 
     QPointF pos = QPointF(
-        right - m_fpsItem->size().width(),
+        right - m_performanceInfoWidget->size().width(),
         titleEffectiveGeometry.bottom());
 
-    if (qFuzzyEquals(pos, m_fpsItem->pos()))
+    if (qFuzzyEquals(pos, m_performanceInfoWidget->pos()))
         return;
 
-    m_fpsItem->setPos(pos);
+    m_performanceInfoWidget->setPos(pos);
 }
 
 void WorkbenchUi::createFpsWidget()
 {
-    m_fpsItem = new QnProxyLabel(m_controlsWidget);
-    m_fpsItem->setAcceptedMouseButtons(Qt::NoButton);
-    m_fpsItem->setAcceptHoverEvents(false);
-    m_fpsItem->setText(lit("...."));
-    m_fpsItem->setTextFormat(Qt::RichText);
-    m_fpsItem->setVisible(false); // Visibility is controlled via setFpsVisible() method.
-    updateFpsGeometry();
-    setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
-    setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
-    display()->setLayer(m_fpsItem, QnWorkbenchDisplay::MessageBoxLayer);
+    m_performanceInfoWidget = new PerformanceInfoWidget{m_controlsWidget, {}, appContext()->mainWindowContext()};
+    m_performanceInfoWidget->setText("....");
+    m_performanceInfoWidget->setVisible(false); // Visibility is controlled via setFpsVisible() method.
 
-    m_connections << connect(action(action::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setFpsVisible);
-    m_connections << connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
+    updateFpsGeometry();
+    setPaletteColor(m_performanceInfoWidget, QPalette::Window, Qt::transparent);
+    setPaletteColor(m_performanceInfoWidget, QPalette::WindowText, QColor(63, 159, 216));
+    display()->setLayer(m_performanceInfoWidget, QnWorkbenchDisplay::MessageBoxLayer);
+
+    m_connections << connect(action(action::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setPerformanceInfoVisible);
+    m_connections << connect(m_performanceInfoWidget, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
 
     setDebugInfoVisible(ini().developerMode);
-
-    const auto performanceInfo = new PerformanceInfo(m_fpsItem);
-
-    m_connections << connect(display()->beforePaintInstrument(), QnSignalingInstrumentActivated, performanceInfo,
-        &PerformanceInfo::registerFrame);
-
-    m_connections << connect(performanceInfo, &PerformanceInfo::textChanged, this,
-        [this](const QString& richText)
-        {
-            m_fpsItem->setText(richText);
-            m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
-        });
 }
 
 #pragma endregion Fps widget methods
