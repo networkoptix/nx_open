@@ -393,6 +393,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::ToggleInfoAction));
     addAction(action(action::FreespaceAction));
     addAction(action(action::ShowDebugOverlayAction));
+    addAction(action(action::DebugToggleElementHighlight));
 
     connect(action(action::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);

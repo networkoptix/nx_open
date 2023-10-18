@@ -1285,6 +1285,11 @@ enum IDType
     DebugDecrementCounterAction,
 
     /**
+     * Toggles element hightlighting for UI elements under cursor.
+     */
+    DebugToggleElementHighlight,
+
+    /**
      * Toggles `securityForPowerUsers` system flag; available only for Administrators.
      */
     DebugToggleSecurityForPowerUsersAction,

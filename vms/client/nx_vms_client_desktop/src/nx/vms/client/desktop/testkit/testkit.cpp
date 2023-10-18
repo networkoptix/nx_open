@@ -542,15 +542,10 @@ TestKit* TestKit::instance()
             engine->globalObject().property(testkit::TestKit::kName).toQObject());
 }
 
-void TestKit::registerAction()
+void TestKit::setHighlightEnabled(bool enabled)
 {
-    registerDebugAction(
-        "Toggle element highlight",
-        [](QnWorkbenchContext*)
-        {
-            if (auto testkit = instance())
-                testkit->m_highlighter->setEnabled(!testkit->m_highlighter->isEnabled());
-        });
+    if (auto testkit = instance())
+        testkit->m_highlighter->setEnabled(enabled);
 }
 
 void TestKit::ensureAsyncActionFinished()
