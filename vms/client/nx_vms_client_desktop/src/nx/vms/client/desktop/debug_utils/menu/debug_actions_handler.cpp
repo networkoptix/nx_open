@@ -163,7 +163,6 @@ DebugActionsHandler::DebugActionsHandler(WindowContext* windowContext, QObject *
     QmlTestDialog::registerAction();
     ResourcePoolDialog::registerAction();
     WebEngineDialog::registerAction();
-    testkit::TestKit::registerAction();
 
 #ifdef Q_OS_MAC
     if (ini().virtualJoystick)
@@ -172,6 +171,13 @@ DebugActionsHandler::DebugActionsHandler(WindowContext* windowContext, QObject *
     if (ini().joystickInvestigationWizard)
         JoystickInvestigationWizardDialog::registerAction();
 #endif
+
+    connect(action(menu::DebugToggleElementHighlight), &QAction::triggered, this,
+        [](bool checked)
+        {
+            if (auto testkit = testkit::TestKit::instance())
+                testkit->setHighlightEnabled(checked);
+        });
 
     connect(action(menu::DebugToggleSecurityForPowerUsersAction), &QAction::triggered,
         this, &DebugActionsHandler::enableSecurityForPowerUsers);

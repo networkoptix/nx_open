@@ -380,6 +380,7 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
     addAction(action(menu::ToggleInfoAction));
     addAction(action(menu::FreespaceAction));
     addAction(action(menu::ShowDebugOverlayAction));
+    addAction(action(menu::DebugToggleElementHighlight));
 
     connect(action(menu::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);
