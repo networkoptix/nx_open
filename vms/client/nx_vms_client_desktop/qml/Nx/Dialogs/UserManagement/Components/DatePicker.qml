@@ -63,6 +63,7 @@ RowLayout
 
         hoverEnabled: control.enabled
         enabled: !popup.opened
+        focusPolicy: Qt.NoFocus
 
         icon.source: "image://svg/skin/calendar/calendar.svg"
         icon.width: width
