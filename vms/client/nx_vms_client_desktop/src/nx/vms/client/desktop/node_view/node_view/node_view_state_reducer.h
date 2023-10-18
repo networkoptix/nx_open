@@ -32,6 +32,9 @@ public:
     static details::NodeViewStatePatch applyUserChangesPatch(
         const details::NodeViewState& state);
 
+    static details::NodeViewStatePatch resetUserChangesPatch(
+        const details::NodeViewState& state);
+
 private:
     NodeViewStateReducer() = default;
     ~NodeViewStateReducer() = default;

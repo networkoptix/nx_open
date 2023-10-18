@@ -46,6 +46,8 @@ public:
 
     void applyUserChanges();
 
+    void resetUserChanges();
+
 signals:
     void patchApplied(const PoeSettingsStatePatch& patch);
 
