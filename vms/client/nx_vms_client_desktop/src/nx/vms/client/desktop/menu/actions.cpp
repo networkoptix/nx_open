@@ -2251,6 +2251,12 @@ void initialize(Manager* manager, Action* root)
             .autoRepeat(true)
             .text("Decrement Debug Counter");
 
+        factory(DebugToggleElementHighlight)
+            .flags(GlobalHotkey | Main | DevMode)
+            .shortcut("Ctrl+Alt+I") //< Same as Dev Tools in Chromium.
+            .text("Toggle element highlight")
+            .checkable();
+
         factory(DebugToggleSecurityForPowerUsersAction)
             .flags(Main | DevMode)
             .text("Toggle Security for Power Users")
