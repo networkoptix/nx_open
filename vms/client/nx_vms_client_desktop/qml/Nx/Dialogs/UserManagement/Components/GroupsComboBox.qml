@@ -29,12 +29,15 @@ Control
     height: expandable && maxRows > 1 ? Math.max(groupFlow.height, kMinHeight) : groupFlow.maxHeight
 
     onEnabledChanged: popupObject.close()
+    onActiveFocusChanged: if (activeFocus) popupObject.close()
 
     focusPolicy: Qt.TabFocus
     Keys.onPressed: event =>
     {
         if (event.key === Qt.Key_Space)
             control.openPopup()
+        else if (event.key === Qt.Key_Tab)
+            control.nextItemInFocusChain().forceActiveFocus()
     }
 
     function highlightMatchingText(text)
@@ -277,6 +280,7 @@ Control
                         ImageButton
                         {
                             visible: model.canEditMembers && control.enabled
+                            focusPolicy: Qt.NoFocus
 
                             Layout.rightMargin: 4
                             Layout.alignment: Qt.AlignVCenter
@@ -357,11 +361,24 @@ Control
                     ? ColorTheme.colors.light10
                     : ColorTheme.colors.light13
 
+                KeyNavigation.backtab: control
+                KeyNavigation.tab: groupListView
+
+                Keys.onPressed: event =>
+                {
+                    if (event.key === Qt.Key_Tab)
+                    {
+                        if (groupListView.currentIndex == -1)
+                            groupListView.currentIndex = 0
+                    }
+                }
+
                 ImageButton
                 {
                     id: clearInput
 
                     visible: !!searchField.text
+                    focusPolicy: Qt.NoFocus
 
                     anchors
                     {
@@ -471,6 +488,9 @@ Control
                 scrollBar.width: 8
                 scrollBar.thumbColor: ColorTheme.colors.dark16
 
+                keyNavigationEnabled: true
+                keyNavigationWraps: true
+
                 model: allowedParents
 
                 section.property: "groupSection"
@@ -479,6 +499,22 @@ Control
 
                 delegate: Item
                 {
+                    id: itemControl
+
+                    Keys.onPressed: (event) =>
+                    {
+                        if (event.key === Qt.Key_Space)
+                        {
+                            model.isParent = !model.isParent
+                            event.accepted = true
+                        }
+                        else if (event.key === Qt.Key_Tab)
+                        {
+                            popupObject.close()
+                            control.nextItemInFocusChain().forceActiveFocus()
+                        }
+                    }
+
                     readonly property bool isSectionBorder:
                         ListView.previousSection != ListView.section && ListView.previousSection
 
@@ -522,7 +558,6 @@ Control
 
                     Rectangle
                     {
-
                         anchors
                         {
                             left: parent.left
@@ -533,8 +568,9 @@ Control
                         height: 28
 
                         color: groupMouseArea.containsMouse
-                            ? ColorTheme.colors.dark15
-                            : ColorTheme.colors.dark13
+                            || (groupListView.currentIndex == index && groupListView.activeFocus)
+                                ? ColorTheme.colors.dark15
+                                : ColorTheme.colors.dark13
 
                         RowLayout
                         {
@@ -594,6 +630,7 @@ Control
 
                                 Layout.alignment: Qt.AlignBaseline
 
+                                focusPolicy: Qt.NoFocus
                                 onVisualFocusChanged:
                                 {
                                     if (visualFocus)
