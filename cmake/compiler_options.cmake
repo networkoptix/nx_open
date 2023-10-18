@@ -418,7 +418,9 @@ if(NOT compilerMsvc)
         -Werror=conversion-null
     )
 
-    if(compilerGcc)
+    if(compilerMsvc)
+        add_compile_options(/utf-8)
+    elseif(compilerGcc)
         add_compile_options(
             -Wno-error=maybe-uninitialized
             -Wno-missing-field-initializers
