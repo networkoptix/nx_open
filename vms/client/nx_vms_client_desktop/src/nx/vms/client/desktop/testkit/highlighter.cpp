@@ -20,13 +20,55 @@ namespace {
 static constexpr auto kPickInterval = 300ms;
 static constexpr auto kHideTimeout = 2s;
 
-std::pair<QObject*, QScreen*> getTopLevelAt(QPoint globalPos)
+std::pair<QObject*, QScreen*> getTopLevelAt(QPoint globalPos, QWidget* skip)
 {
-    if (QWidget* widget = QApplication::topLevelAt(globalPos))
-        return {widget, widget->screen()};
+    const auto widgets = QApplication::topLevelWidgets();
 
-    if (QWindow* window = QGuiApplication::topLevelAt(globalPos))
-        return {window, window->screen()};
+    int minValue = std::numeric_limits<int>::max();
+    QWidget* minWidget = nullptr;
+
+    for (auto& widget: widgets)
+    {
+        if (widget == skip || !widget->isVisible() || !widget->window()->isActiveWindow())
+            continue;
+
+        const auto rect = nx::vms::client::desktop::testkit::utils::globalRect(
+            QVariant::fromValue(widget));
+
+        if (!rect.contains(globalPos))
+            continue;
+
+        const int newMinValue = rect.width() + rect.height();
+        if (newMinValue < minValue)
+        {
+            minValue = newMinValue;
+            minWidget = widget;
+        }
+    }
+
+    if (minWidget)
+        return {minWidget, minWidget->screen()};
+
+    minValue = std::numeric_limits<int>::max();
+    QWindow* minWindow = nullptr;
+
+    const auto windows = QGuiApplication::topLevelWindows();
+    for (auto& window: windows)
+    {
+        if (!window->isVisible() || !window->isActive())
+            continue;
+
+        const auto rect = window->geometry();
+        if (rect.contains(globalPos))
+        {
+            const int newMinValue = rect.size().width() + rect.size().height();
+            if (newMinValue < minValue)
+                minWindow = window;
+        }
+    }
+
+    if (minWindow)
+        return {minWindow, minWindow->screen()};
 
     return {nullptr, nullptr};
 }
@@ -106,7 +148,7 @@ bool Highlighter::isEnabled() const
 
 QVariant Highlighter::pick(QPoint globalPos) const
 {
-    auto [topLevel, screen] = getTopLevelAt(globalPos);
+    auto [topLevel, screen] = getTopLevelAt(globalPos, m_overlay.get());
     if (!topLevel)
         return {};
 
@@ -132,7 +174,8 @@ QVariant Highlighter::pick(QPoint globalPos) const
 
             if (globalRect.contains(globalPos) && globalRect.width() > 0 && globalRect.height() > 0)
             {
-                if (object->property("visible").toBool())
+                // QQuickWindow may be offscreen and thus invisible.
+                if (object->property("visible").toBool() || qobject_cast<QQuickWindow*>(object))
                 {
                     const int newMinValue = globalRect.width() + globalRect.height();
                     if (newMinValue < minValue)
