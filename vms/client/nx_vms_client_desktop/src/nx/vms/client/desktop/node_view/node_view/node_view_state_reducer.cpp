@@ -3,13 +3,53 @@
 #include "node_view_state_reducer.h"
 
 #include "../details/node/view_node.h"
-#include "../details/node/view_node_helper.h"
 #include "../details/node/view_node_data_builder.h"
+#include "../details/node/view_node_helper.h"
 
-namespace nx::vms::client::desktop {
-namespace node_view {
+namespace nx::vms::client::desktop::node_view {
 
 using namespace details;
+
+namespace {
+
+const auto kUserCheckStateRole = ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole);
+
+NodeViewStatePatch makeUserChangesPatch(const details::NodeViewState& state, bool applyUserChanges)
+{
+    NodeViewStatePatch result;
+
+    ViewNodeHelper::ViewNodeHelper::forEachNode(state.rootNode,
+        [&result, applyUserChanges](const NodePtr& node)
+        {
+            const auto& data = node->data();
+            for (const int column: data.usedColumns())
+            {
+                if (!data.hasData(column, ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole)))
+                    continue;
+
+                const auto& path = node->path();
+                result.addRemoveDataStep(path, {{column, {kUserCheckStateRole}}});
+
+                if (!applyUserChanges)
+                    continue;
+
+                const auto& data = node->data();
+                const auto userState = ViewNodeHelper(data).userCheckedState(column);
+                const auto currentState = ViewNodeHelper(data).checkedState(column);
+                if (userState == currentState)
+                    continue;
+
+                const auto updateCheckedData = ViewNodeDataBuilder()
+                    .withCheckedState(column, userState).data();
+
+                result.addUpdateDataStep(path, updateCheckedData);
+            }
+        });
+
+    return result;
+}
+
+} // namespace
 
 details::NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const details::NodePtr& node,
@@ -70,37 +110,13 @@ NodeViewStatePatch NodeViewStateReducer::setNodeExpandedPatch(
 details::NodeViewStatePatch NodeViewStateReducer::applyUserChangesPatch(
     const details::NodeViewState& state)
 {
-    static const auto kUserCheckStateRole = ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole);
-
-    NodeViewStatePatch result;
-
-    ViewNodeHelper::ViewNodeHelper::forEachNode(state.rootNode,
-        [&result](const NodePtr& node)
-        {
-            const auto& data = node->data();
-            for (const int column: data.usedColumns())
-            {
-                if (!data.hasData(column, ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole)))
-                    continue;
-
-                const auto& path = node->path();
-                result.addRemoveDataStep(path, {{column, {kUserCheckStateRole}}});
-
-                const auto& data = node->data();
-                const auto userState = ViewNodeHelper(data).userCheckedState(column);
-                const auto currentState = ViewNodeHelper(data).checkedState(column);
-                if (userState == currentState)
-                    continue;
-
-                const auto updateCheckedData = ViewNodeDataBuilder()
-                    .withCheckedState(column, userState).data();
-
-                result.addUpdateDataStep(path, updateCheckedData);
-            }
-        });
-
-    return result;
+    return makeUserChangesPatch(state, /*applyUserChanges*/ true);
 }
 
-} // namespace node_view
-} // namespace nx::vms::client::desktop
+details::NodeViewStatePatch NodeViewStateReducer::resetUserChangesPatch(
+    const details::NodeViewState& state)
+{
+    return makeUserChangesPatch(state, /*applyUserChanges*/ false);
+}
+
+} // namespace nx::vms::client::desktop::node_view
