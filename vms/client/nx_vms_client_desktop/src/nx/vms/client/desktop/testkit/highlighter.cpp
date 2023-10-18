@@ -11,6 +11,7 @@
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <client_core/client_core_module.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/testkit/utils.h>
 
 using namespace std::chrono;
@@ -82,7 +83,7 @@ class FullScreenOverlay: public QQuickWidget
     using base_type = QQuickWidget;
 
 public:
-    FullScreenOverlay()
+    FullScreenOverlay(QQmlEngine* engine, QWidget* parent = nullptr): base_type(engine, parent)
     {
         const Qt::WindowFlags kExtraFlags(
             Qt::ToolTip
@@ -235,8 +236,8 @@ void Highlighter::highlight(QVariant data, std::chrono::milliseconds hideTimeout
 
     if (!m_overlay)
     {
-        m_overlay = std::make_unique<FullScreenOverlay>();
-        m_overlay->setSource(QUrl("qrc:/qml/Nx/Debug/HighlighterOverlay.qml"));
+        m_overlay = std::make_unique<FullScreenOverlay>(appContext()->qmlEngine());
+        m_overlay->setSource(QUrl("Nx/Debug/HighlighterOverlay.qml"));
         m_overlay->setResizeMode(QQuickWidget::SizeRootObjectToView);
     }
 
