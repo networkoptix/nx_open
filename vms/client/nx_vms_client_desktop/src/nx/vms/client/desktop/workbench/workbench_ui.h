@@ -28,10 +28,11 @@ struct QnPaneSettings;
 namespace nx::vms::client::desktop {
 
 class AbstractWorkbenchPanel;
+class CalendarWorkbenchPanel;
 class DebugInfoInstrument;
 class NotificationsWorkbenchPanel;
+class PerformanceInfoWidget;
 class TimelineWorkbenchPanel;
-class CalendarWorkbenchPanel;
 class TitleWorkbenchPanel;
 
 namespace ui::workbench { class SpecialLayoutPanel; }
@@ -81,7 +82,7 @@ public:
 
     void setFlags(Flags flags);
 
-    bool isFpsVisible() const;
+    bool isPerformanceInfoVisible() const;
 
     /** Whether the Left-side Panel is opened */
     bool isLeftPanelOpened() const;
@@ -118,7 +119,7 @@ public:
     void setTitleUsed(bool titleUsed = true);
 
 private:
-    void setFpsVisible(bool fpsVisible = true);
+    void setPerformanceInfoVisible(bool performanceInfoVisible = true);
     void setDebugInfoVisible(bool debugInfoVisible = true);
 
     void setLeftPanelVisible(bool visible = true, bool animate = true);
@@ -226,7 +227,7 @@ private:
 
     bool m_inactive = false;
 
-    QPointer<QnProxyLabel> m_fpsItem;
+    QPointer<PerformanceInfoWidget> m_performanceInfoWidget;
     QPointer<QnDebugProxyLabel> m_debugOverlayLabel;
 
     /* In freespace mode? */
