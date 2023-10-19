@@ -21,6 +21,7 @@
 #include <nx/utils/std_helpers.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -594,12 +595,16 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
     if (isActionUsingSourceCamera())
         return qnResIconCache->icon(QnResourceIconCache::Camera);
 
+    static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
+        colorSubs = {
+            {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
+
     switch (m_actionType)
     {
         case vms::event::ActionType::sendMailAction:
         {
             if (!isValid(Column::target))
-                return qnSkin->icon("tree/user_alert.svg");
+                return qnSkin->icon("tree/user_alert.svg", colorSubs);
             return qnResIconCache->icon(QnResourceIconCache::Users);
         }
 
@@ -610,7 +615,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             if (m_actionParams.allUsers)
                 return qnResIconCache->icon(QnResourceIconCache::Users);
             if (!isValid(Column::target))
-                return qnSkin->icon("tree/user_alert.svg");
+                return qnSkin->icon("tree/user_alert.svg", colorSubs);
 
             QnUserResourceList users;
             QList<QnUuid> groupIds;
