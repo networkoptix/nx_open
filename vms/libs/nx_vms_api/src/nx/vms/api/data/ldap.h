@@ -90,8 +90,11 @@ struct NX_VMS_API LdapSettings
     /**%apidoc[opt] */
     std::chrono::milliseconds passwordExpirationPeriodMs = 5min;
 
-    /**%apidoc[opt] */
+    /**%apidoc[opt] Timeout for LDAP syncs. */
     std::chrono::seconds searchTimeoutS = 1min;
+
+    /**%apidoc[opt] Timeout for LDAP search responses. */
+    std::chrono::seconds responseTimeoutS = 30s;
 
     /**%apidoc[opt] */
     int searchPageSize = kLdapDefaultSearchPageSize;
@@ -164,6 +167,7 @@ struct NX_VMS_API LdapSettings
     (memberAttribute) \
     (passwordExpirationPeriodMs) \
     (searchTimeoutS) \
+    (responseTimeoutS) \
     (searchPageSize) \
     (filters) \
     (continuousSync) \
