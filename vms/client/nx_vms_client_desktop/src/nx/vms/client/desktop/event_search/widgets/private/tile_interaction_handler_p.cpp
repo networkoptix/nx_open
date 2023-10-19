@@ -13,6 +13,8 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollArea>
 
+#include <chrono>
+
 #include <analytics/db/analytics_db_types.h>
 #include <api/model/analytics_actions.h>
 #include <api/server_rest_connection.h>
@@ -34,6 +36,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
@@ -649,7 +652,20 @@ void TileInteractionHandler::showContextMenu(
         const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
             .filtered(&QnResourceAccessFilter::isOpenableInLayout);
 
-        if (!resourceList.empty())
+        Qn::Permissions requiredPermissions = Qn::ViewLivePermission;
+        const auto timestamp = index.data(Qn::TimestampRole);
+        if (timestamp.isValid())
+        {
+            const auto timeUs = timestamp.value<microseconds>().count();
+            if (timeUs >= 0 && timeUs != DATETIME_NOW)
+                requiredPermissions = Qn::ViewFootagePermission;
+        }
+        if (!resourceList.empty() && std::any_of(resourceList.cbegin(), resourceList.cend(),
+            [requiredPermissions, accessController = system()->accessController()]
+            (const auto& resource)
+            {
+                return accessController->hasPermissions(resource, requiredPermissions);
+            }))
         {
             const auto openAction = new QAction(tr("Open"), menu.get());
             connect(openAction, &QAction::triggered, this,

@@ -1006,12 +1006,12 @@ void initialize(Manager* manager, Action* root)
     factory(CopyBookmarkTextAction)
         .flags(Slider | SingleTarget | WidgetTarget | ResourceTarget)
         .text(ContextMenu::tr("Copy Bookmark Text"))
-        .condition(condition::canExportBookmark());
+        .condition(condition::canCopyBookmarkToClipboard());
 
     factory(CopyBookmarksTextAction)
-        .flags(NoTarget | ResourceTarget)
+        .flags(MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Copy Bookmarks Text"))
-        .condition(condition::canExportBookmarks());
+        .condition(condition::canCopyBookmarksToClipboard());
 
     factory()
         .flags(Slider)
