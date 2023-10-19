@@ -155,9 +155,14 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
 {
     QString urlString = normalizePath(path);
 
+    if (urlString.indexOf("://") == -1)
+    {
+        // The normalizePath() method removes all the preceding slashes which is critical for
+        // the network storage which URL starts with '//'. It is important to recover url here.
+        urlString = QString{"smb://%1"}.arg(urlString);
+    }
+
     QUrl url{urlString};
-    if (url.scheme().isEmpty())
-        url.setScheme("smb");
 
     if (!login.isEmpty())
         url.setUserName(login);
