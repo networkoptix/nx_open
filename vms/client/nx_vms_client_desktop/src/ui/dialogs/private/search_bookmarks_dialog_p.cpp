@@ -300,6 +300,7 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(action::Parameters &pa
     }
 
     QnCameraBookmarkList bookmarks;
+    QnResourceList resourcesList;
     QSet<QnUuid> bookmarkIds;   /*< Make sure we will have no duplicates in all cases. */
     for (const QModelIndex &index: selection)
     {
@@ -311,10 +312,13 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(action::Parameters &pa
 
         if (bookmarkIds.contains(bookmark.guid))
             continue;
-        bookmarkIds << bookmark.guid;
 
+        bookmarkIds << bookmark.guid;
         bookmarks << bookmark;
+        if (auto camera = availableCameraById(bookmark.cameraId))
+            resourcesList << camera;
     }
+    params.setResources(resourcesList);
     if (bookmarks.isEmpty())
         return false;
     else
@@ -329,11 +333,6 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(action::Parameters &pa
         return true;
 
     params.setArgument(Qn::CameraBookmarkRole, currentBookmark);
-
-    auto camera = availableCameraById(currentBookmark.cameraId);
-    if (camera)
-        params.setResources(QnResourceList() << camera);
-
     window = QnTimePeriod(currentBookmark.startTimeMs, currentBookmark.durationMs);
     params.setArgument(Qn::TimePeriodRole, window);
     params.setArgument(Qn::ItemTimeRole, window.startTimeMs);
@@ -388,8 +387,9 @@ QnVirtualCameraResourceList QnSearchBookmarksDialogPrivate::availableCameras() c
     return resourcePool()->getAllCameras(QnResourcePtr(), true).filtered(
         [this](const QnVirtualCameraResourcePtr& camera)
         {
-            return systemContext()->accessController()->hasPermissions(camera,
-                Qn::ViewContentPermission);
+            const auto& accessController = systemContext()->accessController();
+            return accessController->hasPermissions(camera, Qn::ViewContentPermission)
+                || accessController->hasPermissions(camera, Qn::ViewBookmarksPermission);
         }
     );
 }
