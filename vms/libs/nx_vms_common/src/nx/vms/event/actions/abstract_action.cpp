@@ -4,10 +4,10 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <nx/vms/event/strings_helper.h>
-#include <nx/fusion/model_functions.h>
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/camera_resource.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/event/strings_helper.h>
 
 namespace nx::vms::event {
 
@@ -404,6 +404,11 @@ QString AbstractAction::getExternalUniqKey() const
 void AbstractAction::assign(const AbstractAction& other)
 {
     (*this) = other;
+}
+
+QString ActionData::toString() const
+{
+    return QJson::serialized(*this);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ActionData, (ubjson)(json)(xml)(csv_record), ActionData_Fields)
