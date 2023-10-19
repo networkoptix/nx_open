@@ -79,6 +79,8 @@ struct NX_VMS_COMMON_API ActionData
      */
     int flags;
     QString compareString; //< TODO: This string is used on a client side for internal purpose. Need to move it to separate class.
+
+    QString toString() const;
 };
 
 #define ActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)
