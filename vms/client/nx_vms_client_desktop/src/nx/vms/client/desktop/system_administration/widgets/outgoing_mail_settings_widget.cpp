@@ -107,6 +107,8 @@ public:
 
     bool validate() const;
 
+    void applyChanges();
+
 private:
     OutgoingMailSettingsWidget* const q;
 
@@ -708,6 +710,19 @@ bool OutgoingMailSettingsWidget::Private::validate() const
     return ui->emailInput->isValid() && ui->userInput->isValid() && ui->passwordInput->isValid();
 }
 
+void OutgoingMailSettingsWidget::Private::applyChanges()
+{
+    // Notify user about incorrect filling but allow him to apply changes when "Apply" button is pressed.
+    validate();
+
+    if (q->isReadOnly())
+        return;
+
+    fillEmailSettingsFromDialog();
+
+    m_passwordChanged = false;
+}
+
 //-------------------------------------------------------------------------------------------------
 // OutgoingMailSettingsWidget definition.
 
@@ -732,13 +747,7 @@ void OutgoingMailSettingsWidget::loadDataToUi()
 
 void OutgoingMailSettingsWidget::applyChanges()
 {
-    // Notify user about incorrect filling but allow him to apply changes when "Apply" button is pressed.
-    d->validate();
-
-    if (isReadOnly())
-        return;
-
-    d->fillEmailSettingsFromDialog();
+    d->applyChanges();
 }
 
 bool OutgoingMailSettingsWidget::hasChanges() const
