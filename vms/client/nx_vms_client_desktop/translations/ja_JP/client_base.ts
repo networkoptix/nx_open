@@ -525,27 +525,27 @@
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation>デバイス障害確認...</translation>
+      <translation>デバイス障害を確認...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation>デバイス障害確認...</translation>
+      <translation>デバイス障害を確認...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation>カメラ障害確認...</translation>
+      <translation>カメラ障害を確認...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation>カメラ障害確認...</translation>
+      <translation>カメラ障害を確認...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation>I/Oモジュール障害確認...</translation>
+      <translation>I/Oモジュール障害を確認...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation>I/Oモジュール障害確認...</translation>
+      <translation>I/Oモジュール障害を確認...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
@@ -5596,7 +5596,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation>システムストレージが分析データ用に使用されます</translation>
+      <translation>システムストレージが分析データ用に使用されています</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>

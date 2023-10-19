@@ -1463,7 +1463,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>Okres ścieżki audytu (dni, 14–730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1487,11 +1487,11 @@
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>Włącz powiadomienia o aktualizacji</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>Włącz mapowanie portów UPNP</translation>
     </message>
     <message>
       <source>Backup settings</source>
@@ -1499,11 +1499,11 @@
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
+      <translation>Zastąpienie hosta chmury</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>Włącz RTSP dla Arecont</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
@@ -1527,11 +1527,11 @@
     </message>
     <message>
       <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
+      <translation>Liczba powtórzeń RTP</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>Limit czasu na połączenie RTSP (sekundy)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
@@ -1732,11 +1732,11 @@
     <message>
       <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (unsecure)</translation>
+      <translation>Włącz przestarzałe funkcje API aktualnie używane przez oprogramowanie %1 (niezabezpieczone)</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
+      <translation>Rozdzielona średnikami lista serwerów przeznaczonych do połączenia z chmurą. Serwery znajdujące się na górze listy mają wyższy priorytet. Jeśli lista jest pusta, serwer dla połączenia w chmurze jest wybierany automatycznie.</translation>
     </message>
   </context>
   <context>
