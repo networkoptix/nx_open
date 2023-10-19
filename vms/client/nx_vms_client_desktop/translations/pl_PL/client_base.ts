@@ -1037,7 +1037,7 @@
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>Instrukcja obsługi...</translation>
     </message>
   </context>
   <context>
@@ -8426,7 +8426,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>None of your Servers has connection to %1.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">None of your Servers has connection to %1.</translation>
+      <translation>Żaden z Twoich serwerów nie ma połączenia z %1.</translation>
     </message>
   </context>
   <context>
@@ -8509,7 +8509,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Recording will not be enabled on some cameras.</source>
-      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
+      <translation>Nie można włączyć nagrywania niektórych kamer.</translation>
     </message>
   </context>
   <context>
