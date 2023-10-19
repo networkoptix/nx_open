@@ -199,7 +199,7 @@ DialogWithState
 
         DialogBanner
         {
-            style: DialogBanner.Style.Error
+            style: DialogBanner.Style.Warning
             width: banners.width
             visible: dialog.userIsNotRegisteredInCloud
 
