@@ -112,6 +112,8 @@ CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& descri
     init(description);
 
     d->buttonsHorizontalLayout = new QHBoxLayout;
+    d->buttonsHorizontalLayout->setSpacing(style::Metrics::kStandardPadding);
+    d->buttonsHorizontalLayout->addStretch();
     verticalLayout()->addLayout(d->buttonsHorizontalLayout);
 }
 
@@ -192,25 +194,9 @@ void CommonMessageBar::init(const BarDescription& barDescription)
     d->icon->setIcon(icon);
 
     setOpenExternalLinks(barDescription.isOpenExternalLinks);
-
     d->isEnabledProperty = barDescription.isEnabledProperty;
 
     setText(barDescription.text);
-
-    if (barDescription.isMultiLine)
-    {
-        d->label->setAutoFillBackground(true);
-        d->label->setContentsMargins(style::Metrics::kDefaultTopLevelMargin,
-            style::Metrics::kStandardPadding,
-            style::Metrics::kDefaultTopLevelMargin,
-            style::Metrics::kStandardPadding);
-    }
-
-    for (const auto& row: barDescription.additionalRows)
-    {
-        verticalLayout()->addLayout(row);
-    }
-
     updateVisibility();
 }
 
@@ -228,8 +214,8 @@ void CommonMessageBar::addButton(QPushButton* button)
     button->setFlat(true);
     setTextButtonWithBackgroundStyle(button);
 
-    d->buttonsHorizontalLayout->addWidget(button, 1);
-    d->buttonsHorizontalLayout->setAlignment(button, Qt::AlignLeft | Qt::AlignVCenter);
+    // Layout's last element is a Stretch that's added in the constructor.
+    d->buttonsHorizontalLayout->insertWidget(d->buttonsHorizontalLayout->count() - 1, button);
 }
 
 } // namespace nx::vms::client::desktop
