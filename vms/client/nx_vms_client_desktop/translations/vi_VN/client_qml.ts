@@ -537,7 +537,7 @@
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>Để cho phép người dùng LDAP đăng nhập vào %1, cần thiết lập kết nối giữa %1 và máy chủ LDAP của công ty.</translation>
     </message>
   </context>
   <context>
@@ -597,11 +597,11 @@
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Cài đặt danh sách</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Danh sách mới</translation>
     </message>
     <message>
       <source>Name</source>
@@ -609,7 +609,7 @@
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Tên Cột</translation>
     </message>
     <message>
       <source>OK</source>
@@ -700,7 +700,7 @@
     <name>FilterDialog</name>
     <message>
       <source>Edit Filter</source>
-      <translation type="unfinished">Edit Filter</translation>
+      <translation>Chỉnh sửa bộ lọc</translation>
     </message>
     <message>
       <source>Name</source>
@@ -708,11 +708,11 @@
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>DN cơ sở</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>DN cơ sở không được để trống</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -720,11 +720,11 @@
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>DN cơ sở đặt điểm bắt đầu cho tìm kiếm và đồng bộ hóa LDAP.</translation>
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Bộ lọc giúp kiểm soát quyền truy cập vào hệ thống và đồng bộ hóa bằng cách chỉ định người dùng và/hoặc nhóm nào từ Base DN được phép.</translation>
     </message>
   </context>
   <context>
@@ -821,7 +821,7 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>On system level user has permissions to:</source>
-      <translation type="unfinished">On system level user has permissions to:</translation>
+      <translation>Ở cấp độ hệ thống, người dùng có quyền:</translation>
     </message>
   </context>
   <context>
@@ -844,11 +844,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Quyền toàn cầu</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Thành Viên</translation>
     </message>
     <message>
       <source>Add Group</source>
@@ -878,7 +878,7 @@
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Nhóm - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -894,11 +894,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Quyền toàn cầu</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Thành Viên</translation>
     </message>
   </context>
   <context>
@@ -921,7 +921,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Thành Viên</translation>
     </message>
     <message>
       <source>Users</source>
@@ -933,7 +933,7 @@
     </message>
     <message>
       <source>When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Khi Đồng bộ hóa liên tục bị tắt, các nhóm sẽ không tự động đồng bộ hóa. Để cập nhật nhóm này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
     </message>
   </context>
   <context>
@@ -948,19 +948,19 @@
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Không thành viên</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Sử dụng các điều khiển ở bên trái để thêm thành viên</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Tóm tắt thành viên</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Kế thừa thành viên trong nhóm hiện tại</translation>
     </message>
   </context>
   <context>
@@ -979,7 +979,7 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Không có nhóm</translation>
     </message>
   </context>
   <context>
@@ -994,7 +994,7 @@
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Nhập từ thiết bị</translation>
     </message>
   </context>
   <context>
@@ -1019,7 +1019,7 @@
     <name>InsecureWarning</name>
     <message>
       <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation type="unfinished">Account security is important. Do not enable this setting unless you have good reasons to do so.</translation>
+      <translation>Bảo mật tài khoản là quan trọng. Không bật cài đặt này trừ khi bạn có lý do chính đáng để làm như vậy.</translation>
     </message>
   </context>
   <context>
@@ -1038,13 +1038,13 @@
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Dịch vụ không đầy đủ</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration service is required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>%n dịch vụ tích hợp phù hợp là cần thiết để bật tích hợp</numerusform>
       </translation>
     </message>
     <message>
@@ -1052,17 +1052,17 @@
                 services. Please disable integration for some cameras or add more suitable services.
                 Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</translation>
+      <translation>Có nhiều camera sử dụng tích hợp này hơn
+                dịch vụ hiện có. Vui lòng tắt tích hợp cho một số camera hoặc thêm các dịch vụ phù hợp hơn.
+                Nếu không, nó sẽ được thực hiện tự động vào %1</translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 dịch vụ phù hợp có sẵn</translation>
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Dịch vụ yêu cầu</translation>
     </message>
   </context>
   <context>
@@ -1085,7 +1085,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Mức sử dụng</translation>
     </message>
   </context>
   <context>
@@ -1187,11 +1187,11 @@
     <name>LdapSettings</name>
     <message>
       <source>LDAP is not configured yet</source>
-      <translation type="unfinished">LDAP is not configured yet</translation>
+      <translation>LDAP chưa được định cấu hình</translation>
     </message>
     <message>
       <source>Connect your System to a LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to a LDAP server for easier user management</translation>
+      <translation>Kết nối Hệ thống của bạn với máy chủ LDAP để quản lý người dùng dễ dàng hơn</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -1199,7 +1199,7 @@
     </message>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>TRỰC TUYẾN</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1215,7 +1215,7 @@
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Đồng bộ hoá lần cuối</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1223,7 +1223,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Cài đặt Nâng cao</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1231,15 +1231,15 @@
     </message>
     <message>
       <source>Continuous User Import</source>
-      <translation type="unfinished">Continuous User Import</translation>
+      <translation>Nhập người dùng liên tục</translation>
     </message>
     <message>
       <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
-      <translation type="unfinished">LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</translation>
+      <translation>Người dùng LDAP chưa từng đăng nhập vào hệ thống sẽ không được hiển thị trong danh sách người dùng. Sử dụng các nhóm để định cấu hình quyền cho những người dùng đó.</translation>
     </message>
     <message>
       <source>Filters</source>
-      <translation type="unfinished">Filters</translation>
+      <translation>Bộ lọc</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1247,7 +1247,7 @@
     </message>
     <message>
       <source>Add Filter</source>
-      <translation type="unfinished">Add Filter</translation>
+      <translation>Thêm bộ lọc</translation>
     </message>
     <message>
       <source>No filters</source>
@@ -1255,23 +1255,23 @@
     </message>
     <message>
       <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
-      <translation type="unfinished">VMS imports and synchronizes users and groups with LDAP server in real time</translation>
+      <translation>VMS nhập và đồng bộ hóa người dùng và nhóm với máy chủ LDAP theo thời gian thực</translation>
     </message>
     <message>
       <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
-      <translation type="unfinished">VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</translation>
+      <translation>VMS đồng bộ người dùng với máy chủ LDAP khi họ đăng nhập vào hệ thống. Các nhóm được đồng bộ hóa trong thời gian thực.</translation>
     </message>
     <message>
       <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</translation>
+      <translation>Nhập liên tục từ LDAP bị vô hiệu hóa đối với hệ thống này. Việc cập nhật các nhóm và tư cách thành viên của người dùng cũng như của nhóm sẽ chỉ diễn ra thông qua đồng bộ hóa thủ công.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Không có người dùng hoặc nhóm nào phù hợp với cài đặt đồng bộ hóa và được thêm vào cơ sở dữ liệu hệ thống. Đảm bảo các tham số và bộ lọc của máy chủ LDAP được định cấu hình chính xác.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>Vui lòng cẩn thận khi thay đổi cài đặt LDAP. Cấu hình không chính xác có thể làm gián đoạn tính khả dụng của hệ thống đối với một số lượng lớn người dùng cùng một lúc.</translation>
     </message>
   </context>
   <context>
@@ -1364,7 +1364,7 @@
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Bất kỳ %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1379,14 +1379,14 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>BẤT KỲ</translation>
     </message>
   </context>
   <context>
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Danh sách tra cứu</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1402,7 +1402,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Tạo mới...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1424,11 +1424,11 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Liên Kết Mới - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Liên kết trước đó sẽ bị vô hiệu khi liên kết mới được phát hành</translation>
     </message>
     <message>
       <source>Create</source>

@@ -5245,7 +5245,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Dịch vụ</translation>
     </message>
   </context>
   <context>
@@ -5390,23 +5390,23 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Local recording services overused</source>
-      <translation type="unfinished">Local recording services overused</translation>
+      <translation>Dịch vụ ghi cục bộ bị lạm dụng quá mức</translation>
     </message>
     <message>
       <source>Cloud storage services overused</source>
-      <translation type="unfinished">Cloud storage services overused</translation>
+      <translation>Dịch vụ lưu trữ đám mây bị lạm dụng quá mức</translation>
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation type="unfinished">Paid integrations services overused</translation>
+      <translation>Dịch vụ tích hợp trả phí bị sử dụng quá mức</translation>
     </message>
     <message>
       <source>System suspended</source>
-      <translation type="unfinished">System suspended</translation>
+      <translation>Hệ thống bị đình chỉ</translation>
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Hệ thống tắt</translation>
     </message>
   </context>
   <context>
@@ -5512,11 +5512,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Mật khẩu không được để trống</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
-      <translation type="unfinished">Avoid leading and trailing spaces</translation>
+      <translation>Tránh khoảng trống ở đầu và cuối</translation>
     </message>
   </context>
   <context>
@@ -5851,7 +5851,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>To add Video Wall, SaaS should be in active state. %1</source>
-      <translation type="unfinished">To add Video Wall, SaaS should be in active state. %1</translation>
+      <translation>Để thêm Tường Video, SaaS phải ở trạng thái hoạt động. %1</translation>
     </message>
   </context>
   <context>
@@ -6223,13 +6223,13 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Xóa bố cục?</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      <translation>
+        <numerusform>%n bố cục được chia sẻ với những người dùng khác nên chúng cũng sẽ bị xóa trong tài khoản của họ.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6685,11 +6685,11 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Edit Camera Settings.</source>
-      <translation type="unfinished">Edit Camera Settings.</translation>
+      <translation>Điều chỉnh cài đặt camera.</translation>
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+      <translation>Tùy thuộc vào loại tài nguyên, sẽ cho phép người dùng sửa đổi cài đặt thiết bị hoặc điều khiển tường video.</translation>
     </message>
   </context>
   <context>
@@ -6914,43 +6914,43 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Dịch vụ không đầy đủ</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+      <translation>
+        <numerusform>Yêu cầu dịch vụ lưu trữ đám mây %n phù hợp</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
-      <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
+      <translation>
+        <numerusform>%n Megapixel</numerusform>
       </translation>
     </message>
     <message>
       <source>Unknown resolution</source>
-      <translation type="unfinished">Unknown resolution</translation>
+      <translation>Độ phân giải không xác định</translation>
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
-      <translation type="unfinished">No suitable cloud storage services available</translation>
+      <translation>Không có dịch vụ lưu trữ đám mây phù hợp</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
+      <translation>
+        <numerusform>%n dịch vụ lưu trữ đám mây phù hợp</numerusform>
       </translation>
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Độ Phân Giải</translation>
     </message>
   </context>
   <context>
@@ -6978,7 +6978,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
-      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Có nhiều camera được sao lưu hơn các dịch vụ có sẵn. Vui lòng tắt sao lưu cho một số camera hoặc thêm các dịch vụ phù hợp hơn. Nếu không, nó sẽ được thực hiện tự động vào %1</translation>
     </message>
   </context>
   <context>
@@ -7023,15 +7023,15 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Máy chủ đang ngoại tuyến</translation>
     </message>
     <message>
       <source>Backup settings are not available</source>
-      <translation type="unfinished">Backup settings are not available</translation>
+      <translation>Cài đặt sao lưu không có sẵn</translation>
     </message>
     <message>
       <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
-      <translation type="unfinished">To perform backup to the cloud storage SaaS must be in active state. %1</translation>
+      <translation>Để thực hiện sao lưu vào bộ lưu trữ đám mây, SaaS phải ở trạng thái hoạt động. %1</translation>
     </message>
   </context>
   <context>
@@ -7920,15 +7920,15 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation type="unfinished">Enter access link to continue your session</translation>
+      <translation>Nhập liên kết truy cập để tiếp tục phiên của bạn</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+      <translation>Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại bằng liên kết của bạn để tiếp tục.</translation>
     </message>
     <message>
       <source>Authentication details are incorrect</source>
-      <translation type="unfinished">Authentication details are incorrect</translation>
+      <translation>Chi tiết xác thực không chính xác</translation>
     </message>
   </context>
   <context>
@@ -8586,7 +8586,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
-      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+      <translation>Bạn không có quyền xuất bản lưu trữ cho một số camera đã chọn. Video từ những camera đó sẽ không được xuất sang tệp đích.</translation>
     </message>
   </context>
   <context>
@@ -8744,15 +8744,15 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Group name cannot be empty</source>
-      <translation type="unfinished">Group name cannot be empty</translation>
+      <translation>Tên nhóm không được để trống</translation>
     </message>
     <message>
       <source>Group with the same name already exists</source>
-      <translation type="unfinished">Group with the same name already exists</translation>
+      <translation>Nhóm có cùng tên đã tồn tại</translation>
     </message>
     <message>
       <source>Failed to apply changes to %1 group</source>
-      <translation type="unfinished">Failed to apply changes to %1 group</translation>
+      <translation>Không thể áp dụng các thay đổi cho nhóm %1</translation>
     </message>
   </context>
   <context>
@@ -8910,7 +8910,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>KHÔNG CÓ QUYỀN XUẤT VIDEO</translation>
     </message>
   </context>
   <context>
@@ -9099,7 +9099,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>The provided link is not valid or has expired</source>
-      <translation type="unfinished">The provided link is not valid or has expired</translation>
+      <translation>Liên kết được cung cấp không hợp lệ hoặc đã hết hạn</translation>
     </message>
   </context>
   <context>
@@ -9266,7 +9266,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
+      <translation>Kế thừa từ %1</translation>
     </message>
   </context>
   <context>
@@ -9754,7 +9754,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>
-      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+      <translation>Đang tải các gói cập nhật ngoại tuyến lên Máy chủ...</translation>
     </message>
   </context>
   <context>
@@ -9853,11 +9853,11 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::ParentGroupsProvider</name>
     <message>
       <source>LDAP group membership is managed in LDAP</source>
-      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
+      <translation>Thành viên nhóm LDAP được quản lý trong LDAP</translation>
     </message>
     <message>
       <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
+      <translation>Kế thừa từ %1</translation>
     </message>
   </context>
   <context>
@@ -10728,7 +10728,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>Không phải là một phần của chứng chỉ</translation>
     </message>
     <message>
       <source>OK</source>
@@ -10736,7 +10736,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+      <translation>Hãy liên hệ với người dùng có quyền Quản trị viên để giải quyết vấn đề này.</translation>
     </message>
   </context>
   <context>
@@ -10926,15 +10926,15 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Liên kết truy cập</translation>
     </message>
     <message>
       <source>Invalid Link</source>
-      <translation type="unfinished">Invalid Link</translation>
+      <translation>Liên kết không hợp lệ</translation>
     </message>
     <message>
       <source>The provided link is not valid</source>
-      <translation type="unfinished">The provided link is not valid</translation>
+      <translation>Liên kết được cung cấp không hợp lệ</translation>
     </message>
   </context>
   <context>
@@ -11085,15 +11085,15 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Add more services or fix overuse by stopping using services for some devices.</source>
-      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+      <translation>Thêm nhiều dịch vụ hơn hoặc khắc phục tình trạng lạm dụng bằng cách ngừng sử dụng dịch vụ cho một số thiết bị.</translation>
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
-      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+      <translation>Nếu không thực hiện hành động nào, số lượng dịch vụ được yêu cầu sẽ tự động được phát hành vào %1.</translation>
     </message>
     <message>
       <source>Some features may not be available.</source>
-      <translation type="unfinished">Some features may not be available.</translation>
+      <translation>Vài tính năng có thể sẽ không khả dụng.</translation>
     </message>
   </context>
   <context>
@@ -11101,17 +11101,17 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>và</translation>
     </message>
     <message>
       <source>Your access to the System expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the System expires %1</translation>
+      <translation>Quyền truy cập của bạn vào Hệ thống hết hạn %1</translation>
     </message>
     <message>
       <source>Your access to the System expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the System expires in %1</translation>
+      <translation>Quyền truy cập của bạn vào Hệ thống sẽ hết hạn sau %1</translation>
     </message>
   </context>
   <context>
@@ -11305,7 +11305,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
-      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+      <translation>Nhóm không được tìm thấy trong cơ sở dữ liệu LDAP.</translation>
     </message>
     <message>
       <source>There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
@@ -12021,7 +12021,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>In progress... (%1 left)</source>
-      <translation type="unfinished">In progress... (%1 left)</translation>
+      <translation>Đang tiến hành... (%1 còn lại)</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -12033,7 +12033,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Failed to import. Retry in 1 minute.</source>
-      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+      <translation>Không thể nhập được. Hãy thử lại sau 1 phút.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -12041,7 +12041,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Imported up to</source>
-      <translation type="unfinished">Imported up to</translation>
+      <translation>Được nhập khẩu lên tới</translation>
     </message>
     <message>
       <source>Status</source>
@@ -12169,11 +12169,11 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
     <message>
       <source>Event will trigger only if there are matches any of attributes.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+      <translation>Sự kiện sẽ chỉ kích hoạt nếu có bất kỳ thuộc tính nào trùng khớp.</translation>
     </message>
     <message>
       <source>You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>Bạn có thể xem tên của các thuộc tính và giá trị của chúng trên tab Đối tượng.</translation>
     </message>
   </context>
   <context>
@@ -12199,19 +12199,19 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>WHEN</source>
-      <translation type="unfinished">WHEN</translation>
+      <translation>KHI</translation>
     </message>
     <message>
       <source>EVENT</source>
-      <translation type="unfinished">EVENT</translation>
+      <translation>SỰ KIỆN</translation>
     </message>
     <message>
       <source>DO</source>
-      <translation type="unfinished">DO</translation>
+      <translation>THỰC HIỆN</translation>
     </message>
     <message>
       <source>ACTION</source>
-      <translation type="unfinished">ACTION</translation>
+      <translation>HÀNH ĐỘNG</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -12233,15 +12233,15 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>Có thuộc tính</translation>
     </message>
     <message>
       <source>Listed</source>
-      <translation type="unfinished">Listed</translation>
+      <translation>Được liệt kê</translation>
     </message>
     <message>
       <source>Not listed</source>
-      <translation type="unfinished">Not listed</translation>
+      <translation>Không được Liệt Kê</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -12256,7 +12256,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
     <message>
       <source>Once in</source>
-      <translation type="unfinished">Once in</translation>
+      <translation>Một lần vào</translation>
     </message>
     <message>
       <source>For</source>
@@ -12287,7 +12287,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Comment</source>
-      <translation type="unfinished">Comment</translation>
+      <translation>Bình luận</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -12299,7 +12299,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>No source</source>
-      <translation type="unfinished">No source</translation>
+      <translation>Không có nguồn</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -12323,7 +12323,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>No target</source>
-      <translation type="unfinished">No target</translation>
+      <translation>Không có đích đến</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -12343,13 +12343,13 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n nhóm</numerusform>
       </translation>
     </message>
     <message>
       <source>All Server</source>
-      <translation type="unfinished">All Server</translation>
+      <translation>Tất cả Máy chủ</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
@@ -12386,7 +12386,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
     <message>
       <source>Soft trigger</source>
-      <translation type="unfinished">Soft trigger</translation>
+      <translation>Kích hoạt mềm</translation>
     </message>
   </context>
   <context>
@@ -12406,19 +12406,19 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>Chứa từ khóa</translation>
     </message>
     <message>
       <source>Does not contain keywords</source>
-      <translation type="unfinished">Does not contain keywords</translation>
+      <translation>Không chứa từ khóa</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>Chứa các mục danh sách</translation>
     </message>
     <message>
       <source>Does not contain list entries</source>
-      <translation type="unfinished">Does not contain list entries</translation>
+      <translation>Không chứa mục danh sách</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -12433,22 +12433,22 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation type="unfinished">Lookup lists network request failed</translation>
+      <translation>Tra cứu danh sách yêu cầu mạng không thành công</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: </source>
-      <translation type="unfinished">Delete rule error: </translation>
+      <translation>Xóa lỗi quy tắc: </translation>
     </message>
     <message>
       <source>Save rule error: </source>
-      <translation type="unfinished">Save rule error: </translation>
+      <translation>Lưu lỗi quy tắc: </translation>
     </message>
     <message>
       <source>Reset to defaults error: </source>
-      <translation type="unfinished">Reset to defaults error: </translation>
+      <translation>Lỗi đặt lại về mặc định: </translation>
     </message>
   </context>
   <context>
@@ -12463,11 +12463,11 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>Tổng cộng</translation>
     </message>
     <message>
       <source>Used</source>
-      <translation type="unfinished">Used</translation>
+      <translation>Đã dùng</translation>
     </message>
   </context>
   <context>
@@ -12587,11 +12587,11 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Toolbar</source>
-      <translation type="unfinished">Toolbar</translation>
+      <translation>Thanh công cụ</translation>
     </message>
   </context>
   <context>
@@ -12899,7 +12899,7 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>Không đủ quyền truy cập</translation>
     </message>
   </context>
   <context>

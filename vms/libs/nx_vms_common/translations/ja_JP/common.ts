@@ -2210,11 +2210,11 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation>ストレージエラー</translation>
+      <translation>ストレージ障害</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>%1のストレージエラー</translation>
+      <translation>%1のストレージ障害</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>

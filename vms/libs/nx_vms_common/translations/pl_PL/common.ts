@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Nieprawidłowa zawartość JSON.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Nieobsługiwany typ.</translation>
     </message>
   </context>
   <context>
@@ -63,23 +63,23 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Ten użytkownik nie istnieje lub nie może się zalogować.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Przedstawiono więcej niż jednego użytkownika z tym samym logowaniem.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>Nie można zweryfikować certyfikatu SSL/TLS serwera LDAP.</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Klucz zgłoszenia jest nieprawidłowy lub wygasł.</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Błędne hasło</translation>
     </message>
   </context>
   <context>
@@ -191,52 +191,52 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administrator</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Użytkownik zaawansowany</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Zaawansowany przeglądający</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Użytkownik</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Użytkownik podglądu na żywo</translation>
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation type="unfinished">System Health Viewers</translation>
+      <translation>Obserwator systemowy</translation>
     </message>
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</translation>
+      <translation>Członkowie tej grupy mają nieograniczone uprawnienia systemowe. Administratorzy mogą tworzyć i modyfikować użytkowników zaawansowanych, łączyć systemy oraz łączyć lub odłączać %1 kont.</translation>
     </message>
     <message>
       <source>Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Członkowie tej grupy mają kontrolę nad większością konfiguracji systemu, ale nie mogą zmieniać żadnych ustawień administratora, usuwać ani zmieniać własnych grup i uprawnień, a także nie mogą tworzyć ani edytować innych użytkowników zaawansowanych.</translation>
     </message>
     <message>
       <source>Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
+      <translation>Członkowie tej grupy mogą przeglądać i uruchamiać pozycje PTZ i trasy PTZ, korzystać z dwukierunkowego dźwięku, obsługiwać przyciski modułu we/wy, tworzyć i edytować zakładki oraz przeglądać dziennik zdarzeń.</translation>
     </message>
     <message>
       <source>Members of this group can view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can view and export archive and Bookmarks.</translation>
+      <translation>Członkowie tej grupy mogą przeglądać i eksportować archiwum i zakładki.</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>Członkowie tej grupy mogą przeglądać filmy na żywo, moduły I/O i strony internetowe.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information.</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information.</translation>
+      <translation>Członkowie tej grupy mogą wyświetlać informacje dotyczące monitorowania stanu systemu.</translation>
     </message>
   </context>
   <context>
@@ -455,15 +455,15 @@
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>Z urządzenia otrzymano nieprawidłowe dane. Szczegóły: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Z kamery otrzymano nieprawidłowe dane. Szczegóły: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>Z modułu I/O otrzymano nieprawidłowe dane. Szczegóły: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -905,16 +905,16 @@
     </message>
     <message>
       <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <translation>Nagrywanie lokalne</translation>
     </message>
     <message>
       <source>Local Recording service</source>
-      <translation type="unfinished">Local Recording service</translation>
+      <translation>Lokalna usługa nagrywania</translation>
     </message>
     <message numerus="yes">
       <source>%n Local Recording Services</source>
       <translation type="unfinished">
-        <numerusform>%n Local Recording Services</numerusform>
+        <numerusform>%n Lokalne usługi nagrywania</numerusform>
         <numerusform>%n Local Recording Services</numerusform>
         <numerusform>%n Local Recording Services</numerusform>
         <numerusform>%n Local Recording Services</numerusform>
@@ -924,7 +924,7 @@
       <source>%n/%1 Local Recording Services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Local Recording Services</numerusform>
+        <numerusform>%n/%1 Lokalne usługi nagrywania</numerusform>
         <numerusform>%n/%1 Local Recording Services</numerusform>
         <numerusform>%n/%1 Local Recording Services</numerusform>
         <numerusform>%n/%1 Local Recording Services</numerusform>
@@ -1619,7 +1619,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>Okres ścieżki audytu (dni, 14–730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1643,11 +1643,11 @@
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>Włącz powiadomienia o aktualizacji</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>Włącz mapowanie portów UPNP</translation>
     </message>
     <message>
       <source>Backup settings</source>
@@ -1655,11 +1655,11 @@
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
+      <translation>Zastąpienie hosta chmury</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>Włącz RTSP dla Arecont</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
@@ -1683,7 +1683,7 @@
     </message>
     <message>
       <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
+      <translation>Liczba powtórzeń RTP</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
@@ -1691,7 +1691,7 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>Limit czasu na połączenie RTSP (sekundy)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
@@ -1900,11 +1900,11 @@
     <message>
       <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (unsecure)</translation>
+      <translation>Włącz przestarzałe funkcje API aktualnie używane przez oprogramowanie %1 (niezabezpieczone)</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
+      <translation>Rozdzielona średnikami lista serwerów przeznaczonych do połączenia z chmurą. Serwery znajdujące się na górze listy mają wyższy priorytet. Jeśli lista jest pusta, serwer dla połączenia w chmurze jest wybierany automatycznie.</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
