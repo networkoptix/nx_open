@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtQml/QQmlEngine>
+#include <QtQml/private/qv4engine_p.h>
 
 #include <client_core/client_core_meta_types.h>
 #include <common/static_common_module.h>
@@ -21,6 +22,26 @@
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/external_resources.h>
 #include <utils/media/voice_spectrum_analyzer.h>
+
+extern "C" {
+
+/** QtQml exported helper function for getting QML stacktrace (up to 20 frames) in GDBMI format. */
+char* qt_v4StackTraceForEngine(void* executionEngine);
+
+/*
+ * Helper and "C" linkage exported function to get the most recent QML stacktrace in GDBMI format.
+ * Sample GDB invocation: print nx_qmlStackTrace()
+ * Sample CDB invocation: .call nx_vms_client_core!nx_qmlStackTrace() ; gh
+ */
+NX_FORCE_EXPORT char* nx_qmlStackTrace()
+{
+    QV4::ExecutionEngine* engine = nx::vms::client::core::appContext()->qmlEngine()->handle();
+    if (!engine->qmlContext()) //< Avoid a crash when called without QML stack.
+        return nullptr;
+    return qt_v4StackTraceForEngine(engine);
+}
+
+} // extern "C"
 
 // Resources initialization must be located outside of the namespace.
 static void initializeResources()
@@ -140,10 +161,37 @@ ApplicationContext::ApplicationContext(
                 std::make_unique<watchers::KnownServerConnections>();
             break;
     }
+
+    nx::utils::setOnAssertHandler(
+        [](const QString&)
+        {
+            std::cerr << "\nQML stacktrace:\n";
+
+            const QV4::ExecutionEngine* engine = appContext()->qmlEngine()->handle();
+            if (!engine->qmlContext()) //< Avoid a crash when called without QML stack.
+            {
+                std::cerr << "  <no QML context available>" << std::endl;
+                return;
+            }
+
+            const QVector<QV4::StackFrame> stackTrace = engine->stackTrace(20);
+            for (int i = 0; i < stackTrace.size(); ++i)
+            {
+                const QUrl url(stackTrace.at(i).source);
+                const QString fileName = url.isLocalFile() ? url.toLocalFile() : url.toString();
+
+                std::cerr << nx::format("  #%1 %2 in %3:%4\n",
+                    i, stackTrace.at(i).function, fileName, stackTrace.at(i).line).toStdString();
+            }
+
+            std::cerr << std::endl;
+        });
 }
 
 ApplicationContext::~ApplicationContext()
 {
+    nx::utils::setOnAssertHandler(nullptr);
+
     if (NX_ASSERT(s_instance == this))
         s_instance = nullptr;
 }
