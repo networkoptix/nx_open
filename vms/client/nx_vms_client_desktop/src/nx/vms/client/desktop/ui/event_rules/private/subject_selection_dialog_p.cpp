@@ -4,6 +4,8 @@
 
 #include <algorithm>
 
+#include <QtCore/QMap>
+
 #include <client/client_globals.h>
 #include <client/client_meta_types.h>
 #include <core/resource/user_resource.h>
@@ -13,6 +15,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/models/user_roles_model.h>
@@ -266,9 +269,9 @@ Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
 
 QVariant UserListModel::data(const QModelIndex& index, int role) const
 {
-    static const QColor mainColor = "#A5B7C0";
-    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
-        {QnIcon::Normal, {{mainColor, "light10"}}}};
+    static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
+        colorSubs = {
+            {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
 
     switch (role)
     {
@@ -388,9 +391,8 @@ GroupListDelegate::~GroupListDelegate()
 void GroupListDelegate::initStyleOption(QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
-    static const QColor mainColor = "#A5B7C0";
-    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
-        {QnIcon::Normal, {{mainColor, "light10"}}}};
+    static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData> colorSubs = {
+        {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
 
     base_type::initStyleOption(option, index);
     if (index.column() == QnUserRolesModel::NameColumn)
