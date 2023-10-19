@@ -2691,7 +2691,7 @@
     </message>
     <message>
       <source>Server Location ID:</source>
-      <translation type="unfinished">Server Location ID:</translation>
+      <translation>Identyfikator lokalizacji serwera:</translation>
     </message>
   </context>
   <context>

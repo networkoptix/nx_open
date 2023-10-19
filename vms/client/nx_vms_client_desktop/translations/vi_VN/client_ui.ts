@@ -661,22 +661,22 @@
     </message>
     <message>
       <source>Disable import</source>
-      <translation type="unfinished">Disable import</translation>
+      <translation>Vô hiệu hóa nhập</translation>
     </message>
     <message>
       <source>Import Video from Device</source>
-      <translation type="unfinished">Import Video from Device</translation>
+      <translation>Nhập video từ thiết bị</translation>
     </message>
     <message>
       <source>Import camera or server offline periods</source>
-      <translation type="unfinished">Import camera or server offline periods</translation>
+      <translation>Nhập thời gian ngoại tuyến của camera hoặc máy chủ</translation>
     </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1720,15 +1720,15 @@
     </message>
     <message>
       <source>Use Credentials</source>
-      <translation type="unfinished">Use Credentials</translation>
+      <translation>Sử dụng thông tin xác thực</translation>
     </message>
     <message>
       <source>Use Link</source>
-      <translation type="unfinished">Use Link</translation>
+      <translation>Sử dụng liên kết</translation>
     </message>
     <message>
       <source>Link</source>
-      <translation type="unfinished">Link</translation>
+      <translation>Liên kết</translation>
     </message>
   </context>
   <context>
@@ -1983,7 +1983,7 @@
     </message>
     <message>
       <source>Mail from</source>
-      <translation type="unfinished">Mail from</translation>
+      <translation>Email từ</translation>
     </message>
   </context>
   <context>
@@ -2442,19 +2442,19 @@
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
-      <translation type="unfinished">No services found</translation>
+      <translation>Không tìm thấy dịch vụ</translation>
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+      <translation>Liên hệ với Đối tác của bạn để thêm dịch vụ</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation type="unfinished">Channel Partner Contact</translation>
+      <translation>Liên hệ đối tác</translation>
     </message>
     <message>
       <source>Services Usage</source>
-      <translation type="unfinished">Services Usage</translation>
+      <translation>Sử dụng dịch vụ</translation>
     </message>
   </context>
   <context>
@@ -2945,15 +2945,15 @@
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Thêm nhóm</translation>
     </message>
     <message>
       <source>Ctrl+F</source>
-      <translation type="unfinished">Ctrl+F</translation>
+      <translation>Ctrl+F</translation>
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>Xóa</translation>
     </message>
   </context>
   <context>
@@ -2964,15 +2964,15 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Thêm người dùng</translation>
     </message>
     <message>
       <source>Ctrl+F</source>
-      <translation type="unfinished">Ctrl+F</translation>
+      <translation>Ctrl+F</translation>
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>Xóa</translation>
     </message>
   </context>
   <context>

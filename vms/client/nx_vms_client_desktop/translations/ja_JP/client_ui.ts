@@ -1006,7 +1006,7 @@
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation>キャプションに含まれる:</translation>
+      <translation>キャプションに次の内容を含む:</translation>
     </message>
     <message>
       <source>Description contains:</source>

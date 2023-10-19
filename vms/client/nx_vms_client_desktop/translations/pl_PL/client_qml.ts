@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>Name Attribute</source>
-      <translation type="unfinished">Name Attribute</translation>
+      <translation>Atrybut nazwy</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>Group Attribute</source>
-      <translation type="unfinished">Group Attribute</translation>
+      <translation>Atrybut grupy</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
@@ -60,15 +60,15 @@
     </message>
     <message>
       <source>Proxy LDAP requests&lt;br&gt;via server</source>
-      <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
+      <translation>Proxy LDAP żąda&lt;br&gt;za pośrednictwem serwera</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>Aby włączyć uwierzytelnianie szyfrowane dla użytkowników LDAP, którzy są już dodani do bazy danych VMS, musisz włączyć je bezpośrednio w ustawieniach tych użytkowników&apos;.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>Aby włączyć uwierzytelnianie szyfrowane dla użytkowników LDAP, którzy są już dodani do bazy danych VMS, musisz włączyć je bezpośrednio w ustawieniach tych użytkowników&apos;.</translation>
     </message>
   </context>
   <context>
@@ -277,11 +277,11 @@
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>Integracja API może być włączona po zweryfikowaniu kodu otrzymanego od dostawcy integracji. Nowe zapytania mogą być wyłączone, aby zapobiec niepożądanym interakcjom.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Włączyć %1?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -301,11 +301,11 @@
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Usunąć %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Spowoduje to usunięcie żądania integracji</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -320,7 +320,7 @@
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>To pole nie może być puste</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -742,7 +742,7 @@
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filtry pomagają kontrolować dostęp do systemu i synchronizację poprzez określenie, którzy użytkownicy i/lub grupy z bazowego DN są dozwolone.</translation>
     </message>
   </context>
   <context>
@@ -866,7 +866,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Członkowie</translation>
     </message>
     <message>
       <source>Add Group</source>
@@ -889,14 +889,14 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Uprawnienia grup</translation>
     </message>
   </context>
   <context>
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Grupa - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -912,11 +912,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Uprawnienia globalne</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Członkowie</translation>
     </message>
   </context>
   <context>
@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Członkowie</translation>
     </message>
     <message>
       <source>Users</source>
@@ -947,7 +947,7 @@
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Uprawnienia grup</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
