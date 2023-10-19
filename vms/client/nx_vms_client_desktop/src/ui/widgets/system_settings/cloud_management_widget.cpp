@@ -183,7 +183,8 @@ void QnCloudManagementWidget::disconnectFromCloud()
 
     auto handler = nx::utils::guarded(
         this,
-        [this](bool success, rest::Handle requestId, rest::ErrorOrEmpty reply)
+        [this, isCloudUser = context()->user()->isCloud()](
+            bool success, rest::Handle requestId, rest::ErrorOrEmpty reply)
         {
             NX_ASSERT(m_currentRequest == requestId);
             m_currentRequest = 0;
@@ -198,14 +199,21 @@ void QnCloudManagementWidget::disconnectFromCloud()
             }
 
             QString errorString;
-            if (std::holds_alternative<nx::network::rest::Result>(reply))
+            if (const auto error = std::get_if<nx::network::rest::Result>(&reply))
             {
-                const auto& error = std::get<nx::network::rest::Result>(reply);
-                NX_DEBUG(this,
-                    "Cloud unbind failed, error: %1, string: %2",
-                    error.error,
-                    error.errorString);
-                errorString = error.errorString;
+                NX_DEBUG(this, "Cloud unbind failed, cloudUser: %1, error: %2, string: %3",
+                    isCloudUser, error->error, error->errorString);
+
+                // Sometimes server can break unbind request connection early, since the cloud user
+                // is deleted in the process. The request will be automatically retried in
+                // that case and will return Unauthorized error.
+                if (isCloudUser && (error->error == nx::network::rest::Result::Unauthorized))
+                {
+                    onDisconnectSuccess();
+                    return;
+                }
+
+                errorString = std::move(error->errorString);
             }
 
             QnSessionAwareMessageBox::critical(this,
