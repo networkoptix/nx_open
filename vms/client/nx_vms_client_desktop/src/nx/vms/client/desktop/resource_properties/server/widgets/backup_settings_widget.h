@@ -41,7 +41,6 @@ private:
     void loadState(const ServerSettingsDialogState& state);
 
     void setupPlaceholders();
-    void updateMessageBarText();
 
 private:
     const std::unique_ptr<Ui::BackupSettingsWidget> ui;
