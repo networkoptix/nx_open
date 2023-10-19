@@ -948,12 +948,8 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
 
     if (index.column() == QnStorageListModel::StoragePoolColumn)
     {
-        if (!m_model->canChangeStoragePool(record)
-            || !index.flags().testFlag(Qt::ItemIsEditable)
-            || !index.flags().testFlag(Qt::ItemIsUserCheckable))
-        {
+        if (!m_model->canChangeStoragePool(record) || !index.flags().testFlag(Qt::ItemIsEditable))
             return;
-        }
 
         auto findAction =
             [this](StoragePoolMenuItem menuItem) -> QAction*
