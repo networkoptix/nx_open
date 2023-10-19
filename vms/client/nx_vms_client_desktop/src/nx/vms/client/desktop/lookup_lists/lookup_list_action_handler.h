@@ -20,7 +20,6 @@ public:
 
 private:
     void openLookupListsDialog();
-    void openLookupListsManagementDialog();
 
 private:
     struct Private;
