@@ -377,11 +377,11 @@ bool canExportBookmarkInternal(const QnCameraBookmark& bookmark, QnWorkbenchCont
 }
 
 bool canCopyBookmarkToClipboardInternal(
-    const QnCameraBookmark& bookmark, WindowContext* context)
+    const QnCameraBookmark& bookmark, QnWorkbenchContext* context)
 {
-    if (const auto& camera = context->system()->resourcePool()->getResourceById(bookmark.cameraId))
+    if (const auto& camera = context->resourcePool()->getResourceById(bookmark.cameraId))
     {
-        return context->system()->accessController()->
+        return context->accessController()->
             hasPermissions(camera, Qn::ViewBookmarksPermission);
     }
 
@@ -2237,7 +2237,7 @@ ConditionWrapper canExportBookmarks()
 ConditionWrapper canCopyBookmarkToClipboard()
 {
     return new CustomBoolCondition(
-        [](const Parameters& parameters, WindowContext* context)
+        [](const Parameters& parameters, QnWorkbenchContext* context)
         {
             if (!parameters.hasArgument(Qn::CameraBookmarkRole))
                 return false;
@@ -2250,7 +2250,7 @@ ConditionWrapper canCopyBookmarkToClipboard()
 ConditionWrapper canCopyBookmarksToClipboard()
 {
     return new CustomBoolCondition(
-        [](const Parameters& parameters, WindowContext* context)
+        [](const Parameters& parameters, QnWorkbenchContext* context)
         {
             if (!parameters.hasArgument(Qn::CameraBookmarkListRole))
                 return false;
