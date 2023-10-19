@@ -376,6 +376,18 @@ bool canExportBookmarkInternal(const QnCameraBookmark& bookmark, QnWorkbenchCont
     return canExportPeriods(resources, period, /*ignoreLoadedChunks*/ true);
 }
 
+bool canCopyBookmarkToClipboardInternal(
+    const QnCameraBookmark& bookmark, WindowContext* context)
+{
+    if (const auto& camera = context->system()->resourcePool()->getResourceById(bookmark.cameraId))
+    {
+        return context->system()->accessController()->
+            hasPermissions(camera, Qn::ViewBookmarksPermission);
+    }
+
+    return false;
+}
+
 bool resourceHasVideo(const QnResourcePtr& resource)
 {
     if (!resource->hasFlags(Qn::video))
@@ -2218,6 +2230,38 @@ ConditionWrapper canExportBookmarks()
                 [context](const QnCameraBookmark& bookmark)
                 {
                     return canExportBookmarkInternal(bookmark, context);
+                });
+        });
+}
+
+ConditionWrapper canCopyBookmarkToClipboard()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, WindowContext* context)
+        {
+            if (!parameters.hasArgument(Qn::CameraBookmarkRole))
+                return false;
+
+            const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+            return canCopyBookmarkToClipboardInternal(bookmark, context);
+        });
+}
+
+ConditionWrapper canCopyBookmarksToClipboard()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, WindowContext* context)
+        {
+            if (!parameters.hasArgument(Qn::CameraBookmarkListRole))
+                return false;
+
+            const auto bookmarks =
+                parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
+
+            return std::any_of(bookmarks.cbegin(), bookmarks.cend(),
+                [context](const QnCameraBookmark& bookmark)
+                {
+                    return canCopyBookmarkToClipboardInternal(bookmark, context);
                 });
         });
 }

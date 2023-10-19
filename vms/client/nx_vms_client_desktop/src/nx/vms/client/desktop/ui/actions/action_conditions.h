@@ -680,6 +680,9 @@ ConditionWrapper canExportLayout();
 ConditionWrapper canExportBookmark();
 ConditionWrapper canExportBookmarks();
 
+ConditionWrapper canCopyBookmarkToClipboard();
+ConditionWrapper canCopyBookmarksToClipboard();
+
 ConditionWrapper isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAccessRights);
 
 /** Whether virtual camera upload is enabled. */
