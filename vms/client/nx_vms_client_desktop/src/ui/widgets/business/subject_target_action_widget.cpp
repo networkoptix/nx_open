@@ -124,14 +124,13 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
     if (!m_subjectsButton || !model())
         return;
 
-    const auto icon =
-        [](const QString& path) -> QIcon
-        {
-            static const QColor mainColor = "#A5B7C0";
-            static const nx::vms::client::core::SvgIconColorer::IconSubstitutions colorSubs = {
-                {QnIcon::Normal, {{mainColor, "light10"}}}};
-            return qnSkin->icon(path, QString(), {}, colorSubs);
-        };
+    const auto icon = [](const QString& path) -> QIcon
+    {
+        static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
+            colorSubs = {{QnIcon::Normal, {.primary = "light10"}},
+                {QnIcon::Selected, {.primary = "light4"}}};
+        return qnSkin->icon(path, colorSubs);
+    };
 
     const auto params = model()->actionParams();
     if (params.allUsers)

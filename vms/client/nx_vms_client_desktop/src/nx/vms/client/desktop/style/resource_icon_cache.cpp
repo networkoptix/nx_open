@@ -202,12 +202,12 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Media | Offline, loadIcon("tree/media_offline.svg"));
 
     // Users.
-    m_cache.insert(Users, loadIcon("tree/users.svg"));
-    m_cache.insert(User, loadIcon("tree/user.svg"));
-    m_cache.insert(CloudUser, loadIcon("user_settings/user_cloud.svg"));
-    m_cache.insert(LdapUser, loadIcon("user_settings/user_ldap.svg"));
-    m_cache.insert(LocalUser, loadIcon("user_settings/user_local.svg"));
-    m_cache.insert(TemporaryUser, loadIcon("user_settings/user_local_temp.svg"));
+    m_cache.insert(Users, loadIcon("tree/users.svg", kTreeThemeSubstitutions));
+    m_cache.insert(User, loadIcon("tree/user.svg", kTreeThemeSubstitutions));
+    m_cache.insert(CloudUser, loadIcon("user_settings/user_cloud.svg", kTreeThemeSubstitutions));
+    m_cache.insert(LdapUser, loadIcon("user_settings/user_ldap.svg", kTreeThemeSubstitutions));
+    m_cache.insert(LocalUser, loadIcon("user_settings/user_local.svg", kTreeThemeSubstitutions));
+    m_cache.insert(TemporaryUser, loadIcon("user_settings/user_local_temp.svg", kTreeThemeSubstitutions));
 
     // Videowalls.
     m_cache.insert(VideoWall, loadIcon("tree/videowall.svg"));
