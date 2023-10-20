@@ -16,3 +16,16 @@ if(targetDevice STREQUAL "linux_arm32" OR targetDevice STREQUAL "linux_arm64")
 else()
     set(variantVersion "16.04")
 endif()
+
+function(nx_load_deb_dependencies_from_file file_name)
+    set(list_script
+        ${open_source_root}/vms/distribution/common/scripts/generate_deb_dependencies.py)
+
+    nx_execute_process_or_fail(
+        COMMAND ${PYTHON_EXECUTABLE} ${list_script} ${file_name}
+        OUTPUT_VARIABLE output)
+
+    cmake_language(EVAL CODE ${output})
+
+    nx_expose_variables_to_parent_scope(required_dependencies recommended_dependencies)
+endfunction()
