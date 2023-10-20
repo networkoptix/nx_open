@@ -609,14 +609,15 @@ void LdapSettingsWidget::testConnection(
                 d->testMessage = tr("Connection OK");
                 d->testState = TestState::ok;
             }
-            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
+                error && error->error != network::rest::Result::ServiceUnavailable)
             {
                 d->testMessage = error->errorString;
                 d->testState = TestState::error;
             }
             else
             {
-                d->testMessage = tr("Connection failed");
+                d->testMessage = tr("Cannot connect to LDAP server");
                 d->testState = TestState::error;
             }
         });
