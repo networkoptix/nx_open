@@ -188,12 +188,16 @@ ThumbnailTooltip* CameraHotspotItem::Private::createTooltip() const
 
 ui::action::Parameters::ArgumentHash CameraHotspotItem::Private::itemPlaybackParameters() const
 {
+    using namespace std::chrono;
+
     ui::action::Parameters::ArgumentHash result;
 
     const auto playbackSpeed = mediaResourceWidget()->speed();
-    const auto positionMs = mediaResourceWidget()->position();
+    const auto positionMs = mediaResourceWidget()->isPlayingLive()
+        ? DATETIME_NOW
+        : duration_cast<milliseconds>(mediaResourceWidget()->position()).count();
 
-    result.insert(Qn::ItemTimeRole, static_cast<qint64>(positionMs.count()));
+    result.insert(Qn::ItemTimeRole, positionMs);
     result.insert(Qn::ItemSpeedRole, playbackSpeed);
     result.insert(Qn::ItemPausedRole, qFuzzyIsNull(playbackSpeed));
 
@@ -217,9 +221,17 @@ void CameraHotspotItem::Private::openItem()
 
             if (!q->navigator()->syncEnabled())
             {
-                const auto parameters = itemPlaybackParameters();
-                for (const auto& role: parameters.keys())
-                    item->setData(static_cast<Qn::ItemDataRole>(role), parameters.value(role));
+                if (mediaResourceWidget()->isPlayingLive())
+                {
+                    q->menu()->trigger(ui::action::JumpToLiveAction,
+                        q->navigator()->currentWidget());
+                }
+                else
+                {
+                    const auto parameters = itemPlaybackParameters();
+                    for (const auto& role: parameters.keys())
+                        item->setData(static_cast<Qn::ItemDataRole>(role), parameters.value(role));
+                }
             }
 
             const auto display = q->display();
