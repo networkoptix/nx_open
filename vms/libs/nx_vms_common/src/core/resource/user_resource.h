@@ -89,6 +89,7 @@ class NX_VMS_COMMON_API QnUserResource: public QnResource
     typedef QnResource base_type;
 
 public:
+    friend void ec2::fromResourceToApi(const QnUserResource&, nx::vms::api::UserData&);
     friend void ec2::fromResourceToApi(const QnUserResourcePtr&, nx::vms::api::UserData&);
     friend void ec2::fromApiToResource(const nx::vms::api::UserData&, const QnUserResourcePtr&);
 
