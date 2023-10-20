@@ -58,23 +58,24 @@ procedure of Python 3.8 could look like the following:
 **Microsoft Visual Studio** 2022, Community Edition should be installed.
 - NOTE: Microsoft Visual Studio 2019 can also be used to build the repository branches `vms_5.0`,
     `vms_5.0_patch` and `vms_5.1`, but its support may be dropped in further branches like
-    `vms_5.1_patch` and `master`.
+    `vms_5.1_patch`, `vms_6.0` and `master`.
 
 Install **CMake**, **Ninja** and **Conan** via **`pip`**. Note that `pip` must be run with
 **Administrator privileges**: find the Command Prompt in the Start menu, right-click it and choose
 "Run as administrator" from the menu; then execute the commands:
 ```
-git checkout master
+git checkout master #< The master branch contains requirements.txt suitable for all branches.
 pip install -r requirements.txt
 ```
 ATTENTION: If you use **Cygwin**, make sure the Cygwin's **`cmake` is not on `PATH`**.
 
 Alternatively to using `pip` with `requirements.txt`, you may install CMake and Ninja manually
-(just make sure they appear on `PATH`) and install the `pyaml` and `conan` Python packages:
+(just make sure they appear on `PATH`) or use the ones which come with Microsoft Visual Studio,
+and install the following Python packages:
 ```
-python -m pip install pyaml conan==1.46.2
+pip install conan==<version>
 ```
-Alternatively, you can use CMake and Ninja which come with Microsoft Visual Studio.
+Take the `<version>` value from `requirements.txt`.
 
 ### Linux
 
@@ -112,7 +113,7 @@ possible installation procedure of Python 3.8 could look like the following:
 
 Install **CMake**, **Ninja** and **Conan** via **`pip`** using the command:
 ```
-git checkout master
+git checkout master #< The master branch contains requirements.txt suitable for all branches.
 pip install -r requirements.txt
 ```
 ATTENTION: `pip` installs the binaries to `~/.local/bin/`, so make sure this directory is on
@@ -120,18 +121,18 @@ ATTENTION: `pip` installs the binaries to `~/.local/bin/`, so make sure this dir
 executing `pip install` in the case this directory did not exist before.
 
 Alternatively to using `pip` with `requirements.txt`, you may install CMake and Ninja manually
-(just make sure they appear on `PATH`) and install the `pyaml` and `conan` Python packages:
+(just make sure they appear on `PATH`) and install the following Python packages:
 ```
-python -m pip install pyaml conan==1.46.2
+pip install conan==<version>
 ```
+Take the `<version>` value from `requirements.txt`.
 
-Install the build and runtime dependencies specified in `readme.md` of the particular branch
-using the `sudo apt install` command.
+Install the **build and runtime dependencies** specified in `readme.md` of the particular branch.
 
 NOTE: The C++ compiler is downloaded as a Conan artifact during the CMake Generation stage - the
 compilers installed in the Linux system (if any) are not used.
 
-### MacOS
+### macOS
 
 **Python 3.8+** should be installed and available on `PATH` as both `python` and `python3`. A
 possible installation procedure for Python 3.8 could look like the following:
@@ -148,22 +149,22 @@ possible installation procedure for Python 3.8 could look like the following:
   eval "$(pyenv init -)"
   ```
 
-Install the build and runtime dependencies specified in `readme.md` of the particular branch.
-
 NOTE: Xcode Command Line Tools package is installed automatically together with Homebrew.
+
+Install the **build dependencies** specified in `readme.md` of the particular branch.
 
 Install **CMake**, **Ninja** and **Conan** via **`pip`** using the command:
 ```
-git checkout master
+git checkout master #< The master branch contains requirements.txt suitable for all branches.
 pip install -r requirements.txt
 ```
 
 Alternatively to using `pip` with `requirements.txt`, you may install CMake and Ninja manually
-(just make sure they appear on `PATH`) and install the `pyaml`, `conan` and `dmgbuild` Python
-packages:
+(just make sure they appear on `PATH`) and install the following Python packages:
 ```
-python -m pip install pyaml conan==1.46.2 dmgbuild==1.3.2
+pip install conan==<version> dmgbuild==<version>
 ```
+Take `<version>` values from `requirements.txt`.
 
 ---------------------------------------------------------------------------------------------------
 ## Using CMake
