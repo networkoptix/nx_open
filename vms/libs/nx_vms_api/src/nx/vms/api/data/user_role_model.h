@@ -29,6 +29,9 @@ struct NX_VMS_API UserRoleModel
     /**%apidoc[opt] */
     GlobalPermissionsDeprecated permissions;
 
+    /**%apidoc[opt] List of User Roles to inherit permissions. */
+    std::vector<QnUuid> parentGroupIds;
+
     /**%apidoc[opt] List of accessible resource ids for this User Group. */
     std::optional<std::vector<QnUuid>> accessibleResources;
 
@@ -47,7 +50,7 @@ struct NX_VMS_API UserRoleModel
     static_assert(isCreateModelV<UserRoleModel>);
     static_assert(isUpdateModelV<UserRoleModel>);
 };
-#define UserRoleModel_Fields (id)(name)(description)(permissions)(accessibleResources)
+#define UserRoleModel_Fields (id)(name)(description)(permissions)(parentGroupIds)(accessibleResources)
 QN_FUSION_DECLARE_FUNCTIONS(UserRoleModel, (csv_record)(json)(ubjson)(xml), NX_VMS_API)
 
 } // namespace nx::vms::api

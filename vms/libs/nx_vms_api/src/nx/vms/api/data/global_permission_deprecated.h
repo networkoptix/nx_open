@@ -158,7 +158,7 @@ NX_VMS_API std::tuple<GlobalPermissions, std::vector<QnUuid>, std::map<QnUuid, A
 NX_VMS_API std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool>
     extractFromResourceAccessRights(
         GlobalPermissions permissions,
-        std::vector<QnUuid> groups,
+        std::vector<QnUuid>* groups,
         const std::map<QnUuid, AccessRights>& resourceAccessRights);
 
 } // namespace nx::vms::api
