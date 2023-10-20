@@ -3485,14 +3485,17 @@ QRect Style::subElementRect(
                 }
                 else if (header->textAlignment & Qt::AlignRight)
                 {
-                    if (rect.width() + Metrics::kSortIndicatorSize > maxRect.width())
+                    if (header->sortIndicator != QStyleOptionHeader::None)
                     {
-                        rect.setX(rect.x() - maxRect.width() - rect.width());
-                        rect.setWidth(rect.width() - Metrics::kSortIndicatorSize);
-                    }
-                    else
-                    {
-                        rect.setX(rect.x() - Metrics::kSortIndicatorSize);
+                        if (rect.width() + Metrics::kSortIndicatorSize > maxRect.width())
+                        {
+                            rect.setX(rect.x() - maxRect.width() - rect.width());
+                            rect.setWidth(rect.width() - Metrics::kSortIndicatorSize);
+                        }
+                        else
+                        {
+                            rect.setX(rect.x() - Metrics::kSortIndicatorSize);
+                        }
                     }
                 }
                 else if ((header->textAlignment & Qt::AlignHCenter)

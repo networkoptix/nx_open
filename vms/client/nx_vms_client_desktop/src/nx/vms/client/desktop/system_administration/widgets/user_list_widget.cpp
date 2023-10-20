@@ -185,6 +185,47 @@ protected:
 };
 
 // -----------------------------------------------------------------------------------------------
+// UserListHeaderView
+
+class UserListHeaderView : public CheckableHeaderView
+{
+    using base_type = CheckableHeaderView;
+public:
+    UserListHeaderView(int checkboxColumn, int customColumn, QWidget* parent = nullptr):
+        base_type(checkboxColumn, parent),
+        m_customColumn(customColumn)
+    {}
+
+protected:
+    virtual void paintSection(
+        QPainter* painter, const QRect& rect, int logicalIndex) const override
+    {
+        if (logicalIndex != m_customColumn
+            || !isSortIndicatorShown()
+            || sortIndicatorSection() == logicalIndex)
+        {
+            base_type::paintSection(painter, rect, logicalIndex);
+            return;
+        }
+
+        QStyleOptionHeader opt;
+        initStyleOption(&opt);
+        opt.rect = rect;
+        opt.section = logicalIndex;
+        opt.position = QStyleOptionHeader::End;
+        opt.sortIndicator = QStyleOptionHeader::None;
+        if (logicalIndexAt(mapFromGlobal(QCursor::pos())) == logicalIndex)
+            opt.state |= QStyle::State_MouseOver;
+        opt.textAlignment = Qt::AlignRight | Qt::AlignVCenter;
+        opt.text = model()->headerData(logicalIndex, orientation()).toString();
+        style()->drawControl(QStyle::CE_Header, &opt, painter, this);
+    }
+
+private:
+    int m_customColumn;
+};
+
+// -----------------------------------------------------------------------------------------------
 // UserListWidget
 
 class UserListWidget::Private: public QObject
@@ -197,7 +238,8 @@ public:
 
     UserListModel* const usersModel{new UserListModel(q)};
     SortedUserListModel* const sortModel{new SortedUserListModel(q)};
-    CheckableHeaderView* const header{new CheckableHeaderView(UserListModel::CheckBoxColumn, q)};
+    UserListHeaderView* const header{
+        new UserListHeaderView(UserListModel::CheckBoxColumn, UserListModel::IsCustomColumn, q)};
     QAction* filterDigestAction = nullptr;
 
     CommonMessageBar* const notFoundUsersWarning{
