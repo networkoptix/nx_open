@@ -88,6 +88,13 @@ struct NX_VMS_API ThumbnailFilter
      */
     std::chrono::milliseconds timestampMs{kLatestThumbnail};
 
+    /**%apidoc
+     * Timestamp of the image. A negative value means "latest".
+     * %deprecated Use the "timestampMs" field instead.
+     * %example 1000000
+     */
+    std::optional<std::chrono::milliseconds> timestampUs;
+
     /**%apidoc[opt]
      * If enabled, images requested with "Latest" option will not be tried to download from an
      * external archive like NVR.
@@ -130,9 +137,11 @@ struct NX_VMS_API ThumbnailFilter
     StreamSelectionMode streamSelectionMode = StreamSelectionMode::auto_;
 };
 
-#define ThumbnailFilter_Fields (id)(timestampMs)(ignoreExternalArchive)(rotation)(size)\
+#define ThumbnailFilter_Fields (id)(timestampMs)(timestampUs)(ignoreExternalArchive)(rotation)(size)\
     (format)(roundMethod)(aspectRatio)(tolerant)(crop)(streamSelectionMode)
-QN_FUSION_DECLARE_FUNCTIONS(ThumbnailFilter, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ThumbnailFilter, ThumbnailFilter_Fields)
+
+NX_VMS_API void serialize(QnJsonContext* ctx, const ThumbnailFilter& value, QJsonValue* target);
+NX_VMS_API bool deserialize(QnJsonContext* ctx, const QJsonValue& value, ThumbnailFilter* target);
 
 } // namespace nx::vms::api
