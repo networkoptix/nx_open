@@ -750,7 +750,7 @@ const QString ChannelPartnerServer::baseUrl(common::SystemContext* context)
 const nx::utils::Url ChannelPartnerServer::reportUrl(common::SystemContext* context)
 {
     const auto systemId = context->globalSettings()->cloudSystemId();
-    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/system_usage_report", systemId);
+    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/system_usage_report/", systemId);
 }
 
 const nx::utils::Url ChannelPartnerServer::saasServicesUrl(common::SystemContext* context)
