@@ -12,6 +12,7 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -34,6 +35,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -89,6 +92,10 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
         &QnAboutDialog::retranslateUi);
 
     connect(windowContext(), &WindowContext::systemChanged, this, &QnAboutDialog::retranslateUi);
+
+    if (saas::saasInitialized(systemContext()))
+        initSaasSupportInfo();
+
     retranslateUi();
 }
 
@@ -212,4 +219,100 @@ void QnAboutDialog::at_copyButton_clicked()
     output += QTextDocumentFragment::fromHtml(m_serversReport).toPlainText();
 
     QApplication::clipboard()->setText(output);
+}
+
+void QnAboutDialog::initSaasSupportInfo()
+{
+    static constexpr auto kContentsColumn = 1;
+    static constexpr auto kSpacerHeight = 2;
+    static constexpr auto kCaptionFontWeight = QFont::DemiBold;
+
+    const auto addLabelAtPosition =
+        [this](const QString& text, int row, int column) -> QLabel*
+        {
+            auto layout = ui->supportLayout;
+            if (auto item = layout->itemAtPosition(row, column))
+            {
+                NX_ASSERT(false, "Label replaced existing layout item");
+                layout->removeItem(item);
+                delete item;
+            }
+
+            auto label = new QLabel(text);
+            layout->addWidget(label, row, column);
+            return label;
+        };
+
+    const auto appendLabelRow =
+        [this, &addLabelAtPosition](const QString& text, QFont::Weight fontWeight = QFont::Normal)
+        {
+            auto layout = ui->supportLayout;
+            auto label = addLabelAtPosition(text, layout->rowCount(), kContentsColumn);
+            auto font = label->font();
+            font.setWeight(fontWeight);
+            label->setFont(font);
+            return label;
+        };
+
+    const auto addSpacer =
+        [this]
+        {
+            auto layout = ui->supportLayout;
+            auto spacerItem = new QSpacerItem(/*width*/ 0, kSpacerHeight,
+                QSizePolicy::Minimum, QSizePolicy::Fixed);
+            layout->addItem(spacerItem, layout->rowCount(), kContentsColumn);
+        };
+
+    const auto saasData = systemContext()->saasServiceManager()->data();
+    const auto channelPartnerSupportData = saasData.channelPartner.supportInformation;
+    const auto channelPartnerName = saasData.channelPartner.name;
+
+    // It's expected that only valid data structures are returned by the partners API.
+
+    addSpacer();
+    appendLabelRow(channelPartnerName, kCaptionFontWeight);
+    addLabelAtPosition(tr("Partner information"), ui->supportLayout->rowCount() - 1, /*column*/ 0);
+
+    // Web links.
+    for (const auto& webAddress: channelPartnerSupportData.sites)
+    {
+        auto webAddressLabel = appendLabelRow(html::link(QUrl(webAddress)));
+        webAddressLabel->setOpenExternalLinks(true);
+    }
+
+    // Phone numbers.
+    if (!channelPartnerSupportData.phones.empty())
+    {
+        addSpacer();
+        appendLabelRow(tr("Phones"), kCaptionFontWeight);
+    }
+    for (const auto& phoneInfo: channelPartnerSupportData.phones)
+    {
+        auto phoneText = html::phoneNumberLink(phoneInfo.phone);
+        if (!phoneInfo.description.isEmpty())
+            phoneText = nx::format("%1 - %2").args(phoneText, phoneInfo.description);
+
+        auto phoneLabel = appendLabelRow(phoneText);
+        phoneLabel->setOpenExternalLinks(true);
+    }
+
+    // Email addresses.
+    if (!channelPartnerSupportData.emails.empty())
+    {
+        addSpacer();
+        appendLabelRow(tr("Emails"), kCaptionFontWeight);
+    }
+    for (const auto& emailInfo: channelPartnerSupportData.emails)
+    {
+        auto emailLabel = appendLabelRow(html::mailtoLink(emailInfo.email));
+        emailLabel->setOpenExternalLinks(true);
+    }
+
+    // Custom data.
+    for (const auto& customInfo: channelPartnerSupportData.custom)
+    {
+        addSpacer();
+        appendLabelRow(customInfo.label, kCaptionFontWeight);
+        appendLabelRow(customInfo.value)->setWordWrap(true);
+    }
 }
