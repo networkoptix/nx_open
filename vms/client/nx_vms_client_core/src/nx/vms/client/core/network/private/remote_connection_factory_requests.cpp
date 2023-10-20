@@ -514,7 +514,11 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
     request->setCredentials(context->credentials());
 
     ExternalErrorMap expectedErrors{
-        {StatusCode::unprocessableEntity, RemoteConnectionErrorCode::sessionExpired}
+        {StatusCode::unprocessableEntity, RemoteConnectionErrorCode::sessionExpired},
+        // When one server has not cached the session token and cannot validate the token on the
+        // second server, ServiceUnavailable is returned. On the client side, this situation should
+        // be interpreted as an expired session token.
+        {StatusCode::serviceUnavailable, RemoteConnectionErrorCode::sessionExpired}
     };
 
     if (context->isCloudConnection())
