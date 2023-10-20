@@ -103,6 +103,11 @@ NX_VMS_COMMON_API QString customLink(const QString& text, const QString& link);
 NX_VMS_COMMON_API QString mailtoLink(const QString& address);
 
 /**
+ * Create a phone number link with text equal to the number.
+ */
+NX_VMS_COMMON_API QString phoneNumberLink(const QString& phoneNumber);
+
+/**
  * Create html link with text, equal to url.
  */
 NX_VMS_COMMON_API QString link(const QUrl& url);
