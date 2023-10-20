@@ -199,4 +199,6 @@ NX_REFLECTION_INSTRUMENT(BatchErrorInfo, (uncommitted))
 
 NX_REFLECTION_INSTRUMENT(BatchItemErrorInfo, (description)(item))
 
+NX_REFLECTION_INSTRUMENT(SystemCredentials, (id)(authKey))
+
 } // namespace nx::cloud::db::api

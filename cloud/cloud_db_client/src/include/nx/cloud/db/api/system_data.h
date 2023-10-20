@@ -627,4 +627,11 @@ struct BatchErrorInfo
     /**%apidoc Uncommited batch items */
     std::vector<BatchItemErrorInfo> uncommitted;
 };
+
+struct SystemCredentials
+{
+    std::string id;
+    std::string authKey;
+};
+
 } // namespace nx::cloud::db::api
