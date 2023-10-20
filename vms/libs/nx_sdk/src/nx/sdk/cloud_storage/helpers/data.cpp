@@ -1037,6 +1037,8 @@ AttributeSearchCondition::AttributeSearchCondition(const nx::kit::Json& json)
     text = getStringValue(json, "text");
     range = getObjectValue<NumericRange>(json, "range");
     isNegative = getBoolValue(json, "isNegative");
+    matchesFromStart = getBoolValue(json, "matchesFromStart");
+    matchesTillEnd = getBoolValue(json, "matchesTillEnd");
 }
 
 AttributeSearchCondition::AttributeSearchCondition(const char* jsonData):
@@ -1047,7 +1049,8 @@ AttributeSearchCondition::AttributeSearchCondition(const char* jsonData):
 bool AttributeSearchCondition::operator==(const AttributeSearchCondition& other) const
 {
     return other.isNegative == isNegative && other.name == name && other.range == range
-        && other.text == text && other.type == type && other.value == value;
+        && other.text == text && other.type == type && other.value == value
+        && other.matchesFromStart == matchesFromStart && other.matchesTillEnd == matchesTillEnd;
 }
 
 std::string AttributeSearchCondition::typeToString(Type type)
@@ -1089,7 +1092,9 @@ nx::kit::Json AttributeSearchCondition::to_json() const
         {"value", value},
         {"text", text},
         {"range", range},
-        {"isNegative", isNegative}
+        {"isNegative", isNegative},
+        {"matchesFromStart", matchesFromStart},
+        {"matchesTillEnd", matchesTillEnd},
     });
 }
 

@@ -20,6 +20,13 @@ std::vector<TextSearchCondition> UserTextSearchExpressionParser::parse(const QSt
 
 void UserTextSearchExpressionParser::saveToken(QStringView token)
 {
+    const bool matchesFromStart = token.startsWith('^');
+    if (matchesFromStart)
+        token = token.mid(1);
+    const bool matchesTillEnd = token.endsWith('$');
+    if (matchesTillEnd)
+        token.chop(1);
+
     bool isQuoted = false;
     if (token.startsWith('\"'))
     {
@@ -37,7 +44,11 @@ void UserTextSearchExpressionParser::saveToken(QStringView token)
     if (token.empty())
         return;
 
-    m_tokens.push_back({token, isQuoted});
+    m_tokens.push_back({
+        .value = token.toString(),
+        .matchesFromStart = matchesFromStart,
+        .matchesTillEnd = matchesTillEnd,
+        .isQuoted = isQuoted});
 }
 
 QString UserTextSearchExpressionParser::unescape(const QStringView& str)
@@ -108,6 +119,16 @@ bool TextMatcher::matched() const
         [](auto matched) { return matched; });
 }
 
+bool TextMatcher::isAttributeNameMatching(const QString& attributeName, const QString& value)
+{
+    if (value.endsWith('*'))
+        return attributeName.startsWith(value.chopped(1), Qt::CaseInsensitive);
+
+    return attributeName.compare(value, Qt::CaseInsensitive) == 0
+        // NOTE: The period is used to separate Attribute names of nested Objects.
+        || attributeName.startsWith(value + ".", Qt::CaseInsensitive);
+}
+
 void TextMatcher::matchExactAttributes(
     const nx::common::metadata::Attributes& attributes)
 {
@@ -120,8 +141,18 @@ void TextMatcher::matchExactAttributes(
         auto comparator =
             [&condition](const auto& attr)
             {
-                return attr.name.compare(condition.name, Qt::CaseInsensitive) == 0
-                    && attr.value.contains(condition.value, Qt::CaseInsensitive);
+                if (!isAttributeNameMatching(attr.name, condition.name))
+                    return false;
+
+                if (condition.valueToken.matchesFromStart && condition.valueToken.matchesTillEnd)
+                {
+                    return attr.value.compare(condition.valueToken.value, Qt::CaseInsensitive) == 0;
+                }
+                if (condition.valueToken.matchesFromStart)
+                    return attr.value.startsWith(condition.valueToken.value, Qt::CaseInsensitive);
+                if (condition.valueToken.matchesTillEnd)
+                    return attr.value.endsWith(condition.valueToken.value, Qt::CaseInsensitive);
+                return attr.value.contains(condition.valueToken.value, Qt::CaseInsensitive);
             };
         bool matched = condition.isNegative
             ? std::none_of(attributes.begin(), attributes.end(), comparator)
@@ -143,8 +174,7 @@ void TextMatcher::checkAttributesPresence(
         auto comparator =
             [&condition](const auto& attr)
             {
-                return attr.name.compare(condition.name, Qt::CaseInsensitive) == 0
-                    || attr.name.startsWith(condition.name + ".", Qt::CaseInsensitive);
+                return isAttributeNameMatching(attr.name, condition.name);
             };
         if (condition.isNegative)
         {
