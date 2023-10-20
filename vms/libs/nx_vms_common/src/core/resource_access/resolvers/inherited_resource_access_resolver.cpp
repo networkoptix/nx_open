@@ -231,6 +231,10 @@ GlobalPermissions InheritedResourceAccessResolver::Private::globalPermissions(
     if (!subjectHierarchy)
         return result;
 
+    // `subjectHierarchy->directParents(subjectId)` may operate on a changed hierarchy state
+    // between recursive calls to `globalPermissions`. Hence, it may introduce a data race
+    // regardless of the mutex being locked when `directParents` is called.
+    // Moreover, locking and unlocking mutex is expensive. And here it will be done several times in a row.
     for (const auto& parentId: subjectHierarchy->directParents(subjectId))
         result |= globalPermissions(parentId, visitedSubjectIds);
 

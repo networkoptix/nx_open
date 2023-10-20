@@ -50,52 +50,112 @@ struct ServerApiErrors
     Q_DECLARE_TR_FUNCTIONS(ServerApiErrors);
 };
 
+GlobalPermissions getGlobalPermissions(const SystemContext& context, const QnUuid& id)
+{
+    return context.resourceAccessManager()
+        ->globalPermissions(context.accessSubjectHierarchy()->subjectById(id));
+}
+
+// Access and User info of the caller. Unlike `Qn::UserAccessData` can't represent 'Access::System'.
+struct UserAccessorInfo
+{
+    QnUuid id;
+    QString name;
+    GlobalPermissions permissions;
+};
+
+static auto userAccessorInfo(const SystemContext& context, const Qn::UserAccessData& access)
+    -> std::pair<UserAccessorInfo, Result>
+{
+    const auto existingUser =
+        context.resourcePool()->getResourceById<QnUserResource>(access.userId);
+
+    if (!NX_ASSERT(existingUser))
+    {
+        NX_WARNING(NX_SCOPE_TAG, "User '%1' not found.", access.userId);
+        return {{}, {ErrorCode::serverError}};
+    }
+
+    // TODO: Regardless of the mutex locks getting these properties is not atomic,
+    //  hence a data race is possible.
+    const QnUuid id = existingUser->getId();
+    QString name = existingUser->getName();
+    const GlobalPermissions permissions = getGlobalPermissions(context, id);
+
+    return {UserAccessorInfo{.id = id, .name = std::move(name), .permissions = permissions}, {}};
+}
+
 class CanAddOrRemoveParentGroups final
 {
 public:
+    // Input type for User info
+    struct UserInfo
+    {
+        QnUuid id;
+        QString name;
+        std::vector<QnUuid> parentGroups;
+    };
+
+    // Input type for User Group info
+    struct UserGroupInfo
+    {
+        QnUuid id;
+        QString name;
+        api::UserType type;
+        std::vector<QnUuid> parentGroups;
+    };
+
     /**
      * Checks whether a new or existing User can be added to the given parent User Groups.
-     * @param manager
+     * @param context
      * @param accessData
      * @param existingUser existing User. Value `nullptr` is considered as a new user to be
      * created.
      * @param parentGroups parent User Groups to add the User into
      * @return
      */
-    [[nodiscard]] Result operator()(nx::vms::common::UserGroupManager* const manager,
-        const Qn::UserAccessData& accessData,
-        const QnSharedResourcePointer<QnUserResource>& existingUser,
-        const std::vector<QnUuid>& parentGroups) const
+    [[nodiscard]] Result operator()(const SystemContext& context,
+        const UserAccessorInfo& accessor,
+        UserInfo user,
+        std::vector<QnUuid> parentGroups) const
     {
-        return canAddOrRemove(manager, accessData, existingUser, parentGroups);
+        return canAddOrRemove(context, accessor, std::move(user), std::move(parentGroups));
     }
 
     /**
      * Checks whether a new or existing User Group can be added to the given parent User Groups.
-     * @param manager
+     * @param context
      * @param accessData
-     * @param existingGroup existing User Group. Value `nullptr` is considered as a new User Group
+     * @param existingGroup existing User Group. Value `nullopt` is considered as a new User Group
      * to be created.
      * @param parentGroups parent User Groups to add the User Group into
      * @return
      */
-    [[nodiscard]] Result operator()(nx::vms::common::UserGroupManager* const manager,
-        const Qn::UserAccessData& accessData,
-        const std::optional<api::UserGroupData>& existingGroup,
-        const std::vector<QnUuid>& parentGroups) const
+    [[nodiscard]] Result operator()(const SystemContext& context,
+        const UserAccessorInfo& accessor,
+        UserGroupInfo group,
+        std::vector<QnUuid> parentGroups) const
     {
-        return canAddOrRemove(manager, accessData, existingGroup, parentGroups);
+        return canAddOrRemove(context, accessor, std::move(group), std::move(parentGroups));
     }
 
 private:
-    template<typename ChildT>
-    [[nodiscard]] Result canAddOrRemove(nx::vms::common::UserGroupManager* const manager,
-        const Qn::UserAccessData& /*accessData*/,
-        const ChildT& existingChild,
+    struct SelectedGroupProps
+    {
+        QnUuid id;
+        QString name;
+        api::UserType type;
+    };
+
+    template<typename UserOrGroup>
+    [[nodiscard]] Result canAddOrRemove(const nx::vms::common::SystemContext& context,
+        const UserAccessorInfo& accessor,
+        UserOrGroup child,
         std::vector<QnUuid> parentIds) const
     {
-        if (!NX_ASSERT(manager))
-            return {ErrorCode::serverError};
+        static_assert(
+            std::is_same_v<UserOrGroup, UserInfo> || std::is_same_v<UserOrGroup, UserGroupInfo>,
+            "Unexpected resource type: only user or user group are allowed.");
 
         // returns elements from `rangeToSearch` which are not found in `rangeContaining`
         // TODO: #skolesnik Consider moving to `open/libs/nx_utils/src/nx/utils/std/algorithm.h`
@@ -109,126 +169,277 @@ private:
                 return notFound;
             };
 
-        const auto selectGroupProps =
-            [](const api::UserGroupData& groupData)
-            {
-                struct
-                {
-                    QnUuid id;
-                    QString name;
-                    api::UserType type;
-                } selected{.id = groupData.id, .name = groupData.name, .type = groupData.type};
-
-                return selected;
-            };
+        if constexpr (std::is_same_v<UserOrGroup, UserGroupInfo>)
+        {
+            if (Result r = checkForCircularDependencies(context, child, parentIds); !r)
+                return r;
+        }
 
         using nx::utils::unique_sorted;
 
-        const auto existing = unique_sorted(parentGroups(existingChild));
+        const auto existing = unique_sorted(std::move(child.parentGroups));
         const auto updated = unique_sorted(std::move(parentIds));
 
-        const auto newParents = manager->mapGroupsByIds(
-            setDifference(updated, existing),
-            selectGroupProps);
+        const auto selectGroupProps =
+            [](const api::UserGroupData& groupData)
+            {
+                return SelectedGroupProps{
+                    .id = groupData.id, .name = groupData.name, .type = groupData.type};
+            };
 
-        const auto removeParents = manager->mapGroupsByIds(
-            setDifference(existing, updated),
-            selectGroupProps);
+        const auto& groupManager = *context.userGroupManager();
+        const auto [newParents, newNotFound] =
+            groupManager.mapGroupsByIds(setDifference(updated, existing), selectGroupProps);
+
+        if (!newNotFound.empty())
+        {
+            // TODO: (?) Can report all the missing groups.
+            return {ErrorCode::badRequest,
+                nx::format(ServerApiErrors::tr("User Group '%1' does not exist."),
+                    newNotFound.front().toString())};
+        }
+
+        const auto [removeParents, removeNotFound] =
+            groupManager.mapGroupsByIds(setDifference(existing, updated), selectGroupProps);
+
+        for (const QnUuid& id: removeNotFound)
+        {
+            NX_WARNING(this,
+                "User '%1(%2)' has requested to remove from non-existing User Group '%3'.",
+                accessor.name,
+                accessor.id.toString(),
+                id);
+        }
+
+        const auto accessorPermissions = accessor.permissions;
 
         for (const auto& parent: newParents)
         {
-            if (!parent.value)
+            if (parent.type == api::UserType::ldap)
+                return forbidAddToLdap(child, parent);
+
+            if (parent.type != api::UserType::local)
             {
                 return {ErrorCode::badRequest,
-                    nx::format(ServerApiErrors::tr("User Group '%1' does not exist."),
+                    nx::format(
+                        ServerApiErrors::tr("Cannot add to a non-local (%1) User Group '%2(%3)'."),
+                        parent.type,
+                        parent.name,
                         parent.id.toString())};
             }
-        }
 
-        for (const auto& parentGroup: removeParents)
-        {
-            if (!parentGroup.value)
+            if (!accessorPermissions.testAnyFlags(
+                GlobalPermission::powerUser | GlobalPermission::administrator))
             {
-                NX_WARNING(this,
-                    "Requested to remove from non-existing User Group '%1'.",
-                    parentGroup.id);
-                continue;
+                return forbidAddToGroup(accessor, child, parent);
             }
-        }
 
-        for (const auto& parent: newParents)
-        {
-            if (parent.value->type == api::UserType::ldap)
-                return errorCantAddToLdap(existingChild, *parent.value);
+            // This calls a dfs traversal with multiple mutex locks/unlocks.
+            // Very far from being cache-friendly.
+            const auto parentPermissions = getGlobalPermissions(context, parent.id);
+
+            // TODO: Clarify this. Local Administrators are not allowed to create new Admins.
+            // Quotes from the "Permission-clarification" table:
+            // > (Creation) Any local user except Administrator and read-only users
+            // > Also it is impossible to add any group into Administrators group.
+            if (parentPermissions.testFlag(GlobalPermission::administrator))
+                return forbidAddToGroup(accessor, child, parent);
+
+            if (parentPermissions.testFlag(GlobalPermission::powerUser)
+                && !accessorPermissions.testFlag(GlobalPermission::administrator))
+            {
+                return forbidAddToGroup(accessor, child, parent);
+            }
         }
 
         for (const auto& parent: removeParents)
         {
-            if (parent.value->type == api::UserType::ldap)
-                return errorCantRemoveFromLdap(existingChild, *parent.value);
+            if (parent.type == api::UserType::ldap)
+                return forbidRemoveFromLdap(child, parent);
+
+            if (!NX_ASSERT(parent.type == api::UserType::local))
+            {
+                NX_DEBUG(this, "Unexpected parent User Group type '%1'.", parent.type);
+                return {ErrorCode::serverError};
+            }
+
+            if (!accessorPermissions.testFlag(GlobalPermission::powerUser)
+                && !accessorPermissions.testFlag(GlobalPermission::administrator))
+            {
+                return forbidRemoveFromGroup(accessor, child, parent);
+            }
+
+            // This calls a dfs traversal with multiple mutex locks/unlocks.
+            // Very far from being cache-friendly.
+            const auto parentPermissions = getGlobalPermissions(context, parent.id);
+
+            // TODO: Clarify this. Local Administrators are not allowed to remove Admins.
+            if (parentPermissions.testFlag(GlobalPermission::administrator))
+                return forbidRemoveFromGroup(accessor, child, parent);
+
+            if (parentPermissions.testFlag(GlobalPermission::powerUser)
+                && !accessorPermissions.testFlag(GlobalPermission::administrator))
+            {
+                return forbidRemoveFromGroup(accessor, child, parent);
+            }
         }
 
         return {};
     }
 
-    static std::vector<QnUuid> parentGroups(
-        const QnSharedResourcePointer<QnUserResource>& existingUser)
+    static Result checkForCircularDependencies(const SystemContext& context,
+        const UserGroupInfo& group,
+        const std::vector<QnUuid>& parents)
     {
-        return existingUser ? existingUser->groupIds() : std::vector<QnUuid>{};
+        QSet<QnUuid> parentIds = nx::utils::toQSet(parents);
+        parentIds += context.accessSubjectHierarchy()->recursiveParents(parentIds);
+
+        if (parentIds.contains(group.id) && group.type != nx::vms::api::UserType::ldap)
+        {
+            const auto cycledGroups =
+                context.accessSubjectHierarchy()->directMembers(group.id).intersect(parentIds);
+
+            const QStringList cycledGroupNames =
+                [&]
+                {
+                    auto [selected, notFound] = context.userGroupManager()->mapGroupsByIds(cycledGroups,
+                        [](const api::UserGroupData& group) -> QString
+                        {
+                            return NX_FMT("%1(%2)", group.name, group.id.toString());
+                        });
+
+                    return QStringList(std::make_move_iterator(selected.begin()),
+                        std::make_move_iterator(selected.end()));
+                }();
+
+            return {ErrorCode::forbidden,
+                nx::format(
+                    ServerApiErrors::tr(
+                        "Circular dependencies are forbidden. The User Group '%1(%2)' is already "
+                        "inherited by '%3'."),
+                    group.name,
+                    group.id.toString(),
+                    cycledGroupNames.join("', '"))};
+        }
+
+        return {};
     }
 
-    static std::vector<QnUuid> parentGroups(
-        const std::optional<api::UserGroupData>& existingGroup)
+    template<typename Info>
+    static Result forbidAddToLdap(
+        const Info& /*userOrGroup*/, const SelectedGroupProps& group)
     {
-        return existingGroup ? existingGroup->parentGroupIds : std::vector<QnUuid>{};
+        static const auto errorTemplate =
+            []() -> QString
+            {
+                if constexpr (std::is_same_v<Info, UserInfo>)
+                {
+                    return ServerApiErrors::tr(
+                        "Forbidden to add any Users to an LDAP User Group '%1(%2)'.");
+                }
+                else
+                {
+                    static_assert(std::is_same_v<Info, UserGroupInfo>,
+                        "Unexpected resource type: only user or user group are allowed.");
+
+                    return ServerApiErrors::tr(
+                        "Forbidden to add any User Groups to an LDAP User Group '%1(%2)'.");
+                }
+            }();
+
+        return {ErrorCode::forbidden, nx::format(errorTemplate, group.name, group.id.toString())};
     }
 
-    template<typename GroupInfo>
-    static Result errorCantAddToLdap(
-        const QnSharedResourcePointer<QnUserResource>& /*existingUser*/, const GroupInfo& group)
+    template<typename Info>
+    static Result forbidRemoveFromLdap(
+        const Info& /*userOrGroup*/, const SelectedGroupProps& group)
     {
+        static const auto errorTemplate =
+            []() -> QString
+            {
+                if constexpr (std::is_same_v<Info, UserInfo>)
+                {
+                    return ServerApiErrors::tr(
+                        "Forbidden to remove any Users from an LDAP User Group '%1(%2)'.");
+                }
+                else
+                {
+                    static_assert(std::is_same_v<Info, UserGroupInfo>,
+                        "Unexpected resource type: only user or user group are allowed.");
+
+                    return ServerApiErrors::tr(
+                        "Forbidden to remove any User Groups from an LDAP User Group '%1(%2)'.");
+                }
+            }();
+
+        return {ErrorCode::forbidden, nx::format(errorTemplate, group.name, group.id.toString())};
+    }
+
+    template<typename Info>
+    static Result forbidAddToGroup(const UserAccessorInfo& accessor,
+        const Info& userOrGroup,
+        const SelectedGroupProps& parentGroup)
+    {
+        static const auto errorTemplate =
+            []() -> QString
+            {
+                if constexpr (std::is_same_v<Info, UserInfo>)
+                {
+                    return ServerApiErrors::tr(
+                        "User '%1(%2)' is not permitted to add the User '%3(%4)' to the User Group '%5(%6)'.");
+                }
+                else
+                {
+                    static_assert(std::is_same_v<Info, UserGroupInfo>,
+                        "Unexpected resource type: only user or user group are allowed.");
+
+                    return ServerApiErrors::tr(
+                        "User '%1(%2)' is not permitted to add the User Group '%3(%4)' to the User Group '%5(%6)'.");
+                }
+            }();
+
         return {ErrorCode::forbidden,
-            nx::format(
-                ServerApiErrors::tr(
-                    "Forbidden to add any Users to a LDAP User Group '%1(%2)'"),
-                group.name,
-                group.id.toString())};
+            nx::format(errorTemplate,
+                accessor.name,
+                accessor.id,
+
+                userOrGroup.name,
+                userOrGroup.id,
+
+                parentGroup.name,
+                parentGroup.id)};
     }
 
-    template<typename GroupInfo>
-    static Result errorCantRemoveFromLdap(
-        const QnSharedResourcePointer<QnUserResource>& /*existingUser*/, const GroupInfo& group)
+    template<typename Info>
+    static Result forbidRemoveFromGroup(const UserAccessorInfo& accessor,
+        const Info& userOrGroup,
+        const SelectedGroupProps& parentGroup)
     {
-        return {ErrorCode::forbidden,
-            nx::format(
-                ServerApiErrors::tr(
-                    "Forbidden to remove any Users from a LDAP User Group '%1(%2)'"),
-                group.name,
-                group.id.toString())};
-    }
+        static const auto errorTemplate =
+            []() -> QString
+            {
+                if constexpr (std::is_same_v<Info, UserInfo>)
+                {
+                    return ServerApiErrors::tr(
+                        "User '%1(%2)' is not permitted to remove the User '%3(%4)' "
+                        "from the User Group '%5(%6)'.");
+                }
+                else
+                {
+                    static_assert(std::is_same_v<Info, UserGroupInfo>,
+                        "Unexpected resource type: only user or user group are allowed.");
 
-    template<typename GroupInfo>
-    static Result errorCantAddToLdap(
-        const std::optional<api::UserGroupData>& /*existingGroup*/, const GroupInfo& group)
-    {
-        return {ErrorCode::forbidden,
-            nx::format(
-                ServerApiErrors::tr(
-                    "Forbidden to add any User Groups to a LDAP User Group '%1(%2)'"),
-                group.name,
-                group.id.toString())};
-    }
+                    return ServerApiErrors::tr(
+                        "User '%1(%2)' is not permitted to remove the User Group '%3(%4)' "
+                        "from the User Group '%5(%6)'.");
+                }
+            }();
 
-    template<typename GroupInfo>
-    static Result errorCantRemoveFromLdap(
-        const std::optional<api::UserGroupData>& /*existingGroup*/, const GroupInfo& group)
-    {
         return {ErrorCode::forbidden,
-            nx::format(
-                ServerApiErrors::tr(
-                    "Forbidden to remove any User Groups from a LDAP User Group '%1(%2)'"),
-                group.name,
-                group.id.toString())};
+            nx::format(errorTemplate,
+                accessor.name, accessor.id,
+                userOrGroup.name, userOrGroup.id,
+                parentGroup.name, parentGroup.id)};
     }
 
 } const canAddOrRemoveParentGroups{};
@@ -860,8 +1071,18 @@ struct SaveUserAccess
     Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
         const nx::vms::api::UserData& param)
     {
+        if (!NX_ASSERT(systemContext))
+        {
+            NX_WARNING(this, "`systemContext` is nullptr.");
+            return {ErrorCode::serverError};
+        }
+
         if (hasSystemAccess(accessData))
             return ModifyResourceAccess()(systemContext, accessData, param);
+
+        auto [accessor, accessorResult] = userAccessorInfo(*systemContext, accessData);
+        if (!accessorResult)
+            return std::move(accessorResult);
 
         auto resourcePool = systemContext->resourcePool();
 
@@ -881,69 +1102,29 @@ struct SaveUserAccess
         }
 
         const auto existingUser = resourcePool->getResourceById<QnUserResource>(param.id);
-        if (existingUser)
+
+        // `QnUserResource` accessors may not provide consistent information (due to data races)
+        // regardless of having mutexes.
+        // Converting to `api::UserData` gives a chance to reduce the possibility of data races
+        // (although not preventing it completely).
+        const auto apiData =
+            [](const QnUserResource& user)
+            {
+                api::UserData data;
+                fromResourceToApi(user, data);
+                return data;
+            };
+
+        if (Result r = !existingUser
+                ? validateUserCreation(*systemContext, accessor, param)
+                : validateUserModifications(
+                    *systemContext, accessor, apiData(*existingUser), param);
+            !r)
         {
-            if (existingUser->attributes().testFlag(nx::vms::api::UserAttribute::readonly))
-            {
-                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                    "Change of the User with readonly attribute is forbidden for VMS."));
-            }
-
-            if (existingUser->externalId() != param.externalId)
-            {
-                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                    "Change of `externalId` is forbidden."));
-            }
-
-            if (param.digest != nx::vms::api::UserData::kHttpIsDisabledStub
-                && (param.type == nx::vms::api::UserType::cloud
-                    || existingUser->getDigest() == param.digest)
-                && existingUser->getName() != param.name)
-            {
-                return Result(ErrorCode::forbidden,
-                    (param.type == nx::vms::api::UserType::cloud)
-                        ? nx::format(ServerApiErrors::tr(
-                            "User '%1' will not be saved because names differ: "
-                            "'%1' vs '%2' and changing name is forbidden for %3 users.",
-                            /*comment*/ "%3 is the short Cloud name"),
-                            existingUser->getName(), param.name, nx::branding::shortCloudName())
-                        : nx::format(ServerApiErrors::tr(
-                            "User '%1' will not be saved because names differ: "
-                            "'%1' vs '%2' and `password` has not been provided."),
-                            existingUser->getName(), param.name));
-            }
-        }
-        else
-        {
-            if (param.type == nx::vms::api::UserType::ldap)
-            {
-                return Result(
-                    ErrorCode::forbidden, ServerApiErrors::tr("LDAP User creation is forbidden."));
-            }
-
-            if (param.name.isEmpty())
-            {
-                return Result(ErrorCode::badRequest, ServerApiErrors::tr(
-                    "User with empty name is not allowed."));
-            }
+            return r;
         }
 
-        if (!existingUser && param.isAdministrator())
-        {
-            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "Creating an Administrator user is not allowed.")));
-        }
-
-        if (const auto res = canAddOrRemoveParentGroups(
-                    systemContext->userGroupManager(),
-                    accessData,
-                    existingUser,
-                    param.groupIds);
-            !res)
-        {
-            return res;
-        }
-
+        // TODO: This should be handled by `forbidNonLocalModification`.
         if (param.type == nx::vms::api::UserType::cloud
             && ((existingUser && param.fullName != existingUser->fullName())
                 || (!existingUser && !param.fullName.isEmpty())))
@@ -953,15 +1134,13 @@ struct SaveUserAccess
                 nx::branding::shortCloudName()));
         }
 
+        // TODO: #skolesnik Move to 'validateUserModification`. Shouldn't `existing.type` be
+        //     checked instead of `param.type`?
         if (param.type == nx::vms::api::UserType::temporaryLocal && existingUser)
         {
             const auto temporaryToken = QJson::deserialized<nx::vms::api::TemporaryToken>(param.hash);
             if (!temporaryToken.isValid())
-            {
-                return Result(
-                    ErrorCode::forbidden,
-                    ServerApiErrors::tr("Invalid temporary token"));
-            }
+                return {ErrorCode::forbidden, ServerApiErrors::tr("Invalid temporary token")};
         }
 
         NX_ASSERT(resourcePool->getResourcesByIds<QnUserResource>(
@@ -978,6 +1157,329 @@ struct SaveUserAccess
     {
         return (*this)(systemContext, accessData, param.toUserData());
     }
+
+private:
+    static Result validateUserCreation(const SystemContext& context,
+        const UserAccessorInfo& accessor,
+        const api::UserData& user)
+    {
+        if (!accessor.permissions.testAnyFlags(
+            GlobalPermission::administrator | GlobalPermission::powerUser))
+        {
+            return forbidUserCreation(accessor);
+        }
+
+        if (user.attributes.testFlag(api::UserAttribute::readonly))
+            return forbidReadonlyCreation();
+
+        if (Result r = checkNonLocalCreation(user.type); !r)
+            return r;
+
+        if (Result r = checkAdHocCloudCreation(user); !r)
+            return r;
+
+        // TODO: #skolesnik
+        //     Check for attempts to assign `administrator` or `powerUser` as custom rights.
+        //     Example: new set of `parentIds` doesn't have a `powerUser` group, but `attributes`
+        //         has the flag set. In this case a error should be issued stating that creating
+        //         a `Power User` should be done via adding to a `Power Users` (or derived)
+        //         User Group.
+        //         If `parentIds` contain a power user group, but attribute 'powerUser' is not set,
+        //         (???) no error should be reported.
+
+        // TODO: #skolesnik
+        //     Although it is not allowed to inherit from the `Administrators` group, it is
+        //     still technically more correct to perform the hierarchy check.
+        //     Also, `Administrator` as a "custom right" should also be checked (?not allowed).
+        if (user.isAdministrator())
+        {
+            return {ErrorCode::forbidden,
+                nx::format(ServerApiErrors::tr("Creating an Administrator user is not allowed."))};
+        }
+
+        using UserInfo = CanAddOrRemoveParentGroups::UserInfo;
+        if (Result r = canAddOrRemoveParentGroups(context,
+                accessor,
+                UserInfo{.id = user.id, .name = user.name, .parentGroups = {}},
+                user.groupIds);
+            !r)
+        {
+            return r;
+        }
+
+        return {};
+    }
+
+    static Result validateUserModifications(const SystemContext& context,
+        const UserAccessorInfo& accessor,
+        const api::UserData& existing,
+        const api::UserData& modified)
+    {
+        const bool isSelfModification = accessor.id == existing.id;
+
+        if (Result r = !isSelfModification
+                ? checkIfCanModifyUser(context, accessor, existing)
+                : Result{};
+            !r)
+        {
+            return r;
+        }
+
+        if (existing.attributes.testFlag(api::UserAttribute::readonly))
+            return forbidReadonlyModification();
+
+        const bool isLocal = existing.type == api::UserType::local
+            || existing.type == api::UserType::temporaryLocal;
+
+        if (existing.type != modified.type)
+        {
+            // This might happen for `v{1-2}` requests. For `v{3-}` `type` is expected to be
+            // ignored by the schema.
+            NX_WARNING(NX_SCOPE_TAG, "Attempt to modify UserDara `type` property, "
+                                     "which is ignored by the OpenAPI schema.");
+
+            return {ErrorCode::forbidden,
+                nx::format(ServerApiErrors::tr("Forbidden to modify User's 'type' from '%1' to '%2'."),
+                    existing.type,
+                    modified.type)};
+        }
+
+        if (existing.type == nx::vms::api::UserType::temporaryLocal)
+        {
+            const auto temporaryToken =
+                QJson::deserialized<nx::vms::api::TemporaryToken>(modified.hash);
+            if (!temporaryToken.isValid())
+                return {ErrorCode::forbidden, ServerApiErrors::tr("Invalid temporary token")};
+        }
+
+        if (isSelfModification && existing.isEnabled != modified.isEnabled)
+        {
+            const static QString errTemplate = existing.isEnabled
+                ? "User '%1(%2)' can't disable himself."
+                : "User '%1(%2)' can't enable himself.";
+
+            return {ErrorCode::forbidden,
+                nx::format(errTemplate, existing.name, existing.getId().toString())};
+        }
+
+        if (existing.name != modified.name)
+        {
+            if (!isLocal)
+                return forbidNonLocalModification("name", existing);
+
+            if (isSelfModification
+                && (accessor.permissions.testFlag(GlobalPermission::administrator)
+                    || accessor.permissions.testFlag(GlobalPermission::powerUser)))
+            {
+                return forbidSelfModification("name", existing);
+            }
+        }
+
+        if (!isLocal && existing.fullName != modified.fullName)
+            return forbidNonLocalModification("fullName", existing);
+
+        if (!isLocal && existing.email != modified.email)
+            return forbidNonLocalModification("email", existing);
+
+        // TODO: (?) `permissions`
+
+        if (existing.externalId != modified.externalId)
+            return forbidExternalIdModification();
+
+        // TODO: (?) `attributes`
+
+        if (Result r = checkDigestModifications(existing, modified); !r)
+            return r;
+
+        // TODO: (?) hash
+        // TODO: (?) cryptSha512Hash
+
+        // TODO: #skolesnik
+        //     Check for attempts to assign `administrator` or `powerUser` as custom rights.
+        //     Example: new set of `parentIds` doesn't have a `powerUser` group, but `attributes`
+        //         has the flag set. In this case a error should be issued stating that creating
+        //         a `Power User` should be done via adding to a `Power Users` (or derived)
+        //         User Group.
+        //         If `parentIds` contain a power user group, but attribute 'powerUser' is not set,
+        //         (???) no error should be reported.
+        using UserInfo = CanAddOrRemoveParentGroups::UserInfo;
+        if (const auto r = canAddOrRemoveParentGroups(context,
+                accessor,
+                UserInfo{
+                    .id = existing.id, .name = existing.name, .parentGroups = existing.groupIds},
+                modified.groupIds);
+            !r)
+        {
+            return r;
+        }
+
+        return {};
+    }
+
+    static Result checkIfCanModifyUser(const SystemContext& context,
+        const UserAccessorInfo& accessor,
+        const api::UserData& existing)
+    {
+        // TODO: Provide this info with `existing` to reduce potential data races.
+        const GlobalPermissions target = getGlobalPermissions(context, existing.id);
+
+        if (target.testFlag(GlobalPermission::administrator))
+        {
+            return forbidUserModification(accessor, existing, GlobalPermission::administrator);
+        }
+
+        if (!accessor.permissions.testFlag(GlobalPermission::administrator)
+            && !accessor.permissions.testFlag(GlobalPermission::powerUser))
+        {
+            return forbidUserModification(accessor, existing, GlobalPermission::none);
+        }
+
+        if (target.testFlag(GlobalPermission::powerUser)
+            && !accessor.permissions.testFlag(GlobalPermission::administrator))
+        {
+            return forbidUserModification(accessor, existing, GlobalPermission::administrator);
+        }
+
+        return {};
+    }
+
+    static Result checkNonLocalCreation(api::UserType requestedType)
+    {
+        // Ad hoc to allow Cloud users creation via VMS API, although the API Documentations
+        // explicitly says that only local users are allowed to be created via the API.
+        // TODO: Disallow creation of Cloud users?
+        if (requestedType == api::UserType::cloud)
+            return {};
+
+        if (requestedType != api::UserType::local
+            && requestedType != api::UserType::temporaryLocal)
+        {
+            return {ErrorCode::forbidden,
+                nx::format(
+                    ServerApiErrors::tr("Creation of a non-local (%1) User is forbidden for VMS."),
+                    requestedType)};
+        }
+
+        return {};
+    }
+
+    static Result checkDigestModifications(
+        const api::UserData& existing, const api::UserData& modified)
+    {
+        // TODO: Simplify?
+        if (modified.digest != nx::vms::api::UserData::kHttpIsDisabledStub
+            && (modified.type == nx::vms::api::UserType::cloud
+                || existing.digest == modified.digest)
+            && existing.name != modified.name)
+        {
+            return {ErrorCode::forbidden,
+                (modified.type == nx::vms::api::UserType::cloud)
+                    ? nx::format(ServerApiErrors::tr(
+                                     "User '%1' will not be saved because names differ: "
+                                     "'%1' vs '%2' and changing name is forbidden for %3 users.",
+                                     /*comment*/ "%3 is the short Cloud name"),
+                        existing.name,
+                        modified.name,
+                        nx::branding::shortCloudName())
+                    : nx::format(
+                        ServerApiErrors::tr("User '%1' will not be saved because names differ: "
+                                            "'%1' vs '%2' and `password` has not been provided."),
+                        existing.name,
+                        modified.name)};
+        }
+
+        return {};
+    }
+
+    static Result forbidSelfModification(const QString& propName, const api::UserData& user)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(ServerApiErrors::tr(
+                           "User '%1(%2)' is not permitted to change his own property '%3'."),
+                user.name,
+                user.id.toString(),
+                propName)};
+    };
+
+    static Result forbidReadonlyModification()
+    {
+        return {ErrorCode::forbidden,
+            ServerApiErrors::tr(
+                "Change of the User with readonly attribute is forbidden for VMS.")};
+    }
+
+    static Result forbidReadonlyCreation()
+    {
+        return {ErrorCode::forbidden,
+            ServerApiErrors::tr(
+                "Creation of the User with readonly attribute is forbidden for VMS.")};
+    }
+
+    static Result forbidExternalIdModification()
+    {
+        return {ErrorCode::forbidden, ServerApiErrors::tr("Change of `externalId` is forbidden.")};
+    }
+
+    static Result forbidNonLocalModification(const QString& propName, const api::UserData& user)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(ServerApiErrors::tr(
+                           "Cannot modify property '%1' of a non-local (%2) User '%3(%4)'."),
+                propName,
+                user.type,
+                user.name,
+                user.id.toString())};
+    }
+
+    static Result forbidUserModification(const UserAccessorInfo& accessor,
+        const api::UserData& target,
+        GlobalPermission targetPermission)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(
+                ServerApiErrors::tr(
+                    "User '%1(%2)' is not permitted to modify User '%3(%4)' with '%5' rights."),
+                accessor.name,
+                accessor.id.toString(),
+                target.name,
+                target.id.toString(),
+                targetPermission)};
+    }
+
+    static Result forbidUserCreation(const UserAccessorInfo& accessor)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(ServerApiErrors::tr("User '%1(%2)' is not permitted to create new Users."),
+                accessor.name,
+                accessor.id.toString())};
+    }
+
+    static Result forbidUserCreation(const UserAccessorInfo& accessor,
+        const api::UserData& target,
+        GlobalPermission targetPermission)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(ServerApiErrors::tr(
+                           "User '%1(%2)' is not permitted to create a User with '%3' rights."),
+                accessor.name,
+                accessor.id.toString(),
+                targetPermission)};
+    }
+
+    // Ad Hoc function to provide error messages when trying to create a Cloud User with values
+    // that are supposed to be managed by the Cloud.
+    // TODO: Just forbid Cloud User creation?
+    static Result checkAdHocCloudCreation(const api::UserData& user)
+    {
+        if (user.type != api::UserType::cloud)
+            return {};
+
+        if (!user.fullName.isEmpty())
+            return {ErrorCode::forbidden, "User full name is controlled by the Cloud."};
+
+        return {};
+    }
+
 };
 
 struct ModifyCameraDataAccess
@@ -1669,20 +2171,54 @@ public:
         const Qn::UserAccessData& accessData,
         const api::MediaServerData& param) const
     {
-        // TODO: #skolesnik
-        //     Limit `PowerUser` permissions (`Power User` is more limited than `Administrator`).
-        //     `PowerUser` cannot:
-        //          - Detach server
-        //          - Delete server (relates to an option “Delete Server” that appears in the
-        //          resource tree for not online servers only)
-        //          - Reset to defaults
-        //          - Pin certificate (in case of certificate error)
-        //          - (? Not in the table, but logical to have) Create server
-        //     Will be fixed by `VMS-41187_power-user-permissions`.
-        return userHasGlobalAccess(context, accessData, GlobalPermission::powerUser);
+        if (!NX_ASSERT(context))
+        {
+            NX_WARNING(this, "context is `nullptr`.");
+            return {ErrorCode::serverError};
+        }
+
+        if (hasSystemAccess(accessData))
+            return {};
+
+        auto [accessor, accessorResult] = userAccessorInfo(*context, accessData);
+        if (!accessorResult)
+            return std::move(accessorResult);
+
+        if (!accessor.permissions.testAnyFlags(
+                {GlobalPermission::administrator, GlobalPermission::powerUser}))
+        {
+            return forbidSettingsModification(accessor);
+        }
+
+        const auto existing =
+            context->resourcePool()->getResourceById<QnMediaServerResource>(param.id);
+
+        if (!existing)
+        {
+            if (!accessor.permissions.testFlag(GlobalPermission::administrator))
+            {
+                return {ErrorCode::forbidden,
+                    nx::format(
+                        ServerApiErrors::tr(
+                            "User '%1(%2)' is not permitted to create a new Server."),
+                        accessor.name,
+                        accessor.id.toString())};
+            }
+        }
+
+        return {};
     }
 
 private:
+    template<typename User>
+    static Result forbidSettingsModification(const User& user)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(ServerApiErrors::tr(
+                           "User '%1(%2)' is not permitted to modify the Server's settings."),
+                user.name,
+                user.id.toString())};
+    }
 };
 
 struct PowerUserAccess
@@ -1714,58 +2250,65 @@ struct SaveUserRoleAccess
         const Qn::UserAccessData& accessData,
         const nx::vms::api::UserGroupData& param)
     {
+        if (!NX_ASSERT(systemContext))
+        {
+            NX_WARNING(this, "`systemContext` is nullptr.");
+            return {ErrorCode::serverError};
+        }
+
         if (hasSystemAccess(accessData))
             return {};
 
-        if (auto r = PowerUserAccess()(systemContext, accessData, param); !r)
-        {
-            r.message = ServerApiErrors::tr(
-                "Saving User Group is forbidden because the user has no power user access.");
-            return r;
-        }
-
-        QSet<QnUuid> parentIds = nx::utils::toQSet(param.parentGroupIds);
-        parentIds += systemContext->accessSubjectHierarchy()->recursiveParents(parentIds);
-
-        if (parentIds.contains(param.id) && param.type != nx::vms::api::UserType::ldap)
-        {
-            const auto cycledGroups = systemContext->accessSubjectHierarchy()->directMembers(
-                param.id).intersect(parentIds);
-
-            const auto cycledGroupNames = nx::vms::common::userGroupNames(
-                systemContext, cycledGroups);
-
-            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "Circular dependencies are forbidden. This Role is already inherited by '%1'."),
-                cycledGroupNames.join("', '")));
-        }
+        auto [accessor, accessorResult] = userAccessorInfo(*systemContext, accessData);
+        if (!accessorResult)
+            return std::move(accessorResult);
 
         const auto existing = systemContext->userGroupManager()->find(param.id);
 
-        if (param.type == nx::vms::api::UserType::ldap)
+        if (existing)
         {
-            if (!existing)
-            {
-                return Result(ErrorCode::forbidden,
-                    ServerApiErrors::tr("LDAP Group creation is forbidden."));
-            }
+            // TODO: #skolesnik (?) Should we also forbid modification for `systemAccess`?
+            if (Result r = checkForBuiltInModification(*existing); !r)
+                return r;
 
-            // TODO: (?) Is this change forbidden only for LDAP users?
+            if (Result r = checkIfCanModifyUserGroup(*systemContext, accessor, *existing); !r)
+                return r;
+
             if (existing->externalId != param.externalId)
             {
-                return Result(ErrorCode::badRequest,
-                    ServerApiErrors::tr("Change of `externalId` is forbidden."));
+                return {ErrorCode::badRequest,
+                    ServerApiErrors::tr("Change of `externalId` is forbidden.")};
             }
         }
-
-        if (const auto res = canAddOrRemoveParentGroups(
-                    systemContext->userGroupManager(),
-                    accessData,
-                    existing,
-                    param.parentGroupIds);
-            !res)
+        else
         {
-            return res;
+            if (!accessor.permissions.testAnyFlags(
+                {GlobalPermission::administrator, GlobalPermission::powerUser}))
+            {
+                return {ErrorCode::forbidden,
+                    nx::format(
+                        ServerApiErrors::tr(
+                            "User '%1(%2) is not permitted to create new User Groups.'"),
+                        accessor.name,
+                        accessor.id)};
+            }
+
+            if (Result r = checkNonLocalCreation(param.type); !r)
+                return r;
+        }
+
+        // `forbidUserGroupModification` will most likely shadow the removal errors...
+        using UserGroupInfo = CanAddOrRemoveParentGroups::UserGroupInfo;
+        if (const auto r = canAddOrRemoveParentGroups(*systemContext,
+                accessor,
+                UserGroupInfo{.id = existing ? existing->id : param.id,
+                    .name = existing ? existing->name : param.name,
+                    .type = existing ? existing->type : param.type,
+                    .parentGroups = existing ? existing->parentGroupIds : std::vector<QnUuid>()},
+                param.parentGroupIds);
+            !r)
+        {
+            return r;
         }
 
         NX_ASSERT(systemContext->resourcePool()->getResourcesByIds<QnUserResource>(
@@ -1773,6 +2316,77 @@ struct SaveUserRoleAccess
             "User should not be an accessible resource");
 
         return {};
+    }
+
+private:
+    static Result checkIfCanModifyUserGroup(const SystemContext& context,
+        const UserAccessorInfo& accessor,
+        const api::UserGroupData& existing)
+    {
+        // TODO: Provide this info with `existing` to reduce potential data races.
+        const GlobalPermission target =
+            static_cast<GlobalPermission>(getGlobalPermissions(context, existing.id).toInt());
+
+        const bool isTargetAdmin = target & GlobalPermission::administrator;
+        const bool isTargetPowerUser = target & GlobalPermission::powerUser;
+        const bool isAccessorAdmin = accessor.permissions & GlobalPermission::administrator;
+        const bool isAccessorPowerUser = accessor.permissions & GlobalPermission::powerUser;
+
+        if (isTargetAdmin
+            || (!isAccessorAdmin && !isAccessorPowerUser)
+            || (isTargetPowerUser && !isAccessorAdmin))
+        {
+            return forbidUserGroupModification(accessor, existing, target);
+        }
+
+        return {};
+    }
+
+    static Result checkNonLocalCreation(api::UserType requestedType)
+    {
+        if (requestedType != api::UserType::local
+            && requestedType != api::UserType::temporaryLocal)
+        {
+            return {ErrorCode::forbidden,
+                nx::format(
+                    ServerApiErrors::tr("Creation of a non-local (%1) User Group is forbidden for VMS."),
+                    requestedType)};
+        }
+
+        return {};
+    }
+
+    static Result checkForBuiltInModification(const api::UserGroupData& existingGroup)
+    {
+        if (!api::kPredefinedGroupIds.contains(existingGroup.id))
+            return {};
+
+        return {ErrorCode::forbidden,
+            nx::format(ServerApiErrors::tr("Cannot modify the built-in User Group %1(%2)."),
+                existingGroup.name,
+                existingGroup.id.toString())};
+    }
+
+    static Result forbidUserGroupModification(const UserAccessorInfo& accessor,
+        const api::UserGroupData& target,
+        GlobalPermission targetPermission)
+    {
+        GlobalPermission highest = GlobalPermission::none;
+        if (targetPermission & GlobalPermission::powerUser)
+            highest = GlobalPermission::powerUser;
+
+        if (targetPermission & GlobalPermission::administrator)
+            highest = GlobalPermission::administrator;
+
+        return {ErrorCode::forbidden,
+            nx::format(
+                ServerApiErrors::tr(
+                    "User '%1(%2)' is not permitted to modify User Group '%3(%4)' with '%5' rights."),
+                accessor.name,
+                accessor.id.toString(),
+                target.name,
+                target.id.toString(),
+                highest)};
     }
 };
 
