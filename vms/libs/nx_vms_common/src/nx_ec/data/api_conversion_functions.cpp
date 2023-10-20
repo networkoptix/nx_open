@@ -562,30 +562,37 @@ void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst)
     dst->setResourceAccessRights(src.resourceAccessRights);
 }
 
-void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
+void fromResourceToApi(const QnUserResource& src, UserData& dst)
 {
-    dst.id = src->getId();
-    dst.isEnabled = src->isEnabled();
-    dst.permissions = src->getRawPermissions();
-    if (auto context = src->systemContext())
+    dst.id = src.getId();
+    dst.isEnabled = src.isEnabled();
+    dst.permissions = src.getRawPermissions();
+    if (auto context = src.systemContext())
         dst.fullName = context->resourcePropertyDictionary()->value(dst.id, Qn::USER_FULL_NAME);
 
-    NX_MUTEX_LOCKER locker(&src->m_mutex);
-    dst.parentId = src->m_parentId;
-    dst.name = src->m_name;
-    dst.url = src->m_url;
-    dst.email = src->m_email;
-    dst.groupIds = src->m_groupIds;
-    dst.externalId = src->m_externalId;
-    dst.type = src->m_userType;
-    dst.attributes = src->m_attributes;
-    dst.resourceAccessRights = src->m_resourceAccessRights;
-    dst.cryptSha512Hash = src->m_cryptSha512Hash;
-    dst.digest = src->m_digest;
-    dst.hash = src->m_hash.toString();
+    NX_MUTEX_LOCKER locker(&src.m_mutex);
+    dst.parentId = src.m_parentId;
+    dst.name = src.m_name;
+    dst.url = src.m_url;
+    dst.email = src.m_email;
+    dst.groupIds = src.m_groupIds;
+    dst.externalId = src.m_externalId;
+    dst.type = src.m_userType;
+    dst.attributes = src.m_attributes;
+    dst.resourceAccessRights = src.m_resourceAccessRights;
+    dst.cryptSha512Hash = src.m_cryptSha512Hash;
+    dst.digest = src.m_digest;
+    dst.hash = src.m_hash.toString();
 
     if (dst.fullName.isNull())
-        dst.fullName = src->m_fullName;
+        dst.fullName = src.m_fullName;
+}
+
+void fromResourceToApi(const QnUserResourcePtr& src, UserData& dst)
+{
+    if (!NX_ASSERT(src))
+        return;
+    fromResourceToApi(*src, dst);
 }
 
 void fromApiToResource(const VideowallItemData& src, QnVideoWallItem& dst)
