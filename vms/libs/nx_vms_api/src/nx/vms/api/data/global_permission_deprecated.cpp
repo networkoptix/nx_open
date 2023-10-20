@@ -81,36 +81,44 @@ static GlobalPermissionsDeprecated accessRightsToGlobalPermissions(AccessRights 
 std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool>
     extractFromResourceAccessRights(
         GlobalPermissions permissions,
-        std::vector<QnUuid> groups,
+        std::vector<QnUuid>* groups,
         const std::map<QnUuid, AccessRights>& resourceAccessRights)
 {
     GlobalPermissionsDeprecated deprecatedPermissions;
 
-    for (auto g: groups)
+    const auto noGroupInclusions = groups->empty();
+    for (auto g = groups->begin(); g != groups->end(); ++g)
     {
-        if (g == kAdministratorsGroupId)
-            return {{}, {}, true};
-
-        if (g == kPowerUsersGroupId)
+        if (*g == kAdministratorsGroupId)
         {
-            deprecatedPermissions.setFlag(GlobalPermissionDeprecated::admin);
-            return {deprecatedPermissions, {}, false};
+            groups->erase(g);
+            return {deprecatedPermissions, /*accessibleResources*/ {}, /*isOwner*/ true};
         }
 
-        if (g == kAdvancedViewersGroupId)
+        if (*g == kPowerUsersGroupId)
         {
+            groups->erase(g);
+            deprecatedPermissions.setFlag(GlobalPermissionDeprecated::admin);
+            return {deprecatedPermissions, /*accessibleResources*/ {}, /*isOwner*/ false};
+        }
+
+        if (*g == kAdvancedViewersGroupId)
+        {
+            groups->erase(g);
             deprecatedPermissions.setFlag(GlobalPermissionDeprecated::advancedViewerPermissions);
             break;
         }
 
-        if (g == kViewersGroupId)
+        if (*g == kViewersGroupId)
         {
+            groups->erase(g);
             deprecatedPermissions.setFlag(GlobalPermissionDeprecated::viewerPermissions);
             break;
         }
 
-        if (g == kLiveViewersGroupId)
+        if (*g == kLiveViewersGroupId)
         {
+            groups->erase(g);
             deprecatedPermissions.setFlag(GlobalPermissionDeprecated::liveViewerPermissions);
             break;
         }
@@ -149,7 +157,7 @@ std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool
     if (permissions.testFlag(GlobalPermission::generateEvents))
         deprecatedPermissions |= GlobalPermissionDeprecated::userInput;
 
-    if (groups.empty() || !UserDataDeprecated::permissionPresetToGroupId(deprecatedPermissions))
+    if (noGroupInclusions || !UserDataDeprecated::permissionPresetToGroupId(deprecatedPermissions))
         deprecatedPermissions |= GlobalPermissionDeprecated::customUser;
 
     return {

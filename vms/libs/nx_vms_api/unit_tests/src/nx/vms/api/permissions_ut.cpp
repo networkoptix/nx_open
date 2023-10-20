@@ -50,7 +50,7 @@ TEST(Permissions, BackwardCompatibility)
         PermissionsV1 convertedBack;
         std::tie(
             convertedBack.permissions, convertedBack.accessibleResources, convertedBack.isOwner) =
-            extractFromResourceAccessRights(permissions, std::move(groups), resourceAccessRights);
+            extractFromResourceAccessRights(permissions, &groups, resourceAccessRights);
         ASSERT_EQ(nx::reflect::json::serialize(origin), nx::reflect::json::serialize(convertedBack));
     }
 }
@@ -76,7 +76,7 @@ TEST(Permissions, CasesNotPreservingBackwardCompatibility)
         PermissionsV1 convertedBack;
         std::tie(
             convertedBack.permissions, convertedBack.accessibleResources, convertedBack.isOwner) =
-            extractFromResourceAccessRights(permissions, std::move(groups), resourceAccessRights);
+            extractFromResourceAccessRights(permissions, &groups, resourceAccessRights);
         PermissionsV1 expectedPermissions{Old::customUser};
         if (origin.newPermissions.testFlag(GlobalPermission::generateEvents))
             expectedPermissions.permissions |= Old::userInput;

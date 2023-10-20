@@ -113,7 +113,7 @@ std::vector<UserModelV1> UserModelV1::fromDbTypes(DbListTypes data)
 
         std::tie(model.permissions, model.accessibleResources, model.isOwner) =
             extractFromResourceAccessRights(
-                baseData.permissions, std::move(baseData.groupIds), baseData.resourceAccessRights);
+                baseData.permissions, &baseData.groupIds, baseData.resourceAccessRights);
 
         result.push_back(std::move(model));
     }
