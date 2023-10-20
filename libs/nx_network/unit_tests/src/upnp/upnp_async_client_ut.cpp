@@ -12,7 +12,7 @@ namespace upnp {
 namespace test {
 
 static const nx::utils::Url URL(lit("http://192.168.20.1:52869/ctl/IPConn"));
-static const auto TCP = AsyncClient::Protocol::TCP;
+static const auto TCP = AsyncClient::Protocol::tcp;
 static constexpr char INTERNAL_IP[] = "192.168.20.77";
 static constexpr char EXTERNAL_IP[] = "10.0.2.161";
 static constexpr char DESC[] = "test";

@@ -15,18 +15,10 @@ namespace nx::network::upnp {
 class NX_NETWORK_API AsyncClient
 {
 public:
-    enum Protocol { TCP, UDP };
-
-    template<typename Visitor>
-    friend constexpr auto nxReflectVisitAllEnumItems(Protocol*, Visitor&& visitor)
-    {
-        using Item = nx::reflect::enumeration::Item<Protocol>;
-        return visitor(
-            Item{Protocol::TCP, "tcp"},
-            Item{Protocol::UDP, "udp"}
-        );
-    }
-
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Protocol,
+        tcp,
+        udp
+    )
 
     //! Simple SOAP call
     struct NX_NETWORK_API Message
@@ -61,7 +53,7 @@ public:
         MappingInfo(const HostAddress& inIp = HostAddress(),
             quint16 inPort = 0,
             quint16 exPort = 0,
-            Protocol prot = Protocol::TCP,
+            Protocol prot = Protocol::tcp,
             const QString& desc = QString(),
             quint64 dur = 0);
 
