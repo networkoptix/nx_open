@@ -179,6 +179,85 @@ struct ServiceTypeStatus
 #define ServiceTypeState_fields (status)(issueExpirationDate)
 NX_REFLECTION_INSTRUMENT(ServiceTypeStatus, ServiceTypeState_fields)
 
+/**%apidoc ChannelPartnerSupportPhone */
+struct NX_VMS_API ChannelPartnerSupportPhone
+{
+    /**%apidoc Phone number */
+    QString phone;
+
+    /**%apidoc[opt] Explanation of the phone number */
+    QString description;
+
+    bool operator==(const ChannelPartnerSupportPhone&) const = default;
+};
+#define ChannelPartnerSupportPhone_fields (phone)(description)
+NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportPhone, ChannelPartnerSupportPhone_fields)
+
+/**%apidoc ChannelPartnerSupportEmail */
+struct NX_VMS_API ChannelPartnerSupportEmail
+{
+    /**%apidoc Email address */
+    QString email;
+
+    /**%apidoc[opt] Explanation of the email address */
+    QString description;
+
+    bool operator==(const ChannelPartnerSupportEmail&) const = default;
+};
+#define ChannelPartnerSupportEmail_fields (email)(description)
+NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportEmail, ChannelPartnerSupportEmail_fields)
+
+/**%apidoc ChannelPartnerSupportCustomInfo */
+struct NX_VMS_API ChannelPartnerSupportCustomInfo
+{
+    /**%apidoc The title under which provided information will be placed */
+    QString label;
+
+    /**%apidoc Any information in the text form, e.g. street address */
+    QString value;
+
+    bool operator==(const ChannelPartnerSupportCustomInfo&) const = default;
+};
+#define ChannelPartnerSupportCustomInfo_fields (label)(value)
+NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportCustomInfo, ChannelPartnerSupportCustomInfo_fields)
+
+/**%apidoc ChannelPartnerSupportInformation */
+struct NX_VMS_API ChannelPartnerSupportInformation
+{
+    /**%apidoc Set of web page addresses */
+    std::vector<QString> sites;
+
+    /**%apidoc Set of structures describing phone numbers */
+    std::vector<ChannelPartnerSupportPhone> phones;
+
+    /**%apidoc Set of structures describing email addresses */
+    std::vector<ChannelPartnerSupportEmail> emails;
+
+    /**%apidoc Set of structures describing any other information */
+    std::vector<ChannelPartnerSupportCustomInfo> custom;
+
+    bool operator==(const ChannelPartnerSupportInformation&) const = default;
+};
+#define ChannelPartnerSupportInformation_fields (sites)(phones)(emails)(custom)
+NX_REFLECTION_INSTRUMENT(ChannelPartnerSupportInformation, ChannelPartnerSupportInformation_fields)
+
+/**%apidoc ChannelPartner */
+struct NX_VMS_API ChannelPartner
+{
+    /**%apidoc Channel partner id */
+    QnUuid id;
+
+    /**%apidoc Channel partner name */
+    QString name;
+
+    /**%apidoc Channel partner support information, addresses, pnone numbers etc. */
+    ChannelPartnerSupportInformation supportInformation;
+
+    bool operator==(const ChannelPartner&) const = default;
+};
+#define ChannelPartner_fields (id)(name)(supportInformation)
+NX_REFLECTION_INSTRUMENT(ChannelPartner, ChannelPartner_fields)
+
 /**%apidoc Organization */
 struct NX_VMS_API Organization
 {
@@ -188,12 +267,9 @@ struct NX_VMS_API Organization
     /**%apidoc Organization name */
     QString name;
 
-    /**%apidoc Organization web page */
-    QString webPage;
-
     bool operator==(const Organization&) const = default;
 };
-#define Organization_fields (id)(name)(webPage)
+#define Organization_fields (id)(name)
 NX_REFLECTION_INSTRUMENT(Organization, Organization_fields)
 
 /**%apidoc SaasSecurity */
@@ -229,7 +305,7 @@ struct NX_VMS_API SaasData
     QnUuid cloudSystemId;
 
     /**%apidoc Channel partner information */
-    Organization channelPartner;
+    ChannelPartner channelPartner;
 
     /**%apidoc Organization information */
     Organization organization;

@@ -247,6 +247,11 @@ QString mailtoLink(const QString& address)
     return nx::format("<a href=\"mailto:%1\">%1</a>", address).toQString();
 }
 
+QString phoneNumberLink(const QString& phoneNumber)
+{
+    return nx::format("<a href=\"tel:%1\">%1</a>", phoneNumber).toQString();
+}
+
 QString link(const QUrl& url)
 {
     return makeLink(url.toString());
