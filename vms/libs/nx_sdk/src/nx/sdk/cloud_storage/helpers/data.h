@@ -501,6 +501,12 @@ struct AttributeSearchCondition
     // match the given condition.
     bool isNegative = false;
 
+    // If it is set to true than value should be matched from begining.
+    bool matchesFromStart = false;
+
+    // If it is set to true than value should be matched till end.
+    bool matchesTillEnd = false;
+
     // Used when type == numericRangeMatch. Object track attribute value should contain numeric range
     // value and it should intersect the given condition value for the Object track to be included in the result.
     NumericRange range;
