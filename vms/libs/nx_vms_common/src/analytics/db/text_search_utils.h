@@ -46,12 +46,22 @@ enum class ConditionType
     numericRangeMatch,
 };
 
+struct TokenData
+{
+    QString value;
+    bool matchesFromStart = false;
+    bool matchesTillEnd = false;
+    bool isQuoted = false;
+
+    bool operator==(const TokenData&) const = default;
+};
+
 struct TextSearchCondition
 {
     ConditionType type;
 
     QString name;
-    QString value;
+    TokenData valueToken;
     QString text;
 
     // Negative condition. Text should not match (attribute or value is not exists).
@@ -64,7 +74,7 @@ struct TextSearchCondition
     {
         return type == right.type
             && name == right.name
-            && value == right.value
+            && valueToken == right.valueToken
             && text == right.text
             && isNegative == right.isNegative;
     }
@@ -84,11 +94,11 @@ struct AttributePresenceCheck:
 struct AttributeValueMatch:
     public TextSearchCondition
 {
-    AttributeValueMatch(const QString& name, const QString& value, bool isNegative = false):
+    AttributeValueMatch(const QString& name, const TokenData& value, bool isNegative = false):
         TextSearchCondition(ConditionType::attributeValueMatch)
     {
         this->name = name;
-        this->value = value;
+        this->valueToken = value;
         this->isNegative = isNegative;
     }
 };
@@ -149,11 +159,6 @@ private:
     QString unescapeName(const QStringView& str);
 
 private:
-    struct TokenData
-    {
-        QStringView value;
-        bool isQuoted = false;
-    };
     std::vector<TokenData> m_tokens;
 };
 
@@ -198,6 +203,8 @@ private:
         const nx::common::metadata::NumericRange& range,
         const QString& paramName,
         const nx::common::metadata::Attributes& attributes);
+
+    static bool isAttributeNameMatching(const QString& attributeName, const QString& value);
 
 private:
     std::vector<TextSearchCondition> m_conditions;
@@ -302,13 +309,15 @@ void UserTextSearchExpressionParser::processTokens(Handler& handler)
 
             if (!nextToken)
             {
-                // Treating "name:" similar to "$name"
+                // Treating "name:" similar to "$name".
                 handler(AttributePresenceCheck(unescapeName(previousToken->value), isNegative((previousToken->value))));
                 continue;
             }
 
             auto attributeName = unescapeName(previousToken->value);
-            auto attributeValue = unescape(nextToken->value);
+            TokenData valueToken = *nextToken;
+            valueToken.value = unescape(valueToken.value);
+            const QString& attributeValue = valueToken.value;
 
             using namespace nx::common::metadata;
             const bool forceTextSearch = nextToken->isQuoted && token.value == QString("=");
@@ -333,7 +342,7 @@ void UserTextSearchExpressionParser::processTokens(Handler& handler)
                 bool b = isNegative(previousToken->value);
                 if (token.value == QString("!="))
                     b = !b;
-                handler(AttributeValueMatch(attributeName, attributeValue, b));
+                handler(AttributeValueMatch(attributeName, valueToken, b));
             }
             // We have already consumed the next token.
             ++i;
