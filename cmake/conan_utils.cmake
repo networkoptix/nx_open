@@ -6,6 +6,14 @@ option(runConanAutomatically "Run Conan automatically when configuring the proje
 set(extraConanArgs "" CACHE STRING "Extra command line arguments for Conan.")
 set(customConanHome "" CACHE STRING "Custom Conan home directory.")
 
+set(installSystemRequirementsDoc "Allow installation of system requirements by Conan.")
+option(installSystemRequirements ${installSystemRequirementsDoc} OFF)
+# Due to security reasons `installSystemRequirements` should be reset to OFF after every CMake run.
+cmake_language(DEFER
+    DIRECTORY ${CMAKE_SOURCE_DIR}
+    CALL set installSystemRequirements OFF CACHE BOOL ${installSystemRequirementsDoc} FORCE
+)
+
 set(CONAN_DOWNLOAD_TIMEOUT_S 3)
 
 function(nx_init_conan)
@@ -101,9 +109,12 @@ function(nx_run_conan)
     endif()
 
     list(APPEND flags ${CONAN_FLAGS})
+
     list(APPEND flags ${extraConanArgs})
 
     list(TRANSFORM flags PREPEND "        " OUTPUT_VARIABLE flags)
+
+    set(raw_flags "        \$ENV{NX_TEMPORARY_CONAN_ARGS}")
 
     set(run_conan_script_contents
         "#!/usr/bin/env -S cmake -P"
@@ -114,6 +125,8 @@ function(nx_run_conan)
         "        ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}"
         "        --install-folder ${CMAKE_BINARY_DIR}"
         ${flags}
+        @raw_flags@
+        "    COMMAND_ECHO STDERR"
         "    RESULT_VARIABLE result"
         ")"
         "if(NOT result EQUAL 0)"
@@ -129,6 +142,15 @@ function(nx_run_conan)
     nx_store_known_file(${run_conan_script})
 
     if(runConanAutomatically OR NOT EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
+        if(installSystemRequirements)
+            set(temporary_args
+                "-c tools.system.package_manager:mode=install"
+                "-c tools.system.package_manager:sudo=True"
+            )
+            string(JOIN ";" temporary_args ${temporary_args})
+            set(ENV{NX_TEMPORARY_CONAN_ARGS} "${temporary_args}")
+        endif()
+
         nx_execute_process_or_fail(
             COMMAND ${CMAKE_COMMAND} -P ${run_conan_script}
             ERROR_MESSAGE "Conan execution failed."

@@ -2,12 +2,17 @@
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+from conan.errors import ConanException
+from conan.tools.build import cross_building
 from conan.tools.files import save
+from conan.tools.system.package_manager import Apt
 from conans import ConanFile, __version__ as conan_version
 from conans.model import Generator
 from conans.tools import Version
 from itertools import chain
 from pathlib import Path
+import sys
+import yaml
 
 
 required_conan_version = ">=1.53.0"
@@ -20,6 +25,7 @@ def generate_conan_package_paths(conanfile):
         return path.replace("\\", "/")
 
     packages = {reference.ref.name: toPosixPath(package.package_folder) \
+    # TODO: #dklychkov Investigate whether this is required.
         for reference, package in chain(
             conanfile.dependencies.build.items(),
             conanfile.dependencies.host.items())}
@@ -51,12 +57,14 @@ class NxOpenConan(ConanFile):
         "useClang": (True, False),
         "skipCustomizationPackage": (True, False),
         "customization": "ANY",
+        "installRuntimeDependencies": (True, False),
     }
     default_options = {
         "targetDevice": None,
         "useClang": False,
         "skipCustomizationPackage": False,
         "customization": "default",
+        "installRuntimeDependencies": True,
         "quick_start_guide:format": "pdf",
     }
 
@@ -80,6 +88,56 @@ class NxOpenConan(ConanFile):
     def generate(self):
         generate_conan_package_paths(self)
         generate_conan_package_refs(self)
+
+    @staticmethod
+    def read_deb_dependencies(dependencies_list_file):
+        with open(dependencies_list_file, "r") as file:
+            data = yaml.load(file, yaml.Loader)
+
+        def trim_version(dep_str):
+            return dep_str.split(" ", 1)[0]
+
+        def enumerate_deps(deps):
+            for dep in deps:
+                if isinstance(dep, str):
+                    yield trim_version(dep)
+                elif isinstance(dep, list):
+                    yield trim_version(dep[0])
+
+        yield from enumerate_deps(data.get("depends", []))
+        yield from enumerate_deps(data.get("recommends", []))
+
+    def install_system_requirements(self, packages):
+        if cross_building(self):
+            # System requirements installation does not work properly in Conan 1.x for cross
+            # builds.
+            self.output.warn("-DinstallSystemRequirements=ON is ignored for cross builds.")
+            return
+
+        try:
+            Apt(self).install(packages, check=True)
+        except ConanException as e:
+            self.output.error(e)
+            self.output.error("To install the missing system requirements automatically, "
+                "invoke CMake with -DinstallSystemRequirements=ON")
+            exit(1)
+
+    def system_requirements(self):
+        if sys.platform != "linux":
+            return
+
+        packages = [
+            "chrpath",
+            "pkg-config",
+        ]
+
+        if self.options.installRuntimeDependencies:
+            src_dir = Path(__file__).parent
+
+            packages += list(NxOpenConan.read_deb_dependencies(
+                f"{src_dir}/vms/distribution/deb/client/deb_dependencies.yaml"))
+
+        self.install_system_requirements(packages)
 
     def build_requirements(self):
         if self.isLinux:
