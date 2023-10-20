@@ -22,6 +22,10 @@ list(APPEND _additional_conan_parameters "-o useClang=${use_clang}")
 
 list(APPEND _additional_conan_parameters "-o targetDevice=${targetDevice}")
 
+if(NOT developerBuild)
+    list(APPEND _additional_conan_parameters "-o installRuntimeDependencies=False")
+endif()
+
 if(targetDevice MATCHES "windows")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(build_type "Debug")
