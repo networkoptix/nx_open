@@ -78,7 +78,7 @@ bool allUserGroupsExist(SystemContext* systemContext, const IdList& groupIds)
 }
 
 template<class IdList>
-QStringList userGroupNames(SystemContext* systemContext, const IdList& groupIds)
+QStringList userGroupNames(const SystemContext* systemContext, const IdList& groupIds)
 {
     if (!NX_ASSERT(systemContext))
         return {};

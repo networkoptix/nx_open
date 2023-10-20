@@ -50,13 +50,36 @@ public:
     template<class IDList>
     nx::vms::api::UserGroupDataList getGroupsByIds(const IDList& idList) const;
 
-    // TODO: #skolesnik Document return type traits. Or add a template Result type
     /**
-     * Returns a new list populated with the results of calling a provided function on every user
-     * group data specified by id list.
+     * @brief Maps user group IDs to results of unary function `f`.
+     *
+     * For each ID in `idList`, applies `f` if a user group is found. Any unmatched IDs are listed in `notFound`.
+     *
+     * @param idList List of user group IDs.
+     * @param f Function applied on found user group data.
+     *
+     * @return A structure with two vectors:
+     *         - `.groups`: Results of calling `f` with `UserGroupData`.
+     *         - `.notFound`: `QnUuid`s of IDs not found.
+     *
+     * \code{.cpp}
+     * auto [groups, notFound] = manager.mapGroupsByIds(groupIds,
+     *     [](const UserGroupData& data)
+     *     {
+     *         struct SelectedProps
+     *         {
+     *             QnUuid id;
+     *             UserType type;
+     *         };
+     *         return SelectedProps{data.id, data.type};
+     *     });
+     *
+     * for (const auto& g : groups)
+     *     someLogic(g.id, g.type);
+     * \endcode
      */
     template<class IDList, typename UnaryFunction>
-    auto mapGroupsByIds(const IDList& idList, UnaryFunction f) const;
+    auto mapGroupsByIds(const IDList& ids, UnaryFunction f) const;
 
     /** Sets all custom user groups. */
     void resetAll(const nx::vms::api::UserGroupDataList& groups);
@@ -94,26 +117,28 @@ nx::vms::api::UserGroupDataList UserGroupManager::getGroupsByIds(const IDList& i
 }
 
 template <class IDList, typename UnaryFunction>
-auto UserGroupManager::mapGroupsByIds(const IDList& idList, UnaryFunction f) const
+auto UserGroupManager::mapGroupsByIds(const IDList& ids, UnaryFunction f) const
 {
     using result_value_type =
         std::decay_t<decltype(f(*find(std::declval<typename IDList::value_type>())))>;
-    struct Result
+    struct
     {
-        QnUuid id;
+        std::vector<result_value_type> groups;
+        std::vector<QnUuid> notFound;
+    } result;
 
-        // TODO: (?) Rename to something like `existing` of `found` for better semantics.
-        std::optional<result_value_type> value;
-    };
-    std::vector<Result> result;
-    result.reserve(idList.size());
+    result.groups.reserve(ids.size());
 
-    for (const auto& id: idList)
+    for (const auto& id: ids)
     {
+        // This doesn't avoid a data race, since each iteration calls `find` on a potentially
+        // different dataset.
         const auto group = find(id);
-        result.push_back(Result{.id = id,
-            .value = group ? f(*group) : std::optional<result_value_type>{std::nullopt}});
+        group ? result.groups.push_back(f(*group)) : result.notFound.push_back(id);
     }
+
+    result.groups.shrink_to_fit();
+    result.notFound.shrink_to_fit();
 
     return result;
 }

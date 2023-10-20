@@ -125,6 +125,8 @@ NX_VMS_COMMON_API QnUserResourcePtr fromApiToResource(const nx::vms::api::UserDa
 NX_VMS_COMMON_API void fromApiToResource(
     const nx::vms::api::UserData& src, const QnUserResourcePtr& dst);
 NX_VMS_COMMON_API void fromResourceToApi(
+    const QnUserResource& resource, nx::vms::api::UserData& data);
+NX_VMS_COMMON_API void fromResourceToApi(
     const QnUserResourcePtr& resource, nx::vms::api::UserData& data);
 
 NX_VMS_COMMON_API void fromApiToResource(
