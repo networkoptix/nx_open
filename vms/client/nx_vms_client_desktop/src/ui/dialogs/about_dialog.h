@@ -30,6 +30,7 @@ protected slots:
     void at_copyButton_clicked();
 
 private:
+    void initSaasSupportInfo();
     void retranslateUi();
 
     // Makes report that contains a list of connected servers and their versions.
