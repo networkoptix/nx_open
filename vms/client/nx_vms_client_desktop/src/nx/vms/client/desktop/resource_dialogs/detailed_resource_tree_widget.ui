@@ -27,9 +27,6 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="nx::vms::client::desktop::PromoBar" name="infoBar" native="true"/>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <property name="spacing">
       <number>0</number>
@@ -118,12 +115,6 @@
    <class>nx::vms::client::desktop::ResourceDetailsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/resource_dialogs/details/resource_details_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>nx::vms::client::desktop::PromoBar</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

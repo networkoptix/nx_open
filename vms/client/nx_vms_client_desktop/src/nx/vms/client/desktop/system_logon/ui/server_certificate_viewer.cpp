@@ -161,11 +161,11 @@ ServerCertificateViewer::ServerCertificateViewer(
     setWarningStyle(ui->selfSignedLabel);
 
     // Set up the warning banner.
-    ui->warningLabel->setForegroundRole(QPalette::Text);
-    ui->pinCertificateButton->setIcon(qnSkin->icon("misc/pin_text_icon.svg"));
-    ui->viewPinnedButton->setIcon(qnSkin->icon("misc/certificate_text_icon.svg"));
-    setPaletteColor(ui->warningBanner, QPalette::Window, core::colorTheme()->color("dialog.alertBar"));
-    ui->warningBanner->setAutoFillBackground(true);
+    ui->warningBanner->init({.level = BarDescription::BarLevel::Error});
+    viewPinnedButton = ui->warningBanner->addButton(
+        tr("View pinned certificate"), qnSkin->icon("misc/certificate_text_icon.svg"));
+    pinCertificateButton = ui->warningBanner->addButton(
+        tr("Pin to this certificate"), qnSkin->icon("misc/pin_text_icon.svg"));
 
     // Due to layout flaws caused by QTreeWidgets, dialog size constraints should be set through
     // its child element.
@@ -176,10 +176,10 @@ ServerCertificateViewer::ServerCertificateViewer(
         ui->treeWidget, &QTreeWidget::currentItemChanged,
         this, &ServerCertificateViewer::showSelectedCertificate);
     connect(
-        ui->pinCertificateButton, &QPushButton::clicked,
+        pinCertificateButton, &QPushButton::clicked,
         this, &ServerCertificateViewer::pinCertificate);
     connect(
-        ui->viewPinnedButton, &QPushButton::clicked,
+        viewPinnedButton, &QPushButton::clicked,
         this, &ServerCertificateViewer::showPinnedCertificate);
 }
 
@@ -201,8 +201,8 @@ void ServerCertificateViewer::updateWarningLabel(bool isAdministrator, const QSt
     if (!isAdministrator)
         text += " " + tr("Contact a user with Administrators permissions to resolve this issue.");
 
-    ui->pinCertificateButton->setVisible(isAdministrator);
-    ui->warningLabel->setText(text);
+    pinCertificateButton->setVisible(isAdministrator);
+    ui->warningBanner->setText(text);
 }
 
 void ServerCertificateViewer::setCertificateData(
@@ -354,10 +354,10 @@ void ServerCertificateViewer::showPinnedCertificate()
     // We want to make both dialogs simultaneously available. To achieve this we show the child
     // certificate viewer as non-modal window and disable 'Show' button until the child is closed.
     pinnedViewer->setModal(false);
-    ui->viewPinnedButton->setEnabled(false);
+    viewPinnedButton->setEnabled(false);
     connect(
         pinnedViewer, &QDialog::finished,
-        this, [this]{ ui->viewPinnedButton->setEnabled(true); });
+        this, [this]{ viewPinnedButton->setEnabled(true); });
     connect(
         this, &QDialog::finished,
         pinnedViewer, &QDialog::reject);
