@@ -27,13 +27,19 @@ struct BarDescription
         Error
     };
 
+    /** Text of banner's label. */
     QString text;
+    /** Level of alert, which sets the background color and icon of banner. */
     BarLevel level = BarLevel::Info;
-    bool isMultiLine = false;
+    /**
+     * Is close button required in the right corner.
+     * Note, that isClosable has value true if the isEnabledProperty is set.
+     */
     bool isClosable = false;
+    /** Is opening of external links allowed in Banner's label. */
     bool isOpenExternalLinks = true;
+    /** Pointer to property from MessageBarSettings to check, if banner should be shown or not. */
     PropertyPointer isEnabledProperty;
-    std::vector<QHBoxLayout*> additionalRows; //<= Additional rows under the label.
     bool operator==(const BarDescription&) const = default;
 };
 
@@ -41,10 +47,6 @@ struct BarDescription
  * A text message on a colored background.
  * It's intended to be positioned in an external layout at a top or a bottom of a dialog.
  * Has appearance depending on type CommonMessageBar::BarLevel
- *
- * TODO: This is replacement of class MessageBar. Need to replace usage class MessageBar
- * and it's children to this new one, and then delete them. And change implementation
- * of AlertBlock to usage of CommonMessageBox
  */
 class CommonMessageBar: public ControlBar
 {
@@ -67,7 +69,12 @@ public:
     /** Enabled by default. */
     void setOpenExternalLinks(bool open);
 
+    /**
+     * Creates button with required style, adds it to children of banner,
+     * adds it to the banner's layout.
+     */
     QPushButton* addButton(const QString& text, const QIcon& icon);
+    /** Adds existing button to layout of banner and set the style of button. */
     void addButton(QPushButton* button);
 
 signals:
@@ -82,6 +89,9 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
+/**
+ * Automatically generated vertical set of CommonMessageBars.
+ */
 class MessageBarBlock: public QWidget
 {
     Q_OBJECT

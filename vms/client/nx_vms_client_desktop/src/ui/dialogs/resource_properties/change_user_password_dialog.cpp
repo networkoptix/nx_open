@@ -56,8 +56,6 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
         ui->currentPasswordInputField
     });
 
-    setInfoText({});
-
     setResizeToContentsMode(Qt::Vertical);
 }
 
@@ -80,11 +78,6 @@ QString QnChangeUserPasswordDialog::newPassword() const
     }
 
     return ui->newPasswordInputField->text();
-}
-
-void QnChangeUserPasswordDialog::setInfoText(const QString& text)
-{
-    ui->infoBar->setText(text);
 }
 
 bool QnChangeUserPasswordDialog::validate()

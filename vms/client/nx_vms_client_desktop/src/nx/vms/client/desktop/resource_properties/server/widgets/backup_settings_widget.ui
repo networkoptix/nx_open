@@ -333,9 +333,6 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item>
-            <widget class="nx::vms::client::desktop::MessageBar" name="messageBar" native="true"/>
-           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="bandwidthWidgetPage">
@@ -385,12 +382,6 @@
    <class>nx::vms::client::desktop::BackupBandwidthSettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/resource_properties/server/widgets/backup_bandwidth_settings_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>nx::vms::client::desktop::MessageBar</class>
-   <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/common/widgets/control_bars.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

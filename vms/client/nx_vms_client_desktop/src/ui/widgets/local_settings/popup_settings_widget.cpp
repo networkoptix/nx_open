@@ -40,8 +40,10 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 
     setHelpTopic(this, HelpTopic::Id::SystemSettings_Notifications);
 
-    ui->deprecationMessageBar->setText(tr("These settings apply only to the System you are logged"
-        " in to and will be removed in future versions."));
+    ui->deprecationMessageBar->init(
+        {.text = tr("These settings apply only to the System you are logged"
+        " in to and will be removed in future versions."),
+        .level = BarDescription::BarLevel::Info});
 
     for (EventType eventType: nx::vms::event::allEvents())
     {

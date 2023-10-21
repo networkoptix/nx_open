@@ -83,6 +83,8 @@ private:
     std::vector<nx::network::ssl::Certificate> m_certificates;
     QnMediaServerResourcePtr m_server;
     BusyIndicatorButton* m_okButton = nullptr;
+    QPushButton *viewPinnedButton = nullptr;
+    QPushButton *pinCertificateButton = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

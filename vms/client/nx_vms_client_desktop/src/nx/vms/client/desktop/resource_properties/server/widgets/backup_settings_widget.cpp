@@ -94,9 +94,6 @@ BackupSettingsWidget::BackupSettingsWidget(ServerSettingsDialogStore* store, QWi
     connect(m_backupSettingsViewWidget, &BackupSettingsViewWidget::hasChangesChanged,
         this, &BackupSettingsWidget::hasChangesChanged);
 
-    connect(m_backupSettingsViewWidget, &BackupSettingsViewWidget::globalBackupSettingsChanged,
-        this, &BackupSettingsWidget::updateMessageBarText);
-
     connect(ui->backupBandwidthSettingsWidget, &BackupBandwidthSettingsWidget::hasChangesChanged,
         this, &BackupSettingsWidget::hasChangesChanged);
 }
@@ -132,7 +129,6 @@ void BackupSettingsWidget::applyChanges()
     ui->backupBandwidthSettingsWidget->applyChanges();
     QTimer::singleShot(kStatusUpdateTimeout,
         ui->backupStatusWidget, &BackupStatusWidget::updateBackupStatus);
-    updateMessageBarText();
 }
 
 void BackupSettingsWidget::discardChanges()
@@ -231,8 +227,6 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
         ui->backupBandwidthSettingsWidget->loadDataToUi();
     }
 
-    updateMessageBarText();
-
     if (!state.backupStoragesStatus.hasActiveBackupStorage && hasChanges())
         discardChanges();
 }
@@ -258,17 +252,6 @@ void BackupSettingsWidget::setupPlaceholders()
     // 'Server offline' / 'SaaS suspended' / 'SaaS shut down' placeholder.
     ui->genericPlaceholderCaptionLabel->setFont(placeholderMessageCaptionFont());
     ui->genericPlaceholderMessageLabel->setFont(placeholderMessageFont());
-}
-
-void BackupSettingsWidget::updateMessageBarText()
-{
-    const auto savedBackupSettings = systemSettings()->backupSettings();
-    const auto modelBackupSettings = m_backupSettingsViewWidget->globalBackupSettings();
-
-    if (savedBackupSettings == modelBackupSettings)
-    {
-        ui->messageBar->setText({});
-    }
 }
 
 } // namespace nx::vms::client::desktop

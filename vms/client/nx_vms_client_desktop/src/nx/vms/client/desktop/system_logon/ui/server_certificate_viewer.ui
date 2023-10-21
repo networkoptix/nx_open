@@ -609,74 +609,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="warningBanner" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_6">
-      <property name="spacing">
-       <number>4</number>
-      </property>
-      <property name="leftMargin">
-       <number>16</number>
-      </property>
-      <property name="topMargin">
-       <number>6</number>
-      </property>
-      <property name="rightMargin">
-       <number>16</number>
-      </property>
-      <property name="bottomMargin">
-       <number>6</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="warningLabel">
-        <property name="text">
-         <string notr="true">&lt; This certificate doesn’t match the certificate {serverName} is pinned to. &gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <property name="spacing">
-         <number>16</number>
-        </property>
-        <item>
-         <widget class="QPushButton" name="pinCertificateButton">
-          <property name="text">
-           <string>Pin to this certificate</string>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="viewPinnedButton">
-          <property name="text">
-           <string>View pinned certificate</string>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-     </layout>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="warningBanner" native="true">
     </widget>
    </item>
    <item>
@@ -706,6 +639,12 @@
    <class>QnWordWrappedLabel</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::CommonMessageBar</class>
+   <extends>QWidget</extends>
+   <header>nx/vms/client/desktop/common/widgets/message_bar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

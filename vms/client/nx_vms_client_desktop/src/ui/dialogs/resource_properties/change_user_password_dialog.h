@@ -24,8 +24,6 @@ public:
 
     QString newPassword() const;
 
-    void setInfoText(const QString& text);
-
 private:
     bool validate();
 
