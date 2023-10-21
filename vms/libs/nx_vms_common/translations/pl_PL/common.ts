@@ -1647,11 +1647,11 @@
     </message>
     <message>
       <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
+      <translation>Nagłówek HTTP: Pochodzenie</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
+      <translation>Nagłówek HTTP: Opcje X-Frame</translation>
     </message>
     <message>
       <source>Show mouse timeline preview</source>
@@ -1679,7 +1679,7 @@
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
-      <translation type="unfinished">Use only HTTPS for cameras</translation>
+      <translation>Używaj tylko HTTPS dla kamer</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (unsecure)</source>
@@ -2390,7 +2390,7 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>Wyślij polecenie HTTP</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
