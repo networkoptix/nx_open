@@ -223,7 +223,7 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(
     if (!serverApi)
         return kInvalidRequestId;
 
-    request.format = Qn::SerializationFormat::UbjsonFormat;
+    request.format = Qn::SerializationFormat::ubjson;
 
     auto callback = nx::utils::guarded(this,
         [this](
@@ -256,7 +256,7 @@ int QnCameraBookmarksManagerPrivate::sendGetRequest(
         return kInvalidRequestId;
     }
 
-    request.format = Qn::SerializationFormat::UbjsonFormat;
+    request.format = Qn::SerializationFormat::ubjson;
 
     return serverApi->getRawResult(path, request.toParams(), std::move(callback));
 }
@@ -267,7 +267,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
 {
     QnGetBookmarksRequestData requestData;
     requestData.filter = filter;
-    requestData.format = Qn::SerializationFormat::UbjsonFormat;
+    requestData.format = Qn::SerializationFormat::ubjson;
     if (!NX_ASSERT(requestData.filter.startTimeMs.count() >= 0, "Invalid start time passed"))
         requestData.filter.startTimeMs = {};
     if (!NX_ASSERT(requestData.filter.endTimeMs.count() >= 0, "Invalid end time passed"))
@@ -284,7 +284,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarkTagsAsync(
 {
     QnGetBookmarkTagsRequestData requestData;
     requestData.limit = maxTags;
-    requestData.format = Qn::SerializationFormat::UbjsonFormat;
+    requestData.format = Qn::SerializationFormat::ubjson;
 
     return sendGetRequest(
         "/ec2/bookmarks/tags",

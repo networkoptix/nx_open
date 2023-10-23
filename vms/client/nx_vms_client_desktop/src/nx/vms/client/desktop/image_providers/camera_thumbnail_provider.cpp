@@ -206,7 +206,7 @@ void CameraThumbnailProvider::doLoadAsync()
 
             // TODO: add error message processing.
             const bool isJsonError = nx::network::http::getHeaderValue(headers, "Content-Type")
-                == Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat);
+                == Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json);
 
             if (imageData.isEmpty() || isJsonError)
             {

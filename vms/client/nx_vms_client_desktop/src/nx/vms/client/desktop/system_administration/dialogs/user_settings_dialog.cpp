@@ -230,7 +230,7 @@ struct UserSettingsDialog::Private
             .toUrl();
 
         auto messageBody = std::make_unique<nx::network::http::BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat),
+            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
             nx::format(kTrafficRelayUrlRequest, cloudSystemId).toStdString());
 
         httpClient->doPost(url, std::move(messageBody),

@@ -28,7 +28,8 @@ void serializeToUrl(const InputData& data, QUrl* const url)
 {
     QUrlQuery urlQuery;
     serializeToUrlQuery(data, &urlQuery);
-    urlQuery.addQueryItem("format", QString::fromStdString(nx::reflect::toString(Qn::JsonFormat)));
+    urlQuery.addQueryItem(
+        "format", QString::fromStdString(nx::reflect::toString(Qn::SerializationFormat::json)));
     url->setQuery(urlQuery);
 }
 

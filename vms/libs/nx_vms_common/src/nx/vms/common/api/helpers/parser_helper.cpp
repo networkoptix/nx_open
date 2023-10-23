@@ -20,7 +20,7 @@ nx::network::rest::Result parseRestResult(
         return nx::network::rest::Result();
 
     // Support JSON format only for new REST API.
-    if (format == Qn::JsonFormat)
+    if (format == Qn::SerializationFormat::json)
     {
         nx::network::rest::Result result;
         if (QJson::deserialize(messageBody, &result))

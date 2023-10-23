@@ -45,7 +45,7 @@ struct NX_VMS_COMMON_API QnMultiserverRequestData: QnBaseMultiserverRequestData
     virtual bool isValid() const;
 
     /** Fix fields to make local request. */
-    void makeLocal(Qn::SerializationFormat localFormat = Qn::UbjsonFormat);
+    void makeLocal(Qn::SerializationFormat localFormat = Qn::SerializationFormat::ubjson);
 
 protected:
     // Avoid creating invalid instances when making local requests.

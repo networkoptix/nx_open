@@ -327,7 +327,7 @@ void ConnectionBase::onHttpClientDone()
     }
 
     using namespace nx::network;
-    websocket::FrameType frameType = remotePeer.dataFormat == Qn::JsonFormat
+    websocket::FrameType frameType = remotePeer.dataFormat == Qn::SerializationFormat::json
         ? websocket::FrameType::text
         : websocket::FrameType::binary;
 

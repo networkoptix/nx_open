@@ -176,7 +176,7 @@ nx::network::rest::Params QnGetBookmarksRequestData::toParams() const
 
 bool QnGetBookmarksRequestData::isValid() const
 {
-    return format != Qn::UnsupportedFormat;
+    return format != Qn::SerializationFormat::unsupported;
 }
 
 //-------------------------------------------------------------------------------------------------

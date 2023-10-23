@@ -32,7 +32,7 @@ struct NX_VMS_COMMON_API QnEventLogFilterData
 struct NX_VMS_COMMON_API QnEventLogRequestData
 {
     QnEventLogFilterData filter;
-    Qn::SerializationFormat format = Qn::SerializationFormat::JsonFormat;
+    Qn::SerializationFormat format = Qn::SerializationFormat::json;
 
     void loadFromParams(QnResourcePool* resourcePool, const nx::network::rest::Params& params);
     nx::network::rest::Params toParams() const;

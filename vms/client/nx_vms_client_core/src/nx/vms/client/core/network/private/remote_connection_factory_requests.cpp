@@ -280,7 +280,7 @@ struct RemoteConnectionFactoryRequestsManager::Private
     {
         Request request = makeRequestWithCertificateValidation(context->handshakeCertificateChain);
         auto messageBody = std::make_unique<BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
             std::move(data));
         request->setRequestBody(std::move(messageBody));
 

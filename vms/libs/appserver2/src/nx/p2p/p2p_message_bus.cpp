@@ -987,12 +987,12 @@ void MessageBus::sendTransactionImpl(
 
     switch (connection->remotePeer().dataFormat)
     {
-    case Qn::JsonFormat:
+    case Qn::SerializationFormat::json:
         connection->sendTransaction(
             tran,
             m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
         break;
-    case Qn::UbjsonFormat:
+    case Qn::SerializationFormat::ubjson:
         if (connection->remotePeer().isClient())
         {
             connection->sendTransaction(
@@ -1285,7 +1285,7 @@ bool MessageBus::handlePushTransactionData(
     // Workaround for compatibility with server 3.1/3.2 with p2p mode on
     // It could send subscribeForDataUpdates binary message among json data.
     // TODO: we have to remove this checking in 4.0 because it is fixed on server side.
-    if (localPeer().dataFormat == Qn::JsonFormat && !serializedTran.isEmpty()
+    if (localPeer().dataFormat == Qn::SerializationFormat::json && !serializedTran.isEmpty()
         && serializedTran[0] == (quint8)MessageType::subscribeForDataUpdates)
     {
         return true; //< Ignore binary message
@@ -1635,12 +1635,12 @@ void MessageBus::sendUnicastTransactionImpl(
             }
             switch (connection->remotePeer().dataFormat)
             {
-            case Qn::JsonFormat:
+            case Qn::SerializationFormat::json:
                 connection->sendTransaction(
                     tran,
                     m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
                 break;
-            case Qn::UbjsonFormat:
+            case Qn::SerializationFormat::ubjson:
                 connection->sendTransaction(
                     tran,
                     m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
@@ -1656,7 +1656,7 @@ void MessageBus::sendUnicastTransactionImpl(
         {
             switch (connection->remotePeer().dataFormat)
             {
-            case Qn::UbjsonFormat:
+            case Qn::SerializationFormat::ubjson:
                 transportHeader.via.insert(localPeer().id);
                 connection->sendTransaction(
                     tran,

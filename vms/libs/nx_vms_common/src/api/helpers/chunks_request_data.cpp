@@ -145,7 +145,7 @@ bool QnChunksRequestData::isValid() const
 {
     if (resList.isEmpty()
         || endTimeMs <= startTimeMs
-        || format == Qn::UnsupportedFormat)
+        || format == Qn::SerializationFormat::unsupported)
     {
         return false;
     }

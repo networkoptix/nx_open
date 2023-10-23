@@ -327,7 +327,7 @@ rest::Handle CameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCamer
             data.status = Qn::ThumbnailStatus::NoData;
 
             // TODO: add error message processing.
-            const auto json = Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat);
+            const auto json = Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json);
             bool isJsonError = nx::network::http::getHeaderValue(headers, "Content-Type") == json;
 
             if (success && !isJsonError && !imageData.isEmpty())
