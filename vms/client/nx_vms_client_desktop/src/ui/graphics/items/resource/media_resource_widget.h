@@ -33,12 +33,15 @@
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/help/help_topics.h>
 #include <utils/media/sse_helper.h>
-#include <vx/fwd/vxfwd.h>
 
 #include "resource_widget.h"
 
 struct QnMetaDataV1;
 using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
+
+namespace vx {
+class MonitoringResourceWidgetBase;
+}
 
 namespace nx::vms::client::desktop {
 

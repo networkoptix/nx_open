@@ -10,7 +10,9 @@
 #include <nx/vms/event/event_fwd.h>
 #include <ui/workbench/workbench_state_manager.h>
 
-#include <vx/fwd/vxfwd.h>
+namespace vx {
+class MonitoringActionHandler;
+}
 
 class QnWorkbenchLayout;
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
@@ -116,7 +118,6 @@ private:
         const LayoutResourceList& layouts,
         const StreamSynchronizationState& playbackState);
 
-    friend class vx::DebugHandler;
     friend class vx::MonitoringActionHandler;
 };
 
