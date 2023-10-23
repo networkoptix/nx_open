@@ -10,7 +10,7 @@
 
 class QUrlQuery;
 
-namespace Qn { enum SerializationFormat: int; }
+namespace Qn { enum class SerializationFormat: int; }
 namespace nx::network::rest { class Params; }
 namespace nx::vms::common { class SystemContext; }
 

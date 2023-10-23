@@ -82,13 +82,13 @@ rest::RestResultWithData<T> parseMessageBody(
     using Result = rest::RestResultWithData<T>;
     switch (format)
     {
-        case Qn::JsonFormat:
+        case Qn::SerializationFormat::json:
         {
             auto restResult =
                 QJson::deserialized(msgBody, nx::network::rest::JsonResult(), success);
             return Result(restResult, restResult.deserialized<T>());
         }
-        case Qn::UbjsonFormat:
+        case Qn::SerializationFormat::ubjson:
         {
             auto restResult =
                 QnUbjson::deserialized(msgBody, nx::network::rest::UbjsonResult(), success);
@@ -126,9 +126,9 @@ T parseMessageBody(
 
     switch (format)
     {
-        case Qn::JsonFormat:
+        case Qn::SerializationFormat::json:
             return QJson::deserialized(msgBody, T(), success);
-        case Qn::UbjsonFormat:
+        case Qn::SerializationFormat::ubjson:
             return QnUbjson::deserialized(msgBody, T(), success);
         default:
             *success = false;
@@ -169,7 +169,7 @@ rest::ErrorOrData<T> parseMessageBody(
     nx::network::http::StatusCode::Value httpStatusCode,
     bool* success)
 {
-    if (format != Qn::JsonFormat)
+    if (format != Qn::SerializationFormat::json)
     {
         NX_DEBUG(typeid(rest::ServerConnection),
             "Unsupported format '%1', status code: %2, message body: %3 ...",
@@ -522,7 +522,7 @@ rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRe
 
     QnThumbnailRequestData data;
     data.request = request;
-    data.format = Qn::UbjsonFormat;
+    data.format = Qn::SerializationFormat::ubjson;
 
     return executeGet(lit("/ec2/cameraThumbnail"), data.toParams(), callback, targetThread);
 }
@@ -729,7 +729,7 @@ Handle ServerConnection::putServerLogSettings(
         prepareUrl(
             QString("/rest/v2/servers/%1/logSettings").arg(serverId.toString()),
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(settings));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -753,7 +753,7 @@ Handle ServerConnection::patchSystemSettings(
         prepareUrl(
             "/rest/v3/system/settings",
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(settings));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -795,7 +795,7 @@ Handle ServerConnection::addCamera(
 {
     auto request = prepareRequest(nx::network::http::Method::post,
         prepareUrl(QString("/rest/v3/devices"), {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(device));
 
     proxyRequestUsingServer(request, targetServerId);
@@ -819,7 +819,7 @@ Handle ServerConnection::searchCamera(
 {
     auto request = prepareRequest(nx::network::http::Method::post,
         prepareUrl(QString("/rest/v3/devices/*/searches/"), {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(deviceSearchData));
 
     proxyRequestUsingServer(request, targetServerId);
@@ -934,7 +934,7 @@ Handle ServerConnection::setOverlappedId(
     return executePost(
         "/api/overlappedIds",
         nx::network::rest::Params(),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         QJson::serialized(request),
         Result<nx::network::rest::JsonResult>::type(
             [callback = std::move(callback)](
@@ -1257,7 +1257,7 @@ Handle ServerConnection::getEvents(
     Result<EventLogData>::type callback,
     QThread* targetThread)
 {
-    request.format = Qn::SerializationFormat::UbjsonFormat;
+    request.format = Qn::SerializationFormat::ubjson;
     return executeGet("/api/getEvents", request.toParams(), callback, targetThread, serverId);
 }
 
@@ -1553,7 +1553,7 @@ Handle ServerConnection::postJsonResult(
     std::optional<Timeouts> timeouts,
     std::optional<QnUuid> proxyToServer)
 {
-    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json);
     return executePost<nx::network::rest::JsonResult>(
         action,
         params,
@@ -1685,7 +1685,7 @@ Handle ServerConnection::jsonRpcBatchCall(
     auto request = prepareRequest(
         nx::network::http::Method::post,
         prepareUrl(kJsonRpcPath, /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         QJson::serialized(requests));
 
     auto internalCallback =
@@ -1785,7 +1785,7 @@ Handle ServerConnection::putEmptyResult(
     QThread* targetThread,
     std::optional<QnUuid> proxyToServer)
 {
-    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json);
     return executePut<EmptyResponseType>(
         action,
         params,
@@ -1807,7 +1807,7 @@ Handle ServerConnection::putRest(
     auto request = prepareRequest(
         nx::network::http::Method::put,
         prepareUrl(action, params),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         body);
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -1829,7 +1829,7 @@ Handle ServerConnection::patchRest(
 {
     auto request = prepareRequest(nx::network::http::Method::patch,
         prepareUrl(action, params),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         body);
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -1849,7 +1849,7 @@ Handle ServerConnection::postRest(nx::vms::common::SessionTokenHelperPtr helper,
 {
     auto request = prepareRequest(nx::network::http::Method::post,
         prepareUrl(action, params),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         body);
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -1933,7 +1933,7 @@ Handle ServerConnection::postUbJsonResult(
     UbJsonResultCallback&& callback,
     QThread* targetThread)
 {
-    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::UbjsonFormat);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::ubjson);
     return executePost<nx::network::rest::UbjsonResult>(action,
         params,
         contentType,
@@ -2048,7 +2048,7 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
         {
             bool success = false;
             const auto format = Qn::serializationFormatFromHttpContentType(context->response.contentType);
-            bool goodFormat = format == Qn::JsonFormat || format == Qn::UbjsonFormat;
+            bool goodFormat = format == Qn::SerializationFormat::json || format == Qn::SerializationFormat::ubjson;
 
             std::shared_ptr<ResultType> result;
 
@@ -2150,7 +2150,7 @@ Handle ServerConnection::setLdapSettingsAsync(
         prepareUrl(
             "/rest/v3/ldap/settings",
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(settings));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -2174,7 +2174,7 @@ Handle ServerConnection::modifyLdapSettingsAsync(
         prepareUrl(
             "/rest/v3/ldap/settings",
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(settings));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -2219,7 +2219,7 @@ Handle ServerConnection::syncLdapAsync(
         prepareUrl(
             "/rest/v3/ldap/sync",
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
@@ -2241,7 +2241,7 @@ Handle ServerConnection::resetLdapAsync(
         prepareUrl(
             "/rest/v3/ldap/settings",
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
 
@@ -2265,7 +2265,7 @@ Handle ServerConnection::saveUserAsync(
         prepareUrl(
             QString("/rest/v3/users/%1").arg(userData.getId().toString()),
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(userData));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -2312,7 +2312,7 @@ Handle ServerConnection::saveGroupAsync(
         prepareUrl(
             QString("/rest/v3/userGroups/%1").arg(groupData.id.toString()),
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(groupData));
 
     auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
@@ -2404,7 +2404,7 @@ Handle ServerConnection::replaceDevice(
     auto request = prepareRequest(
         nx::network::http::Method::post,
         prepareUrl(nx::format("/rest/v2/devices/%1/replace", deviceToBeReplacedId), /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         QJson::serialized(requestData));
 
     return executeRequest(request, std::move(internal_callback), targetThread);
@@ -2429,7 +2429,7 @@ Handle ServerConnection::recordedTimePeriods(
     QThread* targetThread)
 {
     QnChunksRequestData fixedFormatRequest(request);
-    fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
+    fixedFormatRequest.format = Qn::SerializationFormat::compressedPeriods;
     auto internalCallback =
         [callback=std::move(callback)](
             bool success, Handle requestId, QByteArray result,

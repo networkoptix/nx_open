@@ -5,23 +5,39 @@
 #include <string_view>
 
 #include <QtCore/QByteArray>
+#include <QtCore/QDebug>
 
 #include <nx/reflect/enum_instrument.h>
 
 namespace Qn {
 
-enum SerializationFormat: int
+enum class SerializationFormat: int
 {
-    JsonFormat = 0,
-    UbjsonFormat = 1,
-    // BnsFormat = 2,
-    CsvFormat = 3,
-    XmlFormat = 4,
-    CompressedPeriodsFormat = 5, //< Used for chunks data only.
-    UrlQueryFormat = 6, //< May be added in the future for parsing "name1=val1&name2=val2".
-    UrlEncodedFormat = 7,
+    json = 0,
+    ubjson = 1,
+    // bns = 2,
+    csv = 3,
+    xml = 4,
 
-    UnsupportedFormat = -1
+    /**%apidoc
+     * Used for chunks data only.
+     * %caption periods
+     */
+    compressedPeriods = 5,
+
+    /**%apidoc
+     * May be added in the future for parsing "name1=val1&name2=val2".
+     * %caption urlquery
+     */
+    urlQuery = 6,
+
+    /**%apidoc
+     * %caption urlencoded
+     */
+    urlEncoded = 7,
+
+    /**%apidoc[unused] */
+    unsupported = -1
 };
 
 template<typename Visitor>
@@ -29,12 +45,13 @@ constexpr auto nxReflectVisitAllEnumItems(SerializationFormat*, Visitor&& visito
 {
     using Item = nx::reflect::enumeration::Item<SerializationFormat>;
     return visitor(
-        Item{JsonFormat, "json"},
-        Item{UbjsonFormat, "ubjson"},
-        Item{CsvFormat, "csv"},
-        Item{XmlFormat, "xml"},
-        Item{CompressedPeriodsFormat, "periods"},
-        Item{UrlEncodedFormat, "urlencoded"}
+        Item{SerializationFormat::json, "json"},
+        Item{SerializationFormat::ubjson, "ubjson"},
+        Item{SerializationFormat::csv, "csv"},
+        Item{SerializationFormat::xml, "xml"},
+        Item{SerializationFormat::compressedPeriods, "periods"},
+        Item{SerializationFormat::urlQuery, "urlquery"},
+        Item{SerializationFormat::urlEncoded, "urlencoded"}
     );
 }
 
@@ -45,5 +62,7 @@ NX_UTILS_API SerializationFormat serializationFormatFromHttpContentType(
 
 NX_UTILS_API SerializationFormat serializationFormatFromHttpContentType(
     const QByteArray& httpContentType);
+
+NX_UTILS_API QDebug operator<<(QDebug, const SerializationFormat&);
 
 } // namespace Qn

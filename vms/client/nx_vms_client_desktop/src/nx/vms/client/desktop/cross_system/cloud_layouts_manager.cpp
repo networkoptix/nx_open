@@ -225,7 +225,7 @@ struct CloudLayoutsManager::Private
         auto url = endpoint;
         url.setPath(nx::format(kParticularLayoutPathTemplate, layout.id.toSimpleString()));
         auto messageBody = std::make_unique<BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
             nx::reflect::json::serialize(layout));
         request->setRequestBody(std::move(messageBody));
         networkManager->doRequest(

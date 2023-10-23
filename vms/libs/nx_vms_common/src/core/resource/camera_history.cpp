@@ -286,7 +286,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
     }
 
     QnChunksRequestData request;
-    request.format = Qn::UbjsonFormat;
+    request.format = Qn::SerializationFormat::ubjson;
     request.resList << camera.dynamicCast<QnVirtualCameraResource>();
 
     {

@@ -118,8 +118,8 @@ private:
 
 private:
     std::optional<nx::network::http::ConnectionEvents> m_connectionEvents;
-    Qn::SerializationFormat m_inputFormat = Qn::UnsupportedFormat;
-    Qn::SerializationFormat m_outputFormat = Qn::UnsupportedFormat;
+    Qn::SerializationFormat m_inputFormat = Qn::SerializationFormat::unsupported;
+    Qn::SerializationFormat m_outputFormat = Qn::SerializationFormat::unsupported;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -216,7 +216,7 @@ void BaseApiRequestHandler<Input, Descendant>::requestCompleted(
             m_requestMethod, result.httpStatusCode()))
     {
         nx::Buffer serializedResult;
-        NX_ASSERT(serializeToAnyFusionFormat(result, Qn::JsonFormat, &serializedResult));
+        NX_ASSERT(serializeToAnyFusionFormat(result, Qn::SerializationFormat::json, &serializedResult));
 
         outputMsgBody = std::make_unique<nx::network::http::BufferSource>(
             "application/json",
@@ -250,7 +250,7 @@ bool BaseApiRequestHandler<Input, Descendant>::parseAnySupportedFormat(
 {
     switch (dataFormat)
     {
-        case Qn::UrlQueryFormat:
+        case Qn::SerializationFormat::urlQuery:
             return loadFromUrlQuery(
                 QUrlQuery(QUrl::fromPercentEncoding(data.toRawByteArray())),
                 target);
@@ -269,7 +269,7 @@ bool BaseApiRequestHandler<Input, Descendant>::serializeToAnyFusionFormat(
 {
     switch (dataFormat)
     {
-        case Qn::UrlQueryFormat:
+        case Qn::SerializationFormat::urlQuery:
         {
             NX_ASSERT(false);
             return true;
@@ -289,14 +289,14 @@ bool BaseApiRequestHandler<Input, Descendant>::getInputFormat(
     const nx::network::http::Request& request,
     ApiRequestResult* errorDescription)
 {
-    m_inputFormat = Qn::SerializationFormat::UnsupportedFormat;
+    m_inputFormat = Qn::SerializationFormat::unsupported;
     std::string formatString;
 
     // Input/output formats can differ. E.g., GET request can specify input data in url query only.
     // TODO: #akolesnikov Fetching m_outputDataFormat from url query.
     if (!nx::network::http::Method::isMessageBodyAllowed(request.requestLine.method))
     {
-        m_inputFormat = Qn::UrlQueryFormat;
+        m_inputFormat = Qn::SerializationFormat::urlQuery;
     }
     else //< POST, PUT
     {
@@ -326,7 +326,7 @@ bool BaseApiRequestHandler<Input, Descendant>::getOutputFormat(
     const nx::network::http::Request& request,
     ApiRequestResult* errorDescription)
 {
-    m_outputFormat = Qn::SerializationFormat::JsonFormat;
+    m_outputFormat = Qn::SerializationFormat::json;
 
     const QUrlQuery urlQuery(request.requestLine.url.query());
     const auto formatStr = urlQuery.queryItemValue("format");
@@ -334,7 +334,7 @@ bool BaseApiRequestHandler<Input, Descendant>::getOutputFormat(
     {
         bool parsed = false;
         const auto format =
-            nx::reflect::fromString(formatStr.toStdString(), Qn::JsonFormat, &parsed);
+            nx::reflect::fromString(formatStr.toStdString(), Qn::SerializationFormat::json, &parsed);
         if (!parsed || !isFormatSupported(format))
         {
             *errorDescription = ApiRequestResult(
@@ -357,8 +357,9 @@ template<typename Input, typename Descendant>
 bool BaseApiRequestHandler<Input, Descendant>::isFormatSupported(
     Qn::SerializationFormat dataFormat) const
 {
-    return dataFormat == Qn::JsonFormat || dataFormat == Qn::UrlQueryFormat
-        || dataFormat == Qn::UrlEncodedFormat;
+    return dataFormat == Qn::SerializationFormat::json
+        || dataFormat == Qn::SerializationFormat::urlQuery
+        || dataFormat == Qn::SerializationFormat::urlEncoded;
 }
 
 template<typename Input, typename Descendant>

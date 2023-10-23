@@ -202,7 +202,7 @@ std::optional<QnStatisticsManager::StatisticsData> QnStatisticsManager::prepareS
     StatisticsData result;
     result.payload.statisticsServerUrl = settings.statisticsServerUrl;
     result.payload.metricsList = totalFiltered;
-    result.payload.format = Qn::SerializationFormat::JsonFormat;
+    result.payload.format = Qn::SerializationFormat::json;
     result.filters = settings.filters;
     result.timestamp = timestamp;
     return result;

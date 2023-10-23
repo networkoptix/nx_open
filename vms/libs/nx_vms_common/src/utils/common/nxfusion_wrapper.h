@@ -22,7 +22,7 @@ public:
     {
         switch (format)
         {
-            case Qn::JsonFormat:
+            case Qn::SerializationFormat::json:
                 return serializeToJson(data);
 
             default:
@@ -45,7 +45,7 @@ public:
     {
         switch (format)
         {
-            case Qn::JsonFormat:
+            case Qn::SerializationFormat::json:
                 return deserializeFromJson(data, target);
 
             default:

@@ -127,7 +127,7 @@ CameraAsyncImageRequest::CameraAsyncImageRequest(
 
             // TODO: add error message processing.
             const bool isJsonError = nx::network::http::getHeaderValue(headers, "Content-Type")
-                == Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::JsonFormat);
+                == Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json);
 
             if (!success || imageData.isEmpty() || isJsonError || !d->threadPool())
             {

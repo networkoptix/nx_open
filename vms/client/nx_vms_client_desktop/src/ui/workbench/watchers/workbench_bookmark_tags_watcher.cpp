@@ -43,7 +43,7 @@ void QnWorkbenchBookmarkTagsWatcher::refresh() {
     enum { TagsLimit = 20 };
 
     QnGetBookmarkTagsRequestData requestData(TagsLimit);
-    requestData.format = Qn::SerializationFormat::UbjsonFormat;
+    requestData.format = Qn::SerializationFormat::ubjson;
 
     // FIXME: #sivanov Move watcher itself to the System Context.
     auto systemContext = SystemContext::fromResource(currentServer());

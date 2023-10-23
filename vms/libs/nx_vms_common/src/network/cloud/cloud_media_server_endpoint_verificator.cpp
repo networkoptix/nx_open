@@ -121,7 +121,7 @@ bool CloudMediaServerEndpointVerificator::verifyHostResponse(
 {
     const auto contentType = nx::network::http::getHeaderValue(
         httpClient->response()->headers, "Content-Type");
-    if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
+    if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::SerializationFormat::json)
     {
         NX_VERBOSE(this, nx::format("cross-nat %1. Received unexpected Content-Type %2 from %3")
             .args(m_connectSessionId, contentType, httpClient->url()));

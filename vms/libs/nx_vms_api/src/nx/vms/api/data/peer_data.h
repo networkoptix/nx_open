@@ -42,19 +42,19 @@ struct NX_VMS_API PeerData: PersistentIdData
         const QnUuid& id,
         const QnUuid& instanceId,
         PeerType peerType,
-        Qn::SerializationFormat dataFormat = Qn::UbjsonFormat);
+        Qn::SerializationFormat dataFormat = Qn::SerializationFormat::ubjson);
 
     PeerData(
         const PersistentIdData& peer,
         PeerType peerType,
-        Qn::SerializationFormat dataFormat = Qn::UbjsonFormat);
+        Qn::SerializationFormat dataFormat = Qn::SerializationFormat::ubjson);
 
     PeerData(
         const QnUuid& id,
         const QnUuid& instanceId,
         const QnUuid& persistentId,
         PeerType peerType,
-        Qn::SerializationFormat dataFormat = Qn::UbjsonFormat);
+        Qn::SerializationFormat dataFormat = Qn::SerializationFormat::ubjson);
 
     bool operator==(const PeerData& other) const = default;
 
@@ -85,7 +85,7 @@ struct NX_VMS_API PeerData: PersistentIdData
      * %value UrlEncodedFormat
      * %value UnsupportedFormat
      */
-    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
+    Qn::SerializationFormat dataFormat = Qn::SerializationFormat::ubjson;
 };
 #define PeerData_Fields \
     PersistentIdData_Fields \

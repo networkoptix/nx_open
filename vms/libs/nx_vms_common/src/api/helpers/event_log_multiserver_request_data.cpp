@@ -25,7 +25,7 @@ static constexpr int kInvalidStartTime = -1;
 
 QnEventLogMultiserverRequestData::QnEventLogMultiserverRequestData()
 {
-    format = Qn::UbjsonFormat;
+    format = Qn::SerializationFormat::ubjson;
 }
 
 QnEventLogMultiserverRequestData::QnEventLogMultiserverRequestData(

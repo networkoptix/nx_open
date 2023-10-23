@@ -43,7 +43,7 @@ Connection::Connection(
     m_credentials(std::move(credentials))
 {
     nx::network::http::HttpHeaders headers;
-    const auto serializedPeer = localPeer.dataFormat == Qn::UbjsonFormat
+    const auto serializedPeer = localPeer.dataFormat == Qn::SerializationFormat::ubjson
         ? QnUbjson::serialized(localPeer) : QJson::serialized(localPeer);
     headers.emplace(Qn::EC2_PEER_DATA, serializedPeer.toBase64());
     headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, localPeer.instanceId.toByteArray());
