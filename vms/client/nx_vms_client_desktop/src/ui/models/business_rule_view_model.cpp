@@ -515,7 +515,8 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
             case EventType::pluginDiagnosticEvent:
             {
                 using namespace nx::vms::api;
-                const EventLevels levels = ErrorEventLevel | WarningEventLevel | InfoEventLevel;
+                const EventLevels levels =
+                    EventLevel::error | EventLevel::warning | EventLevel::info;
                 eventParams.inputPortId = QString::fromStdString(nx::reflect::toString(levels));
                 break;
             }

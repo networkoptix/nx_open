@@ -64,10 +64,10 @@ Level levelOf(const EventParameters& params)
             using namespace nx::vms::api;
             switch (params.metadata.level)
             {
-                case EventLevel::ErrorEventLevel:
+                case EventLevel::error:
                     return Level::critical;
 
-                case EventLevel::WarningEventLevel:
+                case EventLevel::warning:
                     return Level::important;
 
                 default:

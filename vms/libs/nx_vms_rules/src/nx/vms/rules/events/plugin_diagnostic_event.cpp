@@ -23,10 +23,10 @@ nx::vms::event::Level calculateLevel(nx::vms::api::EventLevel eventLevel)
 
     switch (eventLevel)
     {
-        case EventLevel::ErrorEventLevel:
+        case EventLevel::error:
             return Level::critical;
 
-        case EventLevel::WarningEventLevel:
+        case EventLevel::warning:
             return Level::important;
 
         default:
