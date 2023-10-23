@@ -24,32 +24,16 @@
 
 #include "abstract_archive_integrity_watcher.h"
 
-enum class PlaybackMode
-{
-    Default,
-    Live,
-    Archive,
-    ThumbNails,
-    Export,
-    Edge,
-    Preview
-};
-
-// Use lower case serialization for compatibility with previous versions.
-template<typename Visitor>
-constexpr auto nxReflectVisitAllEnumItems(PlaybackMode*, Visitor&& visitor)
-{
-    using Item = nx::reflect::enumeration::Item<PlaybackMode>;
-    return visitor(
-        Item{PlaybackMode::Default, "default"},
-        Item{PlaybackMode::Live, "live"},
-        Item{PlaybackMode::Archive, "archive"},
-        Item{PlaybackMode::ThumbNails, "thumbNails"},
-        Item{PlaybackMode::Export, "export"},
-        Item{PlaybackMode::Edge, "edge"},
-        Item{PlaybackMode::Preview, "preview"}
-    );
-}
+// Trailing `_` is removed from a name serialization by NX_REFLECTION_ENUM_CLASS implementation.
+NX_REFLECTION_ENUM_CLASS(PlaybackMode,
+    default_,
+    live,
+    archive,
+    thumbNails,
+    export_,
+    edge,
+    preview
+)
 
 class NX_VMS_COMMON_API QnAbstractArchiveDelegate: public QObject
 {

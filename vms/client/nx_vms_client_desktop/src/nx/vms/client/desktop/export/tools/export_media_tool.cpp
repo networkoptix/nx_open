@@ -202,7 +202,7 @@ private:
             NX_ASSERT(camera);
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false);
-            rtspClient->setMediaRole(PlaybackMode::Export);
+            rtspClient->setMediaRole(PlaybackMode::export_);
             if (isRapidReview)
                 rtspClient->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs);
         }
