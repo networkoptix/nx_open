@@ -373,7 +373,7 @@ RuleList Rule::getPluginDiagnosticEventUpdateRules()
 
     EventParameters parameters;
     parameters.inputPortId = QString::fromStdString(nx::reflect::toString(
-        EventLevel::InfoEventLevel | EventLevel::WarningEventLevel | EventLevel::ErrorEventLevel));
+        EventLevel::info | EventLevel::warning | EventLevel::error));
 
     rule->setEventParams(parameters);
     return {rule};

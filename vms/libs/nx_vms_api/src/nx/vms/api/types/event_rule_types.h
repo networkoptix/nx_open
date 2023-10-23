@@ -287,12 +287,14 @@ NX_REFLECTION_ENUM(ActionType,
     showIntercomInformer = 22
 )
 
-enum EventLevel
+enum class EventLevel
 {
-    UndefinedEventLevel = 0,
-    InfoEventLevel = 1 << 0,
-    WarningEventLevel = 1 << 1,
-    ErrorEventLevel = 1 << 2,
+    /**%apidoc[unused] */
+    undefined = 0,
+
+    info = 1 << 0,
+    warning = 1 << 1,
+    error = 1 << 2,
 };
 
 template<typename Visitor>
@@ -300,10 +302,10 @@ constexpr auto nxReflectVisitAllEnumItems(EventLevel*, Visitor&& visitor)
 {
     using Item = nx::reflect::enumeration::Item<EventLevel>;
     return visitor(
-        Item{EventLevel::UndefinedEventLevel, ""},
-        Item{EventLevel::InfoEventLevel, "info"},
-        Item{EventLevel::WarningEventLevel, "warning"},
-        Item{EventLevel::ErrorEventLevel, "error"}
+        Item{EventLevel::undefined, ""},
+        Item{EventLevel::info, "info"},
+        Item{EventLevel::warning, "warning"},
+        Item{EventLevel::error, "error"}
     );
 }
 

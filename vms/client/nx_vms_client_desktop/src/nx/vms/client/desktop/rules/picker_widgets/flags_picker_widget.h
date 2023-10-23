@@ -90,12 +90,12 @@ template<>
 std::map<api::EventLevel, QString> AnalyticsEventLevelPicker::getFlags() const
 {
     return {
-        {api::EventLevel::ErrorEventLevel,
-            FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel::ErrorEventLevel)},
-        {api::EventLevel::WarningEventLevel,
-            FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel::WarningEventLevel)},
-        {api::EventLevel::InfoEventLevel,
-            FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel::InfoEventLevel)},
+        {api::EventLevel::error,
+            FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel::error)},
+        {api::EventLevel::warning,
+            FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel::warning)},
+        {api::EventLevel::info,
+            FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel::info)},
     };
 }
 
