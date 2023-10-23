@@ -43,7 +43,7 @@ TEST(VmsRulesSerialization, EventField)
     field->flag = true;
     field->number = 42;
     field->state = State::started;
-    field->levels = nx::vms::api::EventLevel::InfoEventLevel;
+    field->levels = nx::vms::api::EventLevel::info;
 
     nx::vms::rules::EventFilter filter(QnUuid::createUuid(), kEventType);
     filter.addField(kFieldName, std::move(field));
@@ -81,7 +81,7 @@ TEST(VmsRulesSerialization, Event)
         std::chrono::seconds(5),
         State::started);
     sourceEvent->attributes = nx::common::metadata::Attributes{{"key", "value"}};
-    sourceEvent->level = nx::vms::api::EventLevel::ErrorEventLevel;
+    sourceEvent->level = nx::vms::api::EventLevel::error;
     sourceEvent->reason = nx::vms::api::EventReason::networkBadCameraTime;
     sourceEvent->conflicts.camerasByServer["test"] = QStringList{"cam1", "cam2"};
 

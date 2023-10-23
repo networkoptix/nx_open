@@ -104,11 +104,11 @@ QString FlagsPickerWidgetStrings::eventLevelDisplayString(api::EventLevel eventL
 {
     switch(eventLevel)
     {
-        case api::EventLevel::ErrorEventLevel:
+        case api::EventLevel::error:
             return tr("Error");
-        case api::EventLevel::WarningEventLevel:
+        case api::EventLevel::warning:
             return tr("Warning");
-        case api::EventLevel::InfoEventLevel:
+        case api::EventLevel::info:
             return tr("Info");
         default:
             return tr("Undefined");

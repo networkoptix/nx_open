@@ -98,9 +98,9 @@ void PluginDiagnosticEventWidget::at_model_dataChanged(Fields fields)
 
         using namespace nx::vms::api;
         const auto levels = model()->eventParams().getDiagnosticEventLevels();
-        ui->errorCheckBox->setChecked(levels.testFlag(ErrorEventLevel));
-        ui->warningCheckBox->setChecked(levels.testFlag(WarningEventLevel));
-        ui->infoCheckBox->setChecked(levels.testFlag(InfoEventLevel));
+        ui->errorCheckBox->setChecked(levels.testFlag(EventLevel::error));
+        ui->warningCheckBox->setChecked(levels.testFlag(EventLevel::warning));
+        ui->infoCheckBox->setChecked(levels.testFlag(EventLevel::info));
     }
 
     if (fields.testFlag(Field::eventResources) || fields.testFlag(Field::eventParams))
@@ -180,11 +180,11 @@ nx::vms::event::EventParameters PluginDiagnosticEventWidget::createEventParamete
     using namespace nx::vms::api;
     EventLevels levels;
     if (ui->errorCheckBox->isChecked())
-        levels.setFlag(ErrorEventLevel);
+        levels.setFlag(EventLevel::error);
     if (ui->warningCheckBox->isChecked())
-        levels.setFlag(WarningEventLevel);
+        levels.setFlag(EventLevel::warning);
     if (ui->infoCheckBox->isChecked())
-        levels.setFlag(InfoEventLevel);
+        levels.setFlag(EventLevel::info);
     eventParams.setDiagnosticEventLevels(levels);
 
     return eventParams;

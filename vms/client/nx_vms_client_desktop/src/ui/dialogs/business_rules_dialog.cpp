@@ -264,14 +264,14 @@ static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColor
                 rule->eventParams().inputPortId.toStdString());
 
             QVector<Level> levels;
-            for (const auto& flag: {Level::ErrorEventLevel, Level::WarningEventLevel, Level::InfoEventLevel})
+            for (const auto& flag: {Level::error, Level::warning, Level::info})
             {
                 if (levelFlags & flag)
                     levels << flag;
             }
 
             nx::vms::event::EventMetaData data;
-            data.level = levels.isEmpty() ? Level::UndefinedEventLevel : nx::utils::random::choice(levels);
+            data.level = levels.isEmpty() ? Level::undefined : nx::utils::random::choice(levels);
             data.cameraRefs.push_back(camera.toString());
 
             params.insert("metadata", QString::fromUtf8(QJson::serialized(data)));
