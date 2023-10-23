@@ -373,7 +373,7 @@ ArchiveFrameExtractor::ArchiveFrameExtractor(
             /*rtpLogTag*/ QString(),
             sleepIfEmptySocket);
         rtspDelegate->setCamera(cameraResource);
-        rtspDelegate->setMediaRole(PlaybackMode::Archive);
+        rtspDelegate->setMediaRole(PlaybackMode::archive);
         d->streamWorker.archiveDelegate = std::move(rtspDelegate);
     }
     else if (const auto aviResource = mediaResource.dynamicCast<QnAviResource>())
