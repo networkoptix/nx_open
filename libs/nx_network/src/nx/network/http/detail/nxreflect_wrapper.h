@@ -23,10 +23,10 @@ public:
     {
         switch (format)
         {
-            case Qn::JsonFormat:
+            case Qn::SerializationFormat::json:
                 return serializeToJson(data);
 
-            case Qn::UrlEncodedFormat:
+            case Qn::SerializationFormat::urlEncoded:
                 return std::make_tuple(nx::Buffer(nx::reflect::urlencoded::serialize(data)), true);
 
             default:
@@ -49,10 +49,10 @@ public:
     {
         switch (format)
         {
-            case Qn::JsonFormat:
+            case Qn::SerializationFormat::json:
                 return deserializeFromJson(data, target);
 
-            case Qn::UrlEncodedFormat:
+            case Qn::SerializationFormat::urlEncoded:
                 return nx::reflect::urlencoded::deserialize(
                     std::string_view(data.data(), data.size()), target);
 

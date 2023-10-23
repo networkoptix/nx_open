@@ -465,9 +465,9 @@ vms::api::PeerDataEx deserializePeerData(
 
     bool success = false;
     auto peerData = nx::utils::fromBase64(nx::network::http::getHeaderValue(headers, Qn::EC2_PEER_DATA));
-    if (dataFormat == Qn::JsonFormat)
+    if (dataFormat == Qn::SerializationFormat::json)
         peer = QJson::deserialized(peerData, defaultPeerDataEx(), &success);
-    else if (dataFormat == Qn::UbjsonFormat)
+    else if (dataFormat == Qn::SerializationFormat::ubjson)
         peer = QnUbjson::deserialized(peerData, defaultPeerDataEx(), &success);
 
     const auto guidHeaderIt = headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
@@ -481,7 +481,7 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 {
     QUrlQuery query(request.requestLine.url.query());
 
-    Qn::SerializationFormat dataFormat = Qn::JsonFormat;
+    Qn::SerializationFormat dataFormat = Qn::SerializationFormat::json;
     if (query.hasQueryItem(QString::fromLatin1("format")))
         nx::reflect::fromString(query.queryItemValue("format").toStdString(), &dataFormat);
 
@@ -520,9 +520,9 @@ void serializePeerData(
     Qn::SerializationFormat dataFormat)
 {
     QByteArray result;
-    if (dataFormat == Qn::JsonFormat)
+    if (dataFormat == Qn::SerializationFormat::json)
         result = QJson::serialized(localPeer);
-    else if (dataFormat == Qn::UbjsonFormat)
+    else if (dataFormat == Qn::SerializationFormat::ubjson)
         result = QnUbjson::serialized(localPeer);
     else
         NX_ASSERT(0, "Unsupported data format.");

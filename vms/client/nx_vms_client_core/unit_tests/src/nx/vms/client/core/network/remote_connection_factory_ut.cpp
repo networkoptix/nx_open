@@ -168,7 +168,7 @@ public:
             requestsManager,
             certificateVerifier.get(),
             nx::vms::api::PeerType::desktopClient,
-            Qn::SerializationFormat::UbjsonFormat);
+            Qn::SerializationFormat::ubjson);
 
         auto userInteractionDelegate = std::make_unique<UserInteractionDelegate>();
         connectionFactory->setUserInteractionDelegate(std::move(userInteractionDelegate));

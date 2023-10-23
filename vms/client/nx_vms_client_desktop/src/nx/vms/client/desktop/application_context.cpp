@@ -168,7 +168,7 @@ QString actualCloudHost()
 
 Qn::SerializationFormat serializationFormat()
 {
-    return ini().forceJsonConnection ? Qn::JsonFormat : Qn::UbjsonFormat;
+    return ini().forceJsonConnection ? Qn::SerializationFormat::json : Qn::SerializationFormat::ubjson;
 }
 
 void initDeveloperOptions(const QnStartupParameters& startupParameters)

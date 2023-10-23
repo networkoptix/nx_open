@@ -759,7 +759,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
 
     switch (m_remotePeer.dataFormat)
     {
-        case Qn::JsonFormat:
+        case Qn::SerializationFormat::json:
             if (!QnJsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.data()),
                     static_cast<int>(tranData.size()),
@@ -775,7 +775,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
             }
             break;
 
-        case Qn::UbjsonFormat:
+        case Qn::SerializationFormat::ubjson:
             if (!QnUbjsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.data()),
                     static_cast<int>(tranData.size()),

@@ -25,7 +25,7 @@ bool handleTransactionParams(
     Function function,
     FastFunctionType fastFunction)
 {
-    if (fastFunction(Qn::UbjsonFormat, abstractTransaction, serializedTransaction))
+    if (fastFunction(Qn::SerializationFormat::ubjson, abstractTransaction, serializedTransaction))
     {
         return true; // process transaction directly without deserialize
     }
@@ -52,7 +52,7 @@ bool handleTransactionParams(
     Function function,
     FastFunctionType fastFunction)
 {
-    if (fastFunction(Qn::JsonFormat, abstractTransaction, serializedTransaction))
+    if (fastFunction(Qn::SerializationFormat::json, abstractTransaction, serializedTransaction))
     {
         return true; // process transaction directly without deserialize
     }
@@ -105,7 +105,7 @@ bool handleTransaction(
     const Function &function,
     FastFunctionType fastFunction)
 {
-    if (tranFormat == Qn::UbjsonFormat)
+    if (tranFormat == Qn::SerializationFormat::ubjson)
     {
         QnAbstractTransaction transaction;
         QnUbjsonReader<QByteArray> stream(&serializedTransaction);
@@ -123,7 +123,7 @@ bool handleTransaction(
             function,
             fastFunction);
     }
-    else if (tranFormat == Qn::JsonFormat)
+    else if (tranFormat == Qn::SerializationFormat::json)
     {
         QnAbstractTransaction transaction;
         QJsonObject tranObject;
@@ -157,7 +157,7 @@ bool handleTransactionWithHeader(
 {
     int headerSize = 0;
     nx::p2p::TransportHeader header;
-    if (connection->remotePeer().dataFormat == Qn::UbjsonFormat)
+    if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
         header = nx::p2p::deserializeTransportHeader(data, &headerSize);
     else
         header.dstPeers.push_back(bus->localPeer().id);
