@@ -734,7 +734,7 @@ QList<ActivityMonitor::PartitionSpace> MacMonitor::totalPartitionSpaceInfo()
         partition.freeBytes = fs.f_bavail * fs.f_bsize;
         partition.sizeBytes = fs.f_blocks * fs.f_bsize;
         partition.type = (fs.f_flags & MNT_REMOVABLE)
-            ? RemovableDiskPartition
+            ? PartitionType::removable
             : getPartitionTypeByFsType(fs.f_fstypename);
 
         foundPartitions << partition;

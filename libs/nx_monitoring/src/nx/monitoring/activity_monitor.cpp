@@ -80,32 +80,32 @@ std::unique_ptr<ActivityMonitor> ActivityMonitor::createForCurrentPlatform()
 ActivityMonitor::PartitionType ActivityMonitor::getPartitionTypeByFsType(const QString& fsTypeName)
 {
     static const QHash<QString, ActivityMonitor::PartitionType> kFsTypes = {
-        { "apfs", LocalDiskPartition },
-        { "ffs", LocalDiskPartition },
-        { "hfs", LocalDiskPartition },
-        { "ufs", LocalDiskPartition },
-        { "rootfs", LocalDiskPartition },
-        { "ext3", LocalDiskPartition },
-        { "ext2", LocalDiskPartition },
-        { "ext4", LocalDiskPartition },
-        { "zfs", LocalDiskPartition },
-        { "exfat", LocalDiskPartition },
-        { "vfat", LocalDiskPartition },
-        { "ecryptfs", LocalDiskPartition },
-        { "fuseblk", LocalDiskPartition }, //< NTFS.
-        { "fuse", LocalDiskPartition },
-        { "fusectl", LocalDiskPartition },
-        { "xfs", LocalDiskPartition },
-        { "fuse.osxfs", LocalDiskPartition }, //< Mounted volumes when Docker host is macOS.
-        { "smbfs", NetworkPartition },
-        { "nfs", NetworkPartition },
-        { "nfs4", NetworkPartition },
-        { "nfsd", NetworkPartition },
-        { "cifs", NetworkPartition },
-        { "ramfs", RamDiskPartition },
-        { "tmpfs", RamDiskPartition },
+        { "apfs", PartitionType::local},
+        { "ffs", PartitionType::local},
+        { "hfs", PartitionType::local},
+        { "ufs", PartitionType::local},
+        { "rootfs", PartitionType::local},
+        { "ext3", PartitionType::local},
+        { "ext2", PartitionType::local},
+        { "ext4", PartitionType::local},
+        { "zfs", PartitionType::local},
+        { "exfat", PartitionType::local},
+        { "vfat", PartitionType::local},
+        { "ecryptfs", PartitionType::local},
+        { "fuseblk", PartitionType::local}, //< NTFS.
+        { "fuse", PartitionType::local},
+        { "fusectl", PartitionType::local},
+        { "xfs", PartitionType::local},
+        { "fuse.osxfs", PartitionType::local}, //< Mounted volumes when Docker host is macOS.
+        { "smbfs", PartitionType::network},
+        { "nfs", PartitionType::network},
+        { "nfs4", PartitionType::network},
+        { "nfsd", PartitionType::network},
+        { "cifs", PartitionType::network},
+        { "ramfs", PartitionType::ram},
+        { "tmpfs", PartitionType::ram},
     };
-    return kFsTypes.value(fsTypeName, UnknownPartition);
+    return kFsTypes.value(fsTypeName, PartitionType::unknown);
 }
 
 } // namespace nx::monitoring

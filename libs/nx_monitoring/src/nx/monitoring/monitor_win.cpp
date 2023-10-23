@@ -296,28 +296,28 @@ static ActivityMonitor::PartitionType getRealDriveType(const QString& drive)
 {
     const auto handle = getDriveHandle(drive);
     if (*handle == INVALID_HANDLE_VALUE)
-        return ActivityMonitor::UnknownPartition;
+        return ActivityMonitor::PartitionType::unknown;
 
     const auto busType = getBusType(*handle);
 
     return busType == BusTypeUsb
-        ? ActivityMonitor::RemovableDiskPartition : ActivityMonitor::LocalDiskPartition;
+        ? ActivityMonitor::PartitionType::removable : ActivityMonitor::PartitionType::local;
 }
 
 static ActivityMonitor::PartitionType getPartitionType(const QString& driveName)
 {
     switch (GetDriveType(reinterpret_cast<LPCWSTR>(driveName.constData())))
     {
-        case DRIVE_REMOVABLE: return ActivityMonitor::RemovableDiskPartition;
+        case DRIVE_REMOVABLE: return ActivityMonitor::PartitionType::removable;
         case DRIVE_FIXED: return getRealDriveType(driveName);
-        case DRIVE_REMOTE: return ActivityMonitor::NetworkPartition;
-        case DRIVE_CDROM: return ActivityMonitor::OpticalDiskPartition;
-        case DRIVE_RAMDISK: return ActivityMonitor::RamDiskPartition;
+        case DRIVE_REMOTE: return ActivityMonitor::PartitionType::network;
+        case DRIVE_CDROM: return ActivityMonitor::PartitionType::optical;
+        case DRIVE_RAMDISK: return ActivityMonitor::PartitionType::ram;
         case DRIVE_UNKNOWN:
-        default: return ActivityMonitor::UnknownPartition;
+        default: return ActivityMonitor::PartitionType::unknown;
     }
 
-    return ActivityMonitor::UnknownPartition;
+    return ActivityMonitor::PartitionType::unknown;
 }
 
 static std::tuple<int64_t, int64_t> getSpaceInfo(const QString& driveName)
