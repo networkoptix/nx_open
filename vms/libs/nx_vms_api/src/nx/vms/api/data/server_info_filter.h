@@ -9,9 +9,10 @@ namespace nx::vms::api {
 
 struct NX_VMS_API ServerInfoFilter
 {
-    /**%apidoc Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
-     *     or be "this" to refer to the current Server.
-     *     %example this
+    /**%apidoc:string
+     * Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`, or be "this" to
+     * refer to the current Server.
+     * %example this
      */
     QnUuid id;
 
