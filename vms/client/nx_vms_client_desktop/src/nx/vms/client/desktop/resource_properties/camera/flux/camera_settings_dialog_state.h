@@ -441,6 +441,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     VirtualCameraMotionDetection virtualCameraMotion;
 
     bool virtualCameraIgnoreTimeZone = false;
+    bool hasExportPermission = false;
+    bool screenRecordingOn = false;
 
     // Helper methods.
 

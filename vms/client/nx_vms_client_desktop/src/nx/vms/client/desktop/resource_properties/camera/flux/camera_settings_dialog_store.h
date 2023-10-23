@@ -237,6 +237,8 @@ public:
     void setStreamUrls(const QString& primary, const QString& secondary);
 
     void setAdvancedSettingsManifest(const QnCameraAdvancedParams& manifest);
+    void setHasExportPermission(bool value);
+    void setScreenRecordingOn(bool value);
 
     Q_INVOKABLE bool isReadOnly() const;
 

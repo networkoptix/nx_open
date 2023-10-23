@@ -9,6 +9,9 @@
 #include <core/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {
+namespace menu {
+class Manager;
+} // namespace menu
 
 class CameraSettingsDialogStore;
 class SystemContext;
@@ -19,9 +22,9 @@ class CameraSettingsResourceAccessWatcher: public QObject
     using base_type = QObject;
 
 public:
-    CameraSettingsResourceAccessWatcher(
-        CameraSettingsDialogStore* store,
+    CameraSettingsResourceAccessWatcher(CameraSettingsDialogStore* store,
         SystemContext* systemContext,
+        menu::Manager* menu,
         QObject* parent);
     virtual ~CameraSettingsResourceAccessWatcher() override;
 
