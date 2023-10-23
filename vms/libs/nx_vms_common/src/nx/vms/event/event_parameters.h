@@ -38,7 +38,7 @@ struct EventMetaData
     //! Users that can generate this event.
     std::vector<QnUuid> instigators;
     bool allUsers = false;
-    nx::vms::api::EventLevel level = nx::vms::api::EventLevel::UndefinedEventLevel;
+    nx::vms::api::EventLevel level = nx::vms::api::EventLevel::undefined;
 
     EventMetaData() = default;
     EventMetaData(const EventMetaData&) = default;
