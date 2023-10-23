@@ -68,7 +68,7 @@ void MessageBarBlock::setMessageBars(const std::vector<BarDescription>& descs)
     // Set new ones.
     for (auto& desc: descs)
     {
-        auto bar = std::make_unique<CommonMessageBar>(nullptr, desc);
+        auto bar = std::make_unique<CommonMessageBar>(this, desc);
         layout()->addWidget(bar.get());
         d->bars.push_back(std::move(bar));
     }
