@@ -24,7 +24,7 @@
 #include <nx/vms/client/desktop/ui/actions/menu_factory.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_actions_factory.h>
 #include <ui/workbench/workbench_layout.h>
-#include <vx/hooks/action_registration.h>
+#include <vx/client/hooks/action_registration.h>
 
 #include "actions.h"
 

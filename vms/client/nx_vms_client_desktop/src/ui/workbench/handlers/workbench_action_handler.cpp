@@ -168,7 +168,7 @@
 #include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <utils/unity_launcher_workaround.h>
-#include <vx/hooks/action_hooks.h>
+#include <vx/client/hooks/action_hooks.h>
 
 #if defined(Q_OS_MACX)
     #include <utils/mac_utils.h>

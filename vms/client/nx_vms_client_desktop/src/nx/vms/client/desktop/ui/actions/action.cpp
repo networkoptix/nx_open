@@ -24,7 +24,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h> // TODO: this one does not belong here.
 #include <ui/workbench/workbench_layout.h>
-#include <vx/hooks/action_hooks.h>
+#include <vx/client/hooks/action_hooks.h>
 
 namespace nx::vms::client::desktop {
 namespace ui {

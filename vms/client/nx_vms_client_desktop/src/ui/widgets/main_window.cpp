@@ -98,7 +98,7 @@
 #include <utils/common/event_processors.h>
 #include "nx/utils/guarded_callback.h"
 
-#include <vx/hooks/handler_registration.h>
+#include <vx/client/hooks/handler_registration.h>
 
 #ifdef Q_OS_WIN
     #include <nx/vms/client/desktop/platforms/windows/gdi_win.h>

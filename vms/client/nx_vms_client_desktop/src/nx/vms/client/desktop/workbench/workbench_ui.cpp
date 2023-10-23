@@ -67,7 +67,7 @@
 #include <ui/workbench/workbench_ui_globals.h>
 #include <utils/common/event_processors.h>
 
-#include <vx/hooks/workbench_hooks.h>
+#include <vx/client/hooks/workbench_hooks.h>
 
 #include "panels/calendar_workbench_panel.h"
 #include "panels/left_workbench_panel.h"
