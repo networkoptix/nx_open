@@ -61,15 +61,15 @@ public:
     /**
      * Type of a partition.
      */
-    enum PartitionType
+    enum class PartitionType
     {
-        LocalDiskPartition = 0x01,
-        RamDiskPartition = 0x02,
-        OpticalDiskPartition = 0x04,
-        SwapPartition = 0x08,
-        NetworkPartition = 0x10,
-        UnknownPartition = 0x20,
-        RemovableDiskPartition = 0x40
+        local = 0x01,
+        ram = 0x02,
+        optical = 0x04,
+        swap = 0x08,
+        network = 0x10,
+        unknown = 0x20,
+        removable = 0x40
     };
 
     template<typename Visitor>
@@ -77,14 +77,14 @@ public:
     {
         using Item = nx::reflect::enumeration::Item<PartitionType>;
         return visitor(
-            Item{LocalDiskPartition, "local"},
-            Item{RamDiskPartition, "ram"},
-            Item{OpticalDiskPartition, "optical"},
-            Item{SwapPartition, "swap"},
-            Item{NetworkPartition, "network"},
-            Item{RemovableDiskPartition, "removable"},
-            Item{RemovableDiskPartition, "usb"}, //< Deprecated.
-            Item{UnknownPartition, "unknown"});
+            Item{PartitionType::local, "local"},
+            Item{PartitionType::ram, "ram"},
+            Item{PartitionType::optical, "optical"},
+            Item{PartitionType::swap, "swap"},
+            Item{PartitionType::network, "network"},
+            Item{PartitionType::removable, "removable"},
+            Item{PartitionType::removable, "usb"}, //< Deprecated.
+            Item{PartitionType::unknown, "unknown"});
     }
 
     Q_DECLARE_FLAGS(PartitionTypes, PartitionType)
@@ -93,9 +93,9 @@ public:
      * Partition space entry.
      */
     struct PartitionSpace {
-        PartitionSpace(): type(UnknownPartition), freeBytes(0), sizeBytes(0) {}
+        PartitionSpace(): type(PartitionType::unknown), freeBytes(0), sizeBytes(0) {}
         PartitionSpace(const QString &path, qint64 freeBytes, qint64 sizeBytes):
-            path(path), type(UnknownPartition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
+            path(path), type(PartitionType::unknown), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
 
         /** System-dependent name of device */
         QString devName;
