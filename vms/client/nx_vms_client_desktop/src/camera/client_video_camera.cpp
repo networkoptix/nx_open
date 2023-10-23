@@ -181,7 +181,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false);
-            rtspClient->setMediaRole(PlaybackMode::Export);
+            rtspClient->setMediaRole(PlaybackMode::export_);
         }
 
         m_exportReader = archiveReader;
