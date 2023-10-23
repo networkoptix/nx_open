@@ -13,6 +13,7 @@
 #include <nx/utils/log/format.h>
 #include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
@@ -46,7 +47,7 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget* parent) :
     QnSessionAwareDelegate(parent)
 {
     rootObjectHolder()->object()->setProperty(
-        "workbenchContext", QVariant::fromValue(workbenchContext()));
+        "windowContext", QVariant::fromValue(windowContext()));
 
     connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,
         this, &QObject::deleteLater);
