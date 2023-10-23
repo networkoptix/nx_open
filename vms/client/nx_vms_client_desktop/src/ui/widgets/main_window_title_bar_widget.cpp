@@ -661,6 +661,9 @@ void QnMainWindowTitleBarWidget::initLayoutsOnlyTabBar()
             /*svgColorSubstitutions*/ colorSubs);
         layout->addWidget(newActionButton(menu::ExitAction, icon));
     }
+
+    installEventHandler(
+        {this}, {QEvent::Resize, QEvent::Move}, this, [this] { emit geometryChanged(); });
 }
 
 void QnMainWindowTitleBarWidget::collapse()
