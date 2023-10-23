@@ -64,13 +64,13 @@ public:
         PostRequestHandler handler)
     {
         QByteArray serializedData;
-        if (serializationFormat() == Qn::UbjsonFormat)
+        if (serializationFormat() == Qn::SerializationFormat::ubjson)
         {
             serializedData = QnUbjson::serialized(input);
         }
         else
         {
-            NX_ASSERT(serializationFormat() == Qn::JsonFormat);
+            NX_ASSERT(serializationFormat() == Qn::SerializationFormat::json);
             serializedData = QJson::serialized(input);
         }
 
@@ -113,11 +113,11 @@ public:
                     bool success = false;
                     switch (format)
                     {
-                        case Qn::JsonFormat:
+                        case Qn::SerializationFormat::json:
                             outputData = QJson::deserialized<OutputData>(
                                 data, OutputData(), &success);
                             break;
-                        case Qn::UbjsonFormat:
+                        case Qn::SerializationFormat::ubjson:
                             outputData = QnUbjson::deserialized<OutputData>(
                                 data, OutputData(), &success);
                             break;

@@ -864,7 +864,7 @@ public:
         PostCallback&& callback,
         QThread* targetThread = nullptr,
         std::optional<QnUuid> proxyToServer = {},
-        std::optional<Qn::SerializationFormat> contentType = Qn::UbjsonFormat);
+        std::optional<Qn::SerializationFormat> contentType = Qn::SerializationFormat::ubjson);
 
     /** Sends PUT request with a response to be an EmptyResult. */
     Handle putEmptyResult(

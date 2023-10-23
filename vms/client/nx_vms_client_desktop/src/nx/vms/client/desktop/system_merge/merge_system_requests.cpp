@@ -54,7 +54,7 @@ rest::ErrorOrData<Data> parseResultOrData(
 
     return nx::vms::common::api::parseRestResult(
         static_cast<nx::network::http::StatusCode::Value>(response.statusLine.statusCode),
-        Qn::JsonFormat,
+        Qn::SerializationFormat::json,
         response.messageBody);
 }
 
@@ -67,7 +67,8 @@ void addRequestData(Request* request, nx::Buffer&& data)
     if (!data.empty())
     {
         auto messageBody = std::make_unique<nx::network::http::BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat), std::move(data));
+            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+            std::move(data));
         request->client->setRequestBody(std::move(messageBody));
     }
 }

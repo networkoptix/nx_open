@@ -2,6 +2,7 @@
 
 #include "format.h"
 
+#include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>
 
@@ -11,19 +12,19 @@ const char* serializationFormatToHttpContentType(SerializationFormat format)
 {
     switch (format)
     {
-        case JsonFormat:
+        case SerializationFormat::json:
             return "application/json";
-        case UbjsonFormat:
+        case SerializationFormat::ubjson:
             return "application/ubjson";
-        case CsvFormat:
+        case SerializationFormat::csv:
             return "text/csv";
-        case XmlFormat:
+        case SerializationFormat::xml:
             return "application/xml";
-        case CompressedPeriodsFormat:
+        case SerializationFormat::compressedPeriods:
             return "application/x-periods";
-        case UrlQueryFormat:
+        case SerializationFormat::urlQuery:
             return "application/x-url-query";
-        case UrlEncodedFormat:
+        case SerializationFormat::urlEncoded:
             return "application/x-www-form-urlencoded";
         default:
             NX_ASSERT(false);
@@ -35,21 +36,21 @@ SerializationFormat serializationFormatFromHttpContentType(
     const std::string_view& httpContentType)
 {
     if (nx::utils::contains(httpContentType, "application/json") || nx::utils::contains(httpContentType, "*/*"))
-        return JsonFormat;
+        return SerializationFormat::json;
     if (nx::utils::contains(httpContentType, "application/ubjson"))
-        return UbjsonFormat;
+        return SerializationFormat::ubjson;
     if (nx::utils::contains(httpContentType, "application/xml"))
-        return XmlFormat;
+        return SerializationFormat::xml;
     if (nx::utils::contains(httpContentType, "text/csv"))
-        return CsvFormat;
+        return SerializationFormat::csv;
     if (nx::utils::contains(httpContentType, "application/x-periods"))
-        return CompressedPeriodsFormat;
+        return SerializationFormat::compressedPeriods;
     if (nx::utils::contains(httpContentType, "application/x-url-query"))
-        return UrlQueryFormat;
+        return SerializationFormat::urlQuery;
     if (nx::utils::contains(httpContentType, "application/x-www-form-urlencoded"))
-        return UrlEncodedFormat;
+        return SerializationFormat::urlEncoded;
 
-    return UnsupportedFormat;
+    return SerializationFormat::unsupported;
 }
 
 SerializationFormat serializationFormatFromHttpContentType(
@@ -58,5 +59,11 @@ SerializationFormat serializationFormatFromHttpContentType(
     return serializationFormatFromHttpContentType(
         std::string_view(httpContentType.data(), httpContentType.size()));
 }
+
+QDebug operator<<(QDebug d, const SerializationFormat& value)
+{
+    return d << nx::reflect::toString(value);
+}
+
 
 } // namespace Qn

@@ -45,7 +45,7 @@ struct NX_VMS_COMMON_API QnChunksRequestData
     // TODO: unify filter object for all type of requests.
     QString filter;
     bool isLocal = false;
-    Qn::SerializationFormat format = Qn::JsonFormat;
+    Qn::SerializationFormat format = Qn::SerializationFormat::json;
     int limit = INT_MAX;
 
     GroupBy groupBy = GroupBy::serverId;

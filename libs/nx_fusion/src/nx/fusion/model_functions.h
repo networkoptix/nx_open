@@ -60,17 +60,17 @@ std::optional<QByteArray> trySerialize(
 {
     switch (format)
     {
-        case Qn::UbjsonFormat:
+        case Qn::SerializationFormat::ubjson:
             return QnUbjson::serialized(outputData);
 
-        case Qn::JsonFormat:
-        case Qn::UnsupportedFormat:
+        case Qn::SerializationFormat::json:
+        case Qn::SerializationFormat::unsupported:
             return QJson::serialized(outputData);
 
-        case Qn::CsvFormat:
+        case Qn::SerializationFormat::csv:
             return QnCsv::serialized(outputData);
 
-        case Qn::XmlFormat:
+        case Qn::SerializationFormat::xml:
         {
             QByteArray result = QnXml::serialized(outputData, QStringLiteral("reply"));
             return result;
