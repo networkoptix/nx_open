@@ -10,6 +10,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/ui/actions/action.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 
@@ -27,8 +29,11 @@ public:
     {
         if (const auto systemContext = SystemContext::fromResource(camera))
         {
-            store->setHasViewLivePermission(systemContext->accessController()->hasPermissions(
+            const auto accessController = systemContext->accessController();
+            store->setHasViewLivePermission(accessController->hasPermissions(
                 camera, Qn::ViewLivePermission));
+            store->setHasExportPermission(accessController->hasPermissions(
+                camera, Qn::ExportPermission));
         }
     };
 };
@@ -36,6 +41,7 @@ public:
 CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
     CameraSettingsDialogStore* store,
     SystemContext* systemContext,
+    ui::action::Manager* menu,
     QObject* parent)
     :
     base_type(parent),
@@ -44,6 +50,11 @@ CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
     if (!NX_ASSERT(store))
         return;
 
+    if (const auto& action = menu->action(ui::action::ToggleScreenRecordingAction))
+    {
+        connect(action, &QAction::toggled, this,
+            [this](bool checked){ d->store->setScreenRecordingOn(checked); });
+    }
     const auto updateUserAccessRightsInfo =
         [this, systemContext]()
         {
