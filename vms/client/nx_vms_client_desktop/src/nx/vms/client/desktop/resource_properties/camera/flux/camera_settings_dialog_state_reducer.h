@@ -203,6 +203,8 @@ public:
     static State setDifferentPtzPanTiltSensitivities(State state, bool value);
     static State setPtzPanSensitivity(State state, qreal value);
     static State setPtzTiltSensitivity(State state, qreal value);
+    static State setHasExportPermission(State state, bool value);
+    static State setScreenRecordingOn(State state, bool value);
 
     /**
      * Enable or disable motion detection in the remote archive. Actual for the Edge Cameras (with
