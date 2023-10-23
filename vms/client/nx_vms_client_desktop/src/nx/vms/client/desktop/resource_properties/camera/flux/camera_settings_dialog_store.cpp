@@ -878,6 +878,22 @@ void CameraSettingsDialogStore::setAdvancedSettingsManifest(const QnCameraAdvanc
         });
 }
 
+void CameraSettingsDialogStore::setHasExportPermission(bool value)
+{
+    d->executeAction([&](State state)
+        {
+            return Reducer::setHasExportPermission(std::move(state), value);
+        });
+}
+
+void CameraSettingsDialogStore::setScreenRecordingOn(bool value)
+{
+    d->executeAction([&](State state)
+        {
+            return Reducer::setScreenRecordingOn(std::move(state), value);
+        });
+}
+
 bool CameraSettingsDialogStore::isReadOnly() const
 {
     return d->state.readOnly;

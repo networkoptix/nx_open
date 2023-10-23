@@ -2915,6 +2915,22 @@ State CameraSettingsDialogStateReducer::setPtzTiltSensitivity(State state, qreal
     return state;
 }
 
+CameraSettingsDialogStateReducer::State CameraSettingsDialogStateReducer::setHasExportPermission(
+    State state, bool value)
+{
+    state.hasExportPermission = value;
+    state.hasChanges = true;
+    return state;
+}
+
+CameraSettingsDialogStateReducer::State CameraSettingsDialogStateReducer::setScreenRecordingOn(
+    State state, bool value)
+{
+    state.screenRecordingOn = value;
+    state.hasChanges = true;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setRemoteArchiveMotionDetectionEnabled(State state,
     bool value)
 {

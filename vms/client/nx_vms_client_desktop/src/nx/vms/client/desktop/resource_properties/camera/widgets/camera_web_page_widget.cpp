@@ -9,16 +9,22 @@
 #include <QtQuick/QQuickItem>
 #include <QtWebEngineQuick/QQuickWebEngineProfile>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QLabel>
 
 #include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/camera_web_authenticator.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/web_widget.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
 
 #include "../flux/camera_settings_dialog_state.h"
@@ -44,6 +50,7 @@ struct CameraWebPageWidget::Private
     void resetPage();
 
     WebWidget* const webWidget;
+    QLabel* const noAccessWidget;
 
     CameraWebPageWidget* parent;
     QString cameraLogin;
@@ -54,9 +61,21 @@ struct CameraWebPageWidget::Private
 
 CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     webWidget(new WebWidget(parent)),
+    noAccessWidget(new QLabel(parent)),
     parent(parent)
 {
     anchorWidgetToParent(webWidget);
+    anchorWidgetToParent(noAccessWidget);
+
+    noAccessWidget->setText("NO ACCESS");
+    auto font = noAccessWidget->font();
+    font.setCapitalization(QFont::AllUppercase);
+    font.setPixelSize(32);
+    font.setWeight(QFont::Normal);
+    noAccessWidget->setFont(font);
+    noAccessWidget->setAlignment(Qt::AlignCenter);
+    setPaletteColor(
+        noAccessWidget, noAccessWidget->foregroundRole(), core::colorTheme()->color("red_core"));
 
     installEventHandler(parent, QEvent::Show, parent,
         [this]()
@@ -190,25 +209,34 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
 
     NX_ASSERT(targetUrl.isValid());
 
-    if (d->lastRequestUrl == targetUrl && cameraId == d->lastCamera.id)
+    bool hasPermissions = state.hasExportPermission || !state.screenRecordingOn;
+    if (d->lastRequestUrl == targetUrl
+        && cameraId == d->lastCamera.id
+        && d->webWidget->isVisible() == hasPermissions)
+    {
         return;
+    }
 
     d->lastRequestUrl = targetUrl;
     d->lastCamera = state.singleCameraProperties;
+    d->webWidget->setVisible(hasPermissions);
+    d->noAccessWidget->setVisible(!hasPermissions);
+    if (hasPermissions)
+    {
+        d->webWidget->controller()->setAuthenticator(
+            std::make_shared<CameraWebAuthenticator>(
+                camera,
+                targetUrl,
+                state.credentials.login.valueOr(QString{}),
+                state.credentials.password.valueOr(QString{})));
 
-    d->webWidget->controller()->setAuthenticator(
-        std::make_shared<CameraWebAuthenticator>(
-            camera,
-            targetUrl,
-            state.credentials.login.valueOr(QString{}),
-            state.credentials.password.valueOr(QString{})));
+        d->webWidget->controller()->closeWindows();
 
-    d->webWidget->controller()->closeWindows();
-
-    if (isVisible())
-        d->loadPage();
-    else
-        d->pendingLoadPage = true;
+        if (isVisible())
+            d->loadPage();
+        else
+            d->pendingLoadPage = true;
+    }
 }
 
 } // namespace nx::vms::client::desktop
