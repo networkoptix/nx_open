@@ -18,13 +18,18 @@ struct NX_VMS_API ThumbnailFilter
 {
     enum class RoundMethod
     {
-        /**%apidoc Get the thumbnail from the nearest keyframe before the given time. */
+        /**%apidoc
+         * Get the thumbnail from the nearest keyframe before the given time.
+         * %caption before
+         */
         iFrameBefore,
 
         /**%apidoc Get the thumbnail as near to given time as possible. */
         precise,
 
-        /**%apidoc Get the thumbnail from the nearest keyframe after the given time. */
+        /**%apidoc Get the thumbnail from the nearest keyframe after the given time.
+         * %caption after
+         */
         iFrameAfter,
     };
 

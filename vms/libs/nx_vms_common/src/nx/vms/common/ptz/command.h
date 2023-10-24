@@ -11,41 +11,144 @@ namespace ptz {
 
 enum class Command
 {
+    /**%apidoc
+     * %caption InvalidPtzCommand
+     */
     invalid = -1,
 
+    /**%apidoc
+     * %caption ContinuousMovePtzCommand
+     */
     continuousMove,
+
+    /**%apidoc
+     * %caption ContinuousFocusPtzCommand
+     */
     continuousFocus,
+
+    /**%apidoc
+     * %caption AbsoluteDeviceMovePtzCommand
+     */
     absoluteDeviceMove,
+
+    /**%apidoc
+     * %caption AbsoluteLogicalMovePtzCommand
+     */
     absoluteLogicalMove,
+
+    /**%apidoc
+     * %caption ViewportMovePtzCommand
+     */
     viewportMove,
 
+    /**%apidoc
+     * %caption GetDevicePositionPtzCommand
+     */
     getDevicePosition,
+
+    /**%apidoc
+     * %caption GetLogicalPositionPtzCommand
+     */
     getLogicalPosition,
+
+    /**%apidoc
+     * %caption GetDeviceLimitsPtzCommand
+     */
     getDeviceLimits,
+
+    /**%apidoc
+     * %caption GetLogicalLimitsPtzCommand
+     */
     getLogicalLimits,
+
+    /**%apidoc
+     * %caption GetFlipPtzCommand
+     */
     getFlip,
 
+    /**%apidoc
+     * %caption CreatePresetPtzCommand
+     */
     createPreset,
+
+    /**%apidoc
+     * %caption UpdatePresetPtzCommand
+     */
     updatePreset,
+
+    /**%apidoc
+     * %caption RemovePresetPtzCommand
+     */
     removePreset,
+
+    /**%apidoc
+     * %caption ActivatePresetPtzCommand
+     */
     activatePreset,
+
+    /**%apidoc
+     * %caption GetPresetsPtzCommand
+     */
     getPresets,
 
+    /**%apidoc
+     * %caption CreateTourPtzCommand
+     */
     createTour,
+
+    /**%apidoc
+     * %caption RemoveTourPtzCommand
+     */
     removeTour,
+
+    /**%apidoc
+     * %caption ActivateTourPtzCommand
+     */
     activateTour,
+
+    /**%apidoc
+     * %caption GetToursPtzCommand
+     */
     getTours,
 
+    /**%apidoc
+     * %caption GetActiveObjectPtzCommand
+     */
     getActiveObject,
+
+    /**%apidoc
+     * %caption UpdateHomeObjectPtzCommand
+     */
     updateHomeObject,
+
+    /**%apidoc
+     * %caption GetHomeObjectPtzCommand
+     */
     getHomeObject,
 
+    /**%apidoc
+     * %caption GetAuxiliaryTraitsPtzCommand
+     */
     getAuxiliaryTraits,
+
+    /**%apidoc
+     * %caption RunAuxiliaryCommandPtzCommand
+     */
     runAuxiliaryCommand,
 
+    /**%apidoc
+     * %caption GetDataPtzCommand
+     */
     getData,
 
+    /**%apidoc
+     * %caption RelativeMovePtzCommand
+     */
     relativeMove,
+
+    /**%apidoc
+     * %caption RelativeFocusPtzCommand
+     */
     relativeFocus,
 };
 

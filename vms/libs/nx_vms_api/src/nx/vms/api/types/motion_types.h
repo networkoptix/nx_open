@@ -35,6 +35,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
 /**%apidoc Index of the stream that is requested from the camera. */
 enum class StreamIndex
 {
+    /**apidoc[unused] */
     undefined = -1,
     primary = 0, /**<%apidoc High-resolution stream. */
     secondary = 1, /**<%apidoc Low-resolution stream. */
