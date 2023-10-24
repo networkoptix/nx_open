@@ -1279,9 +1279,11 @@ void LayoutsHandler::at_openInNewTabAction_triggered()
 
     // Update state depending on how the action was called.
     auto currentState = streamSynchronizer->state();
-    if (!currentMediaWidget || !isCameraWithFootage(currentMediaWidget))
+    if (!currentMediaWidget
+        || !isCameraWithFootage(currentMediaWidget)
+        || currentMediaWidget->isPlayingLive())
     {
-        // Switch to live if current item is not a camera or has no footage.
+        // Switch to live if current item is not a camera or has no footage or playing live.
         currentState = StreamSynchronizationState::live();
     }
     else if (calledFromScene)
