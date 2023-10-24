@@ -59,6 +59,9 @@ Item
     // Enable web page to have its own context menu.
     property bool enableCustomMenu: false
 
+    // Sets whether to load a web page icon.
+    property bool loadIcon: false
+
     property alias url: webView.url
     property alias userScripts: webView.userScripts
     property alias profile: webView.profile
@@ -358,7 +361,7 @@ Item
         sourceSize: Qt.size(40, 40)
 
         // Load the icon directly (favicon image provider can not load some formats).
-        source: String(webView.icon).replace("image://favicon/", "")
+        source: loadIcon ? String(webView.icon).replace("image://favicon/", "") : ""
 
         onStatusChanged:
         {
