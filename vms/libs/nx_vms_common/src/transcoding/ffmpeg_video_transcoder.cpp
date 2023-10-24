@@ -225,6 +225,10 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         {
             m_encoderCtx->qmax = it.value().toInt();
         }
+        else if (it.key() == QnCodecParams::gop_size)
+        {
+            m_encoderCtx->gop_size = it.value().toInt();
+        }
         else
         {
             options.set(it.key().constData(), it.value().toByteArray().constData(), 0);
