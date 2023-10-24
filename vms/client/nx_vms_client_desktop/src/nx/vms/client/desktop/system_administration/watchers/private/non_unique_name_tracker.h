@@ -18,6 +18,8 @@ public:
     bool update(const QnUuid& id, const QString& name);
     bool remove(const QnUuid& id);
 
+    QSet<QnUuid> idsByName(const QString& name) const;
+
 private:
     QSet<QnUuid> m_nonUniqueNameIds;
     QHash<QString, QSet<QnUuid>> m_idsByName;

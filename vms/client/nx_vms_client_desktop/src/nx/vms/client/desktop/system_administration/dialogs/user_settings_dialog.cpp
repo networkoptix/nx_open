@@ -51,6 +51,7 @@
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
+#include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
@@ -1351,6 +1352,11 @@ bool UserSettingsDialog::setUser(const QnUserResourcePtr& user)
                 if (hash.temporaryToken)
                     d->updateUiFromTemporaryToken(*hash.temporaryToken);
             });
+
+        connect(systemContext()->nonEditableUsersAndGroups(),
+            &NonEditableUsersAndGroups::nonUniqueUsersChanged,
+            this,
+            updateState);
     }
     else
     {

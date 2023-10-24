@@ -5,6 +5,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
@@ -30,6 +31,8 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
 
             connect(user.get(), &QnUserResource::permissionsChanged, this, updateUser);
             connect(user.get(), &QnUserResource::userGroupsChanged, this, updateUser);
+            connect(user.get(), &QnUserResource::enabledChanged, this, updateUser);
+            connect(user.get(), &QnUserResource::nameChanged, this, updateUser);
 
             addOrUpdateUser(user);
         };
@@ -52,6 +55,10 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
                 if (auto user = resource.dynamicCast<QnUserResource>())
                 {
                     disconnect(user.get(), nullptr, this, nullptr);
+
+                    if (m_nonUniqueUserTracker.remove(user->getId()))
+                        emit nonUniqueUsersChanged();
+
                     removeUser(user);
                 }
             }
@@ -71,6 +78,8 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
     connect(manager, &nx::vms::common::UserGroupManager::removed, this,
         [this](const nx::vms::api::UserGroupData& group)
         {
+            if (m_nonUniqueGroupTracker.remove(group.id))
+                emit nonUniqueGroupsChanged();
             removeGroup(group.id);
         });
 
@@ -81,7 +90,12 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
             for (const auto& id: groupsCopy)
             {
                 if (!nx::vms::common::PredefinedUserGroups::contains(id))
+                {
+                    if (m_nonUniqueGroupTracker.remove(id))
+                        emit nonUniqueGroupsChanged();
+
                     removeGroup(id);
+                }
             }
 
             for (const auto& group: manager->groups())
@@ -96,7 +110,7 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
 NonEditableUsersAndGroups::~NonEditableUsersAndGroups()
 {}
 
-void NonEditableUsersAndGroups::modifyGroups(const QSet<QnUuid> ids, int diff)
+void NonEditableUsersAndGroups::modifyGroups(const QSet<QnUuid>& ids, int diff)
 {
     for (const auto& id: ids)
     {
@@ -105,13 +119,13 @@ void NonEditableUsersAndGroups::modifyGroups(const QSet<QnUuid> ids, int diff)
         if (count <= 0)
         {
             m_groupsWithNonEditableMembers.remove(id);
-            if (!m_nonEditableGroups.contains(id))
+            if (!m_nonRemovableGroups.contains(id))
                 emit groupModified(id);
         }
         else
         {
             m_groupsWithNonEditableMembers[id] = count;
-            if (diff == 1 && count == 1 && !m_nonEditableGroups.contains(id))
+            if (diff == 1 && count == 1 && !m_nonRemovableGroups.contains(id))
                 emit groupModified(id);
         }
     }
@@ -139,8 +153,12 @@ bool NonEditableUsersAndGroups::canChangeAuthentication(const QnUserResourcePtr&
         Qn::WritePermission | Qn::WriteDigestPermission | Qn::SavePermission);
 }
 
+bool NonEditableUsersAndGroups::canEditParents(const QnUuid& id) const
+{
+    return !m_usersWithUnchangableParents.contains(id) && m_nonUniqueGroupTracker.isUnique(id);
+}
 
-bool NonEditableUsersAndGroups::canEdit(const QnUserResourcePtr& user)
+bool NonEditableUsersAndGroups::canMassEdit(const QnUserResourcePtr& user) const
 {
     // Do not allow mass editing to be used with Administrators.
     if (user->isAdministrator())
@@ -151,20 +169,123 @@ bool NonEditableUsersAndGroups::canEdit(const QnUserResourcePtr& user)
         || canChangeAuthentication(user);
 }
 
+QSet<QnUuid> NonEditableUsersAndGroups::nonUniqueWithEditableParents()
+{
+    const auto nonUniqueIds = m_nonUniqueUserTracker.nonUniqueNameIds();
+    QSet<QnUuid> result;
+
+    for (const QnUuid& nonUniqueId: nonUniqueIds)
+    {
+        const auto nonUniqueUser =
+            systemContext()->resourcePool()->getResourceById<QnUserResource>(nonUniqueId);
+
+        if (!NX_ASSERT(nonUniqueUser))
+            continue;
+
+        const auto idsWithTheSameName =
+            m_nonUniqueUserTracker.idsByName(nonUniqueUser->getName().toLower());
+
+        QSet<QnUuid> enabled;
+
+        if (idsWithTheSameName.size() > 1)
+        {
+            for (const auto& id: idsWithTheSameName)
+            {
+                if (const auto user =
+                    systemContext()->resourcePool()->getResourceById<QnUserResource>(id))
+                {
+                    if (user->isEnabled())
+                        enabled << id;
+                }
+            }
+        }
+
+        const bool canEditParents = idsWithTheSameName.size() == 1 || enabled.size() < 2;
+
+        if (canEditParents)
+            result << nonUniqueId;
+    }
+
+    return result;
+}
+
 void NonEditableUsersAndGroups::addOrUpdateUser(const QnUserResourcePtr& user)
 {
-    if (canEdit(user))
-        removeUser(user);
+    const auto prevMassEditableSize = m_nonMassEditableUsers.size();
+    if (canMassEdit(user))
+        m_nonMassEditableUsers.remove(user);
     else
-        addUser(user);
+        m_nonMassEditableUsers.insert(user);
+
+    const bool emitUserModified = prevMassEditableSize != m_nonMassEditableUsers.size();
+
+    if (m_nonUniqueUserTracker.update(user->getId(), user->getName().toLower()))
+        emit nonUniqueUsersChanged();
+
+    const auto nonUniqueIds = m_nonUniqueUserTracker.nonUniqueNameIds();
+    const auto newUsersWithUnchangableParents = nonUniqueIds - nonUniqueWithEditableParents();
+
+    const auto added = newUsersWithUnchangableParents - m_usersWithUnchangableParents;
+    const auto removed = m_usersWithUnchangableParents - newUsersWithUnchangableParents;
+
+    m_usersWithUnchangableParents = newUsersWithUnchangableParents;
+
+    QSet<QnUuid> changedUsers = added + removed;
+    changedUsers << user->getId();
+
+    for (const QnUuid& changedUserId: changedUsers)
+    {
+        const auto changedUser =
+            systemContext()->resourcePool()->getResourceById<QnUserResource>(changedUserId);
+
+        const bool userIsNonEditable =
+            m_nonMassEditableUsers.contains(changedUser)
+            || m_usersWithUnchangableParents.contains(changedUserId);
+
+        const bool modified = userIsNonEditable
+            ? addUser(changedUser)
+            : removeUser(changedUser);
+
+        if (user == changedUser && !modified && emitUserModified)
+            emit userModified(user);
+    }
 }
 
 void NonEditableUsersAndGroups::addOrUpdateGroup(const nx::vms::api::UserGroupData& group)
 {
+    const auto prevMassEditableSize = m_nonRemovableGroups.size();
     if (canDelete(group))
-        removeGroup(group.id);
+        m_nonRemovableGroups.remove(group.id);
     else
-        addGroup(group.id);
+        m_nonRemovableGroups.insert(group.id);
+
+    const bool emitGroupModified = prevMassEditableSize != m_nonRemovableGroups.size();
+
+    const auto prevNonUniqueGroups = m_nonUniqueGroupTracker.nonUniqueNameIds();
+
+    if (m_nonUniqueGroupTracker.update(group.id, group.name.toLower()))
+        emit nonUniqueGroupsChanged();
+
+    const auto nonUniqueGroups = m_nonUniqueGroupTracker.nonUniqueNameIds();
+    const auto added = nonUniqueGroups - prevNonUniqueGroups;
+    const auto removed = prevNonUniqueGroups - nonUniqueGroups;
+
+    QSet<QnUuid> changedGroups = added + removed;
+    changedGroups << group.id;
+
+    for (const auto& changedGroupId: changedGroups)
+    {
+        const bool groupIsNonEditable =
+            m_nonRemovableGroups.contains(changedGroupId)
+            || !m_nonUniqueGroupTracker.isUnique(changedGroupId);
+
+        const bool modified = groupIsNonEditable
+            ? addGroup(changedGroupId)
+            : removeGroup(changedGroupId);
+
+        if (changedGroupId == group.id && !modified && emitGroupModified)
+            emit groupModified(group.id);
+    }
 }
 
 void NonEditableUsersAndGroups::updateMembers(const QnUuid& groupId)
@@ -183,7 +304,7 @@ void NonEditableUsersAndGroups::updateMembers(const QnUuid& groupId)
     }
 }
 
-void NonEditableUsersAndGroups::addUser(const QnUserResourcePtr& user)
+bool NonEditableUsersAndGroups::addUser(const QnUserResourcePtr& user)
 {
     const auto ids = user->groupIds();
     QSet<QnUuid> parentIds(ids.begin(), ids.end());
@@ -202,35 +323,41 @@ void NonEditableUsersAndGroups::addUser(const QnUserResourcePtr& user)
 
     if (newUser)
         emit userModified(user);
+
+    return newUser;
 }
 
-void NonEditableUsersAndGroups::removeUser(const QnUserResourcePtr& user)
+bool NonEditableUsersAndGroups::removeUser(const QnUserResourcePtr& user)
 {
     if (!m_nonEditableUsers.contains(user))
-        return;
+        return false;
 
     const auto ids = m_nonEditableUsers.value(user);
     m_nonEditableUsers.remove(user);
+    m_nonMassEditableUsers.remove(user);
+    m_usersWithUnchangableParents.remove(user->getId());
+
     emit userModified(user);
 
     modifyGroups(ids, -1);
+    return true;
 }
 
 qsizetype NonEditableUsersAndGroups::userCount() const
 {
-    return m_nonEditableUsers.size();
+    return m_nonMassEditableUsers.size();
 }
 
 bool NonEditableUsersAndGroups::containsUser(const QnUserResourcePtr& user) const
 {
-    return m_nonEditableUsers.contains(user);
+    return m_nonMassEditableUsers.contains(user);
 }
 
-void NonEditableUsersAndGroups::addGroup(const QnUuid& id)
+bool NonEditableUsersAndGroups::addGroup(const QnUuid& id)
 {
     const auto group = systemContext()->userGroupManager()->find(id);
-    if (!NX_ASSERT(group))
-        return;
+    if (!group)
+        return false;
 
     const QSet<QnUuid> groupIds(group->parentGroupIds.begin(), group->parentGroupIds.end());
 
@@ -238,8 +365,22 @@ void NonEditableUsersAndGroups::addGroup(const QnUuid& id)
 
     const QSet<QnUuid> prevGroupIds = m_nonEditableGroups.value(id);
 
-    const auto removed = prevGroupIds - groupIds;
-    const auto added = groupIds - prevGroupIds;
+    auto removed = prevGroupIds - groupIds;
+    auto added = groupIds - prevGroupIds;
+
+    const auto isLdap =
+        [this](const QnUuid& id)
+        {
+            const auto group = systemContext()->userGroupManager()->find(id);
+            return group && group->type == api::UserType::ldap;
+        };
+
+    // Non-editable LDAP groups do not prevent their LDAP parents from removal.
+    if (group->type == api::UserType::ldap)
+    {
+        erase_if(removed, isLdap);
+        erase_if(added, isLdap);
+    }
 
     modifyGroups(removed, -1);
     modifyGroups(added, 1);
@@ -247,22 +388,24 @@ void NonEditableUsersAndGroups::addGroup(const QnUuid& id)
     m_nonEditableGroups[id] = groupIds;
 
     if (!newGroup)
-        return;
+        return false;
 
     if (!m_groupsWithNonEditableMembers.contains(id))
         emit groupModified(id);
 
     updateMembers(id);
+    return true;
 }
 
-void NonEditableUsersAndGroups::removeGroup(const QnUuid& id)
+bool NonEditableUsersAndGroups::removeGroup(const QnUuid& id)
 {
     if (!m_nonEditableGroups.contains(id))
-        return;
+        return false;
 
     const auto parentIds = m_nonEditableGroups.value(id);
 
     m_nonEditableGroups.remove(id);
+    m_nonRemovableGroups.remove(id);
 
     if (!m_groupsWithNonEditableMembers.contains(id))
         emit groupModified(id);
@@ -270,27 +413,18 @@ void NonEditableUsersAndGroups::removeGroup(const QnUuid& id)
     modifyGroups(parentIds, -1);
 
     updateMembers(id);
+    return true;
 }
 
 bool NonEditableUsersAndGroups::containsGroup(const QnUuid& groupId) const
 {
-    return m_nonEditableGroups.contains(groupId)
+    return m_nonRemovableGroups.contains(groupId)
         || m_groupsWithNonEditableMembers.contains(groupId);
 }
 
 QSet<QnUuid> NonEditableUsersAndGroups::groups() const
 {
-    const auto listsOfGroupIds = {
-        m_nonEditableGroups.keys(),
-        m_groupsWithNonEditableMembers.keys()
-    };
-
-    QSet<QnUuid> result;
-
-    for (const auto& ids: listsOfGroupIds)
-        result += QSet(ids.begin(), ids.end());
-
-    return result;
+    return m_nonRemovableGroups + nx::utils::toQSet(m_groupsWithNonEditableMembers.keys());
 }
 
 qsizetype NonEditableUsersAndGroups::groupCount() const
