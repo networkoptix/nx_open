@@ -422,7 +422,7 @@ RuleList Rule::getLdapSyncIssueRules()
             /*isSystem*/ false,
             ActionType::sendMailAction,
             EventType::ldapSyncIssueEvent,
-            {api::kAdministratorsGroupId})),
+            {api::kAdministratorsGroupId, api::kPowerUsersGroupId})),
         RulePtr(new Rule(
             /*internalId*/ 900027,
             /*aggregationPeriod*/ 30,
