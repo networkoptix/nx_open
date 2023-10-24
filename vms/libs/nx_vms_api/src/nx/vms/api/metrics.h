@@ -53,9 +53,12 @@ struct NX_VMS_API Label
 
 enum class Display
 {
+    /**apidoc[unused] */
     none = 0,
     table = (1 << 0),
     panel = (1 << 1),
+
+    /**%apidoc[unused] */
     both = table|panel,
 };
 Q_DECLARE_FLAGS(Displays, Display)
@@ -125,6 +128,7 @@ using SystemManifest
 
 enum class AlarmLevel
 {
+    /**apidoc[unused] */
     none,
     warning,
     error,
