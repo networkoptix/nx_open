@@ -655,13 +655,17 @@ QString UserSettingsDialog::validateLogin(const QString& login)
             }
 
             const auto duplicateUsers = resourcePool()->getResources<QnUserResource>(
-                [id = currentState().userId, name = text.toLower(), dialogType = d->dialogType](
-                    const auto& user)
+                [id = currentState().userId, name = text.toLower()](
+                    const auto& otherUser)
                 {
-                    return user->getId() != id
-                        && user->getName().toLower() == name
-                        && (user->isEnabled() || dialogType == CreateUser);
+                    return otherUser->getId() != id
+                        && otherUser->getName().toLower() == name
+                        && otherUser->isEnabled();
                 });
+
+            // Allow saving disabled users with duplicated names.
+            if (!duplicateUsers.isEmpty() && !currentState().userEnabled)
+                return ValidationResult::kValid;
 
             return duplicateUsers.isEmpty()
                 ? ValidationResult::kValid
