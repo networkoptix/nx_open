@@ -26,8 +26,6 @@
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 
-#include "private/non_unique_name_tracker.h"
-
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -61,7 +59,6 @@ struct UserGroupListModel::Private
     QSet<QnUuid> cycledGroups;
     bool ldapServerOnline = true;
     QSet<QnUuid> notFoundGroups;
-    NonUniqueNameTracker nonUniqueNameTracker;
 
     Private(UserGroupListModel* q): q(q), syncId(q->globalSettings()->ldap().syncId())
     {
@@ -82,6 +79,11 @@ struct UserGroupListModel::Private
                     q->index(row, CheckBoxColumn),
                     {Qn::DisabledRole, Qt::ToolTipRole});
             });
+
+        connect(q->systemContext()->nonEditableUsersAndGroups(),
+            &NonEditableUsersAndGroups::nonUniqueGroupsChanged,
+            q,
+            &UserGroupListModel::nonUniqueGroupsChanged);
 
         connect(q->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
             [this]()
@@ -416,7 +418,8 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                     if (d->ldapServerOnline && d->notFoundGroups.contains(group.id))
                         lines << tr("Group is not found in the LDAP database.");
 
-                    if (!d->nonUniqueNameTracker.isUnique(group.id))
+                    if (!systemContext()->nonEditableUsersAndGroups()->nonUniqueGroups().isUnique(
+                        group.id))
                     {
                         lines << tr("There are multiple groups with this name in the system. To "
                             "maintain a clear and organized structure, we suggest providing "
@@ -462,8 +465,9 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             {
                 case GroupWarningColumn:
                 {
+                    const auto& nonUniqueNameTracker = systemContext()->nonEditableUsersAndGroups();
                     if ((d->ldapServerOnline && d->notFoundGroups.contains(group.id))
-                        || !d->nonUniqueNameTracker.isUnique(group.id)
+                        || !nonUniqueNameTracker->nonUniqueGroups().isUnique(group.id)
                         || d->cycledGroups.contains(group.id))
                     {
                         return QString("user_settings/user_alert.svg");
@@ -654,7 +658,7 @@ QSet<QnUuid> UserGroupListModel::notFoundGroups() const
 
 QSet<QnUuid> UserGroupListModel::nonUniqueGroups() const
 {
-    return d->nonUniqueNameTracker.nonUniqueNameIds();
+    return systemContext()->nonEditableUsersAndGroups()->nonUniqueGroups().nonUniqueNameIds();
 }
 
 QSet<QnUuid> UserGroupListModel::cycledGroups() const
@@ -685,7 +689,6 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
     const ScopedReset reset(this);
     d->checkedGroupIds.clear();
     d->notFoundGroups.clear();
-    d->nonUniqueNameTracker = {};
     d->orderedGroups = groups;
 
     std::sort(d->orderedGroups.begin(), d->orderedGroups.end(),
@@ -701,8 +704,6 @@ void UserGroupListModel::reset(const UserGroupDataList& groups)
     {
         if (d->ldapGroupNotFound(group))
             d->notFoundGroups.insert(group.id);
-
-        d->nonUniqueNameTracker.update(group.id, group.name.toLower());
     }
     d->refreshCycledGroupSets();
     emit notFoundGroupsChanged();
@@ -716,9 +717,6 @@ bool UserGroupListModel::canDeleteGroup(const QnUuid& groupId) const
 
 bool UserGroupListModel::addOrUpdateGroup(const UserGroupData& group)
 {
-    if (d->nonUniqueNameTracker.update(group.id, group.name.toLower()))
-        emit nonUniqueGroupsChanged();
-
     const auto position = d->findPosition(group.id);
     if (position == d->orderedGroups.end() || position->id != group.id)
     {
@@ -761,9 +759,6 @@ bool UserGroupListModel::removeGroup(const QnUuid& groupId)
     {
         return false;
     }
-
-    if (d->nonUniqueNameTracker.remove(groupId))
-        emit nonUniqueGroupsChanged();
 
     const int row = it - d->orderedGroups.begin();
 

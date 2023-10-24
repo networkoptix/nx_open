@@ -5,6 +5,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
+#include "private/non_unique_name_tracker.h"
+
 namespace nx::vms::api { struct UserGroupData; }
 
 namespace nx::vms::client::desktop {
@@ -39,20 +41,28 @@ public:
     bool canDelete(const QnUserResourcePtr& user) const;
     bool canEnableDisable(const QnUserResourcePtr& user) const;
     bool canChangeAuthentication(const QnUserResourcePtr& user) const;
-    bool canEdit(const QnUserResourcePtr& user);
+    bool canMassEdit(const QnUserResourcePtr& user) const;
+
+    // Checks if user or group parents can be changed.
+    bool canEditParents(const QnUuid& id) const;
+
+    const NonUniqueNameTracker& nonUniqueUsers() const { return m_nonUniqueUserTracker; }
+    const NonUniqueNameTracker& nonUniqueGroups() const { return m_nonUniqueGroupTracker; }
 
 signals:
     void userModified(const QnUserResourcePtr& user);
     void groupModified(const QnUuid& groupId);
+    void nonUniqueUsersChanged();
+    void nonUniqueGroupsChanged();
 
 private:
-    void addUser(const QnUserResourcePtr& user);
-    void removeUser(const QnUserResourcePtr& user);
+    bool addUser(const QnUserResourcePtr& user);
+    bool removeUser(const QnUserResourcePtr& user);
 
-    void addGroup(const QnUuid& id);
-    void removeGroup(const QnUuid& id);
+    bool addGroup(const QnUuid& id);
+    bool removeGroup(const QnUuid& id);
 
-    void modifyGroups(const QSet<QnUuid> ids, int diff);
+    void modifyGroups(const QSet<QnUuid>& ids, int diff);
     void addOrUpdateUser(const QnUserResourcePtr& user);
     void addOrUpdateGroup(const nx::vms::api::UserGroupData& group);
 
@@ -60,11 +70,20 @@ private:
 
     void updateMembers(const QnUuid& groupId);
 
-private:
-    QHash<QnUserResourcePtr, QSet<QnUuid>> m_nonEditableUsers; //< Maps user to parentIds.
-    QHash<QnUuid, QSet<QnUuid>> m_nonEditableGroups; //< Maps group to parentIds.
+    QSet<QnUuid> nonUniqueWithEditableParents();
 
-    //< Maps group to the number of its non-editable members.
+private:
+    QSet<QnUserResourcePtr> m_nonMassEditableUsers; //< Disabled checkbox when mass editing.
+    QSet<QnUuid> m_usersWithUnchangableParents; //< Disabled checkbox in Members tab.
+
+    NonUniqueNameTracker m_nonUniqueUserTracker;
+    NonUniqueNameTracker m_nonUniqueGroupTracker;
+
+    QHash<QnUserResourcePtr, QSet<QnUuid>> m_nonEditableUsers; //< Maps user to parentIds.
+    QHash<QnUuid, QSet<QnUuid>> m_nonEditableGroups; //< Maps group to parentIds, disabled checkbox in Members tab.
+    QSet<QnUuid> m_nonRemovableGroups; //< Disabled checkbox when mass editing.
+
+    // Maps group to the number of its members that prevents group removal.
     QHash<QnUuid, int> m_groupsWithNonEditableMembers;
 };
 
