@@ -2579,18 +2579,35 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (d->isIoModule)
     {
-        if (!d->isPlayingLive())
-        {
-            return d->display()->camDisplay()->isLongWaiting()
-                ? Qn::NoDataOverlay
-                : Qn::NoVideoDataOverlay;
-        }
-
-        if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
-            return Qn::EmptyOverlay;
-
         if (!NX_ASSERT(d->camera) || !d->camera->isScheduleEnabled())
             return Qn::IoModuleDisabledOverlay;
+
+        const auto hasArchive = [](const QnSecurityCamResourcePtr& camera)
+        {
+            auto systemContext = SystemContext::fromResource(camera);
+            if (!NX_ASSERT(systemContext))
+                return false;
+
+            const auto footageServers = systemContext->cameraHistoryPool()->
+                getCameraFootageData(camera, true);
+            return !footageServers.empty();
+        };
+
+        if (d->isPlayingLive())
+        {
+            return d->accessController()->hasPermissions(d->camera, Qn::UserInputPermissions)
+                ? Qn::EmptyOverlay
+                : Qn::AccessDeniedOverlay;
+        }
+        else
+        {
+            if (!d->accessController()->hasPermissions(d->camera, Qn::ViewFootagePermission))
+                return Qn::AccessDeniedOverlay;
+
+            return hasArchive(d->camera)
+                ? Qn::NoVideoDataOverlay
+                : Qn::NoDataOverlay;
+        }
     }
 
     if (d->camera)
