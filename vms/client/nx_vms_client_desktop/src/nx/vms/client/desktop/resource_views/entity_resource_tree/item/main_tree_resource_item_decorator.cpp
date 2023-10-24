@@ -65,10 +65,7 @@ bool hasItemIsEditableFlag(
     }
 
     if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::exported))
-    {
-        const auto layout = resource.staticCast<QnLayoutResource>();
-        return permissions.hasPowerUserPermissions || !layout->isShared();
-    }
+        return permissions.permissions.testFlag(Qn::WriteNamePermission);
 
     if (resource->hasFlags(Qn::web_page) || resource->hasFlags(Qn::server))
         return permissions.hasPowerUserPermissions;
