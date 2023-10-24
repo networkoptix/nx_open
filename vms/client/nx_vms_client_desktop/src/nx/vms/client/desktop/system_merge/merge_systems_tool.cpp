@@ -142,6 +142,8 @@ bool MergeSystemsTool::mergeSystem(
     Context* ctx = findContext(ctxId);
     if (!ctx)
         return false;
+
+    NX_DEBUG(this, "Starting system merge, target: %1", ctx->target);
     ctx->mergeData.takeRemoteSettings = !ownSettings;
     ctx->mergeData.mergeOneServer = oneServer;
     ctx->mergeData.ignoreIncompatible = ignoreIncompatible;
@@ -182,6 +184,9 @@ void MergeSystemsTool::reportMergeFinished(
     MergeSystemsStatus status,
     const QString& errorText)
 {
+    NX_DEBUG(this, "Merge finished, target: %1, status: %2, error: %3",
+        ctx.target, status, errorText);
+
     auto targetInfo = ctx.targetInfo;
     m_contextMap.erase(ctx.mergeData.remoteServerId);
 
@@ -194,6 +199,9 @@ void MergeSystemsTool::reportSystemFound(
     const QString& errorText,
     bool removeCtx)
 {
+    NX_DEBUG(this, "System found, target: %1, status: %2, error: %3",
+        ctx.target, status, errorText);
+
     auto targetInfo = ctx.targetInfo;
 
     if (removeCtx)
@@ -212,7 +220,9 @@ void MergeSystemsTool::at_serverInfoReceived(
 
         if (auto status = verifyTargetCertificate(ctx); status != MergeSystemsStatus::ok)
         {
+            NX_VERBOSE(this, "Server certificate verificaton status: %1", status);
             reportSystemFound(ctx, status, {}, true);
+
             return;
         }
 
@@ -265,6 +275,7 @@ void MergeSystemsTool::at_sessionCreated(
 
         if (!nx::vms::license::hasUniqueLicenses(ctx.proxy->systemContext()->licensePool()))
         {
+            NX_DEBUG(this, "Unique license check failed");
             reportSystemFound(ctx, MergeSystemsStatus::ok, {}, false);
             return;
         }
@@ -306,6 +317,7 @@ void MergeSystemsTool::at_licensesReceived(
             ctx.proxy->systemContext()->licensePool(),
             ctx.targetLicenses);
 
+        NX_VERBOSE(this, "License conflict check result: %1", status);
         reportSystemFound(ctx, status, {}, false);
     }
     else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
@@ -321,6 +333,9 @@ void MergeSystemsTool::at_mergeStarted(
 {
     if (auto mergeStatus = std::get_if<nx::vms::api::MergeStatusReply>(&errorOrData))
     {
+        NX_VERBOSE(this, "Merge status received, id: %1, in progress: %2",
+            mergeStatus->mergeId, mergeStatus->mergeInProgress);
+
         if (mergeStatus->mergeInProgress)
             reportMergeFinished(ctx, MergeSystemsStatus::ok);
         else
