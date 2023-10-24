@@ -44,6 +44,7 @@ bool NonUniqueNameTracker::remove(const QnUuid& id)
 
     const QString name = *nameIt;
     m_nameById.erase(nameIt);
+    m_nonUniqueNameIds.remove(id);
 
     bool changed = false;
 
@@ -64,6 +65,11 @@ bool NonUniqueNameTracker::remove(const QnUuid& id)
     }
 
     return changed;
+}
+
+QSet<QnUuid> NonUniqueNameTracker::idsByName(const QString& name) const
+{
+    return m_idsByName.value(name.toLower());
 }
 
 } // namespace nx::vms::client::desktop

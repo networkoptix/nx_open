@@ -14,6 +14,7 @@
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
+#include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -414,6 +415,29 @@ void MembersModel::readUsersAndGroups()
         m_connections << connect(
             m_subjectContext.get(), &AccessSubjectEditingContext::resourceAccessChanged,
             this, &MembersModel::sharedResourcesChanged);
+
+        m_connections << connect(
+            systemContext()->nonEditableUsersAndGroups(),
+            &NonEditableUsersAndGroups::userModified,
+            this,
+            [this](const QnUserResourcePtr& user)
+            {
+                const int row = m_cache->indexIn(m_cache->sorted().users, user->getId());
+                emit dataChanged(index(row, 0), index(row, 0), {CanEditParents});
+            }
+        );
+
+        m_connections << connect(
+            systemContext()->nonEditableUsersAndGroups(),
+            &NonEditableUsersAndGroups::groupModified,
+            this,
+            [this](const QnUuid& groupId)
+            {
+                const auto groupsStart = m_cache->sorted().users.size();
+                const int row = groupsStart + m_cache->indexIn(m_cache->sorted().groups, groupId);
+                emit dataChanged(index(row, 0), index(row, 0), {CanEditParents});
+            }
+        );
     }
     else if (m_subjectId.isNull())
     {
@@ -783,7 +807,8 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
             return !bothAreLdap
                 && systemContext()->accessController()->hasPermissions(
                     id,
-                    Qn::WriteAccessRightsPermission);
+                    Qn::WriteAccessRightsPermission)
+                && systemContext()->nonEditableUsersAndGroups()->canEditParents(id);
         }
 
         case CanEditMembers:

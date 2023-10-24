@@ -186,6 +186,14 @@ public:
         resource->setName(newName);
     }
 
+    void enableUser(const QnUuid& id, bool enable)
+    {
+        auto resourcePool = systemContext()->resourcePool();
+        auto resource = resourcePool->getResourceById<QnUserResource>(id);
+        ASSERT_TRUE(!resource.isNull());
+        resource->setEnabled(enable);
+    }
+
     QStringList visualData(const QAbstractListModel* model, int filterByRole = -1)
     {
         QStringList result;
@@ -829,6 +837,72 @@ TEST_F(MembersModelTest, addRemoveLdapDefaultGroup)
     EXPECT_EQ(kAllSubjectsNoLdapDefault, visualData(m_model.get()));
 }
 
+TEST_F(MembersModelTest, duplicatesNotEditable)
+{
+    m_model->setGroupId(m_group3);
+
+    static const QStringList kAllowedParentsNoDuplicates = {
+        "user1",
+        "user2",
+        "user3",
+        "user4",
+        "user5",
+        "group1",
+        "group2",
+        "group3",
+        "group4",
+        "group5",
+    };
+
+    const QStringList allowedParentsNoDuplicates =
+        filterTopLevelByRole(MembersModel::CanEditParents);
+
+    ASSERT_EQ(kAllowedParentsNoDuplicates, allowedParentsNoDuplicates);
+
+    const auto user2Dup = addUser("user2", {m_group3});
+    const auto group4Dup = addGroup("group4", {m_group3});
+
+    static const QStringList kAllowedParentsWithDuplicates = {
+        "user1",
+        // "user2", //< Duplicate exists.
+        "user3",
+        "user4",
+        "user5",
+        "group1",
+        "group2",
+        "group3",
+        // "group4", //< Duplicate exists.
+        "group5",
+    };
+
+    const QStringList allowedParentsWithDuplicates =
+        filterTopLevelByRole(MembersModel::CanEditParents);
+
+    ASSERT_EQ(kAllowedParentsWithDuplicates, allowedParentsWithDuplicates);
+
+    enableUser(user2Dup, false);
+    renameGroup(group4Dup, "group4dup");
+
+    static const QStringList kAllowedParentsResolvedDuplicate = {
+        "user1",
+        "user2",
+        "user2",
+        "user3",
+        "user4",
+        "user5",
+        "group1",
+        "group2",
+        "group3",
+        "group4",
+        "group4dup",
+        "group5",
+    };
+
+    const QStringList allowedParentsResolvedDuplicate =
+        filterTopLevelByRole(MembersModel::CanEditParents);
+
+    ASSERT_EQ(kAllowedParentsResolvedDuplicate, allowedParentsResolvedDuplicate);
+}
 
 } // namespace test
 } // namespace nx::vms::client::desktop
