@@ -46,7 +46,7 @@ struct NX_VMS_API DeviceModelGeneral
     QString url;
 
     /**%apidoc
-     * Device Driver id, can be obtained from `GET /rest/v{1-}/devices/\*\/types`.
+     * Device Driver id, can be obtained from <code>GET /rest/v{1-}/devices/&ast;/types</code>.
      * %example 1b7181ce-0227-d3f7-9443-c86aab922d96
      */
     QnUuid typeId;
