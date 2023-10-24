@@ -9,9 +9,12 @@ namespace ptz {
 
 enum class Type
 {
+    /**%apidoc[unused] */
     none = 0,
     operational = 1 << 0,
     configurational = 1 << 1,
+
+    /**%apidoc[unused] */
     any = operational | configurational,
 };
 

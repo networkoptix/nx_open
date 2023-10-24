@@ -17,30 +17,36 @@ Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 enum class ResourceStatus
 {
     /**%apidoc The Device is inaccessible.
+     * %caption Offline
      */
     offline = 0,
 
     /**%apidoc The Device does not have correct credentials in the database.
+     * %caption Unauthorized
      */
     unauthorized = 1,
 
     /**%apidoc The Device is operating normally.
+     * %caption Online
      */
     online = 2,
 
     /**%apidoc Applies only to Cameras. The Camera is online and recording the video stream.
+     * %caption Recording
      */
     recording = 3,
 
     /**%apidoc
      * The Device status is unknown. It may show up while Servers synchronize status information.
      * If this status persists, it indicates an internal System problem.
+     * %caption NotDefined
      */
     undefined = 4,
 
     /**%apidoc
      * Applies only to Servers. The Server is incompatible only when it has the System name
      * different from the current one, or it has an incompatible protocol version.
+     * %caption Incompatible
      */
     incompatible = 5,
 
@@ -49,6 +55,7 @@ enum class ResourceStatus
      * certificate provided during the SSL handshake on a Server-to-Server connection. This may
      * happen in the case of a man-in-the-middle attack, or in the case of a certificate loss on
      * the target Server.
+     * %caption mismatchedCertificate
      */
     mismatchedCertificate = 6,
 };
@@ -238,6 +245,10 @@ enum ServerFlag
     SF_Edge = 0x001,
     SF_RemoteEC = 0x002,
     SF_HasPublicIP = 0x004,
+
+    /**%apidoc
+     * %caption SF_IfListCtrl
+     */
     SF_deprecated_IfListCtrl = 0x008,
 
     /**%apidoc[unused] Removed in 6.0 because no longer used. */
@@ -315,7 +326,14 @@ constexpr auto nxReflectVisitAllEnumItems(ServerFlag*, Visitor&& visitor)
 
 enum class IoModuleVisualStyle
 {
+    /**%apidoc
+     * %caption Form
+     */
     form,
+
+    /**%apidoc
+     * %caption Tile
+     */
     tile
 };
 

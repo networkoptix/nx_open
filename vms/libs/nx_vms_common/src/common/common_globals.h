@@ -142,10 +142,26 @@ namespace Qn {
     /** Level of detail for displaying resource info. */
     enum ResourceInfoLevel
     {
+        /**%apidoc[unused] */
         RI_Invalid,
-        RI_NameOnly,       /**< Only resource name */
-        RI_WithUrl,        /**< Resource name and url (if exist) */
-        RI_FullInfo        /**< All info */
+
+        /**%apidoc
+         * Only resource name
+         * %caption nameOnly
+         */
+        RI_NameOnly,
+
+        /**%apidoc
+         * Resource name and url (if exist)
+         * %caption withUrl
+         */
+        RI_WithUrl,
+
+        /**%apidoc
+         * All info
+         * %caption full
+         */
+        RI_FullInfo
     };
 
     template<typename Visitor>
@@ -167,9 +183,24 @@ namespace Qn {
 
     enum IOPortType
     {
-        PT_Unknown  = 0x0,
+        /**%apidoc
+         * %caption Unknown
+         */
+        PT_Unknown = 0x0,
+
+        /**%apidoc
+         * %caption Disabled
+         */
         PT_Disabled = 0x1,
+
+        /**%apidoc
+         * %caption Input
+         */
         PT_Input = 0x2,
+
+        /**%apidoc
+         * %caption Output
+         */
         PT_Output = 0x4
     };
 
@@ -343,9 +374,24 @@ namespace Qn {
 
     enum StorageInitResult
     {
+        /**%apidoc
+         * %caption Ok
+         */
         StorageInit_Ok,
+
+        /**%apidoc
+         * %caption CreateFailed
+         */
         StorageInit_CreateFailed,
+
+        /**%apidoc
+         * %caption InitFailed_WrongPath
+         */
         StorageInit_WrongPath,
+
+        /**%apidoc
+         * %caption InitFailed_WrongAuth
+         */
         StorageInit_WrongAuth,
     };
 
