@@ -8,12 +8,39 @@ namespace nx::vms::api {
 
 enum class DeviceType
 {
+    /**apidoc
+     * %caption Unknown
+     */
     unknown = 0,
+
+    /**apidoc
+     * %caption Camera
+     */
     camera,
+
+    /**apidoc
+     * %caption NVR
+     */
     nvr,
+
+    /**apidoc
+     * %caption Encoder
+     */
     encoder,
+
+    /**apidoc
+     * %caption IOModule
+     */
     ioModule,
+
+    /**apidoc
+     * %caption HornSpeaker
+     */
     hornSpeaker,
+
+    /**apidoc
+     * %caption MultisensorCamera
+     */
     multisensorCamera,
 };
 

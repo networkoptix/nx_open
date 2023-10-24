@@ -9,6 +9,7 @@ namespace nx::vms::api::analytics {
 
 enum class StreamType
 {
+    /**apidoc[unused] */
     none = 0,
     compressedVideo = 1 << 0, //< Compressed video packets.
     uncompressedVideo = 1 << 1, //< Uncompressed video frames.

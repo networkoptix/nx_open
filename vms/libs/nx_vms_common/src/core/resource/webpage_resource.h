@@ -11,6 +11,7 @@ namespace api {
 
 enum class WebPageSubtype
 {
+    /**%apidoc[unused] */
     none,
     clientApi //< Our additional JavaScript API exported to webpage.
 };

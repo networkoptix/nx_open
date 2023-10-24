@@ -41,14 +41,50 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParameterCondition
 {
     enum class ConditionType
     {
-        equal, //< Watched value strictly equals to condition value
+        /**%apidoc
+         * Watched value strictly equals to condition value
+         * %caption value
+         */
+        equal,
+
+        /**%apidoc
+         * %caption valueNe
+         */
         notEqual,
-        inRange, //< Watched value is in condition value range
+
+        /**%apidoc
+         * Watched value is in condition value range
+         * %caption valueIn
+         */
+        inRange,
+
+        /**%apidoc
+         * %caption valueNotIn
+         */
         notInRange,
-        present, //< Watched parameter is present in parameter list
+
+        /**%apidoc
+         * Watched parameter is present in parameter list
+         * %caption present
+         */
+        present,
+
+        /**%apidoc
+         * %caption notPresent
+         */
         notPresent,
+
+        /**%apidoc
+         * %caption valueChanged
+         */
         valueChanged,
+
+        /**%apidoc
+         * %caption valueContains
+         */
         contains,
+
+        /**%apidoc[unused] */
         unknown
     };
 
@@ -92,9 +128,22 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParameterDependency
 {
     enum class DependencyType
     {
+        /**%apidoc
+         * %caption Show
+         */
         show,
+
+        /**%apidoc
+         * %caption Range
+         */
         range,
+
+        /**%apidoc
+         * %caption Trigger
+         */
         trigger,
+
+        /**%apidoc[unused] */
         unknown
     };
 

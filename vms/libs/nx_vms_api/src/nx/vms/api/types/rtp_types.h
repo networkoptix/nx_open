@@ -8,9 +8,24 @@ namespace nx::vms::api {
 
 enum class RtpTransportType
 {
+    /**%apidoc
+     * %caption Auto
+     */
     automatic,
+
+    /**%apidoc
+     * %caption TCP
+     */
     tcp,
+
+    /**%apidoc
+     * %caption UDP
+     */
     udp,
+
+    /**%apidoc
+     * %caption Multicast
+     */
     multicast,
 };
 
