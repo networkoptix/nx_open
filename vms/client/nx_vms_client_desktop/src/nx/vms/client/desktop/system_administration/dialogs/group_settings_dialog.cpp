@@ -154,8 +154,10 @@ GroupSettingsDialog::GroupSettingsDialog(
                 if (d->groupId != groupId)
                     return;
 
-                d->deleteAvailable =
-                    !this->systemContext()->nonEditableUsersAndGroups()->containsGroup(groupId);
+                const auto nonEditableUsersAndGroups =
+                    this->systemContext()->nonEditableUsersAndGroups();
+
+                d->deleteAvailable = !nonEditableUsersAndGroups->containsGroup(groupId);
             });
     }
 

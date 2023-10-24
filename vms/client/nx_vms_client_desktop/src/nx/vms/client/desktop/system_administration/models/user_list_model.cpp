@@ -27,8 +27,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
-#include "private/non_unique_name_tracker.h"
-
 namespace nx::vms::client::desktop {
 
 namespace {
@@ -139,7 +137,6 @@ public:
     QSet<QnUserResourcePtr> checkedUsers;
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
-    NonUniqueNameTracker nonUniqueNameTracker;
 
     bool ldapServerOnline = true;
     qsizetype m_ldapUserCount = 0;
@@ -219,6 +216,11 @@ public:
                     q->index(row, CheckBoxColumn),
                     {Qn::DisabledRole, Qt::ToolTipRole});
             });
+
+        connect(systemContext()->nonEditableUsersAndGroups(),
+            &NonEditableUsersAndGroups::nonUniqueUsersChanged,
+            model,
+            &UserListModel::nonUniqueUsersChanged);
     }
 
     void at_resourcePool_resourceChanged(const QnResourcePtr& resource);
@@ -258,9 +260,6 @@ void UserListModel::Private::handleUserChanged(const QnUserResourcePtr& user)
     const auto it = users.find(user);
     if (it == users.end())
         return;
-
-    if (nonUniqueNameTracker.update(user->getId(), user->getName().toLower()))
-        emit model->nonUniqueUsersChanged();
 
     markUserNotFound(user, ldapUserNotFound(user));
 
@@ -379,8 +378,6 @@ void UserListModel::Private::removeUser(const QnUserResourcePtr& user)
 void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 {
     markUserNotFound(user, ldapUserNotFound(user));
-    if (nonUniqueNameTracker.update(user->getId(), user->getName().toLower()))
-        emit model->nonUniqueUsersChanged();
 
     connect(user.get(), &QnUserResource::nameChanged, this,
         &UserListModel::Private::at_resourcePool_resourceChanged);
@@ -413,9 +410,6 @@ void UserListModel::Private::addUserInternal(const QnUserResourcePtr& user)
 
 void UserListModel::Private::removeUserInternal(const QnUserResourcePtr& user)
 {
-    if (nonUniqueNameTracker.remove(user->getId()))
-        emit model->nonUniqueUsersChanged();
-
     markUserNotFound(user, false);
 
     disconnect(user.get(), &QnUserResource::nameChanged, this,
@@ -476,7 +470,7 @@ void UserListModel::Private::updateLdapUsersNotFound()
 
 bool UserListModel::Private::canEditUser(const QnUserResourcePtr& user) const
 {
-    return systemContext()->nonEditableUsersAndGroups()->canEdit(user);
+    return systemContext()->nonEditableUsersAndGroups()->canMassEdit(user);
 }
 
 UserListModel::UserListModel(QObject* parent):
@@ -556,7 +550,8 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                             lines << tr("User is not found in the LDAP database.");
                     }
 
-                    if (!d->nonUniqueNameTracker.isUnique(user->getId()))
+                    if (!d->systemContext()->nonEditableUsersAndGroups()->nonUniqueUsers()
+                        .isUnique(user->getId()))
                     {
                         lines << tr("There is already a user with the same login in the system. "
                             "To avoid issues it is required for all users to have a unique login.");
@@ -615,7 +610,8 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             {
                 case UserWarningColumn:
                 {
-                    if (!d->nonUniqueNameTracker.isUnique(user->getId())
+                    if (!d->systemContext()->nonEditableUsersAndGroups()->nonUniqueUsers()
+                            .isUnique(user->getId())
                         || (user->userType() == nx::vms::api::UserType::ldap
                             && (!d->ldapServerOnline || d->notFoundUsers.contains(user->getId()))))
                     {
@@ -888,7 +884,7 @@ QSet<QnUuid> UserListModel::notFoundUsers() const
 
 QSet<QnUuid> UserListModel::nonUniqueUsers() const
 {
-    return d->nonUniqueNameTracker.nonUniqueNameIds();
+    return d->systemContext()->nonEditableUsersAndGroups()->nonUniqueUsers().nonUniqueNameIds();
 }
 
 qsizetype UserListModel::ldapUserCount() const
