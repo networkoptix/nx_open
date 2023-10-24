@@ -12,7 +12,10 @@ namespace nx::vms::api {
 
 struct NX_VMS_API FlexibleId
 {
-    /**%apidoc Virtual Device id. */
+    /**%apidoc
+     * Virtual Device id, can be obtained from "id" field via
+     * <code>GET /rest/v{3-}/devices/&ast;/virtual</code>.
+     */
     QString id;
 };
 #define FlexibleId_Fields (id)
@@ -46,15 +49,12 @@ struct NX_VMS_API VirtualDeviceLockInfo
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceLockInfo, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceLockInfo, VirtualDeviceLockInfo_Fields);
 
-struct NX_VMS_API VirtualDeviceStatus
+struct NX_VMS_API VirtualDeviceStatus: FlexibleId
 {
-    /**%apidoc Virtual Device id. */
-    QString id;
-
     /**%apidoc Lock state information, if the Device is locked. */
     std::optional<VirtualDeviceLockInfo> lockInfo;
 };
-#define VirtualDeviceStatus_Fields (id)(lockInfo)
+#define VirtualDeviceStatus_Fields FlexibleId_Fields(lockInfo)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceStatus, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceStatus, VirtualDeviceStatus_Fields);
 
@@ -80,15 +80,12 @@ struct NX_VMS_API VirtualDeviceFootageElement
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceFootageElement, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceFootageElement, VirtualDeviceFootageElement_Fields);
 
-struct NX_VMS_API VirtualDevicePrepare
+struct NX_VMS_API VirtualDevicePrepare: FlexibleId
 {
-    /**%apidoc Virtual Device id. */
-    QString id;
-
     /**%apidoc[opt] Footage to upload. */
     std::vector<VirtualDeviceFootageElement> footage;
 };
-#define VirtualDevicePrepare_Fields (id)(footage)
+#define VirtualDevicePrepare_Fields FlexibleId_Fields(footage)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDevicePrepare, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDevicePrepare, VirtualDevicePrepare_Fields);
 
@@ -102,11 +99,8 @@ struct VirtualDevicePrepareReply
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDevicePrepareReply, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDevicePrepareReply, VirtualDevicePrepareReply_Fields);
 
-struct NX_VMS_API VirtualDeviceConsume
+struct NX_VMS_API VirtualDeviceConsume: FlexibleId
 {
-    /**%apidoc Virtual Device id. */
-    QString id;
-
     /**%apidoc Token acquired when the virtual Device was locked. */
     QnUuid token;
 
@@ -118,26 +112,22 @@ struct NX_VMS_API VirtualDeviceConsume
      */
     std::chrono::milliseconds startTimeMs;
 };
-#define VirtualDeviceConsume_Fields (id)(token)(uploadId) (startTimeMs)
+#define VirtualDeviceConsume_Fields FlexibleId_Fields(token)(uploadId)(startTimeMs)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceConsume, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceConsume, VirtualDeviceConsume_Fields);
 
-struct NX_VMS_API VirtualDeviceLock
+// TODO: (?) add optional `token` to be able to extend the lock.
+struct NX_VMS_API VirtualDeviceLock: FlexibleId
 {
-    /**%apidoc Virtual Device id. */
-    QString id;
-
-    // TODO: (?) add optional `token` to be able to extend the lock
-
-    /**%apidoc Id of a user to acquire the lock for. Should only be used by an admininstrator. */
-    std::optional<QnUuid> userId;
-
     /**%apidoc Lock timeout in milliseconds.
      * %example 60000
      */
     std::chrono::milliseconds ttlMs;
+
+    /**%apidoc Id of a user to acquire the lock for. Should only be used by an admininstrator. */
+    std::optional<QnUuid> userId;
 };
-#define VirtualDeviceLock_Fields (id)(userId)(ttlMs)
+#define VirtualDeviceLock_Fields FlexibleId_Fields(ttlMs)(userId)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceLock, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceLock, VirtualDeviceLock_Fields);
 
@@ -151,15 +141,12 @@ struct NX_VMS_API VirtualDeviceExtend: VirtualDeviceLock
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceExtend, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceExtend, VirtualDeviceExtend_Fields);
 
-struct NX_VMS_API VirtualDeviceRelease
+struct NX_VMS_API VirtualDeviceRelease: FlexibleId
 {
-    /**%apidoc Virtual Device id. */
-    QString id;
-
     /**%apidoc Token acquired when the virtual Device was locked. */
     QnUuid token;
 };
-#define VirtualDeviceRelease_Fields (id)(token)
+#define VirtualDeviceRelease_Fields FlexibleId_Fields(token)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceRelease, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(VirtualDeviceRelease, VirtualDeviceRelease_Fields);
 
