@@ -9,6 +9,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
+#include <ui/common/indents.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context.h>
@@ -25,12 +26,13 @@ public:
         QListWidget(parent)
     {
         setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        setProperty(nx::style::Properties::kSideIndentation, QVariant::fromValue(QnIndents{0, 0}));
     }
 
     QSize sizeHint() const
     {
         return QSize(kRecommendedWidth,
-            nx::style::Metrics::kViewRowHeight * std::min(kMaximumRows, (int) model()->rowCount()));
+            nx::style::Metrics::kViewRowHeight * std::min(kMaximumRows, (int)model()->rowCount()));
     }
 };
 
