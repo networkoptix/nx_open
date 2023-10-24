@@ -2643,7 +2643,7 @@ Handle ServerConnection::executeDelete(
 }
 
 template<typename ResultType>
-nx::network::rest::Result::Error getError(ResultType result)
+nx::network::rest::Result::Error getError(const ResultType& result)
 {
     auto error = std::get_if<nx::network::rest::Result>(&result);
     return error ? error->error : nx::network::rest::Result::NoError;
@@ -2742,11 +2742,11 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
                     // session token is recived.
 
                     std::tie(ctx->expiredIds, ctx->originalResponse) =
-                        extractJsonRpcExpired(std::forward<CallbackParameters>(result)...);
+                        extractJsonRpcExpired(result...);
                     requestNewSession = !ctx->expiredIds.empty();
                 }
             }
-            else if (const auto error = getError(std::forward<CallbackParameters>(result)...))
+            else if (const auto error = getError(result...))
             {
                 requestNewSession = isSessionExpiredError(error);
             }
