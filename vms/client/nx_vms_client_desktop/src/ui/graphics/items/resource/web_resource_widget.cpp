@@ -118,6 +118,7 @@ QnWebResourceWidget::QnWebResourceWidget(
         };
 
     controller->initClientApiSupport(workbench()->context(), this->item(), authCondition);
+    controller->setLoadIcon(true);
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()

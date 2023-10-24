@@ -857,6 +857,15 @@ void WebViewController::setWebPageContextMenuEnabled(bool enabled)
         });
 }
 
+void WebViewController::setLoadIcon(bool value)
+{
+    d->callWhenReady(
+        [value](QQuickItem* root)
+        {
+            root->setProperty("loadIcon", value);
+        });
+}
+
 void WebViewController::addProfileScript(const QWebEngineScript& script)
 {
     d->callWhenReady(
