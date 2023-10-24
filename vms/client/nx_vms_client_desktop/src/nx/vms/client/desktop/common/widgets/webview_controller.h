@@ -104,6 +104,9 @@ public:
     /** Returns true if web page is allowed to have its own context menu. */
     bool isWebPageContextMenuEnabled() const;
 
+    /** Sets whether to load a web page icon. */
+    void setLoadIcon(bool value);
+
     /**
      * Expose QObject properties and slots/signals to the page JavaScript.
      * Lifetime of the object is controlled by its creator. Sutable for separate web views
