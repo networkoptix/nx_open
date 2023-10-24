@@ -36,6 +36,7 @@ namespace QnCodecParams
     static const QByteArray qmax( "qmax" );
     static const QByteArray qscale( "qscale" );
     static const QByteArray global_quality( "global_quality" );
+    static const QByteArray gop_size( "gop_size" );
 }
 
 //!Base class for all raw media stream transcoders
