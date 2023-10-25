@@ -388,7 +388,6 @@ void AsyncSqlQueryExecutor::scheduleQuery(
         queryAggregationKey);
 
     executor->setStatisticsCollector(&m_statisticsCollector);
-
     m_queryQueue.push(std::move(executor));
 }
 
