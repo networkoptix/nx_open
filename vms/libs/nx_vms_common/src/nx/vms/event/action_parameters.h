@@ -104,7 +104,12 @@ struct NX_VMS_COMMON_API ActionParameters
     /**%apidoc For "Exec HTTP" Action. */
     QString contentType;
 
-    /**%apidoc HTTP authentication type. */
+    /**%apidoc:enum
+     * HTTP authentication type.
+     * %value authBasicAndDigest,
+     * %value authDigest,
+     * %value authBasic
+     */
     nx::network::http::AuthType authType = nx::network::http::AuthType::authBasicAndDigest;
 
     /**%apidoc HTTP method (empty string means auto-detection). */

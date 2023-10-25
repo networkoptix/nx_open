@@ -264,8 +264,9 @@ NX_VMS_COMMON_API QString toString(const ObjectMetadataPacket& packet);
  * Contains the binary data for the records from ObjectMetadataPacket which have the same Object
  * Type.
  */
-struct NX_VMS_COMMON_API QnCompressedObjectMetadataPacket: public QnCompressedMetadata
+class NX_VMS_COMMON_API QnCompressedObjectMetadataPacket: public QnCompressedMetadata
 {
+public:
     using base_type = QnCompressedMetadata;
 
     using QnCompressedMetadata::QnCompressedMetadata;

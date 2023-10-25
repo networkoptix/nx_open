@@ -24,7 +24,7 @@
 #include <recording/stream_recorder_data.h>
 #include <utils/color_space/image_correction.h>
 
-namespace nx::common::metadata { struct QnCompressedObjectMetadataPacket; }
+namespace nx::common::metadata { class QnCompressedObjectMetadataPacket; }
 
 class NX_VMS_COMMON_API QnStreamRecorder:
     public QnAbstractDataConsumer,
