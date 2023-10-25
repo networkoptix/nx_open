@@ -179,6 +179,8 @@ public:
 
     void setButtonAutoDetection(QnButtonDetection detection);
 
+    void setAlert(const QString& text);
+
     virtual int exec() override;
 
 signals:

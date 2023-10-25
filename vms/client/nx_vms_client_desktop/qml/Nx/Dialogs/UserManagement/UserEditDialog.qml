@@ -71,6 +71,7 @@ DialogWithState
     property alias tabIndex: tabControl.currentTabIndex
     property bool isSaving: false
     property bool ldapError: false
+    property alias linkReady: generalSettings.linkReady
     property bool continuousSync: true
     property alias editingContext: membersModel.editingContext
     property var self
