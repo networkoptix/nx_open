@@ -43,7 +43,7 @@ public:
             return false;
 
         m_resourceTreeSettings->clear();
-        m_resourceTreeSettings->setShowServersInTree(state[kShowServersInTreeKey].toBool());
+        m_resourceTreeSettings->setShowServersInTree(state[kShowServersInTreeKey].toBool(true));
 
         if (ini().webPagesAndIntegrations)
         {
