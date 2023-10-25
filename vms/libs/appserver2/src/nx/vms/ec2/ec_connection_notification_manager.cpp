@@ -49,7 +49,7 @@ nx::utils::Guard ECConnectionNotificationManager::addMonitor(
     MonitorCallback callback, std::vector<ApiCommand::Value> commands)
 {
     auto monitor = std::make_shared<MonitorCallback>(std::move(callback));
-    nx::utils::MoveOnlyFunc<void()> guard =
+    nx::utils::Guard guard{
         [this, monitor]()
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
@@ -67,7 +67,7 @@ nx::utils::Guard ECConnectionNotificationManager::addMonitor(
                 }
                 m_monitors.erase(monitor);
             }
-        };
+        }};
     NX_MUTEX_LOCKER lock(&m_mutex);
     for (auto c: commands)
         m_monitoredCommands[c].insert(monitor.get());

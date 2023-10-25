@@ -12,12 +12,23 @@ namespace nx::vms::json_rpc {
 
 using namespace detail;
 
-static bool isResponse(const QJsonObject& object)
+namespace {
+
+void logMessage(
+    const char* action, const nx::network::SocketAddress& address, const nx::Buffer& buffer)
+{
+    NX_DEBUG(nx::log::kHttpTag, "JSON-RPC %1 %2\n%3", action, address,
+        nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, nx::log::kHttpTag)
+            ? buffer
+            : buffer.substr(0, 1024 * 5)); //< Should be enough for 5 devices.
+}
+
+bool isResponse(const QJsonObject& object)
 {
     return object.contains("result") || object.contains("error");
 }
 
-static bool isResponse(const QJsonArray& list)
+bool isResponse(const QJsonArray& list)
 {
     bool result = !list.empty() && isResponse(list.begin()->toObject());
     for (int i = 1; i < list.size(); ++i)
@@ -31,7 +42,7 @@ static bool isResponse(const QJsonArray& list)
     return result;
 }
 
-static bool isResponse(const QJsonValue& value)
+bool isResponse(const QJsonValue& value)
 {
     if (value.isArray())
         return isResponse(value.toArray());
@@ -41,6 +52,8 @@ static bool isResponse(const QJsonValue& value)
 
     return false;
 }
+
+} // namespace
 
 WebSocketConnection::WebSocketConnection(
     std::unique_ptr<nx::network::websocket::WebSocket> socket,
@@ -148,6 +161,7 @@ void WebSocketConnection::readNextMessage()
 
 void WebSocketConnection::readHandler(const nx::Buffer& buffer)
 {
+    logMessage("receive from", m_socket->socket()->getForeignAddress(), buffer);
     try
     {
         QJsonValue data;
@@ -194,6 +208,7 @@ void WebSocketConnection::send(QJsonValue data)
 {
     auto buffer = std::make_unique<nx::Buffer>(QJson::serialized(data));
     auto bufferPtr = buffer.get();
+    logMessage("send to", m_socket->socket()->getForeignAddress(), *bufferPtr);
     m_socket->sendAsync(bufferPtr,
         [buffer = std::move(buffer), this](auto errorCode, auto /*bytesTransferred*/)
         {
