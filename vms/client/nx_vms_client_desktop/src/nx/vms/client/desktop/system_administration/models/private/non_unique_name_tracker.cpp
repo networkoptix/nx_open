@@ -56,10 +56,11 @@ bool NonUniqueNameTracker::remove(const QnUuid& id)
         case 2:
             for (const QnUuid& id: *it)
                 m_nonUniqueNameIds.remove(id);
-            changed = true;
             [[fallthrough]];
         default:
+            m_nonUniqueNameIds.remove(id);
             it->remove(id);
+            changed = true;
     }
 
     return changed;
