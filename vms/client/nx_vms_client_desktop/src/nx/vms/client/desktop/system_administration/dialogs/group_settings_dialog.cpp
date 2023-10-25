@@ -594,6 +594,21 @@ void GroupSettingsDialog::removeGroups(
 {
     auto chain = new UserGroupRequestChain(systemContext);
 
+    // LDAP groups will not be removed from `parentIds` or `parentGroupIds` leaving existing
+    // Users or User Groups with garbage ids of non-existing parents because the server does not
+    // allow to break hierarchy between LDAP members.
+    // This is acceptable for LDAP groups because continuous sync is supposed to fix such errors on
+    // the fly.
+    QSet<QnUuid> ldapGroups;
+    for (const auto& id: idsToRemove)
+    {
+        if (const auto group = systemContext->userGroupManager()->find(id);
+            group && group->type == nx::vms::api::UserType::ldap)
+        {
+            ldapGroups.insert(id);
+        }
+    }
+
     // Remove groups from groups.
 
     for (const auto& group: systemContext->userGroupManager()->groups())
@@ -601,7 +616,7 @@ void GroupSettingsDialog::removeGroups(
         UserGroupRequest::ModifyGroupParents mod;
         for (const auto& groupId: group.parentGroupIds)
         {
-            if (!idsToRemove.contains(groupId))
+            if (!idsToRemove.contains(groupId) || ldapGroups.contains(groupId))
                 mod.newParents.emplace_back(groupId);
         }
 
@@ -623,7 +638,7 @@ void GroupSettingsDialog::removeGroups(
         mod.prevParents = user->groupIds();
         for (const auto& groupId: mod.prevParents)
         {
-            if (!idsToRemove.contains(groupId))
+            if (!idsToRemove.contains(groupId) || ldapGroups.contains(groupId))
                 mod.newParents.emplace_back(groupId);
         }
         if (mod.prevParents.size() == mod.newParents.size())
