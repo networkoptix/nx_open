@@ -13,6 +13,7 @@
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -721,6 +722,12 @@ void QnMessageBox::setButtonAutoDetection(QnButtonDetection detection)
 {
     Q_D(QnMessageBox);
     d->buttonDetection = detection;
+}
+
+void QnMessageBox::setAlert(const QString& text)
+{
+    ui->alertBar->init({.text = text, .isClosable = true});
+    ui->alertBar->setVisible(true);
 }
 
 int QnMessageBox::exec()

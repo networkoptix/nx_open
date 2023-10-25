@@ -158,6 +158,9 @@
     </widget>
    </item>
    <item>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="alertBar" native="true"/>
+   </item>
+   <item>
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -176,6 +179,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::CommonMessageBar</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

@@ -10,6 +10,7 @@ import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
 
+import nx.vms.client.core
 import nx.vms.client.desktop 1.0
 
 import ".."
@@ -56,6 +57,7 @@ Item
     property alias displayOffsetMs: linkDates.displayOffsetMs
 
     property bool ldapError: false
+    property bool linkReady: true
     property bool continuousSync: true
     property bool nameIsUnique: true
 
@@ -533,9 +535,78 @@ Item
 
                     ColumnLayout
                     {
+                        id: obtainLinkLayout
+                        visible: accessLinkSection.visible && !control.linkReady
+
+                        onVisibleChanged:
+                        {
+                            if (!visible)
+                                allertAboutBadInternet.visible = false;
+                        }
+
+                        Timer
+                        {
+                            interval: 10000
+                            repeat: false
+                            running: obtainLinkLayout.visible
+                            onTriggered:
+                            {
+                                allertAboutBadInternet.visible = obtainLinkLayout.visible
+                            }
+                        }
+
+                        RowLayout
+                        {
+                            spacing: 8
+
+                            TextButton
+                            {
+                                id: obtainLinkButton
+
+                                icon.source: "image://svg/skin/user_settings/spinner.svg"
+                                icon.width: 20
+                                icon.height: 20
+                                spacing: 4
+                                text: qsTr("Obtaining Link...")
+
+                                RotationAnimation on iconRotation
+                                {
+                                    from: 0;
+                                    to: 360;
+                                    duration: 1200
+                                    running: obtainLinkButton.visible
+                                    loops: Animation.Infinite
+                                }
+                            }
+                        }
+
+                        RowLayout
+                        {
+                            id: allertAboutBadInternet
+                            spacing: 8
+
+                            Image
+                            {
+                                source: "image://svg/skin/tree/warning_yellow.svg"
+                                sourceSize.width: 24
+                                sourceSize.height: 24
+                            }
+
+                            Text
+                            {
+                                text: qsTr("Ensure that this computer is able to connect to the %1",
+                                    "%1 is the cloud name").arg(Branding.cloudName())
+                                color: ColorTheme.colors.yellow_d1
+                                font.pixelSize: 14
+                            }
+                        }
+                    }
+
+                    ColumnLayout
+                    {
                         id: accessLinkLayout
 
-                        visible: accessLinkSection.visible
+                        visible: accessLinkSection.visible && control.linkReady
 
                         width: parent.width
                         spacing: 16

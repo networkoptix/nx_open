@@ -3,6 +3,7 @@
 #include "user_settings_dialog.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
@@ -40,6 +41,7 @@
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
+#include <nx/vms/client/desktop/common/widgets/obtain_button.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
@@ -62,6 +64,7 @@
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 #include <utils/email/email.h>
 
@@ -89,6 +92,9 @@ static const QString kTrafficRelayUrlRequest = R"json(
 
 static const QString kCloudPathTrafficRelayInfo = "/mediator/server/%1/sessions/";
 static const QString kTrafficRelayUrl = "trafficRelayUrl";
+// To exclude status flickering on fast cloud systems, it is necessary to make an artificial delay
+static constexpr std::chrono::milliseconds kArificalDelay = std::chrono::milliseconds(500);
+static constexpr int kTimeBadInternetConnection = 10000;
 
 bool isAcceptedLoginCharacter(QChar character)
 {
@@ -148,6 +154,7 @@ struct UserSettingsDialog::Private
     QmlProperty<int> expiresAfterLoginS;
     QmlProperty<bool> revokeAccessEnabled;
     QmlProperty<QDateTime> firstLoginTime;
+    QmlProperty<bool> linkReady;
 
     QnUserResourcePtr user;
     rest::Handle currentRequest = 0;
@@ -171,7 +178,9 @@ struct UserSettingsDialog::Private
         linkValidUntil(q->rootObjectHolder(), "linkValidUntil"),
         expiresAfterLoginS(q->rootObjectHolder(), "expiresAfterLoginS"),
         revokeAccessEnabled(q->rootObjectHolder(), "revokeAccessEnabled"),
-        firstLoginTime(q->rootObjectHolder(), "firstLoginTime")
+        firstLoginTime(q->rootObjectHolder(), "firstLoginTime"),
+        linkReady(q->rootObjectHolder(), "linkReady")
+
     {
         connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
             [this]()
@@ -206,6 +215,8 @@ struct UserSettingsDialog::Private
         const auto cloudSystemId = q->systemSettings()->cloudSystemId();
         if (cloudSystemId.isEmpty())
             return;
+
+        linkReady = false;
 
         const core::CloudUrlHelper cloudUrlHelper(
             nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
@@ -260,6 +271,8 @@ struct UserSettingsDialog::Private
                 {
                     NX_VERBOSE(this, "Can not deserialize POST response. Url: %1", url);
                 }
+
+                linkReady = true;
             });
     }
 
@@ -406,8 +419,6 @@ struct UserSettingsDialog::Private
 
     void showMessageBoxWithLink(const QString& title, const QString& text, const std::string& token)
     {
-        const QString linkText = linkFromToken(token);
-
         QnMessageBox messageBox(
             QnMessageBoxIcon::Success,
             text,
@@ -421,13 +432,64 @@ struct UserSettingsDialog::Private
             ClipboardButton::tr("Copied", "to Clipboard"));
 
         QObject::connect(copyButton, &QPushButton::pressed,
-            [linkText]
+            [token, this]
             {
-                QGuiApplication::clipboard()->setText(linkText);
+                QGuiApplication::clipboard()->setText(linkFromToken(token));
             });
 
-        messageBox.addCustomWidget(
-            copyButton, QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
+        if (!q->systemSettings()->cloudSystemId().isEmpty())
+        {
+            auto obtainLinkButton = new ObtainButton(tr("Obtaining Link..."));
+            obtainLinkButton->setCheckable(false);
+            messageBox.addCustomWidget(
+                obtainLinkButton, QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
+
+            const auto replaceCustomWidget = nx::utils::guarded(&messageBox,
+                [this, &obtainLinkButton, &copyButton, &messageBox]
+                {
+                    if (!linkReady)
+                        return;
+
+                    messageBox.addCustomWidget(
+                        copyButton, QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
+                    messageBox.removeCustomWidget(obtainLinkButton);
+                    delete obtainLinkButton;
+                });
+
+            const auto showAlert = nx::utils::guarded(&messageBox,
+                [&messageBox]
+                {
+                    messageBox.setAlert(tr("Ensure that this computer is able to connect to the %1",
+                        "%1 is the cloud name").arg(nx::branding::cloudName()));
+                });
+
+            executeDelayedParented(
+                [this, messageBox = QPointer<QnMessageBox>(&messageBox), replaceCustomWidget]
+                {
+                    if (messageBox)
+                        linkReady.connectNotifySignal(messageBox, replaceCustomWidget);
+
+                    if (linkReady)
+                        replaceCustomWidget();
+                },
+                kArificalDelay.count(),
+                q);
+
+            executeDelayedParented(
+                [this, showAlert]
+                {
+                    if (!linkReady)
+                        showAlert();
+                },
+                kTimeBadInternetConnection,
+                q);
+        }
+        else
+        {
+            messageBox.addCustomWidget(
+                copyButton, QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
+        }
+
         messageBox.setWindowTitle(title);
         messageBox.exec();
     }
@@ -1310,6 +1372,12 @@ bool UserSettingsDialog::setUser(const QnUserResourcePtr& user)
 
     d->isSaving = false;
     createStateFrom(user);
+
+    if (!systemSettings()->cloudSystemId().isEmpty() && d->linkReady)
+    {
+        d->linkReady = false;
+        executeDelayedParented([this] { d->linkReady = true; }, kArificalDelay.count(), this);
+    }
 
     return true;
 }
