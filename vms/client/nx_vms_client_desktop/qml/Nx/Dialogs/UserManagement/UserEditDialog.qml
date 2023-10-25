@@ -200,8 +200,9 @@ DialogWithState
         DialogBanner
         {
             style: DialogBanner.Style.Warning
+            closeable: true
             width: banners.width
-            visible: dialog.userIsNotRegisteredInCloud
+            visible: dialog.userIsNotRegisteredInCloud && !closed
 
             text: qsTr("This user has not yet signed up for %1",
                 "%1 is the cloud name").arg(Branding.cloudName())
