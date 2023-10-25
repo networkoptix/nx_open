@@ -14,7 +14,13 @@ namespace nx::network::maintenance {
 class NX_NETWORK_API Server
 {
 public:
-    Server(const std::string& basePath);
+    /**
+     * @param basePath is a request path prefix used to form the server api endpoints
+     * {basePath}/maintenance/...
+     * @param version optionally overrides the VMS version that is returned by the
+     * .../maintenance/version endpoint.
+     */
+    Server(const std::string& basePath, std::optional<std::string> version = std::nullopt);
 
     /** Registers all handlers under {basePath}/maintenance/ given in constructor*/
     void registerRequestHandlers(
@@ -28,9 +34,10 @@ public:
     std::string maintenancePath() const;
 
 private:
+    std::string m_maintenancePath;
+    std::optional<std::string> m_version;
     log::Server m_logServer;
     statistics::Server m_statisticsServer;
-    std::string m_maintenancePath;
 };
 
 } // namespace nx::network::maintenance

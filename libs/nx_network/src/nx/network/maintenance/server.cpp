@@ -14,8 +14,9 @@
 
 namespace nx::network::maintenance {
 
-Server::Server(const std::string& basePath):
-    m_maintenancePath(url::joinPath(basePath, kMaintenance))
+Server::Server(const std::string& basePath, std::optional<std::string> version):
+    m_maintenancePath(url::joinPath(basePath, kMaintenance)),
+    m_version(std::move(version))
 {
 }
 
@@ -48,8 +49,9 @@ void Server::registerRequestHandlers(
      * %return Version information.
      *     %struct Version
      */
-    messageDispatcher->registerRequestProcessor<GetVersion>(
+    messageDispatcher->registerRequestProcessor(
         url::joinPath(m_maintenancePath, kVersion),
+        [version = m_version](){ return std::make_unique<GetVersion>(std::move(version)); },
         http::Method::get);
 
     /**%apidoc GET /placeholder/maintenance/health

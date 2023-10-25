@@ -16,18 +16,29 @@ struct NX_NETWORK_API Version
 
 NX_REFLECTION_INSTRUMENT(Version, (version)(revision))
 
+// Return the VMS version as reported nx::build_info library.
 NX_NETWORK_API Version getVersion();
 
 //-------------------------------------------------------------------------------------------------
 // GetVersion
 
+/**
+ * An HTTP handler that returns the VMS version by default. It can be overriden to return a
+ * different version, e.g. the Cloud version, if the server is running on a cloud service.
+ */
 class GetVersion:
     public http::RequestHandlerWithContext
 {
+public:
+    GetVersion(std::optional<std::string> version = std::nullopt);
+
 protected:
     virtual void processRequest(
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler) override;
+
+private:
+    std::optional<std::string> m_version;
 };
 
 } // namespace nx::network::maintenance
