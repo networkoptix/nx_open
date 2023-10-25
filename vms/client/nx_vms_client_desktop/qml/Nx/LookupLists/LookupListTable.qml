@@ -19,8 +19,7 @@ TableView
     id: control
 
     required property Analytics.StateView taxonomy
-    signal editingStarted
-    signal editingFinished
+    property bool editing: false //< Shouldn't be changed outside this file.
     signal valueChanged
 
     columnSpacing: 0
@@ -28,6 +27,7 @@ TableView
 
     showCheckboxColumn: true
     horizontalHeaderVisible: true
+    horizontalHeaderEnabled: !editing
 
     function rowContainsCorrectData(row)
     {
@@ -63,6 +63,7 @@ TableView
                     y: 6
                     anchors.verticalCenter: parent.verticalCenter
                     checked: model.display
+                    enabled: !editing
                     onCheckStateChanged:
                     {
                         if (checkState !== model.display)
@@ -85,8 +86,8 @@ TableView
                 {
                     id: delegateItem
 
-                    onEditingStarted: control.editingStarted()
-                    onEditingFinished: control.editingFinished()
+                    onEditingStarted: editing = true
+                    onEditingFinished: editing = false
                     onValueChanged: (newValue, previousValue) =>
                     {
                         if (!control.rowContainsCorrectData(row))
@@ -94,7 +95,7 @@ TableView
                         else
                             control.valueChanged()
                     }
-                    Component.onDestruction: control.editingFinished()
+                    Component.onDestruction: editing = false
 
                     taxonomy: control.taxonomy
                 }
