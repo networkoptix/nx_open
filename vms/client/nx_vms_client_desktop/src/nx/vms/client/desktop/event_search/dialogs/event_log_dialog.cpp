@@ -574,7 +574,7 @@ void EventLogDialog::query(
     rest::ServerConnection::Timeouts timeouts;
     timeouts.responseReadTimeout = kQueryTimeout;
 
-    m_request = serverApi->eventLog({}, filter, std::move(callback), this->thread(), timeouts);
+    m_request = serverApi->eventLog(filter, std::move(callback), this->thread(), timeouts);
 }
 
 void EventLogDialog::retranslateUi()

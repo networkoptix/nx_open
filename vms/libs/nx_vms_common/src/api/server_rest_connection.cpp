@@ -1269,7 +1269,6 @@ Handle ServerConnection::getEvents(const QnEventLogMultiserverRequestData& reque
 }
 
 Handle ServerConnection::eventLog(
-    QnUuid serverId,
     const nx::vms::api::rules::EventLogFilter& filter,
     Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
     QThread* targetThread,
@@ -1278,12 +1277,9 @@ Handle ServerConnection::eventLog(
     QJsonValue value;
     QJson::serialize(filter, &value);
     NX_ASSERT(value.isObject());
-    auto params = nx::network::rest::Params::fromJson(value.toObject());
-    params.remove("serverId");
-
     return executeGet(
-        NX_FMT("rest/v3/servers/%1/eventLog", formatRestId(serverId)),
-        params,
+        "rest/v3/events/log",
+        nx::network::rest::Params::fromJson(value.toObject()),
         std::move(callback),
         targetThread,
         /*proxyToServer*/{},

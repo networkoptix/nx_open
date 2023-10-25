@@ -318,6 +318,15 @@ constexpr ApiCommand::Value getUpdateCommand()
 }
 
 template<typename T>
+std::vector<ApiCommand::Value> commands(ApiCommand::Value deleteCommand)
+{
+    std::vector<ApiCommand::Value> r{{deleteCommand}};
+    invokeOnDbTypes<applyComma, T>(
+        [&r](auto&& data) { r.push_back(getUpdateCommand<std::decay_t<decltype(data)>>()); });
+    return r;
+}
+
+template<typename T>
 Result validateResourceTypeId(const T& data)
 {
     if constexpr (kResourceTypeIdExists<T>::value)

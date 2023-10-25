@@ -52,6 +52,8 @@ struct NX_VMS_API EventActionData
     QByteArray runtimeParams;
     QnUuid ruleId;
     qint32 aggregationCount = 0;
+
+    bool operator==(const EventActionData& other) const = default;
 };
 #define EventActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resourceIds) \
     (params)(runtimeParams)(ruleId)(aggregationCount)

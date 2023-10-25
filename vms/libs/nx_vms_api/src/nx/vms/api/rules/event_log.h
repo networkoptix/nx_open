@@ -15,10 +15,10 @@ namespace nx::vms::api::rules {
 
 struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
 {
-    /**%apidoc[opt] List of event resource flexible ids. */
+    /**%apidoc:stringArray List of event resource flexible ids. */
     std::optional<nx::vms::api::json::ValueOrArray<QString>> eventResourceId;
 
-    /**%apidoc[opt]
+    /**%apidoc:stringArray
      * List of event types. See /rest/v{3-}/events/manifest/events for event manifests
      * with possible event types.
      */
@@ -32,7 +32,7 @@ struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
      */
     QString eventSubtype;
 
-    /**%apidoc[opt]
+    /**%apidoc:stringArray
      * List of action types. See /rest/v{3-}/events/manifest/actions for action manifests
      * with possible action types.
      */
