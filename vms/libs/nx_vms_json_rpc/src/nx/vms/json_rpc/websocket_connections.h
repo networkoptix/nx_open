@@ -45,7 +45,8 @@ public:
     {
     }
 
-    virtual ~WebSocketConnections() = default;
+    virtual ~WebSocketConnections() { clear(); }
+    void clear();
 
     WebSocketConnection* addConnection(
         std::any connectionInfo, std::unique_ptr<nx::network::websocket::WebSocket> socket);
