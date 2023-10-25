@@ -122,4 +122,18 @@ std::size_t WebSocketConnections::count() const
     return m_connections.size();
 }
 
+void WebSocketConnections::clear()
+{
+    std::unordered_map<WebSocketConnection*, Connection> connections;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_connections.swap(connections);
+    }
+    for (auto& [_, connection]: connections)
+    {
+        for (auto& thread: connection.threads)
+            thread.join();
+    }
+}
+
 } // namespace nx::vms::json_rpc
