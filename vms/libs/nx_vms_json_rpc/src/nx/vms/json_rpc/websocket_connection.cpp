@@ -99,6 +99,7 @@ void WebSocketConnection::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
+    m_guards.clear();
     m_socket->pleaseStopSync();
     std::queue<QJsonValue> empty;
     m_queuedRequests.swap(empty);
