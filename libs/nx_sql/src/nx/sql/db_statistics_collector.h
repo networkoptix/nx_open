@@ -7,6 +7,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -86,6 +87,7 @@ private:
     std::deque<StatisticsRecordContext> m_recordQueue;
     mutable nx::Mutex m_mutex;
     QueryStatistics m_currentStatistics;
+    nx::utils::ElapsedTimer m_cleanupTimeout;
     DurationStatisticsCalculationContext m_requestExecutionTimesCalculationContext;
     DurationStatisticsCalculationContext m_waitingForExecutionTimesCalculationContext;
 

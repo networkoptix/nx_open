@@ -38,6 +38,11 @@ StatisticsCollector::StatisticsCollector(
 void StatisticsCollector::recordQuery(QueryExecutionInfo queryStatistics)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cleanupTimeout.hasExpired(m_period))
+    {
+        m_cleanupTimeout.restart();
+        removeExpiredRecords(lock);
+    }
 
     updateStatisticsWithNewValue(queryStatistics);
     m_recordQueue.push_back(StatisticsRecordContext(queryStatistics));
