@@ -288,4 +288,9 @@ int RowSelectionModel::columnCount(const QModelIndex& parent) const
     return sourceModel()->columnCount() + (m_checkboxColumnVisible ? 1 : 0);
 }
 
+void RowSelectionModel::sort(int column, Qt::SortOrder order)
+{
+    base_type::sort(m_checkboxColumnVisible ? column - 1 : column, order);
+}
+
 } // namespace nx::vms::client::desktop

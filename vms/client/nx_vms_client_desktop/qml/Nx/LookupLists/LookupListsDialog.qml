@@ -217,6 +217,8 @@ Dialog
                 contentItem: RowLayout
                 {
                     spacing: 8
+                    enabled: !editing
+
                     Button
                     {
                         text: qsTr("Add")
@@ -229,7 +231,6 @@ Dialog
 
                         text: qsTr("Delete")
                         visible: false
-                        enabled: !editing
                         icon.source: "image://svg/skin/text_buttons/delete_20_deprecated.svg"
                         onClicked:
                         {
@@ -241,7 +242,6 @@ Dialog
                     {
                         text: qsTr("Import")
                         icon.source: "image://svg/skin/text_buttons/import.svg"
-                        enabled: !editing
                         onClicked: importDialog.visible = true
                     }
                     TextButton
@@ -250,7 +250,6 @@ Dialog
 
                         text: qsTr("Export")
                         icon.source: "image://svg/skin/text_buttons/export.svg"
-                        enabled: !editing
                         onClicked:
                         {
                             exportProcessor.exportListEntries(
@@ -271,7 +270,7 @@ Dialog
             {
                 id: tableView
 
-                model: entriesModel
+                model: SortFilterProxyModel { sourceModel: entriesModel }
                 taxonomy: control.taxonomy
 
                 onHeaderCheckStateChanged:
@@ -287,8 +286,7 @@ Dialog
                     }
                 }
 
-                onEditingStarted: editing = true
-                onEditingFinished: editing = false
+                onEditingChanged: control.editing = tableView.editing
                 onValueChanged: hasChanges = true
 
                 anchors

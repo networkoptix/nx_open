@@ -50,6 +50,8 @@ public:
     virtual int	rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int	columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
+    virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+
 private:
     bool m_checkboxColumnVisible = true;
     std::set<QPersistentModelIndex> m_checkedRows;
