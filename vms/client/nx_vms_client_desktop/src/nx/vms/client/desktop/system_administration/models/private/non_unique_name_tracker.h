@@ -9,7 +9,7 @@
 
 namespace nx::vms::client::desktop {
 
-class NonUniqueNameTracker
+class NX_VMS_CLIENT_DESKTOP_API NonUniqueNameTracker
 {
 public:
     QSet<QnUuid> nonUniqueNameIds() const { return m_nonUniqueNameIds; }
