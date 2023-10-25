@@ -29,6 +29,16 @@ TableView
     showCheckboxColumn: true
     horizontalHeaderVisible: true
 
+    function rowContainsCorrectData(row)
+    {
+        for (let i = 0; i < control.model.columnCount(); ++i)
+        {
+            if (control.model.data(control.model.index(row, i)))
+                return true
+        }
+        return false
+    }
+
     DelegateChooser
     {
         id: chooser
@@ -77,7 +87,13 @@ TableView
 
                     onEditingStarted: control.editingStarted()
                     onEditingFinished: control.editingFinished()
-                    onValueChanged: control.valueChanged()
+                    onValueChanged: (newValue, previousValue) =>
+                    {
+                        if (!control.rowContainsCorrectData(row))
+                            revert(previousValue) //<= Full row contains only empty values, reverting.
+                        else
+                            control.valueChanged()
+                    }
                     Component.onDestruction: control.editingFinished()
 
                     taxonomy: control.taxonomy

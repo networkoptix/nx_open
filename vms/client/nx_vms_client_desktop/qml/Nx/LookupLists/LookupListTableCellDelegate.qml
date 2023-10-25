@@ -28,7 +28,7 @@ FocusScope
 
     signal editingStarted
     signal editingFinished
-    signal valueChanged
+    signal valueChanged(var newValue, var previousValue)
 
     // Never pass key presses to parents while editing.
     Keys.onPressed: (event) => event.accepted = isEditing
@@ -36,7 +36,6 @@ FocusScope
     function edit()
     {
         control.editingStarted()
-        console.log("Edit started")
         editor.value = model.display
         isEditing = true
         editor.setFocus()
@@ -44,18 +43,18 @@ FocusScope
 
     function commit()
     {
-        console.log("Commit " + editor.value)
         const valueChanged = editor.value !== model.display
+        const previousValue = model.display
         model.edit = editor.value
         isEditing = false
         if (valueChanged)
-            control.valueChanged()
+            control.valueChanged(model.edit, previousValue)
     }
 
-    function revert()
+    function revert(valueRevertTo)
     {
-        console.log("Revert")
-        editor.value = model.display
+        editor.value = valueRevertTo
+        model.edit = editor.value
         isEditing = false
         control.editingFinished()
     }
@@ -94,7 +93,6 @@ FocusScope
 
         onEditingFinished:
         {
-            console.log("Editing Finished")
             commit()
             control.editingFinished()
         }
@@ -110,7 +108,7 @@ FocusScope
                     break
 
                 case Qt.Key_Escape:
-                    control.revert()
+                    control.revert(model.display)
                     break
 
                 default:
