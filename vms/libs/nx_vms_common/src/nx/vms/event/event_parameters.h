@@ -131,7 +131,7 @@ struct NX_VMS_COMMON_API EventParameters
     QString key;
 
     /**%apidoc[opt] */
-    nx::common::metadata::Attributes attributes;
+    std::vector<nx::common::metadata::Attribute> attributes;
 
     /**%apidoc[opt]
      * Used for INVIF Profile G archive synchronization progress.

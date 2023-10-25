@@ -486,7 +486,7 @@ rest::Handle VmsEventSearchListModel::Private::getEvents(
     if (!NX_ASSERT(api))
         return {};
 
-    return api->eventLog(/*serverId*/ {}, filter, std::move(internalCallback), thread());
+    return api->eventLog(filter, std::move(internalCallback), thread());
 }
 
 QString VmsEventSearchListModel::Private::description(const QVariantMap& details) const

@@ -396,7 +396,6 @@ public:
         QThread* targetThread = nullptr);
 
     Handle eventLog(
-        QnUuid serverId,
         const nx::vms::api::rules::EventLogFilter& filter,
         Result<ErrorOrData<nx::vms::api::rules::EventLogRecordList>>::type callback,
         QThread* targetThread = nullptr,
