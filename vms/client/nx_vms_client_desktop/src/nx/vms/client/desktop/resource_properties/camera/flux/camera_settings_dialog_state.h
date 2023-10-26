@@ -65,7 +65,7 @@ struct SingleCameraProperties
     bool networkLink = false;
     bool usbDevice = false;
     bool supportsCameraHotspots = false;
-    bool hasViewLivePermission = false;
+    Qn::Permissions permissions = Qn::NoPermissions;
 
     QSize primaryStreamResolution;
     QSize secondaryStreamResolution;
@@ -80,8 +80,8 @@ NX_REFLECTION_INSTRUMENT(SingleCameraProperties,
     (id)(name)(firmware)(model)(vendor)(macAddress)(ipAddress)(baseCameraUrl)(settingsUrlPath)
     (webPageLabelText)(settingsUrl)
     (overrideXmlHttpRequestTimeout)(overrideHttpUserAgent)(isOnline)(fixupRequestUrls)(hasVideo)
-    (editableStreamUrls)(networkLink)(usbDevice)(hasViewLivePermission)(supportsCameraHotspots)
-    (primaryStreamResolution)(secondaryStreamResolution))
+    (editableStreamUrls)(networkLink)(usbDevice)(permissions)
+    (supportsCameraHotspots)(primaryStreamResolution)(secondaryStreamResolution))
 
 struct CombinedProperties
 {
