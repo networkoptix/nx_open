@@ -225,7 +225,7 @@ void QnTCPConnectionProcessor::parseRequest()
     if (d->owner)
         d->owner->applyModToRequest(&d->request);
 
-    if (!d->requestLogged && nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, nx::log::kHttpTag))
+    if (!d->requestLogged)
     {
         d->requestLogged = true;
         logRequestOrResponse(
@@ -380,8 +380,10 @@ void QnTCPConnectionProcessor::logRequestOrResponse(
     const QByteArray& httpMessageFull,
     const nx::Buffer& httpMessageBodyOnly)
 {
-    Q_D(QnTCPConnectionProcessor);
+    if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, nx::log::kHttpTag))
+        return;
 
+    Q_D(QnTCPConnectionProcessor);
     const auto uncompressDataIfNeeded =
         [&]()
         {
@@ -406,15 +408,15 @@ void QnTCPConnectionProcessor::logRequestOrResponse(
         bodyToPrint = uncompressDataIfNeeded();
     }
 
-    const auto headers =
-        QByteArray::fromRawData(httpMessageFull.constData(), httpMessageFull.size() - httpMessageBodyOnly.size());
+    if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, nx::log::kHttpTag))
+        bodyToPrint.truncate(1024 * 5); //< Should be enough for 5 devices.
 
-    NX_DEBUG(nx::log::kHttpTag,
-        "%1 %2:\n%3%4-------------------\n",
-        logMessage,
-        d->socket->getForeignAddress(),
-        headers,
-        bodyToPrint);
+    const auto headers = QByteArray::fromRawData(
+        httpMessageFull.constData(), httpMessageFull.size() - httpMessageBodyOnly.size());
+
+    NX_DEBUG(nx::log::kHttpTag, "%1 %2:\n%3%4%5",
+        logMessage, d->socket->getForeignAddress(), headers,
+        bodyToPrint, bodyToPrint.isEmpty() ? "" : "\n");
 }
 
 nx::String QnTCPConnectionProcessor::createResponse(
@@ -473,8 +475,7 @@ nx::String QnTCPConnectionProcessor::createResponse(
         ? d->response.toMultipartString(multipartBoundary)
         : d->response.toString();
 
-    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, nx::log::kHttpTag))
-        logRequestOrResponse("Sending response to", contentType, contentEncoding, response, d->response.messageBody);
+    logRequestOrResponse("Sending response to", contentType, contentEncoding, response, d->response.messageBody);
 
     return response;
 }
