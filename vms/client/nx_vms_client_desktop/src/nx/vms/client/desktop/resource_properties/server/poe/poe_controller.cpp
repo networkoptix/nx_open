@@ -248,11 +248,6 @@ bool PoeController::updatingPoweringModes() const
     return d->updatingModeHandle > 0;
 }
 
-bool PoeController::isNetworkRequestRunning() const
-{
-    return d->handle > 0;
-}
-
 void PoeController::cancelRequest()
 {
     d->cancelRequest();

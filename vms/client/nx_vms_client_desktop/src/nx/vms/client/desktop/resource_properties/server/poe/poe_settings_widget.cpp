@@ -153,7 +153,7 @@ void PoeSettingsWidget::discardChanges()
 
 bool PoeSettingsWidget::isNetworkRequestRunning() const
 {
-    return d->controller.isNetworkRequestRunning();
+    return d->controller.updatingPoweringModes();
 }
 
 void PoeSettingsWidget::setServerId(const QnUuid& value)
