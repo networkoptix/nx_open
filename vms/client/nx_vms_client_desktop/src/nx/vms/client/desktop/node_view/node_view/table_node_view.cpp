@@ -3,14 +3,13 @@
 #include "table_node_view.h"
 
 #include "../details/node/view_node.h"
+#include "../details/node/view_node_helper.h"
 #include "../details/node_view_model.h"
-#include "../details/node_view_store.h"
 #include "../details/node_view_state.h"
 #include "../details/node_view_state_patch.h"
-#include "../details/node/view_node_helper.h"
-#include "../details/node/view_node_data_builder.h"
-#include "../node_view/node_view_state_reducer.h"
+#include "../details/node_view_store.h"
 #include "../node_view/node_view_item_delegate.h"
+#include "../node_view/node_view_state_reducer.h"
 
 namespace {
 
@@ -61,15 +60,14 @@ QVariant TableNodeViewModel::headerData(
 
 } // namespace
 
-namespace nx::vms::client::desktop {
-namespace node_view {
+namespace nx::vms::client::desktop::node_view {
 
 using namespace details;
 
 struct TableNodeView::Private: public QObject
 {
-    Private(TableNodeView* ownerd, int columnCount);
-    void updateCheckedIndices();
+    Private(TableNodeView* owner, int columnCount);
+    void updateUserCheckChangedIndices();
     void setHasUserChanges(bool value);
 
     TableNodeView* const q;
@@ -77,7 +75,7 @@ struct TableNodeView::Private: public QObject
     TableNodeViewModel model;
 
     bool hasUserChanges = false;
-    IndicesList checkedIndices;
+    IndicesList userCheckChangedIndices; //< The model's indices where user has changed checked state.
 };
 
 TableNodeView::Private::Private(TableNodeView* owner, int columnCount):
@@ -86,10 +84,11 @@ TableNodeView::Private::Private(TableNodeView* owner, int columnCount):
     model(columnCount, store.data())
 {
     connect(store.data(), &NodeViewStore::patchApplied, &model, &TableNodeViewModel::applyPatch);
-    connect(store.data(), &NodeViewStore::patchApplied, this, &Private::updateCheckedIndices);
+    connect(
+        store.data(), &NodeViewStore::patchApplied, this, &Private::updateUserCheckChangedIndices);
 }
 
-void TableNodeView::Private::updateCheckedIndices()
+void TableNodeView::Private::updateUserCheckChangedIndices()
 {
     TableNodeView::IndicesList current;
     ViewNodeHelper::ViewNodeHelper::forEachNode(store->state().rootNode,
@@ -98,17 +97,25 @@ void TableNodeView::Private::updateCheckedIndices()
             const auto& data = node->data();
             for (const int column: data.usedColumns())
             {
-                if (data.hasData(column, ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole)))
-                    current.append(model.index(node, column));
+                const auto userActionRole = ViewNodeHelper::makeUserActionRole(Qt::CheckStateRole);
+                if (!data.hasData(column, userActionRole))
+                    continue;
+
+                const auto isInitiallyChecked = data.data(column, Qt::CheckStateRole);
+                const auto isUserChecked = data.data(column, userActionRole);
+                if (isInitiallyChecked == isUserChecked)
+                    continue;
+
+                current.append(model.index(node, column));
             }
         });
 
-    if (current == checkedIndices)
+    if (current == userCheckChangedIndices)
         return;
 
-    checkedIndices = current;
+    userCheckChangedIndices = current;
 
-    setHasUserChanges(!checkedIndices.isEmpty());
+    setHasUserChanges(!userCheckChangedIndices.isEmpty());
 }
 
 void TableNodeView::Private::setHasUserChanges(bool value)
@@ -153,12 +160,12 @@ void TableNodeView::setHeaderDataProvider(HeaderDataProvider&& provider)
 
 TableNodeView::IndicesList TableNodeView::userCheckChangedIndices() const
 {
-    return d->checkedIndices;
+    return d->userCheckChangedIndices;
 }
 
 bool TableNodeView::hasUserChanges() const
 {
-    return !d->checkedIndices.isEmpty();
+    return !d->userCheckChangedIndices.isEmpty();
 }
 
 void TableNodeView::applyUserChanges()
@@ -188,5 +195,4 @@ void TableNodeView::handleUserDataChangeRequested(
     d->model.dataChanged(index, index, kCheckStateRole);
 }
 
-} // node_view
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::node_view
