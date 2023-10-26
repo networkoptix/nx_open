@@ -186,6 +186,8 @@
 // TODO: #sivanov remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
 
+using namespace std::chrono;
+
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionSelection;
 using namespace nx::vms::common;
@@ -561,16 +563,9 @@ void ActionHandler::addToLayout(
         layout->setItemData(data.uuid, Qn::ItemPausedRole, false);
         layout->setItemData(data.uuid, Qn::ItemSpeedRole, 1);
     }
-    else if (params.time > 0ms)
+    else if (params.time >= 0ms)
     {
-        qint64 timeMs = params.time.count();
-        if (timeMs == DATETIME_NOW
-            && !accessController()->hasPermissions(resource, Qn::ViewLivePermission))
-        {
-            timeMs = 0;
-        }
-
-        layout->setItemData(data.uuid, Qn::ItemTimeRole, timeMs);
+        layout->setItemData(data.uuid, Qn::ItemTimeRole, (qint64) params.time.count());
         layout->setItemData(data.uuid, Qn::ItemPausedRole, params.paused);
         layout->setItemData(data.uuid, Qn::ItemSpeedRole, params.speed);
     }
@@ -997,17 +992,14 @@ void ActionHandler::at_openInLayoutAction_triggered()
         addParams.speed = 1.0;
 
         const bool canViewFootage = std::any_of(resources.begin(), resources.end(),
-            [this](auto resource)
+            [](auto resource)
             {
                 return ResourceAccessManager::hasPermissions(resource,
                     Qn::Permission::ViewFootagePermission);
             });
 
-        // Live viewers must not open items on archive position
-        if (canViewFootage)
+        if (canViewFootage) //< Live viewers must not open items at archive position.
         {
-            using namespace std::chrono;
-
             if (parameters.hasArgument(Qn::ItemTimeRole))
             {
                 addParams.time = milliseconds(parameters.argument<qint64>(Qn::ItemTimeRole));
@@ -1016,14 +1008,42 @@ void ActionHandler::at_openInLayoutAction_triggered()
             }
             else if (parameters.hasArgument(Qn::LayoutSyncStateRole))
             {
+                const bool canViewLive = std::any_of(resources.begin(), resources.end(),
+                    [](auto resource)
+                    {
+                        return ResourceAccessManager::hasPermissions(resource,
+                            Qn::Permission::ViewLivePermission);
+                    });
+
                 const auto state =
                     parameters.argument<StreamSynchronizationState>(Qn::LayoutSyncStateRole);
-                addParams.time = milliseconds(
-                    state.timeUs == DATETIME_NOW ? DATETIME_NOW : state.timeUs / 1000);
+                if ((!state.isSyncOn || state.timeUs < 0) && !canViewLive)
+                {
+                    addParams.time = 0ms;
+                }
+                else
+                {
+                    addParams.time = milliseconds(
+                        (state.timeUs == DATETIME_NOW || state.timeUs < 0)
+                            ? DATETIME_NOW
+                            : (state.timeUs / 1000));
+                }
                 addParams.paused = qFuzzyIsNull(state.speed);
                 addParams.speed = state.speed;
             }
         }
+        else if (parameters.hasArgument(Qn::LayoutSyncStateRole))
+        {
+            // When playback synchronization is on, items must be opened at the synchronized
+            // playback position even if there are no permissions to view archive.
+            const auto state =
+                parameters.argument<StreamSynchronizationState>(Qn::LayoutSyncStateRole);
+            addParams.time = milliseconds(
+                (state.timeUs == DATETIME_NOW || state.timeUs < 0)
+                    ? DATETIME_NOW
+                    : (state.timeUs / 1000));
+        }
+
         addToLayout(layout, resources, addParams);
     }
 
