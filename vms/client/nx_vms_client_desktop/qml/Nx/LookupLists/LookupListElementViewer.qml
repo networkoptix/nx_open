@@ -62,7 +62,29 @@ Control
 
         ElementViewer
         {
-            text: value || qsTr("ANY color")
+            anchors.fill: parent
+            leftPadding: 26
+            rightPadding: 8
+            verticalAlignment: Text.AlignVCenter
+            text:
+            {
+                const colorSet = attribute.colorSet
+                if (value)
+                    colorSet.items.find((colorName) => value === colorSet.color(colorName)) || value
+                else
+                    qsTr("ANY color")
+            }
+
+            Rectangle
+            {
+                x: 8
+                width: 14
+                height: 14
+                radius: 1
+                anchors.verticalCenter: parent.verticalCenter
+                border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+                color: Utils.getValue(value, "transparent")
+            }
         }
     }
 
