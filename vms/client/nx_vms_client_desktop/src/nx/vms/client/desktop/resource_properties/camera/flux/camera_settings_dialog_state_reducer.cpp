@@ -989,11 +989,13 @@ State CameraSettingsDialogStateReducer::setHasEditAccessRightsForAllCameras(
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setHasViewLivePermission(State state, bool value)
+CameraSettingsDialogStateReducer::State CameraSettingsDialogStateReducer::setPermissions(
+    State state,
+    Qn::Permissions value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    state.singleCameraProperties.hasViewLivePermission = value;
+    state.singleCameraProperties.permissions = value;
 
     return state;
 }
