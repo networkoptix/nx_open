@@ -305,19 +305,21 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
         d->messageProcessor->init(connection->messageBusConnection());
 
     auto messageBus = connection->messageBusConnection()->messageBus();
+
+    // Use for mark original server as invalid in case of message bus error.
     auto makeServerMarkingFunction=
         [this](RemoteConnectionErrorCode errorCode)
         {
             return
                 [this, errorCode]
                 {
-                    NX_DEBUG(this, "Try to mark server invalid, error: %1, keep: %2",
+                    NX_DEBUG(this, "Try to mark original server invalid, error: %1, keep: %2",
                         errorCode, keepCurrentServerOnError(errorCode));
 
                     d->activeServerReconnectErrorCode = errorCode;
                     if (d->reconnectHelper && !keepCurrentServerOnError(errorCode))
                     {
-                        d->reconnectHelper->markCurrentServerAsInvalid();
+                        d->reconnectHelper->markOriginalServerAsInvalid();
                         checkIfReconnectFailed();
                     }
                 };
@@ -433,6 +435,8 @@ void RemoteSession::reconnectStep()
             d->currentConnectionProcess.reset();
             if (const auto error = std::get_if<RemoteConnectionError>(&result))
             {
+                NX_DEBUG(this, "Reconnect error: %1", *error);
+
                 switch (error->code)
                 {
                     // Database was cleaned up during restart, e.g. merge to other system.
@@ -445,6 +449,7 @@ void RemoteSession::reconnectStep()
                     case RemoteConnectionErrorCode::versionIsTooLow:
                     case RemoteConnectionErrorCode::binaryProtocolVersionDiffers:
                     case RemoteConnectionErrorCode::certificateRejected:
+                        NX_DEBUG(this, "Try to mark current server invalid");
                         d->reconnectHelper->markCurrentServerAsInvalid();
                         checkIfReconnectFailed();
                         break;
