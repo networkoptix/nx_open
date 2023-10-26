@@ -29,7 +29,6 @@ Item
     property alias linkValidUntil: temporaryLinkSettings.linkValidUntil
     property alias expiresAfterLoginS: temporaryLinkSettings.expiresAfterLoginS
     property alias revokeAccessEnabled: temporaryLinkSettings.revokeAccessEnabled
-    property alias displayOffsetMs: temporaryLinkSettings.displayOffsetMs
 
     property int userType: UserSettingsGlobal.LocalUser
     readonly property bool isLocalUser: userType != UserSettingsGlobal.CloudUser
@@ -275,6 +274,7 @@ Item
                 id: temporaryLinkSettings
 
                 visible: control.userType == UserSettingsGlobal.TemporaryUser
+                self: control.self
             }
 
             CenteredField

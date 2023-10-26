@@ -20,7 +20,7 @@ Column
     property alias linkValidUntil: datePicker.currentDate
     property alias expiresAfterLoginS: expiresAfterSpinBox.seconds
     property alias revokeAccessEnabled: revokeAccessCheckBox.checked
-    property alias displayOffsetMs: datePicker.displayOffset
+    property var self
 
     property alias leftSideMargin: validUntilField.leftSideMargin
     property alias rightSideMargin: validUntilField.rightSideMargin
@@ -42,6 +42,7 @@ Column
             id: datePicker
 
             enabled: control.enabled
+            displayOffset: (time) => { return control.self.displayOffset(time) }
         }
     }
 
