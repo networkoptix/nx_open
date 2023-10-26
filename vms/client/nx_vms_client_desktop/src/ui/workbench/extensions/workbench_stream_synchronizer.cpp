@@ -12,8 +12,8 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
-#include <plugins/resource/archive/syncplay_wrapper.h>
 #include <plugins/resource/archive/syncplay_archive_delegate.h>
+#include <plugins/resource/archive/syncplay_wrapper.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
@@ -105,7 +105,8 @@ StreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const
     if (result.isSyncOn)
     {
         result.speed = m_syncPlay->getSpeed();
-        result.timeUs = m_syncPlay->getCurrentTime();
+        if (!m_syncedWidgets.empty())
+            result.timeUs = m_syncPlay->getCurrentTime();
     }
 
     return result;
