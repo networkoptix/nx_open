@@ -246,4 +246,48 @@ bool TextMatcher::rangeMatchAttributes(
         });
 }
 
+QString serializeTextSearchConditions(const std::vector<TextSearchCondition>& conditions)
+{
+    auto quoteIfNeeded =
+        [](const QString& str) { return str.contains(" ") ? '"' + str + '"' : str; };
+
+    auto serialize =
+        [&](const TextSearchCondition& condition) -> QString
+        {
+            switch (condition.type)
+            {
+                case ConditionType::attributePresenceCheck:
+                    return (condition.isNegative ? "!$" : "$") + quoteIfNeeded(condition.name);
+
+                case ConditionType::attributeValueMatch:
+                {
+                    return quoteIfNeeded(condition.name)
+                        + (condition.isNegative ? "!=" : "=")
+                        + (condition.valueToken.matchesFromStart ? "^" : "")
+                        + quoteIfNeeded(condition.valueToken.value)
+                        + (condition.valueToken.matchesTillEnd ? "$" : "");
+                }
+
+                case ConditionType::textMatch:
+                    return condition.text;
+
+                case ConditionType::numericRangeMatch:
+                {
+                    return quoteIfNeeded(condition.name)
+                        + "="
+                        + condition.range.stringValue().remove(" ");
+                }
+            }
+
+            NX_ASSERT(false, "Unexpected condition type (%1)", static_cast<int>(condition.type));
+            return "";
+        };
+
+    QStringList result;
+    for (const auto& condition: conditions)
+        result.append(serialize(condition));
+
+    return result.join(" ");
+}
+
 } // namespace nx::analytics::db

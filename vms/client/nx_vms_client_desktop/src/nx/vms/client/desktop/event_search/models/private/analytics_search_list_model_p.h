@@ -21,6 +21,7 @@
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 #include <nx/vms/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
 #include <nx/vms/client/desktop/event_search/utils/live_analytics_receiver.h>
@@ -82,6 +83,8 @@ public:
     virtual void truncateToRelevantTimePeriod() override;
 
     bool canViewArchive(const QnVirtualCameraResourcePtr& camera) const;
+
+    QString makeEnumValuesExact(const QString& filter);
 
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
