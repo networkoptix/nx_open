@@ -63,7 +63,6 @@ DialogWithState
     property alias linkValidUntil: generalSettings.linkValidUntil
     property alias expiresAfterLoginS: generalSettings.expiresAfterLoginS
     property alias revokeAccessEnabled: generalSettings.revokeAccessEnabled
-    property alias displayOffsetMs: generalSettings.displayOffsetMs
     property alias firstLoginTime: generalSettings.firstLoginTime
     property alias nameIsUnique: generalSettings.nameIsUnique
 

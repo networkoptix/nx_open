@@ -37,9 +37,10 @@ Dialog
     property alias linkValidUntil: temporaryLinkSettings.linkValidUntil
     property alias expiresAfterLoginS: temporaryLinkSettings.expiresAfterLoginS
     property alias revokeAccessEnabled: temporaryLinkSettings.revokeAccessEnabled
-    property alias displayOffsetMs: temporaryLinkSettings.displayOffsetMs
 
     property bool isSaving: false
+
+    property var self
 
     function openNew()
     {
@@ -67,6 +68,7 @@ Dialog
             width: parent.width - 16 * 2
 
             rightSideMargin: 100
+            self: dialog.self
         }
 
         DialogBanner

@@ -54,8 +54,6 @@ Item
     property alias revokeAccessEnabled: linkDates.revokeAccessEnabled
     property alias firstLoginTime: linkDates.firstLoginTime
 
-    property alias displayOffsetMs: linkDates.displayOffsetMs
-
     property bool ldapError: false
     property bool linkReady: true
     property bool continuousSync: true
@@ -642,12 +640,11 @@ Item
 
                             NewLinkDialog
                             {
+                                id: dialog
                                 login: control.login
-                                displayOffsetMs: control.displayOffsetMs
+                                self: control.self
                                 isSaving: !control.enabled
                                 transientParent: control.Window.window
-
-                                SessionAware.onTryClose: reject()
 
                                 onAccepted:
                                 {
@@ -664,6 +661,12 @@ Item
                                     if (isSaving)
                                         control.self.cancelRequest()
                                 }
+
+                                Connections
+                                {
+                                    target: control.Window.window
+                                    function onClosing() { dialog.reject() }
+                                }
                             }
                         }
 
@@ -676,6 +679,8 @@ Item
                             readonly property bool expired: expiresInMs <= 0
                             readonly property var expiresInMs:
                                 expirationDate.getTime() - currentServerTimePointMs
+
+                            self: control.self
 
                             Timer
                             {
