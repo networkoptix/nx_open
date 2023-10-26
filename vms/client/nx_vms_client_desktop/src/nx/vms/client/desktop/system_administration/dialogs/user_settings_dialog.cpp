@@ -8,6 +8,7 @@
 #include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
 #include <QtWidgets/QPushButton>
+#include <QtCore/QDateTime>
 
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
@@ -147,7 +148,6 @@ struct UserSettingsDialog::Private
     QmlProperty<bool> continuousSync;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
-    QmlProperty<int> displayOffsetMs;
 
     QmlProperty<QDateTime> linkValidFrom;
     QmlProperty<QDateTime> linkValidUntil;
@@ -173,7 +173,6 @@ struct UserSettingsDialog::Private
         continuousSync(q->rootObjectHolder(), "continuousSync"),
         editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self"),
-        displayOffsetMs(q->rootObjectHolder(), "displayOffsetMs"),
         linkValidFrom(q->rootObjectHolder(), "linkValidFrom"),
         linkValidUntil(q->rootObjectHolder(), "linkValidUntil"),
         expiresAfterLoginS(q->rootObjectHolder(), "expiresAfterLoginS"),
@@ -189,16 +188,6 @@ struct UserSettingsDialog::Private
                 continuousSync = q->globalSettings()->ldap().continuousSync
                     == nx::vms::api::LdapSettings::Sync::usersAndGroups;
             });
-
-        const auto updateDisplayOffset = [this](){ displayOffsetMs = getDisplayOffsetMs(); };
-
-        connect(
-            parent->systemContext()->serverTimeWatcher(),
-            &core::ServerTimeWatcher::displayOffsetsChanged,
-            q,
-            updateDisplayOffset);
-
-        updateDisplayOffset();
 
         continuousSync = q->globalSettings()->ldap().continuousSync
             == nx::vms::api::LdapSettings::Sync::usersAndGroups;
@@ -291,17 +280,6 @@ struct UserSettingsDialog::Private
             return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch.count());
 
         return timeWatcher->serverTime(server, msecsSinceEpoch.count());
-    }
-
-    int getDisplayOffsetMs() const
-    {
-        const auto serverNow = serverDate(
-            duration_cast<milliseconds>(qnSyncTime->currentTimePoint()));
-
-        const auto clientNow = QDateTime::currentDateTime();
-
-        return duration_cast<milliseconds>(
-            seconds(serverNow.offsetFromUtc() - clientNow.offsetFromUtc())).count();
     }
 
     QString linkFromToken(const std::string& token) const
@@ -892,6 +870,15 @@ void UserSettingsDialog::cancelRequest()
 {
     if (d->currentRequest != 0)
         connectedServerApi()->cancelRequest(d->currentRequest);
+}
+
+int UserSettingsDialog::displayOffset(qint64 msecsSinceEpoch)
+{
+    const auto serverTime = d->serverDate(milliseconds(msecsSinceEpoch));
+    const auto clientTime = QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch);
+
+    return duration_cast<milliseconds>(
+        seconds(serverTime.offsetFromUtc() - clientTime.offsetFromUtc())).count();
 }
 
 void UserSettingsDialog::onCopyLink()

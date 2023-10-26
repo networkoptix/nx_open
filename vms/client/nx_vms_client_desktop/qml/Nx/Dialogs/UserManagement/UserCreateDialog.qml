@@ -72,7 +72,6 @@ DialogWithState
     property bool continuousSync //< Not used by current dialog type.
     property alias editingContext: membersModel.editingContext
     property var self
-    property alias displayOffsetMs: generalSettings.displayOffsetMs
     property date firstLoginTime //< Not used by current dialog type.
 
     signal addGroupRequested()

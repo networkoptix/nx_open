@@ -156,6 +156,13 @@ public:
 
     Q_INVOKABLE void cancelRequest();
 
+    /**
+     * The time offset between time zone of a server and a client is not a constant value and
+     * depends on the date on which this offset is calculated. This is due to conversion of clocks
+     * to daylight saving time in some regions.
+     */
+    Q_INVOKABLE int displayOffset(qint64 msecsSinceEpoch);
+
 public slots:
     void onDeleteRequested();
     void onAuditTrailRequested();
