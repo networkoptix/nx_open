@@ -7,7 +7,7 @@ depends:
   - "libfreetype6 (>= 2.6.0)"
   - "libgl1"
   - "libglib2.0-0"
-  - "libglu1"
+  - "libglu1-mesa"
   - "libopengl0"
   - "libpulse-mainloop-glib0"
   - "libpulse0"
