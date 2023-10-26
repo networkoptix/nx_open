@@ -21,10 +21,11 @@ struct NX_VMS_CLIENT_CORE_API ReconnectHelper: public SystemContextAware
     QnMediaServerResourcePtr currentServer() const;
     std::optional<nx::network::SocketAddress> currentAddress() const;
 
-    /**
-     * Remove currently tried server from the list as it cannot be connected.
-     */
+    /** Remove currently tried server from the list as it cannot be connected. */
     void markCurrentServerAsInvalid();
+
+    /** Remove original (message bus) server from the list as it cannot be connected. */
+    void markOriginalServerAsInvalid();
 
     void next();
 
@@ -33,7 +34,7 @@ struct NX_VMS_CLIENT_CORE_API ReconnectHelper: public SystemContextAware
 private:
     QnMediaServerResourceList m_servers;
     int m_currentIndex = -1;
-    const QnUuid m_currentServerId;
+    const QnUuid m_originalServerId;
 };
 
 } // namespace nx::vms::client::core
