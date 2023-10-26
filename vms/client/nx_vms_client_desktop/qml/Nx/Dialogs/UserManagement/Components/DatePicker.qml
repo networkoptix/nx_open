@@ -16,8 +16,6 @@ RowLayout
     spacing: 2
     property date currentDate: new Date()
 
-    property int displayOffset: 0 //< In milliseconds.
-
     // We use different locales to get the region settings (like first day of week) and to get the
     // translated names (days of week, months).
     property var regionLocale: locale
@@ -28,23 +26,34 @@ RowLayout
 
     property int visibleMonth
     property int visibleYear
+    property var displayOffset
+
+    function getDisplayOffset(time)
+    {
+        return control.displayOffset ? control.displayOffset(time) : 0
+    }
 
     function getDateForDisplay()
     {
-        return new Date(control.currentDate.getTime() + control.displayOffset)
+        const time = control.currentDate.getTime();
+        return new Date(time + getDisplayOffset(time))
     }
 
     function generateDate(year, month, day)
     {
-        return new Date(
-            (new Date(year, month, day, 23, 59, 59)).getTime() - control.displayOffset)
+        const time = new Date(year, month, day, 23, 59, 59).getTime()
+        return new Date(time - getDisplayOffset(time))
     }
 
     DateField
     {
         id: dateField
 
-        minimum: new Date(monthGrid.nowDate.getTime() + control.displayOffset)
+        minimum:
+        {
+            const time = monthGrid.nowDate.getTime()
+            return new Date(time + getDisplayOffset(time))
+        }
 
         Binding on date { value: getDateForDisplay() }
 
@@ -256,7 +265,8 @@ RowLayout
 
                     readonly property date today:
                     {
-                        const serverToday = new Date(nowDate.getTime() - control.displayOffset)
+                        const time = nowDate.getTime();
+                        const serverToday = new Date(time - getDisplayOffset(time))
                         return generateDate(
                             serverToday.getFullYear(), serverToday.getMonth(), serverToday.getDate())
                     }

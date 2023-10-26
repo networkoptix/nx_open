@@ -15,6 +15,7 @@ NxObject
     property date firstLoginTime
 
     property var highlightColor: ColorTheme.colors.light10
+    property var self
 
     readonly property bool isLoginTimeValid: !isNaN(firstLoginTime.getTime())
 
@@ -35,7 +36,8 @@ NxObject
 
     readonly property string expirationDateText:
     {
-        const expirationDisplay = new Date(expirationDate.getTime() + displayOffsetMs)
+        const time = expirationDate.getTime()
+        const expirationDisplay = new Date(time + self.displayOffset(time))
 
         const endOfDay = expirationDisplay.getHours() == 23
             && expirationDisplay.getMinutes() == 59
@@ -71,7 +73,8 @@ NxObject
 
     function displayDate(date)
     {
-        const localDisplay = new Date(date.getTime() + displayOffsetMs)
+        const time = date.getTime()
+        const localDisplay = new Date(time + self.displayOffset(time))
         return NxGlobals.dateInShortFormat(localDisplay)
     }
 
