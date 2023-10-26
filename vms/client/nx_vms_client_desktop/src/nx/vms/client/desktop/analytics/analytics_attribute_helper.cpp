@@ -62,7 +62,7 @@ public:
                 {
                     const auto path = pathPrefix + QVector<AbstractAttribute*>({attribute});
                     const auto name = namePrefix + attribute->name();
-                    attributePathByName[name] = path;
+                    attributePathByName[name.toLower()] = path;
 
                     if (attribute->type() == AbstractAttribute::Type::object)
                         addAttributes(attribute->objectType(), path, name + ".");
@@ -84,6 +84,21 @@ public:
             result.push_back(QnLexical::deserialized<bool>(value) ? trueValue : falseValue);
         return result;
     };
+
+    QVector<QString> objectTypeIds() const
+    {
+        const std::shared_ptr<AbstractState> taxonomy =
+            taxonomyStateWatcher ? taxonomyStateWatcher->state() : nullptr;
+
+        if (!taxonomy)
+            return {};
+
+        QVector<QString> result;
+        for (const AbstractObjectType* objectType: taxonomy->objectTypes())
+            result.append(objectType->id());
+
+        return result;
+    }
 };
 
 AttributeHelper::AttributeHelper(AbstractStateWatcher* taxonomyStateWatcher):
@@ -99,7 +114,22 @@ AttributeHelper::~AttributeHelper()
 QVector<AbstractAttribute*> AttributeHelper::attributePath(
     const QString& objectTypeId, const QString& attributeName) const
 {
-    return d->ensureAttributeLookup(objectTypeId.trimmed()).value(attributeName.trimmed());
+    return d->ensureAttributeLookup(objectTypeId.trimmed()).value(
+        attributeName.trimmed().toLower());
+}
+
+nx::analytics::taxonomy::AbstractAttribute* AttributeHelper::findAttribute(
+    const QString& attributeName,
+    const QVector<QString>& objectTypeIds) const
+{
+    for (const QString& objectTypeId: objectTypeIds.isEmpty() ? d->objectTypeIds() : objectTypeIds)
+    {
+        QVector<AbstractAttribute*> path = attributePath(objectTypeId, attributeName);
+        if (!path.isEmpty())
+            return path.last();
+    }
+
+    return nullptr;
 }
 
 AttributeList AttributeHelper::preprocessAttributes(

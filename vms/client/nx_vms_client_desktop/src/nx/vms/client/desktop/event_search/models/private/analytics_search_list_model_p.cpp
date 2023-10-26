@@ -41,6 +41,7 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/desktop/analytics/taxonomy/utils.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -493,6 +494,14 @@ bool AnalyticsSearchListModel::Private::canViewArchive(
     const QnVirtualCameraResourcePtr& camera) const
 {
     return q->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
+}
+
+QString AnalyticsSearchListModel::Private::makeEnumValuesExact(const QString& filter)
+{
+    return analytics::taxonomy::makeEnumValuesExact(
+        filter,
+        qnClientModule->analyticsAttributeHelper(),
+        {m_relevantObjectTypes.begin(), m_relevantObjectTypes.end()});
 }
 
 AnalyticsSearchListModel::ItemCleanupFunction<nx::analytics::db::ObjectTrack>

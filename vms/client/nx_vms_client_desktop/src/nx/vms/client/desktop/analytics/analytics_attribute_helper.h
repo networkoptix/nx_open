@@ -55,6 +55,13 @@ public:
     using AttributePath = QVector<nx::analytics::taxonomy::AbstractAttribute*>;
     AttributePath attributePath(const QString& objectTypeId, const QString& attributeName) const;
 
+    /**
+     * Finds the attribute in the specified object types (or in any object type if not specified).
+     */
+    nx::analytics::taxonomy::AbstractAttribute* findAttribute(
+        const QString& attributeName,
+        const QVector<QString>& objectTypeIds = {}) const;
+
     AttributeList preprocessAttributes(const QString& objectTypeId,
         const nx::common::metadata::Attributes& sourceAttributes) const;
 

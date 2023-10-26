@@ -363,4 +363,7 @@ void UserTextSearchExpressionParser::processTokens(Handler& handler)
     }
 }
 
-} // namespace nx::analytics::db::test
+NX_VMS_COMMON_API QString serializeTextSearchConditions(
+    const std::vector<TextSearchCondition>& conditions);
+
+} // namespace nx::analytics::db
