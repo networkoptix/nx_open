@@ -1052,7 +1052,7 @@ ActionVisibility StartCurrentShowreelCondition::check(
 {
     auto currentLayout = context->workbench()->currentLayoutResource();
     const auto showreelId = currentLayout->data().value(Qn::ShowreelUuidRole).value<QnUuid>();
-    const auto showreel = currentLayout->systemContext()->showreelManager()->showreel(showreelId);
+    const auto showreel = context->system()->showreelManager()->showreel(showreelId);
     if (showreel.isValid() && showreel.items.size() > 0)
         return EnabledAction;
     return DisabledAction;
