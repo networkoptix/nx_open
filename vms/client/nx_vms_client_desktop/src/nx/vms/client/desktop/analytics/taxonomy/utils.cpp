@@ -4,6 +4,7 @@
 
 #include <analytics/db/text_search_utils.h>
 #include <nx/analytics/taxonomy/common.h>
+#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 
 #include "abstract_state_view_filter.h"
 #include "attribute.h"
@@ -288,6 +289,34 @@ std::vector<Attribute*> resolveAttributes(
     determineConditionReferences(result, conditions);
 
     return result;
+}
+
+QString makeEnumValuesExact(
+    const QString& filter,
+    const AttributeHelper* attributeHelper,
+    const QVector<QString>& objectTypeIds)
+{
+    using namespace nx::analytics::db;
+    using namespace nx::analytics::taxonomy;
+
+    std::vector<TextSearchCondition> conditions = UserTextSearchExpressionParser().parse(filter);
+    for (TextSearchCondition& condition: conditions)
+    {
+        const AbstractAttribute* attribute =
+            attributeHelper->findAttribute(condition.name, objectTypeIds);
+
+        const bool isFullMatch = attribute
+            && (attribute->type() == AbstractAttribute::Type::enumeration
+                || attribute->type() == AbstractAttribute::Type::color);
+
+        if (isFullMatch)
+        {
+            condition.valueToken.matchesFromStart = isFullMatch;
+            condition.valueToken.matchesTillEnd = isFullMatch;
+        }
+    };
+
+    return serializeTextSearchConditions(conditions);
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy
