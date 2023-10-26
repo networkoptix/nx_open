@@ -43,7 +43,6 @@ public:
 
     bool initialUpdateInProgress() const;
     bool updatingPoweringModes() const;
-    bool isNetworkRequestRunning() const;
     void cancelRequest();
 
 signals:
