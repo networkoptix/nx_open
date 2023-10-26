@@ -24,7 +24,7 @@ public:
     static ImportExitCode runTask(const QString sourceFile,
         const QString separator,
         bool importHeaders,
-        LookupListEntriesModel* model);
+        LookupListPreviewEntriesModel* model);
     QFutureWatcher<ImportExitCode> currentTask;
     QMap<QPair<int, QString>, QString> clarifications;
 };
@@ -40,7 +40,7 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
     const QString sourceFile,
     const QString separator,
     bool importHeaders,
-    LookupListEntriesModel* model)
+    LookupListPreviewEntriesModel* model)
 {
     if (!NX_ASSERT(model))
         return InternalError;
@@ -48,6 +48,10 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
     QFile file(sourceFile);
     if (!file.open(QFile::ReadOnly))
         return ErrorFileNotFound;
+
+    auto columnIndexToAttribute = model->columnIndexToAttribute();
+    if (columnIndexToAttribute.isEmpty())
+        return Success; //< User have chosen not to import any columns.
 
     QTextStream streamCsv(&file);
     if (importHeaders)
@@ -61,20 +65,25 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
     QScopedPointer<LookupListEntriesModel> tempModel(new LookupListEntriesModel());
     auto listModel = QScopedPointer<LookupListModel>(new LookupListModel());
     tempModel->setListModel(listModel.get());
-    tempModel->listModel()->setAttributeNames(model->listModel()->attributeNames());
+    tempModel->listModel()->setAttributeNames(
+        model->lookupListEntriesModel()->listModel()->attributeNames());
 
     QVariantMap entry;
     for (auto line = streamCsv.readLine(); !line.isEmpty(); line = streamCsv.readLine())
     {
         auto words = line.split(separator);
-        for (int i = 0; i < model->columnCount(); ++i)
+        for (int columnIndex = 0; columnIndex < model->columnCount(); ++columnIndex)
         {
-            if (i >= words.size())
+            if (columnIndex >= words.size())
                 break;
 
-            entry[model->listModel()->attributeNames()[i]] = words[i];
+            auto columnIndexToAttributeIter = columnIndexToAttribute.find(columnIndex);
+            if (columnIndexToAttributeIter == columnIndexToAttribute.end())
+                continue; //< "Do not import" was chosen.
+            entry[columnIndexToAttributeIter.value()] = words[columnIndex];
         }
-        tempModel->addEntry(entry);
+        if (!entry.isEmpty())
+            tempModel->addEntry(entry);
     }
 
     if (tempModel->rowCount() == 0)
@@ -91,7 +100,7 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
         QVariantMap varianEntry;
         for (auto pair: entry)
             varianEntry[pair.first] = pair.second;
-        model->addEntry(varianEntry);
+        model->lookupListEntriesModel()->addEntry(varianEntry);
     }
 
     return Success;
@@ -122,7 +131,7 @@ void LookupListImportProcessor::cancelImport()
 bool LookupListImportProcessor::importListEntries(const QString sourceFile,
     const QString separator,
     const bool importHeaders,
-    LookupListEntriesModel* model)
+    LookupListPreviewEntriesModel* model)
 {
     if (d->currentTask.isRunning())
         return false;
@@ -130,8 +139,11 @@ bool LookupListImportProcessor::importListEntries(const QString sourceFile,
     if (sourceFile.isEmpty() || separator.isEmpty())
         return false;
 
-    auto future = QtConcurrent::run(
-        LookupListImportProcessor::Private::runTask, sourceFile, separator, importHeaders, model);
+    auto future = QtConcurrent::run(LookupListImportProcessor::Private::runTask,
+        sourceFile,
+        separator,
+        importHeaders,
+        model);
     d->currentTask.setFuture(future);
 
     connect(&d->currentTask,

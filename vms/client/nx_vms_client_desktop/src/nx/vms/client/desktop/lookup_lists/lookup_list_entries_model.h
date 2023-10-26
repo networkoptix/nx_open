@@ -64,7 +64,7 @@ public:
     Q_INVOKABLE void setFilter(const QString& searchText, int resultLimit);
 
 signals:
-    void listModelChanged();
+    void listModelChanged(LookupListModel* listModel);
     void rowCountChanged();
 
 private:

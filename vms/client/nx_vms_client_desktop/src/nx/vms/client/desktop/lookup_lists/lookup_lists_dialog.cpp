@@ -17,11 +17,16 @@ namespace nx::vms::client::desktop {
 void LookupListsDialog::registerQmlTypes()
 {
     qmlRegisterType<LookupListModel>("nx.vms.client.desktop", 1, 0, "LookupListModel");
-    qmlRegisterType<LookupListEntriesModel>("nx.vms.client.desktop", 1, 0, "LookupListEntriesModel");
-    qmlRegisterType<LookupListExportProcessor>("nx.vms.client.desktop", 1, 0, "LookupListExportProcessor");
-    qmlRegisterType<LookupListPreviewProcessor>("nx.vms.client.desktop", 1, 0, "LookupListPreviewProcessor");
-    qmlRegisterType<LookupPreviewEntriesModel>("nx.vms.client.desktop", 1, 0, "LookupPreviewEntriesModel");
-    qmlRegisterType<LookupListImportProcessor>("nx.vms.client.desktop", 1, 0, "LookupListImportProcessor");
+    qmlRegisterType<LookupListEntriesModel>(
+        "nx.vms.client.desktop", 1, 0, "LookupListEntriesModel");
+    qmlRegisterType<LookupListExportProcessor>(
+        "nx.vms.client.desktop", 1, 0, "LookupListExportProcessor");
+    qmlRegisterType<LookupListPreviewProcessor>(
+        "nx.vms.client.desktop", 1, 0, "LookupListPreviewProcessor");
+    qmlRegisterType<LookupListPreviewEntriesModel>(
+        "nx.vms.client.desktop", 1, 0, "LookupListPreviewEntriesModel");
+    qmlRegisterType<LookupListImportProcessor>(
+        "nx.vms.client.desktop", 1, 0, "LookupListImportProcessor");
 }
 
 LookupListsDialog::LookupListsDialog(SystemContext* systemContext, QWidget* parent):

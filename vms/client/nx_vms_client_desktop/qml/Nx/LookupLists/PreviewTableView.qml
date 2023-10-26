@@ -14,6 +14,8 @@ CoreItems.TableView
 {
     id: control
 
+    property bool correct: true
+    readonly property string needSelectionText: qsTr("Select attribute")
     flickableDirection: CoreItems.Flickable.VerticalFlick
     boundsBehavior: CoreItems.Flickable.StopAtBounds
     topMargin: columnsHeader.height
@@ -55,11 +57,64 @@ CoreItems.TableView
         height: comboBoxHeight + 8
         color: ColorTheme.colors.dark7
 
+        // To avoid error in Nx.ComboBox, it doesn't accept QList<QString>
+        // so have to implicitly convert to qml list of string.
+        function getModel(index)
+        {
+            if (!control.model)
+                return []
+
+            var result = []
+            var cppData = control.model.headerData(index, Qt.Horizontal)
+            if (cppData)
+            {
+                for (let i = 0; i < cppData.length; ++i)
+                    result.push(String(cppData[i]))
+            }
+            return result
+        }
+
         CoreItems.Row
         {
+            id: headerRow
+
             spacing: columnsHeader.comboBoxSpacing
+
+            function columnWithoutSelectionExist()
+            {
+                for (let i = 0; i < repeater.count; ++i)
+                {
+                    if(!repeater.itemAt(i))
+                        return false
+                    if (repeater.itemAt(i).displayText === control.needSelectionText)
+                        return true
+                }
+                return false
+            }
+
+            function reassignDependantColumns(changedColumnName, changedColumnIndex)
+            {
+                for (let i = 0; i < repeater.count; ++i)
+                {
+                    if (!repeater.itemAt(i))
+                        return
+
+                    if (changedColumnIndex === i)
+                        continue
+
+                    if (repeater.itemAt(i).displayText === changedColumnName &&
+                        repeater.itemAt(i).displayText !== control.model.doNotImportText &&
+                        repeater.itemAt(i).displayText !== control.needSelectionText)
+                    {
+                        repeater.itemAt(i).displayText = control.needSelectionText
+                    }
+                }
+            }
+
             CoreItems.Repeater
             {
+                id: repeater
+
                 model: control.columns > 0 ? control.columns : 1
 
                 ComboBox
@@ -68,8 +123,26 @@ CoreItems.TableView
 
                     width: columnsHeader.comboBoxWidth
                     height: columnsHeader.comboBoxHeight
-                    visible: control.model.rowCount()
-                    model: control.model ? [control.model.headerData(index, Qt.Horizontal)] : []
+                    visible: control.model.rowCount
+                    model: columnsHeader.getModel(index)
+
+                    onCurrentTextChanged:
+                    {
+                        displayText = currentText
+                        control.model.headerIndexChanged(index, currentText)
+                        headerRow.reassignDependantColumns(currentText, index)
+                        control.correct = !headerRow.columnWithoutSelectionExist()
+                    }
+
+                    Connections
+                    {
+                        target: control.model
+
+                        function onHeaderDataChanged()
+                        {
+                            model = columnsHeader.getModel(index)
+                        }
+                    }
                 }
             }
         }

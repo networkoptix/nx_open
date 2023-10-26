@@ -10,13 +10,13 @@
 
 #include <nx/utils/impl_ptr.h>
 
-#include "lookup_list_entries_model.h"
+#include "lookup_list_preview_processor.h"
 
 namespace nx::vms::client::desktop {
 
 typedef QMap<QPair<int, QString>, QString> Clarifications;
 
-class LookupListImportProcessor: public QObject
+class NX_VMS_CLIENT_DESKTOP_API LookupListImportProcessor: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -27,7 +27,7 @@ public:
     Q_INVOKABLE bool importListEntries(const QString sourceFile,
         const QString separator,
         const bool importHeaders,
-        LookupListEntriesModel* model);
+        LookupListPreviewEntriesModel* model);
     Q_INVOKABLE void cancelImport();
 
     enum ImportExitCode
