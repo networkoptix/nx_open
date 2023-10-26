@@ -76,11 +76,11 @@ QString AnalyticsSearchListModel::combinedTextFilter() const
 
     const auto attributesText = attributeFilters().join(" ");
     if (attributesText.isEmpty())
-        return freeText;
+        return d->makeEnumValuesExact(freeText);
 
-    return freeText.isEmpty()
+    return d->makeEnumValuesExact(freeText.isEmpty()
         ? attributesText
-        : QString("%1 %2").arg(attributesText, freeText);
+        : QString("%1 %2").arg(attributesText, freeText));
 }
 
 bool AnalyticsSearchListModel::isConstrained() const
