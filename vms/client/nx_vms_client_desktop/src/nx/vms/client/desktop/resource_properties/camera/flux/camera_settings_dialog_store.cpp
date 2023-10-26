@@ -207,12 +207,12 @@ void CameraSettingsDialogStore::setHasEditAccessRightsForAllCameras(bool value)
         });
 }
 
-void CameraSettingsDialogStore::setHasViewLivePermission(bool value)
+void CameraSettingsDialogStore::setPermissions(Qn::Permissions value)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setHasViewLivePermission(std::move(state), value);
+            return Reducer::setPermissions(std::move(state), value);
         });
 }
 
