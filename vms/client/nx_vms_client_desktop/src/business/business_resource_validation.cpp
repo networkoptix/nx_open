@@ -23,6 +23,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
+#include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
@@ -489,6 +490,21 @@ bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
         case nx::vms::event::ActionType::fullscreenCameraAction:
         case nx::vms::event::ActionType::exitFullscreenAction:
             return true;
+        case nx::vms::event::ActionType::showIntercomInformer:
+        {
+            const auto context = SystemContext::fromResource(user);
+            const auto accessController = context->accessController();
+            if (!NX_ASSERT(accessController))
+                return false;
+
+            const auto resource =
+                context->resourcePool()->getResourceById(action->getResources().first());
+            if (!NX_ASSERT(resource))
+                return false;
+
+            return accessController->hasPermissions(
+                resource, Qn::Permission::UserInputPermissions);
+        }
         default:
             break;
     }
