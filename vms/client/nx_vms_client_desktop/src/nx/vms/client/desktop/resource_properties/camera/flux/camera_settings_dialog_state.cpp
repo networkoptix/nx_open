@@ -172,7 +172,8 @@ bool CameraSettingsDialogState::isPageVisible(CameraSettingsTab page) const
             return canShowAdvancedPage();
 
         case CameraSettingsTab::web:
-            return canShowWebPage() && singleCameraProperties.hasViewLivePermission;
+            return canShowWebPage()
+                && singleCameraProperties.permissions.testFlags(Qn::ViewLivePermission);
 
         case CameraSettingsTab::analytics:
             return isSingleCamera() && !analytics.engines.empty();

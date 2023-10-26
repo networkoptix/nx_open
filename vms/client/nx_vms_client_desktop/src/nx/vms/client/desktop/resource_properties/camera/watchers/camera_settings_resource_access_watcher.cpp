@@ -28,13 +28,7 @@ public:
     void updateCameraPermissions()
     {
         if (const auto systemContext = SystemContext::fromResource(camera))
-        {
-            const auto accessController = systemContext->accessController();
-            store->setHasViewLivePermission(accessController->hasPermissions(
-                camera, Qn::ViewLivePermission));
-            store->setHasExportPermission(accessController->hasPermissions(
-                camera, Qn::ExportPermission));
-        }
+            store->setPermissions(systemContext->accessController()->permissions(camera));
     };
 };
 

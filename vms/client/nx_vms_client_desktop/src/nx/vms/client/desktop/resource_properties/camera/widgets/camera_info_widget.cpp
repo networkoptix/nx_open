@@ -203,6 +203,8 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->secondaryStreamControlWidget->setHidden(isUsbDevice);
     ui->verticalSpacer1->setHidden(isNetworkLink || (isUsbDevice && !hasLogicalId));
     ui->verticalSpacer2->setHidden(isNetworkLink);
+    ui->showOnLayoutButton->setHidden(!state.singleCameraProperties.permissions.
+        testAnyFlags(Qn::ViewLivePermission | Qn::ViewFootagePermission));
 }
 
 void CameraInfoWidget::alignLabels()
