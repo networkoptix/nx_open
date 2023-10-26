@@ -10,43 +10,12 @@
 
 #include <nx/utils/impl_ptr.h>
 
-#include "lookup_list_entries_model.h"
+#include "lookup_list_preview_entries_model.h"
 
 namespace nx::vms::client::desktop {
 
-class LookupListModel;
-
 /**
- * Raw presentation of first N rows from CSV.
- */
-class NX_VMS_CLIENT_DESKTOP_API LookupPreviewEntriesModel: public QAbstractTableModel
-{
-    Q_OBJECT
-    using base_type = QAbstractTableModel;
-
-public:
-    explicit LookupPreviewEntriesModel(QAbstractTableModel* parent = nullptr);
-    virtual ~LookupPreviewEntriesModel() override;
-
-    using PreviewRawData = std::vector<std::vector<QVariant>>;
-    virtual QVariant headerData(
-        int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
-    Q_INVOKABLE void setHeaderRowData(LookupListEntriesModel* model);
-    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    Q_INVOKABLE void setRawData(const PreviewRawData& rawData);
-    Q_INVOKABLE void reset();
-
-private:
-    struct Private;
-    nx::utils::ImplPtr<Private> d;
-};
-
-/**
- * Processor of input csv/tsv file for preview, used in QML.
- * TBD: processing of changing of attributes type per column.
+ * Processor of input csv/tsv file for LookupListPreview, used in QML.
  */
 class NX_VMS_CLIENT_DESKTOP_API LookupListPreviewProcessor: public QObject
 {
@@ -64,12 +33,12 @@ public:
     explicit LookupListPreviewProcessor(QObject* parent = nullptr);
     virtual ~LookupListPreviewProcessor() override;
     Q_INVOKABLE void setImportFilePathFromDialog();
-    Q_INVOKABLE bool buildTablePreview(LookupPreviewEntriesModel* model,
+    Q_INVOKABLE bool buildTablePreview(LookupListPreviewEntriesModel* model,
         const QString& filePath,
         const QString& separator,
         bool hasHeader);
 
-    Q_INVOKABLE void reset(LookupPreviewEntriesModel* model);
+    Q_INVOKABLE void reset(LookupListPreviewEntriesModel* model);
 
     void setRowsNumber(int rowsNumber);
     void setSeparator(const QString& separator);

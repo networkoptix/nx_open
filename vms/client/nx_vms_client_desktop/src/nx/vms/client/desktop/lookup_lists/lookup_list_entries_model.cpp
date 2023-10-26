@@ -152,7 +152,7 @@ void LookupListEntriesModel::setListModel(LookupListModel* value)
     d->data = value;
     endResetModel();
 
-    emit listModelChanged();
+    emit listModelChanged(value);
 
     if (d->data)
     {

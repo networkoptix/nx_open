@@ -218,10 +218,11 @@ Dialog
         {
             text: qsTr("Import")
             isAccentButton: true
+            enabled: tableView.correct
             onClicked:
             {
                 importProcessor.importListEntries(processor.filePath, processor.separator,
-                    processor.dataHasHeaderRow, model)
+                    processor.dataHasHeaderRow, previewModel)
             }
         }
 
@@ -236,9 +237,10 @@ Dialog
         }
     }
 
-    LookupPreviewEntriesModel
+    LookupListPreviewEntriesModel
     {
         id: previewModel
+        lookupListEntriesModel: control.model
     }
 
     LookupListPreviewProcessor
@@ -247,7 +249,6 @@ Dialog
 
         function initPreviewModel()
         {
-            previewModel.setHeaderRowData(control.model)
             buildTablePreview(previewModel, filePath, separator, dataHasHeaderRow)
         }
 

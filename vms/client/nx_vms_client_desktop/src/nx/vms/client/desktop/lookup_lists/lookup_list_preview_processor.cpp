@@ -20,75 +20,6 @@ struct LookupListPreviewProcessor::Private
     bool dataHasHeaderRow;
 };
 
-struct LookupPreviewEntriesModel::Private
-{
-    QList<QString> columnHeaders;
-    PreviewRawData data;
-};
-
-LookupPreviewEntriesModel::LookupPreviewEntriesModel(QAbstractTableModel* parent):
-    base_type(parent),
-    d(new Private())
-{
-}
-
-LookupPreviewEntriesModel::~LookupPreviewEntriesModel()
-{
-}
-
-QVariant LookupPreviewEntriesModel::headerData(
-    int section, Qt::Orientation orientation, int role) const
-{
-    if (orientation != Qt::Orientation::Horizontal || role != Qt::DisplayRole
-        || section >= d->columnHeaders.size())
-    {
-        return {};
-    }
-
-    return d->columnHeaders[section];
-}
-
-void LookupPreviewEntriesModel::setHeaderRowData(LookupListEntriesModel* model)
-{
-    if (!NX_ASSERT(model) || !NX_ASSERT(model->listModel()))
-        return;
-
-    d->columnHeaders = model->listModel()->attributeNames();
-}
-
-void LookupPreviewEntriesModel::reset()
-{
-    beginResetModel();
-    d->columnHeaders.clear();
-    d->data.clear();
-    endResetModel();
-}
-
-int LookupPreviewEntriesModel::rowCount(const QModelIndex& /*parent*/) const
-{
-    return d->data.size();
-}
-
-int LookupPreviewEntriesModel::columnCount(const QModelIndex& /*parent*/) const
-{
-    return d->data.size() ? d->data.front().size() : 0;
-}
-
-QVariant LookupPreviewEntriesModel::data(const QModelIndex& index, int role) const
-{
-    if (role != Qt::DisplayRole || !hasIndex(index.row(), index.column()))
-        return {};
-
-    return d->data[index.row()][index.column()];
-}
-
-void LookupPreviewEntriesModel::setRawData(const PreviewRawData& rawData)
-{
-    emit beginResetModel();
-    d->data = rawData;
-    emit endResetModel();
-}
-
 LookupListPreviewProcessor::LookupListPreviewProcessor(QObject* parent):
     base_type(parent),
     d(new Private())
@@ -119,7 +50,7 @@ void LookupListPreviewProcessor::setImportFilePathFromDialog()
     appContext()->localSettings()->lastImportDir = QFileInfo(fileName).absolutePath();
 }
 
-bool LookupListPreviewProcessor::buildTablePreview(LookupPreviewEntriesModel* model,
+bool LookupListPreviewProcessor::buildTablePreview(LookupListPreviewEntriesModel* model,
     const QString& filePath,
     const QString& separator,
     bool hasHeader)
@@ -136,7 +67,7 @@ bool LookupListPreviewProcessor::buildTablePreview(LookupPreviewEntriesModel* mo
         int lineIndex = 0;
         QTextStream in(&file);
 
-        LookupPreviewEntriesModel::PreviewRawData newData;
+        LookupListPreviewEntriesModel::PreviewRawData newData;
         while (!in.atEnd() && lineIndex < d->rowsNumber)
         {
             QString fileLine = in.readLine();
@@ -219,7 +150,7 @@ bool LookupListPreviewProcessor::dataHasHeaderRow()
     return d->dataHasHeaderRow;
 }
 
-void LookupListPreviewProcessor::reset(LookupPreviewEntriesModel* model)
+void LookupListPreviewProcessor::reset(LookupListPreviewEntriesModel* model)
 {
     if (!NX_ASSERT(model))
         return;
