@@ -38,6 +38,8 @@ public:
         IdRole,
         IsLdap,
         IsTemporary,
+        CanEditParents,
+        UserType
     };
 
 public:
