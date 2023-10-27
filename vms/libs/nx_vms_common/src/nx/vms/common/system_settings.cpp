@@ -469,7 +469,9 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
             "We recommend setting this parameter's value to 2 or more."); });
 
     m_maxRtpRetryCount = new QnLexicalResourcePropertyAdaptor<int>(
-        "maxRtpRetryCount", 0, this, [] { return tr("RTP retry count"); });
+        "maxRtpRetryCount", 6, this, [] { return tr(
+            "Maximum number of consecutive RTP errors before the server reconnects the RTSP "
+            "session."); });
 
     m_rtpFrameTimeoutMs = new QnLexicalResourcePropertyAdaptor<int>(
         "rtpTimeoutMs", 10'000, this, [] { return tr("RTP timeout (milliseconds)"); });
