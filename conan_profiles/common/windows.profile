@@ -8,8 +8,10 @@ compiler.version=16
 compiler.cppstd=20
 
 [options]
-libvpx:shared=False
+libpq/*:shared=True
+libvpx/*:shared=False
+qt/*:psql=True
 
 [build_requires]
-openssl*:jom/1.1.2
+openssl/*:jom/1.1.2
 qt*:patch-windows/0.1,strawberryperl/5.30.0.1
