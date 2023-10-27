@@ -12,6 +12,7 @@
 
 #include <client_core/client_core_module.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/testkit/utils.h>
 
 using namespace std::chrono;
@@ -100,6 +101,9 @@ public:
         setAttribute(Qt::WA_ShowWithoutActivating);
         setAutoFillBackground(false);
         setFocusPolicy(Qt::NoFocus);
+
+        // Workaround for some drivers drawing transparent OpenGL windows as opaque.
+        setWindowOpacity(ini().elementHighlighterOverlayOpacity);
     }
 };
 
