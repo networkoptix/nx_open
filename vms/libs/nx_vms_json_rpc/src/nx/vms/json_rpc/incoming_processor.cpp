@@ -21,7 +21,7 @@ static api::JsonRpcRequest deserialize(const QJsonValue& data)
     catch (const QJson::InvalidParameterException& e)
     {
         throw api::JsonRpcResponse::makeError(
-            jsonRpcRequest.responseId(), {Error::InvalidRequest, e.message().toStdString()});
+            jsonRpcRequest.responseId(), {Error::invalidRequest, e.message().toStdString()});
     }
 }
 
@@ -44,7 +44,7 @@ void IncomingProcessor::processRequest(
             NX_DEBUG(this, "Empty batch request received");
             return sendResponse(
                 api::JsonRpcResponse::makeError(std::nullptr_t(),
-                    {Error::InvalidRequest, "Empty batch request"}),
+                    {Error::invalidRequest, "Empty batch request"}),
                 std::move(handler));
         }
 
@@ -60,7 +60,9 @@ void IncomingProcessor::processRequest(
             NX_DEBUG(this,
                 "Ignore request %1 with method %2", QJson::serialized(id), jsonRpcRequest.method);
             return sendResponse(
-                api::JsonRpcResponse::makeError(id, {Error::MethodNotFound}), std::move(handler));
+                api::JsonRpcResponse::makeError(id, {Error::methodNotFound,
+                    "Method handler is not found"}),
+                std::move(handler));
         }
 
         auto request = std::make_unique<Request>(std::move(jsonRpcRequest));
@@ -105,7 +107,8 @@ void IncomingProcessor::processBatchRequest(
                 NX_DEBUG(this, "Ignore request %1 with method %2",
                     QJson::serialized(id), jsonRpcRequest.method);
                 responses.emplace_back(api::JsonRpcResponse::makeError(
-                    jsonRpcRequest.responseId(), {Error::MethodNotFound}));
+                    jsonRpcRequest.responseId(),
+                    {Error::methodNotFound, "Method handler is not found"}));
             }
         }
         catch (api::JsonRpcResponse e)

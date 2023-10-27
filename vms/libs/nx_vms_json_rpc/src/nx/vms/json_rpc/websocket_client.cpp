@@ -130,7 +130,7 @@ void WebSocketClient::sendAsync(api::JsonRpcRequest request, ResponseHandler han
                     }
 
                     handler(api::JsonRpcResponse::makeError(request.responseId(),
-                        {api::JsonRpcError::InternalError,
+                        {api::JsonRpcError::transportError,
                             NX_FMT("Failed to establish connnection to %1 with error %2",
                                 m_url, errorCode).toStdString()}));
                 });

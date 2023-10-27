@@ -78,8 +78,8 @@ WebSocketConnection* WebSocketConnections::addConnection(
                 }
             }
 
-            handler(api::JsonRpcResponse::makeError(
-                request.responseId(), {api::JsonRpcError::MethodNotFound}));
+            handler(api::JsonRpcResponse::makeError(request.responseId(),
+                {api::JsonRpcError::methodNotFound, "Unsupported method"}));
         });
     auto connectionPtr = connection.get();
     m_connections.emplace(connectionPtr, Connection{std::move(connection)});
