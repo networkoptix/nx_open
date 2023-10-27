@@ -3,6 +3,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "http_server_authentication_manager.h"
 
@@ -21,7 +22,8 @@ namespace nx::network::http::server {
  * PASSWORD = TEXT
  * </code></pre>
  */
-class NX_NETWORK_API HtdigestAuthenticationProvider: public AbstractAuthenticationDataProvider
+class NX_NETWORK_API HtdigestAuthenticationProvider:
+    public AbstractAuthenticationDataProvider
 {
 public:
     HtdigestAuthenticationProvider(const std::string& filePath);
@@ -31,12 +33,14 @@ public:
         const std::string& userName,
         AbstractAuthenticationDataProvider::LookupResultHandler completionHandler) override;
 
+    std::vector<std::string> usernames() const;
+
 private:
     void load(std::istream& input);
 
 private:
-    nx::Mutex m_mutex;
-    std::map<std::string, std::string> m_credentials;
+    mutable nx::Mutex m_mutex;
+    std::map<std::string /*username*/, std::string /*ha1*/> m_credentials;
 };
 
 } // namespace nx::network::http::server
