@@ -72,6 +72,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, showDebugTimeInformationInRibbon,
         "[Dev] Whether to show extra timestamp information in the event ribbon.");
 
+    NX_INI_FLOAT(1.0f, elementHighlighterOverlayOpacity,
+        "[Dev] Opacity for element highlighter overlay (default is 1.0).");
+
     NX_INI_FLAG(false, showPreciseItemTimestamps,
         "[Dev] Whether to show precise timestamps in the camera window. If enabled, the current\n"
         "time in the camera window is shown in microseconds since epoch together with the\n"
