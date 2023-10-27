@@ -14,6 +14,8 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/reflect/instrument.h>
 
+// JSON RPC 2.0 Specification: https://www.jsonrpc.org/specification
+
 namespace nx::vms::api {
 
 using JsonRpcResponseId = std::variant<QString, int, std::nullptr_t>;
@@ -72,19 +74,37 @@ NX_REFLECTION_INSTRUMENT(JsonRpcRequest, JsonRpcRequest_Fields);
 struct NX_VMS_API JsonRpcError
 {
     // Standard defined error codes for `code` field.
+    // Standard codes: https://www.jsonrpc.org/specification#error_object
+    // XML-RPC: https://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php
     enum Code
     {
-        InvalidJson = -32700,
-        InvalidRequest = -32600,
-        MethodNotFound = -32601,
-        InvalidParams = -32602,
-        InternalError = -32603,
-        RequestError = 0,
+        parseError = -32700,
+        encodingError = -32701,
+        charsetError = -32702,
+
+        invalidRequest = -32600,
+        methodNotFound = -32601,
+        invalidParams = -32602,
+        internalError = -32603,
+
+        applicationError = -32500,
+        systemError = -32400,
+        transportError = -32300,
+
+        serverErrorBegin = -32099,
+        serverErrorEnd = -32000,
+
+        reservedErrorBegin = -32768,
+        reservedErrorEnd = -32000,
     };
 
-    int code = RequestError;
+    int code = systemError;
     std::string message;
     std::optional<QJsonValue> data;
+
+    JsonRpcError() = default;
+    JsonRpcError(int code, std::string message, std::optional<QJsonValue> data = {}):
+        code(code), message(std::move(message)), data(std::move(data)) {}
 };
 #define JsonRpcError_Fields (code)(message)(data)
 QN_FUSION_DECLARE_FUNCTIONS(JsonRpcError, (json), NX_VMS_API)

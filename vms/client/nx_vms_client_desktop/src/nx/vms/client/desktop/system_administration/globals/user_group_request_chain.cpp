@@ -27,7 +27,8 @@ static constexpr int kMaxRequestsPerBatch = 500;
 
 QString errorMessage(const nx::vms::api::JsonRpcError& error)
 {
-    if (error.code == nx::vms::api::JsonRpcError::RequestError && error.data)
+    using JsonRpcError = nx::vms::api::JsonRpcError;
+    if (error.code == JsonRpcError::applicationError && error.data)
     {
         nx::network::rest::Result result;
         if (QJson::deserialize(*error.data, &result))
@@ -39,21 +40,27 @@ QString errorMessage(const nx::vms::api::JsonRpcError& error)
 
     switch (error.code)
     {
-        case nx::vms::api::JsonRpcError::RequestError:
-            return UserGroupRequestChain::tr("Request error");
-        case nx::vms::api::JsonRpcError::InvalidJson:
-            return UserGroupRequestChain::tr("Invalid JSON");
-        case nx::vms::api::JsonRpcError::InvalidRequest:
-            return UserGroupRequestChain::tr("Invalid request");
-        case nx::vms::api::JsonRpcError::MethodNotFound:
-            return UserGroupRequestChain::tr("Method not found");
-        case nx::vms::api::JsonRpcError::InvalidParams:
-            return UserGroupRequestChain::tr("Invalid parameters");
-        case nx::vms::api::JsonRpcError::InternalError:
-            return UserGroupRequestChain::tr("Internal error");
+        case JsonRpcError::parseError: return UserGroupRequestChain::tr("Invalid JSON");
+        case JsonRpcError::encodingError: return UserGroupRequestChain::tr("Invalid encoding");
+        case JsonRpcError::charsetError: return UserGroupRequestChain::tr("Invalid encoding charset");
+
+        case JsonRpcError::invalidRequest: return UserGroupRequestChain::tr("Invalid request");
+        case JsonRpcError::methodNotFound: return UserGroupRequestChain::tr("Method not found");
+        case JsonRpcError::invalidParams: return UserGroupRequestChain::tr("Invalid parameters");
+        case JsonRpcError::internalError: return UserGroupRequestChain::tr("Internal error");
+
+        case JsonRpcError::applicationError: return UserGroupRequestChain::tr("Application Error");
+        case JsonRpcError::systemError: return UserGroupRequestChain::tr("System Error");
+        case JsonRpcError::transportError: return UserGroupRequestChain::tr("Transport Error");
     }
 
-    return UserGroupRequestChain::tr("Unknown error - code %1").arg(error.code);
+    if (error.code >= JsonRpcError::serverErrorBegin && error.code <= JsonRpcError::serverErrorEnd)
+        return UserGroupRequestChain::tr("Server error code %1").arg(error.code);
+
+    if (error.code >= JsonRpcError::reservedErrorBegin && error.code <= JsonRpcError::reservedErrorEnd)
+        return UserGroupRequestChain::tr("Reserved error code %1").arg(error.code);
+
+    return UserGroupRequestChain::tr("Unknown error code %1").arg(error.code);
 }
 
 template <auto member, class T>

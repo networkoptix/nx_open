@@ -1626,8 +1626,9 @@ bool mergeJsonRpcResults(
                 {
                     response.result = {};
                     response.error = vms::api::JsonRpcError{
-                        .code = nx::vms::api::JsonRpcError::RequestError,
-                        .data = data
+                        nx::vms::api::JsonRpcError::applicationError,
+                        error->errorString.toStdString(),
+                        data
                     };
                 }
             }
@@ -1720,8 +1721,9 @@ Handle ServerConnection::jsonRpcBatchCall(
                 QJson::serialize(error, &data);
 
                 rpcError.error = vms::api::JsonRpcError{
-                    .code = nx::vms::api::JsonRpcError::RequestError,
-                    .data = data
+                    nx::vms::api::JsonRpcError::applicationError,
+                    error->errorString.toStdString(),
+                    data
                 };
 
                 callback(success, requestId, {rpcError});
