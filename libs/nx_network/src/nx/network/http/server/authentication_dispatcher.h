@@ -2,7 +2,9 @@
 
 #pragma once
 
+#include <memory>
 #include <regex>
+#include <vector>
 
 #include "abstract_authentication_manager.h"
 
@@ -38,6 +40,14 @@ public:
         const std::regex& pathPattern,
         AbstractRequestHandler* authenticator);
 
+    /**
+     * Register authenticator that is chosen not only by path, but also by auxiliaryCondition.
+     */
+    void add(
+        const std::regex& pathPattern,
+        nx::utils::MoveOnlyFunc<bool(const RequestContext&)> auxiliaryCondition,
+        AbstractRequestHandler* authenticator);
+
     void add(
         const std::string& pathPattern,
         AbstractRequestHandler* authenticator);
@@ -47,7 +57,15 @@ public:
         nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
 
 private:
-    std::vector<std::pair<std::regex, AbstractRequestHandler*>> m_authenticatorsByRegex;
+    struct AuthenticatorContext
+    {
+        std::regex pathPattern;
+        nx::utils::MoveOnlyFunc<bool(const RequestContext&)> cond = nullptr;
+        AbstractRequestHandler* authenticator = nullptr;
+    };
+
+private:
+    std::vector<std::shared_ptr<AuthenticatorContext>> m_authenticators;
 };
 
 } // namespace nx::network::http::server
