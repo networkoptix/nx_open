@@ -5,13 +5,14 @@
 #include "http_server_base_authentication_manager.h"
 
 #include <string>
+#include <vector>
 
 namespace nx::network::http::server {
 
 /**
  * Provides htdigest authentication by loading htdigest user/password combinations from a file or
  * input stream.
- * ABNF syntax for the file is following:  
+ * ABNF syntax for the file is following:
  * <pre><code>
  * HTDIGEST_FILE_CONTENTS = 1 *( USER_RECORD LF )
  * USER_RECORD = USERNAME ":" REALM ":" HA1
@@ -21,7 +22,8 @@ namespace nx::network::http::server {
  * PASSWORD = TEXT
  * </code></pre>
  */
-class NX_NETWORK_API HtdigestAuthenticationProvider: public AbstractAuthenticationDataProvider
+class NX_NETWORK_API HtdigestAuthenticationProvider:
+    public AbstractAuthenticationDataProvider
 {
 public:
     HtdigestAuthenticationProvider(const std::string& filePath);
@@ -31,12 +33,14 @@ public:
         const std::string& userName,
         AbstractAuthenticationDataProvider::LookupResultHandler completionHandler) override;
 
+    std::vector<std::string> usernames() const;
+
 private:
     void load(std::istream& input);
 
 private:
-    nx::Mutex m_mutex;
-    std::map<std::string, std::string> m_credentials;
+    mutable nx::Mutex m_mutex;
+    std::map<std::string /*username*/, std::string /*ha1*/> m_credentials;
 };
 
 } // namespace nx::network::http::server
