@@ -31,6 +31,8 @@ QHash<int, QByteArray> RecursiveMembersModel::roleNames() const
     roles[OffsetRole] = "offset";
     roles[IsLdap] = "isLdap";
     roles[IsTemporary] = "isTemporary";
+    roles[CanEditParents] = "canEditParents";
+    roles[UserType] = "userType";
     return roles;
 }
 
@@ -50,6 +52,10 @@ QVariant RecursiveMembersModel::getMemberData(int offset, const QnUuid& id, int 
             return m_cache->info(id).userType == api::UserType::ldap;
         case IsTemporary:
             return m_cache->info(id).userType == api::UserType::temporaryLocal;
+        case CanEditParents:
+            return false;
+        case UserType:
+            return (UserSettingsGlobal::UserType)m_cache->info(id).userType;
     }
     return {};
 }
