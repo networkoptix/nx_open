@@ -36,7 +36,7 @@ bool isResponse(const QJsonArray& list)
         if (isResponse(list[i].toObject()) != result)
         {
             throw api::JsonRpcError{
-                api::JsonRpcError::InvalidJson, "Mixed request and response in a batch"};
+                api::JsonRpcError::invalidRequest, "Mixed request and response in a batch"};
         }
     }
     return result;
@@ -167,7 +167,7 @@ void WebSocketConnection::readHandler(const nx::Buffer& buffer)
         QJsonValue data;
         QString error;
         if (!QJsonDetail::deserialize_json(buffer.toRawByteArray(), &data, &error))
-            throw api::JsonRpcError{api::JsonRpcError::InvalidJson, error.toStdString()};
+            throw api::JsonRpcError{api::JsonRpcError::parseError, error.toStdString()};
 
         if (isResponse(data))
             m_outgoingProcessor->onResponse(data);
