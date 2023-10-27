@@ -29,7 +29,7 @@ using Error = nx::vms::api::JsonRpcError::Code;
 void OutgoingProcessor::clear(SystemError::ErrorCode error)
 {
     auto response = api::JsonRpcResponse::makeError(std::nullptr_t(),
-        {Error::InternalError,
+        {Error::transportError,
             NX_FMT("Connection closed with error %1: %2", error, SystemError::toString(error))
                 .toStdString()});
     for (const auto& [id, handler]: m_awaitingResponses)
@@ -87,7 +87,7 @@ void OutgoingProcessor::processRequest(
         if (handler)
         {
             handler(api::JsonRpcResponse::makeError(jsonRpcRequest.responseId(),
-                {Error::InvalidRequest, "Invalid parameter 'id': Already used"}));
+                {Error::invalidRequest, "Invalid parameter 'id': Already used"}));
         }
         return;
     }
@@ -117,7 +117,7 @@ void OutgoingProcessor::processBatchRequest(
             NX_DEBUG(this, "Id %1 is already used", id);
             awaitingResponse.errors.emplace_back(
                 api::JsonRpcResponse::makeError(jsonRpcRequest.responseId(),
-                    {Error::InvalidRequest, "Invalid parameter 'id': Already used"}));
+                    {Error::invalidRequest, "Invalid parameter 'id': Already used"}));
             continue;
         }
 
@@ -126,7 +126,7 @@ void OutgoingProcessor::processBatchRequest(
             NX_DEBUG(this, "Id %1 is already used in this batch request", id);
             awaitingResponse.errors.emplace_back(
                 api::JsonRpcResponse::makeError(jsonRpcRequest.responseId(),
-                    {Error::InvalidRequest,
+                    {Error::invalidRequest,
                         "Invalid parameter 'id': Already used in this batch request"}));
             continue;
         }
@@ -210,7 +210,7 @@ void OutgoingProcessor::onResponse(const QJsonValue& data)
     {
         NX_DEBUG(this, "Failed to deserialize response: %1", data);
         jsonRpcResponse.error = nx::vms::api::JsonRpcError{
-            Error::InvalidJson, "Failed to deserialize response", data};
+            Error::parseError, "Failed to deserialize response", data};
     }
 
     if (std::holds_alternative<std::nullptr_t>(jsonRpcResponse.id))
@@ -255,7 +255,7 @@ void OutgoingProcessor::onResponse(const QJsonArray& list)
         if (!QJson::deserialize(list[i], &jsonRpcResponse))
         {
             NX_DEBUG(this, "Failed to deserialize response item %1: %2", i, list);
-            jsonRpcResponse.error = nx::vms::api::JsonRpcError{Error::InvalidJson,
+            jsonRpcResponse.error = nx::vms::api::JsonRpcError{Error::parseError,
                 NX_FMT("Failed to deserialize response item %1", i).toStdString(),
                 list};
             nullResponses.push_back(std::move(jsonRpcResponse));
