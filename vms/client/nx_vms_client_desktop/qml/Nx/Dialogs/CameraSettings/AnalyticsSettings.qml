@@ -30,6 +30,7 @@ Item
 
     readonly property var currentEngineId: viewModel.currentEngineId
     property var resourceId: NxGlobals.uuid("")
+    property bool initialized: false
 
     Connections
     {
@@ -46,8 +47,9 @@ Item
                 return
 
             supportsDualStreaming = store.dualStreamingEnabled()
-            const isInitial = analyticsSettings.resourceId !== resourceId
             analyticsSettings.resourceId = resourceId
+            const isInitial =
+                !analyticsSettings.initialized || analyticsSettings.resourceId !== resourceId
 
             const currentEngineId = store.currentAnalyticsEngineId()
             const userEnabledAnalyticsEngines = store.userEnabledAnalyticsEngines()
@@ -62,6 +64,8 @@ Item
                 store.deviceAgentSettingsValues(currentEngineId),
                 store.deviceAgentSettingsErrors(currentEngineId),
                 isInitial)
+
+            analyticsSettings.initialized = true
 
             if (currentEngineId)
             {
@@ -157,7 +161,10 @@ Item
             onRefreshButtonClicked:
             {
                 if (currentEngineId)
+                {
+                    analyticsSettings.initialized = false
                     store.refreshDeviceAgentSettings(currentEngineId)
+                }
             }
 
             onCurrentStreamIndexChanged:
