@@ -141,7 +141,8 @@ TabButton
         Rectangle
         {
             anchors.fill: parent
-
+            anchors.bottomMargin: underline.anchors.bottomMargin
+            anchors.topMargin: 1
             color: tabButton.backgroundColor
         }
 
