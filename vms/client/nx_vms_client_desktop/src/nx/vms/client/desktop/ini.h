@@ -347,6 +347,18 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_INT(300, resourcePreviewRefreshIntervalArm,
         "[Support] How often Resource Tree thumbnails request updates from ARM servers,\n"
         "in seconds. Set 0 to disable automatic updates.");
+    NX_INI_INT(1, resourcePreviewPreloadDelay,
+        "[Support] A delay before a thumbnail is first time loaded from non-ARM servers,\n"
+        "in seconds. Set 0 to remove the delay.");
+    NX_INI_INT(10, resourcePreviewPreloadDelayArm,
+        "[Support] A delay before a thumbnail is first time loaded from ARM servers,\n"
+        "in seconds. Set 0 to remove the delay.");
+    NX_INI_FLOAT(0.5, resourcePreviewRequestScatter,
+        "[Support] Additional scatter to Resource Tree thumbnails requests,\n"
+        "as a fraction of absolute interval value, to prevent requesting all thumbnails\n"
+        "at the same time. Applied to both preload delay and refresh interval.\n"
+        "Actual interval is a random value in the range\n"
+        "[interval * (1 - scatter/2) ... interval * (1 + scatter/2)]");
 
     // VMS-37530, VMS-37550.
     NX_INI_FLAG(false, debugDisableAttributeTables,

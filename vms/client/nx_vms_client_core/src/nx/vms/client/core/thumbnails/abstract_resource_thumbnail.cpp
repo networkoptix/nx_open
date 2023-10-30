@@ -68,6 +68,7 @@ struct AbstractResourceThumbnail::Private
 
     QnResourcePtr resource;
     int maximumSize = kUnlimitedSize;
+    bool loadedAutomatically = true;
     bool active = true;
     Status status;
     qreal aspectRatio = kDefaultAspectRatio.toFloat();
@@ -198,7 +199,9 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
     }
 
     emit resourceChanged();
-    update();
+
+    if (d->loadedAutomatically)
+        update();
 }
 
 QnResource* AbstractResourceThumbnail::rawResource() const
@@ -266,6 +269,16 @@ void AbstractResourceThumbnail::reset()
     d->setStatus(Status::empty);
     d->setImage({});
     d->setObsolete(false);
+}
+
+bool AbstractResourceThumbnail::loadedAutomatically() const
+{
+    return d->loadedAutomatically;
+}
+
+void AbstractResourceThumbnail::setLoadedAutomatically(bool value)
+{
+    d->loadedAutomatically = value;
 }
 
 void AbstractResourceThumbnail::update(bool forceRefresh)

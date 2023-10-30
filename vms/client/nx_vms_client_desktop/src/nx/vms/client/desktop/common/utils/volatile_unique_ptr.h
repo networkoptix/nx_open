@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QPointer>
+#include <QtCore/QScopedPointer>
 
 namespace nx::vms::client::desktop {
 
@@ -12,7 +13,7 @@ namespace nx::vms::client::desktop {
  * it's quite convenient for transient objects like animations or single-shot timers
  * if we need to track them and probably delete early.
  */
-template<typename T>
+template<typename T, typename Deleter = QScopedPointerDeleter<T>>
 class VolatileUniquePtr
 {
 public:
@@ -42,7 +43,7 @@ public:
     {
         auto old = m_ptr;
         m_ptr = raw;
-        delete old;
+        Deleter::cleanup(old);
     }
 
     void swap(VolatileUniquePtr& other)
