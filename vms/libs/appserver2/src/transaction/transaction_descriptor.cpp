@@ -64,7 +64,7 @@ struct UserAccessorInfo
     GlobalPermissions permissions;
 };
 
-static auto userAccessorInfo(const SystemContext& context, const Qn::UserAccessData& access)
+auto userAccessorInfo(const SystemContext& context, const Qn::UserAccessData& access)
     -> std::pair<UserAccessorInfo, Result>
 {
     const auto existingUser =
@@ -85,10 +85,22 @@ static auto userAccessorInfo(const SystemContext& context, const Qn::UserAccessD
     return {UserAccessorInfo{.id = id, .name = std::move(name), .permissions = permissions}, {}};
 }
 
+// Returns the highest permission: `none` or `powerUser` or `administrator`.
+GlobalPermission highestPermission(GlobalPermissions permissions)
+{
+    if (permissions.testFlag(GlobalPermission::administrator))
+        return GlobalPermission::administrator;
+
+    if (permissions.testFlag(GlobalPermission::powerUser))
+        return GlobalPermission::powerUser;
+
+    return GlobalPermission::none;
+}
+
 class CanAddOrRemoveParentGroups final
 {
 public:
-    // Input type for User info
+    // Input type for User info.
     struct UserInfo
     {
         QnUuid id;
@@ -96,7 +108,7 @@ public:
         std::vector<QnUuid> parentGroups;
     };
 
-    // Input type for User Group info
+    // Input type for User Group info.
     struct UserGroupInfo
     {
         QnUuid id;
@@ -1071,11 +1083,8 @@ struct SaveUserAccess
     Result operator()(SystemContext* systemContext, const Qn::UserAccessData& accessData,
         const nx::vms::api::UserData& param)
     {
-        if (!NX_ASSERT(systemContext))
-        {
-            NX_WARNING(this, "`systemContext` is nullptr.");
-            return {ErrorCode::serverError};
-        }
+        NX_CRITICAL(systemContext);
+
 
         if (hasSystemAccess(accessData))
             return ModifyResourceAccess()(systemContext, accessData, param);
@@ -1134,15 +1143,6 @@ struct SaveUserAccess
                 nx::branding::shortCloudName()));
         }
 
-        // TODO: #skolesnik Move to 'validateUserModification`. Shouldn't `existing.type` be
-        //     checked instead of `param.type`?
-        if (param.type == nx::vms::api::UserType::temporaryLocal && existingUser)
-        {
-            const auto temporaryToken = QJson::deserialized<nx::vms::api::TemporaryToken>(param.hash);
-            if (!temporaryToken.isValid())
-                return {ErrorCode::forbidden, ServerApiErrors::tr("Invalid temporary token")};
-        }
-
         NX_ASSERT(resourcePool->getResourcesByIds<QnUserResource>(
             param.resourceAccessRights, [](const auto& pair) { return pair.first; }).empty(),
             "User should not be an accessible resource");
@@ -1197,6 +1197,9 @@ private:
                 nx::format(ServerApiErrors::tr("Creating an Administrator user is not allowed."))};
         }
 
+        // TODO: #skolesnik Clarify the usage of `canAddOrRemoveParentGroups` here. This will
+        //     result in an ambiguous error "forbidden to add" instead of "forbidden to create".
+        //     The error text should at least mention that the user is new: "forbidden to add _new_".
         using UserInfo = CanAddOrRemoveParentGroups::UserInfo;
         if (Result r = canAddOrRemoveParentGroups(context,
                 accessor,
@@ -2171,11 +2174,7 @@ public:
         const Qn::UserAccessData& accessData,
         const api::MediaServerData& param) const
     {
-        if (!NX_ASSERT(context))
-        {
-            NX_WARNING(this, "context is `nullptr`.");
-            return {ErrorCode::serverError};
-        }
+        NX_CRITICAL(context);
 
         if (hasSystemAccess(accessData))
             return {};
@@ -2250,11 +2249,7 @@ struct SaveUserRoleAccess
         const Qn::UserAccessData& accessData,
         const nx::vms::api::UserGroupData& param)
     {
-        if (!NX_ASSERT(systemContext))
-        {
-            NX_WARNING(this, "`systemContext` is nullptr.");
-            return {ErrorCode::serverError};
-        }
+        NX_CRITICAL(systemContext);
 
         if (hasSystemAccess(accessData))
             return {};
@@ -2298,6 +2293,9 @@ struct SaveUserRoleAccess
         }
 
         // `forbidUserGroupModification` will most likely shadow the removal errors...
+        // TODO: #skolesnik Clarify the usage of `canAddOrRemoveParentGroups` here. This will
+        //     result in an ambiguous error "forbidden to add" instead of "forbidden to create".
+        //     The error text should at least mention that the user group is new: "forbidden to add _new_".
         using UserGroupInfo = CanAddOrRemoveParentGroups::UserGroupInfo;
         if (const auto r = canAddOrRemoveParentGroups(*systemContext,
                 accessor,
@@ -2371,13 +2369,6 @@ private:
         const api::UserGroupData& target,
         GlobalPermission targetPermission)
     {
-        GlobalPermission highest = GlobalPermission::none;
-        if (targetPermission & GlobalPermission::powerUser)
-            highest = GlobalPermission::powerUser;
-
-        if (targetPermission & GlobalPermission::administrator)
-            highest = GlobalPermission::administrator;
-
         return {ErrorCode::forbidden,
             nx::format(
                 ServerApiErrors::tr(
@@ -2386,7 +2377,7 @@ private:
                 accessor.id.toString(),
                 target.name,
                 target.id.toString(),
-                highest)};
+                highestPermission(targetPermission))};
     }
 };
 
@@ -2400,50 +2391,124 @@ struct RemoveUserRoleAccess
         if (hasSystemAccess(accessData))
             return {};
 
-        if (!NX_ASSERT(systemContext))
+        NX_CRITICAL(systemContext);
+
+        auto [accessor, accessorResult] = userAccessorInfo(*systemContext, accessData);
+        if (!accessorResult)
+            return std::move(accessorResult);
+
+        if (Result r = expectPowerUserOrAdmin(accessor); !r)
+            return r;
+
+        const auto group = systemContext->userGroupManager()->find(param.id);
+        if (!group)
+        {
+            return {ErrorCode::notFound,
+                nx::format(
+                    ServerApiErrors::tr("User Group '%1' does not exist."), param.id.toString())};
+        }
+
+        if (Result r = checkPermissionsToDelete(*systemContext, accessor, *group); !r)
+            return r;
+
+        if (Result r = checkGroupNotReferenced(*systemContext, *group); !r)
+            return r;
+
+        return {};
+    }
+
+private:
+    // General assessment that can and should be performed before figuring whether the User Group
+    // actually exist. We don't want to give up information about the group's existence to users
+    // with no rights.
+    static Result expectPowerUserOrAdmin(const UserAccessorInfo& accessor)
+    {
+        if (accessor.permissions & (GlobalPermission::powerUser | GlobalPermission::administrator))
             return {};
 
-        if (auto r = PowerUserAccess()(systemContext, accessData, param); !r)
+        return {ErrorCode::forbidden,
+            nx::format(
+                ServerApiErrors::tr("User '%1(%2)' is not permitted to delete User Groups."),
+                accessor.name,
+                accessor.id.toString())};
+    }
+
+    // Check whether the accessor has sufficient rights to delete the User Group.
+    // This function assumes that the group exists.
+    template<typename GroupInfo>
+    static Result checkPermissionsToDelete(
+        const SystemContext& context, const UserAccessorInfo& accessor, const GroupInfo& group)
+    {
+        const auto errorForbidden =
+            [](const auto& user, const auto& group, GlobalPermission groupPermissions) -> Result
+            {
+                return {ErrorCode::forbidden,
+                    nx::format(
+                        ServerApiErrors::tr("User '%1(%2)' is not permitted to delete the "
+                            "User Group '%3(%4)' with '%5' rights."),
+                        user.name,
+                        user.id.toString(),
+                        group.name,
+                        group.id.toString(),
+                        highestPermission(groupPermissions))};
+        };
+
+        const auto groupPermissions =
+            static_cast<GlobalPermission>(getGlobalPermissions(context, group.id).toInt());
+
+        // As of this writing, deleting administrator groups is not permitted.
+        if (groupPermissions & GlobalPermission::administrator)
+            return errorForbidden(accessor, group, groupPermissions);
+
+        if (!expectPowerUserOrAdmin(accessor))
+            return errorForbidden(accessor, group, groupPermissions);
+
+        if ((groupPermissions & GlobalPermission::powerUser)
+            && !(accessor.permissions & GlobalPermission::administrator))
         {
-            r.message = ServerApiErrors::tr(
-                "Removing User Group is forbidden because the user has no power user access.");
-            return r;
+            return errorForbidden(accessor, group, groupPermissions);
         }
 
-        if (const auto group = systemContext->userGroupManager()->find(param.id))
-        {
-            // Current group will not be removed from `parentIds` or `parentGroupIds` leaving
-            // existing Users or User Groups with garbage ids of non-existing parents.
-            // This is acceptable for LDAP groups because continuous sync is supposed to fix
-            // such errors on the fly.
-            if (group->type == nx::vms::api::UserType::ldap)
-                return {};
-        }
-        else
-        {
-            return {ErrorCode::notFound, nx::format(
-                ServerApiErrors::tr("User Group '%1' does not exist."), param.id.toString())};
-        }
+        return {};
+    }
 
-        const auto memberIds = systemContext->accessSubjectHierarchy()->directMembers(param.id);
+    template<typename GroupInfo>
+    static Result checkGroupNotReferenced(const SystemContext& context, const GroupInfo& userGroup)
+    {
+        // The Current group will not be removed from `parentIds` or `parentGroupIds` leaving
+        // existing Users or User Groups with garbage ids of non-existing parents.
+        // This is acceptable for LDAP groups because continuous sync is supposed to fix
+        // such errors on the fly.
+        if (userGroup.type == nx::vms::api::UserType::ldap)
+            return {};
+
+        // The hierarchy data is likely to change between iterations. Data race is possible.
+        const auto memberIds = context.accessSubjectHierarchy()->directMembers(userGroup.id);
         for (const auto& id: memberIds)
         {
-            const auto member = systemContext->accessSubjectHierarchy()->subjectById(id);
+            // TODO: #skolesnik Informative error string referencing name and id.
+
+            const auto member = context.accessSubjectHierarchy()->subjectById(id);
             if (auto user = member.user())
             {
-                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                    "Removing Role is forbidden because it is still used by '%1'."),
-                    user->getName()));
+                return {ErrorCode::forbidden,
+                    nx::format(
+                        ServerApiErrors::tr(
+                            "Removing User Group is forbidden because it is still used by '%1'."),
+                        user->getName())};
             }
-            else if (auto group = systemContext->userGroupManager()->find(id))
+
+            if (auto group = context.userGroupManager()->find(id))
             {
-                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                    "Removing Role is forbidden because it is still inherited by '%1'."),
-                    group->name));
+                return {ErrorCode::forbidden,
+                    nx::format(
+                        ServerApiErrors::tr(
+                            "Removing User Group is forbidden because it is still inherited by '%1'."),
+                        group->name)};
             }
         }
 
-        return Result();
+        return {};
     }
 };
 
