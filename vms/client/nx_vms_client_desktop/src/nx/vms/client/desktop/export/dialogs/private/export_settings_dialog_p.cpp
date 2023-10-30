@@ -147,6 +147,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         request.rotation = 0;
         request.tolerant = false;
         request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
+        request.streamSelectionMode = api::ThumbnailFilter::StreamSelectionMode::forcedPrimary;
 
         m_mediaRawImageProvider.reset(new ResourceThumbnailProvider(request, this));
     }
