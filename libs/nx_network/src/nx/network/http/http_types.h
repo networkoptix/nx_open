@@ -262,6 +262,7 @@ enum Value: int
     unsupportedMediaType = 415,
     rangeNotSatisfiable = 416,
     unprocessableEntity = 422,
+    tooManyRequests = 429,
     unavailableForLegalReasons = 451,
 
     internalServerError = 500,
