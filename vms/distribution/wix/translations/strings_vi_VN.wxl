@@ -27,7 +27,7 @@
   <String Id="OptionsHeader">Thiết lập tùy chọn</String>
   <String Id="OptionsLocationLabel">Cài đặt vị trí:</String>
   <String Id="OptionsBrowseButton">Chọn</String>
-  <String Id="OptionsOkButton">Xác định</String>
+  <String Id="OptionsOkButton">OK</String>
   <String Id="OptionsCancelButton">Hủy bỏ</String>
   <String Id="ProgressHeader">Tiến trình cài đặt</String>
   <String Id="ProgressLabel">Đang xử lý...</String>
@@ -55,7 +55,7 @@
   <String Id="FilesInUseLabel">Các ứng dụng sau đây cần được dừng lại để tiếp tục cài đặt:</String>
   <String Id="FilesInUseCloseRadioButton">Đóng các ứng dụng và cố gắng khởi động lại chúng</String>
   <String Id="FilesInUseDontCloseRadioButton">Không đóng ứng dụng. Khởi động lại sẽ được yêu cầu</String>
-  <String Id="FilesInUseOkButton">Xác định</String>
+  <String Id="FilesInUseOkButton">OK</String>
   <String Id="FilesInUseCancelButton">Hủy bỏ</String>
   <String Id="Options">Tùy chọn</String>
   <String Id="SelectApps">Chọn các ứng dụng cần cài đặt:</String>

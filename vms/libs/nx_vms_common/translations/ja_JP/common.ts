@@ -1871,7 +1871,7 @@
     </message>
     <message>
       <source>Show text overlay</source>
-      <translation>テキストオーバーレイ表示</translation>
+      <translation>テキストオーバーレイを表示</translation>
     </message>
     <message>
       <source>Show on Alarm Layout</source>
@@ -2177,7 +2177,7 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation>最低1人のユーザーを選択してください</translation>
+      <translation>ユーザーを1人以上選択してください</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -2422,7 +2422,7 @@
     </message>
     <message>
       <source>Also show source camera</source>
-      <translation>ソースカメラも表示する</translation>
+      <translation>ソースカメラも表示</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -2430,7 +2430,7 @@
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation>ソースカメラも表示する</translation>
+      <translation>ソースカメラにも表示</translation>
     </message>
     <message>
       <source>Also set on source camera</source>

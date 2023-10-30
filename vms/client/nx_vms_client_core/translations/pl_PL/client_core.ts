@@ -191,11 +191,11 @@
     </message>
     <message>
       <source>Your access to this system has expired.</source>
-      <translation type="unfinished">Your access to this system has expired.</translation>
+      <translation>Twój dostęp do tego systemu wygasł.</translation>
     </message>
     <message>
       <source>Please contact the system administrator to regain access.</source>
-      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+      <translation>Aby odzyskać dostęp, skontaktuj się z administratorem systemu.</translation>
     </message>
   </context>
   <context>
