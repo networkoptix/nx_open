@@ -41,7 +41,7 @@ Control
         onActivated: (index) =>
         {
             control.editingStarted()
-            control.value = valueAt(index)
+            control.value = index ? valueAt(index) : qsTr("Any %1").arg(attribute.name)
             control.editingFinished()
         }
 
