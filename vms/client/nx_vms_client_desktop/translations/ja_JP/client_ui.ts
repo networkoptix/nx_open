@@ -74,11 +74,11 @@
     <name>AdvancedSettingsWidget</name>
     <message>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>5.1ch→2.1chへオーディオ変換</translation>
+      <translation>音声を 5.1ch から 2.1ch にダウンミックスする</translation>
     </message>
     <message>
       <source>Double Buffering</source>
-      <translation>ダブル バッファリング</translation>
+      <translation>ダブルバッファリングを行う</translation>
     </message>
     <message>
       <source>Maximum Live Buffer Length</source>
@@ -86,7 +86,7 @@
     </message>
     <message>
       <source>Clear Local Cache</source>
-      <translation>ローカルキャッシュのクリア</translation>
+      <translation>ローカルキャッシュをクリア</translation>
     </message>
     <message>
       <source>Reset All Warnings</source>
@@ -106,7 +106,7 @@
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation>ハードウェア ビデオ デコードを使用する</translation>
+      <translation>ハードウェアビデオデコーディングを使用する</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
@@ -364,11 +364,11 @@
     </message>
     <message>
       <source>Pre-recording:</source>
-      <translation>プリレコーディング:</translation>
+      <translation>プレ録画:</translation>
     </message>
     <message>
       <source>Post-recording:</source>
-      <translation>ポストレコーディング:</translation>
+      <translation>ポスト録画:</translation>
     </message>
   </context>
   <context>
@@ -926,7 +926,7 @@
     </message>
     <message>
       <source>Showreels</source>
-      <translation>シーケンス表示</translation>
+      <translation>シーケンシャル表示</translation>
     </message>
     <message>
       <source>Read more on the help page</source>
@@ -1380,7 +1380,7 @@
     </message>
     <message>
       <source>Auto Pause Video</source>
-      <translation>自動一時停止</translation>
+      <translation>映像を自動的に一時停止する</translation>
     </message>
     <message>
       <source>after</source>
@@ -1416,7 +1416,7 @@
     </message>
     <message>
       <source>Run Application when PC Boots up</source>
-      <translation>PC 起動時にアプリケーション起動</translation>
+      <translation>PC の起動時にアプリケーションを実行する</translation>
     </message>
     <message>
       <source>Startup</source>
@@ -1436,7 +1436,7 @@
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation>マイクがアクティブなときに音声をミュート</translation>
+      <translation>マイクがアクティブなときに音声をミュートする</translation>
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
@@ -1919,7 +1919,7 @@
     </message>
     <message>
       <source>Show additional info in tree</source>
-      <translation>リソースツリーにIP表示</translation>
+      <translation>リソースツリーに追加情報を表示する</translation>
     </message>
     <message>
       <source>seconds</source>
@@ -1935,7 +1935,7 @@
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation>PTZカメラの照準オーバーレイを表示</translation>
+      <translation>PTZ カメラに照準オーバーレイを表示する</translation>
     </message>
   </context>
   <context>
@@ -2205,7 +2205,7 @@
     <name>PopupSettingsWidget</name>
     <message>
       <source>Show all notifications</source>
-      <translation>すべての通知を表示</translation>
+      <translation>すべての通知を表示する</translation>
     </message>
     <message>
       <source>System Notifications</source>
@@ -2536,11 +2536,11 @@
     </message>
     <message>
       <source>Pre-Recording:</source>
-      <translation>プリレコーディング:</translation>
+      <translation>プレ録画:</translation>
     </message>
     <message>
       <source>Post-Recording:</source>
-      <translation>ポストレコーディング:</translation>
+      <translation>ポスト録画:</translation>
     </message>
     <message>
       <source>Fixed duration:</source>
@@ -2559,7 +2559,7 @@
     </message>
     <message>
       <source>Disable Aero</source>
-      <translation>Aero無効</translation>
+      <translation>Aero を無効にする</translation>
     </message>
     <message>
       <source>Capture Cursor</source>
@@ -2594,11 +2594,11 @@
     <name>RecordingThresholdWidget</name>
     <message>
       <source>Pre-Recording</source>
-      <translation>プリレコーディング</translation>
+      <translation>プレ録画</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation>ポストレコーディング</translation>
+      <translation>ポスト録画</translation>
     </message>
   </context>
   <context>
@@ -3092,7 +3092,7 @@
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation>匿名の使用統計とクラッシュレポートをソフトウェア開発に送信</translation>
+      <translation>匿名の使用状況とクラッシュ統計をソフトウェア開発者に送信する</translation>
     </message>
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
@@ -3100,7 +3100,7 @@
     </message>
     <message>
       <source>Custom language for Cloud notifications</source>
-      <translation>クラウド通知のカスタム言語</translation>
+      <translation>クラウド通知の言語設定を変更する</translation>
     </message>
   </context>
   <context>

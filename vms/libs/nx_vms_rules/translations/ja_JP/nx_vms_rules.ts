@@ -698,7 +698,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show text overlay</source>
-      <translation>テキストオーバーレイ表示</translation>
+      <translation>テキストオーバーレイを表示</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -706,7 +706,7 @@
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation>ソースカメラも表示する</translation>
+      <translation>ソースカメラにも表示</translation>
     </message>
     <message>
       <source>Display text for</source>
