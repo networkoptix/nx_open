@@ -76,7 +76,7 @@ SpinBox
         readOnly: !control.editable
         clip: true
 
-        Keys.onPressed:
+        Keys.onPressed: (event)=>
         {
             switch (event.key)
             {
@@ -99,7 +99,7 @@ SpinBox
 
         WheelHandler
         {
-            onWheel:
+            onWheel: (event)=>
             {
                 const kSensitivity = 1.0 / 120.0
                 control.value += control.stepSize * event.angleDelta.y * kSensitivity
