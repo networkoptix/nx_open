@@ -680,7 +680,7 @@ Item
                             readonly property var expiresInMs:
                                 expirationDate.getTime() - currentServerTimePointMs
 
-                            self: control.self
+                            timeOffsetProvider: control.self
 
                             Timer
                             {
