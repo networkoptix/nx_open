@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>In selected area</source>
-      <translation>選択されたエリア</translation>
+      <translation>指定領域内</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -147,7 +147,7 @@
     </message>
     <message>
       <source>Push my screen</source>
-      <translation>Pc画面を表示</translation>
+      <translation>PC画面を表示</translation>
     </message>
     <message>
       <source>Select Time Server</source>
@@ -179,11 +179,11 @@
     </message>
     <message>
       <source>Window</source>
-      <translation>画面</translation>
+      <translation>ウィンドウ</translation>
     </message>
     <message>
       <source>New Window</source>
-      <translation>新規画面</translation>
+      <translation>新規ウインドウ</translation>
     </message>
     <message>
       <source>User...</source>
@@ -386,7 +386,7 @@
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation>新規画面で開く</translation>
+      <translation>新規ウィンドウで開く</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
@@ -738,15 +738,15 @@
     </message>
     <message>
       <source>Showreel...</source>
-      <translation>シーケンス表示...</translation>
+      <translation>シーケンシャル表示...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation>シーケンス表示から削除</translation>
+      <translation>シーケンシャル表示から削除</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation>シーケンス表示作成</translation>
+      <translation>シーケンシャル表示を作成</translation>
     </message>
     <message>
       <source>Upload File...</source>
@@ -964,7 +964,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation>詳細設定...</translation>
+      <translation>詳細...</translation>
     </message>
     <message>
       <source>Archive filter...</source>
@@ -1902,7 +1902,7 @@ License Key: %2</source>
     <name>QnAdvancedSettingsWidget</name>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation>OpenGLの表示でCPU負荷が100％になる問題を回避できます。</translation>
+      <translation>OpenGLの描画により、CPU負荷が100%発生する問題を回避できます。</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
@@ -2085,7 +2085,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>操作履歴再表示</translation>
+      <translation>操作履歴からのリプレイ</translation>
     </message>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
@@ -2359,11 +2359,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>少なくとも一つのデバイスを選択してください</translation>
+      <translation>デバイスを1台以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>少なくとも1台のカメラを選択してください</translation>
+      <translation>カメラを1台以上選択してください</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
@@ -2459,11 +2459,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation>少なくとも 1 つのデバイスを選択してください</translation>
+      <translation>デバイスを1台以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation>少なくとも 1 つのカメラを選択してください</translation>
+      <translation>カメラを1台以上選択してください</translation>
     </message>
     <message>
       <source>Select Server</source>
@@ -2488,11 +2488,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>少なくとも一つのデバイスを選択してください</translation>
+      <translation>デバイスを1台以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>少なくとも1台のカメラを選択してください</translation>
+      <translation>カメラを1台以上選択してください</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -2516,7 +2516,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>プリレコーディング時間が長いと、サーバーのRAM使用率が増加します</translation>
+      <translation>プレ録画時間が長いと、サーバーのRAM使用率が増加します</translation>
     </message>
   </context>
   <context>
@@ -3975,7 +3975,7 @@ to %1</source>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation>押したまま</translation>
+      <translation>長押し</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
@@ -4058,7 +4058,7 @@ to %1</source>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Clip sound up to %1 seconds</source>
-      <translation>クリップサウンドは最大 %1秒</translation>
+      <translation>%1 秒までのサウンドを使用</translation>
     </message>
     <message>
       <source>Rename sound</source>
@@ -4078,15 +4078,15 @@ to %1</source>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation>新規タイトル入力:</translation>
+      <translation>新しいタイトルを入力してください:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
-      <translation>ファイルを追加できませんでした</translation>
+      <translation>ファイルの追加に失敗しました</translation>
     </message>
     <message>
       <source>Failed to set new title</source>
-      <translation>新しいタイトルを設定できませんでした</translation>
+      <translation>新しいタイトルの設定に失敗しました</translation>
     </message>
     <message>
       <source>Delete sound?</source>
@@ -4097,7 +4097,7 @@ to %1</source>
     <name>QnNotificationSoundModel</name>
     <message>
       <source>Downloading sound list...</source>
-      <translation>ダウンロードしているサウンドリスト...</translation>
+      <translation>サウンドリストをダウンロード中...</translation>
     </message>
     <message>
       <source>No Sound</source>
@@ -4105,11 +4105,11 @@ to %1</source>
     </message>
     <message>
       <source>Downloading sound...</source>
-      <translation>ダウンロードしているサウンド...</translation>
+      <translation>サウンドをダウンロード中...</translation>
     </message>
     <message>
       <source>Uploading sound...</source>
-      <translation>アップロードしているサウンド...</translation>
+      <translation>サウンドをアップロード中...</translation>
     </message>
   </context>
   <context>
@@ -6106,16 +6106,16 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation>既存のシーケンス表示を上書きしますか？</translation>
+      <translation>既存のシーケンシャル表示を上書きしますか?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation>同じ名前の別のシーケンス表示があります</translation>
+      <translation>同じ名前の別のシーケンシャル表示があります。</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
       <translation>
-        <numerusform>シーケンス表示から%nアイテムを削除しますか？</numerusform>
+        <numerusform>シーケンシャル表示から %n アイテムを削除しますか?</numerusform>
       </translation>
     </message>
     <message>
@@ -6271,7 +6271,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation>シーケンス表示開始</translation>
+      <translation>シーケンシャル表示を開始</translation>
     </message>
   </context>
   <context>
@@ -6282,7 +6282,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>In selected area</source>
-      <translation>選択されたエリア</translation>
+      <translation>指定領域内</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -6306,23 +6306,23 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>SourcePickerWidgetStrings</name>
     <message>
       <source>Select at least one Server</source>
-      <translation>1台以上のサーバーを選択してください</translation>
+      <translation>サーバーを1台以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation>1人以上のユーザーを選択してください</translation>
+      <translation>ユーザーを1人以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>少なくとも一つのデバイスを選択してください</translation>
+      <translation>デバイスを1台以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>少なくとも1台のカメラを選択してください</translation>
+      <translation>カメラを1台以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one I/O module</source>
-      <translation>1台以上のI/Oモジュールを選択してください</translation>
+      <translation>I/Oモジュールを1台以上選択してください</translation>
     </message>
     <message>
       <source>Test</source>
@@ -6354,7 +6354,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation>ソースカメラも表示</translation>
+      <translation>ソースカメラにも表示</translation>
     </message>
     <message>
       <source>Use event source camera</source>
@@ -6451,7 +6451,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation>1人以上のユーザーを選択してください</translation>
+      <translation>ユーザーを1人以上選択してください</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -7457,7 +7457,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>プリレコーディング時間が長いと、サーバーのRAM使用率が増加します</translation>
+      <translation>プレ録画時間が長いと、サーバーのRAM使用率が増加します</translation>
     </message>
   </context>
   <context>
@@ -10941,15 +10941,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
     <message>
       <source>Showreel</source>
-      <translation>シーケンス表示</translation>
+      <translation>シーケンシャル表示</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation>シーケンス表示 %1</translation>
+      <translation>シーケンシャル表示 %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>シーケンス表示「%1」を削除しますか?</translation>
+      <translation>シーケンシャル表示 「%1」 を削除しますか?</translation>
     </message>
   </context>
   <context>
@@ -10963,7 +10963,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ShowreelExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>キーボードの矢印キーでレイアウト切替、Escキーでシーケンス表示を終了</translation>
+      <translation>キーボードの矢印キー押下でレイアウトを手動切替します。Escキー押下でシーケンシャル表示を終了します。</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
@@ -11947,7 +11947,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Showreels</source>
-      <translation>シーケンス表示</translation>
+      <translation>シーケンシャル表示</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -12613,7 +12613,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation>シーケンス表示停止</translation>
+      <translation>シーケンシャル表示を停止</translation>
     </message>
     <message>
       <source>Start Tour</source>
@@ -12621,7 +12621,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation>シーケンス表示開始</translation>
+      <translation>シーケンシャル表示を開始</translation>
     </message>
   </context>
   <context>

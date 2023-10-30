@@ -5440,7 +5440,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Usługi</translation>
     </message>
   </context>
   <context>
@@ -5585,23 +5585,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local recording services overused</source>
-      <translation type="unfinished">Local recording services overused</translation>
+      <translation>Lokalne usługi nagrywania są nadużywane</translation>
     </message>
     <message>
       <source>Cloud storage services overused</source>
-      <translation type="unfinished">Cloud storage services overused</translation>
+      <translation>Usługi przechowywania w chmurze są nadużywane</translation>
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation type="unfinished">Paid integrations services overused</translation>
+      <translation>Nadmierne wykorzystanie płatnych usług integracyjnych</translation>
     </message>
     <message>
       <source>System suspended</source>
-      <translation type="unfinished">System suspended</translation>
+      <translation>System zawieszony</translation>
     </message>
     <message>
       <source>System shut down</source>
-      <translation type="unfinished">System shut down</translation>
+      <translation>Zamknięcie systemu</translation>
     </message>
   </context>
   <context>
@@ -5692,7 +5692,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Custom access rights</source>
-      <translation type="unfinished">Custom access rights</translation>
+      <translation>Własne prawa dostępu</translation>
     </message>
   </context>
   <context>
@@ -5707,11 +5707,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Hasło nie może być puste</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
-      <translation type="unfinished">Avoid leading and trailing spaces</translation>
+      <translation>Unikaj spacji na początku i na końcu</translation>
     </message>
   </context>
   <context>
@@ -5783,11 +5783,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Otworzyć tę integrację?</translation>
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integracja</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -5799,18 +5799,17 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+      <translation>Próbujesz otworzyć
+%1, ale ta integracja nie przedstawiła zaufanego certyfikatu.
+Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzyć integrację.</translation>
     </message>
     <message>
       <source>Integration settings...</source>
-      <translation type="unfinished">Integration settings...</translation>
+      <translation>Ustawienia integracji...</translation>
     </message>
     <message>
       <source>Web Page settings...</source>
-      <translation type="unfinished">Web Page settings...</translation>
+      <translation>Ustawienia strony internetowej...</translation>
     </message>
   </context>
   <context>
@@ -6063,7 +6062,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>To add Video Wall, SaaS should be in active state. %1</source>
-      <translation type="unfinished">To add Video Wall, SaaS should be in active state. %1</translation>
+      <translation>Aby dodać ścianę wideo, SaaS powinien być w stanie aktywnym. %1</translation>
     </message>
   </context>
   <context>
@@ -6476,7 +6475,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>Delete %n layouts?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>Usunąć %n układy?</numerusform>
         <numerusform>Delete %n layouts?</numerusform>
         <numerusform>Delete %n layouts?</numerusform>
         <numerusform>Delete %n layouts?</numerusform>
@@ -6486,7 +6485,7 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
       <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>Te układy są udostępniane innym użytkownikom, więc zostaną usunięte również z ich kont.</numerusform>
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
@@ -6499,7 +6498,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>%n items were not deleted.</source>
       <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n elementów nie zostało usuniętych.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
@@ -6507,7 +6506,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Usunąć układ?</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>

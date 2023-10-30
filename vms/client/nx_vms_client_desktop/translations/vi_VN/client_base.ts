@@ -2644,7 +2644,7 @@ Khóa giấy phép: %2</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -3758,7 +3758,7 @@ to %1</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>Xác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Error</source>
@@ -6518,7 +6518,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -7916,7 +7916,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Enter access link to continue your session</source>
@@ -9610,7 +9610,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>OK</source>
-      <translation>Kác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -10732,7 +10732,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
@@ -12835,7 +12835,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>OK</source>
-      <translation>Kác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>

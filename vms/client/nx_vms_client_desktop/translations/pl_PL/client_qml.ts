@@ -297,7 +297,7 @@
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Włącz integrację</translation>
     </message>
     <message>
       <source>Remove %1?</source>
@@ -313,7 +313,7 @@
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Usuń żądanie</translation>
     </message>
   </context>
   <context>
@@ -332,8 +332,8 @@
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
       <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
+        <numerusform>Edycja zbiorcza — %n użytkowników</numerusform>
+        <numerusform>Edycja zbiorcza — %n użytkowników</numerusform>
         <numerusform>Batch Edit - %n Users</numerusform>
         <numerusform>Batch Edit - %n Users</numerusform>
       </translation>
@@ -341,7 +341,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n użytkowników</numerusform>
         <numerusform>%n Users</numerusform>
         <numerusform>%n Users</numerusform>
         <numerusform>%n Users</numerusform>
@@ -350,23 +350,23 @@
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Status użytkownika</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Aktywny</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Nieaktywny</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Skrócone uwierzytelnianie (ryzykowne)</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>zachowaj aktualną wartość</translation>
     </message>
   </context>
   <context>
@@ -391,7 +391,7 @@
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Naciśnij każdy przycisk kilka razy i wpisz nazwy tych przycisków w poniższej tabeli.</translation>
     </message>
   </context>
   <context>
@@ -479,11 +479,11 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Zawieszony</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Zamknij</translation>
     </message>
   </context>
   <context>
@@ -511,7 +511,7 @@
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP – Ustawienia połączenia</translation>
     </message>
     <message>
       <source>Host</source>
@@ -551,7 +551,7 @@
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Hasło nie może być puste</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
@@ -619,7 +619,7 @@
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Nowa lista</translation>
     </message>
     <message>
       <source>Name</source>
@@ -627,7 +627,7 @@
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Nazwa kolumny</translation>
     </message>
     <message>
       <source>OK</source>
@@ -718,7 +718,7 @@
     <name>FilterDialog</name>
     <message>
       <source>Edit Filter</source>
-      <translation type="unfinished">Edit Filter</translation>
+      <translation>Edytuj filtr</translation>
     </message>
     <message>
       <source>Name</source>
@@ -997,7 +997,7 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Brak grup</translation>
     </message>
   </context>
   <context>
@@ -1026,11 +1026,11 @@
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Wybierz joystick.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Brak podłączonych urządzeń.</translation>
     </message>
   </context>
   <context>
@@ -1140,11 +1140,11 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Zapisz</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Poprzedni</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1220,7 +1220,7 @@
     </message>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>ONLINE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1236,7 +1236,7 @@
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Ostatnia synchronizacja</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1244,7 +1244,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Ustawienia zaawansowane</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1968,15 +1968,15 @@ aby aktywować PTZ</translation>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Wybierz plik do zapisania</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>Pliki JSON (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>Plik do zapisania wyników:</translation>
     </message>
   </context>
   <context>
@@ -2552,21 +2552,21 @@ aby aktywować PTZ</translation>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Poruszaj joystickiem kilka razy w lewo i w prawo.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Poruszaj joystickiem kilka razy w górę i w dół.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Obróć joysticka kilkakrotnie zgodnie z ruchem wskazówek zegara i odwrotnie.</translation>
     </message>
   </context>
 </TS>
