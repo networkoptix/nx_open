@@ -330,6 +330,12 @@ TreeView
                 refreshIntervalSeconds: isArmServer
                     ? LocalSettings.iniConfigValue("resourcePreviewRefreshIntervalArm")
                     : LocalSettings.iniConfigValue("resourcePreviewRefreshInterval")
+
+                preloadDelayMs: 1000 * (isArmServer
+                    ? LocalSettings.iniConfigValue("resourcePreviewPreloadDelayArm")
+                    : LocalSettings.iniConfigValue("resourcePreviewPreloadDelay"))
+
+                requestScatter: LocalSettings.iniConfigValue("resourcePreviewRequestScatter")
             }
         }
     }

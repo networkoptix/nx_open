@@ -16,20 +16,21 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/thumbnails/camera_async_image_request.h>
 #include <nx/vms/client/core/thumbnails/immediate_image_result.h>
 #include <nx/vms/client/core/thumbnails/local_media_async_image_request.h>
 #include <nx/vms/client/core/thumbnails/proxy_image_result.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_cache.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
 #include <nx/vms/client/desktop/thumbnails/fallback_image_result.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
 using namespace nx::vms::client::core;
-
-static constexpr auto kRefreshTimerResolution = 500ms;
 
 // ------------------------------------------------------------------------------------------------
 // ResourceIdentificationThumbnail::Private
@@ -37,9 +38,14 @@ static constexpr auto kRefreshTimerResolution = 500ms;
 struct ResourceIdentificationThumbnail::Private
 {
     ResourceIdentificationThumbnail* const q;
+    bool objectComplete = true;
 
+    milliseconds preloadDelay = 0ms;
     seconds refreshInterval = 10s;
+    milliseconds nextRefreshInterval = refreshInterval;
+    qreal requestScatter = 0.0;
     std::unique_ptr<QTimer> refreshTimer{new QTimer()};
+    VolatileUniquePtr<QTimer, QScopedPointerDeleteLater> preloadTimer;
     nx::utils::ElapsedTimer elapsed;
     bool online = false;
     bool enforced = false;
@@ -59,7 +65,9 @@ struct ResourceIdentificationThumbnail::Private
 
         online = value;
         updateRefreshTimer();
-        q->update();
+
+        if (!preloadTimer)
+            q->update();
     }
 
     void setRefreshActive(bool value)
@@ -80,6 +88,46 @@ struct ResourceIdentificationThumbnail::Private
             && (q->status() == Status::ready || q->status() == Status::unavailable)
             && q->active()
             && q->resource());
+    }
+
+    milliseconds applyScatterToInterval(milliseconds interval) const
+    {
+        if (qFuzzyIsNull(requestScatter))
+            return interval;
+
+        const qreal baseIntervalMs = milliseconds(interval).count();
+
+        const qreal actualIntervalMs = baseIntervalMs
+            * (1.0 + requestScatter * (((qreal) rand() / RAND_MAX) - 0.5));
+
+        return milliseconds(qRound(actualIntervalMs));
+    }
+
+    void updateNextRefreshInterval()
+    {
+        nextRefreshInterval = applyScatterToInterval(refreshInterval);
+    }
+
+    milliseconds calculateTimerResolution(seconds updateInterval)
+    {
+        if (updateInterval > 1min)
+            return 10s;
+
+        if (updateInterval > 10s)
+            return 1s;
+
+        if (updateInterval > 1s)
+            return 200ms;
+
+        return 0ms;
+    }
+
+    void preloadDelayed()
+    {
+        preloadTimer.reset(executeDelayedParented(
+            [q = q]() { q->update(); },
+            applyScatterToInterval(preloadDelay),
+            q));
     }
 
     bool isLicensedCamera() const
@@ -165,30 +213,42 @@ ResourceIdentificationThumbnail::ResourceIdentificationThumbnail(QObject* parent
     d(new Private{this})
 {
     setMaximumSize(320); //< Default.
-    d->refreshTimer->setInterval(500ms);
-    d->elapsed.restart();
+    setLoadedAutomatically(false);
+    d->updateNextRefreshInterval();
 
     d->refreshTimer->callOnTimeout(this,
         [this]()
         {
-            if (!d->elapsed.hasExpired(d->refreshInterval))
+            if (!d->elapsed.isValid() || !d->elapsed.hasExpired(d->nextRefreshInterval))
                 return;
 
             if (status() != Status::ready && status() != Status::unavailable)
                 return;
 
+            d->updateNextRefreshInterval();
             d->elapsed.restart();
             update();
         });
 
-    connect(this, &AbstractResourceThumbnail::imageChanged, this,
-        [this]() { d->elapsed.restart(); });
+    connect(this, &AbstractResourceThumbnail::updated, this,
+        [this]()
+        {
+            d->updateNextRefreshInterval();
+            d->preloadTimer.reset();
+            d->elapsed.restart();
+        });
 
     connect(this, &AbstractResourceThumbnail::activeChanged, this,
         [this]() { d->updateRefreshTimer(); });
 
     connect(this, &AbstractResourceThumbnail::statusChanged, this,
-        [this]() { d->updateRefreshTimer(); });
+        [this]()
+        {
+            if (status() == Status::ready || status() == Status::unavailable)
+                d->elapsed.restart();
+
+            d->updateRefreshTimer();
+        });
 
     connect(this, &AbstractResourceThumbnail::resourceChanged, this,
         [this]()
@@ -196,6 +256,8 @@ ResourceIdentificationThumbnail::ResourceIdentificationThumbnail(QObject* parent
             d->online = resource() && resource()->isOnline();
             d->camera = resource().objectCast<QnVirtualCameraResource>();
             d->fallbackImage = {};
+            d->elapsed.invalidate();
+            d->preloadTimer.reset();
             d->updateRefreshTimer();
 
             if (!resource())
@@ -204,6 +266,9 @@ ResourceIdentificationThumbnail::ResourceIdentificationThumbnail(QObject* parent
             // No need to bother with disconnecting (see AbstractResourceThumbnail::setResource).
             connect(resource().get(), &QnResource::statusChanged, this,
                 [this](const QnResourcePtr& resource) { d->setOnline(resource->isOnline()); });
+
+            if (d->objectComplete)
+                d->preloadDelayed();
         });
 }
 
@@ -223,8 +288,47 @@ void ResourceIdentificationThumbnail::setRefreshInterval(seconds value)
         return;
 
     d->refreshInterval = value;
+    d->refreshTimer->setInterval(d->calculateTimerResolution(d->refreshInterval));
     d->updateRefreshTimer();
     emit refreshIntervalChanged();
+}
+
+qreal ResourceIdentificationThumbnail::requestScatter() const
+{
+    return d->requestScatter;
+}
+
+void ResourceIdentificationThumbnail::setRequestScatter(qreal value)
+{
+    const auto allowedValue = qBound(0.0, value, 1.0);
+
+    if (qFuzzyEquals(d->requestScatter, allowedValue))
+        return;
+
+    d->requestScatter = allowedValue;
+    emit requestScatterChanged();
+
+    d->updateNextRefreshInterval();
+
+    if (d->preloadTimer)
+        d->preloadDelayed(); //< Restart preload if needed.
+}
+
+std::chrono::milliseconds ResourceIdentificationThumbnail::preloadDelay() const
+{
+    return d->preloadDelay;
+}
+
+void ResourceIdentificationThumbnail::setPreloadDelay(std::chrono::milliseconds value)
+{
+    if (d->preloadDelay == value)
+        return;
+
+    d->preloadDelay = value;
+    emit preloadDelayChanged();
+
+    if (d->preloadTimer)
+        d->preloadDelayed(); //< Restart preload if needed.
 }
 
 std::unique_ptr<AsyncImageResult> ResourceIdentificationThumbnail::getImageAsync(
@@ -281,6 +385,19 @@ std::unique_ptr<AsyncImageResult> ResourceIdentificationThumbnail::getImageAsync
     NX_VERBOSE(this, "getImageAsyncUncached for irrelevant resource %1, skipping", resource());
 
     return {};
+}
+
+void ResourceIdentificationThumbnail::classBegin()
+{
+    d->objectComplete = false;
+}
+
+void ResourceIdentificationThumbnail::componentComplete()
+{
+    d->objectComplete = true;
+
+    if (resource())
+        d->preloadDelayed();
 }
 
 bool ResourceIdentificationThumbnail::enforced() const

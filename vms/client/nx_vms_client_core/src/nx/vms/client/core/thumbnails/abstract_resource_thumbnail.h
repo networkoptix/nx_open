@@ -169,6 +169,13 @@ protected:
     /** Clears current image, resets status to `empty` and cancels loading if it's in progress. */
     void reset();
 
+    /**
+     * Whether the thumbnail is immediately loaded after a resource is set. Default is true.
+     * If false, `update` must be called explicitly.
+     */
+    bool loadedAutomatically() const;
+    void setLoadedAutomatically(bool value);
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

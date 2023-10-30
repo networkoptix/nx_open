@@ -105,6 +105,8 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         ${qt_styles_headers}
         ${qt_widgets_headers}
         ${qt_imagess_headers}
+    ADDITIONAL_MOC_INCLUDE_DIRS
+        ${Qt6Qml_INCLUDE_DIRS}
     OTHER_SOURCES
         ${QML_FILES}
         ${SHADER_FILES}
