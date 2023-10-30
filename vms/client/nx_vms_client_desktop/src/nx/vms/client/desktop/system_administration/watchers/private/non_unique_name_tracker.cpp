@@ -44,7 +44,6 @@ bool NonUniqueNameTracker::remove(const QnUuid& id)
 
     const QString name = *nameIt;
     m_nameById.erase(nameIt);
-    m_nonUniqueNameIds.remove(id);
 
     bool changed = false;
 

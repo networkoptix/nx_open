@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/vms/client/desktop/system_administration/models/private/non_unique_name_tracker.h>
+#include <nx/vms/client/desktop/system_administration/watchers/private/non_unique_name_tracker.h>
 
 namespace nx::vms::client::desktop::test {
 
