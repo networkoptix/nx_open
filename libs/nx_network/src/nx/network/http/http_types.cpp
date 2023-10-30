@@ -317,6 +317,8 @@ std::string toString(Value val)
             return "Unsupported Media Type";
         case unprocessableEntity:
             return "Unprocessable Entity";
+        case tooManyRequests:
+            return "Too Many Requests";
         case unavailableForLegalReasons:
             return "Unavailable For Legal Reasons";
 
