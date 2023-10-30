@@ -177,7 +177,8 @@ void WorkbenchUpdateWatcher::forcedUpdate()
         return;
 
     auto systemId = systemSettings()->localSystemId();
-    m_private->serverUpdateTool->onConnectToSystem(systemId);
+    if (!systemId.isNull())
+        m_private->serverUpdateTool->onConnectToSystem(systemId);
 }
 
 bool WorkbenchUpdateWatcher::tryClose(bool /*force*/)
