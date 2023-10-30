@@ -89,7 +89,7 @@ Rectangle
             sourceSize: Qt.size(20, 20)
         }
 
-        ColumnLayout
+        Column
         {
             spacing: 8
 
@@ -100,11 +100,9 @@ Rectangle
             {
                 id: bannerText
 
-                Layout.alignment: Qt.AlignTop
-                Layout.fillWidth: true
+                width: parent.width
 
                 topPadding: 2
-
                 wrapMode: Text.WordWrap
 
                 color: ColorTheme.colors.light4
@@ -115,9 +113,7 @@ Rectangle
             {
                 id: bannerButton
 
-                Layout.alignment: Qt.AlignLeft
                 visible: !!text
-
                 leftPadding: 6
                 rightPadding: 6
                 spacing: 4
@@ -136,7 +132,6 @@ Rectangle
 
                 onClicked: control.buttonClicked()
             }
-
         }
 
         ImageButton
