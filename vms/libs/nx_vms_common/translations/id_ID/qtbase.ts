@@ -5,7 +5,7 @@
     <name>CloseButton</name>
     <message>
       <source>Close Tab</source>
-      <translation type="unfinished">Close Tab</translation>
+      <translation>Tutup Tab</translation>
     </message>
   </context>
   <context>

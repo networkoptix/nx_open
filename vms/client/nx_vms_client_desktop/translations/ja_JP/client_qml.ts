@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>In selected area</source>
-      <translation>選択されたエリア</translation>
+      <translation>指定領域内</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -107,7 +107,7 @@
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation>高度なオブジェクト検索</translation>
+      <translation>詳細オブジェクト検索</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -119,7 +119,7 @@
     </message>
     <message>
       <source>In selected area</source>
-      <translation>選択されたエリア</translation>
+      <translation>指定領域内</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -739,11 +739,11 @@
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
-      <translation>選択エリア内</translation>
+      <translation>指定領域内</translation>
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation>映像領域を選択して結果をフィルタリングします</translation>
+      <translation>映像領域を選択して結果をフィルタリング</translation>
     </message>
   </context>
   <context>
@@ -1000,7 +1000,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>シーケンス表示</translation>
+      <translation>シーケンシャル表示</translation>
     </message>
     <message>
       <source>Video Walls</source>

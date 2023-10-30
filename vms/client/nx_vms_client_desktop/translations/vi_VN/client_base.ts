@@ -2553,7 +2553,7 @@ Khóa giấy phép: %2</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -3855,7 +3855,7 @@ to %1</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>Xác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Error</source>
@@ -8015,7 +8015,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -9334,7 +9334,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>OK</source>
-      <translation>Kác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -11754,7 +11754,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>OK</source>
-      <translation>Kác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>

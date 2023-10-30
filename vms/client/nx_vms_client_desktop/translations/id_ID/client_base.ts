@@ -1031,7 +1031,7 @@
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>Panduan Pengguna...</translation>
     </message>
   </context>
   <context>
@@ -8149,7 +8149,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording will not be enabled on some cameras.</source>
-      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
+      <translation>Rekaman tidak akan diaktifkan pada beberapa kamera.</translation>
     </message>
   </context>
   <context>
