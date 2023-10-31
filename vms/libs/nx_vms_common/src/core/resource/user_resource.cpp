@@ -516,10 +516,11 @@ QString QnUserResource::getEmail() const
 void QnUserResource::setEmail(const QString& email)
 {
     {
+        auto newEmail = email.trimmed().toLower();
         NX_MUTEX_LOCKER locker(&m_mutex);
-        if (email.trimmed() == m_email)
+        if (newEmail == m_email)
             return;
-        m_email = email.trimmed();
+        m_email = newEmail;
     }
     emit emailChanged(::toSharedPointer(this));
 }
