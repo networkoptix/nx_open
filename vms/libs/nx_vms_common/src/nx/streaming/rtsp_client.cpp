@@ -730,7 +730,11 @@ CameraDiagnostics::Result QnRtspClient::sendOptions()
 
     QString allowedMethods = extractRtspParam(QLatin1String(response), QLatin1String("Public:"));
     if (!allowedMethods.contains("GET_PARAMETER"))
+    {
+        NX_DEBUG(this, "GET_PARAMETER method not allowed, disable keep alive, public methods: %1",
+            allowedMethods);
         m_config.disableKeepAlive = true;
+    }
 
     return result;
 }
@@ -894,6 +898,8 @@ bool QnRtspClient::parseSetupResponse(const QString& response, SDPTrackInfo* tra
             if (timeoutSec > 0 && timeoutSec < 5000)
             {
                 m_keepAliveTimeOut = seconds(timeoutSec);
+                NX_DEBUG(this,
+                    "Session timeout specified: %1", duration_cast<seconds>(m_keepAliveTimeOut));
             }
             else
             {
@@ -1120,6 +1126,8 @@ void QnRtspClient::sendKeepAliveIfNeeded()
 
 bool QnRtspClient::sendKeepAlive()
 {
+    NX_DEBUG(this, "Send keep alive message, keepAliveTimeOut: %1, url: %2",
+        m_keepAliveTimeOut, m_url);
     nx::network::http::Request request;
     request.requestLine.method = kGetParameterCommand;
     request.requestLine.url = m_url;
