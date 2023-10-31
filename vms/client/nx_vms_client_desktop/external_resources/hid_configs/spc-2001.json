@@ -1,0 +1,153 @@
+{
+    "id": "20010839",
+    "manufacturer": "",
+    "model": "Joystick Controller SPC-2001",
+    "reportSize": "64",
+    "xAxis":
+    {
+        "bits": "0-9",
+        "min": "0x0",
+        "max": "0x03ff",
+        "bounce": "1",
+        "sensitivity": "1"
+    },
+    "yAxis":
+    {
+        "bits": "16-25",
+        "min": "0x0",
+        "max": "0x03ff",
+        "bounce": "1",
+        "sensitivity": "1"
+    },
+    "zAxis":
+    {
+        "bits": "32-41",
+        "min": "0x0",
+        "max": "0x03ff",
+        "bounce": "1",
+        "sensitivity": "1"
+    },
+    "buttons":
+    [
+        {
+            "bits": "48",
+            "name": "1",
+            "actions":
+            [
+                {
+                    "id": "PtzActivateByHotkeyAction",
+                    "parameters": {"hotkey": "1"}
+                }
+            ]
+        },
+        {
+            "bits": "49",
+            "name": "2",
+            "actions":
+            [
+                {
+                    "id": "PtzActivateByHotkeyAction",
+                    "parameters": {"hotkey": "2"}
+                }
+            ]
+        },
+        {
+            "bits": "50",
+            "name": "3",
+            "actions":
+            [
+                {
+                    "id": "PtzActivateByHotkeyAction",
+                    "parameters": {"hotkey": "3"}
+                }
+            ]
+        },
+        {
+            "bits": "51",
+            "name": "4",
+            "actions":
+            [
+                {
+                    "id": "PtzActivateByHotkeyAction",
+                    "parameters": {"hotkey": "4"}
+                }
+            ]
+        },
+        {
+            "bits": "52",
+            "name": "5",
+            "actions":
+            [
+                {
+                    "id": "PtzActivateByHotkeyAction",
+                    "parameters": {"hotkey": "5"}
+                }
+            ]
+        },
+        {
+            "bits": "53",
+            "name": "6",
+            "actions":
+            [
+                {
+                    "id": "PtzActivateByHotkeyAction",
+                    "parameters": {"hotkey": "6"}
+                }
+            ]
+        },
+        {
+            "bits": "54",
+            "name": "7",
+            "actions":
+            [
+                {
+                    "id": "PtzActivateByHotkeyAction",
+                    "parameters": {"hotkey": "7"}
+                }
+            ]
+        },
+        {
+            "bits": "55",
+            "name": "8",
+            "actions":
+            [
+                {
+                    "id": "PtzActivateByHotkeyAction",
+                    "parameters": {"hotkey": "8"}
+                }
+            ]
+        },
+        {
+            "bits": "56",
+            "name": "9",
+            "actions":
+            [
+                {"id": "PtzFocusInAction"}
+            ]
+        },
+        {
+            "bits": "57",
+            "name": "10",
+            "actions":
+            [
+                {"id": "PtzFocusOutAction"}
+            ]
+        },
+        {
+            "bits": "58",
+            "name": "11",
+            "actions":
+            [
+                {"id": "GoToPreviousItemAction"}
+            ]
+        },
+        {
+            "bits": "59",
+            "name": "12",
+            "actions":
+            [
+                {"id": "GoToNextItemAction"}
+            ]
+        }
+    ]
+}
