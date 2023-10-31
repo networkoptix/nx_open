@@ -215,7 +215,14 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
             ? helpers::kFactorySystemPassword.toStdString()
             : password.toStdString());
 
-    m_mergeContextId = m_mergeTool->pingSystem(currentServer(), m_url, m_remoteOwnerCredentials);
+    m_mergeContextId = m_mergeTool->pingSystem(
+        currentServer(),
+        m_url,
+        m_remoteOwnerCredentials,
+        MergeSystemsTool::DryRunSettings {
+            .ownSettings = ui->currentSystemRadioButton->isChecked() }
+        );
+
     ui->credentialsGroupBox->setEnabled(false);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
