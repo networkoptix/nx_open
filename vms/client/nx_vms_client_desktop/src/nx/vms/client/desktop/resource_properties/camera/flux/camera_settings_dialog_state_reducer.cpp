@@ -1659,6 +1659,16 @@ State CameraSettingsDialogStateReducer::handleMediaCapabilitiesChanged(
     return state;
 }
 
+State CameraSettingsDialogStateReducer::handleAudioEnabledChanged(
+    State state, const QnVirtualCameraResourceList& cameras)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
+    fetchFromCameras<bool>(state.audioEnabled, cameras,
+        [](const Camera& camera) { return camera->isAudioEnabled(); });
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setSingleCameraUserName(State state, const QString& text)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, text);

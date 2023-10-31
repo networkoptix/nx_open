@@ -85,6 +85,9 @@ public:
     /** Media capabilities were changed on one of the cameras. */
     void handleMediaCapabilitiesChanged(const QnVirtualCameraResourceList& cameras);
 
+    /** Audio enabled status were changed on one of the cameras. */
+    void handleAudioEnabledChanged(const QnVirtualCameraResourceList& cameras);
+
     void updatePtzSettings(const QnVirtualCameraResourceList& cameras);
     void setReadOnly(bool value);
     void setSelectedTab(CameraSettingsTab value);

@@ -54,10 +54,21 @@ public:
                 &QnVirtualCameraResource::compatibleObjectTypesMaybeChanged,
                 this,
                 &Private::handleCompatibleObjectTypesMaybeChanged);
+
+            connections << connect(camera.get(),
+                &QnSecurityCamResource::audioEnabledChanged,
+                this,
+                &Private::handleAudioEnabledChanged);
         }
     }
 
 private:
+    void handleAudioEnabledChanged(const QnResourcePtr& /*resource*/)
+    {
+        if (store)
+            store->handleAudioEnabledChanged(cameras);
+    }
+
     void handleDualStreamingChanged(const QnResourcePtr& /*resource*/)
     {
         if (store)
