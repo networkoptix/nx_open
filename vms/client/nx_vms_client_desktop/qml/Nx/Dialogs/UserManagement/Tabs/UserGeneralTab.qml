@@ -834,9 +834,9 @@ Item
             watchToReopen: control.userId
             Layout.fillWidth: true
 
-            text: qsTr("This user’s login duplicates the login of another user. None of them is" +
-                " able to login. To resolve this issue you can change user’s login or disable or" +
-                " delete users with duplicating logins.")
+            text: qsTr("This user’s login duplicates the login of another user. None of them is "
+                + "able to login. To resolve this issue you can change user’s login or disable or "
+                + "delete users with duplicating logins.")
         }
 
         DialogBanner
@@ -850,7 +850,7 @@ Item
                 && !control.continuousSync
                 && !closed
 
-            text: qsTr("When Continuous Sync is disabled, user’s membership in groups do not "
+            text: qsTr("When Continuous Sync is disabled, user membership in groups do not "
                 + "synchronize automatically. To update this information, initiate a manual sync.")
         }
     }
