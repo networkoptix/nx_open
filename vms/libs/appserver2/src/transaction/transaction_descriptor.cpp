@@ -2076,30 +2076,55 @@ struct ModifyServerAttributesAccess
         const Qn::UserAccessData& accessData,
         const api::MediaServerUserAttributesData& param)
     {
+        NX_CRITICAL(systemContext);
+
         if (hasSystemAccess(accessData))
-            return Result();
+            return {};
+
+        auto [accessor, accessorResult] = userAccessorInfo(*systemContext, accessData);
+        if (!accessorResult)
+            return std::move(accessorResult);
+
+        if (!accessor.permissions.testAnyFlags(
+            {GlobalPermission::administrator, GlobalPermission::powerUser}))
+        {
+            return forbidAttributesModification(accessor);
+        }
 
         const auto& resPool = systemContext->resourcePool();
         auto accessManager = systemContext->resourceAccessManager();
         auto server = resPool->getResourceById<QnMediaServerResource>(param.serverId);
+
+        if (!server && param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
+            return {};
+
         if (server)
         {
             // CRUD API PATCH merges with existing attributes represented as JSON object so they
             // can be not changed.
             if (server->userAttributes() == param)
-                return Result();
-        }
-        else if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
-        {
-            if (accessManager->hasPowerUserPermissions(accessData))
-                return Result();
+                return {};
         }
 
-        auto user = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        return accessManager->hasPermission(user, server, Qn::SavePermission)
-            ? Result()
-            : Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                "Saving Server attributes is forbidden: no saving permission."));
+        auto user = resPool->getResourceById<QnUserResource>(accessor.id);
+        if (!NX_ASSERT(user))
+            return {ErrorCode::serverError};
+
+        if (!accessManager->hasPermission(user, server, Qn::SavePermission))
+            return forbidAttributesModification(accessor);
+
+        return {};
+    }
+
+private:
+    static Result forbidAttributesModification(const UserAccessorInfo& user)
+    {
+        return {ErrorCode::forbidden,
+            nx::format(
+                ServerApiErrors::tr(
+                    "User '%1(%2)' is not permitted to modify the Server's attributes."),
+                user.name,
+                user.id.toString())};
     }
 };
 
