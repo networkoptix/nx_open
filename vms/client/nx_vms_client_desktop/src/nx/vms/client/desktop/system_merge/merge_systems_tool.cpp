@@ -12,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/license/remote_licenses.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -88,7 +89,8 @@ MergeSystemsTool::~MergeSystemsTool()
 QnUuid MergeSystemsTool::pingSystem(
     const QnMediaServerResourcePtr& proxy,
     const nx::utils::Url& targetUrl,
-    const nx::network::http::Credentials& targetCredentials)
+    const nx::network::http::Credentials& targetCredentials,
+    std::optional<DryRunSettings> dryRunSettings)
 {
     auto ctxId = QnUuid::createUuid();
 
@@ -98,6 +100,14 @@ QnUuid MergeSystemsTool::pingSystem(
     ctx.target = nx::network::SocketAddress::fromUrl(targetUrl);
     ctx.targetUser = targetCredentials.username;
     ctx.targetPassword = targetCredentials.authToken.value;
+
+    if (dryRunSettings)
+    {
+        ctx.mergeData.takeRemoteSettings = !dryRunSettings->ownSettings;
+        ctx.mergeData.mergeOneServer = dryRunSettings->oneServer;
+        ctx.mergeData.ignoreIncompatible = dryRunSettings->ignoreIncompatible;
+        ctx.mergeData.dryRun = true;
+    }
 
     NX_DEBUG(this, "Starting ping server at address %1", ctx.target);
 
@@ -132,6 +142,61 @@ QnUuid MergeSystemsTool::pingSystem(
     return ctxId;
 }
 
+void MergeSystemsTool::mergeSystemDryRun(const Context& ctx)
+{
+    NX_DEBUG(this, "Starting system merge dry run, target: %1", ctx.target);
+
+    auto mergeData = ctx.mergeData;
+    mergeData.ignoreOfflineServerDuplicates = true;
+    mergeData.remoteEndpoint = ctx.target.toString();
+    // FIXME: Use handshake certificate here when CertificateChain PEM serialization
+    // will be available.
+    mergeData.remoteCertificatePem =
+        ctx.targetInfo.userProvidedCertificatePem.empty()
+        ? ctx.targetInfo.certificatePem
+        : ctx.targetInfo.userProvidedCertificatePem;
+
+    NX_ASSERT(mergeData.dryRun);
+    mergeData.dryRun = true;
+
+    auto onMergeDryRunStarted =
+        [this, ctxId = ctx.id](
+            const rest::ErrorOrData<nx::vms::api::MergeStatusReply>& errorOrData)
+        {
+            if (auto ctx = findContext(ctxId))
+            {
+                if (const auto status = std::get_if<nx::vms::api::MergeStatusReply>(&errorOrData))
+                {
+                    reportSystemFound(
+                        *ctx,
+                        MergeSystemsStatus::ok,
+                        /*errorText*/ {},
+                        /*removeCtx*/ false);
+                }
+                else if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                {
+                    NX_WARNING(
+                        this, "Can't dry run merge, rest result: %1", QJson::serialized(*error));
+
+                    reportSystemFound(
+                        *ctx, mergeStatusFromResult(*error), error->errorString, true);
+                }
+            }
+        };
+
+    const auto context = desktop::SystemContext::fromResource(ctx.proxy);
+    nx::network::http::Credentials credentials;
+    if (NX_ASSERT(context))
+        credentials = context->connectionCredentials();
+
+    m_requestManager->mergeSystem(
+        ctx.proxy,
+        m_certificateVerifier->makeAdapterFunc(ctx.proxy->getId(), ctx.proxy->getApiUrl()),
+        credentials,
+        mergeData,
+        nx::utils::guarded(this, std::move(onMergeDryRunStarted)));
+}
+
 bool MergeSystemsTool::mergeSystem(
     const QnUuid& ctxId,
     const std::string& ownerSessionToken,
@@ -156,6 +221,8 @@ bool MergeSystemsTool::mergeSystem(
         ? ctx->targetInfo.certificatePem
         : ctx->targetInfo.userProvidedCertificatePem;
 
+    ctx->mergeData.dryRun = false;
+
     auto onMergeStarted =
         [this, ctxId](const rest::ErrorOrData<nx::vms::api::MergeStatusReply>& errorOrData)
         {
@@ -166,7 +233,7 @@ bool MergeSystemsTool::mergeSystem(
     m_requestManager->mergeSystem(
         ctx->proxy,
         m_certificateVerifier->makeAdapterFunc(ctx->proxy->getId(), ctx->proxy->getApiUrl()),
-        ownerSessionToken,
+        nx::network::http::BearerAuthToken(ownerSessionToken),
         ctx->mergeData,
         nx::utils::guarded(this, std::move(onMergeStarted)));
 
@@ -272,6 +339,13 @@ void MergeSystemsTool::at_sessionCreated(
     {
         NX_ASSERT(!loginSession->token.empty());
         ctx.mergeData.remoteSessionToken = std::move(loginSession->token);
+
+        if (ctx.mergeData.dryRun)
+        {
+            // Skip further checks and do a dry run - the server should perform all other checks.
+            mergeSystemDryRun(ctx);
+            return;
+        }
 
         if (!nx::vms::license::hasUniqueLicenses(ctx.proxy->systemContext()->licensePool()))
         {

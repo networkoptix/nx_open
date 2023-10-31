@@ -76,7 +76,7 @@ void addRequestData(Request* request, nx::Buffer&& data)
 Request makeDirectRequest(
     QnMediaServerResourcePtr proxy,
     nx::network::ssl::AdapterFunc proxyAdapterFunc,
-    const std::string& ownerSessionToken,
+    const nx::network::http::Credentials& credentials,
     const std::string& path,
     nx::Buffer data)
 {
@@ -86,7 +86,7 @@ Request makeDirectRequest(
 
     request.client = std::make_unique<nx::network::http::AsyncClient>(std::move(proxyAdapterFunc));
     addRequestData(&request, std::move(data));
-    request.client->setCredentials(nx::network::http::BearerAuthToken(ownerSessionToken));
+    request.client->setCredentials(credentials);
 
     return request;
 }
@@ -331,15 +331,16 @@ void MergeSystemRequestsManager::getTargetLicenses(
 void MergeSystemRequestsManager::mergeSystem(
     QnMediaServerResourcePtr proxy,
     nx::network::ssl::AdapterFunc proxyAdapterFunc,
-    const std::string& ownerSessionToken,
+    const nx::network::http::Credentials& credentials,
     const nx::vms::api::SystemMergeData& data,
     Callback<nx::vms::api::MergeStatusReply> callback)
 {
     NX_DEBUG(this, "Merging target %1 to %2", data.remoteEndpoint, proxy);
+    NX_ASSERT(!credentials.authToken.empty(), "Credentials are required");
     Request request = makeDirectRequest(
         proxy,
         std::move(proxyAdapterFunc),
-        ownerSessionToken,
+        credentials,
         "/rest/v1/system/merge",
         QJson::serialized(data));
     d->doRequest(nx::network::http::Method::post, std::move(request), std::move(callback));
