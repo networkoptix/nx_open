@@ -12,6 +12,8 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/system_merge_data.h>
 
+namespace nx::network::http { class Credentials; }
+
 namespace rest {
 
 template<typename Data>
@@ -60,7 +62,7 @@ public:
     void mergeSystem(
         QnMediaServerResourcePtr proxy,
         nx::network::ssl::AdapterFunc proxyAdapterFunc,
-        const std::string& ownerSessionToken,
+        const nx::network::http::Credentials& credentials,
         const nx::vms::api::SystemMergeData& request,
         Callback<nx::vms::api::MergeStatusReply> callback);
 

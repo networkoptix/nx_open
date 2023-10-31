@@ -216,7 +216,13 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
             : password.toStdString());
 
     m_mergeContextId = m_mergeTool->pingSystem(
-        system()->currentServer(), m_url, m_remoteOwnerCredentials);
+        system()->currentServer(),
+        m_url,
+        m_remoteOwnerCredentials,
+        MergeSystemsTool::DryRunSettings {
+            .ownSettings = ui->currentSystemRadioButton->isChecked() }
+        );
+
     ui->credentialsGroupBox->setEnabled(false);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
