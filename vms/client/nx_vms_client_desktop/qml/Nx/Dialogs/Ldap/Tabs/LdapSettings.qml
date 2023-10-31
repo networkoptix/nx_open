@@ -193,7 +193,7 @@ Rectangle
         anchors.verticalCenterOffset: -32
         imageSource: "image://svg/skin/user_settings/ldap_not_configured.svg"
         text: qsTr("LDAP is not configured yet")
-        additionalText: qsTr("Connect your System to a LDAP server for easier user management")
+        additionalText: qsTr("Connect your System to an LDAP server for easier user management")
 
         maxWidth: 250
 
