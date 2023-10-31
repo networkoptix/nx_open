@@ -405,8 +405,8 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
                 {
                     setConfigurationStatus(Active);
                     setConfigurationStatusHint(testRemoteSettings && !useCloudServiceChanged()
-                        ? "Users are receiving emails"
-                        : "Users will start receiving emails right after you apply settings");
+                        ? tr("Users are receiving emails")
+                        : tr("Users will start receiving emails right after you apply settings"));
                 }
                 else
                 {
@@ -417,7 +417,7 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
             else
             {
                 setConfigurationStatus(Error);
-                setConfigurationStatusHint("Unable to test SMTP server");
+                setConfigurationStatusHint(tr("Unable to test SMTP server"));
             }
         });
 
@@ -433,7 +433,7 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
         if (!settingsForTesting.isValid())
         {
             setConfigurationStatus(NotConfigured);
-            setConfigurationStatusHint("Additional info required");
+            setConfigurationStatusHint(tr("Additional info required"));
             return;
         }
 
