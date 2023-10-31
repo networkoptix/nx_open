@@ -42,6 +42,14 @@ public:
     using Delegate = nx::vms::client::core::AbstractRemoteConnectionUserInteractionDelegate;
 
 public:
+    struct DryRunSettings
+    {
+        bool ownSettings = false;
+        bool oneServer = false;
+        bool ignoreIncompatible = false;
+    };
+
+public:
     MergeSystemsTool(
         QObject* parent,
         CertificateVerifier* certificateVerifier,
@@ -50,16 +58,19 @@ public:
     ~MergeSystemsTool();
 
     /**
-     * Obtains target server info by it's address. Validates licenses.
+     * Obtains target server info by it's address. Validates licenses. Tries merge in dry run mode
+     * if setting are provided.
      * @param proxy Current system server resource.
      * @param targetUrl Target server API url.
+     * @param dryRunSettings Settings for merge in dry run mode.
      * @return Ping id which can be used for subsequent merge.
      */
     [[nodiscard]]
     QnUuid pingSystem(
         const QnMediaServerResourcePtr& proxy,
         const nx::utils::Url& targetUrl,
-        const nx::network::http::Credentials& targetCredentials);
+        const nx::network::http::Credentials& targetCredentials,
+        std::optional<DryRunSettings> dryRunSettings = {});
 
     /**
      * Continues merge process after successful ping.
@@ -108,6 +119,8 @@ private:
         MergeSystemsStatus status,
         const QString& errorText = QString(),
         bool removeCtx = true);
+
+    void mergeSystemDryRun(const Context& ctx);
 
     void at_serverInfoReceived(
         Context& ctx, const rest::ErrorOrData<nx::vms::api::ServerInformation>& errorOrData);
