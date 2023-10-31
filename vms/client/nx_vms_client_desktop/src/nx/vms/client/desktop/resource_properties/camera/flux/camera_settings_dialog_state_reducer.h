@@ -72,6 +72,11 @@ public:
         State state,
         const QnVirtualCameraResourceList& cameras);
 
+    /** Audio enabled status were changed on one of the cameras. */
+    static State handleAudioEnabledChanged(
+        State state,
+        const QnVirtualCameraResourceList& cameras);
+
     static State updatePtzSettings(State state, const QnVirtualCameraResourceList& cameras);
     static State setSelectedTab(State state, CameraSettingsTab value);
     static State setReadOnly(State state, bool value);

@@ -161,6 +161,16 @@ void CameraSettingsDialogStore::handleMediaCapabilitiesChanged(
         });
 }
 
+void CameraSettingsDialogStore::handleAudioEnabledChanged(
+    const QnVirtualCameraResourceList& cameras)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::handleAudioEnabledChanged(std::move(state), cameras);
+        });
+}
+
 void CameraSettingsDialogStore::updatePtzSettings(const QnVirtualCameraResourceList& cameras)
 {
     d->executeAction(
