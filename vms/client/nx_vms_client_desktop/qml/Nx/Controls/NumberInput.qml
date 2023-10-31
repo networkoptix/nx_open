@@ -48,6 +48,7 @@ FocusScope
     property alias prefix: prefixText.text
     property alias background: textField.background
     property alias cursorPosition: textField.cursorPosition
+    property alias contextMenuOpening: textField.contextMenuOpening
 
     enum Mode
     {

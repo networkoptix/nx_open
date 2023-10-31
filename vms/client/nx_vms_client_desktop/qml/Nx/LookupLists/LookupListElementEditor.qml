@@ -67,7 +67,12 @@ Control
             }
 
             onTextChanged: control.value = text
-            onEditingFinished: control.editingFinished()
+            onEditingFinished:
+            {
+                if (!contextMenuOpening)
+                    control.editingFinished()
+            }
+
             Component.onCompleted: text = control.value
         }
     }
@@ -92,7 +97,11 @@ Control
             }
 
             onValueChanged: control.value = value || ""
-            onEditingFinished: control.editingFinished()
+            onEditingFinished:
+            {
+                if (!contextMenuOpening)
+                    control.editingFinished()
+            }
             Component.onCompleted: setValue(control.value)
         }
     }
