@@ -20,6 +20,7 @@ T.TextField
     placeholderTextColor: ColorTheme.transparent(color, 0.5)
     property bool hidePlaceholderOnFocus: false
     property bool selectPlaceholderOnFocus: false
+    property bool contextMenuOpening: false
 
     property int prevSelectionStart: 0
     property int prevSelectionEnd: 0
@@ -152,10 +153,15 @@ T.TextField
         CursorOverride.active: containsMouse
         hoverEnabled: true
 
-        onMenuAboutToBeOpened: control.forceActiveFocus()
+        onMenuAboutToBeOpened:
+        {
+            contextMenuOpening = true
+            control.forceActiveFocus()
+        }
 
         onMenuOpened: (prevSelectionStart, prevSelectionEnd, prevCursorPosition) =>
         {
+            contextMenuOpening = false
             control.prevSelectionStart = prevSelectionStart
             control.prevSelectionEnd = prevSelectionEnd
             control.prevCursorPosition = prevCursorPosition
