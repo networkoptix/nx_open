@@ -25,7 +25,7 @@ set(client_update_files_directory "${CMAKE_CURRENT_BINARY_DIR}/client_update_pac
 
 nx_generate_package_json(${client_update_files_directory}/package.json
     COMPONENT client
-    VARIANTS "{ \"minimumVersion\": \"6.3\" }") #< Corresponds to Windows 8.1.
+    VARIANTS "{ \"minimumVersion\": \"10.0\" }") #< Windows 10 / Windows Server 2016.
 
 # Copy qt.conf for the Client update package generation script.
 file(COPY "${qt_conf_path}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
