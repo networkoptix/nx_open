@@ -201,6 +201,7 @@ DialogWithState
         {
             style: DialogBanner.Style.Warning
             closeable: true
+            watchToReopen: dialog.userId
             width: banners.width
             visible: dialog.userIsNotRegisteredInCloud && !closed
 
