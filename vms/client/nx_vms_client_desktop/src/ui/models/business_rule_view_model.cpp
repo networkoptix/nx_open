@@ -596,9 +596,8 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
     if (isActionUsingSourceCamera())
         return qnResIconCache->icon(QnResourceIconCache::Camera);
 
-    static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-        colorSubs = {
-            {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
+    static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+        {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
 
     switch (m_actionType)
     {

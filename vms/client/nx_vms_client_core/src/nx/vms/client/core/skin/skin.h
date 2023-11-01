@@ -42,7 +42,7 @@ public:
         const QnIcon::Suffixes* suffixes = nullptr,
         const SvgIconColorer::IconSubstitutions& svgColorSubstitutions = {},
         const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {},
-        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& svgThemeSubstitutions = {});
+        const SvgIconColorer::ThemeSubstitutions& svgThemeSubstitutions = {});
     QIcon icon(const char* name, const char* checkedName = nullptr);
     QIcon icon(const QIcon& icon);
     QIcon icon(const QString& name,
@@ -53,9 +53,9 @@ public:
         const QString& checkedName,
         const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions = {});
     QIcon icon(const QString& name,
-        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions);
+        const SvgIconColorer::ThemeSubstitutions& themeSubstitutions);
     QIcon icon(const QString& name,
-        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions,
+        const SvgIconColorer::ThemeSubstitutions& themeSubstitutions,
         const QString& checkedName);
 
     /**

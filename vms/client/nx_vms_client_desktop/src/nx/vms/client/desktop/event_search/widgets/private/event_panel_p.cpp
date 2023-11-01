@@ -77,7 +77,7 @@ static const QSize kToolTipMaxThumbnailSize{240, 180};
 static constexpr int kMaxMultiThumbnailCount = 5;
 static constexpr int kMultiThumbnailSpacing = 1;
 
-const QMap<QIcon::Mode, core::SvgIconColorer::ThemeColorsRemapData> kTabIconSubstitutions = {
+const core::SvgIconColorer::ThemeSubstitutions kTabIconSubstitutions = {
     {QnIcon::Disabled, {.primary = "dark14"}},
     {QnIcon::Selected, {.primary = "light4"}},
     {QnIcon::Active, {.primary = "brand_core"}},
