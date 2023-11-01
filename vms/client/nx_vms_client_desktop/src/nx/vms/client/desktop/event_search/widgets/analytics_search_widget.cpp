@@ -65,7 +65,7 @@
 
 namespace nx::vms::client::desktop {
 
-static const QMap<QIcon::Mode, core::SvgIconColorer::ThemeColorsRemapData> kThemeSubstitutions = {
+static const core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
     {QIcon::Normal, {.primary = "light16"}},
     {QIcon::Active, {.primary = "light17"}},
     {QIcon::Selected, {.primary = "light15"}},

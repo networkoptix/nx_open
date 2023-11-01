@@ -321,9 +321,8 @@ void SubjectSelectionDialog::setValidationPolicy(QnSubjectValidationPolicy* poli
 
 void SubjectSelectionDialog::validateAllUsers()
 {
-    static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-        colorSubs = {
-            {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
+    static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+        {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
 
     const auto validationState = m_roles->validateUsers(std::move(allSubjects()));
 

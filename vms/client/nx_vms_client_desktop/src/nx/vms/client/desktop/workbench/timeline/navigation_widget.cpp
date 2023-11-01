@@ -44,13 +44,11 @@ bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, cons
     return true;
 };
 
-static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-    kNavigationIconSubstitutions =
-{
-    {QIcon::Normal, {.primary = "light4", .secondary="dark7"}},
-    {QIcon::Active, {.primary = "light6", .secondary="dark8"}},
-    {QIcon::Disabled, {.primary = "light4", .secondary="dark7", .alpha=0.3}},
-    {QnIcon::Pressed, {.primary = "light2", .secondary="dark6"}},
+static const core::SvgIconColorer::ThemeSubstitutions kNavigationIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light4", .secondary = "dark7"}},
+    {QIcon::Active, {.primary = "light6", .secondary = "dark8"}},
+    {QIcon::Disabled, {.primary = "light4", .secondary = "dark7", .alpha = 0.3}},
+    {QnIcon::Pressed, {.primary = "light2", .secondary = "dark6"}},
 };
 
 } // namespace

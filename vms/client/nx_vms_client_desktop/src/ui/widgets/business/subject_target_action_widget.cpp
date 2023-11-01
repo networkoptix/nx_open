@@ -126,9 +126,8 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
 
     const auto icon = [](const QString& path) -> QIcon
     {
-        static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-            colorSubs = {{QnIcon::Normal, {.primary = "light10"}},
-                {QnIcon::Selected, {.primary = "light4"}}};
+        static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+            {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
         return qnSkin->icon(path, colorSubs);
     };
 
