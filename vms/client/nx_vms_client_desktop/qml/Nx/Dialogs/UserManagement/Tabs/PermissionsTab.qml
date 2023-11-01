@@ -25,11 +25,13 @@ Item
     readonly property int columnCount: availableAccessRightDescriptors.length
 
     readonly property int kRowHeight: 28
-    readonly property int kColumnWidth: 64
+    readonly property int kMinColumnWidth: 64
 
     property var buttonBox
 
     property bool editingEnabled: true
+
+    property bool advancedMode: true
 
     readonly property var availableAccessRightDescriptors:
         Array.prototype.slice.call(AccessRightsList.items) //< Deep copy to JS for optimization.
@@ -37,44 +39,84 @@ Item
     readonly property var availableAccessRights:
         Array.prototype.map.call(availableAccessRightDescriptors, item => item.accessRight)
 
+    enum Mode
+    {
+        SimpleMode,
+        AdvancedMode
+    }
+    property int mode: PermissionsTab.SimpleMode
+
     Item
     {
         id: accessRightsHeader
+
+        property int columnWidth: Math.max(control.kMinColumnWidth,
+             Math.round((control.width * 0.5) / control.columnCount))
 
         anchors.right: control.right
         anchors.rightMargin: 9
 
         height: 64
-        width: control.columnCount * control.kColumnWidth
+        width: control.columnCount * columnWidth
 
-        property int hoveredAccessRight: tree.hoveredCell
-            ? tree.hoveredCell.accessRight
-            : 0
+        property int hoveredAccessRight: 0
+        property var hoverPos
 
         Row
         {
+            spacing: 1
+            leftPadding: 1
+
             Repeater
             {
+                id: accessRightsButtonsRepeater
+
                 model: control.availableAccessRightDescriptors
 
                 AccessRightsHeaderItem
                 {
                     id: accessRightItem
 
+                    readonly property int accessRight: modelData.accessRight
+
                     height: accessRightsHeader.height
-                    width: control.kColumnWidth
+                    width: accessRightsHeader.columnWidth - 1
+
                     icon: modelData.icon
 
-                    color: accessRightsHeader.hoveredAccessRight == modelData.accessRight && enabled
+                    color: tree.hoveredAccessRight == modelData.accessRight && enabled
                         ? ColorTheme.colors.light4
                         : ColorTheme.colors.light10
 
-                    enabled: control.editingEnabled && !frameSelector.dragging
+                    enabled: control.editingEnabled
+                    interactive: !tree.selectionEmpty
 
                     GlobalToolTip.text: modelData.description
 
-                    readonly property int index: Positioner.index
-                    readonly property int accessRight: modelData.accessRight
+                    onHoveredChanged:
+                    {
+                        if (hovered)
+                        {
+                            accessRightsHeader.hoveredAccessRight = accessRight
+                            accessRightsHeader.hoverPos = x
+                        }
+                        else if (accessRightsHeader.hoveredAccessRight == accessRight)
+                        {
+                            accessRightsHeader.hoveredAccessRight = 0
+                            accessRightsHeader.hoverPos = undefined
+                        }
+                    }
+
+                    onClicked:
+                    {
+                        if (!control.editingContext)
+                            return
+
+                        control.editingContext.modifyAccessRights(tree.selection(),
+                            accessRight,
+                            tree.nextBatchCheckState === Qt.Checked,
+                            automaticDependenciesSwitch.checked)
+                    }
                 }
             }
         }
@@ -92,7 +134,21 @@ Item
             bottom: tree.bottom
         }
 
-        color: control.editingEnabled ? ColorTheme.colors.dark4 : ColorTheme.colors.dark7
+        color: control.editingEnabled && control.mode === PermissionsTab.AdvancedMode
+            ? ColorTheme.colors.dark5
+            : ColorTheme.colors.dark7
+
+        Rectangle
+        {
+            id: hoveredColumnBackground
+
+            x: accessRightsHeader.hoverPos || 0
+            width: accessRightsHeader.columnWidth - 1
+            height: permissionsBackground.height
+
+            visible: accessRightsHeader.hoverPos !== undefined
+            color: tree.tableHoverColor
+        }
     }
 
     ResourceSelectionTree
@@ -100,9 +156,19 @@ Item
         id: tree
 
         property var hoveredRow: null
-        property var hoveredCell: hoveredRow ? hoveredRow.hoveredCell : null
+        readonly property var hoveredCell: hoveredRow ? hoveredRow.hoveredCell : null
+        readonly property int hoveredAccessRight: hoveredCell ? hoveredCell.accessRight : 0
+
+        property bool interactiveCells: control.editingEnabled
+            && control.mode === PermissionsTab.AdvancedMode
+
+        property color tableHoverColor: interactiveCells
+            ? ColorTheme.colors.dark6
+            : ColorTheme.colors.dark8
 
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
+
+        property int nextBatchCheckState: Qt.Checked
 
         property var currentSearchRegExp: null
 
@@ -124,10 +190,14 @@ Item
         anchors.leftMargin: 16
 
         expandsOnDoubleClick: false
-        hoverHighlightColor: "transparent"
+        selectionEnabled: true
         showResourceStatus: false
         clipDelegates: false
-        topMargin: 0
+        topMargin: 1
+        spacing: 1
+
+        inactiveSelectionHighlightColor: selectionHighlightColor
+        hoverHighlightColor: ColorTheme.colors.dark8
 
         resourceTypes:
         {
@@ -145,6 +215,35 @@ Item
         webPagesAndIntegrationsCombined: true
 
         filterText: searchField.text
+
+        function updateNextBatchCheckState()
+        {
+            if (!accessRightsHeader.hoveredAccessRight || !control.editingContext)
+                return
+
+            const currentCheckState = control.editingContext.combinedOwnCheckState(
+                tree.selection(), accessRightsHeader.hoveredAccessRight)
+
+            nextBatchCheckState = currentCheckState === Qt.Checked
+                ? Qt.Unchecked
+                : Qt.Checked;
+        }
+
+        onSelectionChanged:
+            updateNextBatchCheckState()
+
+        Connections
+        {
+            target: accessRightsHeader
+            function onHoveredAccessRightChanged() { tree.updateNextBatchCheckState() }
+        }
+
+        Connections
+        {
+            target: control.editingContext
+            function onResourceAccessChanged() { tree.updateNextBatchCheckState() }
+            function onSubjectChanged() { tree.clearSelection(/*clearCurrentIndex*/ true) }
+        }
 
         Binding
         {
@@ -164,22 +263,45 @@ Item
                 || tree.model.isExtraInfoForced(resource)
 
             selectionMode: tree.selectionMode
+            hoverColor: tree.tableHoverColor
             showResourceStatus: tree.showResourceStatus
-            columnWidth: control.kColumnWidth
+            columnWidth: accessRightsHeader.columnWidth
             implicitHeight: control.kRowHeight
-            editingEnabled: control.editingEnabled
+            editingEnabled: tree.interactiveCells
             automaticDependencies: automaticDependenciesSwitch.checked
             accessRightsList: control.availableAccessRights
             highlightRegExp: tree.currentSearchRegExp
-            frameSelectionMode: frameSelector.currentMode
 
-            frameSelectionRect:
+            hoveredColumnAccessRight: accessRightsHeader.hoveredAccessRight
+            isRowHovered: tree.hoveredItem === this
+
+            externalNextCheckState: tree.nextBatchCheckState
+
+            externallyHoveredGroups:
             {
-                if (!frameSelector.dragging || !control.editingEnabled)
-                    return Qt.rect(0, 0, 0, 0)
+                if (tree.hoveredRow)
+                {
+                    return {
+                        "indexes": [tree.hoveredRow.resourceTreeIndex],
+                        "accessRight": tree.hoveredCell.accessRight,
+                        "toggledOn": tree.hoveredCell.toggledOn,
+                        "fromSelection": false}
+                }
 
-                return rowAccess.mapFromItem(tree, tree.mapFromItem(selectionArea,
-                    selectionArea.frameRect))
+                if (accessRightsHeader.hoveredAccessRight && control.editingContext)
+                {
+                    const selection = tree.selection()
+                    if (!selection.length)
+                        return undefined
+
+                    return {
+                        "indexes": selection,
+                        "accessRight": accessRightsHeader.hoveredAccessRight,
+                        "toggledOn": tree.nextBatchCheckState !== Qt.Checked,
+                        "fromSelection": true}
+                }
+
+                return undefined
             }
 
             onHoveredCellChanged:
@@ -190,147 +312,8 @@ Item
                     tree.hoveredRow = null
             }
 
-            Connections
-            {
-                target: frameSelector
-                function onCanceled() { rowAccess.hoveredCell = null }
-            }
-        }
-
-        MouseArea
-        {
-            id: selectionArea
-
-            x: accessRightsHeader.x - tree.x + 1
-            y: 1
-            width: accessRightsHeader.width
-            height: Math.max(tree.height - 1, 0)
-
-            hoverEnabled: false
-            propagateComposedEvents: true
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-
-            property point start
-
-            readonly property point current: Qt.point(
-                frameSelector.position.x,
-                frameSelector.position.y - tree.contentItem.y)
-
-            readonly property point topLeft: Qt.point(
-                Math.max(0, Math.min(start.x, current.x)),
-                Math.max(0, Math.min(start.y, current.y)) + tree.contentItem.y);
-
-            readonly property point bottomRight: Qt.point(
-                Math.min(width - 1, Math.max(start.x, current.x)),
-                Math.min(Math.max(height, tree.contentItem.height) - 1,
-                    Math.max(start.y, current.y)) + tree.contentItem.y);
-
-            readonly property rect frameRect: Qt.rect(
-                topLeft.x,
-                topLeft.y,
-                bottomRight.x - topLeft.x,
-                bottomRight.y - topLeft.y)
-
-            onCanceled: //< Called when another item grabs mouse exclusively.
-                frameSelector.cancel()
-
-            SimpleDragInstrument
-            {
-                id: frameSelector
-
-                item: selectionArea
-                enabled: control.editingEnabled
-
-                property int currentMode: ResourceAccessDelegate.NoFrameOperation
-
-                onStarted:
-                {
-                    selectionArea.start = Qt.point(
-                        pressPosition.x,
-                        pressPosition.y - tree.contentItem.y)
-
-                    currentMode = Qt.binding(() => KeyboardModifiers.shiftPressed
-                        ? ResourceAccessDelegate.FrameUnselection
-                        : ResourceAccessDelegate.FrameSelection)
-                }
-
-                onFinished:
-                {
-                    if (!control.editingContext
-                        || selectionArea.frameRect.width === 0
-                        || selectionArea.frameRect.height === 0)
-                    {
-                        currentMode = ResourceAccessDelegate.NoFrameOperation
-                        return
-                    }
-
-                    const nextCheckValue = currentMode == ResourceAccessDelegate.FrameSelection
-                    currentMode = ResourceAccessDelegate.NoFrameOperation
-
-                    const rect = Qt.rect(
-                        selectionArea.frameRect.left,
-                        selectionArea.frameRect.top - tree.contentItem.y,
-                        selectionArea.frameRect.width,
-                        selectionArea.frameRect.height)
-
-                    const firstRow = Math.floor(rect.top / control.kRowHeight)
-                    const lastRow = Math.floor(rect.bottom / control.kRowHeight)
-                    const firstColumn = Math.floor(rect.left / control.kColumnWidth)
-                    const lastColumn = Math.floor(rect.right / control.kColumnWidth)
-
-                    let accessRights = 0
-                    for (let column = firstColumn; column <= lastColumn; ++column)
-                        accessRights |= control.availableAccessRights[column];
-
-                    const indexes = tree.rowIndexes(firstRow, lastRow)
-                    const resources = indexes.map(index => NxGlobals.modelData(index, "resource"))
-                        .filter(resource => !!resource)
-
-                    control.editingContext.modifyAccessRights(resources, accessRights,
-                        nextCheckValue, automaticDependenciesSwitch.checked)
-                }
-
-                onCanceled:
-                {
-                    currentMode = ResourceAccessDelegate.NoFrameOperation
-                    tree.hoveredRow = null
-                }
-            }
-
-            Binding
-            {
-                when: frameSelector.dragging
-                target: tree.autoScroller
-                property: "velocity"
-
-                value:
-                {
-                    const rect = Qt.rect(
-                        0, -tree.contentItem.y, selectionArea.width, selectionArea.height)
-
-                    return ProximityScrollHelper.velocity(rect,
-                        Geometry.bounded(selectionArea.current, rect))
-                }
-            }
-
-            Rectangle
-            {
-                id: selectionFrame
-
-                visible: frameSelector.currentMode != ResourceAccessDelegate.NoFrameOperation
-                z: 2
-
-                color: ColorTheme.transparent(border.color, 0.1)
-
-                border.color: frameSelector.currentMode == ResourceAccessDelegate.FrameUnselection
-                    ? ColorTheme.colors.red_d1
-                    : ColorTheme.colors.brand_core
-
-                x: selectionArea.frameRect.left
-                y: selectionArea.frameRect.top
-                width: selectionArea.frameRect.width
-                height: selectionArea.frameRect.height
-            }
+            onTriggered:
+                tree.clearSelection()
         }
     }
 
@@ -437,7 +420,26 @@ Item
         anchors.top: parent.top
         height: parent.height
         x: 16
-        spacing: 8
+        spacing: 16
+
+        Switch
+        {
+            id: modeSwitch
+
+            anchors.verticalCenter: parent.verticalCenter
+            visible: control.editingEnabled
+
+            text: checked ? qsTr("Advanced Mode On") : qsTr("Advanced Mode Off")
+            color: ColorTheme.colors.light10
+
+            onToggled:
+                control.mode = (checked ? PermissionsTab.AdvancedMode : PermissionsTab.SimpleMode)
+
+            Binding on checked
+            {
+                value: control.mode === PermissionsTab.AdvancedMode
+            }
+        }
 
         Switch
         {
@@ -463,21 +465,6 @@ Item
             onToggled:
                 GlobalTemporaries.automaticAccessDependenciesEnabledByDefault = checked
         }
-
-        ContextHintButton
-        {
-            anchors.verticalCenter: parent.verticalCenter
-
-            toolTipText:
-                qsTr("Resources table gives you an overview of user or group permissions and "
-                    + "allows you to assign permissions for specific resources.")
-                + "<br>"
-                + qsTr("Click on the cells to select and unselect them. Use drag&drop and "
-                    + "Shift+drag&drop for batch edit.")
-                + "<br>"
-                + qsTr("If you select a permission that depends on another permission both "
-                    + "permissions will be granted automatically.")
-        }
     }
 
     Shortcut
@@ -489,12 +476,6 @@ Item
             GlobalTemporaries.automaticAccessDependencySwitchVisible = true
     }
 
-    Shortcut
-    {
-        sequence: "Esc"
-        enabled: frameSelector.dragging
-
-        onActivated:
-            frameSelector.cancel()
-    }
+    onEditingContextChanged:
+        tree.clearSelection(/*clearCurrentIndex*/ true)
 }

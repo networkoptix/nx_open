@@ -12,7 +12,7 @@ import nx.vms.client.desktop
 
 Item
 {
-    id: delegateRoot
+    id: root
 
     property alias showExtraInfo: mainDelegate.showExtraInfo
     property alias selectionMode: mainDelegate.selectionMode
@@ -28,38 +28,56 @@ Item
 
     property bool editingEnabled: true
 
+    property color hoverColor
+
     property bool automaticDependencies: false
 
-    enum FrameSelectionMode
+    readonly property alias hoveredCell: cellsRow.hoveredCell
+
+    readonly property var resourceTreeIndex: modelIndex
+
+    property bool isRowHovered: false
+    property int hoveredColumnAccessRight: 0
+    property int externalNextCheckState: Qt.Checked
+
+    readonly property int externallySelectedAccessRight: isSelected
+        ? hoveredColumnAccessRight
+        : 0
+
+    property var externallyHoveredGroups // {indexes[], accessRight, toggledOn, fromSelection}
+
+    readonly property bool isParentHovered:
     {
-        NoFrameOperation,
-        FrameSelection,
-        FrameUnselection
+        if (!externallyHoveredGroups)
+            return false
+
+        for (let parent of externallyHoveredGroups.indexes)
+        {
+            if (NxGlobals.isRecursiveChildOf(root.resourceTreeIndex, parent))
+                return true
+        }
+
+        return false
     }
-
-    property int frameSelectionMode: ResourceAccessDelegate.NoFrameOperation
-    property rect frameSelectionRect
-
-    property var hoveredCell: null
 
     readonly property var resource: (model && model.resource) || null
     readonly property var nodeType: (model && model.nodeType) || -1
 
-    implicitWidth: mainDelegate.implicitWidth
+    signal triggered(int index)
+
+    implicitWidth: mainDelegate.implicitWidth + cellsRow.width + 1
     implicitHeight: 28
 
-    enabled: editingEnabled && frameSelectionMode == ResourceAccessDelegate.NoFrameOperation
+    enabled: editingEnabled
 
     ResourceSelectionDelegate
     {
         id: mainDelegate
 
-        width: delegateRoot.width - cellsRow.width - 1
-        height: delegateRoot.height
+        width: root.width - cellsRow.width - 1
+        height: root.height
 
-        highlighted: delegateRoot.enabled
-            && frameSelectionMode == ResourceAccessDelegate.NoFrameOperation
-            && delegateRoot.hoveredCell
+        highlighted: !!cellsRow.hoveredCell
 
         customSelectionIndicator: true
         wholeRowToggleable: false
@@ -70,9 +88,17 @@ Item
     {
         id: accessRightsModel
 
-        context: delegateRoot.editingContext
-        resource: delegateRoot.resource
-        nodeType: delegateRoot.nodeType
+        context: root.editingContext
+        resourceTreeIndex: root.resourceTreeIndex
+    }
+
+    Rectangle
+    {
+        id: rowHoverMarker
+
+        anchors.fill: cellsRow
+        visible: root.isRowHovered && !isSelected
+        color: root.hoverColor
     }
 
     Row
@@ -80,11 +106,9 @@ Item
         id: cellsRow
 
         x: mainDelegate.width
+        spacing: 1
 
-        readonly property int frameAccessRights: Array.prototype.reduce.call(
-            children,
-            (total, child) => child.frameSelected ? (total | child.accessRight) : total,
-            0)
+        property Item hoveredCell: null
 
         Repeater
         {
@@ -96,72 +120,111 @@ Item
                 {
                     id: cell
 
-                    width: delegateRoot.columnWidth
-                    height: delegateRoot.height
+                    width: root.columnWidth - 1
+                    height: root.height
 
                     hoverEnabled: true
-                    acceptedButtons: cell.toggleable ? Qt.LeftButton : Qt.NoButton
-
-                    GlobalToolTip.enabled:
-                        frameSelectionMode == ResourceAccessDelegate.NoFrameOperation
+                    acceptedButtons: Qt.LeftButton
 
                     GlobalToolTip.text: model.toolTip
 
                     readonly property int accessRight: model.accessRight
+                    readonly property bool relevant: model.editable
 
-                    readonly property bool relevant:
-                        (accessRightsModel.resource || accessRightsModel.isResourceGroup)
-                        && model.editable
-
-                    readonly property bool toggleable:
+                    readonly property bool toggledOn:
                     {
-                        return delegateRoot.editingEnabled && cell.relevant
-                            && model.providedVia != ResourceAccessInfo.ProvidedVia.ownResourceGroup
+                        switch (accessRightsModel.rowType)
+                        {
+                            case ResourceAccessTreeItem.Type.resource:
+                                return model.providedVia === ResourceAccessInfo.ProvidedVia.own
+                                    || model.providedVia
+                                            === ResourceAccessInfo.ProvidedVia.ownResourceGroup
+
+                            case ResourceAccessTreeItem.Type.specialResourceGroup:
+                                return model.providedVia === ResourceAccessInfo.ProvidedVia.own
+
+                            default:
+                                return model.checkedChildCount === model.totalChildCount
+                        }
                     }
 
-                    readonly property bool frameSelected: toggleable && delegateRoot.resource
-                        && Geometry.intersects(frameSelectionRect, cellsRow.mapToItem(delegateRoot,
-                            cell.x, cell.y, cell.width, cell.height))
+                    readonly property int displayedProvider:
+                    {
+                        if (!highlighted)
+                            return model.providedVia
+
+                        return toggledOn
+                            ? model.inheritedFrom
+                            : ResourceAccessInfo.ProvidedVia.own
+                    }
 
                     // Highlighted to indicate that a mouse click at current mouse position
-                    // or applying current frame selection shall affect this cell.
+                    // shall affect this cell.
                     readonly property bool highlighted:
                     {
-                        const context = delegateRoot.editingContext
-                        if (!context || !toggleable)
+                        const context = root.editingContext
+                        if (!context || !relevant)
                             return false
+
+                        // Highlight external selection (selected rows & hovered column crossings).
+                        if (accessRight === root.externallySelectedAccessRight)
+                        {
+                            const willBeToggledOn =
+                                root.externalNextCheckState === Qt.Checked
+
+                            return toggledOn !== willBeToggledOn
+                        }
 
                         // Highlight directly hovered cell.
-                        if (delegateRoot.enabled && delegateRoot.hoveredCell === cell)
+                        if (root.editingEnabled && cellsRow.hoveredCell === cell)
                             return true
 
-                        const toggledOn = isToggledOn()
+                        const hg = root.externallyHoveredGroups
 
-                        const nextCheckValue =
-                            frameSelectionMode != ResourceAccessDelegate.FrameUnselection
+                        if (hg
+                            && root.isParentHovered
+                            && hg.toggledOn === toggledOn
+                            && (hg.fromSelection || root.editingEnabled)
+                            && (accessRightsModel.relevantAccessRights & hg.accessRight))
+                        {
+                            // Highlight a child of a hovered resource group cell.
+                            if (hg.accessRight === accessRight)
+                                return true
 
-                        // Highlight frame-selected cell.
-                        if (frameSelected && nextCheckValue != toggledOn)
-                            return true
+                            if (root.automaticDependencies)
+                            {
+                                if (toggledOn && context.isDependingOn(accessRight, hg.accessRight)
+                                    || !toggledOn && context.isRequiredFor(accessRight,
+                                        hg.accessRight))
+                                {
+                                    return true
+                                }
+                            }
+                        }
 
-                        if (!delegateRoot.automaticDependencies)
+                        if (!root.automaticDependencies)
                             return false
 
-                        // Highlight access rights dependency for current frame selection.
-                        if (frameSelectionMode != ResourceAccessDelegate.NoFrameOperation
-                            && nextCheckValue != toggledOn)
+                        // Highlight dependencies from the external selection.
+                        if (root.externallySelectedAccessRight
+                            && (accessRightsModel.relevantAccessRights
+                                & root.externallySelectedAccessRight))
                         {
-                            return nextCheckValue
-                                ? context.isRequiredFor(accessRight, cellsRow.frameAccessRights)
-                                : context.isDependingOn(accessRight, cellsRow.frameAccessRights)
+                            if (root.externalNextCheckState === Qt.Unchecked)
+                            {
+                                return toggledOn && context.isDependingOn(
+                                    accessRight, root.externallySelectedAccessRight)
+                            }
+                            else
+                            {
+                                return !toggledOn && context.isRequiredFor(
+                                    accessRight, root.externallySelectedAccessRight)
+                            }
                         }
 
                         // Highlight access rights dependency from hovered other cell.
-                        const base = delegateRoot.hoveredCell
-
-                        if (base && base.toggleable
-                            && frameSelectionMode == ResourceAccessDelegate.NoFrameOperation
-                            && toggledOn == base.isToggledOn())
+                        const base = root.editingEnabled ? cellsRow.hoveredCell : null
+                        if (base && base.relevant && toggledOn == base.toggledOn)
                         {
                             return toggledOn
                                 ? context.isDependingOn(accessRight, base.accessRight)
@@ -173,89 +236,87 @@ Item
 
                     readonly property color backgroundColor:
                     {
-                        if (!delegateRoot.editingEnabled)
-                            return ColorTheme.colors.dark7
+                        if (cell.highlighted)
+                            return ColorTheme.colors.brand_core
 
-                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
-                            return ColorTheme.transparent(ColorTheme.colors.brand_core, 0.12)
+                        if (isSelected || root.isRowHovered)
+                            return "transparent"
 
-                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.own)
-                        {
-                            return cell.highlighted
-                                ? ColorTheme.transparent(ColorTheme.colors.brand_core, 0.6)
-                                : ColorTheme.transparent(ColorTheme.colors.brand_core, 0.4)
-                        }
+                        if (cell.relevant && (root.hoveredColumnAccessRight & cell.accessRight))
+                            return root.hoverColor
 
-                        return cell.highlighted
-                            ? ColorTheme.colors.dark6
-                            : ColorTheme.colors.dark5
+                        return root.editingEnabled
+                            ? ColorTheme.colors.dark5
+                            : ColorTheme.colors.dark7
                     }
 
                     readonly property color foregroundColor:
                     {
-                        if (!delegateRoot.editingEnabled)
-                        {
-                            if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
-                                return ColorTheme.colors.dark13
+                        if (cell.highlighted)
+                            return ColorTheme.colors.brand_contrast
 
-                            return model.providedVia == ResourceAccessInfo.ProvidedVia.own
-                                ? ColorTheme.colors.brand_core
-                                : ColorTheme.colors.light16
+                        if (cell.displayedProvider
+                                === ResourceAccessInfo.ProvidedVia.ownResourceGroup
+                            || cell.displayedProvider === ResourceAccessInfo.ProvidedVia.own)
+                        {
+                            return ColorTheme.colors.brand_core
                         }
 
-                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.ownResourceGroup)
-                            return ColorTheme.transparent(ColorTheme.colors.light13, 0.3)
-
-                        if (model.providedVia == ResourceAccessInfo.ProvidedVia.own)
-                        {
-                            return cell.highlighted
-                                ? ColorTheme.colors.light4
-                                : ColorTheme.colors.light10
-                        }
-
-                        return cell.highlighted
-                            ? ColorTheme.colors.dark14
+                        return isSelected //< TreeView delegate context property.
+                            ? ColorTheme.colors.light16
                             : ColorTheme.colors.dark13
-                    }
-
-                    function isToggledOn()
-                    {
-                        // A group not explicitly toggled on but having all children toggled on
-                        // is still considered toggled on, for convenience of access right
-                        // dependency tracking.
-
-                        return providedVia == ResourceAccessInfo.ProvidedVia.own
-                            || (model.checkedChildCount
-                                && model.checkedChildCount == model.totalChildCount)
                     }
 
                     onContainsMouseChanged:
                     {
-                        if (containsMouse)
-                            delegateRoot.hoveredCell = cell
-                        else if (delegateRoot.hoveredCell == cell)
-                            delegateRoot.hoveredCell = null
+                        if (relevant && containsMouse)
+                            cellsRow.hoveredCell = cell
+                        else if (cellsRow.hoveredCell == cell)
+                            cellsRow.hoveredCell = null
                     }
 
                     onClicked:
-                        accessRightsModel.toggle(index, delegateRoot.automaticDependencies)
+                    {
+                        if (!cell.relevant || !root.editingEnabled)
+                            return
+
+                        accessRightsModel.toggle(
+                            modelIndex, index, root.automaticDependencies)
+
+                        cellsRow.hoveredCell = null
+                        root.triggered(index)
+                    }
+
+                    Rectangle
+                    {
+                        id: backgroundRect
+
+                        anchors.fill: cell
+
+                        color: cell.backgroundColor
+                        visible: cell.relevant
+
+                        Rectangle
+                        {
+                            id: frameRect
+
+                            x: -1
+                            y: -1
+                            width: cell.width + 2
+                            height: cell.height + 2
+                            color: "transparent"
+
+                            border.color: root.editingEnabled
+                                ? ColorTheme.colors.dark4
+                                : ColorTheme.colors.dark6
+                        }
+                    }
 
                     Item
                     {
                         anchors.fill: cell
 
                         visible: cell.relevant
-
-                        Rectangle
-                        {
-                            width: cell.width + 1
-                            height: cell.height + 1
-                            color: cell.backgroundColor
-
-                            border.color: delegateRoot.editingEnabled
-                                ? ColorTheme.colors.dark4
-                                : ColorTheme.colors.dark6
-                        }
 
                         IconImage
                         {
@@ -267,7 +328,7 @@ Item
 
                             source:
                             {
-                                switch (providedVia)
+                                switch (cell.displayedProvider)
                                 {
                                     case ResourceAccessInfo.ProvidedVia.own:
                                     case ResourceAccessInfo.ProvidedVia.ownResourceGroup:
@@ -300,12 +361,12 @@ Item
                             horizontalAlignment: Qt.AlignHCenter
                             verticalAlignment: Qt.AlignVCenter
 
-                            visible: accessRightsModel.isResourceGroup
-                                && model.providedVia == ResourceAccessInfo.ProvidedVia.none
-                                && model.checkedChildCount
+                            visible: model.checkedAndInheritedChildCount > 0
+                                && cell.displayedProvider !== ResourceAccessInfo.ProvidedVia.own
+                                && !cell.highlighted
 
                             color: cell.foregroundColor
-                            text: model.checkedChildCount
+                            text: model.checkedAndInheritedChildCount
                         }
                     }
                 }

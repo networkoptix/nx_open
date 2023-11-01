@@ -273,7 +273,7 @@ FocusScope
     }
 
     // Never pass key presses to parents while editing.
-    Keys.onPressed:
+    Keys.onPressed: (event) =>
         event.accepted = isEditing
 
     readonly property string iconSource:

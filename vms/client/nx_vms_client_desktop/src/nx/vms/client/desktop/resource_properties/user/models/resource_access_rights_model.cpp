@@ -6,9 +6,9 @@
 #include <vector>
 
 #include <QtCore/QCollator>
+#include <QtCore/QMap>
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
-#include <QtCore/QMap>
 #include <QtQml/QtQml>
 
 #include <core/resource/camera_resource.h>
@@ -23,8 +23,8 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/client/core/qml/nx_globals_object.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_administration/models/members_sort.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -53,14 +53,6 @@ void modifyAccessRightMap(ResourceAccessMap& accessRightMap, const QnUuid& resou
         value,
         /*withDependent*/ false,
         /*relevantRightsMask*/ kFullAccessRights);
-}
-
-AccessRights relevantAccessRights(const QnUuid& resourceGroupId)
-{
-    if (const auto group = specialResourceGroup(resourceGroupId))
-        return AccessSubjectEditingContext::relevantAccessRights(*group);
-
-    return kFullAccessRights;
 }
 
 int providerPriority(ResourceAccessInfo::ProvidedVia providerType)
@@ -110,7 +102,9 @@ bool ResourceAccessInfo::operator==(const ResourceAccessInfo& other) const
     return providedVia == other.providedVia
         && providerUserGroups == other.providerUserGroups
         && indirectProviders == other.indirectProviders
-        && checkedChildCount == other.checkedChildCount;
+        && checkedChildCount == other.checkedChildCount
+        && checkedAndInheritedChildCount == other.checkedAndInheritedChildCount
+        && totalChildCount == other.totalChildCount;
 }
 
 bool ResourceAccessInfo::operator!=(const ResourceAccessInfo& other) const
@@ -127,22 +121,16 @@ struct ResourceAccessRightsModel::Private
 
     QPointer<AccessSubjectEditingContext> context;
     QVector<AccessRight> accessRightList;
-    QnResourcePtr resource;
-    ResourceTree::NodeType nodeType = ResourceTree::NodeType::spacer;
-    QVector<ResourceAccessInfo> info;
 
+    QPersistentModelIndex resourceTreeIndex;
+    ResourceAccessTreeItem item;
+
+    QVector<ResourceAccessInfo> info;
     nx::utils::ScopedConnections contextConnections;
 
     void updateInfo(bool suppressSignals = false);
     QVector<ResourceAccessInfo> calculateInfo() const;
-    QnResourceList getResources() const;
-    QnResourceList getGroupResources(const QnUuid& groupId) const;
     std::vector<QnUuid> getGroupContents(const QnUuid& groupId) const;
-
-    void countGroupResources(const QnUuid& groupId, AccessRight accessRight,
-        int& checked, int& total) const;
-
-    AccessRights relevantAccessRights() const;
 
     bool isEditable(int index) const;
 
@@ -185,7 +173,7 @@ void ResourceAccessRightsModel::setContext(AccessSubjectEditingContext* value)
             connect(d->context, &AccessSubjectEditingContext::resourceGroupsChanged, this,
                 [this](const QSet<QnUuid>& resourceGroupIds)
                 {
-                    if (resourceGroupIds.contains(groupId()))
+                    if (resourceGroupIds.contains(d->item.target.groupId()))
                         d->updateInfo();
                 });
     }
@@ -211,45 +199,33 @@ void ResourceAccessRightsModel::setAccessRightsList(const QVector<AccessRight>& 
     emit accessRightsListChanged();
 }
 
-QnResource* ResourceAccessRightsModel::resource() const
+QModelIndex ResourceAccessRightsModel::resourceTreeIndex() const
 {
-    return d->resource.get();
+    return d->resourceTreeIndex;
 }
 
-void ResourceAccessRightsModel::setResource(QnResource* value)
+void ResourceAccessRightsModel::setResourceTreeIndex(const QModelIndex& value)
 {
-    const auto shared = value ? value->toSharedPointer() : QnResourcePtr();
-    if (!NX_ASSERT(shared.get() == value, "Cannot obtain a shared pointer to the resource"))
+    if (d->resourceTreeIndex == value)
         return;
 
-    if (d->resource == shared)
-        return;
+    d->resourceTreeIndex = value;
+    d->item = AccessSubjectEditingContext::resourceAccessTreeItemInfo(d->resourceTreeIndex);
 
-    d->resource = shared;
+    d->info.clear();
     d->updateInfo();
 
-    emit resourceChanged();
+    emit resourceTreeIndexChanged();
 }
 
-QnUuid ResourceAccessRightsModel::groupId() const
+ResourceAccessTreeItem::Type ResourceAccessRightsModel::rowType() const
 {
-    return AccessSubjectEditingContext::resourceGroupId(d->nodeType);
+    return d->item.type;
 }
 
-ResourceTree::NodeType ResourceAccessRightsModel::nodeType() const
+AccessRights ResourceAccessRightsModel::relevantAccessRights() const
 {
-    return d->nodeType;
-}
-
-void ResourceAccessRightsModel::setNodeType(ResourceTree::NodeType value)
-{
-    if (d->nodeType == value)
-        return;
-
-    d->nodeType = value;
-    d->updateInfo();
-
-    emit nodeTypeChanged();
+    return d->item.relevantAccessRights;
 }
 
 QVariant ResourceAccessRightsModel::data(const QModelIndex& index, int role) const
@@ -261,10 +237,14 @@ QVariant ResourceAccessRightsModel::data(const QModelIndex& index, int role) con
     {
         case ProviderRole:
             return static_cast<int>(d->info[index.row()].providedVia);
+        case InheritedFromRole:
+            return static_cast<int>(d->info[index.row()].inheritedFrom);
         case TotalChildCountRole:
             return static_cast<int>(d->info[index.row()].totalChildCount);
         case CheckedChildCountRole:
             return static_cast<int>(d->info[index.row()].checkedChildCount);
+        case CheckedAndInheritedChildCountRole:
+            return static_cast<int>(d->info[index.row()].checkedAndInheritedChildCount);
         case AccessRightRole:
             return static_cast<int>(d->accessRightList[index.row()]);
         case EditableRole:
@@ -276,105 +256,35 @@ QVariant ResourceAccessRightsModel::data(const QModelIndex& index, int role) con
     }
 }
 
-void ResourceAccessRightsModel::toggle(int index, bool withDependentAccessRights)
+void ResourceAccessRightsModel::toggle(const QModelIndex& resourceTreeModelIndex,
+    int index, bool withDependentAccessRights)
 {
     if (index >= rowCount() || index < 0 || !d->context)
         return;
 
-    const auto id = d->resource ? d->resource->getId() : groupId();
-    if (!NX_ASSERT(!id.isNull()))
-        return;
-
     const auto toggledRight = d->accessRightList[index];
-
-    if (d->resource)
-        NX_VERBOSE(this, "Toggle request for `%1`, for %2", toggledRight, d->resource);
-    else
-        NX_VERBOSE(this, "Toggle request for `%1`, for %2", toggledRight, id);
-
-    const bool isGroup = !d->resource;
-    const auto outerGroupId = AccessSubjectEditingContext::specialResourceGroupFor(d->resource);
-    const bool hasOuterGroup = !outerGroupId.isNull();
-
-    auto accessMap = d->context->ownResourceAccessMap();
-    const auto itemAccessRights = accessMap.value(id);
-
-    const auto outerGroupAccessRights = hasOuterGroup
-        ? accessMap.value(outerGroupId)
-        : AccessRights{};
-
     const auto& info = d->info[index];
-    const auto allChildrenWereChecked = info.totalChildCount > 0
-        && info.totalChildCount == info.checkedChildCount;
 
-    const bool outerGroupWasChecked = outerGroupAccessRights.testFlag(toggledRight);
-    const bool itemWasChecked = outerGroupWasChecked || itemAccessRights.testFlag(toggledRight);
-    const bool itemWillBeChecked = !(itemWasChecked || allChildrenWereChecked);
+    const bool itemWasChecked = info.providedVia == ResourceAccessInfo::ProvidedVia::own
+        || info.providedVia == ResourceAccessInfo::ProvidedVia::ownResourceGroup;
 
-    const auto relevantRights = isGroup
-        ? relevantAccessRights(groupId())
-        : relevantAccessRights(outerGroupId);
+    const bool itemWillBeChecked = !(itemWasChecked
+        || (d->item.type == ResourceAccessTreeItem::Type::groupingNode
+            && info.totalChildCount > 0
+            && info.totalChildCount == info.checkedChildCount));
 
-    NX_VERBOSE(this, "Relevant access rights: `%1`", relevantRights);
-
-    if (!NX_ASSERT(relevantRights.testFlag(toggledRight)))
-        return;
-
-    AccessRights toggledMask = toggledRight;
-    if (withDependentAccessRights)
-    {
-        toggledMask |= (itemWillBeChecked
-            ? (AccessSubjectEditingContext::requiredAccessRights(toggledRight) & relevantRights)
-            : AccessSubjectEditingContext::dependentAccessRights(toggledRight));
-    }
-
-    NX_VERBOSE(this, "Access rights to toggle %1: `%2`", itemWillBeChecked ? "on" : "off",
-        toggledMask);
-
-    if (isGroup)
-    {
-        // If we're toggling a group on, we must explicitly toggle all its children off.
-        // If we're toggling a group off, we must explicitly toggle all its children on.
-
-        auto mask = itemWasChecked
-            ? (toggledMask & itemAccessRights)
-            : toggledMask;
-
-        NX_VERBOSE(this, "Toggling %1 `%2` for group's children", itemWasChecked ? "on" : "off",
-            mask);
-
-        for (const auto& itemId: d->getGroupContents(id))
-            modifyAccessRightMap(accessMap, itemId, mask, itemWasChecked);
-    }
-
-    if (outerGroupWasChecked)
-    {
-        // If we're toggling off an item that was implicitly toggled on by its group,
-        // we must toggle the group off, and explicitly toggle all its children on.
-
-        NX_VERBOSE(this,
-            "`%1` was toggled on for the outer group %2; toggling it on for all its children",
-            toggledMask, outerGroupId);
-
-        for (const auto& itemId: d->getGroupContents(outerGroupId))
-            modifyAccessRightMap(accessMap, itemId, toggledMask, true);
-
-        NX_VERBOSE(this, "Toggling off `%1` for the outer group %2", toggledMask, outerGroupId);
-        modifyAccessRightMap(accessMap, outerGroupId, toggledMask, false);
-    }
-
-    // Toggle the item.
-    NX_VERBOSE(this, "Toggling %1 `%2` for %3", itemWillBeChecked ? "on" : "off", toggledMask, id);
-    modifyAccessRightMap(accessMap, id, toggledMask, itemWillBeChecked);
-    d->context->setOwnResourceAccessMap(accessMap);
+    d->context->modifyAccessRight(resourceTreeModelIndex,
+        (int) toggledRight, itemWillBeChecked, withDependentAccessRights);
 }
 
 QHash<int, QByteArray> ResourceAccessRightsModel::roleNames() const
 {
     auto names = base_type::roleNames();
     names.insert(ProviderRole, "providedVia");
+    names.insert(InheritedFromRole, "inheritedFrom");
     names.insert(TotalChildCountRole, "totalChildCount");
     names.insert(CheckedChildCountRole, "checkedChildCount");
+    names.insert(CheckedAndInheritedChildCountRole, "checkedAndInheritedChildCount");
     names.insert(AccessRightRole, "accessRight");
     names.insert(EditableRole, "editable");
     return names;
@@ -406,11 +316,15 @@ void ResourceAccessRightsModel::registerQmlTypes()
 {
     qRegisterMetaType<QVector<AccessRight>>();
     qRegisterMetaType<QVector<ResourceAccessInfo>>();
+    qRegisterMetaType<QVector<ResourceAccessTreeItem>>();
     qRegisterMetaType<QVector<QnUuid>>();
     qRegisterMetaType<QVector<QnResource*>>();
 
     qmlRegisterUncreatableType<ResourceAccessInfo>("nx.vms.client.desktop", 1, 0,
         "ResourceAccessInfo", "Cannot create an instance of ResourceAccessInfo");
+
+    qmlRegisterUncreatableType<ResourceAccessTreeItem>("nx.vms.client.desktop", 1, 0,
+        "ResourceAccessTreeItem", "Cannot create an instance of ResourceAccessTreeItem");
 
     qmlRegisterType<ResourceAccessRightsModel>(
         "nx.vms.client.desktop", 1, 0, "ResourceAccessRightsModel");
@@ -418,40 +332,6 @@ void ResourceAccessRightsModel::registerQmlTypes()
 
 // ------------------------------------------------------------------------------------------------
 // ResourceAccessRightsModel::Private
-
-QnResourceList ResourceAccessRightsModel::Private::getResources() const
-{
-    if (!context)
-        return {};
-
-    const auto resourcePool = context->systemContext()->resourcePool();
-
-    switch (nodeType)
-    {
-        case ResourceTree::NodeType::camerasAndDevices:
-            return resourcePool->getAllCameras(QnUuid{}, /*ignoreDesktopCameras*/ true);
-
-        case ResourceTree::NodeType::integrations:
-        case ResourceTree::NodeType::webPages:
-            return resourcePool->getResources<QnWebPageResource>();
-
-        case ResourceTree::NodeType::layouts:
-            return resourcePool->getResources<QnLayoutResource>().filtered(
-                [](const QnLayoutResourcePtr& layout)
-                {
-                    return !layout->isFile() && !layout->hasFlags(Qn::cross_system);
-                });
-
-        case ResourceTree::NodeType::servers:
-            return resourcePool->getResources<QnMediaServerResource>();
-
-        case ResourceTree::NodeType::videoWalls:
-            return resourcePool->getResources<QnVideoWallResource>();
-
-        default:
-            return resource ? QnResourceList{resource} : QnResourceList{};
-    }
-}
 
 void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
 {
@@ -470,43 +350,65 @@ void ResourceAccessRightsModel::Private::updateInfo(bool suppressSignals)
 
 QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() const
 {
-    const auto groupId = q->groupId();
-    const bool isResourceGroup = !groupId.isNull();
-
     const int count = accessRightList.size();
     QVector<ResourceAccessInfo> result(count);
 
-    if (!context || context->currentSubjectId().isNull() || (!resource && !isResourceGroup))
+    if (!context || context->currentSubjectId().isNull() || !resourceTreeIndex.isValid())
         return result;
+
+    const auto childResources = AccessSubjectEditingContext::getChildResources(resourceTreeIndex);
+    const auto accessMap = context->ownResourceAccessMap();
 
     for (int i = 0; i < count; ++i)
     {
         auto& newInfo = result[i];
-        if (isResourceGroup)
+        const auto accessRight = accessRightList[i];
+        const bool outerGroupChecked =
+            accessMap.value(item.outerSpecialResourceGroupId).testFlag(accessRight);
+
+        if (!item.relevantAccessRights.testFlag(accessRight))
+            continue;
+
+        newInfo.totalChildCount = childResources.size();
+
+        newInfo.checkedChildCount = outerGroupChecked
+            ? newInfo.totalChildCount
+            : std::count_if(childResources.cbegin(), childResources.cend(),
+                [&accessMap, accessRight](const QnResourcePtr& resource)
+                {
+                    return accessMap.value(resource->getId()).testFlag(accessRight);
+                });
+
+        newInfo.checkedAndInheritedChildCount = outerGroupChecked
+            ? newInfo.totalChildCount
+            : std::count_if(childResources.cbegin(), childResources.cend(),
+                [this, accessRight](const QnResourcePtr& resource)
+                {
+                    return context->accessRights(resource).testFlag(accessRight);
+                });
+
+        if (item.target.group()) //< Special resource group.
         {
             newInfo.providerUserGroups = context->resourceGroupAccessProviders(
-                groupId, accessRightList[i]);
+                item.target.id(), accessRight);
 
             // Keep arrays sorted for easy comparison.
             std::sort(newInfo.providerUserGroups.begin(), newInfo.providerUserGroups.end());
 
-            if (context->hasOwnAccessRight(groupId, accessRightList[i]))
-            {
-                newInfo.providedVia = ResourceAccessInfo::ProvidedVia::own;
-            }
-            else
-            {
-                if (!newInfo.providerUserGroups.empty())
-                    newInfo.providedVia = ResourceAccessInfo::ProvidedVia::parentUserGroup;
+            if (!newInfo.providerUserGroups.empty())
+                newInfo.inheritedFrom = ResourceAccessInfo::ProvidedVia::parentUserGroup;
 
-                countGroupResources(groupId, accessRightList[i],
-                    newInfo.checkedChildCount, newInfo.totalChildCount);
-            }
+            newInfo.providedVia = context->hasOwnAccessRight(item.target.id(), accessRight)
+                ? ResourceAccessInfo::ProvidedVia::own
+                : newInfo.inheritedFrom;
 
             continue;
         }
 
-        const auto details = context->accessDetails(resource, accessRightList[i]);
+        if (!item.target.resource()) //< Other grouping node.
+            continue;
+
+        const auto details = context->accessDetails(item.target.resource(), accessRight);
         if (details.contains(context->currentSubjectId()))
         {
             const auto providers = details.value(context->currentSubjectId());
@@ -515,13 +417,13 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
                 if (!NX_ASSERT(provider))
                     continue;
 
-                if (provider == resource)
+                if (provider == item.target.resource())
                 {
                     const auto resourceGroupId =
-                        AccessSubjectEditingContext::specialResourceGroupFor(resource);
+                        AccessSubjectEditingContext::specialResourceGroupFor(item.target.resource());
 
                     const auto accessViaResourceGroup = !resourceGroupId.isNull()
-                        && context->hasOwnAccessRight(resourceGroupId, accessRightList[i]);
+                        && context->hasOwnAccessRight(resourceGroupId, accessRight);
 
                     if (accessViaResourceGroup)
                         newInfo.parentResourceGroupId = resourceGroupId;
@@ -533,8 +435,8 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
                 else
                 {
                     const auto providedVia = providerType(provider.get());
-                    if (providerPriority(providedVia) > providerPriority(newInfo.providedVia))
-                        newInfo.providedVia = providedVia;
+                    if (providerPriority(providedVia) > providerPriority(newInfo.inheritedFrom))
+                        newInfo.inheritedFrom = providedVia;
 
                     // Keep arrays sorted for easy comparison.
                     const auto insertionPos = std::upper_bound(
@@ -545,11 +447,20 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
                     newInfo.indirectProviders.insert(insertionPos, provider);
                 }
             }
+
+            if (newInfo.inheritedFrom == ResourceAccessInfo::ProvidedVia::none
+                && details.size() > 1)
+            {
+                newInfo.inheritedFrom = ResourceAccessInfo::ProvidedVia::parentUserGroup;
+            }
         }
         else if (!details.empty())
         {
-            newInfo.providedVia = ResourceAccessInfo::ProvidedVia::parentUserGroup;
+            newInfo.inheritedFrom = ResourceAccessInfo::ProvidedVia::parentUserGroup;
         }
+
+        if (newInfo.providedVia == ResourceAccessInfo::ProvidedVia::none)
+            newInfo.providedVia = newInfo.inheritedFrom;
 
         if (newInfo.providedVia != ResourceAccessInfo::ProvidedVia::none)
         {
@@ -577,40 +488,15 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
     return result;
 }
 
-QnResourceList ResourceAccessRightsModel::Private::getGroupResources(const QnUuid& groupId) const
-{
-    // Only special resource groups are supported at this time.
-
-    const auto group = specialResourceGroup(groupId);
-    if (!context || !NX_ASSERT(group))
-        return {};
-
-    const auto resourcePool = context->systemContext()->resourcePool();
-    switch (*group)
-    {
-        case SpecialResourceGroup::allDevices:
-            return resourcePool->getAllCameras(QnUuid{}, true);
-
-        case SpecialResourceGroup::allServers:
-            return resourcePool->servers();
-
-        case SpecialResourceGroup::allWebPages:
-            return resourcePool->getResources<QnWebPageResource>();
-
-        case SpecialResourceGroup::allVideowalls:
-            return resourcePool->getResources<QnVideoWallResource>();
-    }
-
-    NX_ASSERT(false, "Unhandled special resource group type");
-    return {};
-}
-
 std::vector<QnUuid> ResourceAccessRightsModel::Private::getGroupContents(
     const QnUuid& groupId) const
 {
     // Only special resource groups are supported at this time.
 
-    const auto groupResources = getGroupResources(groupId);
+    if (!context)
+        return {};
+
+    const auto groupResources = context->getGroupResources(groupId);
     if (groupResources.empty())
         return {};
 
@@ -619,20 +505,6 @@ std::vector<QnUuid> ResourceAccessRightsModel::Private::getGroupContents(
     std::transform(groupResources.begin(), groupResources.end(), std::back_inserter(result),
         [](const QnResourcePtr& resource) { return resource->getId(); });
     return result;
-}
-
-void ResourceAccessRightsModel::Private::countGroupResources(
-    const QnUuid& groupId, AccessRight accessRight, int& checked, int& total) const
-{
-    const auto contents = getGroupResources(groupId);
-    total = contents.size();
-
-    const auto accessMap = context->ownResourceAccessMap();
-    checked = std::count_if(contents.cbegin(), contents.cend(),
-        [accessMap, accessRight](const QnResourcePtr& resource)
-        {
-            return accessMap.value(resource->getId()).testFlag(accessRight);
-        });
 }
 
 QString ResourceAccessRightsModel::Private::accessDetailsText(
@@ -755,20 +627,9 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     return descriptions.join("<br>");
 }
 
-AccessRights ResourceAccessRightsModel::Private::relevantAccessRights() const
-{
-    if (resource)
-        return AccessSubjectEditingContext::relevantAccessRights(resource);
-
-    if (const auto group = nx::vms::api::specialResourceGroup(q->groupId()))
-        return AccessSubjectEditingContext::relevantAccessRights(*group);
-
-    return {};
-}
-
 bool ResourceAccessRightsModel::Private::isEditable(int index) const
 {
-    return relevantAccessRights().testFlag(accessRightList[index]);
+    return item.relevantAccessRights.testFlag(accessRightList[index]);
 }
 
 } // namespace nx::vms::client::desktop

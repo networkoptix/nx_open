@@ -1,15 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
-import QtQml.Models 2.15
+import QtQuick
+import QtQml.Models
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
 
-import nx.client.desktop 1.0
-import nx.vms.client.core 1.0
-import nx.vms.client.desktop 1.0
+import nx.client.desktop
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 /**
  * A tree view with multi-selection, drag-n-drop and editing support.
@@ -29,9 +29,11 @@ FocusScope
     property bool selectionEnabled: true
     property alias itemHeightHint: listView.itemHeightHint
     property alias scrollStepSize: listView.scrollStepSize //< In pixels.
+    property alias spacing: listView.spacing
 
     property alias hoverHighlightColor: listView.hoverHighlightColor
     property color selectionHighlightColor: "teal"
+    property color inactiveSelectionHighlightColor: hoverHighlightColor
     property color dropHighlightColor: "blue"
 
     property bool editable: true
@@ -49,6 +51,8 @@ FocusScope
 
     readonly property alias hoveredRowItem: listView.hoveredItem
     readonly property Item hoveredItem: hoveredRowItem && hoveredRowItem.delegateItem
+
+    readonly property bool selectionEmpty: selectionModel.effectiveSelectedIndexes.length === 0
 
     property real leftMargin: 0
     property real rightMargin: 0
@@ -111,17 +115,19 @@ FocusScope
     {
         if (selectionModel.cachedSourceSelection === undefined)
         {
-            selectionModel.cachedSourceSelection = selectionModel.optimizedSelectedIndexes.map(
+            selectionModel.cachedSourceSelection = selectionModel.effectiveSelectedIndexes.map(
                 index => NxGlobals.toPersistent(linearizationListModel.mapToSource(index)))
         }
 
         return selectionModel.cachedSourceSelection
     }
 
-    /** Clear selection, but keep current index. */
-    function clearSelection()
+    function clearSelection(clearCurrentIndex)
     {
         selectionModel.clearSelection()
+
+        if (clearCurrentIndex)
+            selectionModel.clearCurrentIndex()
     }
 
     function setSelection(indexes)
@@ -217,6 +223,9 @@ FocusScope
                 return data(index, LinearizationListModel.HasChildrenRole)
                     && !data(index, LinearizationListModel.ExpandedRole)
             }
+
+            onModelAboutToBeReset:
+                selectionModel.clear() //< QItemSelectionModel doesn't do it on its own.
         }
 
         PersistentIndexWatcher
@@ -245,26 +254,31 @@ FocusScope
         ItemSelectionModel
         {
             id: selectionModel
+
             model: linearizationListModel
 
             property var cachedSourceSelection: undefined
+            property var effectiveSelectedIndexes: []
 
-            readonly property var optimizedSelectedIndexes: Array.prototype.map.call(
-                // Convert selectedIndexes to QVariantList to avoid huge performance loss.
-                NxGlobals.toQVariantList(selectedIndexes),
-                index => NxGlobals.toPersistent(index))
-
-            onOptimizedSelectedIndexesChanged:
+            function updateSelectedIndexes()
             {
+                effectiveSelectedIndexes = Array.prototype.filter.call(
+                    // Convert selectedIndexes to QVariantList to avoid huge performance loss.
+                    NxGlobals.toQVariantList(selectedIndexes), (index) => index.valid)
+                        .map(index => NxGlobals.toPersistent(index))
+
                 cachedSourceSelection = undefined
                 treeView.selectionChanged()
             }
 
             function hasDraggableIndexes()
             {
-                return optimizedSelectedIndexes.some(
+                return effectiveSelectedIndexes.some(
                     (index) => linearizationListModel.flags(index) & Qt.ItemIsDragEnabled)
             }
+
+            onSelectionChanged:
+                updateSelectedIndexes()
         }
 
         ListNavigationHelper
@@ -409,7 +423,7 @@ FocusScope
 
                     color: treeView.activeFocus && !isDelegateFocused
                         ? selectionHighlightColor
-                        : hoverHighlightColor
+                        : inactiveSelectionHighlightColor
                 }
 
                 DropArea
@@ -513,7 +527,7 @@ FocusScope
                                     DragAndDrop.execute(
                                         listItem,
                                         DragAndDrop.createMimeData(
-                                            selectionModel.optimizedSelectedIndexes),
+                                            selectionModel.effectiveSelectedIndexes),
                                         DragAndDrop.supportedDragActions(linearizationListModel),
                                         Qt.MoveAction,
                                         resultUrl)
@@ -720,7 +734,7 @@ FocusScope
             id: currentItemHighlight
 
             color: ColorTheme.transparent(ColorTheme.highlight, 0.5)
-            z: 1
+            z: 10 //< Above everything.
 
             visible: treeView.activeFocus
                 && listView.currentItem
@@ -753,11 +767,11 @@ FocusScope
                 id: indexListModel
 
                 readonly property int remainder:
-                    selectionModel.optimizedSelectedIndexes.length
+                    selectionModel.effectiveSelectedIndexes.length
                         - treeView.maximumDragIndicatorLines
 
-                source: Array.prototype.slice.call(selectionModel.optimizedSelectedIndexes,
-                    0, Math.min(selectionModel.optimizedSelectedIndexes.length,
+                source: Array.prototype.slice.call(selectionModel.effectiveSelectedIndexes,
+                    0, Math.min(selectionModel.effectiveSelectedIndexes.length,
                         treeView.maximumDragIndicatorLines))
             }
 
@@ -857,7 +871,7 @@ FocusScope
                 break
 
             case Qt.Key_F2:
-                if (selectionModel.optimizedSelectedIndexes.length == 1)
+                if (selectionModel.effectiveSelectedIndexes.length == 1)
                     treeView.startEditing()
                 break
 

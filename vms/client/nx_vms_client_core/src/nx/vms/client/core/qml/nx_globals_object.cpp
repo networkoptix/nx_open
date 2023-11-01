@@ -106,6 +106,22 @@ QVariant NxGlobalsObject::modelData(const QModelIndex& index, const QString& rol
     return index.data(role);
 }
 
+bool NxGlobalsObject::isRecursiveChildOf(const QModelIndex& child, const QModelIndex& parent) const
+{
+    if (!child.isValid()
+        || child == parent //< We don't consider an index a recursive child of itself.
+        || !NX_ASSERT(parent.isValid())
+        || !NX_ASSERT(child.model() == parent.model()))
+    {
+        return false;
+    }
+
+    const auto next = child.parent();
+    return next == parent
+        ? true
+        : isRecursiveChildOf(next, parent);
+}
+
 bool NxGlobalsObject::hasChildren(const QModelIndex& index) const
 {
     return index.isValid() && index.model()->hasChildren(index);

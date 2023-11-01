@@ -11,6 +11,7 @@
 #include <common/static_common_module.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop::test {
@@ -49,6 +50,13 @@ QnClientCoreModule* Context::clientCoreModule() const
 SystemContext* Context::systemContext() const
 {
     return d->appContext->currentSystemContext();
+}
+
+QnLayoutResourcePtr ContextBasedTest::createLayout()
+{
+    LayoutResourcePtr layout(new LayoutResource());
+    layout->setIdUnsafe(QnUuid::createUuid());
+    return layout;
 }
 
 } // namespace nx::vms::client::desktop::test
