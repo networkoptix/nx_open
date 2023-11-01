@@ -35,6 +35,7 @@
 #include <nx/reflect/string_conversion.h>
 #include <nx/reflect/urlencoded/serializer.h>
 #include <nx/utils/buffer.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/serialization/qjson.h>
@@ -1919,10 +1920,10 @@ Handle ServerConnection::deleteRest(
         nx::network::http::Method::delete_,
         prepareUrl(action, params));
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(std::move(helper), request, std::move(callback));
 
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(wrapper), executor)
+        ? executeRequest(request, std::move(wrapper), std::move(executor))
         : Handle();
 
     return handle;
@@ -2981,42 +2982,50 @@ Handle ServerConnection::executeRequest(
                 "/rest handler responses with Result if request is failed, use ErrorOrData");
         }
         const QString serverId = d->serverId.toString();
-        return sendRequest(request,
-            [this, callback = std::move(callback), serverId](ContextPtr context)
-            {
-                NX_VERBOSE(d->logTag, "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
-                    context->handle, context->systemError, context->getStatusCode());
-                bool success = false;
-                const auto format = Qn::serializationFormatFromHttpContentType(context->response.contentType);
-
-                // All parsing functions can handle incorrect format.
-                auto resultPtr = std::make_shared<ResultType>(
-                    parseMessageBody<ResultType>(
-                        format,
-                        context->response.messageBody,
-                        context->getStatusCode(),
-                        &success));
-
-                if (!success)
-                    NX_VERBOSE(d->logTag, "<%1> Could not parse message body.", context->handle);
-
-                if (context->systemError != SystemError::noError
-                    || context->getStatusCode() != nx::network::http::StatusCode::ok)
+        return sendRequest(
+            request,
+            // Guarded function is used as in some cases callback could be executed when
+            // ServerConnection instance is already destroyed.
+            utils::guarded(
+                this,
+                [this, callback = std::move(callback), serverId](ContextPtr context)
                 {
-                    success = false;
-                }
+                    NX_VERBOSE(d->logTag, "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
+                        context->handle, context->systemError, context->getStatusCode());
+                    bool success = false;
+                    const auto format
+                        = Qn::serializationFormatFromHttpContentType(context->response.contentType);
 
-                const auto id = context->handle;
+                    // All parsing functions can handle incorrect format.
+                    auto resultPtr = std::make_shared<ResultType>(
+                        parseMessageBody<ResultType>(
+                            format,
+                            context->response.messageBody,
+                            context->getStatusCode(),
+                            &success));
 
-                auto internal_callback =
-                    [callback = std::move(callback), success, id, resultPtr]()
+                    if (!success)
+                        NX_VERBOSE(d->logTag, "<%1> Could not parse message body.", context->handle);
+
+                    if (context->systemError != SystemError::noError
+                        || context->getStatusCode() != nx::network::http::StatusCode::ok)
                     {
-                        if (callback)
-                            callback(success, id, std::move(*resultPtr));
-                    };
+                        success = false;
+                    }
 
-                invoke(context, std::move(internal_callback), success, serverId);
-            }, targetThread, timeouts);
+                    const auto id = context->handle;
+
+                    auto internal_callback =
+                        [callback = std::move(callback), success, id, resultPtr]()
+                        {
+                            if (callback)
+                                callback(success, id, std::move(*resultPtr));
+                        };
+
+                    invoke(context, std::move(internal_callback), success, serverId);
+                }),
+            targetThread,
+            timeouts);
     }
 
     return sendRequest(request, {}, targetThread);
@@ -3040,40 +3049,44 @@ Handle ServerConnection::executeRequest(
     const QString serverId = d->serverId.toString();
     return sendRequest(
         request,
-        [this, callback = std::move(callback), serverId](ContextPtr context)
-        {
-            NX_VERBOSE(d->logTag,
-                "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
-                context->handle,
-                context->systemError,
-                context->getStatusCode());
-            bool success = false;
-            const auto format =
-                Qn::serializationFormatFromHttpContentType(context->response.contentType);
-
-            // All parsing functions can handle incorrect format.
-            auto resultPtr = std::make_shared<ResultType>(parseMessageBody<ResultType>(
-                format, context->response.messageBody, context->getStatusCode(), &success));
-
-            if (!success)
-                NX_VERBOSE(d->logTag, "<%1> Could not parse message body.", context->handle);
-
-            if (context->systemError != SystemError::noError
-                || context->getStatusCode() != nx::network::http::StatusCode::ok)
+        // Guarded function is used as in some cases callback could be executed when
+        // ServerConnection instance is already destroyed.
+        utils::guarded(
+            this,
+            [this, callback = std::move(callback), serverId](ContextPtr context)
             {
-                success = false;
-            }
+                NX_VERBOSE(d->logTag,
+                    "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
+                    context->handle,
+                    context->systemError,
+                    context->getStatusCode());
+                bool success = false;
+                const auto format =
+                    Qn::serializationFormatFromHttpContentType(context->response.contentType);
 
-            const auto id = context->handle;
+                // All parsing functions can handle incorrect format.
+                auto resultPtr = std::make_shared<ResultType>(parseMessageBody<ResultType>(
+                    format, context->response.messageBody, context->getStatusCode(), &success));
 
-            auto internal_callback = [callback = std::move(callback), success, id, resultPtr]()
-            {
-                if (callback)
-                    callback(success, id, std::move(*resultPtr));
-            };
+                if (!success)
+                    NX_VERBOSE(d->logTag, "<%1> Could not parse message body.", context->handle);
 
-            invoke(context, std::move(internal_callback), success, serverId);
-        },
+                if (context->systemError != SystemError::noError
+                    || context->getStatusCode() != nx::network::http::StatusCode::ok)
+                {
+                    success = false;
+                }
+
+                const auto id = context->handle;
+
+                auto internal_callback = [callback = std::move(callback), success, id, resultPtr]()
+                {
+                    if (callback)
+                        callback(success, id, std::move(*resultPtr));
+                };
+
+                invoke(context, std::move(internal_callback), success, serverId);
+            }),
         executor,
         timeouts);
 }
@@ -3091,26 +3104,42 @@ Handle ServerConnection::executeRequest(
     {
         const QString serverId = d->serverId.toString();
         QPointer<QThread> targetThreadGuard(targetThread);
-        return sendRequest(request,
-            [this, callback,  targetThreadGuard, serverId](ContextPtr context)
-            {
-                const auto statusCode = context->getStatusCode();
-                const auto osErrorCode = context->systemError;
-                const auto id = context->handle;
+        return sendRequest(
+            request,
+            // Guarded function is used as in some cases callback could be executed when
+            // ServerConnection instance is already destroyed.
+            utils::guarded(
+                this,
+                [this, callback,  targetThreadGuard, serverId](ContextPtr context)
+                {
+                    const auto statusCode = context->getStatusCode();
+                    const auto osErrorCode = context->systemError;
+                    const auto id = context->handle;
 
-                NX_VERBOSE(d->logTag,
-                    "<%1> Got %2 byte(s) reply of content type %3. OS error: %4, HTTP status: %5",
-                    id, context->response.messageBody.size(), QString::fromLatin1(context->response.contentType), osErrorCode, statusCode);
+                    NX_VERBOSE(
+                        d->logTag,
+                        "<%1> Got %2 byte(s) reply of content type %3. OS error: %4, HTTP status: %5",
+                        id,
+                        context->response.messageBody.size(),
+                        QString::fromLatin1(context->response.contentType),
+                        osErrorCode,
+                        statusCode);
 
-                const bool success = context->hasSuccessfulResponse();
-                auto internal_callback =
-                    [callback, success, id, context]()
-                    {
-                        callback(success, id, context->response.messageBody, context->response.headers);
-                    };
+                    const bool success = context->hasSuccessfulResponse();
+                    auto internal_callback =
+                        [callback, success, id, context]()
+                        {
+                            callback(
+                                success,
+                                id,
+                                context->response.messageBody,
+                                context->response.headers);
+                        };
 
-                invoke(context, internal_callback, success, serverId);
-            }, targetThread, timeouts);
+                    invoke(context, internal_callback, success, serverId);
+                }),
+            targetThread,
+            timeouts);
     }
 
     return sendRequest(request, {}, targetThread, timeouts);
@@ -3125,26 +3154,33 @@ Handle ServerConnection::executeRequest(
     if (callback)
     {
         const QString serverId = d->serverId.toString();
-        return sendRequest(request,
-            [this, callback, serverId](ContextPtr context)
-            {
-                const auto statusCode = context->getStatusCode();
-                const auto osErrorCode = context->systemError;
-                const auto id = context->handle;
-                bool success = (osErrorCode == SystemError::noError
-                    && statusCode >= nx::network::http::StatusCode::ok
-                    && statusCode <= nx::network::http::StatusCode::partialContent);
+        return sendRequest(
+            request,
+            // Guarded function is used as in some cases callback could be executed when
+            // ServerConnection instance is already destroyed.
+            utils::guarded(
+                this,
+                [this, callback, serverId](ContextPtr context)
+                {
+                    const auto statusCode = context->getStatusCode();
+                    const auto osErrorCode = context->systemError;
+                    const auto id = context->handle;
+                    bool success = (osErrorCode == SystemError::noError
+                        && statusCode >= nx::network::http::StatusCode::ok
+                        && statusCode <= nx::network::http::StatusCode::partialContent);
 
-                NX_VERBOSE(d->logTag, "<%1> Got reply. OS error: %2, HTTP status: %3",
-                    id, osErrorCode, statusCode);
+                    NX_VERBOSE(d->logTag, "<%1> Got reply. OS error: %2, HTTP status: %3",
+                        id, osErrorCode, statusCode);
 
-                auto internal_callback = [callback, success, id]()
-                    {
-                        callback(success, id, EmptyResponseType());
-                    };
+                    auto internal_callback = [callback, success, id]()
+                        {
+                            callback(success, id, EmptyResponseType());
+                        };
 
-                invoke(context, internal_callback, success, serverId);
-            }, targetThread, timeouts);
+                    invoke(context, internal_callback, success, serverId);
+                }),
+            targetThread,
+            timeouts);
     }
 
     return sendRequest(request, {}, targetThread, timeouts);
