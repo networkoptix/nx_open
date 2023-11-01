@@ -47,8 +47,8 @@ struct NX_VMS_API SystemInformation
     /**%apidoc For remote Systems only. */
     std::optional<SystemCompatibilityStatus> status;
 
-    /**%apidoc If set, the LDAP server this System is connected to. */
-    std::optional<nx::utils::Url> ldapUri;
+    /**%apidoc[proprietary] Internal identification of LDAP connection. */
+    std::optional<QString> ldapSyncId;
 
     /**%apidoc Synchronized time of the VMS System, in milliseconds since epoch. */
     std::chrono::milliseconds synchronizedTimeMs{0};
@@ -64,7 +64,7 @@ struct NX_VMS_API SystemInformation
 };
 #define SystemInformation_Fields \
     (name)(customization)(version)(protoVersion)(cloudHost)(localId)(cloudId)(cloudOwnerId) \
-    (endpoint)(servers)(devices)(status)(ldapUri)(synchronizedTimeMs)
+    (endpoint)(servers)(devices)(status)(ldapSyncId)(synchronizedTimeMs)
 NX_VMS_API_DECLARE_STRUCT_EX(SystemInformation, (json))
 
 struct NX_VMS_API OtherSystemRequest
