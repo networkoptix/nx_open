@@ -986,7 +986,7 @@ void initialize(Manager* manager, Action* root)
         );
 
     factory(RemoveBookmarksAction)
-        .flags(NoTarget | ResourceTarget)
+        .flags(MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Delete Bookmarks...")) //< Copied to an internal context menu
         .condition(
             condition::hasPermissionsForResources(Qn::ManageBookmarksPermission)
