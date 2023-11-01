@@ -11,6 +11,7 @@
 #include <common/static_common_module.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/message_processor_mock.h>
 
@@ -58,6 +59,13 @@ SystemContext* Context::systemContext() const
 MessageProcessorMock* ContextBasedTest::createMessageProcessor()
 {
     return systemContext()->createMessageProcessor<MessageProcessorMock>();
+}
+
+QnLayoutResourcePtr ContextBasedTest::createLayout()
+{
+    LayoutResourcePtr layout(new LayoutResource());
+    layout->setIdUnsafe(QnUuid::createUuid());
+    return layout;
 }
 
 } // namespace nx::vms::client::desktop::test

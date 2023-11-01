@@ -8,7 +8,7 @@
 
 #include <core/resource/resource.h>
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
@@ -151,18 +151,17 @@ void ResourceSelectionModelAdapter::setContext(SystemContext* context)
         d->treeEntityBuilder.reset(new entity_resource_tree::ResourceTreeEntityBuilder(
             d->context));
 
-        if (d->context->userWatcher()) //< UserWatcher does not exist in unit tests.
-        {
-            const auto setUser =
-                [this](const QnUserResourcePtr& user)
-                {
-                    d->treeEntityBuilder->setUser(user);
-                    d->updateRootEntity();
-                };
+        const auto updateUser =
+            [this]()
+            {
+                d->treeEntityBuilder->setUser(d->context->accessController()->user());
+                d->updateRootEntity();
+            };
 
-            connect(d->context->userWatcher(), &core::UserWatcher::userChanged, this, setUser);
-            setUser(d->context->userWatcher()->user());
-        }
+        connect(d->context->accessController(), &core::AccessController::userChanged,
+            this, updateUser);
+
+        updateUser();
     }
 
     emit contextChanged();

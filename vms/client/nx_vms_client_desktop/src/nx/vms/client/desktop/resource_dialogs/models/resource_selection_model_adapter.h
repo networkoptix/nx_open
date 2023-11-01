@@ -13,7 +13,8 @@ class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
-class ResourceSelectionModelAdapter: public ScopedModelOperations<FilterProxyModel>
+class NX_VMS_CLIENT_DESKTOP_API ResourceSelectionModelAdapter:
+    public ScopedModelOperations<FilterProxyModel>
 {
     Q_OBJECT
     Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")

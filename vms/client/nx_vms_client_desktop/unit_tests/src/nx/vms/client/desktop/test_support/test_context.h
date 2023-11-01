@@ -38,6 +38,9 @@ public:
 
     /** Create and install dummy message processor. */
     MessageProcessorMock* createMessageProcessor();
+
+    /** Client tests should create client layouts. */
+    virtual QnLayoutResourcePtr createLayout() override;
 };
 
 } // namespace nx::vms::client::desktop::test

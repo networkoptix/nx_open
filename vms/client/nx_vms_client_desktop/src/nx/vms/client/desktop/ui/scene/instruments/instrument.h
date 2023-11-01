@@ -15,12 +15,16 @@ namespace scene {
 class MouseEvent;
 class HoverEvent;
 class KeyEvent;
+class WheelEvent;
 
 class Instrument: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QObject* item READ item WRITE setItem NOTIFY itemChanged)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
+    Q_PROPERTY(bool hoverEnabled READ hoverEnabled WRITE setHoverEnabled NOTIFY hoverEnabledChanged)
+    Q_PROPERTY(Qt::MouseButtons acceptedButtons READ acceptedButtons WRITE setAcceptedButtons
+        NOTIFY acceptedButtonsChanged)
 
     using base_type = QObject;
 
@@ -29,10 +33,16 @@ public:
     virtual ~Instrument() override;
 
     QObject* item() const;
-    void setItem(QObject* item);
+    void setItem(QObject* value);
 
     bool enabled() const;
-    void setEnabled(bool enabled);
+    void setEnabled(bool value);
+
+    bool hoverEnabled() const;
+    void setHoverEnabled(bool value);
+
+    Qt::MouseButtons acceptedButtons() const;
+    void setAcceptedButtons(Qt::MouseButtons value);
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
@@ -41,11 +51,14 @@ public:
 signals:
     void itemChanged();
     void enabledChanged();
+    void hoverEnabledChanged();
+    void acceptedButtonsChanged();
 
     void mousePress(nx::vms::client::desktop::ui::scene::MouseEvent* mouse);
     void mouseRelease(nx::vms::client::desktop::ui::scene::MouseEvent* mouse);
     void mouseMove(nx::vms::client::desktop::ui::scene::MouseEvent* mouse);
     void mouseDblClick(nx::vms::client::desktop::ui::scene::MouseEvent* mouse);
+    void mouseWheel(nx::vms::client::desktop::ui::scene::WheelEvent* wheel);
     void hoverEnter(nx::vms::client::desktop::ui::scene::HoverEvent* hover);
     void hoverLeave(nx::vms::client::desktop::ui::scene::HoverEvent* hover);
     void hoverMove(nx::vms::client::desktop::ui::scene::HoverEvent* hover);
