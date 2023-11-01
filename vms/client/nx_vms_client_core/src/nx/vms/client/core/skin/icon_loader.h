@@ -26,7 +26,7 @@ public:
     QIcon polish(const QIcon& icon);
     QIcon load(const QString& name,
         const QString& checkedName = QString(),
-        const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions = {},
+        const SvgIconColorer::ThemeSubstitutions& themeSubstitutions = {},
         const QnIcon::Suffixes* suffixes = nullptr,
         const SvgIconColorer::IconSubstitutions& svgColorSubstitutions =
             SvgIconColorer::kDefaultIconSubstitutions,

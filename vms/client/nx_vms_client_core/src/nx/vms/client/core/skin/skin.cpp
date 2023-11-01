@@ -128,7 +128,7 @@ QIcon Skin::icon(const QString& name,
     const QnIcon::Suffixes* suffixes,
     const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
     const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions,
-    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& svgThemeSubstitutions)
+    const SvgIconColorer::ThemeSubstitutions& svgThemeSubstitutions)
 {
     return m_iconLoader->load(name,
         checkedName,
@@ -170,13 +170,13 @@ QIcon Skin::icon(const QString& name,
 }
 
 QIcon Skin::icon(const QString& name,
-    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions)
+    const SvgIconColorer::ThemeSubstitutions& themeSubstitutions)
 {
     return m_iconLoader->load(name, QString(), themeSubstitutions);
 }
 
 QIcon Skin::icon(const QString& name,
-    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions,
+    const SvgIconColorer::ThemeSubstitutions& themeSubstitutions,
     const QString& checkedName)
 {
     return m_iconLoader->load(name,

@@ -200,7 +200,7 @@ QIcon IconLoader::polish(const QIcon& icon)
 
 QIcon IconLoader::load(const QString& name,
     const QString& checkedName,
-    const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions,
+    const SvgIconColorer::ThemeSubstitutions& themeSubstitutions,
     const QnIcon::Suffixes* suffixes,
     const SvgIconColorer::IconSubstitutions& svgColorSubstitutions,
     const SvgIconColorer::IconSubstitutions& svgCheckedColorSubstitutions)
@@ -208,8 +208,12 @@ QIcon IconLoader::load(const QString& name,
     static const QString kSeparator = "=^_^=";
     static const QString kHashSeparator = ">_<";
 
-    QString key = name + kHashSeparator + svgColorSubstitutions.hash()
-        + kSeparator + checkedName + kHashSeparator + svgCheckedColorSubstitutions.hash();
+    QString key = name
+        + kHashSeparator + svgColorSubstitutions.hash()
+        + kSeparator + checkedName
+        + kHashSeparator + svgCheckedColorSubstitutions.hash()
+        + kSeparator + themeSubstitutions.hash();
+
     if (!suffixes)
     {
         key += kSeparator + "_default";

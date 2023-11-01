@@ -21,11 +21,10 @@ namespace {
 const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
 const qreal kBytesInTb = 1024.0 * kBytesInGB;
 
-static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-    kThemeSubstitutions = {
-        {QIcon::Normal, {.primary = "light16"}},
-        {QIcon::Active, {.primary = "light17"}},
-        {QIcon::Selected, {.primary = "light15"}},
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
+    {QIcon::Normal, {.primary = "light16"}},
+    {QIcon::Active, {.primary = "light17"}},
+    {QIcon::Selected, {.primary = "light15"}},
 };
 
 int storageIndex(const QnStorageModelInfoList& list, const QnStorageModelInfo& storage)

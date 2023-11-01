@@ -63,8 +63,8 @@ namespace {
 
 static constexpr int kMaximumColumnWidth = 200;
 
-static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-    kTextButtonColors = {{QIcon::Normal, {"light4"}}, {QIcon::Active, {"light3"}}};
+static const core::SvgIconColorer::ThemeSubstitutions kTextButtonColors = {
+    {QIcon::Normal, {"light4"}}, {QIcon::Active, {"light3"}}};
 
 } // namespace
 

@@ -256,4 +256,15 @@ QString SvgIconColorer::IconSubstitutions::hash() const
     return QString::fromLatin1(hash.resultView());
 }
 
+QString SvgIconColorer::ThemeSubstitutions::hash() const
+{
+    QByteArray data;
+    QDataStream stream(&data, QDataStream::WriteOnly);
+    for (const auto& key: this->keys())
+        stream << key << "/" << this->value(key).toString() << "/";
+    QCryptographicHash hash(QCryptographicHash::Sha1);
+    hash.addData(data);
+    return QString::fromLatin1(hash.resultView());
+}
+
 } // namespace nx::vms::client::core

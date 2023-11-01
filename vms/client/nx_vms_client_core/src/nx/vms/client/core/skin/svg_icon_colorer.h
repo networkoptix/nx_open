@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <sstream>
+
 #include <QtCore/QByteArray>
 #include <QtCore/QDir>
 #include <QtCore/QMap>
@@ -12,6 +14,7 @@
 namespace nx::vms::client::core {
 
 static const QString kInvalidColor = "invalidColor";
+
 
 class NX_VMS_CLIENT_CORE_API SvgIconColorer
 {
@@ -45,6 +48,20 @@ public:
                 return tertiary;
             return kInvalidColor;
         }
+
+        QString toString() const
+        {
+            std::stringstream ss;
+            ss << primary.toStdString() << "-" << secondary.toStdString() << "-"
+               << tertiary.toStdString() << "-" << alpha;
+            return QString::fromStdString(ss.str());
+        }
+    };
+
+    struct ThemeSubstitutions: public QMap<QIcon::Mode, ThemeColorsRemapData>
+    {
+        using QMap<QIcon::Mode, ThemeColorsRemapData>::QMap;
+        QString hash() const;
     };
 
     using Substitutions = QMap<QColor, QString>;
