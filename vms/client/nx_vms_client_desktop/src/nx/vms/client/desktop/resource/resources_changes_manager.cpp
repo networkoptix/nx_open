@@ -310,7 +310,7 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
         ? helper
         : systemContext->restApiHelper()->getSessionTokenHelper();
 
-    api->deleteRest(tokenHelper, action, network::rest::Params{}, handler, thread());
+    api->deleteRest(tokenHelper, action, network::rest::Params{}, handler, this);
 }
 
 void ResourcesChangesManager::saveCamera(const QnVirtualCameraResourcePtr& camera,
