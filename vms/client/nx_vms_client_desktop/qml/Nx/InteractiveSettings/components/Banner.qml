@@ -48,6 +48,11 @@ Control
             lineHeightMode: Text.FixedHeight
             lineHeight: 16
             wrapMode: Text.Wrap
+            linkColor: hoveredLink
+                ? ColorTheme.colors.brand_core
+                : ColorTheme.colors.brand_d2
+
+            onLinkActivated: (link) => Qt.openUrlExternally(link)
 
             Layout.fillWidth: true
         }
