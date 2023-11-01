@@ -51,7 +51,7 @@ public:
      * @return True if frame is decoded without errors. For null input data, return true while
      * flushing internal buffer (result is not null)
      */
-    bool decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr);
+    bool decode(const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result = nullptr);
 
     /**
      * @return Current frame number in range [0..INT_MAX]. This number will be used for the next
@@ -70,7 +70,7 @@ public:
     void pleaseStop();
 
 private:
-    void pushFrame(QVideoFramePtr frame, int decodedFrameNum, double sar);
+    void pushFrame(VideoFramePtr frame, int decodedFrameNum, double sar);
 
 private:
     QScopedPointer<SeamlessVideoDecoderPrivate> d_ptr;

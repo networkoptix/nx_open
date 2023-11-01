@@ -2,6 +2,7 @@
 
 #include "image_video_buffer.h"
 
+#include <nx/media/video_frame.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx::media {
@@ -26,14 +27,14 @@ void ImageVideoBuffer::unmap()
     m_mapMode = QVideoFrame::NotMapped;
 }
 
-QVideoFramePtr videoFrameFromImage(const QImage& image)
+VideoFramePtr videoFrameFromImage(const QImage& image)
 {
     const auto pixelFormat = QVideoFrameFormat::pixelFormatFromImageFormat(image.format());
     if (!NX_ASSERT(pixelFormat != QVideoFrameFormat::Format_Invalid))
         return {};
 
     const QVideoFrameFormat format(image.size(), pixelFormat);
-    return std::make_shared<QVideoFrame>(new ImageVideoBuffer(image), format);
+    return std::make_shared<VideoFrame>(new ImageVideoBuffer(image), format);
 }
 
 } // namespace nx::media

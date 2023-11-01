@@ -7,6 +7,7 @@
 #include <core/resource/media_resource.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/media/media_data_packet.h>
+#include <nx/media/video_frame.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/log/log.h>
 
@@ -228,7 +229,7 @@ bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& constData)
         m_eofPacketCounter = 0;
     }
 
-    QVideoFramePtr packet(new QVideoFrame());
+    VideoFramePtr packet = std::make_shared<VideoFrame>();
     FrameMetadata metadata = FrameMetadata(data);
     metadata.serialize(packet);
     enqueueVideoFrame(packet);
@@ -297,7 +298,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     }
     SeamlessVideoDecoder* videoDecoder = m_videoDecoders[videoChannel].get();
 
-    QVideoFramePtr decodedFrame;
+    VideoFramePtr decodedFrame;
     if (!videoDecoder->decode(data, &decodedFrame))
     {
         NX_WARNING(this, nx::format("Cannot decode the video frame. The frame is skipped."));
@@ -330,7 +331,7 @@ bool PlayerDataConsumer::checkSequence(int sequence)
     return true;
 }
 
-void PlayerDataConsumer::enqueueVideoFrame(QVideoFramePtr decodedFrame)
+void PlayerDataConsumer::enqueueVideoFrame(VideoFramePtr decodedFrame)
 {
     NX_ASSERT(decodedFrame);
     NX_MUTEX_LOCKER lock(&m_queueMutex);
@@ -356,12 +357,12 @@ void PlayerDataConsumer::clearUnprocessedData()
     m_queueWaitCond.wakeAll();
 }
 
-QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
+VideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 {
     NX_MUTEX_LOCKER lock(&m_queueMutex);
     if (m_decodedVideo.empty())
-        return QVideoFramePtr(); //< no data
-    QVideoFramePtr result = std::move(m_decodedVideo.front());
+        return VideoFramePtr(); //< no data
+    VideoFramePtr result = std::move(m_decodedVideo.front());
     m_decodedVideo.pop_front();
     lock.unlock();
 
