@@ -19,6 +19,7 @@ extern "C"
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
+#include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/annexb_to_mp4.h>
@@ -342,7 +343,7 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
 
 int IOSVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& videoData,
-    QVideoFramePtr* outDecodedFrame)
+    VideoFramePtr* outDecodedFrame)
 {
     Q_D(IOSVideoDecoder);
 
@@ -431,7 +432,7 @@ int IOSVideoDecoder::decode(
 
     QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame);
     d->frame = av_frame_alloc();
-    QVideoFrame* videoFrame = new QVideoFrame(buffer, {frameSize, qtPixelFormat});
+    VideoFrame* videoFrame = new VideoFrame(buffer, {frameSize, qtPixelFormat});
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);

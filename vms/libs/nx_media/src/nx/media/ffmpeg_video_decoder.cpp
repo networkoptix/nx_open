@@ -2,10 +2,9 @@
 
 #include "ffmpeg_video_decoder.h"
 
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include <nx/media/video_frame.h>
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/pixdesc.h>
@@ -263,7 +262,7 @@ QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
 }
 
 int FfmpegVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)
+    const QnConstCompressedVideoDataPtr& compressedVideoData, VideoFramePtr* outDecodedFrame)
 {
     Q_D(FfmpegVideoDecoder);
 
@@ -325,7 +324,7 @@ int FfmpegVideoDecoder::decode(
         buffer = new AvFrameMemoryBuffer(newFrame);
     }
 
-    QVideoFrame* videoFrame = new QVideoFrame(buffer, {frameSize, qtPixelFormat});
+    VideoFrame* videoFrame = new VideoFrame(buffer, {frameSize, qtPixelFormat});
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);

@@ -90,7 +90,7 @@ public:
      */
     virtual int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,
-        QVideoFramePtr* outDecodedFrame) = 0;
+        VideoFramePtr* outDecodedFrame) = 0;
 
     /**
      * Should be called before other methods. Allows to obtain video window coords for some

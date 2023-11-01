@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtMultimedia/QVideoFrame>
 
 #include <nx/media/video_data_packet.h>
 
@@ -32,7 +31,7 @@ public:
     static QSize maxResolution(const AVCodecID codec);
 
     virtual int decode(
-        const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
+        const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result = nullptr) override;
 
     virtual Capabilities capabilities() const override;
 private:

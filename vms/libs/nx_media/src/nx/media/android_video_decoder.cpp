@@ -15,7 +15,6 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
-#include <QtMultimedia/QVideoFrame>
 #include <QtMultimedia/QVideoFrameFormat>
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
 #include <QtOpenGL/QOpenGLFramebufferObject>
@@ -24,6 +23,7 @@
 #include <media/filters/h264_mp4_to_annexb.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
+#include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -524,7 +524,7 @@ QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
     return AndroidVideoDecoderPrivate::maxResolutions[codec]; //< Return empty QSize if not found.
 }
 
-int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, QVideoFramePtr* result)
+int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, VideoFramePtr* result)
 {
     QnConstCompressedVideoDataPtr frame;
     if (frameSrc)
@@ -623,7 +623,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, Q
     NX_VERBOSE(this, nx::format("got frame num %1 decode time1=%2 time2=%3").args(
         outFrameNum, time1, tm.elapsed()));
 
-    auto videoFrame = new QVideoFrame(
+    auto videoFrame = new VideoFrame(
         new TextureBuffer(std::move(fboToRender), d),
         QVideoFrameFormat(d->frameSize, QVideoFrameFormat::Format_BGRX8888));
 

@@ -3,13 +3,15 @@
 #include "quick_sync_video_decoder_impl.h"
 
 #include <deque>
-#include <sysmem_allocator.h>
 #include <thread>
+
+#include <sysmem_allocator.h>
 
 #include <QtMultimedia/QVideoFrame>
 
 #include <media/filters/h264_mp4_to_annexb.h>
 #include <nx/codec/nal_units.h>
+#include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
 
 #include "compatibility_cache.h"
@@ -264,7 +266,7 @@ void QuickSyncVideoDecoderImpl::releaseSurface(const mfxFrameSurface1* surface)
 }
 
 bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
-    mfxFrameSurface1* surface, nx::QVideoFramePtr* result)
+    mfxFrameSurface1* surface, nx::media::VideoFramePtr* result)
 {
     QAbstractVideoBuffer* buffer = nullptr;
     if (m_config.useVideoMemory)
@@ -273,7 +275,7 @@ bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
         buffer = new MfxQtVideoBuffer(surface, m_allocator);
 
     QSize frameSize(surface->Info.CropW, surface->Info.CropH);
-    result->reset(new QVideoFrame(buffer, {frameSize, QVideoFrameFormat::Format_NV12}));
+    result->reset(new VideoFrame(buffer, {frameSize, QVideoFrameFormat::Format_NV12}));
     result->get()->setStartTime(surface->Data.TimeStamp);
     return true;
 }
@@ -330,7 +332,7 @@ void QuickSyncVideoDecoderImpl::resetDecoder()
 }
 
 int QuickSyncVideoDecoderImpl::decode(
-    const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result)
+    const QnConstCompressedVideoDataPtr& frame, nx::media::VideoFramePtr* result)
 {
     QnConstCompressedVideoDataPtr frameAnnexB;
     if (frame)

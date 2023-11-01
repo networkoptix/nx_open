@@ -5,10 +5,10 @@
 #include <deque>
 
 #include <QtCore/QMutexLocker>
-#include <QtMultimedia/QVideoFrame>
 
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
+#include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
 
 #include "abstract_video_decoder.h"
@@ -63,7 +63,7 @@ public:
     void updateSar(const QnConstCompressedVideoDataPtr& frame);
 
 public:
-    std::deque<QVideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
+    std::deque<VideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
     VideoDecoderPtr videoDecoder;
     CodecParametersConstPtr currentCodecParameters;
     FrameBasicInfo prevFrameInfo;
@@ -190,7 +190,7 @@ void SeamlessVideoDecoder::pleaseStop()
 }
 
 bool SeamlessVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
+    const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result)
 {
     Q_D(SeamlessVideoDecoder);
     if (result)
@@ -215,7 +215,7 @@ bool SeamlessVideoDecoder::decode(
         {
             for (;;)
             {
-                QVideoFramePtr decodedFrame;
+                VideoFramePtr decodedFrame;
                 int decodedFrameNum = d->videoDecoder->decode(
                     QnConstCompressedVideoDataPtr(), &decodedFrame);
                 if (!decodedFrame)
@@ -250,7 +250,7 @@ bool SeamlessVideoDecoder::decode(
     int decodedFrameNum = 0;
     if (d->videoDecoder)
     {
-        QVideoFramePtr decodedFrame;
+        VideoFramePtr decodedFrame;
         decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
         if (decodedFrame)
             pushFrame(decodedFrame, decodedFrameNum, d->sar);
@@ -267,7 +267,7 @@ bool SeamlessVideoDecoder::decode(
     return true;
 }
 
-void SeamlessVideoDecoder::pushFrame(QVideoFramePtr decodedFrame, int decodedFrameNum, double sar)
+void SeamlessVideoDecoder::pushFrame(VideoFramePtr decodedFrame, int decodedFrameNum, double sar)
 {
     Q_D(SeamlessVideoDecoder);
     FrameMetadata metadata = d->findMetadata(d->decoderFrameNumToLocalNum(decodedFrameNum));
