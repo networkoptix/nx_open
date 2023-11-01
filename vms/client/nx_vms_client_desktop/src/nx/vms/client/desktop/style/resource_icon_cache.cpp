@@ -41,14 +41,13 @@ Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
 namespace {
 
-static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-    kTreeThemeSubstitutions = {
-        {QnIcon::Disabled, {.primary = "dark14"}},
-        {QnIcon::Selected, {.primary = "light4"}},
-        {QnIcon::Active, {.primary = "brand_core"}},
-        {QnIcon::Normal, {.primary = "light10"}},
-        {QnIcon::Error, {.primary = "red_l2"}},
-        {QnIcon::Pressed, {.primary = "light4"}}};
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTreeThemeSubstitutions = {
+    {QnIcon::Disabled, {.primary = "light10", .secondary = "light4", .alpha=0.3}},
+    {QnIcon::Selected, {.primary = "light4", .secondary = "light2"}},
+    {QnIcon::Active, {.primary = "brand_core", .secondary= "light4"}},
+    {QnIcon::Normal, {.primary = "light10", .secondary = "light4"}},
+    {QnIcon::Error, {.primary = "red_l2", .secondary = "red_l2"}},
+    {QnIcon::Pressed, {.primary = "light4", .secondary = "light2"}}};
 
 bool isCurrentlyConnectedServer(const QnResourcePtr& resource)
 {
@@ -76,8 +75,7 @@ bool isDetachedServer(const QnResourcePtr& resource)
 }
 
 QIcon loadIcon(const QString& name,
-    const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>&
-        themeSubstitutions = {})
+    const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions& themeSubstitutions = {})
 {
     static const QnIcon::Suffixes kResourceIconSuffixes({
         {QnIcon::Active,   "accented"},
@@ -207,7 +205,8 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(CloudUser, loadIcon("user_settings/user_cloud.svg", kTreeThemeSubstitutions));
     m_cache.insert(LdapUser, loadIcon("user_settings/user_ldap.svg", kTreeThemeSubstitutions));
     m_cache.insert(LocalUser, loadIcon("user_settings/user_local.svg", kTreeThemeSubstitutions));
-    m_cache.insert(TemporaryUser, loadIcon("user_settings/user_local_temp.svg", kTreeThemeSubstitutions));
+    m_cache.insert(
+        TemporaryUser, loadIcon("user_settings/user_local_temp.svg", kTreeThemeSubstitutions));
 
     // Videowalls.
     m_cache.insert(VideoWall, loadIcon("tree/videowall.svg"));

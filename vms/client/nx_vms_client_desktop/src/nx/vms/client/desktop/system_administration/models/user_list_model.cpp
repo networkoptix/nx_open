@@ -106,18 +106,19 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
     }
 }
 
-static const QColor kLight10Color = "#A5B7C0";
-static const core::SvgIconColorer::IconSubstitutions kEnabledUncheckedIconSubstitutions = {
-    {QIcon::Selected, {{kLight10Color, "light4"}}}};
-static const core::SvgIconColorer::IconSubstitutions kEnabledCheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light2"}}},
-    {QIcon::Selected, {{kLight10Color, "light4"}}}};
-static const core::SvgIconColorer::IconSubstitutions kDisabledUncheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "dark16"}}},
-    {QIcon::Selected, {{kLight10Color, "light13"}}}};
-static const core::SvgIconColorer::IconSubstitutions kDisabledCheckedIconSubstitutions = {
-    {QIcon::Normal, {{kLight10Color, "light13"}}},
-    {QIcon::Selected, {{kLight10Color, "light10"}}}};
+// .primary = light10, .secondary = light4
+static const core::SvgIconColorer::ThemeSubstitutions kEnabledUncheckedIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light10", .secondary = "light4"}},
+    {QIcon::Selected, {.primary = "light4", .secondary = "light2"}}};
+static const core::SvgIconColorer::ThemeSubstitutions kEnabledCheckedIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light2", .secondary = "light1"}},
+    {QIcon::Selected, {.primary = "light4", .secondary = "light2"}}};
+static const core::SvgIconColorer::ThemeSubstitutions kDisabledUncheckedIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light10", .secondary = "light4", .alpha = 0.3}},
+    {QIcon::Selected, {.primary = "light4", .secondary = "light2", .alpha = 0.3}}};
+static const core::SvgIconColorer::ThemeSubstitutions kDisabledCheckedIconSubstitutions = {
+    {QIcon::Normal, {.primary = "light2", .secondary = "light1", .alpha = 0.3}},
+    {QIcon::Selected, {.primary = "light4", .secondary = "light2", .alpha = 0.3}}};
 
 } // namespace
 
@@ -662,7 +663,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
         {
             if (const auto path = data(index, Qn::DecorationPathRole).toString(); !path.isEmpty())
             {
-                core::SvgIconColorer::IconSubstitutions colorSubstitutions;
+                core::SvgIconColorer::ThemeSubstitutions colorSubstitutions;
 
                 const bool checked =
                     data(index.siblingAtColumn(CheckBoxColumn), Qt::CheckStateRole).toBool();

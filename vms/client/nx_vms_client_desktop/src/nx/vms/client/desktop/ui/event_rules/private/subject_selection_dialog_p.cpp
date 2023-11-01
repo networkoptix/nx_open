@@ -269,9 +269,8 @@ Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
 
 QVariant UserListModel::data(const QModelIndex& index, int role) const
 {
-    static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData>
-        colorSubs = {
-            {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
+    static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+        {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
 
     switch (role)
     {
@@ -391,7 +390,7 @@ GroupListDelegate::~GroupListDelegate()
 void GroupListDelegate::initStyleOption(QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
-    static const QMap<QIcon::Mode, nx::vms::client::core::SvgIconColorer::ThemeColorsRemapData> colorSubs = {
+    static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
         {QnIcon::Normal, {.primary = "light10"}}, {QnIcon::Selected, {.primary = "light4"}}};
 
     base_type::initStyleOption(option, index);
