@@ -1434,10 +1434,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>RTP retry count</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Max RTSP connection duration (seconds)</source>
         <translation></translation>
     </message>
@@ -1644,6 +1640,14 @@
     </message>
     <message>
         <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTP timeout (milliseconds)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
