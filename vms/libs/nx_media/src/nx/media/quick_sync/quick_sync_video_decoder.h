@@ -27,7 +27,7 @@ public:
     static QSize maxResolution(const AVCodecID codec);
 
     virtual int decode(
-        const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
+        const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result = nullptr) override;
 
     virtual Capabilities capabilities() const override;
 

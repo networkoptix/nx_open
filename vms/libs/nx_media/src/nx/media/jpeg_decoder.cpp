@@ -2,9 +2,10 @@
 
 #include "jpeg_decoder.h"
 
-#include "jpeg.h"
-
 #include <nx/media/image_video_buffer.h>
+#include <nx/media/video_frame.h>
+
+#include "jpeg.h"
 
 namespace nx {
 namespace media {
@@ -48,7 +49,7 @@ QSize JpegDecoder::maxResolution(const AVCodecID /*codec*/)
     return QSize();
 }
 
-int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
+int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result)
 {
     Q_D(JpegDecoder);
 

@@ -113,7 +113,7 @@ public:
 
     virtual int decode(
         const QnConstCompressedVideoDataPtr& /*compressedVideoData*/,
-        QVideoFramePtr* /*outDecodedFrame*/) override
+        VideoFramePtr* /*outDecodedFrame*/) override
     {
         NX_INFO(this, "INTERNAL ERROR: decode() called");
         return 0;

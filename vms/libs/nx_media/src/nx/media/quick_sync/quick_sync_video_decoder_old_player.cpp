@@ -3,6 +3,7 @@
 #include "quick_sync_video_decoder_old_player.h"
 
 #include <nx/media/utils.h>
+#include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
 
 #include "quick_sync_video_decoder_impl.h"
@@ -77,7 +78,7 @@ bool QuickSyncVideoDecoderOldPlayer::decode(
     }
 
     CLVideoDecoderOutputPtr outFrame = *outFramePtr;
-    nx::QVideoFramePtr result;
+    nx::media::VideoFramePtr result;
     if (m_impl->decode(data, &result) < 0)
     {
         NX_WARNING(this, "Failed to decode frame");

@@ -4,20 +4,18 @@
 
 #include <memory>
 
-class QVideoFrame;
-
 namespace nx {
 
 struct AudioFrame;
-
-using QVideoFramePtr = std::shared_ptr<QVideoFrame>;
-using QnConstVideoFramePtr = std::shared_ptr<const QVideoFrame>;
 
 using AudioFramePtr = std::shared_ptr<AudioFrame>;
 using ConstAudioFramePtr = std::shared_ptr<const AudioFrame>;
 
 namespace media {
 
+class VideoFrame;
+using VideoFramePtr = std::shared_ptr<VideoFrame>;
+using ConstVideoFramePtr = std::shared_ptr<const VideoFrame>;
 struct AbstractRenderContextSynchronizer;
 using RenderContextSynchronizerPtr = std::shared_ptr<AbstractRenderContextSynchronizer>;
 

@@ -2,18 +2,18 @@
 
 #include "quick_sync_video_frame.h"
 
-#include <nx/utils/log/log.h>
-
-#include <nx/media/quick_sync/utils.h>
 #include <nx/media/quick_sync/quick_sync_surface.h>
 #include <nx/media/quick_sync/quick_sync_video_decoder_impl.h>
+#include <nx/media/quick_sync/utils.h>
+#include <nx/media/video_frame.h>
+#include <nx/utils/log/log.h>
 
-#include "qt_video_buffer.h"
 #include "mfx_sys_qt_video_buffer.h"
+#include "qt_video_buffer.h"
 
 namespace {
 
-mfxFrameSurface1* getSurface(const std::shared_ptr<QVideoFrame>& frame)
+mfxFrameSurface1* getSurface(const nx::media::VideoFramePtr& frame)
 {
     QAbstractVideoBuffer* videoBuffer = frame->videoBuffer();
 
@@ -26,7 +26,7 @@ mfxFrameSurface1* getSurface(const std::shared_ptr<QVideoFrame>& frame)
 } // namespace
 
 QuickSyncVideoFrame::QuickSyncVideoFrame(
-    const std::shared_ptr<QVideoFrame>& frame,
+    const nx::media::VideoFramePtr& frame,
     std::weak_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> decoder)
 {
     m_frame = frame;

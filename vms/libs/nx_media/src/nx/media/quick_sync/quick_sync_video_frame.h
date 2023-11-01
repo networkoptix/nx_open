@@ -3,8 +3,8 @@
 #pragma once
 
 #include <QtGui/QOpenGLContext>
-#include <QtMultimedia/QVideoFrame>
 
+#include <nx/media/media_fwd.h>
 #include <utils/media/frame_info.h>
 
 namespace nx::media::quick_sync { class QuickSyncVideoDecoderImpl; }
@@ -12,8 +12,7 @@ namespace nx::media::quick_sync { class QuickSyncVideoDecoderImpl; }
 class NX_MEDIA_API QuickSyncVideoFrame: public AbstractVideoSurface
 {
 public:
-    QuickSyncVideoFrame(
-        const std::shared_ptr<QVideoFrame>& frame,
+    QuickSyncVideoFrame(const nx::media::VideoFramePtr& frame,
         std::weak_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> decoder);
 
     bool renderToRgb(
@@ -29,7 +28,7 @@ public:
 
 private:
     // Contain video surface
-    std::shared_ptr<QVideoFrame> m_frame;
+    nx::media::VideoFramePtr m_frame;
     std::weak_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> m_decoder;
 };
 

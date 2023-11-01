@@ -38,6 +38,6 @@ private:
     QVideoFrame::MapMode m_mapMode = QVideoFrame::NotMapped;
 };
 
-QVideoFramePtr videoFrameFromImage(const QImage& image);
+VideoFramePtr videoFrameFromImage(const QImage& image);
 
 } // namespace nx::media
