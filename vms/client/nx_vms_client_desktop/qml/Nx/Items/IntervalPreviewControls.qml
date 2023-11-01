@@ -103,7 +103,7 @@ Item
 
         enabled: progress.enabled
 
-        onPressed:
+        onPressed: (mouse) =>
         {
             if (preview.playing)
                 resume = !preview.atEnd
@@ -119,7 +119,7 @@ Item
             resume = false
         }
 
-        onPositionChanged:
+        onPositionChanged: (mouse) =>
         {
             if (pressed)
                 setPosition(mouse.x)

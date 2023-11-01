@@ -23,6 +23,7 @@
 #include <nx/media/image_video_buffer.h>
 #include <nx/media/ini.h>
 #include <nx/media/quick_sync/qsv_supported.h>
+#include <nx/media/video_frame.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/utils/log/log.h>
@@ -193,7 +194,7 @@ public:
     qint64 ptsTimerBaseMs = 0;
 
     // Decoded video which is awaiting to be rendered.
-    QVideoFramePtr videoFrameToRender;
+    VideoFramePtr videoFrameToRender;
 
     // Separate thread. Performs network IO and gets compressed AV data.
     std::unique_ptr<QnArchiveStreamReader> archiveReader;
@@ -281,9 +282,9 @@ private:
 
     void presentNextFrame();
     qint64 getDelayForNextFrameWithAudioMs(
-        const QVideoFramePtr& frame,
+        const VideoFramePtr& frame,
         const ConstAudioOutputPtr& audioOutput);
-    qint64 getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame);
+    qint64 getDelayForNextFrameWithoutAudioMs(const VideoFramePtr& frame);
     bool createArchiveReader();
     bool initDataProvider();
 
@@ -297,7 +298,7 @@ private:
     void resetLiveBufferState();
     void updateLiveBufferState(BufferState value);
 
-    QVideoFramePtr scaleFrame(const QVideoFramePtr& videoFrame);
+    VideoFramePtr scaleFrame(const VideoFramePtr& videoFrame);
 
     void doPeriodicTasks();
 
@@ -556,7 +557,7 @@ void PlayerPrivate::presentNextFrameDelayed()
     }
 }
 
-QVideoFramePtr PlayerPrivate::scaleFrame(const QVideoFramePtr& videoFrame)
+VideoFramePtr PlayerPrivate::scaleFrame(const VideoFramePtr& videoFrame)
 {
     if (videoFrame->handleType() != QVideoFrame::NoHandle)
         return videoFrame; //< Do not scale any hardware video frames.
@@ -653,7 +654,7 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
 }
 
 qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(
-    const QVideoFramePtr& frame,
+    const VideoFramePtr& frame,
     const ConstAudioOutputPtr& audioOutput)
 {
     const qint64 currentPosUsec = audioOutput->playbackPositionUsec();
@@ -664,7 +665,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(
     return delayToAudioMs;
 }
 
-qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame)
+qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const VideoFramePtr& frame)
 {
     const qint64 ptsMs = frame->startTime();
     const qint64 ptsDeltaMs = ptsMs - ptsTimerBaseMs;

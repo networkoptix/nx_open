@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <QtMultimedia/QVideoFrame>
-
 #include <nx/media/video_data_packet.h>
 #include <nx/reflect/instrument.h>
 
@@ -27,8 +25,8 @@ struct NX_MEDIA_API FrameMetadata
     FrameMetadata(const QnConstCompressedVideoDataPtr& frame);
     FrameMetadata(const QnEmptyMediaDataPtr& frame);
 
-    void serialize(const QVideoFramePtr& frame) const;
-    static FrameMetadata deserialize(const QnConstVideoFramePtr& frame);
+    void serialize(const VideoFramePtr& frame) const;
+    static FrameMetadata deserialize(const ConstVideoFramePtr& frame);
 
     QnAbstractMediaData::MediaFlags flags; /**< Various flags passed from compressed video data. */
     DisplayHint displayHint; /**< Display frame immediately with no delay. */

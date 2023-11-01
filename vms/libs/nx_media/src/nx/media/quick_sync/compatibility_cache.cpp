@@ -47,7 +47,7 @@ bool CompatibilityCache::isDecodableCached(const QnConstCompressedVideoDataPtr& 
     // Try to decode frame.
     bool isDecodable = true;
     nx::media::quick_sync::QuickSyncVideoDecoderImpl decoder;
-    nx::QVideoFramePtr result;
+    nx::media::VideoFramePtr result;
     if (decoder.decode(frame, &result) < 0)
         isDecodable = false;
 

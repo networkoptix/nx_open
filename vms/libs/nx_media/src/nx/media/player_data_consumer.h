@@ -40,7 +40,7 @@ public:
         RenderContextSynchronizerPtr renderContextSynchronizer);
     virtual ~PlayerDataConsumer();
 
-    QVideoFramePtr dequeueVideoFrame();
+    VideoFramePtr dequeueVideoFrame();
     qint64 queueVideoDurationUsec() const;
 
     ConstAudioOutputPtr audioOutput() const;
@@ -129,7 +129,7 @@ private:
     bool processVideoFrame(const QnCompressedVideoDataPtr& data);
     bool processAudioFrame(const QnCompressedAudioDataPtr& data);
 
-    void enqueueVideoFrame(QVideoFramePtr decodedFrame);
+    void enqueueVideoFrame(VideoFramePtr decodedFrame);
     int getBufferingMask() const;
     QnCompressedVideoDataPtr queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame);
     bool checkSequence(int sequence);
@@ -171,7 +171,7 @@ private:
     std::unique_ptr<SeamlessAudioDecoder> m_audioDecoder;
     AudioOutputPtr m_audioOutput;
 
-    std::deque<QVideoFramePtr> m_decodedVideo;
+    std::deque<VideoFramePtr> m_decodedVideo;
     nx::WaitCondition m_queueWaitCond;
     mutable nx::Mutex m_queueMutex; //< sync with player thread
     mutable nx::Mutex m_jumpMutex; //< sync jump related logic

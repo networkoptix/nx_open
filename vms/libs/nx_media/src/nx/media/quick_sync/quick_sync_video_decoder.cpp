@@ -34,7 +34,7 @@ QuickSyncVideoDecoder::~QuickSyncVideoDecoder()
 }
 
 int QuickSyncVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
+    const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result)
 {
     return m_impl->decode(frame, result);
 }

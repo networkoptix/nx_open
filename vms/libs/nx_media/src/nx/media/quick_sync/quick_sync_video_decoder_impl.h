@@ -21,7 +21,7 @@ class NX_MEDIA_API QuickSyncVideoDecoderImpl : public std::enable_shared_from_th
 public:
     QuickSyncVideoDecoderImpl();
     ~QuickSyncVideoDecoderImpl();
-    int decode(const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result = nullptr);
+    int decode(const QnConstCompressedVideoDataPtr& frame, nx::media::VideoFramePtr* result = nullptr);
 
     void lockSurface(const mfxFrameSurface1* surface);
     void releaseSurface(const mfxFrameSurface1* surface);
@@ -49,7 +49,7 @@ private:
     bool allocFrames();
     mfxFrameSurface1* getFreeSurface();
 
-    bool buildQVideoFrame(mfxFrameSurface1* surface, nx::QVideoFramePtr* result);
+    bool buildQVideoFrame(mfxFrameSurface1* surface, nx::media::VideoFramePtr* result);
     std::unique_ptr<mfxBitstream> updateBitStream(const QnConstCompressedVideoDataPtr& frame);
     void clearData();
 
