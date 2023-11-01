@@ -8,10 +8,10 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 Q_MOC_INCLUDE("core/resource/resource.h")
-Q_MOC_INCLUDE("nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h")
 
 namespace nx::vms::client::desktop {
 
@@ -20,7 +20,7 @@ class AccessSubjectEditingContext;
 /**
  * An information about resource access details to be used in a QML subject editing UI.
  */
-struct ResourceAccessInfo
+struct NX_VMS_CLIENT_DESKTOP_API ResourceAccessInfo
 {
     Q_GADGET
 
@@ -38,10 +38,12 @@ public:
     Q_ENUM(ProvidedVia);
 
     ProvidedVia providedVia{ProvidedVia::none};
+    ProvidedVia inheritedFrom{ProvidedVia::none};
     QVector<QnUuid> providerUserGroups;
     QVector<QnResourcePtr> indirectProviders;
     QnUuid parentResourceGroupId;
     int checkedChildCount = 0;
+    int checkedAndInheritedChildCount = 0;
     int totalChildCount = 0;
 
     bool operator==(const ResourceAccessInfo& other) const;
@@ -51,7 +53,7 @@ public:
 /**
  * An utility class to obtain information about resource access details in a QML subject editing UI.
  */
-class ResourceAccessRightsModel: public QAbstractListModel
+class NX_VMS_CLIENT_DESKTOP_API ResourceAccessRightsModel: public QAbstractListModel
 {
     Q_OBJECT
 
@@ -63,16 +65,14 @@ class ResourceAccessRightsModel: public QAbstractListModel
     Q_PROPERTY(QVector<nx::vms::api::AccessRight> accessRightsList READ accessRightsList
         WRITE setAccessRightsList NOTIFY accessRightsListChanged)
 
-    /** A resource of interest. */
-    Q_PROPERTY(QnResource* resource READ resource WRITE setResource NOTIFY resourceChanged)
+    Q_PROPERTY(QModelIndex resourceTreeIndex READ resourceTreeIndex WRITE setResourceTreeIndex
+        NOTIFY resourceTreeIndexChanged)
 
-    /** Node type for current resource or top level tree item. */
-    Q_PROPERTY(nx::vms::client::desktop::ResourceTree::NodeType nodeType READ nodeType
-        WRITE setNodeType NOTIFY nodeTypeChanged)
+    Q_PROPERTY(nx::vms::client::desktop::ResourceAccessTreeItem::Type rowType READ rowType
+        NOTIFY resourceTreeIndexChanged)
 
-    /** Id of a group of interest (all cameras, all web pages etc.) - deduced from node type. */
-    Q_PROPERTY(QnUuid groupId READ groupId NOTIFY nodeTypeChanged)
-    Q_PROPERTY(bool isResourceGroup READ isResourceGroup NOTIFY nodeTypeChanged)
+    Q_PROPERTY(nx::vms::api::AccessRights relevantAccessRights READ relevantAccessRights
+        NOTIFY resourceTreeIndexChanged)
 
     using base_type = QAbstractListModel;
 
@@ -80,8 +80,10 @@ public:
     enum Roles
     {
         ProviderRole = Qt::UserRole + 1,
+        InheritedFromRole,
         TotalChildCountRole,
         CheckedChildCountRole,
+        CheckedAndInheritedChildCountRole,
         AccessRightRole,
         EditableRole
     };
@@ -96,14 +98,11 @@ public:
     QVector<nx::vms::api::AccessRight> accessRightsList() const;
     void setAccessRightsList(const QVector<nx::vms::api::AccessRight>& value);
 
-    QnResource* resource() const;
-    void setResource(QnResource* value);
+    QModelIndex resourceTreeIndex() const;
+    void setResourceTreeIndex(const QModelIndex& value);
 
-    QnUuid groupId() const;
-    bool isResourceGroup() const { return !groupId().isNull(); }
-
-    ResourceTree::NodeType nodeType() const;
-    void setNodeType(ResourceTree::NodeType value);
+    ResourceAccessTreeItem::Type rowType() const;
+    nx::vms::api::AccessRights relevantAccessRights() const;
 
     QVector<ResourceAccessInfo> info() const;
 
@@ -116,16 +115,15 @@ public:
     /** @returns ProvidedVia::layout, ProvidedVia::videowall or ProvidedVia::unknown. */
     static Q_INVOKABLE ResourceAccessInfo::ProvidedVia providerType(QnResource* provider);
 
-    Q_INVOKABLE void toggle(int index, bool withDependentAccessRights);
+    Q_INVOKABLE void toggle(
+        const QModelIndex& resourceTreeModelIndex, int index, bool withDependentAccessRights);
 
     static void registerQmlTypes();
 
 signals:
     void contextChanged();
     void accessRightsListChanged();
-    void resourceChanged();
-    void nodeTypeChanged();
-    void collapsedChanged();
+    void resourceTreeIndexChanged();
 
 private:
     struct Private;
