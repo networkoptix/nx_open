@@ -156,12 +156,12 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                         {
                             "type": "Banner",
                             "icon": "info",
-                            "text": "Some info text"
+                            "text": "Some info text <a href=\"https://example.com/\">example</a>"
                         },
                         {
                             "type": "Banner",
                             "icon": "warning",
-                            "text": "Some warning text"
+                            "text": "Some warning text <a href=\"https://example.com/\">example</a>"
                         }
                     ]
                 },
@@ -507,12 +507,12 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                         {
                             "type": "Banner",
                             "icon": "info",
-                            "text": "Some info text"
+                            "text": "Some info text <a href=\"https://example.com/\">example</a>"
                         },
                         {
                             "type": "Banner",
                             "icon": "warning",
-                            "text": "Some warning text"
+                            "text": "Some warning text <a href=\"https://example.com/\">example</a>"
                         }
                     ]
                 },

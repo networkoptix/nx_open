@@ -371,6 +371,9 @@ A static text with an icon.
 
 The `"icon"` field is optional and accepts the following values: `"info"` (default), `"warning"`.
 
+The `"text"` field supports hyperlinks, for example:
+`"<a href=\"https://example.com/\">example</a>"`.
+
 NOTE: This setting is non-editable and has no value, it is just a visual item in the dialog.
 
 NOTE: There is a similar non-editable item with a different look, called `Placeholder`.
@@ -394,6 +397,9 @@ NOTE: There is a similar non-editable item with a different look, called `Placeh
 ## Placeholder
 
 A static icon with a header and a description. If there are no other items, takes up all the space.
+
+The `"header"` and `"description"` fields support hyperlinks, for example:
+`"<a href=\"https://example.com/\">example</a>"`.
 
 The `"icon"` field accepts the following values:
 - `"default"` (default)

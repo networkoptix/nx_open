@@ -6,6 +6,7 @@ import QtQuick.Layouts
 
 import Nx
 import Nx.Core
+import Nx.Controls
 
 /**
  * Interactive Settings private type.
@@ -38,7 +39,7 @@ Control
             sourceSize: Qt.size(Layout.preferredWidth, Layout.preferredHeight)
         }
 
-        Text
+        Label
         {
             id: header
 
@@ -49,13 +50,18 @@ Control
             lineHeightMode: Text.FixedHeight
             lineHeight: 20
             wrapMode: Text.Wrap
+            linkColor: hoveredLink
+                ? ColorTheme.colors.brand_core
+                : ColorTheme.colors.brand_d2
+
+            onLinkActivated: (link) => Qt.openUrlExternally(link)
 
             Layout.alignment: Qt.AlignCenter
             Layout.maximumWidth: parent.width
             Layout.topMargin: 16
         }
 
-        Text
+        Label
         {
             id: description
 
@@ -66,6 +72,11 @@ Control
             lineHeightMode: Text.FixedHeight
             lineHeight: 16
             wrapMode: Text.Wrap
+            linkColor: hoveredLink
+                ? ColorTheme.colors.brand_core
+                : ColorTheme.colors.brand_d2
+
+            onLinkActivated: (link) => Qt.openUrlExternally(link)
 
             Layout.alignment: Qt.AlignCenter
             Layout.maximumWidth: parent.width
