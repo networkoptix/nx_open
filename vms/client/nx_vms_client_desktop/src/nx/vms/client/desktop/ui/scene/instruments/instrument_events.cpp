@@ -6,15 +6,32 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace scene {
 
-MouseEvent::MouseEvent(const QMouseEvent* event):
-    localPosition(event->localPos()),
-    windowPosition(event->windowPos()),
-    screenPosition(event->screenPos()),
+BaseEvent::BaseEvent()
+{
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+}
+
+SinglePointEvent::SinglePointEvent(const QSinglePointEvent* event):
+    localPosition(event->position()),
+    windowPosition(event->scenePosition()),
+    screenPosition(event->globalPosition()),
     button(event->button()),
     buttons(event->buttons()),
     modifiers(event->modifiers())
 {
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+}
+
+MouseEvent::MouseEvent(const QMouseEvent* event):
+    SinglePointEvent(event)
+{
+}
+
+WheelEvent::WheelEvent(const QWheelEvent* event):
+    SinglePointEvent(event),
+    angleDelta(event->angleDelta()),
+    pixelDelta(event->pixelDelta()),
+    inverted(event->inverted())
+{
 }
 
 HoverEvent::HoverEvent(const QHoverEvent* event):

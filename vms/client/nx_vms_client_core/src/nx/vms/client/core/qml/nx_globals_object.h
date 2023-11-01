@@ -34,6 +34,7 @@ public:
     Q_INVOKABLE QPersistentModelIndex toPersistent(const QModelIndex& index) const;
     Q_INVOKABLE QModelIndex fromPersistent(const QPersistentModelIndex& index) const;
     Q_INVOKABLE QVariant modelData(const QModelIndex& index, const QString& roleName) const;
+    Q_INVOKABLE bool isRecursiveChildOf(const QModelIndex& child, const QModelIndex& parent) const;
 
     Q_INVOKABLE bool hasChildren(const QModelIndex& index) const;
     Q_INVOKABLE Qt::ItemFlags itemFlags(const QModelIndex& index) const;

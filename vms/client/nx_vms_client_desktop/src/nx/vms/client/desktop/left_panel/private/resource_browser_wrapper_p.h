@@ -40,9 +40,9 @@ public:
         invokeQmlMethod<void>(*this, "setSelection", indexes);
     }
 
-    void clearSelection() const
+    void clearSelection(bool clearCurrentIndex = false) const
     {
-        invokeQmlMethod<void>(*this, "clearSelection");
+        invokeQmlMethod<void>(*this, "clearSelection", clearCurrentIndex);
     }
 
     void setExpanded(const QModelIndex& index, bool value) const

@@ -1031,41 +1031,38 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogEntities(
             flatteningPolicy));
     }
 
-    if (combineWebPagesAndIntegrations)
+    constexpr ResourceTree::ResourceFilters webPagesAndIntegrations =
+        ResourceTree::ResourceFilter::webPages
+        | ResourceTree::ResourceFilter::integrations;
+
+    if (combineWebPagesAndIntegrations && resourceTypes.testFlags(webPagesAndIntegrations))
     {
-        constexpr ResourceTree::ResourceFilters webPagesAndIntegrations =
-            ResourceTree::ResourceFilter::webPages
-            | ResourceTree::ResourceFilter::integrations;
+        auto webPagesList = makeKeyList<QnResourcePtr>(
+            webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
+            numericOrder());
 
-        if (resourceTypes.testFlags(webPagesAndIntegrations))
+        webPagesList->installItemSource(
+            m_itemKeySourcePool->webPagesAndIntegrationsSource(
+                user(), /*includeProxied*/ true));
+
+        // If only web pages & integrations, return without a group element.
+        if (maySkipGroup && resourceTypes == (int) webPagesAndIntegrations)
+            return webPagesList;
+
+        if (ini().webPagesAndIntegrations)
         {
-            auto webPagesList = makeKeyList<QnResourcePtr>(
-                webPageItemCreator(m_itemFactory.get(), hasPowerUserPermissions()),
-                numericOrder());
-
-            webPagesList->installItemSource(
-                m_itemKeySourcePool->webPagesAndIntegrationsSource(
-                    user(), /*includeProxied*/ true));
-
-            // If only web pages & integrations, return without a group element.
-            if (maySkipGroup && resourceTypes == (int) webPagesAndIntegrations)
-                return webPagesList;
-
-            if (ini().webPagesAndIntegrations)
-            {
-                entities.push_back(makeFlatteningGroup(
-                    m_itemFactory->createWebPagesAndIntegrationsItem(
-                        Qt::ItemIsEnabled | Qt::ItemIsSelectable),
-                    std::move(webPagesList),
-                    flatteningPolicy));
-            }
-            else
-            {
-                entities.push_back(makeFlatteningGroup(
-                    m_itemFactory->createWebPagesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
-                    std::move(webPagesList),
-                    flatteningPolicy));
-            }
+            entities.push_back(makeFlatteningGroup(
+                m_itemFactory->createWebPagesAndIntegrationsItem(
+                    Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+                std::move(webPagesList),
+                flatteningPolicy));
+        }
+        else
+        {
+            entities.push_back(makeFlatteningGroup(
+                m_itemFactory->createWebPagesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+                std::move(webPagesList),
+                flatteningPolicy));
         }
     }
     else

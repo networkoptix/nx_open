@@ -95,6 +95,8 @@ void LayoutResourceSource::processResource(
         return;
 
     const auto layout = resource.dynamicCast<LayoutResource>();
+    if (!NX_ASSERT(layout))
+        return;
 
     if (layout->isServiceLayout()
         || layout->layoutType() == LayoutResource::LayoutType::intercom

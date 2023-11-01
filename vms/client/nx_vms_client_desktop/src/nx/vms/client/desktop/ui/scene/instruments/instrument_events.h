@@ -11,7 +11,17 @@ namespace nx::vms::client::desktop {
 namespace ui {
 namespace scene {
 
-class MouseEvent: public QObject
+class BaseEvent: public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(bool accepted MEMBER accepted)
+
+public:
+    BaseEvent();
+    bool accepted = false;
+};
+
+class SinglePointEvent: public BaseEvent
 {
     Q_OBJECT
 
@@ -21,14 +31,13 @@ class MouseEvent: public QObject
     Q_PROPERTY(QPoint position READ position CONSTANT)
     Q_PROPERTY(QPoint globalPosition READ globalPosition CONSTANT)
 
-    Q_PROPERTY(int button MEMBER button CONSTANT)
     Q_PROPERTY(int buttons MEMBER buttons CONSTANT)
     Q_PROPERTY(int modifiers MEMBER modifiers CONSTANT)
 
     Q_PROPERTY(bool accepted MEMBER accepted)
 
 public:
-    MouseEvent(const QMouseEvent* event);
+    SinglePointEvent(const QSinglePointEvent* event);
 
     QPoint position() const { return localPosition.toPoint(); }
     QPoint globalPosition() const { return screenPosition.toPoint(); }
@@ -40,41 +49,55 @@ public:
     Qt::MouseButton button;
     Qt::MouseButtons buttons;
     Qt::KeyboardModifiers modifiers;
-
-    bool accepted = false;
 };
 
-class HoverEvent: public QObject
+class MouseEvent: public SinglePointEvent
+{
+    Q_OBJECT
+    Q_PROPERTY(int button MEMBER button CONSTANT)
+
+public:
+    MouseEvent(const QMouseEvent* event);
+};
+
+class WheelEvent: public SinglePointEvent
 {
     Q_OBJECT
 
-    Q_PROPERTY(QPoint position MEMBER position CONSTANT)
+    Q_PROPERTY(QPoint angleDelta MEMBER angleDelta CONSTANT)
+    Q_PROPERTY(QPoint pixelDelta MEMBER pixelDelta CONSTANT)
+    Q_PROPERTY(bool inverted MEMBER inverted CONSTANT)
 
-    Q_PROPERTY(bool accepted MEMBER accepted)
+public:
+    WheelEvent(const QWheelEvent* event);
+
+    QPoint angleDelta;
+    QPoint pixelDelta;
+    bool inverted = false;
+};
+
+class HoverEvent: public BaseEvent
+{
+    Q_OBJECT
+    Q_PROPERTY(QPoint position MEMBER position CONSTANT)
 
 public:
     HoverEvent(const QHoverEvent* event);
 
     QPoint position;
-
-    bool accepted = false;
 };
 
-class KeyEvent: public QObject
+class KeyEvent: public BaseEvent
 {
     Q_OBJECT
     Q_PROPERTY(int key MEMBER key CONSTANT)
     Q_PROPERTY(int modifiers MEMBER modifiers CONSTANT)
 
-    Q_PROPERTY(bool accepted MEMBER accepted)
-
 public:
     KeyEvent(const QKeyEvent* event);
 
-    int key;
+    int key{};
     Qt::KeyboardModifiers modifiers;
-
-    bool accepted = false;
 };
 
 } // namespace scene
@@ -82,4 +105,5 @@ public:
 } // namespace nx::vms::client::desktop
 
 QML_DECLARE_TYPE(nx::vms::client::desktop::ui::scene::MouseEvent)
+QML_DECLARE_TYPE(nx::vms::client::desktop::ui::scene::WheelEvent)
 QML_DECLARE_TYPE(nx::vms::client::desktop::ui::scene::HoverEvent)

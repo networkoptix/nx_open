@@ -47,7 +47,7 @@ public:
         const std::map<QnUuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
         const QString& ldapDn = "");
 
-    QnLayoutResourcePtr createLayout();
+    virtual QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();
     QnUuid addToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource);
 

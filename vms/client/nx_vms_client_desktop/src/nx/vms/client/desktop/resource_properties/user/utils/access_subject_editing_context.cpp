@@ -62,7 +62,98 @@ static const QHash<AccessRight, AccessRights> kDependentAccessRights =
         return dependentAccessRights;
     }();
 
+QModelIndex topLevelIndex(const QModelIndex& child)
+{
+    if (!child.isValid())
+        return {};
+
+    for (auto current = child;;)
+    {
+        const auto parent = current.parent();
+        if (!parent.isValid())
+            return current;
+
+        current = parent;
+    }
+}
+
+void fetchChildResourcesRecursively(const QModelIndex& parentIndex, QSet<QnResourcePtr>& resources)
+{
+    if (!NX_ASSERT(parentIndex.isValid()))
+        return;
+
+    const auto model = parentIndex.model();
+    const int rowCount = model->rowCount(parentIndex);
+
+    for (int row = 0; row < rowCount; ++row)
+    {
+        const auto child = model->index(row, 0, parentIndex);
+        const auto resource = child.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if (resource)
+            resources.insert(resource);
+
+        fetchChildResourcesRecursively(child, resources);
+    }
+}
+
+ResourceAccessTarget accessTarget(const QModelIndex& resourceTreeModelIndex)
+{
+    const auto nodeTypeVar = resourceTreeModelIndex.data(Qn::NodeTypeRole);
+    if (nodeTypeVar.isValid())
+    {
+        const auto nodeType = nodeTypeVar.value<ResourceTree::NodeType>();
+        if (nodeType != ResourceTree::NodeType::resource)
+            return ResourceAccessTarget(AccessSubjectEditingContext::specialResourceGroup(nodeType));
+    }
+
+    const auto resource = resourceTreeModelIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+    return ResourceAccessTarget(resource);
+}
+
 } // namespace
+
+// ------------------------------------------------------------------------------------------------
+// ResourceAccessTarget
+
+ResourceAccessTarget::ResourceAccessTarget(const QnResourcePtr& resource):
+    m_resource(resource),
+    m_id(resource ? resource->getId() : QnUuid{})
+{
+}
+
+ResourceAccessTarget::ResourceAccessTarget(SpecialResourceGroup group):
+    m_group(group),
+    m_id(specialResourceGroupId(group))
+{
+}
+
+ResourceAccessTarget::ResourceAccessTarget(const QnUuid& specialResourceGroupId):
+    m_group(specialResourceGroup(specialResourceGroupId)),
+    m_id(m_group ? specialResourceGroupId : QnUuid{})
+{
+    NX_ASSERT(specialResourceGroupId.isNull() || m_group);
+}
+
+ResourceAccessTarget::ResourceAccessTarget(
+    QnResourcePool* resourcePool,
+    const QnUuid& resourceOrGroupId)
+    :
+    m_resource(NX_ASSERT(resourcePool)
+        ? resourcePool->getResourceById(resourceOrGroupId)
+        : QnResourcePtr{}),
+    m_group(m_resource
+        ? decltype(m_group){}
+        : specialResourceGroup(resourceOrGroupId)),
+    m_id(m_resource ? m_resource->getId() : (m_group ? resourceOrGroupId : QnUuid{}))
+{
+}
+
+QString ResourceAccessTarget::toString() const
+{
+    return m_resource
+        ? nx::toString(m_resource)
+        : (m_group ? nx::toString(*m_group) : "<invalid>");
+}
 
 // ------------------------------------------------------------------------------------------------
 // AccessSubjectEditingContext::Private
@@ -162,32 +253,6 @@ public:
             emit q->resourceGroupsChanged(affectedGroupIds);
     };
 
-    QnResourceList getGroupResources(const QnUuid& groupId) const
-    {
-        const auto group = specialResourceGroup(groupId);
-        if (!NX_ASSERT(group))
-            return {};
-
-        const auto resourcePool = systemContext->resourcePool();
-        switch (*group)
-        {
-            case SpecialResourceGroup::allDevices:
-                return resourcePool->getAllCameras(QnUuid{}, true);
-
-            case SpecialResourceGroup::allServers:
-                return resourcePool->servers();
-
-            case SpecialResourceGroup::allWebPages:
-                return resourcePool->getResources<QnWebPageResource>();
-
-            case SpecialResourceGroup::allVideowalls:
-                return resourcePool->getResources<QnVideoWallResource>();
-        }
-
-        NX_ASSERT(false, "Unhandled special resource group type: %1", *group);
-        return {};
-    }
-
     void handleSystemHierarchyChanged(
         const QSet<QnUuid>& added,
         const QSet<QnUuid>& removed,
@@ -213,6 +278,22 @@ public:
             currentHierarchy->remove(removed);
         }
     }
+
+    static AccessRights withRequirements(AccessRights for_)
+    {
+        if (!for_)
+            return {};
+
+        AccessRights requirements{};
+
+        for (unsigned int i = 1; i != 0; i <<= 1)
+        {
+            if ((for_ & i) != 0)
+                requirements |= requiredAccessRights((AccessRight) i);
+        }
+
+        return for_ | requirements;
+    };
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -326,18 +407,14 @@ void AccessSubjectEditingContext::resetOwnResourceAccessMap()
     d->accessRightsManager->resetOwnResourceAccessMap();
 }
 
-AccessRights AccessSubjectEditingContext::accessRights(const QnResourcePtr& resource) const
+AccessRights AccessSubjectEditingContext::accessRights(const ResourceAccessTarget& target) const
 {
-    return d->currentSubjectId.isNull()
-        ? AccessRights{}
-        : d->accessRightsResolver->accessRights(d->currentSubjectId, resource->toSharedPointer());
-}
+    if (!target.isValid() || d->currentSubjectId.isNull())
+        return {};
 
-AccessRights AccessSubjectEditingContext::accessRights(const QnUuid& resourceGroupId) const
-{
-    return d->currentSubjectId.isNull()
-        ? AccessRights{}
-        : d->accessRightsResolver->accessRights(d->currentSubjectId, resourceGroupId);
+    return target.resource()
+        ? d->accessRightsResolver->accessRights(d->currentSubjectId, target.resource())
+        : d->accessRightsResolver->accessRights(d->currentSubjectId, target.id());
 }
 
 ResourceAccessDetails AccessSubjectEditingContext::accessDetails(
@@ -373,30 +450,18 @@ AccessSubjectEditingContext::IsIndexAccepted
             if (!guard || !sourceIndex.isValid())
                 return false;
 
-            const auto resource = sourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
-            const QnUuid id =
-                [&]() -> QnUuid
-                {
-                    if (resource)
-                        return resource->getId();
-
-                    const auto nodeType =
-                        sourceIndex.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
-
-                    return resourceGroupId(nodeType);
-                }();
-
-            if (id.isNull())
+            const auto target = accessTarget(sourceIndex);
+            if (!target.isValid())
                 return false;
 
-            if (d->currentlyAccessibleIdsCache.contains(id))
+            if (d->currentlyAccessibleIdsCache.contains(target.id()))
                 return true;
 
-            const auto possessedRights = resource ? accessRights(resource) : accessRights(id);
+            const auto possessedRights = accessRights(target);
             if (!possessedRights)
                 return false;
 
-            d->currentlyAccessibleIdsCache.insert(id);
+            d->currentlyAccessibleIdsCache.insert(target.id());
             return true;
     };
 
@@ -478,30 +543,59 @@ QnUuid AccessSubjectEditingContext::specialResourceGroupFor(const QnResourcePtr&
     return {};
 }
 
-AccessRights AccessSubjectEditingContext::relevantAccessRights(SpecialResourceGroup group)
+QnUuid AccessSubjectEditingContext::specialResourceGroup(ResourceTree::NodeType nodeType)
 {
-    switch (group)
+    switch (nodeType)
     {
-        case SpecialResourceGroup::allDevices:
-            return kFullAccessRights;
+        case ResourceTree::NodeType::camerasAndDevices:
+            return nx::vms::api::kAllDevicesGroupId;
 
-        case SpecialResourceGroup::allVideowalls:
-            return AccessRight::edit;
+        case ResourceTree::NodeType::videoWalls:
+            return nx::vms::api::kAllVideoWallsGroupId;
+
+        case ResourceTree::NodeType::integrations:
+        case ResourceTree::NodeType::webPages:
+            return nx::vms::api::kAllWebPagesGroupId;
+
+        case ResourceTree::NodeType::servers:
+            return nx::vms::api::kAllServersGroupId;
 
         default:
-            return AccessRight::view;
+            return QnUuid();
     }
 }
 
-AccessRights AccessSubjectEditingContext::relevantAccessRights(const QnResourcePtr& resource)
+AccessRights AccessSubjectEditingContext::relevantAccessRights(const ResourceAccessTarget& target)
 {
-    if (resource.objectCast<QnLayoutResource>())
+    if (!target.isValid())
+        return {};
+
+    const auto relevantRights =
+        [](SpecialResourceGroup group) -> AccessRights
+        {
+            switch (group)
+            {
+                case SpecialResourceGroup::allDevices:
+                    return kFullAccessRights;
+
+                case SpecialResourceGroup::allVideowalls:
+                    return AccessRight::edit;
+
+                default:
+                    return AccessRight::view;
+            }
+        };
+
+    if (auto group = target.group())
+        return relevantRights(*group);
+
+    if (target.resource().objectCast<QnLayoutResource>())
         return kFullAccessRights;
 
-    if (const auto group = specialResourceGroup(specialResourceGroupFor(resource)))
-        return relevantAccessRights(*group);
+    if (const auto group = api::specialResourceGroup(specialResourceGroupFor(target.resource())))
+        return relevantRights(*group);
 
-    NX_ASSERT(false, "Unexpected resource type: %1", resource);
+    NX_ASSERT(false, "Unexpected resource type: %1", target.resource());
     return {};
 }
 
@@ -545,34 +639,245 @@ void AccessSubjectEditingContext::modifyAccessRightMap(
         accessRightMap.remove(resourceOrGroupId);
 }
 
-void AccessSubjectEditingContext::modifyAccessRights(const QList<QnResource*>& resources,
-    AccessRights modifiedRightsMask, bool value, bool withDependent)
+Qt::CheckState AccessSubjectEditingContext::combinedOwnCheckState(
+    const QModelIndexList& indexes, AccessRight accessRight) const
 {
-    auto map = ownResourceAccessMap();
-    AccessRights relevantRightsMask = kFullAccessRights;
+    int total = 0;
+    int checked = 0;
+    const auto accessRightMap = ownResourceAccessMap();
 
-    for (const auto& resource: resources)
+    for (const auto& index: indexes)
     {
-        if (!resource)
+        if (!index.isValid())
             continue;
 
-        const auto resourcePtr = resource->toSharedPointer();
-        AccessRights accessRightsMask = modifiedRightsMask & relevantAccessRights(resourcePtr);
+        const auto target = accessTarget(index);
+
+        if (!target.isValid()) //< Simple grouping node.
+        {
+            QModelIndexList children;
+            const auto model = index.model();
+            const int childCount = model->rowCount(index);
+
+            for (int i = 0; i < childCount; ++i)
+                children.push_back(model->index(i, 0, index));
+
+            total += childCount;
+            switch (combinedOwnCheckState(children, accessRight))
+            {
+                case Qt::PartiallyChecked: //< Do early return, if possible.
+                    return Qt::PartiallyChecked;
+
+                case Qt::Checked:
+                    checked += childCount;
+                    break;
+
+                case Qt::Unchecked:
+                    break;
+
+                default:
+                    NX_ASSERT(false);
+                    break;
+            }
+
+            continue;
+        }
+
+        if (!relevantAccessRights(target).testFlag(accessRight))
+            continue;
+
+        ++total;
+
+        if (target.resource())
+        {
+            if (const auto groupId = specialResourceGroupFor(target.resource()); !groupId.isNull())
+            {
+                if (accessRightMap.value(groupId).testFlag(accessRight))
+                {
+                    ++checked;
+                    continue;
+                }
+            }
+        }
+
+        if (accessRightMap.value(target.id()).testFlag(accessRight))
+            ++checked;
+
+        if (checked > 0 && checked < total) //< Do early return, if possible.
+            return Qt::PartiallyChecked;
+    }
+
+    return (checked < total || total == 0)
+        ? (checked > 0 ? Qt::PartiallyChecked : Qt::Unchecked)
+        : Qt::Checked;
+}
+
+QnResourceList AccessSubjectEditingContext::getGroupResources(const QnUuid& resourceGroupId) const
+{
+    // Only special resource groups are supported at this time.
+
+    const auto group = api::specialResourceGroup(resourceGroupId);
+    if (!NX_ASSERT(group))
+        return {};
+
+    const auto resourcePool = systemContext()->resourcePool();
+    switch (*group)
+    {
+        case SpecialResourceGroup::allDevices:
+            return resourcePool->getAllCameras(QnUuid{}, true);
+
+        case SpecialResourceGroup::allServers:
+            return resourcePool->servers();
+
+        case SpecialResourceGroup::allWebPages:
+            return resourcePool->getResources<QnWebPageResource>();
+
+        case SpecialResourceGroup::allVideowalls:
+            return resourcePool->getResources<QnVideoWallResource>();
+    }
+
+    NX_ASSERT(false, "Unhandled special resource group type");
+    return {};
+}
+
+QnResourceList AccessSubjectEditingContext::getChildResources(
+    const QModelIndex& parentTreeNodeIndex)
+{
+    QSet<QnResourcePtr> result;
+    fetchChildResourcesRecursively(parentTreeNodeIndex, result);
+    return QnResourceList(
+        std::make_move_iterator(result.begin()),
+        std::make_move_iterator(result.end()));
+}
+
+void AccessSubjectEditingContext::modifyAccessRight(const QModelIndex& objectIndex,
+    int /*AccessRight*/ accessRight, bool value, bool withDependentAccessRights)
+{
+    modifyAccessRight(objectIndex, (AccessRight) accessRight, value, withDependentAccessRights);
+}
+
+void AccessSubjectEditingContext::modifyAccessRight(const QModelIndex& objectIndex,
+    AccessRight accessRight, bool value, bool withDependentAccessRights)
+{
+    const auto item = resourceAccessTreeItemInfo(objectIndex);
+    const auto toggledRight = static_cast<AccessRight>(accessRight);
+    const auto objectName = objectIndex.data(Qt::DisplayRole).toString();
+    const auto logValue = [](bool value) { return value ? "on" : "off"; };
+
+    NX_VERBOSE(this, "Toggle `%1` %2 for \"%3\"", toggledRight, logValue(value), objectName);
+
+    auto accessMap = ownResourceAccessMap();
+
+    const auto outerGroupAccessRights = item.outerSpecialResourceGroupId.isNull()
+        ? AccessRights{}
+        : accessMap.value(item.outerSpecialResourceGroupId);
+
+    const Qt::CheckState oldCheckState = combinedOwnCheckState({objectIndex},
+        (AccessRight) accessRight);
+
+    const bool itemWasChecked = oldCheckState == Qt::Checked;
+    const bool outerGroupWasChecked = outerGroupAccessRights.testFlag(toggledRight);
+
+    if (oldCheckState != Qt::PartiallyChecked && itemWasChecked == value)
+    {
+        NX_VERBOSE(this, "Already toggled %1, nothing to do", logValue(value));
+        return;
+    }
+
+    NX_VERBOSE(this, "Relevant access rights: `%1`", item.relevantAccessRights);
+
+    if (!item.relevantAccessRights.testFlag(toggledRight))
+        return;
+
+    AccessRights toggledMask = toggledRight;
+    if (withDependentAccessRights)
+    {
+        toggledMask |= (value
+            ? (requiredAccessRights(toggledRight) & item.relevantAccessRights)
+            : dependentAccessRights(toggledRight));
+    }
+
+    NX_VERBOSE(this, "Access rights to toggle %1: `%2`", logValue(value), toggledMask);
+
+    if (item.type == ResourceAccessTreeItem::Type::specialResourceGroup)
+    {
+        // If we're toggling a special group off, we must explicitly toggle its children off.
+        // If we're toggling a special group on, we also must explicitly toggle its children off,
+        // except access rights required for other set access rights.
 
         if (value)
         {
-            // Don't grant access rights already granted by resource group access rights.
-            if (const auto groupId = specialResourceGroupFor(resourcePtr); !groupId.isNull())
-                accessRightsMask &= ~ownResourceAccessMap().value(groupId);
+            for (const auto& resource: getGroupResources(item.target.id()))
+            {
+                const auto resourceId = resource->getId();
+                const auto toKeep = accessMap.value(resourceId) & ~toggledMask;
+                const auto toClear = toggledMask & ~Private::withRequirements(toKeep);
 
-            relevantRightsMask = relevantAccessRights(resourcePtr);
+                if (toClear)
+                {
+                    NX_VERBOSE(this, "Toggling off `%1` for %2", toClear, resource);
+                    modifyAccessRightMap(accessMap, resourceId, toClear, false);
+                }
+            }
         }
+        else
+        {
+            NX_VERBOSE(this, "Toggling off `%1` for all group's children", toggledMask);
 
-        modifyAccessRightMap(
-            map, resourcePtr->getId(), accessRightsMask, value, withDependent, relevantRightsMask);
+            for (const auto& resource: getGroupResources(item.target.id()))
+                modifyAccessRightMap(accessMap, resource->getId(), toggledMask, false);
+        }
     }
 
-    setOwnResourceAccessMap(map);
+    if (outerGroupWasChecked)
+    {
+        // If we're toggling off an item that was implicitly toggled on by its group,
+        // we must toggle the group off, and explicitly toggle all its children on.
+
+        NX_VERBOSE(this,
+            "`%1` was toggled on for the outer group %2; toggling it on for all its children",
+            toggledMask, item.outerSpecialResourceGroupId);
+
+        for (const auto& resource: getGroupResources(item.outerSpecialResourceGroupId))
+        {
+            modifyAccessRightMap(
+                accessMap, resource->getId(), toggledMask & outerGroupAccessRights, true);
+        }
+
+        NX_VERBOSE(this, "Toggling off `%1` for the outer group %2", toggledMask,
+            item.outerSpecialResourceGroupId);
+        modifyAccessRightMap(accessMap, item.outerSpecialResourceGroupId, toggledMask, false);
+    }
+
+    if (item.target.isValid())
+    {
+        // Toggle the item.
+        NX_VERBOSE(this, "Toggling %1 `%2` for %3", logValue(value), toggledMask, item.target);
+        modifyAccessRightMap(accessMap, item.target.id(), toggledMask, value);
+    }
+    else
+    {
+        // If we're toggling a grouping node on or off, we just toggle its children on or off.
+        NX_VERBOSE(this, "Toggling %1 `%2` for group's children", logValue(value), toggledMask);
+
+        for (const auto& resource: getChildResources(objectIndex))
+            modifyAccessRightMap(accessMap, resource->getId(), toggledMask, value);
+    }
+
+    setOwnResourceAccessMap(accessMap);
+}
+
+void AccessSubjectEditingContext::modifyAccessRights(const QModelIndexList& indexes,
+    AccessRights modifiedRightsMask, bool value, bool withDependent)
+{
+    for (unsigned int i = 1; i != 0; i <<= 1)
+    {
+        if ((i & modifiedRightsMask) == 0)
+            continue;
+
+        for (const auto& index: indexes)
+            modifyAccessRight(index, i, value, withDependent);
+    }
 }
 
 AccessRights AccessSubjectEditingContext::dependentAccessRights(AccessRight dependingOn)
@@ -595,26 +900,55 @@ bool AccessSubjectEditingContext::isRequiredFor(int /*AccessRight*/ what, Access
     return dependentAccessRights(static_cast<AccessRight>(what)).testAnyFlags(for_);
 }
 
-QnUuid AccessSubjectEditingContext::resourceGroupId(ResourceTree::NodeType nodeType)
+ResourceAccessTreeItem AccessSubjectEditingContext::resourceAccessTreeItemInfo(
+    const QModelIndex& resourceTreeModelIndex)
 {
-    switch (nodeType)
+    if (!resourceTreeModelIndex.isValid())
+        return {};
+
+    const auto resource = resourceTreeModelIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+
+    if (resource)
     {
-        case ResourceTree::NodeType::camerasAndDevices:
-            return nx::vms::api::kAllDevicesGroupId;
-
-        case ResourceTree::NodeType::videoWalls:
-            return nx::vms::api::kAllVideoWallsGroupId;
-
-        case ResourceTree::NodeType::integrations:
-        case ResourceTree::NodeType::webPages:
-            return nx::vms::api::kAllWebPagesGroupId;
-
-        case ResourceTree::NodeType::servers:
-            return nx::vms::api::kAllServersGroupId;
-
-        default:
-            return QnUuid();
+        return ResourceAccessTreeItem{
+            .type = ResourceAccessTreeItem::Type::resource,
+            .target = resource,
+            .nodeType = ResourceTree::NodeType::resource, //< For consistency.
+            .outerSpecialResourceGroupId = specialResourceGroupFor(resource),
+            .relevantAccessRights = relevantAccessRights(resource)};
     }
+
+    const auto nodeType =
+        resourceTreeModelIndex.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+
+    const auto specialResourceGroupId = specialResourceGroup(nodeType);
+    if (!specialResourceGroupId.isNull())
+    {
+        return ResourceAccessTreeItem{
+            .type = ResourceAccessTreeItem::Type::specialResourceGroup,
+            .target = specialResourceGroupId,
+            .nodeType = nodeType,
+            .relevantAccessRights = relevantAccessRights(specialResourceGroupId)};
+    }
+
+    const auto topLevel = topLevelIndex(resourceTreeModelIndex);
+    const auto topLevelNodeType = topLevel.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+
+    if (nodeType == ResourceTree::NodeType::layouts)
+    {
+        return ResourceAccessTreeItem{
+            .type = ResourceAccessTreeItem::Type::groupingNode,
+            .nodeType = nodeType,
+            .relevantAccessRights = kFullAccessRights};
+    }
+
+    const auto outerSpecialResourceGroupId = specialResourceGroup(topLevelNodeType);
+
+    return ResourceAccessTreeItem{
+        .type = ResourceAccessTreeItem::Type::groupingNode,
+        .nodeType = nodeType,
+        .outerSpecialResourceGroupId = outerSpecialResourceGroupId,
+        .relevantAccessRights = relevantAccessRights(outerSpecialResourceGroupId)};
 }
 
 } // namespace nx::vms::client::desktop

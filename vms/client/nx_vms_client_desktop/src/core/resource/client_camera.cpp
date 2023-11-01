@@ -97,7 +97,7 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(
 
 QString QnClientCameraResource::idForToStringFromPtr() const
 {
-    return getName();
+    return QnResource::idForToStringFromPtr();
 }
 
 bool QnClientCameraResource::isIntercom() const

@@ -33,6 +33,9 @@ class ContextBasedTest: public nx::vms::common::test::GenericContextBasedTest<Co
 {
 public:
     QnCommonModule* commonModule() const { return context()->commonModule(); }
+
+    /** Client tests should create client layouts. */
+    virtual QnLayoutResourcePtr createLayout() override;
 };
 
 } // namespace nx::vms::client::desktop::test
