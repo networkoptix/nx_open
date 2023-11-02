@@ -35,7 +35,7 @@ int eventHelpId(EventType type)
         case EventType::serverStartEvent:
             return HelpTopic::Id::EventsActions_MediaServerStarted;
         case EventType::ldapSyncIssueEvent:
-            return HelpTopic::Id::Ldap; //< #spanasenko What is a proper page?
+            return HelpTopic::Id::EventsActions_LdapSyncIssue;
         case EventType::licenseIssueEvent:
             return HelpTopic::Id::EventsActions_LicenseIssue;
         case EventType::backupFinishedEvent:
