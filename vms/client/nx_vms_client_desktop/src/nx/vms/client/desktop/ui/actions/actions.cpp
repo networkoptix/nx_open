@@ -1370,7 +1370,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
         .text(ContextMenu::tr("Rotate to"))
-        .condition(new RotateItemCondition())
+        .condition(ConditionWrapper(new RotateItemCondition()) && !condition::layoutIsLocked())
         .childFactory(new RotateActionFactory(manager));
 
     factory(RadassAction)
@@ -1793,7 +1793,8 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Cell Spacing"))
         .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeSingleItem))
             && !condition::isShowreelReviewMode()
-            && !condition::showreelIsRunning());
+            && !condition::showreelIsRunning()
+            && !condition::layoutIsLocked());
 
     // TODO: #sivanov Move to childFactory, reduce actions number.
     factory.beginSubMenu();
