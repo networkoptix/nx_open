@@ -9,7 +9,7 @@ Item
     property var figureSettings
 
     property string hint: ""
-    property int hintStyle: Banner.Style.Info
+    property int hintStyle: DialogBanner.Style.Info
     property bool acceptable: true
 
     property var hoverInstrument: null

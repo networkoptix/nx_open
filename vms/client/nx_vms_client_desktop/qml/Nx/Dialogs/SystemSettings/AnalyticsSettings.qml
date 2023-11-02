@@ -140,6 +140,7 @@ Item
 
         height: visible ? implicitHeight : 0
         anchors.bottom: parent.bottom
+        width: parent.width
     }
 
     onStoreChanged: store.setCurrentEngineId(viewModel.currentEngineId ?? NxGlobals.uuid(""))

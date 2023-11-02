@@ -611,7 +611,7 @@ Figure
             : qsTr("Minimum object size cannot be greater than maximum.")
     }
 
-    hintStyle: acceptable ? Banner.Style.Info : Banner.Style.Error
+    hintStyle: acceptable ? DialogBanner.Style.Info : DialogBanner.Style.Error
 
     hoverInstrument: Instrument { item: mouseArea }
 

@@ -50,9 +50,9 @@ PolyFigure
         if (!pointMakerInstrument.enabled
              && (pathUtil.hasSelfIntersections || pointMakerInstrument.count < minPoints))
         {
-            return Banner.Style.Error
+            return DialogBanner.Style.Error
         }
-        return Banner.Style.Info
+        return DialogBanner.Style.Info
     }
 
     function deserialize(json)

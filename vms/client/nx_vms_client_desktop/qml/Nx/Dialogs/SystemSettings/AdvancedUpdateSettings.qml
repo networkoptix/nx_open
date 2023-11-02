@@ -196,11 +196,12 @@ Dialog
         }
     }
 
-    Banner
+    DialogBanner
     {
         height: visible ? implicitHeight : 0
         visible: Branding.isDesktopClientCustomized()
         anchors.bottom: buttonBox.top
+        width: parent.width
         text: qsTr("You are using a custom client. Please contact %1 to get the update "
             + "instructions.").arg(Branding.company())
     }
