@@ -117,6 +117,8 @@ private:
     QString engineName(const nx::analytics::db::ObjectTrack& track) const;
     QSharedPointer<QMenu> contextMenu(const nx::analytics::db::ObjectTrack& track) const;
 
+    void addCreateNewListAction(QMenu* menu, const nx::analytics::db::ObjectTrack& track) const;
+
     QnVirtualCameraResourcePtr camera(const nx::analytics::db::ObjectTrack& track) const;
 
     nx::utils::Guard makeAvailableNewTracksGuard();
