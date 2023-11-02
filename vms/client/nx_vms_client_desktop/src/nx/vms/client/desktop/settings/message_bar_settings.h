@@ -41,6 +41,9 @@ public:
     Property<bool> storageConfigUsbWarning{this, "storageConfigUsbWarning", true};
     Property<bool> storageConfigCloudStorageWarning{this, "storageConfigCloudStorageWarning", true};
     Property<bool> notificationsDeprecationInfo{this, "notificationsDeprecationInfo", true};
+    Property<bool> multiServerUpdateWeekendWarning{this, "multiServerUpdateWeekendWarning", true};
+    Property<bool> multiServerUpdateCustomClientWarning{
+        this, "multiServerUpdateCustomClientWarning", true};
 };
 
 MessageBarSettings* messageBarSettings();
