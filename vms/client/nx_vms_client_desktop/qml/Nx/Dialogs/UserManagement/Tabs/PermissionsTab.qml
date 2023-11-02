@@ -84,7 +84,7 @@ Item
 
                     icon: modelData.icon
 
-                    color: tree.hoveredAccessRight == modelData.accessRight && enabled
+                    color: tree.hoveredAccessRight == modelData.accessRight
                         ? ColorTheme.colors.light4
                         : ColorTheme.colors.light10
 
@@ -190,7 +190,7 @@ Item
         anchors.leftMargin: 16
 
         expandsOnDoubleClick: false
-        selectionEnabled: true
+        selectionEnabled: control.editingEnabled
         showResourceStatus: false
         clipDelegates: false
         topMargin: 1
