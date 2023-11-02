@@ -1434,10 +1434,6 @@
       <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
     </message>
@@ -1645,6 +1641,14 @@
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Lista de servidores separados por punto y coma designados para conectarse a la nube. Los servidores que encabezan la lista tienen mayor prioridad. Si la lista está vacía, se selecciona automáticamente un Servidor para la conexión a la Nube.</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>Tiempo de espera de RTP (milisegundos)</translation>
     </message>
   </context>
   <context>

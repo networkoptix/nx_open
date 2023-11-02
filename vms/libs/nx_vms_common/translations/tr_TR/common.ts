@@ -1434,10 +1434,6 @@
       <translation>Maksimum kayıt kuyruğu boyutu (öğeler, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>RTP deneme sayısı</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>Maks. RTSP bağlantı süresi (saniye)</translation>
     </message>
@@ -1645,6 +1641,14 @@
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Buluta bağlanmak üzere belirlenmiş Sunucuların noktalı virgülle ayrılmış listesi. Listenin en üstündeki sunucular daha yüksek önceliğe sahiptir. Liste boşsa Bulut bağlantısı için bir Sunucu otomatik olarak seçilir.</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>Sunucu RTSP oturumuna yeniden bağlanmadan önce art arda meydana gelebilecek maksimum RTP hatası sayısı.</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>RTP zaman aşımı (milisaniye)</translation>
     </message>
   </context>
   <context>

@@ -1434,10 +1434,6 @@
       <translation>Maks. postkø størrelse (elementer, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>Antall RTP-forsøk på nytt</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>Maks RTSP-tilkoblingsvarighet (sekunder)</translation>
     </message>
@@ -1645,6 +1641,14 @@
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Semikolon-separert liste over servere som er utpekt til å koble til skyen. Servere på toppen av listen har høyere prioritet. Hvis listen er tom, velges en Server for Cloud-tilkoblingen automatisk.</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>RTP timeout (millisekunder)</translation>
     </message>
   </context>
   <context>

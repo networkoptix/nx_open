@@ -1159,21 +1159,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Billeder</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alle Filer</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1570,6 +1555,22 @@ Licensnøgle: %2</translation>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation>Brugere modtager e-mails</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation>Brugere vil begynde at modtage e-mails lige efter du anvender indstillinger</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation>Kan ikke teste SMTP server</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation>Yderligere information påkrævet</translation>
     </message>
   </context>
   <context>
@@ -3157,6 +3158,21 @@ to %1</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation type="unfinished">To generate Generic Event, please refer to %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Billeder</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alle Filer</translation>
     </message>
   </context>
   <context>
@@ -8187,7 +8203,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>None of your Servers has connection to %1.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">None of your Servers has connection to %1.</translation>
+      <translation>Ingen af dine servere har forbindelse til %1.</translation>
     </message>
   </context>
   <context>

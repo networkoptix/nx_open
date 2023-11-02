@@ -1434,10 +1434,6 @@
       <translation>Max inspelningsköstorlek (element 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>Max antal RTP återförsök</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>Maximal RTSP-anslutningstid (sekunder)</translation>
     </message>
@@ -1645,6 +1641,14 @@
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Semikolonseparerad lista över servrar som är utsedda att ansluta till molnet. Servrar överst på listan har högre prioritet. Om listan är tom väljs en server för molnanslutningen automatiskt.</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>Maximalt antal på varandra följande RTP-fel innan servern återansluter RTSP-sessionen.</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>RTP timeout (millisekunder)</translation>
     </message>
   </context>
   <context>
