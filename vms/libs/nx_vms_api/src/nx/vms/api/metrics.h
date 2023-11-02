@@ -53,7 +53,7 @@ struct NX_VMS_API Label
 
 enum class Display
 {
-    /**apidoc[unused] */
+    /**%apidoc[unused] */
     none = 0,
     table = (1 << 0),
     panel = (1 << 1),
@@ -128,7 +128,7 @@ using SystemManifest
 
 enum class AlarmLevel
 {
-    /**apidoc[unused] */
+    /**%apidoc[unused] */
     none,
     warning,
     error,

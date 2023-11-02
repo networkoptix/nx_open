@@ -9,42 +9,42 @@ namespace nx::vms::api {
 
 enum class PeerType
 {
-    /**apidoc
+    /**%apidoc
      * %caption PT_NotDefined
      */
     notDefined = -1,
 
-    /**apidoc
+    /**%apidoc
      * %caption PT_Server
      */
     server = 0,
 
-    /**apidoc
+    /**%apidoc
      * %caption PT_DesktopClient
      */
     desktopClient = 1,
 
-    /**apidoc
+    /**%apidoc
      * %caption PT_VideowallClient
      */
     videowallClient = 2,
 
-    /**apidoc
+    /**%apidoc
      * %caption PT_OldMobileClient
      */
     oldMobileClient = 3,
 
-    /**apidoc
+    /**%apidoc
      * %caption PT_MobileClient
      */
     mobileClient = 4,
 
-    /**apidoc
+    /**%apidoc
      * %caption PT_CloudServer
      */
     cloudServer = 5,
 
-    /**apidoc
+    /**%apidoc
      * 2.6 or below
      * %caption PT_OldServer
      */
@@ -69,23 +69,23 @@ constexpr auto nxReflectVisitAllEnumItems(PeerType*, Visitor&& visitor)
 
 enum class RuntimeFlag
 {
-    /**apidoc
+    /**%apidoc
      * Sync transactions with cloud.
      * %caption MasterCloudSync
      */
     masterCloudSync = 1 << 0,
 
-    /**apidoc
+    /**%apidoc
      * %caption NoStorages
      */
     noStorages = 1 << 1,
 
-    /**apidoc
+    /**%apidoc
      * %caption noBackupStorages
      */
     noBackupStorages = 1 << 2,
 
-    /**apidoc
+    /**%apidoc
      * %caption masterLdapSync
      */
     masterLdapSync = 1 << 3,

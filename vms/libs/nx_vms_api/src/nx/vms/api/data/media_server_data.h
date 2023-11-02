@@ -13,7 +13,7 @@
 
 namespace nx::vms::api {
 
-/**apidoc
+/**%apidoc
  * %param[immutable] id Storage unique id. Can be omitted when creating a new object.
  * %param parentId Parent Server unique id.
  * %param[opt] name Arbitrary Storage name.
@@ -45,7 +45,7 @@ struct NX_VMS_API StorageData: ResourceData
      */
     QString storageType;
 
-    /**apidoc[proprietary]
+    /**%apidoc[proprietary]
      * List of Storage additional parameters. Intended for internal use; leave empty when creating
      * a new Storage.
      */
