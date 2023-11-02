@@ -498,7 +498,7 @@ bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
                 return false;
 
             const auto resource =
-                context->resourcePool()->getResourceById(action->getResources().first());
+                context->resourcePool()->getResourceById(action->getParams().actionResourceId);
             if (!NX_ASSERT(resource))
                 return false;
 
