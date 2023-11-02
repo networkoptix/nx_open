@@ -101,12 +101,13 @@ Window
             }
         }
 
-        Banner
+        DialogBanner
         {
             id: banner
 
             visible: text !== ""
             anchors.bottom: parent.bottom
+            width: parent.width
             text: editor.hint
             style: editor.hintStyle
             opacity: hovered ? 0 : 1

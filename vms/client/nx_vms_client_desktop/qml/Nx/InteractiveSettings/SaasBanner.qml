@@ -2,7 +2,7 @@
 
 import Nx.Controls
 
-Banner
+DialogBanner
 {
     id: root
 
