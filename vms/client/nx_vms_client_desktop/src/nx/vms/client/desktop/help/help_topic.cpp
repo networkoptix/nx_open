@@ -122,6 +122,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "generic_event.html";
         case Id::EventsActions:
             return "configuring_events_and_actions.html";
+        case Id::EventsActions_LdapSyncIssue:
+            return "ldap-sync-issue.html";
         case Id::EventsActions_LicenseIssue:
             return "license_issue.html";
         case Id::EventsActions_MediaServerConflict:
