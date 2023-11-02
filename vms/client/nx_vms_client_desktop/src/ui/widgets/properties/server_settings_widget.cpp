@@ -319,6 +319,15 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server)
             &QnServerSettingsWidget::updateCertificatesInfo);
         connect(m_server.get(), &QnMediaServerResource::statusChanged, this,
             &QnServerSettingsWidget::updateCertificatesInfo);
+        connect(m_server.get(), &QnMediaServerResource::redundancyChanged, this,
+            &QnServerSettingsWidget::updateFailoverSettings);
+        connect(m_server.get(), &QnMediaServerResource::maxCamerasChanged, this, [this]()
+            {
+                updateMaxCamerasSettings();
+                m_maxCamerasAdjusted = true;
+            });
+        connect(m_server.get(), &QnMediaServerResource::locationIdChanged,
+            this, &QnServerSettingsWidget::updateLocationIdSettings);
     }
 
     updateReadOnly();
@@ -401,13 +410,11 @@ bool QnServerSettingsWidget::isNetworkRequestRunning() const
     return !d->requests.empty() || d->requestHandle != 0;
 }
 
-void QnServerSettingsWidget::loadDataToUi()
+void QnServerSettingsWidget::updateMaxCamerasSettings()
 {
     if (!m_server)
         return;
 
-    m_initServerName = m_server->getName();
-    ui->nameLineEdit->setText(m_initServerName);
     int maxCameras;
     if (m_server->getServerFlags().testFlag(vms::api::SF_Edge))
         maxCameras = EDGE_SERVER_MAX_CAMERAS;   //edge server
@@ -422,13 +429,39 @@ void QnServerSettingsWidget::loadDataToUi()
         currentMaxCamerasValue = maxCameras;
 
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
-    ui->locationIdSpinBox->setValue(m_server->locationId());
-    ui->failoverGroupBox->setChecked(m_server->isRedundancy());
     ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
+}
 
-    m_maxCamerasAdjusted = false;
+void QnServerSettingsWidget::updateLocationIdSettings()
+{
+    if (!m_server)
+        return;
 
+    ui->locationIdSpinBox->setValue(m_server->locationId());
+}
+
+void QnServerSettingsWidget::updateFailoverSettings()
+{
+    if (!m_server)
+        return;
+
+    updateMaxCamerasSettings();
+    updateLocationIdSettings();
+
+    ui->failoverGroupBox->setChecked(m_server->isRedundancy());
     updateFailoverLabel();
+}
+
+void QnServerSettingsWidget::loadDataToUi()
+{
+    if (!m_server)
+        return;
+
+    m_initServerName = m_server->getName();
+    ui->nameLineEdit->setText(m_initServerName);
+
+    updateFailoverSettings();
+    m_maxCamerasAdjusted = false;
     updateUrl();
     updateWebCamerasDiscoveryEnabled();
     updateCertificatesInfo();
