@@ -812,7 +812,7 @@ void MultiServerUpdatesWidget::updateAlertBlock()
         messages.push_back(
             {.text = tr("Applying System updates at the end of the week is not recommended"),
                 .level = BarDescription::BarLevel::Warning,
-                .isEnabledProperty = &messageBarSettings()->transcodingExportWarning});
+                .isEnabledProperty = &messageBarSettings()->multiServerUpdateWeekendWarning});
     }
 
     if (nx::branding::isDesktopClientCustomized())
@@ -822,7 +822,7 @@ void MultiServerUpdatesWidget::updateAlertBlock()
                  "You are using a custom client. Please contact %1 to get the update instructions.")
                      .arg(nx::branding::company()),
                 .level = BarDescription::BarLevel::Warning,
-                .isEnabledProperty = &messageBarSettings()->transcodingExportWarning});
+                .isEnabledProperty = &messageBarSettings()->multiServerUpdateCustomClientWarning});
     }
 
     ui->messageBarBlock->setMessageBars(messages);

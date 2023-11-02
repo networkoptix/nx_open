@@ -60,7 +60,11 @@ MessageBarBlock::~MessageBarBlock()
 void MessageBarBlock::setMessageBars(const std::vector<BarDescription>& descs)
 {
     if (descs == d->barsDescriptions)
+    {
+        for (auto& bar: d->bars)
+            bar->updateVisibility();
         return;
+    }
 
     // Clear previous banners.
     d->bars.clear();
