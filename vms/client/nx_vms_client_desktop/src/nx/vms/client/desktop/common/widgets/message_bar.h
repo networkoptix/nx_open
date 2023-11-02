@@ -73,7 +73,7 @@ public:
      * Creates button with required style, adds it to children of banner,
      * adds it to the banner's layout.
      */
-    QPushButton* addButton(const QString& text, const QIcon& icon);
+    QPushButton* addButton(const QString& text, const QString& iconPath);
     /** Adds existing button to layout of banner and set the style of button. */
     void addButton(QPushButton* button);
 

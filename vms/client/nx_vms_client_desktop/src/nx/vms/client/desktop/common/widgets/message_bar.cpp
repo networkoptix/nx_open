@@ -22,6 +22,11 @@
 
 #include "nx/vms/client/desktop/common/widgets/control_bars.h"
 
+namespace {
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kTextButtonColors = {
+    {QIcon::Normal, {"light4"}}, {QIcon::Active, {"light3"}}};
+}
+
 namespace nx::vms::client::desktop {
 
 struct CommonMessageBar::Private
@@ -204,11 +209,11 @@ void CommonMessageBar::init(const BarDescription& barDescription)
     updateVisibility();
 }
 
-QPushButton* CommonMessageBar::addButton(const QString& text, const QIcon& icon)
+QPushButton* CommonMessageBar::addButton(const QString& text, const QString& iconPath)
 {
     QPushButton* button = new QPushButton(this);
     button->setText(text);
-    button->setIcon(icon);
+    button->setIcon(qnSkin->icon(iconPath, kTextButtonColors));
     addButton(button);
     return button;
 }
