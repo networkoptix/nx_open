@@ -39,6 +39,9 @@ protected:
 
 private:
     void updateFailoverLabel();
+    void updateFailoverSettings();
+    void updateMaxCamerasSettings();
+    void updateLocationIdSettings();
     void updateUrl();
     void updateReadOnly();
     void updateWebCamerasDiscoveryEnabled();
