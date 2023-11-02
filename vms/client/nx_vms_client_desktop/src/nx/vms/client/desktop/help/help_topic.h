@@ -65,6 +65,7 @@ public:
         EventsActions_ExecutePtzPreset,
         EventsActions_Generic,
         EventsActions,
+        EventsActions_LdapSyncIssue,
         EventsActions_LicenseIssue,
         EventsActions_MediaServerConflict,
         EventsActions_MediaServerFailure,
