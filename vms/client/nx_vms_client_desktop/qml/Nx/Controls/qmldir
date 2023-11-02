@@ -7,7 +7,6 @@ AlertBar 1.0 AlertBar.qml
 ArrowIcon 1.0 ArrowIcon.qml
 AutoScalableItem 1.0 AutoScalableItem.qml
 AutoScroller 1.0 AutoScroller.qml
-Banner 1.0 Banner.qml
 BasicTableCellDelegate 1.0 BasicTableCellDelegate.qml
 Bubble 1.0 Bubble.qml
 BubbleToolTip 1.0 BubbleToolTip.qml

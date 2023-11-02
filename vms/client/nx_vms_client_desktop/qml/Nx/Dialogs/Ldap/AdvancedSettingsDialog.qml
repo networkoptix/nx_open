@@ -200,7 +200,7 @@ Dialog
         width: parent.width
         anchors.bottom: buttonBox.top
 
-        style: Banner.Style.Info
+        style: DialogBanner.Style.Info
         text: digestCheckBox.checked
             ? qsTr("To enable digest authentication for LDAP users that are already added to the "
                 + "VMS database, you need to enable it directly in these users' settings.")
