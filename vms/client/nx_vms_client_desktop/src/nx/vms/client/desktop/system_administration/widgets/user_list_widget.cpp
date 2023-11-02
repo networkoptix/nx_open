@@ -676,9 +676,9 @@ void UserListWidget::Private::updateBanners()
             usersModel->ldapUserCount()));
 
     ldapServerOfflineWarning->setVisible(
-        (q->systemContext()->ldapStatusWatcher()->status()
-            && q->systemContext()->ldapStatusWatcher()->status()->state
-                != api::LdapStatus::State::online)
+        q->systemContext()->ldapStatusWatcher()->status()
+        && q->systemContext()->ldapStatusWatcher()->status()->state
+            != api::LdapStatus::State::online
         && usersModel->ldapUserCount() > 0);
 
     notFoundUsersWarning->setVisible(!ldapServerOfflineWarning->isVisible()

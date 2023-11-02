@@ -56,6 +56,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/resource/server_host_priority.h>
@@ -146,6 +147,7 @@ struct UserSettingsDialog::Private
     QmlProperty<int> tabIndex;
     QmlProperty<bool> isSaving;
     QmlProperty<bool> ldapError;
+    QmlProperty<bool> ldapOffline;
     QmlProperty<bool> continuousSync;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
@@ -171,6 +173,7 @@ struct UserSettingsDialog::Private
         tabIndex(q->rootObjectHolder(), "tabIndex"),
         isSaving(q->rootObjectHolder(), "isSaving"),
         ldapError(q->rootObjectHolder(), "ldapError"),
+        ldapOffline(q->rootObjectHolder(), "ldapOffline"),
         continuousSync(q->rootObjectHolder(), "continuousSync"),
         editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self"),
@@ -1069,9 +1072,12 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
             d->updateUiFromTemporaryToken({});
         }
     }
-
-    d->ldapError =
-        user->isLdap() && !user->externalId().dn.isEmpty() && user->externalId().syncId != d->syncId;
+    const auto status = systemContext()->ldapStatusWatcher()->status();
+    d->ldapOffline = !status || status->state != api::LdapStatus::State::online;
+    d->ldapError = user->isLdap()
+        && !user->externalId().dn.isEmpty()
+        && user->externalId().syncId != d->syncId
+        && !d->ldapOffline;
 
     state.linkEditable = accessController()->hasPowerUserPermissions()
         && permissions.testFlag(Qn::SavePermission);
