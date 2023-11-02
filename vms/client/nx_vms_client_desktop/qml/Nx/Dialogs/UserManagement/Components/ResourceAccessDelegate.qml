@@ -362,7 +362,7 @@ Item
                             verticalAlignment: Qt.AlignVCenter
 
                             visible: model.checkedAndInheritedChildCount > 0
-                                && cell.displayedProvider !== ResourceAccessInfo.ProvidedVia.own
+                                && cell.displayedProvider === ResourceAccessInfo.ProvidedVia.none
                                 && !cell.highlighted
 
                             color: cell.foregroundColor

@@ -34,6 +34,9 @@ Item
 
         onClicked:
         {
+            if (!hovered)
+                return
+
             item.clicked()
             hovered = false
         }
@@ -54,9 +57,15 @@ Item
             width: mouseArea.width + 2
             height: mouseArea.height + 2
 
-            color: mouseArea.hovered
-                ? ColorTheme.colors.dark12
-                : (item.interactive ? ColorTheme.colors.dark10 : ColorTheme.colors.dark7)
+            color:
+            {
+                if (mouseArea.hovered)
+                    return ColorTheme.colors.dark12
+
+                return item.interactive && item.enabled
+                    ? ColorTheme.colors.dark10
+                    : ColorTheme.colors.dark7
+            }
 
             border.color: ColorTheme.colors.dark7
         }
