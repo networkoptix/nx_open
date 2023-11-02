@@ -204,15 +204,20 @@ Item
         SaasBanner
         {
             id: saasBanner
+
+            width: parent.width
             saasServiceManager: analyticsSettings.saasServiceManager
             licenseSummary: viewModel.currentEngineLicenseSummary
             deviceSpecific: true
         }
 
-        Banner
+        DialogBanner
         {
             id: recordingNotEnabledBanner
+
             visible: false
+            width: parent.width
+            style: DialogBanner.Style.Warning
             text: qsTr("Camera analytics will work only when camera is being viewed."
                 + " Enable recording to make it work all the time.")
         }
