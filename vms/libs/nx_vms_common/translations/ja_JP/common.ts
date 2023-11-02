@@ -1388,10 +1388,6 @@
       <translation>レコードキューの最大サイズ (要素数, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>RTPリトライ回数</translation>
-    </message>
-    <message>
       <source>Max RTSP connection duration (seconds)</source>
       <translation>最大RTSP接続時間 (秒)</translation>
     </message>
@@ -1599,6 +1595,14 @@
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>クラウドに接続するように指定されたサーバーのセミコロン区切りのリスト。リストの先頭にあるサーバーの優先度が高くなります。リストが空の場合、クラウド接続用のサーバーが自動的に選択されます。</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数。</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>RTPタイムアウト (ミリ秒)</translation>
     </message>
   </context>
   <context>

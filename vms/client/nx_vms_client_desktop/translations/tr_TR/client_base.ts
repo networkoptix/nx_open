@@ -1159,21 +1159,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Resimler</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tüm Dosyalar</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1569,6 +1554,22 @@ License Key: %2</source>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation>%1 kullanıcı, siz bu ayarları uyguladıktan sonra e-posta almaya başlayacak</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation>Kullanıcılar e-posta alıyor</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation>Siz bu ayarları uyguladıktan sonra kullanıcılar e-posta almaya başlayacak</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation>SMTP sunucusu test edilemiyor</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation>Ek bilgi gerekli</translation>
     </message>
   </context>
   <context>
@@ -3152,6 +3153,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Kapsamlı Olay Oluşturmak İçin, Lütfen %1'e Bakın.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Resimler</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>

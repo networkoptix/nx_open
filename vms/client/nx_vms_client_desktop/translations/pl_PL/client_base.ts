@@ -1165,21 +1165,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Zdjęcia</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Wideo</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Wszystkie pliki</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1592,6 +1577,22 @@ Klucz licencyjny: %2</translation>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation>%1 użytkowników rozpocznie otrzymywanie wiadomości e-mail zaraz po zastosowaniu tych ustawień</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation type="unfinished">Users are receiving emails</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation type="unfinished">Unable to test SMTP server</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation type="unfinished">Additional info required</translation>
     </message>
   </context>
   <context>
@@ -3227,6 +3228,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Aby wygenerować inne zdarzenie, zobacz %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Zdjęcia</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Wideo</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Wszystkie pliki</translation>
     </message>
   </context>
   <context>

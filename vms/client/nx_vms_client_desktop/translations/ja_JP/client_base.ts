@@ -1156,21 +1156,6 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>画像</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>映像</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>すべてのファイル</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1523,7 +1508,7 @@ License Key: %2</source>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>%1 ユーザーがメールを受信します</translation>
+      <translation>%1 ユーザーはメールを受信しています</translation>
     </message>
     <message>
       <source>%1 is not available</source>
@@ -1559,6 +1544,22 @@ License Key: %2</source>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation>これらの設定を適用すると、%1 ユーザーへのメール配信がすぐに始まります</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation>ユーザーはメールを受信しています</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation>設定を適用すると、 ユーザーへのメール配信がすぐに始まります</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation>SMTPサーバーをテストできません</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation>追加情報が必要です</translation>
     </message>
   </context>
   <context>
@@ -3117,6 +3118,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>汎用イベントを生成するには、 %1を参照してください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>画像</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>映像</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>すべてのファイル</translation>
     </message>
   </context>
   <context>
