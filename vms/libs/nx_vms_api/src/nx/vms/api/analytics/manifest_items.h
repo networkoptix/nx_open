@@ -52,35 +52,35 @@ NX_REFLECTION_INSTRUMENT(ColorType, ColorType_Fields);
 
 enum class AttributeType
 {
-    /**apidoc[unused] */
+    /**%apidoc[unused] */
     undefined,
 
-    /**apidoc
+    /**%apidoc
      * %caption Number
      */
     number,
 
-    /**apidoc
+    /**%apidoc
      * %caption Boolean
      */
     boolean,
 
-    /**apidoc
+    /**%apidoc
      * %caption String
      */
     string,
 
-    /**apidoc
+    /**%apidoc
      * %caption Color
      */
     color,
 
-    /**apidoc
+    /**%apidoc
      * %caption Enum
      */
     enumeration,
 
-    /**apidoc
+    /**%apidoc
      * %caption Object
      */
     object,

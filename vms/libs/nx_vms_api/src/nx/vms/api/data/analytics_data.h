@@ -211,7 +211,7 @@ struct NX_VMS_API PluginInfo
  */
 struct NX_VMS_API PluginResourceBindingInfo
 {
-    /**apidoc
+    /**%apidoc
      * Id of the Engine in the case of Analytics Plugins, an empty string for Device Plugins.
      */
     QString id;
