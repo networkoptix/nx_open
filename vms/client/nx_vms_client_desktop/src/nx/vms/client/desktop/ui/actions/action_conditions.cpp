@@ -2109,6 +2109,15 @@ ConditionWrapper isShowreelReviewMode()
         });
 }
 
+ConditionWrapper layoutIsLocked()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return context->workbench()->currentLayoutResource()->locked();
+        });
+}
+
 ConditionWrapper canSavePtzPosition()
 {
     return new CustomBoolCondition(
