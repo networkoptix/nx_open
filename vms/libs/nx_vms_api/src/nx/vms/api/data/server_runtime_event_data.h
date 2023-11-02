@@ -16,7 +16,7 @@ namespace nx::vms::api {
 
 enum class ServerRuntimeEventType
 {
-    /**apidoc[unused] */
+    /**%apidoc[unused] */
     undefined = 0,
     deviceAgentSettingsMaybeChanged = 1,
     deviceFootageChanged = 2,

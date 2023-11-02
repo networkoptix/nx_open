@@ -53,17 +53,17 @@ NX_REFLECTION_ENUM_CLASS(EventReason,
 
 enum class EventState
 {
-    /**apidoc
+    /**%apidoc
      * %caption Inactive
      */
     inactive = 0,
 
-    /**apidoc
+    /**%apidoc
      * %caption Active
      */
     active = 1,
 
-    /**apidoc
+    /**%apidoc
      * Also used in event rule to associate non-toggle action with event with any toggle state.
      * %caption Undefined
      */
