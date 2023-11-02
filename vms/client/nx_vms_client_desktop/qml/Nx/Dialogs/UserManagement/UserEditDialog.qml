@@ -70,6 +70,7 @@ DialogWithState
     property alias tabIndex: tabControl.currentTabIndex
     property bool isSaving: false
     property bool ldapError: false
+    property bool ldapOffline: true
     property alias linkReady: generalSettings.linkReady
     property bool continuousSync: true
     property alias editingContext: membersModel.editingContext
@@ -115,6 +116,7 @@ DialogWithState
                 parentGroupsEditable: dialog.parentGroupsEditable
                 enabled: !dialog.isSaving
                 ldapError: dialog.ldapError
+                ldapOffline: dialog.ldapOffline
                 continuousSync: dialog.continuousSync
 
                 onDeleteRequested: dialog.deleteRequested()
