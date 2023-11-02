@@ -55,6 +55,7 @@ Item
     property alias firstLoginTime: linkDates.firstLoginTime
 
     property bool ldapError: false
+    property bool ldapOffline: true
     property bool linkReady: true
     property bool continuousSync: true
     property bool nameIsUnique: true
@@ -824,6 +825,19 @@ Item
             buttonIcon: "image://svg/skin/user_settings/trash.svg"
 
             onButtonClicked: control.deleteRequested()
+        }
+
+        DialogBanner
+        {
+            id: ldapServerIsOffline
+
+            style: DialogBanner.Style.Error
+            closeable: true
+            watchToReopen: control.userId
+            visible: control.ldapOffline && !closed
+            Layout.fillWidth: true
+
+            text: qsTr("LDAP server is offline. User is not able to log in.")
         }
 
         DialogBanner
