@@ -139,7 +139,7 @@ public:
     QHash<QnUserResourcePtr, bool> enableChangedUsers;
     QHash<QnUserResourcePtr, bool> digestChangedUsers;
 
-    bool ldapServerOnline = true;
+    bool ldapServerOnline = false;
     qsizetype m_ldapUserCount = 0;
 
     Private(UserListModel* q):
@@ -192,6 +192,15 @@ public:
             {
                 if (const auto status = systemContext()->ldapStatusWatcher()->status())
                     ldapServerOnline = (status->state == api::LdapStatus::State::online);
+                if (ldapServerOnline)
+                {
+                    for (const auto& user: users)
+                        markUserNotFound(user, ldapUserNotFound(user));
+                }
+                else
+                {
+                    notFoundUsers.clear();
+                }
 
                 emit q->dataChanged(
                     q->index(0, UserWarningColumn),
@@ -279,7 +288,9 @@ QnUserResourcePtr UserListModel::Private::user(const QModelIndex& index) const
 
 bool UserListModel::Private::ldapUserNotFound(const QnUserResourcePtr& user) const
 {
-    return !user->externalId().dn.isEmpty() && user->externalId().syncId != syncId;
+    return !user->externalId().dn.isEmpty()
+        && user->externalId().syncId != syncId
+        && ldapServerOnline;
 }
 
 Qt::CheckState UserListModel::Private::checkState() const
