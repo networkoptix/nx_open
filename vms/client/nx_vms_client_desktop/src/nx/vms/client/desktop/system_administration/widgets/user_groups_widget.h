@@ -24,6 +24,9 @@ public:
 
     virtual QSize sizeHint() const override;
 
+protected:
+    virtual void showEvent(QShowEvent* event) override;
+
 private:
     class Private;
     class Delegate;
