@@ -959,7 +959,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
             case Qn::AR_StorageInsert:
             case Qn::AR_StorageUpdate:
             case Qn::AR_ServerUpdate:
-                return qnSkin->icon("tree/server.png");
+                return qnSkin->icon("tree/server.svg");
 
             case Qn::AR_CameraInsert:
             case Qn::AR_CameraUpdate:
