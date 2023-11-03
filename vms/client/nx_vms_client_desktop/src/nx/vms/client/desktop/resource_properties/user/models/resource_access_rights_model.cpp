@@ -77,21 +77,6 @@ int providerPriority(ResourceAccessInfo::ProvidedVia providerType)
     return kPriorityByProvider.value(providerType, /*defaultValue*/ kLowestPriority);
 }
 
-class ComparableGroup: public ComparableMember<ComparableGroup>
-{
-    const nx::vms::api::UserGroupData& group;
-
-public:
-    ComparableGroup(const nx::vms::api::UserGroupData& group): group(group)
-    {
-    }
-
-    QnUuid id() const { return group.id; }
-    bool isGroup() const { return true; }
-    nx::vms::api::UserType userType() const { return group.type; }
-    QString name() const { return group.name; }
-};
-
 } // namespace
 
 // ------------------------------------------------------------------------------------------------
