@@ -42,7 +42,7 @@ Column
             id: datePicker
 
             enabled: control.enabled
-            displayOffset: (time) => { return control.self.displayOffset(time) }
+            displayOffset: (time) => { return control.self ? control.self.displayOffset(time) : 0 }
         }
     }
 
