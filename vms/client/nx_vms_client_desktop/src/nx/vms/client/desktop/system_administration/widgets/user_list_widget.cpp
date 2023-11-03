@@ -409,6 +409,11 @@ QSize UserListWidget::sizeHint() const
     return QSize(200, 200);
 }
 
+void UserListWidget::showEvent(QShowEvent*)
+{
+    d->ui->filterLineEdit->setFocus();
+}
+
 void UserListWidget::Private::setupUi()
 {
     ui->setupUi(q);
