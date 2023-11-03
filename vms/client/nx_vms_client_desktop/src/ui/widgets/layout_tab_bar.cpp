@@ -251,6 +251,10 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
     if (!systemContext) //< Perfectly valid for temporary layouts like showreel.
         return baseName;
 
+    // It makes no sense to show locked layout as modified as saving is prohibited anyway.
+    if (layout->locked())
+        return baseName;
+
     return systemContext->layoutSnapshotManager()->isModified(resource)
         ? baseName + '*'
         : baseName;
