@@ -2425,7 +2425,8 @@ struct RemoveUserRoleAccess
         if (Result r = expectPowerUserOrAdmin(accessor); !r)
             return r;
 
-        const auto group = systemContext->userGroupManager()->find(param.id);
+        const std::optional<api::UserGroupData> group =
+            systemContext->userGroupManager()->find(param.id);
         if (!group)
         {
             return {ErrorCode::notFound,
@@ -2437,6 +2438,9 @@ struct RemoveUserRoleAccess
             return r;
 
         if (Result r = checkGroupNotReferenced(*systemContext, *group); !r)
+            return r;
+
+        if (Result r = checkNonBuiltInDeletion(*systemContext, *group); !r)
             return r;
 
         return {};
@@ -2460,9 +2464,8 @@ private:
 
     // Check whether the accessor has sufficient rights to delete the User Group.
     // This function assumes that the group exists.
-    template<typename GroupInfo>
     static Result checkPermissionsToDelete(
-        const SystemContext& context, const UserAccessorInfo& accessor, const GroupInfo& group)
+        const SystemContext& context, const UserAccessorInfo& accessor, const api::UserGroupData& group)
     {
         const auto errorForbidden =
             [](const auto& user, const auto& group, GlobalPermission groupPermissions) -> Result
@@ -2497,8 +2500,7 @@ private:
         return {};
     }
 
-    template<typename GroupInfo>
-    static Result checkGroupNotReferenced(const SystemContext& context, const GroupInfo& userGroup)
+    static Result checkGroupNotReferenced(const SystemContext& context, const api::UserGroupData& userGroup)
     {
         // The Current group will not be removed from `parentIds` or `parentGroupIds` leaving
         // existing Users or User Groups with garbage ids of non-existing parents.
@@ -2531,6 +2533,23 @@ private:
                             "Removing User Group is forbidden because it is still inherited by '%1'."),
                         group->name)};
             }
+        }
+
+        return {};
+    }
+
+    static Result checkNonBuiltInDeletion(
+        const SystemContext& context, const api::UserGroupData& group)
+    {
+        if (api::kPredefinedGroupIds.contains(group.id)
+            || api::kDefaultLdapGroupId == group.id)
+        {
+            return {ErrorCode::forbidden,
+                nx::format(
+                    ServerApiErrors::tr(
+                        "Cannot delete the built-in User Group %1(%2)."),
+                    group.name,
+                    group.id.toString())};
         }
 
         return {};
