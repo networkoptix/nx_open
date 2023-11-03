@@ -1558,19 +1558,19 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>Brukere mottar e-poster</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>Brukere vil begynne å motta e-poster rett etter at du har lagret innstillingene</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>Kan ikke teste SMTP-serveren</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>Ytterligere informasjon kreves</translation>
     </message>
   </context>
   <context>
