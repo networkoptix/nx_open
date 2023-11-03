@@ -363,6 +363,7 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
     {
         auto& newInfo = result[i];
         const auto accessRight = accessRightList[i];
+        const bool checked = context->hasOwnAccessRight(item.target.id(), accessRight);
         const bool outerGroupChecked =
             accessMap.value(item.outerSpecialResourceGroupId).testFlag(accessRight);
 
@@ -398,7 +399,7 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
             if (!newInfo.providerUserGroups.empty())
                 newInfo.inheritedFrom = ResourceAccessInfo::ProvidedVia::parentUserGroup;
 
-            newInfo.providedVia = context->hasOwnAccessRight(item.target.id(), accessRight)
+            newInfo.providedVia = checked
                 ? ResourceAccessInfo::ProvidedVia::own
                 : newInfo.inheritedFrom;
 
@@ -419,18 +420,15 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
 
                 if (provider == item.target.resource())
                 {
-                    const auto resourceGroupId =
-                        AccessSubjectEditingContext::specialResourceGroupFor(item.target.resource());
-
-                    const auto accessViaResourceGroup = !resourceGroupId.isNull()
-                        && context->hasOwnAccessRight(resourceGroupId, accessRight);
-
-                    if (accessViaResourceGroup)
-                        newInfo.parentResourceGroupId = resourceGroupId;
-
-                    newInfo.providedVia = accessViaResourceGroup
-                        ? ResourceAccessInfo::ProvidedVia::ownResourceGroup
-                        : ResourceAccessInfo::ProvidedVia::own;
+                    if (checked)
+                    {
+                        newInfo.providedVia = ResourceAccessInfo::ProvidedVia::own;
+                    }
+                    else if (NX_ASSERT(outerGroupChecked))
+                    {
+                        newInfo.providedVia = ResourceAccessInfo::ProvidedVia::ownResourceGroup;
+                        newInfo.parentResourceGroupId = item.outerSpecialResourceGroupId;
+                    }
                 }
                 else
                 {
@@ -593,7 +591,7 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
                 ? tr("User's custom permissions")
                 : tr("Group's custom permissions"));
     }
-    else if (auto nodeName = resourceGroupName(accessInfo.parentResourceGroupId))
+    else if (const auto nodeName = resourceGroupName(accessInfo.parentResourceGroupId))
     {
         descriptions << tr("Access granted by %1",
             "`%1` will be substituted with a resource group like `Cameras & Devices`")
