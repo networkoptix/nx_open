@@ -3,6 +3,8 @@
 #ifndef __MOTION_WINDOW_H__
 #define __MOTION_WINDOW_H__
 
+#include <optional>
+
 #include <QtCore/QMetaType>
 #include <QtCore/QMultiMap>
 #include <nx/utils/thread/mutex.h>
@@ -111,10 +113,13 @@ private:
 
 Q_DECLARE_METATYPE(QnMotionRegion);
 
-void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString);
+NX_VMS_COMMON_API std::optional<QnMotionRegion> parseMotionRegion(const QByteArray& regionString);
+
 QString serializeMotionRegion(const QnMotionRegion& region);
 
-void parseMotionRegionList(QList<QnMotionRegion>& regions, const QByteArray& regionsString);
+NX_VMS_COMMON_API std::optional<QList<QnMotionRegion>> parseMotionRegionList(
+    const QByteArray& regionsString);
+
 QString serializeMotionRegionList(const QList<QnMotionRegion>& regions);
 
 

@@ -508,11 +508,8 @@ QnMotionRegion QnSecurityCamResource::getMotionRegion() const
 
 QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const
 {
-    QList<QnMotionRegion> result;
-
     NX_MUTEX_LOCKER lock(&m_attributesMutex);
-    parseMotionRegionList(result, m_userAttributes.motionMask);
-    return result;
+    return parseMotionRegionList(m_userAttributes.motionMask).value_or(QList<QnMotionRegion>());
 }
 
 void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList)
