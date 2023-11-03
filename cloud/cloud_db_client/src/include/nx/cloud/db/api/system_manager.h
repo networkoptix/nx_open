@@ -65,7 +65,7 @@ public:
      * @note sharing is removed if sharingData.accessRole is api::SystemAccessRole::none.
      */
     virtual void shareSystem(
-        SystemSharing sharingData,
+        ShareSystemRequest sharingData,
         std::function<void(ResultCode, SystemSharing)> completionHandler) = 0;
 
     /**
@@ -82,7 +82,7 @@ public:
      */
     virtual void getCloudUsersOfSystem(
         const std::string& systemId,
-        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) = 0;
 
     /**
      * Returns list of access roles which can be used to share system systemId.

@@ -204,7 +204,7 @@ enum class SystemAccessRole
     system = 10,
 };
 
-struct SystemSharing
+struct ShareSystemRequest
 {
     /**%apidoc The account to share the system with. */
     std::string accountEmail;
@@ -230,14 +230,14 @@ struct SystemSharing
     //TODO #akolesnikov this field is redundant here. Move it to libcloud_db internal data structures
     std::string vmsUserId;
 
-    bool operator<(const SystemSharing& rhs) const
+    bool operator<(const ShareSystemRequest& rhs) const
     {
         if (accountEmail != rhs.accountEmail)
             return accountEmail < rhs.accountEmail;
         return systemId < rhs.systemId;
     }
 
-    bool operator==(const SystemSharing& rhs) const
+    bool operator==(const ShareSystemRequest& rhs) const
     {
         return accountEmail == rhs.accountEmail
             && systemId == rhs.systemId
@@ -248,16 +248,10 @@ struct SystemSharing
     }
 };
 
-struct SystemSharingList
-{
-    /**%apidoc List of accounts the system has been shared with. */
-    std::vector<SystemSharing> sharing;
-};
-
 /**
- * Expands SystemSharing to contain more data.
+ * Expands ShareSystemRequest to contain more data.
  */
-struct SystemSharingEx: SystemSharing
+struct SystemSharing: ShareSystemRequest
 {
     /**%apidoc Globally unique account id. */
     std::string accountId;
@@ -270,23 +264,23 @@ struct SystemSharingEx: SystemSharing
     /**%apidoc UTC time of the last login of user to the system. */
     std::chrono::system_clock::time_point lastLoginTime;
 
-    bool operator==(const SystemSharingEx& rhs) const
+    bool operator==(const SystemSharing& rhs) const
     {
-        return static_cast<const SystemSharing&>(*this) == static_cast<const SystemSharing&>(rhs)
+        return static_cast<const ShareSystemRequest&>(*this) == static_cast<const ShareSystemRequest&>(rhs)
             && accountId == rhs.accountId
             && accountFullName == rhs.accountFullName;
     }
 
-    bool operator<(const SystemSharingEx& rhs) const
+    bool operator<(const SystemSharing& rhs) const
     {
         return std::tie(accountId, systemId) < std::tie(rhs.accountId, rhs.systemId);
     }
 };
 
-struct SystemSharingExList
+struct SystemSharingList
 {
     /**%apidoc List of accounts the system has been shared with. */
-    std::vector<SystemSharingEx> sharing;
+    std::vector<SystemSharing> sharing;
 };
 
 struct ShareSystemQuery

@@ -46,8 +46,8 @@ public:
     virtual void shareSystem(
         const std::string& organizationId,
         const std::string& systemId,
-        const api::SystemSharing& sharing,
-        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) = 0;
+        const api::ShareSystemRequest& sharing,
+        std::function<void(api::ResultCode, api::ShareSystemRequest)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api
