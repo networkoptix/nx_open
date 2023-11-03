@@ -113,26 +113,17 @@ NX_REFLECTION_INSTRUMENT_ENUM(SystemAccessRole,
     system
 )
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
-void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
+#define ShareSystemRequest_Fields (accountEmail)(systemId)(accessRole)(userRoleId)(customPermissions)(isEnabled)(vmsUserId)
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing);
+NX_REFLECTION_INSTRUMENT(ShareSystemRequest, ShareSystemRequest_Fields)
 
-#define SystemSharing_Fields (accountEmail)(systemId)(accessRole)(userRoleId)(customPermissions)(isEnabled)(vmsUserId)
+#define SystemSharing_Fields ShareSystemRequest_Fields(accountId)(accountFullName)(usageFrequency)(lastLoginTime)
 
 NX_REFLECTION_INSTRUMENT(SystemSharing, SystemSharing_Fields)
 
 #define SystemSharingList_Fields (sharing)
 
 NX_REFLECTION_INSTRUMENT(SystemSharingList, SystemSharingList_Fields)
-
-#define SystemSharingEx_Fields SystemSharing_Fields(accountId)(accountFullName)(usageFrequency)(lastLoginTime)
-
-NX_REFLECTION_INSTRUMENT(SystemSharingEx, SystemSharingEx_Fields)
-
-#define SystemSharingExList_Fields (sharing)
-
-NX_REFLECTION_INSTRUMENT(SystemSharingExList, SystemSharingExList_Fields)
 
 #define SystemAccessRoleData_Fields (accessRole)
 

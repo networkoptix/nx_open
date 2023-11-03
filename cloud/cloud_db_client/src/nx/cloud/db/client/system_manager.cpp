@@ -84,7 +84,7 @@ void SystemManager::getSystems(
 }
 
 void SystemManager::shareSystem(
-    api::SystemSharing sharingData,
+    api::ShareSystemRequest sharingData,
     std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
 {
     auto systemId = sharingData.systemId;
@@ -108,15 +108,15 @@ void SystemManager::revokeUserAccess(
 
 void SystemManager::getCloudUsersOfSystem(
     const std::string& systemId,
-    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<std::vector<api::SystemSharingEx>>(
+    m_requestsExecutor->executeRequest<std::vector<api::SystemSharing>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
         [completionHandler = std::move(completionHandler)](
-            api::ResultCode resultCode, std::vector<api::SystemSharingEx> systems)
+            api::ResultCode resultCode, std::vector<api::SystemSharing> systems)
         {
-            completionHandler(resultCode, api::SystemSharingExList{std::move(systems)});
+            completionHandler(resultCode, api::SystemSharingList{std::move(systems)});
         });
 }
 
