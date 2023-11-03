@@ -1110,6 +1110,13 @@ struct ModifyCameraAttributesAccess
         using namespace nx::vms::license;
         CamLicenseUsageHelper licenseUsageHelper(commonModule->systemContext());
 
+        if (!param.motionMask.isEmpty() && !parseMotionRegionList(param.motionMask))
+        {
+            return Result(ErrorCode::badRequest,
+                NX_FMT("Motion mask should be in range [0,0 %1x%2]",
+                    Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+        }
+
         // Check the license if and only if recording goes from 'off' to 'on' state
         if (param.scheduleEnabled && !camera->isScheduleEnabled())
         {
