@@ -592,9 +592,17 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
                 case UserGroupsColumn:
                 {
-                    QStringList groupNames = nx::vms::common::userGroupNames(user);
-                    for (auto& line: groupNames)
-                        line = toHtmlEscaped(line);
+                    auto groups =
+                        d->systemContext()->userGroupManager()->getGroupsByIds(user->groupIds());
+                    std::sort(groups.begin(), groups.end(),
+                        [](const auto& left, const auto& right)
+                        {
+                            return ComparableGroup(left) < ComparableGroup(right);
+                        });
+
+                    QStringList groupNames;
+                    for (const auto& group: groups)
+                        groupNames << toHtmlEscaped(group.name);
                     return noWrap(groupNames.join(kLineBreak));
                 }
 
