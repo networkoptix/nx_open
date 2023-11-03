@@ -41,7 +41,7 @@ public:
     ProvidedVia inheritedFrom{ProvidedVia::none};
     QVector<QnUuid> providerUserGroups;
     QVector<QnResourcePtr> indirectProviders;
-    QnUuid parentResourceGroupId;
+    QnUuid parentResourceGroupId; //< Filled only if access is granted through it.
     int checkedChildCount = 0;
     int checkedAndInheritedChildCount = 0;
     int totalChildCount = 0;
