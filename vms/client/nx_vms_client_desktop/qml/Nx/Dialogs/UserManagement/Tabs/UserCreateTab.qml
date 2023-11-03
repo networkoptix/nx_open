@@ -33,8 +33,15 @@ Item
     property int userType: UserSettingsGlobal.LocalUser
     readonly property bool isLocalUser: userType != UserSettingsGlobal.CloudUser
 
+    property string savedEmail
+
     onIsLocalUserChanged:
     {
+        if (!savedEmail)
+            savedEmail = email
+        else
+            [email, savedEmail] = [savedEmail, email]
+
         if (isLocalUser)
         {
             if (!login)
