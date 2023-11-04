@@ -1015,6 +1015,7 @@ public:
 
 class DirectParentsModel: public QSortFilterProxyModel
 {
+    Q_DECLARE_TR_FUNCTIONS(DirectParentsModel)
     using base_type = QSortFilterProxyModel;
 
 public:
