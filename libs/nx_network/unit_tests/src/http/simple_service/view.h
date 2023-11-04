@@ -5,6 +5,7 @@
 #include <nx/network/http/server/authentication_dispatcher.h>
 #include <nx/network/http/server/multi_endpoint_server.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
+#include <nx/reflect/instrument.h>
 
 #include "settings.h"
 
@@ -13,6 +14,13 @@ class MultiEndpointServer;
 }
 
 namespace nx::network::http::server::test {
+
+struct Response
+{
+    std::string httpRequest;
+};
+
+NX_REFLECTION_INSTRUMENT(Response, (httpRequest))
 
 class View
 {
@@ -28,9 +36,11 @@ public:
      * Stops listening ports and terminates all opened connections.
      */
     void stop();
+
     void doResponse(
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
+
     std::vector<network::SocketAddress> httpEndpoints() const;
     void setSuccessfullAttemptNum(unsigned num) { m_successAttemptNum = num; };
     void resetAttemptsNum() { m_curAttemptNum = 0; };

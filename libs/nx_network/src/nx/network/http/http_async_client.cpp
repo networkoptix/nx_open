@@ -33,21 +33,203 @@ static bool logTraffic()
 
 namespace nx::network::http {
 
-static AsyncClient::Timeouts kDefaultTimeouts{
+//-------------------------------------------------------------------------------------------------
+
+static ClientOptions::Timeouts kDefaultTimeouts{
     /*sendTimeout*/ std::chrono::milliseconds(3001),
     /*responseReadTimeout*/ std::chrono::milliseconds(3002),
     /*messageBodyReadTimeout*/ std::chrono::milliseconds(10003),
 };
 
-const AsyncClient::Timeouts& AsyncClient::Timeouts::defaults()
+const ClientOptions::Timeouts& ClientOptions::Timeouts::defaults()
 {
     return kDefaultTimeouts;
 }
 
-void AsyncClient::Timeouts::setDefaults(Timeouts value)
+void ClientOptions::Timeouts::setDefaults(Timeouts value)
 {
     kDefaultTimeouts = value;
 }
+
+void ClientOptions::setUseCompression(bool toggleUseEntityEncoding)
+{
+    m_contentEncodingUsed = toggleUseEntityEncoding;
+}
+
+bool ClientOptions::useCompression() const
+{
+    return m_contentEncodingUsed;
+}
+
+void ClientOptions::setSubsequentReconnectTries(int val)
+{
+    m_subsequentReconnectTries = val;
+}
+
+int ClientOptions::subsequentReconnectTries() const
+{
+    return m_subsequentReconnectTries;
+}
+
+void ClientOptions::setTotalReconnectTries(int val)
+{
+    m_totalReconnectTries = val;
+}
+
+int ClientOptions::totalReconnectTries() const
+{
+    return m_totalReconnectTries;
+}
+
+void ClientOptions::setUserAgent(const std::string& userAgent)
+{
+    m_userAgent = userAgent;
+}
+
+const std::string& ClientOptions::userAgent() const
+{
+    return m_userAgent;
+}
+
+void ClientOptions::setProxyCredentials(const Credentials& credentials)
+{
+    m_proxyCredentials = credentials;
+}
+
+const Credentials& ClientOptions::proxyCredentials() const
+{
+    return m_proxyCredentials;
+}
+
+void ClientOptions::setProxyVia(
+    const SocketAddress& proxyEndpoint, bool isSecure, ssl::AdapterFunc adapterFunc)
+{
+    if (proxyEndpoint.isNull())
+    {
+        m_proxyEndpoint.reset();
+    }
+    else
+    {
+        NX_ASSERT(proxyEndpoint.port > 0);
+        m_proxyEndpoint = proxyEndpoint;
+        m_isProxySecure = isSecure;
+        m_proxyAdapterFunc = std::move(adapterFunc);
+    }
+}
+
+const std::optional<SocketAddress>& ClientOptions::proxyEndpoint() const
+{
+    return m_proxyEndpoint;
+}
+
+bool ClientOptions::isProxySecure() const
+{
+    return m_isProxySecure;
+}
+
+const ssl::AdapterFunc& ClientOptions::proxyAdapterFunc() const
+{
+    return m_proxyAdapterFunc;
+}
+
+void ClientOptions::setDisablePrecalculatedAuthorization(bool val)
+{
+    m_precalculatedAuthorizationDisabled = val;
+}
+
+bool ClientOptions::disablePrecalculatedAuthorization() const
+{
+    return m_precalculatedAuthorizationDisabled;
+}
+
+void ClientOptions::setSendTimeout(std::chrono::milliseconds sendTimeout)
+{
+    m_timeouts.sendTimeout = sendTimeout;
+}
+
+void ClientOptions::setResponseReadTimeout(
+    std::chrono::milliseconds _responseReadTimeout)
+{
+    m_timeouts.responseReadTimeout = _responseReadTimeout;
+}
+
+void ClientOptions::setMessageBodyReadTimeout(
+    std::chrono::milliseconds messageBodyReadTimeout)
+{
+    m_timeouts.messageBodyReadTimeout = messageBodyReadTimeout;
+}
+
+void ClientOptions::setTimeouts(const Timeouts& timeouts)
+{
+    m_timeouts = timeouts;
+}
+
+const ClientOptions::Timeouts& ClientOptions::timeouts() const
+{
+    return m_timeouts;
+}
+
+void ClientOptions::addAdditionalHeader(const std::string& key, const std::string& value)
+{
+    m_additionalHeaders.emplace(key, value);
+}
+
+void ClientOptions::removeAdditionalHeader(const std::string& key)
+{
+    m_additionalHeaders.erase(key);
+}
+
+void ClientOptions::setAdditionalHeaders(HttpHeaders additionalHeaders)
+{
+    m_additionalHeaders = std::move(additionalHeaders);
+}
+
+const HttpHeaders& ClientOptions::additionalHeaders() const
+{
+    return m_additionalHeaders;
+}
+
+void ClientOptions::addRequestHeaders(const HttpHeaders& headers)
+{
+    m_additionalHeaders.insert(headers.begin(), headers.end());
+}
+
+void ClientOptions::setAuthType(AuthType value)
+{
+    m_authType = value;
+}
+
+AuthType ClientOptions::authType() const
+{
+    return m_authType;
+}
+
+void ClientOptions::setMaxNumberOfRedirects(int maxNumberOfRedirects)
+{
+    m_maxNumberOfRedirects = maxNumberOfRedirects;
+}
+
+int ClientOptions::maxNumberOfRedirects() const
+{
+    return m_maxNumberOfRedirects;
+}
+
+void ClientOptions::setCredentials(const Credentials& credentials)
+{
+    m_credentials = credentials;
+}
+
+const Credentials& ClientOptions::credentials() const
+{
+    return m_credentials;
+}
+
+void ClientOptions::assignOptions(const ClientOptions& other)
+{
+    *this = other;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 AsyncClient::AsyncClient(ssl::AdapterFunc adapterFunc): m_adapterFunc(std::move(adapterFunc))
 {
@@ -322,11 +504,11 @@ void AsyncClient::doUpgrade(
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    if (m_additionalHeaders.count("Connection") == 0)
-        m_additionalHeaders.emplace("Connection", "Upgrade");
-    if (m_additionalHeaders.count("Upgrade") == 0)
-        m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
-    m_additionalHeaders.emplace("Content-Length", "0");
+    if (additionalHeaders().count("Connection") == 0)
+        addAdditionalHeader("Connection", "Upgrade");
+    if (additionalHeaders().count("Upgrade") == 0)
+        addAdditionalHeader("Upgrade", protocolToUpgradeTo);
+    addAdditionalHeader("Content-Length", "0");
     composeRequest(method);
     initiateHttpMessageDelivery();
 }
@@ -497,84 +679,6 @@ quint64 AsyncClient::bytesRead() const
     return m_messagePipeline->totalBytesReceived();
 }
 
-void AsyncClient::setUseCompression(bool toggleUseEntityEncoding)
-{
-    m_contentEncodingUsed = toggleUseEntityEncoding;
-}
-
-void AsyncClient::setSubsequentReconnectTries(int /*reconnectTries*/)
-{
-    //TODO #akolesnikov
-}
-
-void AsyncClient::setTotalReconnectTries(int /*reconnectTries*/)
-{
-    //TODO #akolesnikov
-}
-
-void AsyncClient::setUserAgent(const std::string& userAgent)
-{
-    m_userAgent = userAgent;
-}
-
-const Credentials& AsyncClient::credentials() const
-{
-    return m_credentials;
-}
-
-void AsyncClient::setCredentials(const Credentials& credentials)
-{
-    m_credentials = credentials;
-}
-
-void AsyncClient::setProxyCredentials(const Credentials& credentials)
-{
-    m_proxyCredentials = credentials;
-}
-
-void AsyncClient::setProxyVia(
-    const SocketAddress& proxyEndpoint, bool isSecure, ssl::AdapterFunc adapterFunc)
-{
-    if (proxyEndpoint.isNull())
-    {
-        m_proxyEndpoint.reset();
-    }
-    else
-    {
-        NX_ASSERT(proxyEndpoint.port > 0);
-        m_proxyEndpoint = proxyEndpoint;
-        m_isProxySecure = isSecure;
-        m_proxyAdapterFunc = std::move(adapterFunc);
-    }
-}
-
-void AsyncClient::setDisablePrecalculatedAuthorization(bool val)
-{
-    m_precalculatedAuthorizationDisabled = val;
-}
-
-void AsyncClient::setSendTimeout(std::chrono::milliseconds sendTimeout)
-{
-    m_timeouts.sendTimeout = sendTimeout;
-}
-
-void AsyncClient::setResponseReadTimeout(
-    std::chrono::milliseconds _responseReadTimeout)
-{
-    m_timeouts.responseReadTimeout = _responseReadTimeout;
-}
-
-void AsyncClient::setMessageBodyReadTimeout(
-    std::chrono::milliseconds messageBodyReadTimeout)
-{
-    m_timeouts.messageBodyReadTimeout = messageBodyReadTimeout;
-}
-
-void AsyncClient::setTimeouts(const Timeouts& timeouts)
-{
-    m_timeouts = timeouts;
-}
-
 void AsyncClient::stopWhileInAioThread()
 {
     m_socket.reset();
@@ -591,7 +695,7 @@ void AsyncClient::stopWhileInAioThread()
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
     NX_VERBOSE(this, "Connect to %1%2 completed with result %3",
-        m_contentLocationUrl, m_proxyEndpoint ? " via proxy " + m_proxyEndpoint->toString() : "",
+        m_contentLocationUrl, proxyEndpoint() ? " via proxy " + proxyEndpoint()->toString() : "",
         errorCode);
 
     initializeMessagePipeline();
@@ -607,7 +711,7 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
     }
 
     NX_DEBUG(this, "Failed to establish TCP connection to %1%2. %3",
-        m_contentLocationUrl, m_proxyEndpoint ? " via proxy " + m_proxyEndpoint->toString() : "",
+        m_contentLocationUrl, proxyEndpoint() ? " via proxy " + proxyEndpoint()->toString() : "",
         SystemError::toString(errorCode));
 
     reportConnectionFailure(errorCode);
@@ -668,7 +772,7 @@ void AsyncClient::onRequestSent(SystemError::ErrorCode errorCode)
     }
 
     m_state = State::sReceivingResponse;
-    m_messagePipeline->startReadingConnection(m_timeouts.responseReadTimeout);
+    m_messagePipeline->startReadingConnection(timeouts().responseReadTimeout);
 }
 
 void AsyncClient::initializeMessagePipeline()
@@ -744,7 +848,7 @@ void AsyncClient::onMessageReceived(Message message)
 
     if (messageBodyAllowed && messageHasMessageBody)
     {
-        m_messagePipeline->setInactivityTimeout(m_timeouts.messageBodyReadTimeout);
+        m_messagePipeline->setInactivityTimeout(timeouts().messageBodyReadTimeout);
         m_state = State::sReadingMessageBody;
     }
 }
@@ -915,8 +1019,8 @@ void AsyncClient::sendRequestOverExternalConnection()
 bool AsyncClient::configureSocket(AbstractStreamSocket* connection)
 {
     if (!connection->setNonBlockingMode(true) ||
-        !connection->setSendTimeout(m_timeouts.sendTimeout) ||
-        !connection->setRecvTimeout(m_timeouts.responseReadTimeout))
+        !connection->setSendTimeout(timeouts().sendTimeout) ||
+        !connection->setRecvTimeout(timeouts().responseReadTimeout))
     {
         NX_VERBOSE(this, "Error configuring connection to %1. %2",
             m_contentLocationUrl, SystemError::getLastOSErrorText());
@@ -934,10 +1038,10 @@ void AsyncClient::initiateTcpConnection()
 
     SocketAddress remoteAddress;
     bool isSecureConnection = false;
-    if (m_proxyEndpoint)
+    if (proxyEndpoint())
     {
-        remoteAddress = *m_proxyEndpoint;
-        isSecureConnection = m_isProxySecure;
+        remoteAddress = *proxyEndpoint();
+        isSecureConnection = isProxySecure();
     }
     else
     {
@@ -954,7 +1058,7 @@ void AsyncClient::initiateTcpConnection()
         : SocketFactory::tcpClientIpVersion();
 
     m_socket =
-        SocketFactory::createStreamSocket(m_proxyEndpoint ? m_proxyAdapterFunc : m_adapterFunc,
+        SocketFactory::createStreamSocket(proxyEndpoint() ? proxyAdapterFunc() : m_adapterFunc,
             isSecureConnection, nx::network::NatTraversalSupport::enabled, ipVersion);
     m_socket->bindToAioThread(getAioThread());
     if (m_keepAliveOptions)
@@ -994,8 +1098,8 @@ void AsyncClient::resumeReading()
     if (m_readingCeased)
     {
         const auto timeout = (m_state == State::sReadingMessageBody)
-            ? m_timeouts.messageBodyReadTimeout
-            : m_timeouts.responseReadTimeout;
+            ? timeouts().messageBodyReadTimeout
+            : timeouts().responseReadTimeout;
 
         m_messagePipeline->startReadingConnection(timeout);
         m_readingCeased = false;
@@ -1037,7 +1141,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
                 m_ha1RecalcTried = true;
             }
 
-            if (!m_authorizationTried && (!m_credentials.username.empty() || !m_credentials.authToken.empty()))
+            if (!m_authorizationTried && (!credentials().username.empty() || !credentials().authToken.empty()))
             {
                 //trying authorization
                 if (resendRequestWithAuthorization(response))
@@ -1050,7 +1154,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
         case StatusCode::proxyAuthenticationRequired:
         {
             if (!m_proxyAuthorizationTried &&
-                (!m_proxyCredentials.username.empty() || !m_proxyCredentials.authToken.empty()))
+                (!proxyCredentials().username.empty() || !proxyCredentials().authToken.empty()))
             {
                 if (resendRequestWithAuthorization(response, true))
                     return true;
@@ -1074,7 +1178,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
 
 bool AsyncClient::sendRequestToNewLocation(const Response& response)
 {
-    if (m_numberOfRedirectsTried >= m_maxNumberOfRedirects)
+    if (m_numberOfRedirectsTried >= maxNumberOfRedirects())
         return false;
     ++m_numberOfRedirectsTried;
 
@@ -1112,14 +1216,26 @@ void AsyncClient::composeRequest(const Method& httpMethod)
 
     // Adding user credentials.
     if (!m_contentLocationUrl.userName().isEmpty())
-        m_credentials.username = m_contentLocationUrl.userName().toStdString();
+    {
+        auto tmp = credentials();
+        tmp.username = m_contentLocationUrl.userName().toStdString();
+        setCredentials(tmp);
+    }
     else
-        m_contentLocationUrl.setUserName(m_credentials.username);
+    {
+        m_contentLocationUrl.setUserName(credentials().username);
+    }
 
     if (!m_contentLocationUrl.password().isEmpty())
-        m_credentials.authToken.setPassword(m_contentLocationUrl.password().toStdString());
-    else if (m_credentials.authToken.isPassword())
-        m_contentLocationUrl.setPassword(m_credentials.authToken.value);
+    {
+        auto tmp = credentials();
+        tmp.authToken.setPassword(m_contentLocationUrl.password().toStdString());
+        setCredentials(tmp);
+    }
+    else if (credentials().authToken.isPassword())
+    {
+        m_contentLocationUrl.setPassword(credentials().authToken.value);
+    }
 
     prepareRequestHeaders(useHttp11, httpMethod);
 }
@@ -1130,7 +1246,7 @@ void AsyncClient::prepareRequestLine(
 {
     m_request.requestLine.method = httpMethod;
 
-    if (m_proxyEndpoint)
+    if (proxyEndpoint())
     {
         m_request.requestLine.url = m_contentLocationUrl;
     }
@@ -1157,12 +1273,12 @@ void AsyncClient::prepareRequestHeaders(
         &m_request.headers,
         HttpHeader(
             "User-Agent",
-            m_userAgent.empty() ? nx::network::http::userAgentString() : m_userAgent));
+            userAgent().empty() ? nx::network::http::userAgentString() : userAgent()));
     if (useHttp11)
     {
         if (httpMethod == nx::network::http::Method::get || httpMethod == nx::network::http::Method::head)
         {
-            if (m_contentEncodingUsed && m_additionalHeaders.count("Accept-Encoding") == 0)
+            if (useCompression() && additionalHeaders().count("Accept-Encoding") == 0)
             {
                 http::insertOrReplaceHeader(
                     &m_request.headers,
@@ -1170,22 +1286,22 @@ void AsyncClient::prepareRequestHeaders(
             }
         }
 
-        if (m_additionalHeaders.count("Connection") == 0)
+        if (additionalHeaders().count("Connection") == 0)
         {
             nx::network::http::insertOrReplaceHeader(
                 &m_request.headers,
                 HttpHeader("Connection", "keep-alive"));
         }
 
-        if (m_additionalHeaders.count("Host") == 0)
+        if (additionalHeaders().count("Host") == 0)
             insertOrReplaceHeader(&m_request.headers, header::Host(url::getEndpoint(m_contentLocationUrl)));
     }
 
     // It is not correct just to replace headers because there
     // could be multiple headers with same name in m_additionalHeaders.
-    for (const auto& header: m_additionalHeaders)
+    for (const auto& header: additionalHeaders())
         m_request.headers.erase(header.first);
-    m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
+    m_request.headers.insert(additionalHeaders().cbegin(), additionalHeaders().cend());
 
     addAppropriateAuthenticationInformation();
 }
@@ -1195,26 +1311,26 @@ void AsyncClient::addAppropriateAuthenticationInformation()
     // Adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and to 3.0
     // (generate user's digest after changing realm).
     // TODO: #akolesnikov Remove it after version prior to 3.0 support is over.
-    if (!m_credentials.username.empty() &&
+    if (!credentials().username.empty() &&
         m_request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME) == m_request.headers.end())
     {
         nx::network::http::insertOrReplaceHeader(
             &m_request.headers,
-            HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_credentials.username));
+            HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, credentials().username));
     }
 
-    if (m_proxyCredentials.authToken.isBearerToken())
+    if (proxyCredentials().authToken.isBearerToken())
     {
-        header::BearerAuthorization bearerAuthorization(m_proxyCredentials.authToken.value);
+        header::BearerAuthorization bearerAuthorization(proxyCredentials().authToken.value);
         nx::network::http::insertOrReplaceHeader(
             &m_request.headers,
             nx::network::http::HttpHeader(
                 header::kProxyAuthorization, bearerAuthorization.serialized()));
     }
 
-    if (m_credentials.authToken.isBearerToken())
+    if (credentials().authToken.isBearerToken())
     {
-        header::BearerAuthorization bearerAuthorization(m_credentials.authToken.value);
+        header::BearerAuthorization bearerAuthorization(credentials().authToken.value);
         nx::network::http::insertOrReplaceHeader(
             &m_request.headers,
             nx::network::http::HttpHeader(
@@ -1223,13 +1339,13 @@ void AsyncClient::addAppropriateAuthenticationInformation()
         return;
     }
 
-    if (m_precalculatedAuthorizationDisabled || m_credentials.username.empty())
+    if (disablePrecalculatedAuthorization() || credentials().username.empty())
         return;
 
     // Not using Basic authentication by default, since it is not secure.
     nx::network::http::removeHeader(&m_request.headers, header::Authorization::NAME);
 
-    if (m_authType == AuthType::authBasic && m_credentials.authToken.isPassword())
+    if (authType() == AuthType::authBasic && credentials().authToken.isPassword())
     {
         addBasicAuthorizationToRequest();
     }
@@ -1239,7 +1355,7 @@ void AsyncClient::addAppropriateAuthenticationInformation()
         const auto cachedServerResponse = AuthInfoCache::instance().getServerResponse(
             url::getEndpoint(m_contentLocationUrl),
             server::Role::resourceServer,
-            m_credentials.username);
+            credentials().username);
 
         if (cachedServerResponse &&
             cachedServerResponse->authScheme == header::AuthScheme::digest)
@@ -1247,7 +1363,7 @@ void AsyncClient::addAppropriateAuthenticationInformation()
             addDigestAuthorizationToRequest(
                 url::getEndpoint(m_contentLocationUrl),
                 server::Role::resourceServer,
-                m_credentials,
+                credentials(),
                 *cachedServerResponse,
                 header::Authorization::NAME);
         }
@@ -1286,26 +1402,6 @@ bool AsyncClient::isIgnoringCurrentMessage() const
         m_awaitedMessageNumber > m_messageReceivedThroughTheCurrentConnectionCount ||
         // Have already invoked "request completed" handler.
         m_lastReportedMessageNumber >= m_messageReceivedThroughTheCurrentConnectionCount;
-}
-
-void AsyncClient::addAdditionalHeader(const std::string& key, const std::string& value)
-{
-    m_additionalHeaders.emplace(key, value);
-}
-
-void AsyncClient::removeAdditionalHeader(const std::string& key)
-{
-    m_additionalHeaders.erase(key);
-}
-
-void AsyncClient::setAdditionalHeaders(HttpHeaders additionalHeaders)
-{
-    m_additionalHeaders = std::move(additionalHeaders);
-}
-
-void AsyncClient::addRequestHeaders(const HttpHeaders& headers)
-{
-    m_additionalHeaders.insert(headers.begin(), headers.end());
 }
 
 void AsyncClient::setCustomRequestPrepareFunc(CustomRequestPrepareFunc func)
@@ -1381,29 +1477,29 @@ bool AsyncClient::resendRequestWithAuthorization(
 
     const std::string authorizationHeaderName =
         isProxy ? std::string("Proxy-Authorization") : header::Authorization::NAME;
-    const auto credentials = isProxy ? m_proxyCredentials : m_credentials;
+    const auto credentialsToUse = isProxy ? proxyCredentials() : credentials();
 
-    auto wwwAuthenticateHeader = extractAuthenticateHeader(response.headers, isProxy, m_authType);
+    auto wwwAuthenticateHeader = extractAuthenticateHeader(response.headers, isProxy, authType());
     if (!wwwAuthenticateHeader)
         return false;
 
     if (wwwAuthenticateHeader->authScheme == header::AuthScheme::digest)
     {
-        const auto& serverEndpoint = isProxy && m_proxyEndpoint
-            ? *m_proxyEndpoint
+        const auto& serverEndpoint = isProxy && proxyEndpoint()
+            ? *proxyEndpoint()
             : url::getEndpoint(m_contentLocationUrl);
         const auto serverRole = isProxy ? server::Role::proxy : server::Role::resourceServer;
 
         AuthInfoCache::instance().cacheServerResponse(
             serverEndpoint,
             serverRole,
-            credentials.username,
+            credentialsToUse.username,
             *wwwAuthenticateHeader);
 
         if (!addDigestAuthorizationToRequest(
                 serverEndpoint,
                 serverRole,
-                credentials,
+            credentialsToUse,
                 *wwwAuthenticateHeader,
                 authorizationHeaderName))
         {
@@ -1411,7 +1507,7 @@ bool AsyncClient::resendRequestWithAuthorization(
         }
     }
     else if (wwwAuthenticateHeader->authScheme == header::AuthScheme::basic &&
-        (credentials.authToken.isPassword() || credentials.authToken.empty()))
+        (credentialsToUse.authToken.isPassword() || credentialsToUse.authToken.empty()))
     {
         addBasicAuthorizationToRequest();
     }
@@ -1465,8 +1561,8 @@ bool AsyncClient::addDigestAuthorizationToRequest(
 void AsyncClient::addBasicAuthorizationToRequest()
 {
     header::BasicAuthorization basicAuthorization(
-        m_credentials.username,
-        m_credentials.authToken.value);
+        credentials().username,
+        credentials().authToken.value);
     nx::network::http::insertOrReplaceHeader(
         &m_request.headers,
         nx::network::http::HttpHeader(
@@ -1480,7 +1576,7 @@ void AsyncClient::doSomeCustomLogic(
 {
     // TODO: #akolesnikov This method is not part of http, so it should not be in this class.
 
-    if (!m_credentials.authToken.isPassword())
+    if (!credentials().authToken.isPassword())
         return;
 
     auto realmIter = response.headers.find(Qn::REALM_HEADER_NAME);
@@ -1489,11 +1585,11 @@ void AsyncClient::doSomeCustomLogic(
 
     // Calculating user's digest with new realm.
     const auto newRealmDigest = calcHa1(
-        m_credentials.username,
+        credentials().username,
         realmIter->second,
-        m_credentials.authToken.value);
+        credentials().authToken.value);
     const auto cryptSha512Hash = nx::crypt::linuxCryptSha512(
-        QByteArray::fromStdString(m_credentials.authToken.value),
+        QByteArray::fromStdString(credentials().authToken.value),
         nx::crypt::generateSalt(nx::crypt::kLinuxCryptSaltLength));
 
     nx::network::http::insertOrReplaceHeader(
@@ -1532,11 +1628,6 @@ const char* AsyncClient::toString(State state)
     }
 }
 
-void AsyncClient::setAuthType(AuthType value)
-{
-    m_authType = value;
-}
-
 AsyncClient::Result AsyncClient::emitDone()
 {
     m_lastReportedMessageNumber = m_currentMessageNumber;
@@ -1556,11 +1647,6 @@ AsyncClient::Result AsyncClient::emitResponseReceived()
 AsyncClient::Result AsyncClient::emitSomeMessageBodyAvailable()
 {
     return invokeHandler(m_onSomeMessageBodyAvailable);
-}
-
-void AsyncClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)
-{
-    m_maxNumberOfRedirects = maxNumberOfRedirects;
 }
 
 template<typename ... Args>

@@ -5,6 +5,7 @@
 #include <nx/network/http/generic_api_client.h>
 
 #include "simple_service/service_launcher.h"
+#include "simple_service/view.h"
 
 namespace nx::network::http::test {
 
@@ -68,9 +69,12 @@ public:
     }
 
 public:
+    using Result = std::tuple<ResultType, http::server::test::Response>;
+
     std::unique_ptr<Client> m_client;
     SimpleServiceLauncher m_instance;
-    std::promise<ResultType> m_resultCode;
+    nx::utils::SyncQueue<Result> m_results;
+    std::optional<Result> m_lastResult;
 
 protected:
     virtual void SetUp() override
@@ -80,33 +84,29 @@ protected:
         m_initialHttpClientCount = SocketGlobals::instance().debugCounters().httpClientConnectionCount;
     }
 
-    void saveRequestResult(std::tuple<ResultType> response)
-    {
-        m_resultCode.set_value(std::get<0>(response));
-    }
-
     void whenPerformApiCall()
     {
-        m_client->makeAsyncCall<void>(
+        m_client->makeAsyncCall<http::server::test::Response>(
             nx::network::http::Method::get, kDefaultPath, [this](auto&&... args) {
                 // Using post to make sure that the completion handler has returned before saving the result.
                 m_client->post([this, args = std::make_tuple(std::forward<decltype(args)>(args)...)]() {
-                    std::apply(
-                        [this](auto&&... args) { saveRequestResult(std::forward<decltype(args)>(args)...); },
-                        std::move(args));
+                    m_results.push(std::move(args));
                 });
             });
     }
 
     void thenApiCallSucceeded()
     {
-        ASSERT_EQ(nx::network::http::StatusCode::ok, m_resultCode.get_future().get());
+        m_lastResult = m_results.pop();
+
+        ASSERT_EQ(nx::network::http::StatusCode::ok, std::get<0>(*m_lastResult));
     }
 
     void thenApiCallFail500()
     {
-        ASSERT_EQ(
-            nx::network::http::StatusCode::internalServerError, m_resultCode.get_future().get());
+        m_lastResult = m_results.pop();
+
+        ASSERT_EQ(nx::network::http::StatusCode::internalServerError, std::get<0>(*m_lastResult));
     }
 
     void andThenRetriesDone(int numRetries)
@@ -119,6 +119,21 @@ protected:
         ASSERT_EQ(
             count,
             SocketGlobals::instance().debugCounters().httpClientConnectionCount - m_initialHttpClientCount);
+    }
+
+    void andHttpRequestContainedHeaders(std::vector<HttpHeader> expectedHeaders)
+    {
+        Request request;
+        ASSERT_TRUE(request.parse(std::get<1>(*m_lastResult).httpRequest));
+
+        for (const auto& h: expectedHeaders)
+            ASSERT_EQ(h.second, getHeaderValue(request.headers, h.first));
+    }
+
+    void setCustomHeaders(std::vector<HttpHeader> headers)
+    {
+        for (const auto& h: headers)
+            m_client->httpClientOptions().addAdditionalHeader(h.first, h.second);
     }
 
 private:
@@ -165,6 +180,16 @@ TEST_F(GenericApiClient, internal_http_client_is_freed_after_request_completion)
 
     thenApiCallSucceeded();
     andHttpClientCountIs(0);
+}
+
+TEST_F(GenericApiClient, custom_headers_are_added_to_request)
+{
+    setCustomHeaders({{"X-Custom-Test", "foo"}});
+
+    whenPerformApiCall();
+
+    thenApiCallSucceeded();
+    andHttpRequestContainedHeaders({{"X-Custom-Test", "foo"}});
 }
 
 } // namespace nx::network::http::test
