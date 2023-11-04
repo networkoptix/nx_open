@@ -16,6 +16,8 @@ class QnSystemSettingsWidget;
 class QnGeneralSystemAdministrationWidget:
     public nx::vms::client::desktop::AbstractSystemSettingsWidget
 {
+    Q_OBJECT
+
 public:
     QnGeneralSystemAdministrationWidget(
         nx::vms::api::SaveableSystemSettings* editableSystemSettings,
