@@ -34,13 +34,20 @@ std::vector<network::SocketAddress> View::httpEndpoints() const
 }
 
 void View::doResponse(
-    nx::network::http::RequestContext /*requestContext*/,
+    nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     ++m_curAttemptNum;
     if (m_curAttemptNum == m_successAttemptNum)
-        return completionHandler(
-            nx::network::http::RequestResult(nx::network::http::StatusCode::ok));
+    {
+        Response response{.httpRequest = requestContext.request.toString()};
+
+        nx::network::http::RequestResult reply(nx::network::http::StatusCode::ok);
+        reply.body = std::make_unique<BufferSource>(
+            "application/json",
+            nx::reflect::json::serialize(response));
+        return completionHandler(std::move(reply));
+    }
     else
     {
         completionHandler(

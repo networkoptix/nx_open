@@ -24,21 +24,11 @@
 namespace nx::network::http {
 
 /**
- * HTTP client. All operations are done asynchronously.
- *
- * All events (setOn...) are delivered within object's aio thread.
- * State is changed just before delivering event.
- * This class methods are not thread-safe.
- * NOTE: This class is a replacement for nx::network::http::AsyncHttpClient.
- * WARNING: It is strongly recommended to listen for someMessageBodyAvailable() event and
- *   read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
- *   to avoid internal message body buffer consuming too much memory.
+ * Accumulates HTTP client options. Should be used to provide HTTP options in classes that use
+ * nx::network::http::AsyncClient internaly without providing direct access to it.
  */
-class NX_NETWORK_API AsyncClient:
-    public nx::network::aio::BasicPollable
+class NX_NETWORK_API ClientOptions
 {
-    using base_type = nx::network::aio::BasicPollable;
-
 public:
     /**
      * 0 means infinity for any timeout.
@@ -63,12 +53,111 @@ public:
         static void setDefaults(Timeouts value);
     };
 
-    using CustomRequestPrepareFunc = nx::utils::MoveOnlyFunc<void(Request* request)>;
-
     static constexpr Timeouts kInfiniteTimeouts = {
         std::chrono::milliseconds::zero(),
         std::chrono::milliseconds::zero(),
-        std::chrono::milliseconds::zero()};
+        std::chrono::milliseconds::zero() };
+
+    /** By default, entity compression is on. */
+    void setUseCompression(bool toggleUseEntityEncoding);
+    bool useCompression() const;
+
+    void setSubsequentReconnectTries(int reconnectTries);
+    int subsequentReconnectTries() const;
+
+    void setTotalReconnectTries(int reconnectTries);
+    int totalReconnectTries() const;
+
+    void setUserAgent(const std::string& userAgent);
+    const std::string& userAgent() const;
+
+    void setProxyCredentials(const Credentials& credentials);
+    const Credentials& proxyCredentials() const;
+
+    void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure, ssl::AdapterFunc adapterFunc);
+    const std::optional<SocketAddress>& proxyEndpoint() const;
+    bool isProxySecure() const;
+    const ssl::AdapterFunc& proxyAdapterFunc() const;
+
+    /** If set to true client will not try to add Authorization header to the first request. false by default. */
+    void setDisablePrecalculatedAuthorization(bool val);
+    bool disablePrecalculatedAuthorization() const;
+
+    /** Set socket connect/send timeout. */
+    void setSendTimeout(std::chrono::milliseconds sendTimeout);
+
+    /**
+     * @param responseReadTimeoutMs 0 means infinity.
+     * By default, 3000 ms.
+     * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
+     */
+    void setResponseReadTimeout(std::chrono::milliseconds responseReadTimeout);
+
+    /**
+     * @param messageBodyReadTimeoutMs 0 means infinity.
+     * By default there is no timeout.
+     * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
+     */
+    void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
+
+    void setTimeouts(const Timeouts& timeouts);
+    const Timeouts& timeouts() const;
+
+    void addAdditionalHeader(const std::string& key, const std::string& value);
+    void addRequestHeaders(const HttpHeaders& headers);
+    void removeAdditionalHeader(const std::string& key);
+    void setAdditionalHeaders(HttpHeaders additionalHeaders);
+    const HttpHeaders& additionalHeaders() const;
+
+    void setMaxNumberOfRedirects(int maxNumberOfRedirects);
+    int maxNumberOfRedirects() const;
+
+    void setAuthType(AuthType value);
+    AuthType authType() const;
+
+    void setCredentials(const Credentials& credentials);
+    const Credentials& credentials() const;
+
+    void assignOptions(const ClientOptions& other);
+
+private:
+    bool m_contentEncodingUsed = true;
+    int m_subsequentReconnectTries = 1;
+    int m_totalReconnectTries = 1;
+    std::string m_userAgent;
+    Credentials m_credentials;
+    Credentials m_proxyCredentials;
+    std::optional<SocketAddress> m_proxyEndpoint;
+    ssl::AdapterFunc m_proxyAdapterFunc = ssl::kDefaultCertificateCheck;
+    bool m_isProxySecure = false;
+    Timeouts m_timeouts;
+    AuthType m_authType = AuthType::authBasicAndDigest;
+    HttpHeaders m_additionalHeaders;
+    bool m_precalculatedAuthorizationDisabled = false;
+    int m_maxNumberOfRedirects = 5;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * HTTP client. All operations are done asynchronously.
+ *
+ * All events (setOn...) are delivered within object's aio thread.
+ * State is changed just before delivering event.
+ * This class methods are not thread-safe.
+ * NOTE: This class is a replacement for nx::network::http::AsyncHttpClient.
+ * WARNING: It is strongly recommended to listen for someMessageBodyAvailable() event and
+ *   read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
+ *   to avoid internal message body buffer consuming too much memory.
+ */
+class NX_NETWORK_API AsyncClient:
+    public nx::network::aio::BasicPollable,
+    public ClientOptions
+{
+    using base_type = nx::network::aio::BasicPollable;
+
+public:
+    using CustomRequestPrepareFunc = nx::utils::MoveOnlyFunc<void(Request* request)>;
 
     static constexpr int UNLIMITED_RECONNECT_TRIES = -1;
 
@@ -262,40 +351,6 @@ public:
      */
     quint64 bytesRead() const;
 
-    /** By default, entity compression is on. */
-    void setUseCompression(bool toggleUseEntityEncoding);
-    void setSubsequentReconnectTries(int reconnectTries);
-    void setTotalReconnectTries(int reconnectTries);
-    void setUserAgent(const std::string& userAgent);
-
-    void setProxyCredentials(const Credentials& credentials);
-    void setKeepAlive(const KeepAliveOptions& keepAliveOptions);
-
-    void setProxyVia(
-        const SocketAddress& proxyEndpoint, bool isSecure, ssl::AdapterFunc adapterFunc);
-
-    /** If set to true client will not try to add Authorization header to the first request. false by default. */
-    void setDisablePrecalculatedAuthorization(bool val);
-
-    /** Set socket connect/send timeout. */
-    void setSendTimeout(std::chrono::milliseconds sendTimeout);
-
-    /**
-     * @param responseReadTimeoutMs 0 means infinity.
-     * By default, 3000 ms.
-     * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
-     */
-    void setResponseReadTimeout(std::chrono::milliseconds responseReadTimeout);
-
-    /**
-     * @param messageBodyReadTimeoutMs 0 means infinity.
-     * By default there is no timeout.
-     * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
-     */
-    void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
-
-    void setTimeouts(const Timeouts& timeouts);
-
     const std::unique_ptr<AbstractStreamSocket>& socket();
 
     /**
@@ -304,24 +359,13 @@ public:
      */
     std::unique_ptr<AbstractStreamSocket> takeSocket();
 
-    void addAdditionalHeader(const std::string& key, const std::string& value);
-    void addRequestHeaders(const HttpHeaders& headers);
-    void removeAdditionalHeader(const std::string& key);
-    void setAdditionalHeaders(HttpHeaders additionalHeaders);
-
     /**
      * @param func Invoked after fully preparing request to be sent.
      */
     void setCustomRequestPrepareFunc(CustomRequestPrepareFunc func);
-
-    void setAuthType(AuthType value);
-
-    const Credentials& credentials() const;
-    void setCredentials(const Credentials& credentials);
+    void setKeepAlive(const KeepAliveOptions& keepAliveOptions);
 
     static std::string endpointWithProtocol(const nx::utils::Url& url);
-
-    void setMaxNumberOfRedirects(int maxNumberOfRedirects);
 
     int totalRequestsSentViaCurrentConnection() const;
     int totalRequestsSent() const;
@@ -387,22 +431,12 @@ private:
     std::unique_ptr<AsyncMessagePipeline> m_messagePipeline;
     nx::utils::Url m_requestUrl;
     nx::utils::Url m_contentLocationUrl;
-    std::string m_userAgent;
-    Credentials m_credentials;
-    Credentials m_proxyCredentials;
-    std::optional<SocketAddress> m_proxyEndpoint;
-    ssl::AdapterFunc m_proxyAdapterFunc = ssl::kDefaultCertificateCheck;
-    bool m_isProxySecure = false;
     bool m_authorizationTried = false;
     bool m_proxyAuthorizationTried = false;
     bool m_ha1RecalcTried = false;
     int m_totalRequestsSentViaCurrentConnection = 0;
     int m_totalRequestsSent = 0;
     int m_totalRequestsScheduled = 0;
-    bool m_contentEncodingUsed = true;
-    Timeouts m_timeouts;
-    AuthType m_authType = AuthType::authBasicAndDigest;
-    HttpHeaders m_additionalHeaders;
     CustomRequestPrepareFunc m_customRequestPrepareFunc;
     int m_messageReceivedThroughTheCurrentConnectionCount = 0;
     int m_currentMessageNumber = 0;
@@ -411,11 +445,9 @@ private:
     std::string m_remoteEndpointWithProtocol;
     SystemError::ErrorCode m_lastSysErrorCode = SystemError::noError;
     int m_requestSequence = 0;
-    bool m_precalculatedAuthorizationDisabled = false;
     int m_numberOfRedirectsTried = 0;
     nx::utils::InterruptionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
-    int m_maxNumberOfRedirects = 5;
     bool m_readingCeased = false;
     bool m_isPersistentConnection = false;
     int m_closeHandlerId = -1;
