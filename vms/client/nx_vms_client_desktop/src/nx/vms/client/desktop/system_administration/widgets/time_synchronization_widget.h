@@ -17,6 +17,7 @@ class TimeSynchronizationServersDelegate;
 
 class TimeSynchronizationWidget: public AbstractSystemSettingsWidget
 {
+    Q_OBJECT
     using base_type = AbstractSystemSettingsWidget;
 
 public:

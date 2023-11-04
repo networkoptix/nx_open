@@ -13,6 +13,8 @@ namespace Ui { class SystemSettingsWidget; }
 class QnSystemSettingsWidget:
     public nx::vms::client::desktop::AbstractSystemSettingsWidget
 {
+    Q_OBJECT
+
 public:
     QnSystemSettingsWidget(
         nx::vms::api::SaveableSystemSettings* editableSystemSettings,
