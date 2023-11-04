@@ -2056,13 +2056,6 @@
     </message>
 </context>
 <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-        <source>Attention! Power limit exceeded</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>PopupBusinessActionWidget</name>
     <message>
         <source>Force Acknowledgment</source>
@@ -2574,14 +2567,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Encrypting video traffic will significantly increase CPU usage.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connection with cameras that do not support HTTPS will be lost.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Force servers to accept only encrypted connections</source>
         <translation></translation>
     </message>
@@ -2641,14 +2626,6 @@
     </message>
     <message>
         <source>Details</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pin to this certificate</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>View pinned certificate</source>
         <translation></translation>
     </message>
 </context>
@@ -2793,22 +2770,6 @@
     </message>
     <message>
         <source>Reindex Backup</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Recording was enabled on the USB storage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
         <translation></translation>
     </message>
 </context>

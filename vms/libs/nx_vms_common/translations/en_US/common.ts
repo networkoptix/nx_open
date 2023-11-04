@@ -202,28 +202,28 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</source>
-        <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Members of this group can view and export archive and Bookmarks.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Members of this group can view live videos, I/O modules and web pages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Members of this group can view System Health Monitoring information.</source>
+        <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1570,10 +1570,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>RTP retry count</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>RTP timeout (milliseconds)</source>
         <translation></translation>
     </message>
@@ -1786,11 +1782,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
-        <comment>%1 is a company name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1800,6 +1791,19 @@
     </message>
     <message>
         <source>Enable deprecated API functions (insecure)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel partners service</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+        <comment>%1 is a company name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
