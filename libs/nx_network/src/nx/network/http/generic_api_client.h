@@ -63,15 +63,22 @@ public:
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
+    // Deprecated. Use httpClientOptions().setTimeouts() instead.
     void setRequestTimeout(std::optional<std::chrono::milliseconds> timeout);
-    void setRetryPolicy(unsigned numOfRetries, ResultType res);
 
+    void setRetryPolicy(unsigned numOfRetries, ResultType res);
     void setRetryPolicy(
         unsigned numOfRetries,
         nx::utils::MoveOnlyFunc<bool(ResultType)> requestSuccessed);
 
+    // Deprecated. Use httpClientOptions().setCredentials() instead.
     void setHttpCredentials(Credentials credentials);
     std::optional<Credentials> getHttpCredentials() const;
+
+    /**
+     * Full set of HTTP client options that are set on every request.
+     */
+    ClientOptions& httpClientOptions() { return this->m_clientOptions; }
 
 protected:
     /**
@@ -83,14 +90,6 @@ protected:
         const network::http::Method& method,
         const std::string& requestPath,
         const nx::utils::UrlQuery& urlQuery,
-        InputArgsAndCompletionHandler&&... args);
-
-    template<typename OutputData, typename... InputArgsAndCompletionHandler>
-    void makeAsyncCall(
-        const network::http::Method& method,
-        const std::string& requestPath,
-        const nx::utils::UrlQuery& urlQuery,
-        network::http::Credentials credentials,
         InputArgsAndCompletionHandler&&... args);
 
     template<
@@ -111,7 +110,6 @@ protected:
         const network::http::Method& method,
         const std::string& requestPath,
         const nx::utils::UrlQuery& urlQuery,
-        network::http::Credentials credentials,
         InputTuple&& argsTuple,
         unsigned attemptNum,
         Handler handler);
@@ -138,15 +136,12 @@ private:
     std::map<network::aio::BasicPollable*, Context> m_activeRequests;
     nx::Mutex m_mutex;
     std::optional<std::chrono::milliseconds> m_requestTimeout;
-    std::optional<Credentials> m_credentials;
     unsigned int m_numRetries = 1;
     std::optional<nx::utils::MoveOnlyFunc<bool(ResultType)>> m_isRequestSucceeded;
+    ClientOptions m_clientOptions;
 
     template<typename Output, typename SerializationLibWrapper, typename... Args>
-    auto createHttpClient(
-        const nx::utils::Url& url,
-        network::http::Credentials credentials,
-        Args&&... args);
+    auto createHttpClient(const nx::utils::Url& url, Args&&... args);
 
     template<typename Request, typename CompletionHandler, typename... Output>
     void processResponse(
@@ -242,13 +237,14 @@ void GenericApiClient<ResultCode, Base>::setRetryPolicy(
 template<HasResultCodeT ResultCode, typename Base>
 void GenericApiClient<ResultCode, Base>::setHttpCredentials(Credentials credentials)
 {
-    m_credentials = std::move(credentials);
+    m_clientOptions.setCredentials(std::move(credentials));
 }
 
 template<HasResultCodeT ResultCode, typename Base>
 std::optional<Credentials> GenericApiClient<ResultCode, Base>::getHttpCredentials() const
 {
-    return m_credentials;
+    return !m_clientOptions.credentials().username.empty()
+        ? std::make_optional(m_clientOptions.credentials()) : std::nullopt;
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
@@ -267,23 +263,6 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
     const nx::utils::UrlQuery& urlQuery,
     InputArgsAndCompletionHandler&&... args)
 {
-    this->makeAsyncCall<Output>(
-        method,
-        requestPath,
-        urlQuery,
-        m_credentials ? *m_credentials : network::http::Credentials(),
-        std::forward<InputArgsAndCompletionHandler>(args)...);
-}
-
-template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-template<typename Output, typename... InputArgsAndCompletionHandler>
-inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
-    const network::http::Method& method,
-    const std::string& requestPath,
-    const nx::utils::UrlQuery& urlQuery,
-    network::http::Credentials credentials,
-    InputArgsAndCompletionHandler&&... args)
-{
     static_assert(sizeof...(args) > 0);
 
     auto argsTuple = nx::utils::make_tuple_from_arg_range<0, sizeof...(args) - 1>(
@@ -296,7 +275,6 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
         method,
         requestPath,
         urlQuery,
-        std::move(credentials),
         std::move(argsTuple),
         1,
         std::move(handler));
@@ -308,17 +286,15 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
     const network::http::Method& method,
     const std::string& requestPath,
     const nx::utils::UrlQuery& urlQuery,
-    network::http::Credentials credentials,
     InputTuple&& argsTuple,
     unsigned attemptNum,
     Handler handler)
 {
     auto request = std::apply(
-        [this, &requestPath, &urlQuery, &credentials](auto&&... inputArgs)
+        [this, &requestPath, &urlQuery](auto&&... inputArgs)
         {
             return this->template createHttpClient<Output, SerializationLibWrapper>(
                 network::url::Builder(m_baseApiUrl).appendPath(requestPath).setQuery(urlQuery),
-                credentials,
                 std::forward<decltype(inputArgs)>(inputArgs)...);
         },
         argsTuple);
@@ -329,7 +305,6 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
         method,
         requestPath,
         urlQuery,
-        credentials = std::move(credentials),
         attemptNum](ResultType result, auto&&... outArgs) mutable
     {
         if (m_isRequestSucceeded && !(*m_isRequestSucceeded)(result) && attemptNum < m_numRetries)
@@ -338,7 +313,6 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
                 method,
                 requestPath,
                 urlQuery,
-                std::move(credentials),
                 std::move(argsTuple),
                 ++attemptNum,
                 std::move(handler));
@@ -366,7 +340,6 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
         method,
         requestPath,
         nx::utils::UrlQuery(),
-        m_credentials ? *m_credentials : network::http::Credentials(),
         std::forward<InputArgsAndCompletionHandler>(args)...);
 }
 
@@ -395,15 +368,17 @@ const utils::Url& GenericApiClient<ApiResultCodeDescriptor, Base>::baseApiUrl() 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename SerializationLibWrapper, typename... Args>
 auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
-    const nx::utils::Url& url, network::http::Credentials credentials, Args&&... args)
+    const nx::utils::Url& url,
+    Args&&... args)
 {
     using InputParamType = nx::utils::tuple_first_element_t<std::tuple<std::decay_t<Args>...>>;
 
-    auto httpClient =
-        std::make_unique<
-            network::http::FusionDataHttpClient<InputParamType, Output, SerializationLibWrapper>>(
-                url, std::move(credentials), m_adapterFunc, std::forward<Args>(args)...);
+    auto httpClient = std::make_unique<
+        network::http::FusionDataHttpClient<InputParamType, Output, SerializationLibWrapper>>(
+            url, http::Credentials(), m_adapterFunc, std::forward<Args>(args)...);
     httpClient->bindToAioThread(this->getAioThread());
+
+    httpClient->httpClient().assignOptions(m_clientOptions);
 
     if (m_requestTimeout)
         httpClient->setRequestTimeout(*m_requestTimeout);
