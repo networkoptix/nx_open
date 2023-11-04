@@ -279,6 +279,187 @@ public:
         }
     }
 
+    static Qt::CheckState combinedOwnCheckState(
+        const ResourceAccessMap& accessMap,
+        const QModelIndexList& indexes,
+        AccessRight accessRight)
+    {
+        int total = 0;
+        int checked = 0;
+
+        for (const auto& index: indexes)
+        {
+            if (!index.isValid())
+                continue;
+
+            const auto target = accessTarget(index);
+
+            if (!target.isValid()) //< Simple grouping node.
+            {
+                QModelIndexList children;
+                const auto model = index.model();
+                const int childCount = model->rowCount(index);
+
+                for (int i = 0; i < childCount; ++i)
+                    children.push_back(model->index(i, 0, index));
+
+                total += childCount;
+                switch (combinedOwnCheckState(accessMap, children, accessRight))
+                {
+                    case Qt::PartiallyChecked: //< Do early return, if possible.
+                        return Qt::PartiallyChecked;
+
+                    case Qt::Checked:
+                        checked += childCount;
+                        break;
+
+                    case Qt::Unchecked:
+                        break;
+
+                    default:
+                        NX_ASSERT(false);
+                        break;
+                }
+
+                continue;
+            }
+
+            if (!relevantAccessRights(target).testFlag(accessRight))
+                continue;
+
+            ++total;
+
+            if (target.resource())
+            {
+                if (const auto groupId = specialResourceGroupFor(target.resource()); !groupId.isNull())
+                {
+                    if (accessMap.value(groupId).testFlag(accessRight))
+                    {
+                        ++checked;
+                        continue;
+                    }
+                }
+            }
+
+            if (accessMap.value(target.id()).testFlag(accessRight))
+                ++checked;
+
+            if (checked > 0 && checked < total) //< Do early return, if possible.
+                return Qt::PartiallyChecked;
+        }
+
+        return (checked < total || total == 0)
+            ? (checked > 0 ? Qt::PartiallyChecked : Qt::Unchecked)
+            : Qt::Checked;
+    }
+
+    void modifyAccessRight(ResourceAccessMap& accessMap, const QModelIndex& objectIndex,
+        AccessRight accessRight, bool value, bool withDependentAccessRights) const
+    {
+        const auto item = resourceAccessTreeItemInfo(objectIndex);
+        const auto toggledRight = static_cast<AccessRight>(accessRight);
+        const auto objectName = objectIndex.data(Qt::DisplayRole).toString();
+        const auto logValue = [](bool value) { return value ? "on" : "off"; };
+
+        NX_VERBOSE(q, "Toggle `%1` %2 for \"%3\"", toggledRight, logValue(value), objectName);
+
+        const auto outerGroupAccessRights = item.outerSpecialResourceGroupId.isNull()
+            ? AccessRights{}
+            : accessMap.value(item.outerSpecialResourceGroupId);
+
+        const Qt::CheckState oldCheckState = combinedOwnCheckState(accessMap, {objectIndex},
+            (AccessRight) accessRight);
+
+        const bool itemWasChecked = oldCheckState == Qt::Checked;
+        const bool outerGroupWasChecked = outerGroupAccessRights.testFlag(toggledRight);
+
+        if (oldCheckState != Qt::PartiallyChecked && itemWasChecked == value)
+        {
+            NX_VERBOSE(q, "Already toggled %1, nothing to do", logValue(value));
+            return;
+        }
+
+        NX_VERBOSE(q, "Relevant access rights: `%1`", item.relevantAccessRights);
+
+        if (!item.relevantAccessRights.testFlag(toggledRight))
+            return;
+
+        AccessRights toggledMask = toggledRight;
+        if (withDependentAccessRights)
+        {
+            toggledMask |= (value
+                ? (requiredAccessRights(toggledRight) & item.relevantAccessRights)
+                : dependentAccessRights(toggledRight));
+        }
+
+        NX_VERBOSE(q, "Access rights to toggle %1: `%2`", logValue(value), toggledMask);
+
+        if (item.type == ResourceAccessTreeItem::Type::specialResourceGroup)
+        {
+            // If we're toggling a special group off, we must explicitly toggle its children off.
+            // If we're toggling a special group on, we also must explicitly toggle its children off,
+            // except access rights required for other set access rights.
+
+            if (value)
+            {
+                for (const auto& resource: q->getGroupResources(item.target.id()))
+                {
+                    const auto resourceId = resource->getId();
+                    const auto toKeep = accessMap.value(resourceId) & ~toggledMask;
+                    const auto toClear = toggledMask & ~Private::withRequirements(toKeep);
+
+                    if (toClear)
+                    {
+                        NX_VERBOSE(q, "Toggling off `%1` for %2", toClear, resource);
+                        modifyAccessRightMap(accessMap, resourceId, toClear, false);
+                    }
+                }
+            }
+            else
+            {
+                NX_VERBOSE(q, "Toggling off `%1` for all group's children", toggledMask);
+
+                for (const auto& resource: q->getGroupResources(item.target.id()))
+                    modifyAccessRightMap(accessMap, resource->getId(), toggledMask, false);
+            }
+        }
+
+        if (outerGroupWasChecked)
+        {
+            // If we're toggling off an item that was implicitly toggled on by its group,
+            // we must toggle the group off, and explicitly toggle all its children on.
+
+            NX_VERBOSE(q,
+                "`%1` was toggled on for the outer group %2; toggling it on for all its children",
+                toggledMask, item.outerSpecialResourceGroupId);
+
+            for (const auto& resource: q->getGroupResources(item.outerSpecialResourceGroupId))
+            {
+                modifyAccessRightMap(
+                    accessMap, resource->getId(), toggledMask & outerGroupAccessRights, true);
+            }
+
+            NX_VERBOSE(q, "Toggling off `%1` for the outer group %2", toggledMask,
+                item.outerSpecialResourceGroupId);
+            modifyAccessRightMap(accessMap, item.outerSpecialResourceGroupId, toggledMask, false);
+        }
+
+        if (item.target.isValid())
+        {
+            // Toggle the item.
+            NX_VERBOSE(q, "Toggling %1 `%2` for %3", logValue(value), toggledMask, item.target);
+            modifyAccessRightMap(accessMap, item.target.id(), toggledMask, value);
+        }
+        else
+        {
+            // If we're toggling a grouping node on or off, we just toggle its children on or off.
+            NX_VERBOSE(q, "Toggling %1 `%2` for group's children", logValue(value), toggledMask);
+
+            for (const auto& resource: getChildResources(objectIndex))
+                modifyAccessRightMap(accessMap, resource->getId(), toggledMask, value);
+        }
+    }
+
     static AccessRights withRequirements(AccessRights for_)
     {
         if (!for_)
@@ -642,74 +823,7 @@ void AccessSubjectEditingContext::modifyAccessRightMap(
 Qt::CheckState AccessSubjectEditingContext::combinedOwnCheckState(
     const QModelIndexList& indexes, AccessRight accessRight) const
 {
-    int total = 0;
-    int checked = 0;
-    const auto accessRightMap = ownResourceAccessMap();
-
-    for (const auto& index: indexes)
-    {
-        if (!index.isValid())
-            continue;
-
-        const auto target = accessTarget(index);
-
-        if (!target.isValid()) //< Simple grouping node.
-        {
-            QModelIndexList children;
-            const auto model = index.model();
-            const int childCount = model->rowCount(index);
-
-            for (int i = 0; i < childCount; ++i)
-                children.push_back(model->index(i, 0, index));
-
-            total += childCount;
-            switch (combinedOwnCheckState(children, accessRight))
-            {
-                case Qt::PartiallyChecked: //< Do early return, if possible.
-                    return Qt::PartiallyChecked;
-
-                case Qt::Checked:
-                    checked += childCount;
-                    break;
-
-                case Qt::Unchecked:
-                    break;
-
-                default:
-                    NX_ASSERT(false);
-                    break;
-            }
-
-            continue;
-        }
-
-        if (!relevantAccessRights(target).testFlag(accessRight))
-            continue;
-
-        ++total;
-
-        if (target.resource())
-        {
-            if (const auto groupId = specialResourceGroupFor(target.resource()); !groupId.isNull())
-            {
-                if (accessRightMap.value(groupId).testFlag(accessRight))
-                {
-                    ++checked;
-                    continue;
-                }
-            }
-        }
-
-        if (accessRightMap.value(target.id()).testFlag(accessRight))
-            ++checked;
-
-        if (checked > 0 && checked < total) //< Do early return, if possible.
-            return Qt::PartiallyChecked;
-    }
-
-    return (checked < total || total == 0)
-        ? (checked > 0 ? Qt::PartiallyChecked : Qt::Unchecked)
-        : Qt::Checked;
+    return d->combinedOwnCheckState(ownResourceAccessMap(), indexes, accessRight);
 }
 
 QnResourceList AccessSubjectEditingContext::getGroupResources(const QnUuid& resourceGroupId) const
@@ -759,125 +873,26 @@ void AccessSubjectEditingContext::modifyAccessRight(const QModelIndex& objectInd
 void AccessSubjectEditingContext::modifyAccessRight(const QModelIndex& objectIndex,
     AccessRight accessRight, bool value, bool withDependentAccessRights)
 {
-    const auto item = resourceAccessTreeItemInfo(objectIndex);
-    const auto toggledRight = static_cast<AccessRight>(accessRight);
-    const auto objectName = objectIndex.data(Qt::DisplayRole).toString();
-    const auto logValue = [](bool value) { return value ? "on" : "off"; };
-
-    NX_VERBOSE(this, "Toggle `%1` %2 for \"%3\"", toggledRight, logValue(value), objectName);
-
     auto accessMap = ownResourceAccessMap();
-
-    const auto outerGroupAccessRights = item.outerSpecialResourceGroupId.isNull()
-        ? AccessRights{}
-        : accessMap.value(item.outerSpecialResourceGroupId);
-
-    const Qt::CheckState oldCheckState = combinedOwnCheckState({objectIndex},
-        (AccessRight) accessRight);
-
-    const bool itemWasChecked = oldCheckState == Qt::Checked;
-    const bool outerGroupWasChecked = outerGroupAccessRights.testFlag(toggledRight);
-
-    if (oldCheckState != Qt::PartiallyChecked && itemWasChecked == value)
-    {
-        NX_VERBOSE(this, "Already toggled %1, nothing to do", logValue(value));
-        return;
-    }
-
-    NX_VERBOSE(this, "Relevant access rights: `%1`", item.relevantAccessRights);
-
-    if (!item.relevantAccessRights.testFlag(toggledRight))
-        return;
-
-    AccessRights toggledMask = toggledRight;
-    if (withDependentAccessRights)
-    {
-        toggledMask |= (value
-            ? (requiredAccessRights(toggledRight) & item.relevantAccessRights)
-            : dependentAccessRights(toggledRight));
-    }
-
-    NX_VERBOSE(this, "Access rights to toggle %1: `%2`", logValue(value), toggledMask);
-
-    if (item.type == ResourceAccessTreeItem::Type::specialResourceGroup)
-    {
-        // If we're toggling a special group off, we must explicitly toggle its children off.
-        // If we're toggling a special group on, we also must explicitly toggle its children off,
-        // except access rights required for other set access rights.
-
-        if (value)
-        {
-            for (const auto& resource: getGroupResources(item.target.id()))
-            {
-                const auto resourceId = resource->getId();
-                const auto toKeep = accessMap.value(resourceId) & ~toggledMask;
-                const auto toClear = toggledMask & ~Private::withRequirements(toKeep);
-
-                if (toClear)
-                {
-                    NX_VERBOSE(this, "Toggling off `%1` for %2", toClear, resource);
-                    modifyAccessRightMap(accessMap, resourceId, toClear, false);
-                }
-            }
-        }
-        else
-        {
-            NX_VERBOSE(this, "Toggling off `%1` for all group's children", toggledMask);
-
-            for (const auto& resource: getGroupResources(item.target.id()))
-                modifyAccessRightMap(accessMap, resource->getId(), toggledMask, false);
-        }
-    }
-
-    if (outerGroupWasChecked)
-    {
-        // If we're toggling off an item that was implicitly toggled on by its group,
-        // we must toggle the group off, and explicitly toggle all its children on.
-
-        NX_VERBOSE(this,
-            "`%1` was toggled on for the outer group %2; toggling it on for all its children",
-            toggledMask, item.outerSpecialResourceGroupId);
-
-        for (const auto& resource: getGroupResources(item.outerSpecialResourceGroupId))
-        {
-            modifyAccessRightMap(
-                accessMap, resource->getId(), toggledMask & outerGroupAccessRights, true);
-        }
-
-        NX_VERBOSE(this, "Toggling off `%1` for the outer group %2", toggledMask,
-            item.outerSpecialResourceGroupId);
-        modifyAccessRightMap(accessMap, item.outerSpecialResourceGroupId, toggledMask, false);
-    }
-
-    if (item.target.isValid())
-    {
-        // Toggle the item.
-        NX_VERBOSE(this, "Toggling %1 `%2` for %3", logValue(value), toggledMask, item.target);
-        modifyAccessRightMap(accessMap, item.target.id(), toggledMask, value);
-    }
-    else
-    {
-        // If we're toggling a grouping node on or off, we just toggle its children on or off.
-        NX_VERBOSE(this, "Toggling %1 `%2` for group's children", logValue(value), toggledMask);
-
-        for (const auto& resource: getChildResources(objectIndex))
-            modifyAccessRightMap(accessMap, resource->getId(), toggledMask, value);
-    }
-
+    d->modifyAccessRight(accessMap, objectIndex, accessRight, value, withDependentAccessRights);
     setOwnResourceAccessMap(accessMap);
 }
 
 void AccessSubjectEditingContext::modifyAccessRights(const QModelIndexList& indexes,
     AccessRights modifiedRightsMask, bool value, bool withDependent)
 {
+    auto accessMap = ownResourceAccessMap();
+
     for (unsigned int i = 1; i != 0; i <<= 1)
     {
         if ((i & modifiedRightsMask) == 0)
             continue;
 
         for (const auto& index: indexes)
-            modifyAccessRight(index, i, value, withDependent);
+            d->modifyAccessRight(accessMap, index, (AccessRight) i, value, withDependent);
     }
+
+    setOwnResourceAccessMap(accessMap);
 }
 
 AccessRights AccessSubjectEditingContext::dependentAccessRights(AccessRight dependingOn)
