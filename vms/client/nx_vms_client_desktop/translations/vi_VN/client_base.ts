@@ -11460,7 +11460,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Change search criteria or create a new user</source>
-      <translation type="unfinished">Change search criteria or create a new user</translation>
+      <translation>Thay đổi tiêu chí tìm kiếm hoặc tạo người dùng mới</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -11468,34 +11468,34 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+      <translation>Nhiều người dùng sử dụng cùng một thông tin đăng nhập, gây ra lỗi đăng nhập. Để giải quyết vấn đề này, hãy cập nhật thông tin đăng nhập của người dùng bị ảnh hưởng hoặc tắt/xóa các thông tin đăng nhập trùng lặp.</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>Không tìm thấy %n người dùng LDAP hiện tại trong cơ sở dữ liệu LDAP.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users</numerusform>
+      <translation>
+        <numerusform>Xóa %n người dùng</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      <translation>
+        <numerusform>Máy chủ LDAP đang ngoại tuyến. Người dùng %n không thể đăng nhập.</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+      <translation>Không xóa được người dùng %1.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
+      <translation>
+        <numerusform>Không thể xóa người dùng %n.</numerusform>
       </translation>
     </message>
   </context>
@@ -11527,7 +11527,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Lưu người dùng</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -11543,7 +11543,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Áp dụng thay đổi?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -11555,27 +11555,27 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>Sao chép liên kết truy cập</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>Bạn có chắc chắn muốn chấm dứt liên kết truy cập?</translation>
     </message>
     <message>
       <source>This will instantly remove an access to the system for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the system for this user</translation>
+      <translation>Thao tác này sẽ ngay lập tức xóa quyền truy cập vào hệ thống của người dùng này</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Chấm dứt</translation>
     </message>
     <message>
       <source>Terminate access link</source>
-      <translation type="unfinished">Terminate access link</translation>
+      <translation>Chấm dứt liên kết truy cập</translation>
     </message>
     <message>
       <source>Create access link</source>
-      <translation type="unfinished">Create access link</translation>
+      <translation>Tạo liên kết truy cập</translation>
     </message>
     <message>
       <source>Create</source>
@@ -11583,53 +11583,53 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
+      <translation>Liên kết truy cập đã được tạo thành công!</translation>
     </message>
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>và</translation>
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
-      <translation type="unfinished">User %1 has been successfully created!</translation>
+      <translation>Người dùng %1 đã được tạo thành công!</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>Mật khẩu hiện tại không hợp lệ</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>Đăng nhập không được để trống</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
+      <translation>Chỉ cho phép chữ cái, số và ký hiệu %1</translation>
     </message>
     <message>
       <source>User with specified login already exists</source>
-      <translation type="unfinished">User with specified login already exists</translation>
+      <translation>Người dùng với thông tin đăng nhập này đã tồn tại</translation>
     </message>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Liên Kết Mới - %1</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+      <translation>Không nên cấp nhiều quyền cho người dùng tạm thời. Một số hành động có thể không hoạt động.</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
+      <translation>Không nên cấp nhiều quyền cho người dùng tạm thời.</translation>
     </message>
     <message>
       <source>in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">in %1</translation>
+      <translation>trong %1</translation>
     </message>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Người dùng mới</translation>
     </message>
   </context>
   <context>
@@ -11748,14 +11748,14 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Developer Tools</source>
-      <translation type="unfinished">Developer Tools</translation>
+      <translation>Công cụ phát triển</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
     <message>
       <source>Empty schedule is not allowed</source>
-      <translation type="unfinished">Empty schedule is not allowed</translation>
+      <translation>Không được phép để lịch trống</translation>
     </message>
   </context>
   <context>
@@ -11879,11 +11879,11 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>%1 Version is available</source>
-      <translation type="unfinished">%1 Version is available</translation>
+      <translation>Phiên bản %1 có sẵn</translation>
     </message>
     <message>
       <source>%1</source>
-      <translation type="unfinished">%1</translation>
+      <translation>%1</translation>
     </message>
   </context>
   <context>
@@ -11983,7 +11983,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Theo dõi tài nguyên hệ thống</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -11995,7 +11995,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Trang web &amp; Tích hợp</translation>
     </message>
   </context>
   <context>
@@ -12017,7 +12017,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>All imported</source>
-      <translation type="unfinished">All imported</translation>
+      <translation>Tất cả được nhập khẩu</translation>
     </message>
     <message>
       <source>In progress... (%1 left)</source>

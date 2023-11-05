@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Any server issue</source>
-      <translation type="unfinished">Any server issue</translation>
+      <translation>Herhangi bir sunucu sorunu</translation>
     </message>
   </context>
   <context>
@@ -277,7 +277,7 @@
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Cihaz Çıkışı</translation>
     </message>
     <message>
       <source>At</source>
@@ -625,7 +625,7 @@
     </message>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Panik Kaydı</translation>
     </message>
   </context>
   <context>
@@ -636,7 +636,7 @@
     </message>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>Sesi Oynat</translation>
     </message>
     <message>
       <source>At</source>
@@ -663,7 +663,7 @@
     </message>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>Eklenti için</translation>
     </message>
     <message>
       <source>And Caption</source>
@@ -745,7 +745,7 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Mobil Bildirim Gönder</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
@@ -768,7 +768,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Sesi Tekrarla</translation>
     </message>
     <message>
       <source>At</source>
@@ -1016,11 +1016,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Sabit Süre</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>Özel Metin</translation>
     </message>
     <message>
       <source>Show to</source>
@@ -1054,7 +1054,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>Günlüğe Yaz</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -1101,7 +1101,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Bilinmeyen eylem</translation>
     </message>
   </context>
 </TS>

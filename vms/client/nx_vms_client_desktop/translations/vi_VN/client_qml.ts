@@ -64,11 +64,11 @@
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>Để bật xác thực thông báo cho người dùng LDAP đã được thêm vào cơ sở dữ liệu VMS, bạn cần bật tính năng này trực tiếp trong cài đặt người dùng.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>Để tắt xác thực thông báo cho người dùng LDAP đã được thêm vào cơ sở dữ liệu VMS, bạn cần tắt nó trực tiếp trong cài đặt người dùng.</translation>
     </message>
   </context>
   <context>
@@ -299,7 +299,7 @@
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Việc này sẽ xóa yêu cầu tích hợp</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -307,14 +307,14 @@
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Xóa yêu cầu</translation>
     </message>
   </context>
   <context>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Trường này không được để trống</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -325,36 +325,36 @@
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Chỉnh sửa hàng loạt - %n người dùng</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Người dùng</numerusform>
       </translation>
     </message>
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Tình trạng người dùng</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Đã bật</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Vô hiệu hóa</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Xác thực (digest) không an toàn</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>giữ giá trị hiện tại</translation>
     </message>
   </context>
   <context>
@@ -461,11 +461,11 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Bị tạm ngưng</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Tắt nguồn</translation>
     </message>
   </context>
   <context>
@@ -493,7 +493,7 @@
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - Cài đặt kết nối</translation>
     </message>
     <message>
       <source>Host</source>
@@ -501,7 +501,7 @@
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Đăng nhập DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -509,7 +509,7 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Bỏ qua lỗi chứng chỉ máy chủ LDAP</translation>
     </message>
     <message>
       <source>Test</source>
@@ -521,19 +521,19 @@
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Sử dụng StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>Host không thể trống</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Đăng nhập DN không được để trống</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Mật khẩu không được để trống</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
@@ -1432,14 +1432,14 @@
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Tạo</translation>
     </message>
   </context>
   <context>
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Không có danh sách</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
@@ -1447,7 +1447,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Tạo mới...</translation>
     </message>
   </context>
   <context>
@@ -1499,7 +1499,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Duyệt</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1518,7 +1518,7 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Chưa có nhóm tùy chỉnh nào</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1526,7 +1526,7 @@
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Thay đổi tiêu chí tìm kiếm hoặc tạo nhóm mới</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -1539,11 +1539,11 @@
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Thành viên của</translation>
     </message>
     <message>
       <source>Built-in</source>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Tích hợp sẵn</translation>
     </message>
   </context>
   <context>
@@ -1570,7 +1570,7 @@
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Mật khẩu không khớp</translation>
     </message>
   </context>
   <context>
@@ -1584,15 +1584,15 @@
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Không tìm thấy nguồn tài nguyên nào</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Tự động thêm quyền phụ thuộc</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Bảng tài nguyên cung cấp cho bạn cái nhìn tổng quan về quyền của dùng hoặc nhóm và cho phép bạn chỉ định quyền cho các tài nguyên cụ thể. Nhấp vào các ô để chọn và bỏ chọn chúng. Sử dụng kéo&amp;thả và Shift+kéo&amp;thả để chỉnh sửa hàng loạt. Nếu bạn chọn một quyền phụ thuộc vào một quyền khác thì cả hai quyền đó sẽ được cấp tự động.</translation>
     </message>
   </context>
   <context>
@@ -2127,19 +2127,19 @@ to activate PTZ</source>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Liên kết có hiệu lực cho đến khi</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Liên kết sẽ vẫn có thể truy cập được cho đến ngày được chỉ định (bao gồm, dựa trên thời gian của máy chủ)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Thu hồi quyền truy cập sau khi đăng nhập</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Quyền truy cập có thể bị thu hồi sớm hơn nếu thời hạn hiệu lực của liên kết kết thúc</translation>
     </message>
     <message>
       <source>In</source>

@@ -8102,7 +8102,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>None of your Servers has connection to %1.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">None of your Servers has connection to %1.</translation>
+      <translation>Ingen af dine servere har forbindelse til %1.</translation>
     </message>
   </context>
   <context>

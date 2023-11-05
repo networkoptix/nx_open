@@ -6512,7 +6512,7 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
       <translation type="unfinished">
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n układów jest udostępnione innym użytkownikom, więc zostaną one również usunięte z ich kont.</numerusform>
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
@@ -6555,7 +6555,7 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Serwer źródłowy i %n serwerów</numerusform>
         <numerusform>Source Server and %n Servers</numerusform>
         <numerusform>Source Server and %n Servers</numerusform>
         <numerusform>Source Server and %n Servers</numerusform>
@@ -6625,15 +6625,15 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Pokazuj również na kamerze źródłowej</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Wyzwalaj również na kamerze źródłowej</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Nagrywaj również kamerę źródłową</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -6641,7 +6641,7 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Odtwarzaj również na kamerze źródłowej</translation>
     </message>
     <message>
       <source>Also show source camera</source>
@@ -6760,7 +6760,7 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     <message numerus="yes">
       <source>%n Groups</source>
       <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Grupy</numerusform>
         <numerusform>%n Groups</numerusform>
         <numerusform>%n Groups</numerusform>
         <numerusform>%n Groups</numerusform>
@@ -6815,7 +6815,7 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
-      <translation type="unfinished">Reset all rules to defaults?</translation>
+      <translation>Przywróć wszystkie reguły do ​​domyślnych?</translation>
     </message>
   </context>
   <context>
