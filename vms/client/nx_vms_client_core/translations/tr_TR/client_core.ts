@@ -191,11 +191,11 @@
     </message>
     <message>
       <source>Your access to this system has expired.</source>
-      <translation type="unfinished">Your access to this system has expired.</translation>
+      <translation>Bu sisteme erişim süreniz doldu.</translation>
     </message>
     <message>
       <source>Please contact the system administrator to regain access.</source>
-      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+      <translation>Yeniden erişim sağlamak için lütfen sistem yöneticisiyle iletişime geçin.</translation>
     </message>
   </context>
   <context>

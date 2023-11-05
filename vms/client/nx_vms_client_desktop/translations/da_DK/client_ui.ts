@@ -958,7 +958,7 @@
     <name>CloudManagementWidget</name>
     <message>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>Dette system er forbundet til</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1044,7 @@
     </message>
     <message>
       <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
+      <translation>&lt;Message&gt;</translation>
     </message>
     <message>
       <source>Open Folder</source>
@@ -2691,7 +2691,7 @@
     </message>
     <message>
       <source>Server Location ID:</source>
-      <translation type="unfinished">Server Location ID:</translation>
+      <translation>Server Placerings- ID:</translation>
     </message>
   </context>
   <context>

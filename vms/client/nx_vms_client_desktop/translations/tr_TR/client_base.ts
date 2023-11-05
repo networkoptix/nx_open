@@ -36,7 +36,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Sistem Olayı</translation>
     </message>
   </context>
   <context>
@@ -1326,7 +1326,7 @@
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
       <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>%n grup(lar) silinsin mi?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
       </translation>
     </message>
@@ -2913,7 +2913,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Parolalar eşleşmiyor</translation>
     </message>
   </context>
   <context>
@@ -2939,11 +2939,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Parolalar eşleşmiyor</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>Şifrenizi değiştirmek için lütfen mevcut şifrenizi giriniz</translation>
     </message>
     <message>
       <source>Invalid current password</source>
@@ -3225,7 +3225,7 @@ to %1</source>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Oturumunuz sona erdi</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
@@ -4984,7 +4984,7 @@ to %1</source>
     </message>
     <message>
       <source>NO CONNECTION TO THE LICENSE SERVER</source>
-      <translation type="unfinished">NO CONNECTION TO THE LICENSE SERVER</translation>
+      <translation>LİSANS SUNUCUSUNA BAĞLANTI YOK</translation>
     </message>
   </context>
   <context>
@@ -5309,7 +5309,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Servisler</translation>
     </message>
   </context>
   <context>
@@ -5576,7 +5576,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Parola boş olamaz</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
@@ -11585,7 +11585,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>LDAP sunucusu çevrimdışı. Kullanıcılar giriş yapamıyor.</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
@@ -12381,7 +12381,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>ACTION</source>
-      <translation type="unfinished">ACTION</translation>
+      <translation>AKSİYON</translation>
     </message>
     <message>
       <source>Enabled</source>

@@ -2446,11 +2446,11 @@
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+      <translation>Hizmet eklemek için Kanal Ortağınız ile iletişime geçin</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation type="unfinished">Channel Partner Contact</translation>
+      <translation>Kanal Ortağı İletişimi</translation>
     </message>
     <message>
       <source>Services Usage</source>

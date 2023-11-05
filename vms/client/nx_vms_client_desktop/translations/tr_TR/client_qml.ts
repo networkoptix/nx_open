@@ -471,7 +471,7 @@
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Kapat</translation>
     </message>
   </context>
   <context>
@@ -1441,7 +1441,7 @@
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Oluştur</translation>
     </message>
   </context>
   <context>
@@ -1579,7 +1579,7 @@
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Parolalar eşleşmiyor</translation>
     </message>
   </context>
   <context>
@@ -1593,7 +1593,7 @@
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Kaynak bulunamadı</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
@@ -2325,7 +2325,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Erişim</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
@@ -2344,7 +2344,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Kullanıcı - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2434,11 +2434,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Sonlandır</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Yeni Link...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
@@ -2447,7 +2447,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>Copied</source>
       <comment>Copied here means that a link is copied</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Kopyalandı</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
