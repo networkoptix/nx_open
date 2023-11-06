@@ -5,15 +5,24 @@
 #include <chrono>
 
 #include <QtGui/QPainter>
-#include <QtWidgets/QLabel>
 #include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QLabel>
 
-#include <nx/vms/client/core/skin/skin.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 using namespace std::chrono;
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+const core::SvgIconColorer::ThemeSubstitutions kTabIconSubstitutions = {
+    {QnIcon::Disabled, {.primary = "dark14"}},
+    {QnIcon::Selected, {.primary = "light4"}},
+    {QnIcon::Active, {.primary = "brand_core"}},
+    {QnIcon::Normal, {.primary = "light10"}}};
+}
 
 NotificationBellWidget::NotificationBellWidget(QWidget* parent):
     QWidget(parent)
@@ -32,7 +41,7 @@ NotificationBellWidget::NotificationBellWidget(QWidget* parent):
             updateIconLabel();
         });
 
-    m_normalIcon = qnSkin->icon("events/tabs/notifications.svg");
+    m_normalIcon = qnSkin->icon("events/tabs/notifications.svg", kTabIconSubstitutions);
     m_rightIcon = qnSkin->icon("events/tabs/notifications_green.svg");
 
     setFixedSize(calculateSize());
