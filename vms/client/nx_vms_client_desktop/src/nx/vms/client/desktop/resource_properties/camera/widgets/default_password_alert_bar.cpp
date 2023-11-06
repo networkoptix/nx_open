@@ -9,31 +9,15 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-
-namespace {
-
-static const QColor kLight16Color = "#698796";
-static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}}},
-};
-
-} // namespace
 
 namespace nx::vms::client::desktop {
 
 DefaultPasswordAlertBar::DefaultPasswordAlertBar(QWidget* parent):
     base_type(parent, {.level = BarDescription::BarLevel::Error}),
     QnWorkbenchContextAware(parent),
-    m_setPasswordButton(new QPushButton(this))
+    m_setPasswordButton(addButton(tr("Set Password"), "text_buttons/password_20.svg"))
 {
-    m_setPasswordButton->setFlat(true);
-    m_setPasswordButton->setIcon(qnSkin->icon("text_buttons/password_20.svg", kIconSubstitutions));
-    addButton(m_setPasswordButton);
-
     connect(this, &DefaultPasswordAlertBar::targetCamerasChanged,
         this, &DefaultPasswordAlertBar::updateState);
     connect(m_setPasswordButton, &QPushButton::clicked, this,
@@ -96,7 +80,6 @@ void DefaultPasswordAlertBar::updateState()
     else
         setText(kSingleCameraAlertText + suffix);
 
-    m_setPasswordButton->setText(tr("Set Password"));
     m_setPasswordButton->setVisible(hasAdminAccess);
 }
 
