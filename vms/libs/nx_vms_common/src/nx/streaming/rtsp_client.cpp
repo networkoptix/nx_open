@@ -625,6 +625,11 @@ void QnRtspClient::fillRequestAuthorization(nx::network::http::Request* request)
 {
     using namespace nx::network::http;
     const auto& token = m_credentials.authToken;
+
+    // Avoid setting auth headers when credentials are empty.
+    if (token.empty() && m_credentials.username.empty())
+        return;
+
     if (token.isBearerToken())
     {
         insertOrReplaceHeader(&request->headers,
