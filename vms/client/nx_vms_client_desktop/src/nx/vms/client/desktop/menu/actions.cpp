@@ -1779,6 +1779,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Cell Aspect Ratio..."))
         .condition(!ConditionWrapper(new VideoWallReviewModeCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeSingleItem))
+            && !condition::layoutIsLocked()
             && !condition::isShowreelReviewMode()
             && !condition::showreelIsRunning());
 
