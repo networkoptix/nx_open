@@ -1077,7 +1077,11 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         }
     }
     const auto status = systemContext()->ldapStatusWatcher()->status();
-    d->ldapOffline = !status || status->state != api::LdapStatus::State::online;
+    const auto ldap = globalSettings()->ldap();
+    const bool hasConfig = !ldap.uri.isEmpty() || !ldap.adminDn.isEmpty() || !ldap.filters.empty();
+    d->ldapOffline = hasConfig
+        && user->isLdap()
+        && (!status || status->state != api::LdapStatus::State::online);
     d->ldapError = user->isLdap()
         && !user->externalId().dn.isEmpty()
         && user->externalId().syncId != d->syncId
