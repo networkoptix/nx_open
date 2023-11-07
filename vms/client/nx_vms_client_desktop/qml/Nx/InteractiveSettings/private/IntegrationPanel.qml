@@ -18,6 +18,8 @@ PanelBase
     property bool checked: false
     property bool refreshing: false
     property bool refreshable: false
+    property bool removable: false
+    property bool offline: false
 
     property alias streamSelectorVisible: panel.contentVisible
     property alias streamSelectorEnabled: streamSelection.enabled
@@ -25,9 +27,9 @@ PanelBase
 
     signal enableSwitchClicked()
     signal refreshButtonClicked()
+    signal removeClicked()
 
-    enableButtonVisible: false
-    removeButtonVisible: false
+    rejectButtonVisible: false
 
     headerItem: IntegrationHeader
     {
@@ -37,8 +39,11 @@ PanelBase
         checked: panel.checked
         refreshing: panel.refreshing
         refreshable: panel.refreshable
+        offline: panel.offline
+        removable: panel.removable
         onEnableSwitchClicked: panel.enableSwitchClicked()
         onRefreshButtonClicked: panel.refreshButtonClicked()
+        onRemoveClicked: panel.removeClicked()
     }
 
     description: engineInfo ? engineInfo.description : ""
@@ -96,6 +101,13 @@ PanelBase
                 : ColorTheme.light
             visible: !panel.checkable && !!text
         }
+    }
+
+    permissions
+    {
+        highlighted: request ? !!request.permission : false
+        collapsible: !request
+        permission: (engineInfo && engineInfo.permission) || (request && request.permission) || ""
     }
 
     content: Row

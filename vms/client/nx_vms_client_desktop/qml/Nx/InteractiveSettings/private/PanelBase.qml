@@ -8,7 +8,7 @@ import Nx
 import Nx.Core
 import Nx.Controls
 
-Control
+FocusScope
 {
     id: informationPanel
 
@@ -16,98 +16,140 @@ Control
     property alias description: description.text
     property alias sourceItem: sourceControl.contentItem
     property alias content: content.contentItem
+    property alias permissions: permissions
+    property var request
 
-    property bool enableButtonVisible: false
-    property bool removeButtonVisible: false
+    property bool approveButtonVisible: !!request
+    property bool rejectButtonVisible: false
     property bool contentVisible: true
 
-    signal enableClicked()
-    signal removeClicked()
+    signal approveClicked(string authCode)
+    signal rejectClicked()
 
-    padding: 12
+    implicitWidth: column.implicitWidth
+    implicitHeight: column.implicitHeight
 
-    background: Rectangle { color: ColorTheme.colors.dark8 }
+    onRequestChanged: authCode.clear()
+    onVisibleChanged:
+    {
+        authCode.clear()
+        permissions.collapsed = true
+    }
 
-    contentItem: ColumnLayout
+    Control
     {
         id: column
-        spacing: 16
+        padding: 12
+        background: Rectangle { color: ColorTheme.colors.dark8 }
+        anchors.fill: parent
 
-        clip: true
-
-        Column
+        contentItem: ColumnLayout
         {
-            spacing: 8
-            Layout.fillWidth: true
+            spacing: 16
+
+            clip: true
+
+            Column
+            {
+                spacing: 8
+                Layout.fillWidth: true
+
+                Control
+                {
+                    id: headerControl
+
+                    width: parent.width
+                }
+
+                Text
+                {
+                    id: description
+
+                    font.pixelSize: 14
+                    color: ColorTheme.windowText
+                    width: parent.width
+                    visible: !!text
+                    wrapMode: Text.Wrap
+                }
+            }
 
             Control
             {
-                id: headerControl
+                id: sourceControl
 
+                Layout.fillWidth: true
+                visible: !!contentItem
+            }
+
+            Permissions
+            {
+                id: permissions
+                visible: !!permission
+            }
+
+            Column
+            {
+                spacing: 8
+                visible: !!request && !!request.pinCode
+
+                Text
+                {
+                    text: qsTr("Integration pairing code")
+                    color: ColorTheme.light
+                    font.pixelSize: 14
+                }
+
+                AuthCode
+                {
+                    id: authCode
+                    onValidChanged:
+                    {
+                        if (valid)
+                            approveButton.focus = true
+                    }
+                }
+            }
+
+            Row
+            {
+                spacing: 8
+                visible: approveButtonVisible || rejectButtonVisible
+
+                Button
+                {
+                    id: approveButton
+                    visible: approveButtonVisible
+                    text: qsTr("Approve")
+                    enabled: authCode.valid || !authCode.visible
+                    onClicked: informationPanel.approveClicked(authCode.value)
+                }
+
+                Button
+                {
+                    visible: rejectButtonVisible
+                    text: qsTr("Reject")
+                    onClicked: informationPanel.rejectClicked()
+                }
+            }
+
+            Rectangle
+            {
+                id: separator
+
+                Layout.fillWidth: true
+                height: 1
+                color: ColorTheme.colors.dark13
+                visible: content.contentItem && content.contentItem.visible
+            }
+
+            Control
+            {
+                id: content
+
+                Layout.fillWidth: true
                 width: parent.width
+                visible: contentItem && contentVisible
             }
-
-            Text
-            {
-                id: description
-
-                font.pixelSize: 14
-                color: ColorTheme.windowText
-                width: parent.width
-                visible: !!text
-                wrapMode: Text.Wrap
-            }
-        }
-
-        Control
-        {
-            id: sourceControl
-
-            Layout.fillWidth: true
-            visible: !!contentItem
-        }
-
-        Row
-        {
-            spacing: 8
-            visible: enableButtonVisible || removeButtonVisible
-
-            Button
-            {
-                id: enableButton
-
-                visible: enableButtonVisible
-                text: qsTr("Approve")
-                onClicked: informationPanel.enableClicked()
-            }
-
-            Button
-            {
-                id: removeButton
-
-                visible: removeButtonVisible
-                text: qsTr("Reject")
-                onClicked: informationPanel.removeClicked()
-            }
-        }
-
-        Rectangle
-        {
-            id: separator
-
-            Layout.fillWidth: true
-            height: 1
-            color: ColorTheme.colors.dark13
-            visible: content.contentItem && content.contentItem.visible
-        }
-
-        Control
-        {
-            id: content
-
-            Layout.fillWidth: true
-            width: parent.width
-            visible: contentItem && contentVisible
         }
     }
 }

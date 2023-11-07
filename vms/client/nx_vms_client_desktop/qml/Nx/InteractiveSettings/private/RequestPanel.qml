@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx
+import Nx.Core
 
 PanelBase
 {
@@ -10,8 +11,8 @@ PanelBase
 
     description: request.description
 
-    enableButtonVisible: true
-    removeButtonVisible: true
+    approveButtonVisible: true
+    rejectButtonVisible: true
 
     headerItem: RequestHeader
     {

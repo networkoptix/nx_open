@@ -119,7 +119,6 @@ function _createItemsRecursively(parent, visualParent, model, depth)
 
 function createItems(parent, model)
 {
-
     let item = _createItemsRecursively(
         parent,
         parent.childrenItem ?? null,

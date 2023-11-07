@@ -417,7 +417,7 @@ ApiIntegrationRequestsModel*
     AnalyticsSettingsWidget::Private::makeApiIntegrationRequestsModel() const
 {
     return ini().enableMetadataApi
-        ? new ApiIntegrationRequestsModel(q->systemContext())
+        ? new ApiIntegrationRequestsModel(q->systemContext(), /*parent*/ q)
         : nullptr;
 }
 

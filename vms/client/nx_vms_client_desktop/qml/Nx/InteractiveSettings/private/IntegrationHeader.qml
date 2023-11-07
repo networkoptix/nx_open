@@ -21,9 +21,11 @@ RowLayout
     property var offline: undefined
     property bool refreshing: false
     property bool refreshable: false
+    property bool removable: false
 
     signal enableSwitchClicked()
     signal refreshButtonClicked()
+    signal removeClicked()
 
     implicitWidth: 100
     implicitHeight: 20
@@ -170,7 +172,7 @@ RowLayout
     {
         id: tag
 
-        visible: !header.checkable && !!engineInfo && engineInfo.isLicenseRequired
+        visible: !header.checkable && !!engineInfo && !!engineInfo.isLicenseRequired
         text: qsTr("Services Required")
         textColor: ColorTheme.colors.light10
         color: ColorTheme.colors.dark7
@@ -197,6 +199,19 @@ RowLayout
             font: refreshButton.font
             color: refreshButton.color
             Layout.alignment: Qt.AlignVCenter
+        }
+    }
+
+    TextButton
+    {
+        visible: header.removable
+        text: qsTr("Remove")
+        icon.source: "image://svg/skin/text_buttons/trash.svg"
+
+        Layout.alignment: Qt.AlignBaseline
+        onClicked:
+        {
+            header.removeClicked()
         }
     }
 }

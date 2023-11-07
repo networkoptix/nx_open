@@ -73,7 +73,7 @@ void ApiIntegrationRequestsModel::refresh()
         thread());
 }
 
-void ApiIntegrationRequestsModel::remove(const QString& id)
+void ApiIntegrationRequestsModel::reject(const QString& id)
 {
     if (!connection()) //< It may be null if the client just disconnected from the server.
         return;
@@ -89,7 +89,7 @@ void ApiIntegrationRequestsModel::remove(const QString& id)
         thread());
 }
 
-void ApiIntegrationRequestsModel::enable(const QString& id)
+void ApiIntegrationRequestsModel::approve(const QString& id, const QString&)
 {
     if (!connection()) //< It may be null if the client just disconnected from the server.
         return;

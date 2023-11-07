@@ -25,12 +25,13 @@ Item
 
     property bool loading: false
     property bool supportsDualStreaming: false
-    readonly property bool isDeviceDependent: viewModel.currentEngineInfo !== undefined
+    readonly property bool isDeviceDependent: !!viewModel.currentEngineInfo
         && viewModel.currentEngineInfo.isDeviceDependent
 
     readonly property var currentEngineId: viewModel.currentEngineId
     property var resourceId: NxGlobals.uuid("")
     property bool initialized: false
+    property alias viewModel: viewModel
 
     Connections
     {
@@ -59,7 +60,6 @@ Item
             viewModel.updateState(
                 store.analyticsEngines(),
                 licenseSummary,
-                currentEngineId,
                 store.deviceAgentSettingsModel(currentEngineId),
                 store.deviceAgentSettingsValues(currentEngineId),
                 store.deviceAgentSettingsErrors(currentEngineId),
@@ -96,14 +96,27 @@ Item
         }
     }
 
-    AnalyticsSettingsMenu
+    Component
+    {
+        id: analyticsSettingsMenu
+        AnalyticsSettingsMenu { viewModel: analyticsSettings.viewModel }
+    }
+
+    Component
+    {
+        id: integrationsMenu
+        IntegrationsMenu { viewModel: analyticsSettings.viewModel }
+    }
+
+    Loader
     {
         id: navigationMenu
-
         width: 240
         height: parent.height - banners.height
 
-        viewModel: viewModel
+        sourceComponent: LocalSettings.iniConfigValue("integrationsManagement")
+            ? integrationsMenu
+            : analyticsSettingsMenu
     }
 
     AnalyticsSettingsView

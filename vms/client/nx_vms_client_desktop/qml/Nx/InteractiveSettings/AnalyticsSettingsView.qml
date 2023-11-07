@@ -3,6 +3,8 @@
 import QtQuick
 import QtQuick.Layouts
 
+import nx.vms.client.desktop
+
 import "private"
 
 StackLayout
@@ -17,11 +19,20 @@ StackLayout
     currentIndex:
         Array.from(children).findIndex((widget) => widget.itemType === viewModel.currentItemType)
 
+    SettingsPlaceholder
+    {
+        property string itemType: "Placeholder"
+        header: qsTr("Integrations allow the seamless utilization of video analytics on various"
+            + " devices from the VMS.\nSelect an Integration to begin configuring its parameters.")
+    }
+
     Plugins
     {
         id: plugins
 
         property string itemType: "Plugins"
+
+        visible: !LocalSettings.iniConfigValue("integrationsManagement")
     }
 
     ApiIntegrations
@@ -30,7 +41,8 @@ StackLayout
 
         property string itemType: "ApiIntegrations"
 
-        requestsModel: viewModel.requestsModel
+        visible: !LocalSettings.iniConfigValue("integrationsManagement")
+        requestsModel: visible ? viewModel.requestsModel : null
     }
 
     SettingsView
@@ -45,13 +57,26 @@ StackLayout
             id: header
             engineInfo: viewModel.currentEngineInfo
             licenseSummary: viewModel.currentEngineLicenseSummary
+            request: viewModel.currentRequest
             checked:
                 checkable && viewModel.enabledEngines.indexOf(viewModel.currentEngineId) !== -1
+
+            onApproveClicked: (authCode) =>
+            {
+                viewModel.requestsModel.approve(request.requestId, authCode)
+            }
+
+            onRemoveClicked: () =>
+            {
+                if (request)
+                    viewModel.requestsModel.reject(request.requestId)
+            }
         }
 
         placeholderItem: SettingsPlaceholder
         {
             id: placeholder
+            visible: !viewModel.currentRequestId
         }
 
         Connections
@@ -72,7 +97,7 @@ StackLayout
                 settingsView.engineId = currentEngineId
 
                 settingsView.loadModel(
-                    model ?? {},
+                    model,
                     initialValues ?? {},
                     viewModel.currentSectionPath,
                     restoreScrollPosition)
@@ -86,6 +111,11 @@ StackLayout
             function onCurrentSettingsErrorsChanged()
             {
                 settingsView.setErrors(viewModel.currentSettingsErrors)
+            }
+
+            function onCurrentItemChanged()
+            {
+                header.forceActiveFocus()
             }
         }
     }

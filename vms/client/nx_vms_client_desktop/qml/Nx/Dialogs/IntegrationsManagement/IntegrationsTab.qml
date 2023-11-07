@@ -11,8 +11,6 @@ import Nx.Controls
 import Nx.Controls.NavigationMenu
 import Nx.InteractiveSettings
 
-import nx.vms.client.desktop
-
 Item
 {
     id: analyticsSettings
@@ -20,7 +18,6 @@ Item
     property var store: null
     property var engineLicenseSummaryProvider: null
     property var saasServiceManager: null
-    property alias viewModel: viewModel
 
     function activateEngine(engineId) { viewModel.setCurrentEngine(engineId) }
 
@@ -39,7 +36,10 @@ Item
         function storeUpdated()
         {
             const engineId = store.getCurrentEngineId()
-            const licenseSummary = engineLicenseSummaryProvider.licenseSummary(engineId)
+            const licenseSummary = engineLicenseSummaryProvider
+                ? engineLicenseSummaryProvider.licenseSummary(engineId)
+                : null
+
             viewModel.updateState(
                 store.analyticsEngines,
                 licenseSummary,
@@ -59,27 +59,14 @@ Item
         }
     }
 
-    Component
-    {
-        id: analyticsSettingsMenu
-        AnalyticsSettingsMenu { viewModel: analyticsSettings.viewModel }
-    }
-
-    Component
-    {
-        id: integrationsMenu
-        IntegrationsMenu { viewModel: analyticsSettings.viewModel }
-    }
-
-    Loader
+    IntegrationsMenu
     {
         id: menu
+
         width: 240
         height: parent.height - saasBanner.height
 
-        sourceComponent: LocalSettings.iniConfigValue("integrationsManagement")
-            ? integrationsMenu
-            : analyticsSettingsMenu
+        viewModel: viewModel
     }
 
     Item
@@ -127,7 +114,7 @@ Item
         {
             checkable: false
             refreshable: false
-            removable: !!viewModel.currentRequestId
+            removable: true
             streamSelectorVisible: false
         }
 
@@ -156,8 +143,11 @@ Item
 
         height: visible ? implicitHeight : 0
         anchors.bottom: parent.bottom
-        width: parent.width
     }
 
-    onStoreChanged: store.setCurrentEngineId(viewModel.currentEngineId ?? NxGlobals.uuid(""))
+    onStoreChanged:
+    {
+        store.setCurrentEngineId(viewModel.currentEngineId ?? NxGlobals.uuid(""))
+        viewModel.storeUpdated()
+    }
 }

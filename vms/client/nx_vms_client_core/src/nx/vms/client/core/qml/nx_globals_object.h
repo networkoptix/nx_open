@@ -64,6 +64,8 @@ public:
 
     Q_INVOKABLE void copyToClipboard(const QString& text) const;
 
+    Q_INVOKABLE QString clipboardText() const;
+
     Q_INVOKABLE double toDouble(const QVariant& value) const;
 
     /**
