@@ -7,6 +7,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/motion_window.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
@@ -17,6 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/data/auth_data.h>
+#include <nx/media/motion_detection.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/data/backup_settings.h>
@@ -1888,6 +1890,13 @@ struct ModifyCameraAttributesAccess
         {
             return Result(ErrorCode::forbidden, ServerApiErrors::tr(
                 "Saving Device attributes is forbidden: no saving permission."));
+        }
+
+        if (!param.motionMask.isEmpty() && !parseMotionRegionList(param.motionMask))
+        {
+            return Result(ErrorCode::badRequest,
+                NX_FMT("Motion mask should be in range [0,0 %1x%2]",
+                    Qn::kMotionGridWidth, Qn::kMotionGridHeight));
         }
 
         // Check the license if and only if recording goes from 'off' to 'on' state

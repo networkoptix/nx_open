@@ -326,21 +326,25 @@ void QnMotionRegion::updatePathCache() const
 /* Serialization functions                                              */
 /************************************************************************/
 
-void parseMotionRegionList(QList<QnMotionRegion>& regions, const QByteArray& regionsString)
+std::optional<QList<QnMotionRegion>> parseMotionRegionList(const QByteArray& regionsString)
 {
-    regions.clear();
+    QList<QnMotionRegion> regions;
     for (const auto& serializedRegion: regionsString.split(':'))
     {
-        QnMotionRegion region;
-        parseMotionRegion(region, serializedRegion);
-        regions << region;
+        auto region = parseMotionRegion(serializedRegion);
+        if (!region.has_value())
+            return std::nullopt;
+        regions << *region;
     }
+    return regions;
 }
 
-void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString)
+std::optional<QnMotionRegion> parseMotionRegion(const QByteArray& regionString)
 {
+    QnMotionRegion result;
     QList<QRect> motionMask;
     bool firstRect = true;
+    static const QRect kBoundRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
     for (const QByteArray& rectString: regionString.split(';'))
     {
         QList<QByteArray> rectList = rectString.split(',');
@@ -356,8 +360,9 @@ void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString)
         }
         else if (rectList.size() == 5)
         {
-            if (firstRect) {
-                region.removeDefaultMotion();
+            if (firstRect)
+            {
+                result.removeDefaultMotion();
                 firstRect = false;
             }
             sensitivity = rectList[0].toInt();
@@ -366,13 +371,21 @@ void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString)
             r.setWidth(rectList[3].toInt());
             r.setHeight(rectList[4].toInt());
         }
+        if (!kBoundRect.contains(r))
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Invalid motion rect: %1, it should be bounded by: %2",
+                r, kBoundRect);
+            return std::nullopt;
+        }
         if (sensitivity > 0)
-            region.addRect(sensitivity, r);
+            result.addRect(sensitivity, r);
         else
             motionMask << r;
     }
     for (int i = 0; i < motionMask.size(); ++i)
-        region.addRect(0, motionMask[i]);
+        result.addRect(0, motionMask[i]);
+
+    return result;
 }
 
 QString serializeMotionRegion(const QnMotionRegion& region)
