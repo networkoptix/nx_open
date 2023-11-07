@@ -1097,19 +1097,20 @@ QString StringsHelper::ldapSyncIssueReason(
     switch (reasonCode)
     {
         case EventReason::failedToConnectToLdap:
-            return tr("Failed to connect to LDAP");
+            return tr("Failed to connect to the LDAP server.");
 
         case EventReason::failedToCompleteSyncWithLdap:
             return syncInterval
-                ? tr("Failed to complete sync within a %1 timeout").arg(
-                    text::HumanReadable::timeSpan(*syncInterval))
-                : tr("Failed to complete sync within a given timeout");
+                ? tr("Failed to complete the sync within a %1 timeout.",
+                    "Timeout duration in human-readable form (ex.: 1 minute)")
+                    .arg(text::HumanReadable::timeSpan(*syncInterval))
+                : tr("Failed to complete the sync within a given timeout.");
 
         case EventReason::noLdapUsersAfterSync:
-            return tr("There are zero LDAP users in VMS after sync");
+            return tr("No user accounts on LDAP server match the synchronization settings.");
 
         case EventReason::someUsersNotFoundInLdap:
-            return tr("Some LDAP users were not found in LDAP");
+            return tr("Some LDAP users or groups were not found in the LDAP database.");
 
         default:
             NX_ASSERT(false);
