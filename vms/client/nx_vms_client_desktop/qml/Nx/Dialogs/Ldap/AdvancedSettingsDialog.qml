@@ -92,7 +92,7 @@ Dialog
                 x: -3
                 y: 6
                 width: parent.width - x
-                text: qsTr("Allow digest authentication for imported users")
+                text: qsTr("Allow insecure (digest) authentication for imported users")
                 wrapMode: Text.WordWrap
             }
         }
@@ -104,7 +104,7 @@ Dialog
 
         CenteredField
         {
-            text: qsTr("Name Attribute")
+            text: "objectClass"
 
             leftSideMargin: 180
             rightSideMargin: 0
@@ -123,7 +123,7 @@ Dialog
 
         CenteredField
         {
-            text: qsTr("Group Attribute")
+            text: qsTr("Group Members Attribute")
 
             leftSideMargin: 180
             rightSideMargin: 0
