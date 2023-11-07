@@ -19,23 +19,20 @@ Rectangle
         {
             case DialogBanner.Style.Error:
                 return {
-                    "background": ColorTheme.colors.attention.red_bg,
-                    "border": ColorTheme.colors.attention.red_dark,
+                    "background": ColorTheme.colors.red_d1,
                     "icon": "image://svg/skin/banners/error.svg"
                 }
 
             case DialogBanner.Style.Warning:
                 return {
-                    "background": ColorTheme.colors.attention.yellow_bg,
-                    "border": ColorTheme.colors.attention.yellow_dark,
+                    "background": ColorTheme.colors.dark9,
                     "icon": "image://svg/skin/banners/warning.svg"
                 }
 
             case DialogBanner.Style.Info:
             default:
                 return {
-                    "background": ColorTheme.colors.attention.blue_bg,
-                    "border": ColorTheme.colors.attention.blue_dark,
+                    "background": ColorTheme.colors.dark9,
                     "icon": "image://svg/skin/banners/info.svg"
                 }
         }
@@ -58,8 +55,6 @@ Rectangle
     signal closeClicked()
 
     color: styleData.background
-    border.color: styleData.border
-    border.width: 1
 
     implicitHeight: bannerLayout.height + 20
 
