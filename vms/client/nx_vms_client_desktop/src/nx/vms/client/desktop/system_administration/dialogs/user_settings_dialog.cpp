@@ -722,7 +722,8 @@ void UserSettingsDialog::onTerminateLink()
 
                 if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
                 {
-                    d->showServerError(tr("Failed to apply changes"), *error);
+                    if (error->error != nx::network::rest::Result::SessionExpired)
+                        d->showServerError(tr("Failed to apply changes"), *error);
                     return;
                 }
 
@@ -783,8 +784,11 @@ void UserSettingsDialog::onResetLink(
 
                 if (!success)
                 {
-                    if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                    if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
+                        error && error->error != nx::network::rest::Result::SessionExpired)
+                    {
                         d->showServerError(tr("Failed to apply changes"), *error);
+                    }
                     return;
                 }
 
@@ -1101,8 +1105,11 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 
                 if (!success)
                 {
-                    if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                    if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
+                        error && error->error != nx::network::rest::Result::SessionExpired)
+                    {
                         d->showServerError(tr("Failed to apply changes"), *error);
+                    }
                     return;
                 }
 
@@ -1225,8 +1232,9 @@ void UserSettingsDialog::refreshToken(const QString& password)
             }
             else
             {
-                auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-                NX_INFO(this, "Can't receive token: %1", QJson::serialized(*error));
+                const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
+                if (error)
+                    NX_INFO(this, "Can't receive token: %1", QJson::serialized(*error));
             }
         });
 
