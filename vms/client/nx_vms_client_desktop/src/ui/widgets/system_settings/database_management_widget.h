@@ -44,10 +44,11 @@ private:
 
     void backupDb();
     void restoreDb();
-    void updateVisible(bool operationSuccess = true);
+    void updateState(State state, bool operationSuccess = true);
 
 private:
     QScopedPointer<Ui::DatabaseManagementWidget> ui;
+
     State m_state = State::empty;
     rest::Handle m_currentRequest = 0;
 };
