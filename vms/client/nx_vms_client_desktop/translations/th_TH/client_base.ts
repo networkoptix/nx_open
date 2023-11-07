@@ -1547,19 +1547,19 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>ผู้ใช้กำลังได้รับอีเมล</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>ผู้ใช้จะเริ่มได้รับอีเมลทันทีหลังจากที่คุณได้มีการตั้งค่า</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>ไม่สามารถทดสอบเซิร์ฟเวอร์ SMTP</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>โปรดระบุ ข้อมูลเพิ่มเติม</translation>
     </message>
   </context>
   <context>
