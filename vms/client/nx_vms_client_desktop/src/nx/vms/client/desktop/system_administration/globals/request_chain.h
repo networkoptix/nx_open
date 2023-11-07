@@ -6,6 +6,7 @@
 
 #include <QtCore/QString>
 
+#include <nx/network/rest/result.h>
 #include <nx/utils/move_only_func.h>
 
 namespace nx::vms::client::desktop {
@@ -17,13 +18,23 @@ template <typename T>
 class RequestChain
 {
 public:
-    using ChainCompleteCallback = nx::utils::MoveOnlyFunc<void(bool, const QString&)>;
+    using ChainCompleteCallback =
+        nx::utils::MoveOnlyFunc<void(bool, nx::network::rest::Result::Error, const QString&)>;
 
 public:
     virtual ~RequestChain()
     {
-        if (m_chainComplete)
-            m_chainComplete(/*success*/ !hasNext(), {});
+        if (!m_chainComplete)
+            return;
+
+        const bool success = !hasNext();
+
+        m_chainComplete(
+            success,
+            success
+                ? nx::network::rest::Result::Error::NoError
+                : nx::network::rest::Result::Error::InternalServerError,
+            /*errorString*/ {});
     }
 
     template<typename ...V>
@@ -47,13 +58,16 @@ public:
 
     int nextIndex() const { return m_next; }
 
-    void requestComplete(bool success, const QString& errorString = {})
+    void requestComplete(
+        bool success,
+        nx::network::rest::Result::Error errorCode,
+        const QString& errorString = {})
     {
         if (!success)
         {
             if (m_chainComplete)
             {
-                m_chainComplete(success, errorString);
+                m_chainComplete(success, errorCode, errorString);
                 m_chainComplete = {};
             }
             return;
@@ -80,7 +94,7 @@ private:
         {
             if (m_chainComplete)
             {
-                m_chainComplete(true, {});
+                m_chainComplete(true, nx::network::rest::Result::Error::NoError, {});
                 m_chainComplete = {};
             }
             return;

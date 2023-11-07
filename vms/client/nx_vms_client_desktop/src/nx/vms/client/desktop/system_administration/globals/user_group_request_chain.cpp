@@ -25,35 +25,38 @@ namespace {
 
 static constexpr int kMaxRequestsPerBatch = 500;
 
-QString errorMessage(const nx::vms::api::JsonRpcError& error)
+std::tuple<nx::network::rest::Result::Error, QString> extractError(
+    const nx::vms::api::JsonRpcError& error)
 {
     if (error.code == nx::vms::api::JsonRpcError::RequestError && error.data)
     {
         nx::network::rest::Result result;
         if (QJson::deserialize(*error.data, &result))
-            return result.errorString;
+            return {result.error, result.errorString};
     }
 
+    static const auto kRestApiError = nx::network::rest::Result::ServiceUnavailable;
+
     if (!error.message.empty())
-        return QString::fromStdString(error.message);
+        return {kRestApiError, QString::fromStdString(error.message)};
 
     switch (error.code)
     {
         case nx::vms::api::JsonRpcError::RequestError:
-            return UserGroupRequestChain::tr("Request error");
+            return {kRestApiError, UserGroupRequestChain::tr("Request error")};
         case nx::vms::api::JsonRpcError::InvalidJson:
-            return UserGroupRequestChain::tr("Invalid JSON");
+            return {kRestApiError, UserGroupRequestChain::tr("Invalid JSON")};
         case nx::vms::api::JsonRpcError::InvalidRequest:
-            return UserGroupRequestChain::tr("Invalid request");
+            return {kRestApiError, UserGroupRequestChain::tr("Invalid request")};
         case nx::vms::api::JsonRpcError::MethodNotFound:
-            return UserGroupRequestChain::tr("Method not found");
+            return {kRestApiError, UserGroupRequestChain::tr("Method not found")};
         case nx::vms::api::JsonRpcError::InvalidParams:
-            return UserGroupRequestChain::tr("Invalid parameters");
+            return {kRestApiError, UserGroupRequestChain::tr("Invalid parameters")};
         case nx::vms::api::JsonRpcError::InternalError:
-            return UserGroupRequestChain::tr("Internal error");
+            return {kRestApiError, UserGroupRequestChain::tr("Internal error")};
     }
 
-    return UserGroupRequestChain::tr("Unknown error - code %1").arg(error.code);
+    return {kRestApiError, UserGroupRequestChain::tr("Unknown error - code %1").arg(error.code)};
 }
 
 template <auto member, class T>
@@ -323,6 +326,7 @@ void UserGroupRequestChain::Private::runRequests(
                 if (NX_ASSERT(handle == currentRequest))
                     currentRequest = 0;
 
+                nx::network::rest::Result::Error errorCode = nx::network::rest::Result::NoError;
                 QString errorString;
 
                 if (success)
@@ -332,7 +336,7 @@ void UserGroupRequestChain::Private::runRequests(
                         if (response.error)
                         {
                             success = false;
-                            errorString = errorMessage(*response.error);
+                            std::tie(errorCode, errorString) = extractError(*response.error);
                             break;
                         }
 
@@ -357,12 +361,17 @@ void UserGroupRequestChain::Private::runRequests(
                 else
                 {
                     if (!result.empty() && result.front().error)
-                        errorString = errorMessage(*result.front().error);
+                    {
+                        std::tie(errorCode, errorString) = extractError(*result.front().error);
+                    }
                     else
+                    {
                         errorString = tr("Connection failure");
+                        errorCode = nx::network::rest::Result::ServiceUnavailable;
+                    }
                 }
 
-                q->requestComplete(success, errorString);
+                q->requestComplete(success, errorCode, errorString);
             }),
         q->thread());
 }
