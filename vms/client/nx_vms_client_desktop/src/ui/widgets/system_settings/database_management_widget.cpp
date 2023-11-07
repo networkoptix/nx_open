@@ -59,7 +59,7 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     connect(ui->cancelCreateBackupButton, &QPushButton::clicked, this, cancelRequest);
     connect(ui->cancelRestoreBackupButton, &QPushButton::clicked, this, cancelRequest);
 
-    updateVisible();
+    updateState(State::empty);
 }
 
 QnDatabaseManagementWidget::~QnDatabaseManagementWidget()
@@ -145,11 +145,12 @@ void QnDatabaseManagementWidget::backupDb()
                 setWarningStyle(ui->labelMessage);
                 ui->labelMessage->setText(tr("Failed to back up database"));
             }
-            m_state = State::backupFinished;
-            updateVisible(success);
+
+            m_currentRequest = 0;
+            updateState(State::backupFinished, success);
         });
-    m_state = State::backupStarted;
-    updateVisible();
+
+    updateState(State::backupStarted);
 
     auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
         this,
@@ -221,11 +222,12 @@ void QnDatabaseManagementWidget::restoreDb()
     ui->labelMessage->setText(tr("Database backup is being uploaded to the server. Please wait."));
 
     auto restoreDatabaseHandler = nx::utils::guarded(this,
-        [this, fileName](bool, rest::Handle requestId, rest::ErrorOrEmpty reply)
+        [this, fileName](bool success, rest::Handle requestId, rest::ErrorOrEmpty reply)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
-            m_state = State::restoreFinished;
-            updateVisible();
+            m_currentRequest = 0;
+            updateState(State::restoreFinished, success);
+
             if (std::holds_alternative<rest::Empty>(reply))
             {
                 ui->labelMessage->setText(tr(
@@ -241,8 +243,7 @@ void QnDatabaseManagementWidget::restoreDb()
             ui->labelMessage->setText(tr("Failed to restore database"));
         });
 
-    m_state = State::restoreStarted;
-    updateVisible();
+    updateState(State::restoreStarted);
 
     auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
         this,
@@ -255,8 +256,10 @@ void QnDatabaseManagementWidget::restoreDb()
         sessionTokenHelper, data, std::move(restoreDatabaseHandler), thread());
 }
 
-void QnDatabaseManagementWidget::updateVisible(bool operationSuccess)
+void QnDatabaseManagementWidget::updateState(State state, bool operationSuccess)
 {
+    m_state = state;
+
     switch (m_state)
     {
         case State::empty:
@@ -322,8 +325,5 @@ void QnDatabaseManagementWidget::hideEvent(QHideEvent* event)
 {
     base_type::hideEvent(event);
     if (m_state == State::backupFinished || m_state == State::restoreFinished)
-    {
-        m_state = State::empty;
-        updateVisible();
-    }
+        updateState(State::empty);
 }
