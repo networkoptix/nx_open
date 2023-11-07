@@ -1251,13 +1251,17 @@ void QnStorageConfigWidget::confirmNewMetadataStorage(const QnUuid& storageId)
                     NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
                     m_currentRequest = 0;
                     if (!success)
+                    {
+                        emit hasChangesChanged();
                         return;
+                    }
 
                     auto internalCallback = nx::utils::guarded(this,
                         [this](bool /*success*/, rest::Handle requestId)
                         {
                             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
                             m_currentRequest = 0;
+                            emit hasChangesChanged();
                         });
 
                     m_server->setMetadataStorageId(storageId);
