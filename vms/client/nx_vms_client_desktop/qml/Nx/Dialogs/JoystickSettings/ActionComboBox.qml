@@ -15,6 +15,8 @@ ComboBox
 
     textRole: "name"
 
+    onMaxDelegateWidthChanged: popup.width = control.maxDelegateWidth
+
     delegate: ItemDelegate
     {
         height: isSeparator ? 8 : 24
@@ -100,29 +102,6 @@ ComboBox
                     text: buttons
                 }
             }
-        }
-    }
-
-    popup: Popup
-    {
-        y: control.height
-        width: control.maxDelegateWidth
-
-        implicitHeight: contentItem.implicitHeight + 4
-
-        padding: 0
-        topPadding: 2
-        bottomPadding: 2
-
-        background: Rectangle
-        {
-            color: ColorTheme.midlight
-            radius: 2
-        }
-
-        contentItem: Loader
-        {
-            sourceComponent: control.view
         }
     }
 
