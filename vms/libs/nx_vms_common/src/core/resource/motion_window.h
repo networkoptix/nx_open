@@ -3,6 +3,8 @@
 #ifndef __MOTION_WINDOW_H__
 #define __MOTION_WINDOW_H__
 
+#include <optional>
+
 #include <QtCore/QMultiMap>
 #include <QtGui/QPainterPath>
 #include <QtGui/QRegion>
@@ -108,11 +110,13 @@ private:
     mutable bool m_dirty = false;
 };
 
+NX_VMS_COMMON_API std::optional<QnMotionRegion> parseMotionRegion(const QByteArray& regionString);
 
-void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString);
 QString serializeMotionRegion(const QnMotionRegion& region);
 
-void parseMotionRegionList(QList<QnMotionRegion>& regions, const QByteArray& regionsString);
+NX_VMS_COMMON_API std::optional<QList<QnMotionRegion>> parseMotionRegionList(
+    const QByteArray& regionsString);
+
 QString serializeMotionRegionList(const QList<QnMotionRegion>& regions);
 
 
