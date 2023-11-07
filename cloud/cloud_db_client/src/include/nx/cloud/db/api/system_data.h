@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <compare>
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -11,11 +12,14 @@
 
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
+#include <nx/utils/std/cpp20.h>
+
+#include "permissions.h"
 
 namespace nx::cloud::db::api {
 
 /**
- * System attribute
+ * System attribute.
  */
 struct Attribute
 {
@@ -204,7 +208,8 @@ enum class SystemAccessRole
     system = 10,
 };
 
-struct ShareSystemRequest
+// Deprecated share system request. Preserved for the backward compatibility.
+struct ShareSystemRequestV1
 {
     /**%apidoc The account to share the system with. */
     std::string accountEmail;
@@ -227,17 +232,17 @@ struct ShareSystemRequest
 
     bool isEnabled = true;
 
-    //TODO #akolesnikov this field is redundant here. Move it to libcloud_db internal data structures
+    // User id to set in the VMS DB.
     std::string vmsUserId;
 
-    bool operator<(const ShareSystemRequest& rhs) const
+    bool operator<(const ShareSystemRequestV1& rhs) const
     {
         if (accountEmail != rhs.accountEmail)
             return accountEmail < rhs.accountEmail;
         return systemId < rhs.systemId;
     }
 
-    bool operator==(const ShareSystemRequest& rhs) const
+    bool operator==(const ShareSystemRequestV1& rhs) const
     {
         return accountEmail == rhs.accountEmail
             && systemId == rhs.systemId
@@ -249,9 +254,9 @@ struct ShareSystemRequest
 };
 
 /**
- * Expands ShareSystemRequest to contain more data.
+ * Describes an account to system relation.
  */
-struct SystemSharing: ShareSystemRequest
+struct SystemSharingV1: ShareSystemRequestV1
 {
     /**%apidoc Globally unique account id. */
     std::string accountId;
@@ -264,24 +269,115 @@ struct SystemSharing: ShareSystemRequest
     /**%apidoc UTC time of the last login of user to the system. */
     std::chrono::system_clock::time_point lastLoginTime;
 
-    bool operator==(const SystemSharing& rhs) const
+    bool operator==(const SystemSharingV1& rhs) const
     {
-        return static_cast<const ShareSystemRequest&>(*this) == static_cast<const ShareSystemRequest&>(rhs)
+        return static_cast<const ShareSystemRequestV1&>(*this) == static_cast<const ShareSystemRequestV1&>(rhs)
             && accountId == rhs.accountId
             && accountFullName == rhs.accountFullName;
     }
 
-    bool operator<(const SystemSharing& rhs) const
+    bool operator<(const SystemSharingV1& rhs) const
     {
         return std::tie(accountId, systemId) < std::tie(rhs.accountId, rhs.systemId);
     }
 };
 
-struct SystemSharingList
+struct SystemSharingV1List
 {
     /**%apidoc List of accounts the system has been shared with. */
-    std::vector<SystemSharing> sharing;
+    std::vector<SystemSharingV1> sharing;
 };
+
+/**
+ * Request to share a system with a new user or to modify the access rights of an existing user.
+ * Provides improved support for permissions and roles.
+ * This is the current version of the request. Corresponds to the version 2 of the API.
+ */
+struct ShareSystemRequest
+{
+    /**%apidoc The account to share the system with. */
+    std::string accountEmail;
+
+    /**%apidoc List of roles to assign to the user.
+     * This can be both cloud and VMS-specific roles. Cloud uses those roles it recognizes
+     * while authorizing user requests.
+     */
+    std::vector<std::string> roleIds;
+
+    /**%apidoc List of specific permissions to grant to the user. This extends the list of roles.
+     * This can be both cloud and VMS-specific permissions. Cloud uses those permissions it
+     * recognizes while authorizing user requests.
+     */
+    std::vector<std::string> permissions;
+
+    /**%apidoc Allows to disable/re-enable user. Disabled user does not have access to the system.
+     * But, still present in the system.
+     */
+    bool isEnabled = true;
+
+    // User id to set in the VMS DB.
+    std::string vmsUserId;
+
+    // NOTE: Cannot use operator<=> due to lack of compiler support on some platforms.
+    bool operator==(const ShareSystemRequest& rhs) const
+    {
+        return std::tie(accountEmail, roleIds, permissions, isEnabled, vmsUserId)
+            == std::tie(rhs.accountEmail, rhs.roleIds, rhs.permissions, rhs.isEnabled, rhs.vmsUserId);
+    }
+
+    bool operator<(const ShareSystemRequest& rhs) const
+    {
+        return std::tie(accountEmail, roleIds, permissions, isEnabled, vmsUserId)
+            < std::tie(rhs.accountEmail, rhs.roleIds, rhs.permissions, rhs.isEnabled, rhs.vmsUserId);
+    }
+};
+
+NX_REFLECTION_INSTRUMENT(ShareSystemRequest, (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId))
+
+/**
+ * Describes an account to system relation.
+ */
+struct SystemSharing: ShareSystemRequest
+{
+    using base_type = ShareSystemRequest;
+
+    /**%apidoc Id of the system. */
+    std::string systemId;
+
+    /**%apidoc Globally unique account id. */
+    std::string accountId;
+
+    /**%apidoc Account full name. */
+    std::string accountFullName;
+
+    /**%apidoc Shows how often user accesses given system in comparison to other user's systems. */
+    float usageFrequency = 0.0;
+
+    /**%apidoc UTC time of the last login of user to the system. */
+    std::chrono::system_clock::time_point lastLoginTime;
+
+    bool operator==(const SystemSharing& rhs) const
+    {
+        return std::tie(static_cast<const base_type&>(*this), systemId, accountId, accountFullName)
+            == std::tie(static_cast<const base_type&>(rhs), rhs.systemId, rhs.accountId,
+                rhs.accountFullName);
+    }
+
+    bool operator<(const SystemSharing& rhs) const
+    {
+        return std::tie(static_cast<const base_type&>(*this), systemId, accountId, accountFullName)
+            < std::tie(static_cast<const base_type&>(rhs), rhs.systemId, rhs.accountId,
+                rhs.accountFullName);
+    }
+};
+
+#define SystemSharing_Fields (systemId)(accountId)(accountFullName)(usageFrequency)(lastLoginTime) \
+    (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)
+
+NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(usageFrequency) \
+    (lastLoginTime))
+
+using SystemSharingList = std::vector<SystemSharing>;
 
 struct ShareSystemQuery
 {
@@ -352,9 +448,6 @@ struct SystemDataEx: SystemData
     /**%apidoc Access role of the entity (usually, an account) that requested the system information. */
     SystemAccessRole accessRole = SystemAccessRole::none;
 
-    /**%apidoc Permissions, account can share current system with. */
-    std::vector<SystemAccessRoleData> sharingPermissions;
-
     SystemHealth stateOfHealth = SystemHealth::offline;
 
     /**%apidoc
@@ -388,8 +481,7 @@ struct SystemDataEx: SystemData
 // will not been seen anywhere SystemDataEx type is used.
 // TODO: #akolesnikov Move NX_REFLECTION_INSTRUMENT for other types here as well.
 NX_REFLECTION_INSTRUMENT(SystemDataEx,
-    (accessRole)(sharingPermissions)(stateOfHealth) \
-    (usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(version))
+    (accessRole)(stateOfHealth)(usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(version))
 
 // Providing custom JSON serialization functions so that SystemDataEx::attributes are added on the
 // same level with other fields in the resulting JSON document.
@@ -543,16 +635,16 @@ struct SystemOfferPatch
 */
 struct SystemUsersBatchItem
 {
-    /**%apidoc Users emails */
+    /**%apidoc Users emails. */
     std::vector<std::string> users;
 
-    /**%apidoc System ids */
+    /**%apidoc System ids. */
     std::vector<std::string> systems;
 
-    /**%apidoc Access role to be assigned. */
-    SystemAccessRole accessRole = SystemAccessRole::none;
+    /**%apidoc Roles to be assigned. Empty array is used for revoking access. */
+    std::vector<std::string> roleIds;
 
-    /**%apidoc Custom attributes to assign */
+    /**%apidoc Custom attributes to assign. */
     std::map<std::string, std::string> attributes;
 };
 
@@ -561,7 +653,7 @@ struct SystemUsersBatchItem
 */
 struct CreateBatchRequest
 {
-    /**%apidoc Batch items to process */
+    /**%apidoc Batch items to process. */
     std::vector<SystemUsersBatchItem> items;
 };
 

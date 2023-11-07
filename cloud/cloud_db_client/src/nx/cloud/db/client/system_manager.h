@@ -39,6 +39,7 @@ public:
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;
 
     virtual void shareSystem(
+        const std::string& systemId,
         api::ShareSystemRequest sharingData,
         std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) override;
 

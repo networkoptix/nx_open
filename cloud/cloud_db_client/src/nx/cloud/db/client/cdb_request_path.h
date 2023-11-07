@@ -22,8 +22,6 @@ static constexpr char kAccountEmailParam[] = "accountEmail";
 //-------------------------------------------------------------------------------------------------
 
 static constexpr char kSystemBindPath[] = "/cdb/systems/bind";
-static constexpr char kSystemSharePath[] = "/cdb/systems/share";
-static constexpr char kSystemGetAccessRoleListPath[] = "/cdb/systems/getAccessRoleList";
 static constexpr char kSystemRecordUserSessionStartPath[] = "/cdb/systems/recordUserSessionStart";
 
 static constexpr char kSystemsPath[] = "/cdb/systems";
@@ -32,8 +30,8 @@ static constexpr char kSystemPath[] = "/cdb/systems/{systemId}";
 static constexpr char kSystemHealthHistoryPath[] = "/cdb/systems/{systemId}/health-history";
 static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/systems/{systemId}/merged_systems/";
 static constexpr char kSystemsValidateMSSignature[] = "/cdb/systems/{systemId}/signature/validate";
-static constexpr char kSystemUsersPath[] = "/cdb/systems/{systemId}/users";
-static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{accountEmail}";
+static constexpr char kSystemUsersPath[] = "/cdb/v2/systems/{systemId}/users";
+static constexpr char kSystemUserPath[] = "/cdb/v2/systems/{systemId}/users/{accountEmail}";
 
 static constexpr char kSystemAttributesPath[] = "/cdb/systems/{systemId}/attributes";
 static constexpr char kSystemAttributePath[] = "/cdb/systems/{systemId}/attributes/{attributeName}";
@@ -137,6 +135,11 @@ static constexpr char kSystemGetPath[] = "/cdb/systems/get";
 static constexpr char kSystemRenamePath[] = "/cdb/systems/rename";
 static constexpr char kSystemUpdatePath[] = "/cdb/systems/update";
 static constexpr char kSystemGetCloudUsersPath[] = "/cdb/systems/getCloudUsers";
+
+static constexpr char kSystemGetAccessRoleListPath[] = "/cdb/systems/getAccessRoleList";
+static constexpr char kSystemSharePath[] = "/cdb/systems/share";
+static constexpr char kSystemUsersPath[] = "/cdb/systems/{systemId}/users";
+static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{accountEmail}";
 
 } // namespace deprecated
 

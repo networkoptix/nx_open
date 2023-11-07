@@ -30,8 +30,8 @@ public:
     virtual void shareSystem(
         const std::string& organizationId,
         const std::string& systemId,
-        const api::ShareSystemRequest& sharing,
-        std::function<void(api::ResultCode, api::ShareSystemRequest)> completionHandler) override;
+        const api::ShareSystemRequest& request,
+        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) override;
 
 private:
     AsyncRequestsExecutor* m_requestsExecutor = nullptr;

@@ -65,6 +65,7 @@ public:
      * @note sharing is removed if sharingData.accessRole is api::SystemAccessRole::none.
      */
     virtual void shareSystem(
+        const std::string& systemId,
         ShareSystemRequest sharingData,
         std::function<void(ResultCode, SystemSharing)> completionHandler) = 0;
 
