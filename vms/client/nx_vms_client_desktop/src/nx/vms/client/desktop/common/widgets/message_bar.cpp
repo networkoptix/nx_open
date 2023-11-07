@@ -177,29 +177,25 @@ void CommonMessageBar::init(const BarDescription& barDescription)
     mainLayout()->setSpacing(style::Metrics::kStandardPadding);
 
     QString backgroundColor;
-    QString frameColor;
     QIcon icon;
     switch (barDescription.level)
     {
         case BarDescription::BarLevel::Info:
-            backgroundColor = "attention.blue_bg";
-            frameColor = "attention.blue_dark";
+            backgroundColor = "dark9";
             icon = qnSkin->icon("banners/info.svg");
             break;
         case BarDescription::BarLevel::Warning:
-            backgroundColor = "attention.yellow_bg";
-            frameColor = "yellow_d1";
+            backgroundColor = "dark9";
             icon = qnSkin->icon("banners/warning.svg");
             break;
         case BarDescription::BarLevel::Error:
-            backgroundColor = "attention.red_bg";
-            frameColor = "red_d1";
+            backgroundColor = "red_d1";
             icon = qnSkin->icon("banners/error.svg");
             break;
     }
 
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color(backgroundColor));
-    setPaletteColor(this, QPalette::Dark, core::colorTheme()->color(frameColor));
+    setPaletteColor(this, QPalette::Dark, {}); // No frame color is used for banners.
     d->icon->setIcon(icon);
 
     setOpenExternalLinks(barDescription.isOpenExternalLinks);
