@@ -912,8 +912,12 @@ QString UserSettingsDialog::warningForTemporaryUser(
     const nx::core::access::ResourceAccessMap& sharedResources,
     const nx::vms::api::GlobalPermissions permissions) const
 {
-    static constexpr nx::vms::api::GlobalPermissions kUserPermissions =
-        nx::vms::api::GlobalPermission::viewLogs | nx::vms::api::GlobalPermission::generateEvents;
+    using namespace nx::vms::api;
+    static constexpr GlobalPermissions kUserPermissions =
+        GlobalPermission::viewLogs | GlobalPermission::generateEvents;
+
+    static constexpr AccessRights kTemporaryUserViewAccesRights = AccessRight::view
+        | AccessRight::viewArchive | AccessRight::exportArchive | AccessRight::viewBookmarks;
 
     const auto hasGroups =
         [this, &parentGroups](const QSet<QnUuid>& permissionGroups)
@@ -938,9 +942,9 @@ QString UserSettingsDialog::warningForTemporaryUser(
             return std::any_of(
                 sharedResources.begin(),
                 sharedResources.end(),
-                [](const nx::vms::api::AccessRights& accessRights)
+                [](const AccessRights& accessRights)
                 {
-                    return accessRights & ~nx::vms::api::kViewAccessRights;
+                    return accessRights & ~kTemporaryUserViewAccesRights;
                 });
         };
 
@@ -949,7 +953,7 @@ QString UserSettingsDialog::warningForTemporaryUser(
         return tr("Granting broad permissions to the temporary user is not recommended."
             " Some actions may not work.");
     }
-    else if (hasGroups({api::kAdvancedViewersGroupId, api::kViewersGroupId})
+    else if (hasGroups({api::kAdvancedViewersGroupId})
         || permissions & kUserPermissions || hasAccessRightAboveView())
     {
         return tr("Granting broad permissions to the temporary user is not recommended.");
