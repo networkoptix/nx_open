@@ -113,17 +113,19 @@ NX_REFLECTION_INSTRUMENT_ENUM(SystemAccessRole,
     system
 )
 
-#define ShareSystemRequest_Fields (accountEmail)(systemId)(accessRole)(userRoleId)(customPermissions)(isEnabled)(vmsUserId)
+#define ShareSystemRequestV1_Fields (accountEmail)(systemId)(accessRole)(userRoleId) \
+    (customPermissions)(isEnabled)(vmsUserId)
 
-NX_REFLECTION_INSTRUMENT(ShareSystemRequest, ShareSystemRequest_Fields)
+NX_REFLECTION_INSTRUMENT(ShareSystemRequestV1, ShareSystemRequestV1_Fields)
 
-#define SystemSharing_Fields ShareSystemRequest_Fields(accountId)(accountFullName)(usageFrequency)(lastLoginTime)
+#define SystemSharingV1_Fields ShareSystemRequestV1_Fields(accountId)(accountFullName) \
+    (usageFrequency)(lastLoginTime)
 
-NX_REFLECTION_INSTRUMENT(SystemSharing, SystemSharing_Fields)
+NX_REFLECTION_INSTRUMENT(SystemSharingV1, SystemSharingV1_Fields)
 
-#define SystemSharingList_Fields (sharing)
+#define SystemSharingV1List_Fields (sharing)
 
-NX_REFLECTION_INSTRUMENT(SystemSharingList, SystemSharingList_Fields)
+NX_REFLECTION_INSTRUMENT(SystemSharingV1List, SystemSharingV1List_Fields)
 
 #define SystemAccessRoleData_Fields (accessRole)
 
@@ -176,7 +178,7 @@ NX_REFLECTION_INSTRUMENT(SystemOfferPatch, (comment)(status))
 
 NX_REFLECTION_INSTRUMENT(Attribute, (name)(value))
 
-NX_REFLECTION_INSTRUMENT(SystemUsersBatchItem, (users)(systems)(accessRole)(attributes))
+NX_REFLECTION_INSTRUMENT(SystemUsersBatchItem, (users)(systems)(roleIds)(attributes))
 
 NX_REFLECTION_INSTRUMENT(CreateBatchRequest, (items))
 

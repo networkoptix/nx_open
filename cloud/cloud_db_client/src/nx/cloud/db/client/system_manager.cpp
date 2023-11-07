@@ -84,10 +84,10 @@ void SystemManager::getSystems(
 }
 
 void SystemManager::shareSystem(
+    const std::string& systemId,
     api::ShareSystemRequest sharingData,
     std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
 {
-    auto systemId = sharingData.systemId;
     m_requestsExecutor->executeRequest<api::SystemSharing>(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
@@ -126,7 +126,7 @@ void SystemManager::getAccessRoleList(
 {
     m_requestsExecutor->executeRequest<api::SystemAccessRoleList>(
         nx::network::http::Method::get,
-        kSystemGetAccessRoleListPath,
+        deprecated::kSystemGetAccessRoleListPath,
         api::SystemId(systemId),
         std::move(completionHandler));
 }

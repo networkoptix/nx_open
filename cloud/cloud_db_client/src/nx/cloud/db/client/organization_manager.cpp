@@ -51,16 +51,17 @@ void OrganizationManager::removeSystem(
         rest::substituteParameters(kOrganizationSystemPath, {organizationId, systemId}),
         std::move(completionHandler));
 }
+
 void OrganizationManager::shareSystem(
     const std::string& organizationId,
     const std::string& systemId,
-    const api::ShareSystemRequest& sharing,
-    std::function<void(api::ResultCode, api::ShareSystemRequest)> completionHandler)
+    const api::ShareSystemRequest& request,
+    std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
 {
-    m_requestsExecutor->executeRequest<api::ShareSystemRequest>(
+    m_requestsExecutor->executeRequest<api::SystemSharing>(
         Method::post,
         rest::substituteParameters(kOrganizationSystemUsersPath, {organizationId, systemId}),
-        sharing,
+        request,
         std::move(completionHandler));
 }
 

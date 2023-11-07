@@ -78,6 +78,9 @@ std::optional<QnUuid> UserDataDeprecated::permissionPresetToGroupId(GlobalPermis
 
 GlobalPermissionsDeprecated UserDataDeprecated::groupIdToPermissionPreset(const QnUuid& id)
 {
+    if (id == kAdministratorsGroupId)
+        return GlobalPermissionDeprecated::adminPermissions;
+
     if (id == kPowerUsersGroupId)
         return GlobalPermissionDeprecated::adminPermissions;
 
