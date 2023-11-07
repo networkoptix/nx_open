@@ -34,8 +34,8 @@ public:
     void refresh();
     bool isNewRequestsEnabled() const { return m_isNewRequestsEnabled; }
     Q_INVOKABLE void setNewRequestsEnabled(bool enabled);
-    Q_INVOKABLE void remove(const QString& id);
-    Q_INVOKABLE void enable(const QString& id);
+    Q_INVOKABLE void reject(const QString& id);
+    Q_INVOKABLE void approve(const QString& id, const QString& authCode);
 
 signals:
     void requestsChanged();

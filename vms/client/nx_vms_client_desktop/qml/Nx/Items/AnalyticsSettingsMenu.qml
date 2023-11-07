@@ -42,6 +42,16 @@ NavigationMenu
         }
     }
 
+    function setCurrentItem(engineId, sectionId, requestId)
+    {
+        viewModel.setCurrentItem("Engine", engineId, sectionId, requestId)
+    }
+
+    function getId(engineId, sectionId, requestId)
+    {
+        return sectionId || requestId || engineId
+    }
+
     MenuSection
     {
         id: plugins
@@ -59,6 +69,7 @@ NavigationMenu
         content: EngineList
         {
             navigationMenu: menu
+            viewModel: menu.viewModel
             engines: plugins.engines
             enabledEngines: viewModel.enabledEngines
             level: plugins.mainItemVisible ? 1 : 0
@@ -92,6 +103,7 @@ NavigationMenu
         content: EngineList
         {
             navigationMenu: menu
+            viewModel: menu.viewModel
             engines: apiIntegrations.engines
             enabledEngines: viewModel.enabledEngines
         }

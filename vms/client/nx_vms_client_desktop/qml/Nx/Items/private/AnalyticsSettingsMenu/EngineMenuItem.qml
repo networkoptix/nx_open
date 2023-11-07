@@ -8,10 +8,11 @@ MenuSection
 
     property var engineId
     property var sectionId: null
+    property var requestId
     property var settingsModel
 
     text: (settingsModel && settingsModel.caption) || ""
-    itemId: sectionId ?? engineId
+    itemId: navigationMenu.getId(engineId, sectionId, requestId)
     collapsible:
         !!settingsModel
         && !!settingsModel.sections
@@ -20,7 +21,7 @@ MenuSection
 
     onClicked:
     {
-        viewModel.setCurrentItem("Engine", engineId, sectionId)
+        navigationMenu.setCurrentItem(engineId, sectionId, requestId)
     }
 
     content: Column

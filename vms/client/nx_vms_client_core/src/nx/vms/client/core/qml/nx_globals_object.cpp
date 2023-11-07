@@ -249,6 +249,11 @@ void NxGlobalsObject::copyToClipboard(const QString& text) const
     qApp->clipboard()->setText(text);
 }
 
+QString NxGlobalsObject::clipboardText() const
+{
+    return qApp->clipboard()->text();
+}
+
 double NxGlobalsObject::toDouble(const QVariant& value) const
 {
     return value.toDouble();

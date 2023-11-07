@@ -63,7 +63,7 @@ Scrollable
                 width: column.width
                 request: modelData
 
-                onEnableClicked:
+                onApproveClicked: (authCode) =>
                 {
                     const result = MessageBox.exec(
                         MessageBox.Icon.Question,
@@ -79,11 +79,10 @@ Scrollable
                         qsTr("Enable Integration"));
 
                     if (result !== MessageBox.Cancel)
-                        requestsModel.enable(id)
-
+                        requestsModel.approve(id, authCode)
                 }
 
-                onRemoveClicked:
+                onRejectClicked:
                 {
                     const result = MessageBox.exec(
                         MessageBox.Icon.Warning,
@@ -98,7 +97,7 @@ Scrollable
                         qsTr("Remove Request"));
 
                     if (result !== MessageBox.Cancel)
-                        requestsModel.remove(id)
+                        requestsModel.reject(id)
                 }
             }
         }

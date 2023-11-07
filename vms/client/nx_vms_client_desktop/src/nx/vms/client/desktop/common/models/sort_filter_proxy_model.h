@@ -30,6 +30,7 @@ class SortFilterProxyModel: public QSortFilterProxyModel
         READ sortRoleName WRITE setSortRoleName NOTIFY sortRoleNameChanged)
     Q_PROPERTY(QString filterRoleName
         READ filterRoleName WRITE setFilterRoleName NOTIFY filterRoleNameChanged)
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
 
 public:
     SortFilterProxyModel(QObject* parent = nullptr);
@@ -39,11 +40,13 @@ public:
     void setFilterRoleName(const QString& name, bool force = false);
     QString filterRoleName() const;
 
+    int count() const;
     int sourceRole(const QString& name) const;
 
     static void registerQmlType();
 
 signals:
+    void countChanged();
     void sortRoleNameChanged();
     void filterRoleNameChanged();
 

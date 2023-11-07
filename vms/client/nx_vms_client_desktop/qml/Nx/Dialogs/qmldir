@@ -2,5 +2,7 @@ module Nx.Dialogs
 
 Dialog 1.0 Dialog.qml
 DialogWithState 1.0 DialogWithState.qml
+DialogTabControl 1.0 DialogTabControl.qml
+DialogTabButton 1.0 DialogTabButton.qml
 FigureEditorDialog 1.0 FigureEditorDialog.qml
 ModalDialog 1.0 ModalDialog.qml

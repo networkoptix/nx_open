@@ -1,6 +1,7 @@
 module Nx.Items
 
 AnalyticsSettingsMenu 1.0 AnalyticsSettingsMenu.qml
+IntegrationsMenu 1.0 IntegrationsMenu.qml
 CameraDisplay 1.0 CameraDisplay.qml
 DewarpingSettings 1.0 DewarpingSettings.qml
 FigureEditor 1.0 FigureEditor.qml

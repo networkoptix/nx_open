@@ -297,6 +297,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, nativeLinkForTemporaryUsers,
         "[Feature] Use native link type for temporary user");
 
+    // VMS-41884
+    NX_INI_FLAG(false, integrationsManagement,
+        "[Feature] Enables Integrations Management feature.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

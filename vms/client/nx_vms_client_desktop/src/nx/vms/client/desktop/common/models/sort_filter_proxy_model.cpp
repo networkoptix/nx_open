@@ -31,7 +31,16 @@ SortFilterProxyModel::SortFilterProxyModel(QObject* parent):
             updateRoles();
         });
 
+    connect(this, &QAbstractItemModel::rowsInserted, this, &SortFilterProxyModel::countChanged);
+    connect(this, &QAbstractItemModel::rowsRemoved, this, &SortFilterProxyModel::countChanged);
+    connect(this, &QAbstractItemModel::modelReset, this, &SortFilterProxyModel::countChanged);
+
     sort(/*column*/ 0); //< Start sorting.
+}
+
+int SortFilterProxyModel::count() const
+{
+    return rowCount();
 }
 
 int SortFilterProxyModel::sourceRole(const QString& name) const
