@@ -564,6 +564,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
     chain->start(nx::utils::guarded(this,
         [chain, state, this](
             bool success,
+            nx::network::rest::Result::Error errorCode,
             const QString& errorString)
         {
             d->isSaving = false;
@@ -572,7 +573,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
             {
                 saveStateComplete(state);
             }
-            else
+            else if (errorCode != nx::network::rest::Result::Error::SessionExpired)
             {
                 QnMessageBox messageBox(
                     QnMessageBoxIcon::Critical,
@@ -665,9 +666,10 @@ void GroupSettingsDialog::removeGroups(
     chain->start(nx::utils::guarded(chain,
         [chain, callback = std::move(callback)](
             bool success,
+            nx::network::rest::Result::Error errorCode,
             const QString& errorString)
         {
-            if (callback)
+            if (callback && errorCode != nx::network::rest::Result::Error::SessionExpired)
                 callback(success, errorString);
             chain->deleteLater();
         }));
