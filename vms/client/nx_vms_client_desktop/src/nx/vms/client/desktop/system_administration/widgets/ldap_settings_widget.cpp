@@ -504,9 +504,14 @@ void LdapSettingsWidget::applyChanges()
                 globalSettings()->setLdap(settingsBackup);
 
                 if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-                    showError(error->errorString);
+                {
+                    if (error->error != nx::network::rest::Result::SessionExpired)
+                        showError(error->errorString);
+                }
                 else
+                {
                     showError(tr("Connection failed"));
+                }
             }
         });
 

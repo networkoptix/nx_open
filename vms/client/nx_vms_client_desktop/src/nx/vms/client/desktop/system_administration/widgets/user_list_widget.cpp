@@ -752,9 +752,9 @@ void UserListWidget::Private::deleteUsers(const QnUserResourceList& usersToDelet
 
     chain->start(nx::utils::guarded(this,
         [this, chain, usersToDelete, rollback = std::move(rollback)](
-            bool success, const QString& errorString)
+            bool success, nx::network::rest::Result::Error errorCode, const QString& errorString)
         {
-            if (!success)
+            if (!success && errorCode != nx::network::rest::Result::Error::SessionExpired)
             {
                 QnResourceList nonDeletedUsers;
                 for (const auto& user: usersToDelete)
@@ -888,9 +888,10 @@ void UserListWidget::Private::editSelected()
     auto rollback = nx::utils::makeScopeGuard([this]{ setMassEditInProgress(false); });
 
     requestChain->start(
-        [this, rollback = std::move(rollback)](bool success, const QString& errorString)
+        [this, rollback = std::move(rollback)](
+            bool success,  nx::network::rest::Result::Error errorCode, const QString& errorString)
         {
-            if (success)
+            if (success || errorCode == nx::network::rest::Result::Error::SessionExpired)
                 return;
 
             QnMessageBox messageBox(
