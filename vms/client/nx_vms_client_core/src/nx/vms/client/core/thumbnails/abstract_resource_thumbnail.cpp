@@ -17,6 +17,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/thumbnails/generic_image_store.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <utils/common/synctime.h>
@@ -67,6 +68,7 @@ struct AbstractResourceThumbnail::Private
     GenericImageStore* const imageStore;
 
     QnResourcePtr resource;
+    nx::utils::ScopedConnections resourceConnections;
     int maximumSize = kUnlimitedSize;
     bool active = true;
     Status status;
@@ -161,9 +163,7 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
     if (d->resource == value)
         return;
 
-    if (d->resource)
-        d->resource->disconnect(this);
-
+    d->resourceConnections.reset();
     d->resource = value;
     reset();
 
@@ -174,22 +174,22 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
 
     if (d->resource)
     {
-        connect(d->resource.get(), &QnResource::propertyChanged, this,
+        d->resourceConnections << connect(d->resource.get(), &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& key)
             {
                 if (key == QnMediaResource::customAspectRatioKey())
                     d->updateAspectRatio();
             });
 
-        connect(d->resource.get(), &QnResource::rotationChanged, this,
+        d->resourceConnections << connect(d->resource.get(), &QnResource::rotationChanged, this,
             [this]() { d->updateRotation(); });
 
-        connect(d->resource.get(), &QnResource::parentIdChanged, this,
+        d->resourceConnections << connect(d->resource.get(), &QnResource::parentIdChanged, this,
             [this]() { d->updateIsArmServer(); });
 
         // Safety measure. Actually this shall be done by the owner class, who calls setResource.
         // It should listen for resourcesRemoved instead.
-        connect(d->resource.get(), &QnResource::flagsChanged, this,
+        d->resourceConnections << connect(d->resource.get(), &QnResource::flagsChanged, this,
             [this]()
             {
                 if (NX_ASSERT(d->resource) && d->resource->hasFlags(Qn::removed))
