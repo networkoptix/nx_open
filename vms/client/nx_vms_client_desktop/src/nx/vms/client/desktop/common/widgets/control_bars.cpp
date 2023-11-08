@@ -173,6 +173,7 @@ QnWordWrappedLabel* MessageBar::label() const
 AlertBar::AlertBar(QWidget* parent):
     base_type(parent)
 {
+    setPaletteColor(this, QPalette::Base, colorTheme()->color("dialog.alertBar")); // This is required when drawing alert bars on the scene.
     setPaletteColor(this, QPalette::Window, colorTheme()->color("dialog.alertBar"));
     setPaletteColor(this, QPalette::WindowText, colorTheme()->color("light4"));
 }
