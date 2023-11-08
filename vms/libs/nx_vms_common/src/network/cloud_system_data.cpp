@@ -17,5 +17,6 @@ bool QnCloudSystem::visuallyEqual(const QnCloudSystem& other) const
         && name == other.name
         && authKey == other.authKey
         && ownerAccountEmail == other.ownerAccountEmail
-        && ownerFullName == other.ownerFullName;
+        && ownerFullName == other.ownerFullName
+        && organizationId == other.organizationId;
 }

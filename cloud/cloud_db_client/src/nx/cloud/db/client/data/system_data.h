@@ -36,7 +36,7 @@ NX_REFLECTION_INSTRUMENT_ENUM(SystemStatus,
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(authKeyHash)(ownerAccountEmail) \
                           (status)(cloudConnectionSubscriptionStatus)(systemSequence) \
-                          (opaque)(registrationTime)(system2faEnabled)
+                          (opaque)(registrationTime)(system2faEnabled)(organizationId)
 
 NX_REFLECTION_INSTRUMENT(SystemData, SystemData_Fields)
 
@@ -209,4 +209,4 @@ NX_REFLECTION_INSTRUMENT(SystemOfferPatch, (comment)(status))
 
 NX_REFLECTION_INSTRUMENT(Attribute, (name)(value))
 
-} // namespace nx::cloud::db::api
+} // namespace nx::cloud::client::data

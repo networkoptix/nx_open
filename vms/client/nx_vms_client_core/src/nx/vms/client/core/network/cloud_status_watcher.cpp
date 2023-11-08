@@ -78,6 +78,7 @@ QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
         system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>
             (systemData.lastLoginTime.time_since_epoch()).count();
         system.version = QString::fromStdString(systemData.version);
+        system.organizationId = QString::fromStdString(systemData.organizationId);
         result.append(system);
     }
 

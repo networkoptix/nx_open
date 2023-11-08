@@ -9,6 +9,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
+#include <nx/cloud/cps/api/system_data.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -21,10 +22,12 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/license/usage_helper.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 using namespace nx::cloud::db::api;
+using namespace nx::cloud::cps::api;
 using namespace std::chrono;
 
 namespace {
@@ -35,11 +38,13 @@ constexpr auto kSuppressCloudTimeout = 60s;
 
 namespace nx::vms::client::desktop {
 
-ConnectToCloudTool::ConnectToCloudTool(QWidget* parent):
+ConnectToCloudTool::ConnectToCloudTool(QWidget* parent, nx::vms::common::SystemSettings* settings)
+    :
     base_type(parent),
     QnSessionAwareDelegate(parent),
     m_parent(parent),
-    m_cloudConnectionFactory(std::make_unique<core::CloudConnectionFactory>())
+    m_cloudConnectionFactory(std::make_unique<core::CloudConnectionFactory>()),
+    m_systemSettings(settings)
 {
     NX_ASSERT(m_parent);
 }
@@ -156,20 +161,33 @@ void ConnectToCloudTool::onCloudAuthDataReady()
     m_cloudAuthData = m_oauthLoginDialog->authData();
     NX_ASSERT(!m_cloudAuthData.empty());
 
-    m_cloudConnection = m_cloudConnectionFactory->createConnection();
-    m_cloudConnection->setCredentials(m_cloudAuthData.credentials);
+    SystemRegistrationRequest request;
+    request.name = systemSettings()->systemName().toStdString();
+    request.customization = nx::branding::customization().toStdString();
 
-    SystemRegistrationData sysRegistrationData;
-    sysRegistrationData.name = systemSettings()->systemName().toStdString();
-    sysRegistrationData.customization = nx::branding::customization().toStdString();
+    // TODO: Fill organization here from dialog data.
+    request.organization = std::string();
 
-    const auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
-        [this](ResultCode result, SystemData systemData)
+    auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
+        [this](ResultCode result, SystemRegistrationResponse data)
         {
-            onBindFinished(result, std::move(systemData));
+            onBindFinished(result, std::move(data));
         });
 
-    m_cloudConnection->systemManager()->bindSystem(sysRegistrationData, std::move(handler));
+    if (request.organization.empty())
+    {
+        m_cloudConnection = m_cloudConnectionFactory->createConnection();
+        m_cloudConnection->setCredentials(m_cloudAuthData.credentials);
+        m_cloudConnection->systemManager()->bindSystem(request, std::move(handler));
+    }
+    else
+    {
+        nx::utils::Url url(nx::vms::license::ChannelPartnerServer::baseUrl(m_systemSettings));
+        m_channelPartnerClient = std::make_unique<nx::cloud::cps::ChannelPartnerClient>(
+            m_systemSettings->cloudHost().toStdString(), url);
+        m_channelPartnerClient->setHttpCredentials(m_cloudAuthData.credentials);
+        m_channelPartnerClient->bindSystemToOrganization(std::move(request), std::move(handler));
+    }
 }
 
 bool ConnectToCloudTool::processBindResult(ResultCode result)
@@ -211,7 +229,7 @@ bool ConnectToCloudTool::processBindResult(ResultCode result)
     return false;
 }
 
-void ConnectToCloudTool::onBindFinished(ResultCode result, SystemData systemData)
+void ConnectToCloudTool::onBindFinished(ResultCode result, SystemRegistrationResponse systemData)
 {
     NX_DEBUG(this, "Cloud DB bind finished, result: %1", result);
 
@@ -297,6 +315,7 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
         QString::fromStdString(m_systemData.id),
         QString::fromStdString(m_systemData.authKey),
         QString::fromStdString(m_cloudAuthData.credentials.username),
+        QString::fromStdString(m_systemData.organizationId),
         localToken.value,
         std::move(handleReply),
         m_parent->thread());

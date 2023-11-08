@@ -259,6 +259,10 @@ struct CloudSystemsFinder::Private
             NX_VERBOSE(this, "Set 2fa state for the system \"%1\" <%2> to [%3]",
                 systemDescription->name(), systemDescription->id(), system.system2faEnabled);
             systemDescription->set2faEnabled(system.system2faEnabled);
+
+            NX_VERBOSE(this, "Set organization Id for the system \"%1\" <%2> to [%3]",
+                systemDescription->name(), systemDescription->id(), system.organizationId);
+            systemDescription->setOrganization(system.organizationId);
         }
     }
 
@@ -284,7 +288,8 @@ struct CloudSystemsFinder::Private
                 system.ownerAccountEmail,
                 system.ownerFullName,
                 system.online,
-                system.system2faEnabled);
+                system.system2faEnabled,
+                system.organizationId);
 
             if (system.online)
             {

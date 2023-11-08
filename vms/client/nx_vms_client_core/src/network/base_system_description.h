@@ -110,4 +110,5 @@ signals:
     void oauthSupportedChanged();
     void versionChanged();
     void saasStateChanged();
+    void organizationChanged();
 };

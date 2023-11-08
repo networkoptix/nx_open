@@ -30,29 +30,29 @@ struct SystemRegistrationData
  */
 struct SystemAttributesUpdate
 {
-    std::optional<std::string> systemId = std::nullopt;
+    std::optional<std::string> systemId;
 
     /**%apidoc Non-unique system name. */
-    std::optional<std::string> name = std::nullopt;
+    std::optional<std::string> name;
 
     /**%apidoc Vms-specific data. Transparently stored and returned. */
-    std::optional<std::string> opaque = std::nullopt;
+    std::optional<std::string> opaque;
 
     /**%apidoc If set to true, then cloud users will be asked to enter 2FA code when logging
      * into this system.
      */
-    std::optional<bool> system2faEnabled = std::nullopt;
+    std::optional<bool> system2faEnabled;
 
     /**%apidoc
      * %deprecated Replaced by `mfaCode` attribute.
      * One-time password from the authenticator app.
      */
-    std::optional<std::string> totp = std::nullopt;;
+    std::optional<std::string> totp;
 
     /**%apidoc One-time password from the authenticator app.
      * Required and MUST be valid if changing system2faEnabled setting.
      */
-    std::optional<std::string> mfaCode = std::nullopt;
+    std::optional<std::string> mfaCode;
 };
 
 enum class SystemStatus
@@ -104,6 +104,8 @@ struct SystemData
     /**%apidoc If true, then all cloud users are asked to use 2FA to log in to this system. */
     bool system2faEnabled = false;
 
+    std::string organizationId;
+
     bool operator==(const SystemData& right) const
     {
         return
@@ -115,7 +117,8 @@ struct SystemData
             cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus &&
             systemSequence == right.systemSequence &&
             opaque == right.opaque &&
-            system2faEnabled == right.system2faEnabled;
+            system2faEnabled == right.system2faEnabled &&
+            organizationId == right.organizationId;
     }
 };
 

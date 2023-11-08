@@ -292,6 +292,9 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
     m_cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::cloudAccountName, QString(), this, [] { return tr("Cloud owner account"); });
 
+    m_organizationIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
+        Names::organizationId, QnUuid(), this, [] { return tr("Organization Id"); });
+
     m_cloudSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::cloudSystemID, QString(), this, [] { return tr("Cloud System ID"); });
 
@@ -311,6 +314,7 @@ SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
     AdaptorList result;
     result
         << m_cloudAccountNameAdaptor
+        << m_organizationIdAdaptor
         << m_cloudSystemIdAdaptor
         << m_cloudAuthKeyAdaptor
         << m_system2faEnabledAdaptor
@@ -1560,6 +1564,16 @@ QString SystemSettings::cloudAccountName() const
 void SystemSettings::setCloudAccountName(const QString& value)
 {
     m_cloudAccountNameAdaptor->setValue(value);
+}
+
+QnUuid SystemSettings::organizationId() const
+{
+    return m_organizationIdAdaptor->value();
+}
+
+void SystemSettings::setOrganizationId(const QnUuid& value)
+{
+    m_organizationIdAdaptor->setValue(value);
 }
 
 QString SystemSettings::cloudSystemId() const

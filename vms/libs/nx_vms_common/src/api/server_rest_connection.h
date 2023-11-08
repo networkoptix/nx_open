@@ -260,6 +260,7 @@ public:
         const QString& cloudSystemId,
         const QString& cloudAuthKey,
         const QString& cloudAccountName,
+        const QString& organizationId,
         const std::string& ownerSessionToken,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread = nullptr);
