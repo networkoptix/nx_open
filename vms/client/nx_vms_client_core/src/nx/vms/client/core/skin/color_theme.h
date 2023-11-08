@@ -58,6 +58,7 @@ public:
         bool hovered, bool pressed, bool selected, bool disabled, bool checked) const;
 
     static Q_INVOKABLE QColor transparent(const QColor& color, qreal alpha);
+    static Q_INVOKABLE QColor blend(const QColor& background, const QColor& foreground, qreal alpha);
     Q_INVOKABLE QColor darker(const QColor& color, int offset) const;
     Q_INVOKABLE QColor lighter(const QColor& color, int offset) const;
 

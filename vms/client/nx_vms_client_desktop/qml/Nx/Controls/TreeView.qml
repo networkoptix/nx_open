@@ -31,6 +31,10 @@ FocusScope
     property alias scrollStepSize: listView.scrollStepSize //< In pixels.
     property alias spacing: listView.spacing
 
+    // Whether the selection overlaps spacing between items. As in that case neighboring selection
+    // lines overlap each other, `selectionHighlightColor` must be opaque.
+    property bool selectionOverlapsSpacing: false
+
     property alias hoverHighlightColor: listView.hoverHighlightColor
     property color selectionHighlightColor: "teal"
     property color inactiveSelectionHighlightColor: hoverHighlightColor
@@ -52,7 +56,10 @@ FocusScope
     readonly property alias hoveredRowItem: listView.hoveredItem
     readonly property Item hoveredItem: hoveredRowItem && hoveredRowItem.delegateItem
 
-    readonly property bool selectionEmpty: selectionModel.effectiveSelectedIndexes.length === 0
+    readonly property bool hasSelection: selectionModel.effectiveSelectedIndexes.length > 0
+
+    // Whether clicking on a single selected item unselects it.
+    property bool clickUnselectsSingleSelectedItem: false
 
     property real leftMargin: 0
     property real rightMargin: 0
@@ -145,6 +152,12 @@ FocusScope
 
         for (let i = 1; i < linearIndexes.length; ++i)
             selectionModel.select(linearIndexes[i], ItemSelectionModel.Select)
+    }
+
+    function isSelected(index)
+    {
+        const linearIndex = linearizationListModel.mapFromSource(index)
+        return linearIndex.valid && selectionModel.isSelected(linearIndex)
     }
 
     function ensureVisible(indexes)
@@ -418,12 +431,19 @@ FocusScope
                             selectionModel.isRowSelected(index, NxGlobals.invalidModelIndex())
                     }
 
-                    anchors.fill: parent
-                    visible: isItemSelected
+                    property int margin: treeView.selectionOverlapsSpacing ? -treeView.spacing : 0
 
-                    color: treeView.activeFocus && !isDelegateFocused
-                        ? selectionHighlightColor
-                        : inactiveSelectionHighlightColor
+                    parent: listItem.parent
+                    visible: isItemSelected
+                    z: -10
+
+                    anchors.fill: (parent === listItem.parent) ? listItem : undefined
+                    anchors.topMargin: margin
+                    anchors.bottomMargin: margin
+
+                    color: treeView.activeFocus && !listItem.isDelegateFocused
+                        ? treeView.selectionHighlightColor
+                        : treeView.inactiveSelectionHighlightColor
                 }
 
                 DropArea
@@ -585,7 +605,8 @@ FocusScope
                             if (!modelIndex.valid)
                                 return
 
-                            if (mouse.button == Qt.MiddleButton || treeView.activateOnSingleClick(listItem.sourceIndex))
+                            if (mouse.button == Qt.MiddleButton
+                                || treeView.activateOnSingleClick(listItem.sourceIndex))
                             {
                                 activated(modelIndex,
                                     selection(),
@@ -597,7 +618,7 @@ FocusScope
                             else
                             {
                                 if (isSelected
-                                        && !(mouse.modifiers & (Qt.ControlModifier | Qt.ShiftModifier)))
+                                    && !(mouse.modifiers & (Qt.ControlModifier | Qt.ShiftModifier)))
                                 {
                                     if (isDelegateFocused)
                                         forceActiveFocus()
@@ -633,22 +654,33 @@ FocusScope
 
                         reselectOnRelease = false
 
-                        if (modelIndex.valid && containsMouse)
-                        {
-                            const editingRequired = isEditable
-                                && !justGotFocus
-                                && mouse.button == Qt.LeftButton
-                                && selectionModel.selection.length == 1
-                                && selectionModel.selection[0].height == 1
+                        if (!modelIndex.valid || !containsMouse)
+                            return
 
+                        const editingRequired = isEditable
+                            && !justGotFocus
+                            && mouse.button == Qt.LeftButton
+                            && selectionModel.selection.length == 1
+                            && selectionModel.selection[0].height == 1
+
+                        if (treeView.clickUnselectsSingleSelectedItem
+                            && selectionModel.effectiveSelectedIndexes.length === 1
+                            && NxGlobals.fromPersistent(
+                                selectionModel.effectiveSelectedIndexes[0]) == modelIndex)
+                        {
+                            selectionModel.clearSelection()
+                            selectionModel.clearCurrentIndex()
+                        }
+                        else
+                        {
                             selectionModel.setCurrentIndex(
                                 modelIndex, ItemSelectionModel.ClearAndSelect)
+                        }
 
-                            if (editingRequired)
-                            {
-                                editingTimer.item = delegateLoader
-                                editingTimer.restart()
-                            }
+                        if (editingRequired)
+                        {
+                            editingTimer.item = delegateLoader
+                            editingTimer.restart()
                         }
                     }
 
@@ -666,6 +698,8 @@ FocusScope
                     readonly property bool isCurrent: listItem.isCurrent
                     readonly property bool isSelected: listItem.isSelected
 
+                    readonly property Item rowItem: listItem
+
                     readonly property real itemIndent: x
 
                     signal startEditing()
@@ -676,8 +710,11 @@ FocusScope
 
                     anchors.left: button.right
                     anchors.right: listItem.right
+
                     anchors.rightMargin: treeView.rightMargin
-                        + (listView.ScrollBar.vertical.visible ? listView.ScrollBar.vertical.width : 0)
+                        + (listView.ScrollBar.vertical.visible
+                            ? listView.ScrollBar.vertical.width
+                            : 0)
 
                     Connections
                     {
