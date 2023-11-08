@@ -29,6 +29,7 @@
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
+#include <nx/vms/client/desktop/system_administration/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
@@ -82,6 +83,7 @@ struct SystemContext::Private
     std::unique_ptr<IntercomManager> intercomManager;
     std::unique_ptr<AnalyticsEventsSearchTreeBuilder> analyticsEventsSearchTreeBuilder;
     std::unique_ptr<SystemHealthState> systemHealthState;
+    std::unique_ptr<TraffiRelayUrlWatcher> traffiRelayUrlWatcher;
 
     void initLocalRuntimeInfo()
     {
@@ -141,6 +143,7 @@ SystemContext::SystemContext(
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             d->defaultPasswordCamerasWatcher = std::make_unique<DefaultPasswordCamerasWatcher>(
                 this);
+            d->traffiRelayUrlWatcher = std::make_unique<TraffiRelayUrlWatcher>(this);
             break;
 
         case Mode::crossSystem:
@@ -301,6 +304,11 @@ DefaultPasswordCamerasWatcher* SystemContext::defaultPasswordCamerasWatcher() co
 SystemHealthState* SystemContext::systemHealthState() const
 {
     return d->systemHealthState.get();
+}
+
+TraffiRelayUrlWatcher* SystemContext::traffiRelayUrlWatcher() const
+{
+    return d->traffiRelayUrlWatcher.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
