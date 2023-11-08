@@ -11,6 +11,7 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -21,8 +22,7 @@
 
 namespace {
 
-static const QString kPureTreeResourcesOnlyMimeType =
-    "application/x-pure-tree-resources-only";
+static const QString kPureTreeResourcesOnlyMimeType = "application/x-pure-tree-resources-only";
 
 bool mimeFormatsIntersects(const QStringList& firstMimeFormats,
     const QStringList& secondMimeFormats)
@@ -200,6 +200,7 @@ QMimeData* ResourceTreeDragDropDecoratorModel::mimeData(const QModelIndexList& i
     data.setResources(resources.values());
     data.setArguments(arguments);
     data.setData(kPureTreeResourcesOnlyMimeType, QByteArray(pureTreeResourcesOnly ? "1" : "0"));
+    data.addContextInformation(appContext()->mainWindowContext()); //< TODO: #mmalofeev use actual window context.
 
     return data.createMimeData();
 }
@@ -225,6 +226,11 @@ bool ResourceTreeDragDropDecoratorModel::canDropMimeData(const QMimeData* mimeDa
 
     // Check if the drop is targeted for the scene.
     MimeData data(mimeData);
+
+    // Check whether mime data is made by the same user from the same system.
+    if (!data.allowedInWindowContext(appContext()->mainWindowContext())) //< TODO: #mmalofeev use actual window context.
+        return false;
+
     if (data.arguments().contains(Qn::ItemTimeRole))
         return false;
 

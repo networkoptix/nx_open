@@ -24,6 +24,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -352,6 +353,7 @@ void QnVideowallItemWidget::startDrag(DragInfo *info)
     MimeData data;
     data.setEntities({m_itemUuid});
     data.setData(Qn::NoSceneDrop, QByteArray());
+    data.addContextInformation(appContext()->mainWindowContext()); //< TODO: #mmalofeev use actual window context.
 
     auto drag = new QDrag(this);
     drag->setMimeData(data.createMimeData());
@@ -469,6 +471,10 @@ void QnVideowallItemWidget::updateHud(bool animate)
 
 bool QnVideowallItemWidget::isDragValid() const
 {
+    // Check whether mime data is made by the same user from the same system.
+    if (!m_mimeData->allowedInWindowContext(appContext()->mainWindowContext())) //< TODO: #mmalofeev use actual window context.
+        return false;
+
     return !m_mimeData->isEmpty();
 }
 
