@@ -111,6 +111,11 @@ void UserManagementTabWidget::manageDigestUsers()
         userList->filterDigestUsers();
 }
 
+void UserManagementTabWidget::showEvent(QShowEvent*)
+{
+    d->tabWidget->setFocus();
+}
+
 void UserManagementTabWidget::resetWarnings()
 {
     for (auto tab: d->tabs())
