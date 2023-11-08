@@ -115,9 +115,6 @@ public:
     /** @returns ProvidedVia::layout, ProvidedVia::videowall or ProvidedVia::unknown. */
     static Q_INVOKABLE ResourceAccessInfo::ProvidedVia providerType(QnResource* provider);
 
-    Q_INVOKABLE void toggle(
-        const QModelIndex& resourceTreeModelIndex, int index, bool withDependentAccessRights);
-
     static void registerQmlTypes();
 
 signals:

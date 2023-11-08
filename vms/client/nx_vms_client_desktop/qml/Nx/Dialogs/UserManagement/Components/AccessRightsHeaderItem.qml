@@ -63,7 +63,7 @@ Item
                     return ColorTheme.colors.dark12
 
                 return item.interactive && item.enabled
-                    ? ColorTheme.colors.dark10
+                    ? ColorTheme.colors.dark11
                     : ColorTheme.colors.dark7
             }
 

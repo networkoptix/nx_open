@@ -241,27 +241,6 @@ QVariant ResourceAccessRightsModel::data(const QModelIndex& index, int role) con
     }
 }
 
-void ResourceAccessRightsModel::toggle(const QModelIndex& resourceTreeModelIndex,
-    int index, bool withDependentAccessRights)
-{
-    if (index >= rowCount() || index < 0 || !d->context)
-        return;
-
-    const auto toggledRight = d->accessRightList[index];
-    const auto& info = d->info[index];
-
-    const bool itemWasChecked = info.providedVia == ResourceAccessInfo::ProvidedVia::own
-        || info.providedVia == ResourceAccessInfo::ProvidedVia::ownResourceGroup;
-
-    const bool itemWillBeChecked = !(itemWasChecked
-        || (d->item.type == ResourceAccessTreeItem::Type::groupingNode
-            && info.totalChildCount > 0
-            && info.totalChildCount == info.checkedChildCount));
-
-    d->context->modifyAccessRight(resourceTreeModelIndex,
-        (int) toggledRight, itemWillBeChecked, withDependentAccessRights);
-}
-
 QHash<int, QByteArray> ResourceAccessRightsModel::roleNames() const
 {
     auto names = base_type::roleNames();

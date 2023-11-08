@@ -52,22 +52,16 @@ Window
 
     property bool enabled: true //< Required for GUI autotesting.
 
-    Instrument
+    Shortcut
     {
-        item: rootItem
-        onKeyPress: event =>
-        {
-            switch (event.key)
-            {
-                case Qt.Key_Escape:
-                    reject()
-                    return
-                case Qt.Key_Return:
-                case Qt.Key_Enter:
-                    accept()
-                    return
-            }
-        }
+        sequence: "Esc"
+        onActivated: dialog.reject()
+    }
+
+    Shortcut
+    {
+        sequences: ["Enter", "Return"]
+        onActivated: dialog.accept()
     }
 
     onContentItemChanged:

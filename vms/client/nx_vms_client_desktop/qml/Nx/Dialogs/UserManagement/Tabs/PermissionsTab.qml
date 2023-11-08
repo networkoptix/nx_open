@@ -39,12 +39,9 @@ Item
     readonly property var availableAccessRights:
         Array.prototype.map.call(availableAccessRightDescriptors, item => item.accessRight)
 
-    enum Mode
-    {
-        SimpleMode,
-        AdvancedMode
-    }
-    property int mode: PermissionsTab.SimpleMode
+    // Acts as a minimum width for the dialog.
+    implicitWidth: Math.max(footerRow.width + control.buttonBox.implicitWidth,
+        accessRightsHeader.width + 320 /*some sensible minimum for the tree*/)
 
     Item
     {
@@ -60,7 +57,6 @@ Item
         width: control.columnCount * columnWidth
 
         property int hoveredAccessRight: 0
-        property var hoverPos
 
         Row
         {
@@ -84,27 +80,21 @@ Item
 
                     icon: modelData.icon
 
-                    color: tree.hoveredAccessRight == modelData.accessRight
+                    color: tree.hoveredCell && tree.hoveredCell.accessRight == accessRight
                         ? ColorTheme.colors.light4
                         : ColorTheme.colors.light10
 
                     enabled: control.editingEnabled
-                    interactive: !tree.selectionEmpty
+                    interactive: tree.hasSelection
 
                     GlobalToolTip.text: modelData.description
 
                     onHoveredChanged:
                     {
                         if (hovered)
-                        {
                             accessRightsHeader.hoveredAccessRight = accessRight
-                            accessRightsHeader.hoverPos = x
-                        }
                         else if (accessRightsHeader.hoveredAccessRight == accessRight)
-                        {
                             accessRightsHeader.hoveredAccessRight = 0
-                            accessRightsHeader.hoverPos = undefined
-                        }
                     }
 
                     onClicked:
@@ -134,20 +124,22 @@ Item
             bottom: tree.bottom
         }
 
-        color: control.editingEnabled && control.mode === PermissionsTab.AdvancedMode
-            ? ColorTheme.colors.dark5
-            : ColorTheme.colors.dark7
+        color: ColorTheme.colors.dark7
 
         Rectangle
         {
             id: hoveredColumnBackground
 
-            x: accessRightsHeader.hoverPos || 0
+            readonly property int index:
+                control.availableAccessRights.indexOf(tree.hoveredColumnAccessRight)
+
+            x: index * accessRightsHeader.columnWidth
+
             width: accessRightsHeader.columnWidth - 1
             height: permissionsBackground.height
 
-            visible: accessRightsHeader.hoverPos !== undefined
-            color: tree.tableHoverColor
+            visible: index >= 0
+            color: ColorTheme.colors.dark8
         }
     }
 
@@ -157,14 +149,17 @@ Item
 
         property var hoveredRow: null
         readonly property var hoveredCell: hoveredRow ? hoveredRow.hoveredCell : null
-        readonly property int hoveredAccessRight: hoveredCell ? hoveredCell.accessRight : 0
 
-        property bool interactiveCells: control.editingEnabled
-            && control.mode === PermissionsTab.AdvancedMode
+        readonly property int hoveredColumnAccessRight:
+        {
+            if (accessRightsHeader.hoveredAccessRight)
+                return accessRightsHeader.hoveredAccessRight
 
-        property color tableHoverColor: interactiveCells
-            ? ColorTheme.colors.dark6
-            : ColorTheme.colors.dark8
+            if (hoveredRow && (hoveredRow.selected || hoveredRow.parentNodeSelected))
+                return hoveredCell.accessRight
+
+            return 0
+        }
 
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
 
@@ -191,13 +186,31 @@ Item
 
         expandsOnDoubleClick: false
         selectionEnabled: control.editingEnabled
+        clickUnselectsSingleSelectedItem: true
         showResourceStatus: false
         clipDelegates: false
         topMargin: 1
         spacing: 1
 
+        selectionHighlightColor: ColorTheme.blend(
+            ColorTheme.colors.dark6, ColorTheme.colors.brand_core, 0.4)
+
         inactiveSelectionHighlightColor: selectionHighlightColor
-        hoverHighlightColor: ColorTheme.colors.dark8
+
+        hoverHighlightColor:
+        {
+            if (!hoveredItem)
+                return ColorTheme.colors.dark8
+
+            if (hoveredItem.selected)
+                return ColorTheme.blend(ColorTheme.colors.dark8, ColorTheme.colors.brand_core, 0.4)
+
+            return hoveredItem.parentNodeSelected
+                ? ColorTheme.colors.dark9
+                : ColorTheme.colors.dark8
+        }
+
+        selectionOverlapsSpacing: true
 
         resourceTypes:
         {
@@ -218,11 +231,11 @@ Item
 
         function updateNextBatchCheckState()
         {
-            if (!accessRightsHeader.hoveredAccessRight || !control.editingContext)
+            if (!hoveredColumnAccessRight || !control.editingContext)
                 return
 
             const currentCheckState = control.editingContext.combinedOwnCheckState(
-                tree.selection(), accessRightsHeader.hoveredAccessRight)
+                tree.selection(), hoveredColumnAccessRight)
 
             nextBatchCheckState = currentCheckState === Qt.Checked
                 ? Qt.Unchecked
@@ -232,11 +245,8 @@ Item
         onSelectionChanged:
             updateNextBatchCheckState()
 
-        Connections
-        {
-            target: accessRightsHeader
-            function onHoveredAccessRightChanged() { tree.updateNextBatchCheckState() }
-        }
+        onHoveredColumnAccessRightChanged:
+            updateNextBatchCheckState()
 
         Connections
         {
@@ -263,32 +273,20 @@ Item
                 || tree.model.isExtraInfoForced(resource)
 
             selectionMode: tree.selectionMode
-            hoverColor: tree.tableHoverColor
             showResourceStatus: tree.showResourceStatus
             columnWidth: accessRightsHeader.columnWidth
             implicitHeight: control.kRowHeight
-            editingEnabled: tree.interactiveCells
+            editingEnabled: control.editingEnabled
             automaticDependencies: automaticDependenciesSwitch.checked
             accessRightsList: control.availableAccessRights
             highlightRegExp: tree.currentSearchRegExp
-
-            hoveredColumnAccessRight: accessRightsHeader.hoveredAccessRight
-            isRowHovered: tree.hoveredItem === this
+            hoveredColumnAccessRight: tree.hoveredColumnAccessRight
 
             externalNextCheckState: tree.nextBatchCheckState
 
             externallyHoveredGroups:
             {
-                if (tree.hoveredRow)
-                {
-                    return {
-                        "indexes": [tree.hoveredRow.resourceTreeIndex],
-                        "accessRight": tree.hoveredCell.accessRight,
-                        "toggledOn": tree.hoveredCell.toggledOn,
-                        "fromSelection": false}
-                }
-
-                if (accessRightsHeader.hoveredAccessRight && control.editingContext)
+                if (hoveredColumnAccessRight && control.editingContext)
                 {
                     const selection = tree.selection()
                     if (!selection.length)
@@ -296,9 +294,18 @@ Item
 
                     return {
                         "indexes": selection,
-                        "accessRight": accessRightsHeader.hoveredAccessRight,
+                        "accessRight": hoveredColumnAccessRight,
                         "toggledOn": tree.nextBatchCheckState !== Qt.Checked,
                         "fromSelection": true}
+                }
+
+                if (tree.hoveredRow)
+                {
+                    return {
+                        "indexes": [tree.hoveredRow.resourceTreeIndex],
+                        "accessRight": tree.hoveredCell.accessRight,
+                        "toggledOn": tree.hoveredCell.toggledOn,
+                        "fromSelection": false}
                 }
 
                 return undefined
@@ -312,8 +319,78 @@ Item
                     tree.hoveredRow = null
             }
 
-            onTriggered:
-                tree.clearSelection()
+            onTriggered: (cell) =>
+            {
+                if (!control.editingContext)
+                    return
+
+                if (rowAccess.selected || rowAccess.parentNodeSelected)
+                {
+                    control.editingContext.modifyAccessRights(tree.selection(),
+                        cell.accessRight,
+                        tree.nextBatchCheckState === Qt.Checked,
+                        automaticDependenciesSwitch.checked)
+                }
+                else
+                {
+                    control.editingContext.modifyAccessRight(modelIndex,
+                        cell.accessRight,
+                        !cell.toggledOn,
+                        automaticDependenciesSwitch.checked)
+
+                    tree.clearSelection(/*clearCurrentIndex*/ true)
+                }
+            }
+
+            function isParentNodeSelected()
+            {
+                for (let index = modelIndex.parent; index.valid; index = index.parent)
+                {
+                    if (tree.isSelected(index))
+                        return true
+                }
+
+                return false
+            }
+
+            property bool parentNodeSelected: false
+
+            onResourceTreeIndexChanged:
+                rowAccess.parentNodeSelected = rowAccess.isParentNodeSelected()
+
+            Connections
+            {
+                target: tree
+
+                function onSelectionChanged()
+                {
+                    rowAccess.parentNodeSelected = rowAccess.isParentNodeSelected()
+                }
+            }
+
+            Rectangle
+            {
+                id: childSelectionHighlight
+
+                parent: rowItem.parent //< rowItem is TreeView delegate's context property.
+                anchors.fill: (rowItem.parent === parent) ? rowItem : undefined
+                anchors.topMargin: -tree.spacing
+                anchors.bottomMargin: -tree.spacing
+
+                z: -1
+                color: ColorTheme.colors.dark8
+                visible: rowAccess.parentNodeSelected && !isSelected
+            }
+
+            Rectangle
+            {
+                id: rowHoverMarker
+
+                anchors.fill: rowAccess
+                visible: tree.hoveredItem === this && !rawAccess.selected
+                color: tree.hoverHighlightColor
+                z: -1
+            }
         }
     }
 
@@ -378,7 +455,7 @@ Item
         y: permissionsBackground.y
         width: permissionsBackground.width
         height: 1
-        color: ColorTheme.colors.dark5
+        color: ColorTheme.colors.dark6
     }
 
     Rectangle
@@ -386,7 +463,7 @@ Item
         x: permissionsBackground.x
         width: 1
         height: permissionsBackground.y + permissionsBackground.height
-        color: ColorTheme.colors.dark5
+        color: ColorTheme.colors.dark6
     }
 
     Rectangle
@@ -406,46 +483,53 @@ Item
 
         gradient: Gradient
         {
-            GradientStop { position: 0.0; color: ColorTheme.transparent("black", 0.4) }
-            GradientStop { position: 1.0; color: "transparent" }
+            GradientStop
+            {
+                position: 0.0
+                color: ColorTheme.transparent(ColorTheme.colors.dark2, 0.3)
+            }
+
+            GradientStop
+            {
+                position: 1.0
+                color: "transparent"
+            }
         }
     }
 
+    // A footer over the dialog button box.
     Row
     {
-        // Covers dialog button box.
+        id: footerRow
+
         parent: control.buttonBox
+        height: parent.height
+
         visible: control.visible
 
-        anchors.top: parent.top
-        height: parent.height
-        x: 16
+        leftPadding: 16
+        rightPadding: 16
         spacing: 16
 
-        Switch
+        Text
         {
-            id: modeSwitch
+            font.pixelSize: 14
+            color: ColorTheme.colors.light16
+            height: footerRow.height
+            verticalAlignment: Text.AlignVCenter
 
-            anchors.verticalCenter: parent.verticalCenter
-            visible: control.editingEnabled
-
-            text: checked ? qsTr("Advanced Mode On") : qsTr("Advanced Mode Off")
-            color: ColorTheme.colors.light10
-
-            onToggled:
-                control.mode = (checked ? PermissionsTab.AdvancedMode : PermissionsTab.SimpleMode)
-
-            Binding on checked
-            {
-                value: control.mode === PermissionsTab.AdvancedMode
-            }
+            text: qsTr("Use %1 or %2 to select multiple lines, or %3 to clear the selection",
+                "%1, %2 and %3 will be replaced with keyboard key names")
+                    .arg("<b>" + NxGlobals.modifierName(Qt.ControlModifier) + "</b>")
+                    .arg("<b>" + NxGlobals.modifierName(Qt.ShiftModifier) + "</b>")
+                    .arg("<b>Esc</b>")
         }
 
         Switch
         {
             id: automaticDependenciesSwitch
 
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenter: footerRow.verticalCenter
 
             visible: control.editingEnabled
                 && GlobalTemporaries.automaticAccessDependencySwitchVisible
@@ -476,6 +560,21 @@ Item
             GlobalTemporaries.automaticAccessDependencySwitchVisible = true
     }
 
+    Keys.onShortcutOverride: (event) =>
+    {
+        if (event.key !== Qt.Key_Escape)
+            return
+
+        event.accepted = true
+        tree.clearSelection(/*clearCurrentIndex*/ true)
+    }
+
     onEditingContextChanged:
         tree.clearSelection(/*clearCurrentIndex*/ true)
+
+    onVisibleChanged:
+    {
+        if (visible)
+            tree.forceActiveFocus()
+    }
 }

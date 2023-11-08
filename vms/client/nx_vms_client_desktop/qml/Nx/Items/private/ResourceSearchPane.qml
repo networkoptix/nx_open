@@ -49,7 +49,6 @@ FocusScope
 
             height: 32
             width: parent.width
-            placeholderTextColor: ColorTheme.windowText
             hoveredButtonColor: ColorTheme.lighter(backgroundRect.color, 2)
             focus: true
 
