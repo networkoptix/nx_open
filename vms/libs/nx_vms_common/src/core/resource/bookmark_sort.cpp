@@ -106,7 +106,7 @@ struct BookmarkFacade<nx::vms::api::Bookmark>: public BookmarkSort
 
     static QString creatorName(const Bookmark& bookmark, QnResourcePool* resourcePool)
     {
-        return BookmarkSort::creatorName(bookmark.creatorUserId, resourcePool);
+        return BookmarkSort::creatorName(bookmark.creatorUserId.value_or(QnUuid()), resourcePool);
     }
 
     static QString cameraName(const Bookmark& bookmark, QnResourcePool* resourcePool)
