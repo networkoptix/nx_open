@@ -608,6 +608,8 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         resourcePool()->removeResource(existing);
 
     QnFileProcessor::createResourcesForFile(filename, resourcePool());
+
+    emit screenshotSaved(filename);
 }
 
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
@@ -717,7 +719,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     }
 
     QScopedPointer<QnScreenshotLoader> loader(new QnScreenshotLoader(localParameters, this));
-    connect(loader.get(), &ImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
+    connect(loader.get(), &ImageProvider::imageChanged, this, &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
     /* Check if name is already given - that usually means silent mode. */

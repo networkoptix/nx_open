@@ -92,6 +92,9 @@ private:
     nx::vms::client::desktop::ImageProvider* getLocalScreenshotProvider(QnMediaResourceWidget *widget,
         const QnScreenshotParameters &parameters, bool forced = false) const;
 
+Q_SIGNALS:
+    void screenshotSaved(const QString &filename);
+
 private slots:
     void at_takeScreenshotAction_triggered();
     void at_imageLoaded(const QImage &image);
