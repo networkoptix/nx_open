@@ -22,6 +22,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -252,5 +253,9 @@ bool DropInstrument::delayedTriggerIfPossible(action::IDType id, const action::P
 
 bool DropInstrument::isDragValid() const
 {
+    // Check whether mime data is made by the same user from the same system.
+    if (!m_mimeData->allowedInWindowContext(appContext()->mainWindowContext())) //< TODO: #mmalofeev use actual window context.
+        return false;
+
     return !m_mimeData->isEmpty();
 }

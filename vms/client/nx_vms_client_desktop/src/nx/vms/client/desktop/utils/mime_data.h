@@ -15,6 +15,8 @@
 
 namespace nx::vms::client::desktop {
 
+class WindowContext;
+
 /**
  * Utility class to handle in-app and between-app drag-n-drop. Stores list of dragged resources
  * and other entities (e.g. Showreels or videowall items).
@@ -59,6 +61,15 @@ public:
 
     QHash<int, QVariant> arguments() const;
     void setArguments(const QHash<int, QVariant>& value);
+
+    /** Add user id and cloud system id (if the user is cloud). */
+    void addContextInformation(const WindowContext* context);
+
+    /**
+     * Check whether the give mime data has user id and cloud system id and the values are equal
+     * to the values in the given context.
+     */
+    bool allowedInWindowContext(const WindowContext* context) const;
 
     QString serialized() const;
 
