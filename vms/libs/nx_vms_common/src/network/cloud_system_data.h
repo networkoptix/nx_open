@@ -21,6 +21,8 @@ struct NX_VMS_COMMON_API QnCloudSystem
     /** The VMS version reported by the last connected VMS server. */
     QString version;
 
+    QString organizationId;
+
     bool operator==(const QnCloudSystem &other) const;
 
     bool visuallyEqual(const QnCloudSystem& other) const;
@@ -28,6 +30,6 @@ struct NX_VMS_COMMON_API QnCloudSystem
 
 NX_REFLECTION_INSTRUMENT(QnCloudSystem,
     (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight)(lastLoginTimeUtcMs)
-    (authKey)(online)(system2faEnabled)(version))
+    (authKey)(online)(system2faEnabled)(version)(organizationId))
 
 typedef QList<QnCloudSystem> QnCloudSystemList;

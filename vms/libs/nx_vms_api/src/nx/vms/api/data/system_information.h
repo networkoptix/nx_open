@@ -103,8 +103,11 @@ struct NX_VMS_API CloudSystemAuth
 
     /**%apidoc User agent of the client. */
     std::optional<QString> userAgent;
+
+    /**%apidoc[opt] The cloud user's organization. */
+    QString organizationId;
 };
-#define CloudSystemAuth_Fields (systemId)(authKey)(owner)(userAgent)
+#define CloudSystemAuth_Fields (systemId)(authKey)(owner)(userAgent)(organizationId)
 NX_VMS_API_DECLARE_STRUCT_EX(CloudSystemAuth, (json))
 NX_REFLECTION_INSTRUMENT(CloudSystemAuth, CloudSystemAuth_Fields)
 

@@ -149,7 +149,7 @@ void QnCloudManagementWidget::connectToCloud()
 {
     NX_ASSERT(!m_connectTool);
 
-    m_connectTool = new ConnectToCloudTool(this);
+    m_connectTool = new ConnectToCloudTool(this, globalSettings());
     connect(
         m_connectTool,
         &ConnectToCloudTool::finished,

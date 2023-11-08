@@ -19,6 +19,7 @@ namespace nx::vms::api {
 struct SystemSettings
 {
     QString cloudAccountName;
+    QString organization;
     QString cloudSystemID;
     QString defaultExportVideoCodec;
     QString localSystemId;
@@ -56,7 +57,7 @@ struct SystemSettings
     bool operator==(const SystemSettings& other) const = default;
 };
 
-NX_REFLECTION_INSTRUMENT(SystemSettings, (cloudAccountName)(cloudSystemID)(defaultExportVideoCodec)
+NX_REFLECTION_INSTRUMENT(SystemSettings, (cloudAccountName)(organization)(cloudSystemID)(defaultExportVideoCodec)
     (localSystemId)(systemName)(watermarkSettings)(webSocketEnabled)(autoDiscoveryEnabled)
     (cameraSettingsOptimization)(statisticsAllowed)(cloudNotificationsLanguage)
     (auditTrailEnabled)(trafficEncryptionForced)(useHttpsOnlyForCameras)

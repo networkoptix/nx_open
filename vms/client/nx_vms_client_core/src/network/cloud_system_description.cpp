@@ -11,10 +11,11 @@ QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(
     const QString& ownerEmail,
     const QString& ownerFullName,
     bool online,
-    bool system2faEnabled)
+    bool system2faEnabled,
+    const QString& organizationId)
 {
     return QnCloudSystemDescriptionPtr(new QnCloudSystemDescription(
-        systemId, localSystemId, systemName, ownerEmail, ownerFullName, online, system2faEnabled));
+        systemId, localSystemId, systemName, ownerEmail, ownerFullName, online, system2faEnabled, organizationId));
 }
 
 QnCloudSystemDescription::QnCloudSystemDescription(
@@ -24,13 +25,15 @@ QnCloudSystemDescription::QnCloudSystemDescription(
     const QString& ownerEmail,
     const QString& ownerFullName,
     bool online,
-    bool system2faEnabled)
+    bool system2faEnabled,
+    const QString& organizationId)
     :
     base_type(systemId, localSystemId, systemName),
     m_ownerEmail(ownerEmail),
     m_ownerFullName(ownerFullName),
     m_online(online),
-    m_system2faEnabled(system2faEnabled)
+    m_system2faEnabled(system2faEnabled),
+    m_organizationId(organizationId)
 {
 }
 
@@ -50,6 +53,15 @@ void QnCloudSystemDescription::set2faEnabled(bool system2faEnabled)
 
     m_system2faEnabled = system2faEnabled;
     emit system2faEnabledChanged();
+}
+
+void QnCloudSystemDescription::setOrganization(const QString& organizationId)
+{
+    if (m_organizationId == organizationId)
+        return;
+
+    m_organizationId = organizationId;
+    emit organizationChanged();
 }
 
 void QnCloudSystemDescription::updateLastKnownVersion(const nx::utils::SoftwareVersion& version)

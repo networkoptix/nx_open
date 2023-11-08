@@ -43,6 +43,7 @@ struct SystemSettingNames
 
     DECLARE_SETTING_NAME(backupSettings);
     DECLARE_SETTING_NAME(cloudAccountName);
+    DECLARE_SETTING_NAME(organizationId);
     DECLARE_SETTING_NAME(cloudAuthKey);
     DECLARE_SETTING_NAME(cloudHost);
     DECLARE_SETTING_NAME(cloudNotificationsLanguage);
@@ -82,6 +83,7 @@ struct SystemSettingNames
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
+        organizationId,
         cloudAuthKey,
         cloudHost,
         cloudSystemID,
@@ -310,6 +312,9 @@ public:
 
     QString cloudAccountName() const;
     void setCloudAccountName(const QString& value);
+
+    QnUuid organizationId() const;
+    void setOrganizationId(const QnUuid& value);
 
     QString cloudSystemId() const;
     void setCloudSystemId(const QString& value);
@@ -620,6 +625,7 @@ private:
 
     // set of cloud adaptors
     QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnUuid>* m_organizationIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudSystemIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_system2faEnabledAdaptor = nullptr;
