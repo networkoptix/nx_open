@@ -2,6 +2,8 @@
 
 #include "tile_interaction_handler_p.h"
 
+#include <chrono>
+
 #include <QtCore/QModelIndex>
 #include <QtGui/QClipboard>
 #include <QtGui/QDrag>
@@ -12,8 +14,6 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollArea>
-
-#include <chrono>
 
 #include <analytics/db/analytics_db_types.h>
 #include <api/model/analytics_actions.h>
@@ -597,6 +597,7 @@ void TileInteractionHandler::performDragAndDrop(
     MimeData data(baseMimeData.get());
     data.setResources(resourceList);
     data.setArguments(setupDropActionParameters(resourceList, index.data(Qn::TimestampRole)));
+    data.addContextInformation(workbench()->windowContext());
 
     QScopedPointer<QDrag> drag(new QDrag(this));
     drag->setMimeData(data.createMimeData());

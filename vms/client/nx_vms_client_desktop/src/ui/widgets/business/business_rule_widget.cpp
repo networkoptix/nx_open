@@ -30,6 +30,7 @@
 #include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/widgets/business/aggregation_widget.h>
@@ -439,14 +440,19 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event)
         QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
 
         m_mimeData.reset(new MimeData{de->mimeData()});
-        if (!m_mimeData->resources().empty())
+        if (m_mimeData->allowedInWindowContext(workbench()->windowContext())
+            && !m_mimeData->resources().empty())
+        {
             de->acceptProposedAction();
+        }
+
         return true;
     }
     else if (event->type() == QEvent::Drop)
     {
         QDropEvent* de = static_cast<QDropEvent*>(event);
-        if (!m_mimeData->resources().empty())
+        if (m_mimeData->allowedInWindowContext(workbench()->windowContext())
+            && !m_mimeData->resources().empty())
         {
             if (object == ui->eventDefinitionGroupBox)
             {

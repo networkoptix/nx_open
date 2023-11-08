@@ -33,6 +33,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/common/palette.h>
 #include <ui/widgets/cloud_status_panel.h>
@@ -396,6 +397,11 @@ void QnMainWindowTitleBarWidget::dragEnterEvent(QDragEnterEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
     d->mimeData.reset(new MimeData{event->mimeData()});
+
+    // Check whether mime data is made by the same user from the same system.
+    if (!d->mimeData->allowedInWindowContext(workbench()->windowContext()))
+        return;
+
     if (d->mimeData->isEmpty())
         return;
 
@@ -423,6 +429,11 @@ void QnMainWindowTitleBarWidget::dragLeaveEvent(QDragLeaveEvent* /*event*/)
 void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
+
+    // Check whether mime data is made by the same user from the same system.
+    if (!d->mimeData->allowedInWindowContext(workbench()->windowContext()))
+        return;
+
     if (d->mimeData->isEmpty())
         return;
 
