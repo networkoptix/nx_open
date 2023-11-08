@@ -48,8 +48,7 @@ DeviceSearcher::DeviceSearcher(
     m_settings(std::move(settings)),
     m_ignoreUsb0NetworkInterfaceIfOthersExist(ignoreUsb0NetworkInterfaceIfOthersExist),
     m_isHttpsForced(isHttpsForced),
-    m_discoverTryTimeoutMS(
-        discoverTryTimeoutMS == 0 ? kDefaultDiscoverTryTimeoutMs : discoverTryTimeoutMS),
+    m_discoverTryTimeoutMS(discoverTryTimeoutMS),
     m_timerID(0),
     m_terminated(false),
     m_needToUpdateReceiveSocket(false),
@@ -310,7 +309,7 @@ void DeviceSearcher::dispatchDiscoverPackets()
                 data.append("Host: " + sock->getLocalAddress().toString() + "\r\n");
                 data.append("ST:" + toUpnpUrn(deviceType, "device").toStdString() + "\r\n");
                 data.append("Man:\"sdp:discover\"\r\n");
-                data.append("MX:3\r\n\r\n" );
+                data.append("MX:5\r\n\r\n" );
                 sock->sendTo(data.data(), data.size(), groupAddress.toString().toStdString(), kGroupPort);
             }
         }
