@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <future>
 
 #include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
@@ -50,6 +51,7 @@
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
+#include <nx/vms/client/desktop/system_administration/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -86,17 +88,8 @@ static constexpr int kDefaultTempUserExpiresAfterLoginS = 60 * 60 * 8; //< 8 hou
 
 static const QString kAllowedLoginSymbols = "!#$%&'()*+,-./:;<=>?[]^_`{|}~";
 
-static const QString kTrafficRelayUrlRequest = R"json(
-    {
-        "destinationHostName": "%1",
-        "connectionMethods": 5,
-        "cloudConnectVersion": "connectOverHttpHasHostnameAsString"
-    })json";
-
-static const QString kCloudPathTrafficRelayInfo = "/mediator/server/%1/sessions/";
-static const QString kTrafficRelayUrl = "trafficRelayUrl";
 // To exclude status flickering on fast cloud systems, it is necessary to make an artificial delay
-static constexpr std::chrono::milliseconds kArificalDelay = std::chrono::milliseconds(500);
+static constexpr std::chrono::milliseconds kArificialDelay = std::chrono::milliseconds(500);
 static constexpr int kTimeBadInternetConnection = 10000;
 
 bool isAcceptedLoginCharacter(QChar character)
@@ -162,10 +155,6 @@ struct UserSettingsDialog::Private
     QnUserResourcePtr user;
     rest::Handle currentRequest = 0;
 
-    std::unique_ptr<nx::network::http::AsyncClient> httpClient;
-    mutable nx::Mutex mutex;
-    QString trafficRelayUrl;
-
     Private(UserSettingsDialog* parent, DialogType dialogType):
         q(parent),
         syncId(parent->globalSettings()->ldap().syncId()),
@@ -196,83 +185,22 @@ struct UserSettingsDialog::Private
         continuousSync = q->globalSettings()->ldap().continuousSync
             == nx::vms::api::LdapSettings::Sync::usersAndGroups;
 
-        connect(parent->globalSettings(),
-            &common::SystemSettings::cloudSettingsChanged,
+        connect(q->systemContext()->traffiRelayUrlWatcher(),
+            &TraffiRelayUrlWatcher::trafficRelayUrlReady,
             q,
-            [this]() { updateTrafficRelayUrl(); });
-        updateTrafficRelayUrl();
-    }
+            [this] { linkReady = true; });
 
-    void updateTrafficRelayUrl()
-    {
-        const auto cloudSystemId = q->systemSettings()->cloudSystemId();
-        if (cloudSystemId.isEmpty())
-            return;
-
-        linkReady = false;
-
-        const core::CloudUrlHelper cloudUrlHelper(
-            nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
-            nx::vms::utils::SystemUri::ReferralContext::None);
-
-        const auto urlCloud = nx::utils::Url::fromQUrl(cloudUrlHelper.mainUrl());
-
-        const nx::network::SocketAddress address{urlCloud.host().toStdString(),
-            (quint16) urlCloud.port(
-                nx::network::http::defaultPortForScheme(urlCloud.scheme().toStdString()))};
-
-        if (!httpClient)
-        {
-            httpClient = std::make_unique<nx::network::http::AsyncClient>(
-                nx::network::ssl::kAcceptAnyCertificate);
-        }
-
-        const auto url = nx::network::url::Builder()
-            .setScheme(urlCloud.scheme().toStdString())
-            .setEndpoint(address)
-            .setPath(nx::format(kCloudPathTrafficRelayInfo, cloudSystemId))
-            .toUrl();
-
-        auto messageBody = std::make_unique<nx::network::http::BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
-            nx::format(kTrafficRelayUrlRequest, cloudSystemId).toStdString());
-
-        httpClient->doPost(url, std::move(messageBody),
-            [this, url]()
-            {
-                NX_MUTEX_LOCKER lock(&mutex);
-                trafficRelayUrl = {};
-                if (httpClient->failed())
-                {
-                    NX_VERBOSE(this, "POST request failed. Url: %1", url);
-                    return;
-                }
-
-                const auto result = httpClient->fetchMessageBodyBuffer();
-                if (result.empty())
-                {
-                    NX_VERBOSE(this, "POST body fetch failed. Url: %1", url);
-                    return;
-                }
-
-                QJsonObject response;
-                if (QJson::deserialize(result.toByteArray(), &response))
-                {
-                    trafficRelayUrl = response[kTrafficRelayUrl].toString();
-                }
-                else
-                {
-                    NX_VERBOSE(this, "Can not deserialize POST response. Url: %1", url);
-                }
-
-                linkReady = true;
-            });
+        updateStateLinkReady();
     }
 
     QString getTrafficRelayUrl() const
     {
-        NX_MUTEX_LOCKER lock(&mutex);
-        return trafficRelayUrl;
+        return q->systemContext()->traffiRelayUrlWatcher()->trafficRelayUrl();
+    }
+
+    void updateStateLinkReady()
+    {
+        linkReady = !getTrafficRelayUrl().isEmpty();
     }
 
     QDateTime serverDate(milliseconds msecsSinceEpoch) const
@@ -454,7 +382,7 @@ struct UserSettingsDialog::Private
                     if (linkReady)
                         replaceCustomWidget();
                 },
-                kArificalDelay.count(),
+                kArificialDelay.count(),
                 q);
 
             executeDelayedParented(
@@ -1381,10 +1309,12 @@ bool UserSettingsDialog::setUser(const QnUserResourcePtr& user)
     d->isSaving = false;
     createStateFrom(user);
 
-    if (!systemSettings()->cloudSystemId().isEmpty() && d->linkReady)
+    d->updateStateLinkReady();
+
+    if (!systemSettings()->cloudSystemId().isEmpty() && d->linkReady.value())
     {
         d->linkReady = false;
-        executeDelayedParented([this] { d->linkReady = true; }, kArificalDelay.count(), this);
+        executeDelayedParented([this] { d->linkReady = true; }, kArificialDelay.count(), this);
     }
 
     return true;

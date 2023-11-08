@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
+#include <nx/vms/client/desktop/system_administration/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
@@ -66,6 +67,7 @@ struct SystemContext::Private
     std::unique_ptr<DelayedDataLoader> delayedDataLoader;
     std::unique_ptr<analytics::TaxonomyManager> taxonomyManager;
     std::unique_ptr<NonEditableUsersAndGroups> nonEditableUsersAndGroups;
+    std::unique_ptr<TraffiRelayUrlWatcher> traffiRelayUrlWatcher;
 
     void initLocalRuntimeInfo()
     {
@@ -121,6 +123,7 @@ SystemContext::SystemContext(
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->ldapStatusWatcher = std::make_unique<LdapStatusWatcher>(this);
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
+            d->traffiRelayUrlWatcher = std::make_unique<TraffiRelayUrlWatcher>(this);
             break;
 
         case Mode::crossSystem:
@@ -243,6 +246,11 @@ analytics::TaxonomyManager* SystemContext::taxonomyManager() const
 common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const
 {
     return d->restApiHelper->getSessionTokenHelper();
+}
+
+TraffiRelayUrlWatcher* SystemContext::traffiRelayUrlWatcher() const
+{
+    return d->traffiRelayUrlWatcher.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

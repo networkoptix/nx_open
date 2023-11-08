@@ -24,6 +24,7 @@ class RestApiHelper;
 class ShowreelStateManager;
 class ServerRuntimeEventConnector;
 class SystemSpecificLocalSettings;
+class TraffiRelayUrlWatcher;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
@@ -76,6 +77,7 @@ public:
     RestApiHelper* restApiHelper() const;
     Q_INVOKABLE nx::vms::client::desktop::analytics::TaxonomyManager* taxonomyManager() const;
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;
+    TraffiRelayUrlWatcher* traffiRelayUrlWatcher() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;
