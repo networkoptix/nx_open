@@ -18,6 +18,7 @@ struct TwoWayAudioCameraButtonController::Private
     TwoWayAudioCameraButtonController * const q;
     const IntercomButtonMode intercomButtonMode;
     const std::unique_ptr<TwoWayAudioController> controller;
+    nx::utils::ScopedConnections connections;
 
     void updateButton();
 
@@ -144,10 +145,11 @@ TwoWayAudioCameraButtonController::TwoWayAudioCameraButtonController(
         d->controller->setSourceId(sourceId);
     };
 
-    connect(accessController, &AccessController::userChanged, this, updateControllerSourceId);
+    d->connections << connect(
+        accessController, &AccessController::userChanged, this, updateControllerSourceId);
     updateControllerSourceId();
 
-    connect(d->controller.get(), &TwoWayAudioController::startedChanged, this,
+    d->connections << connect(d->controller.get(), &TwoWayAudioController::startedChanged, this,
         [this]()
         {
             if (d->controller->started())
@@ -159,9 +161,11 @@ TwoWayAudioCameraButtonController::TwoWayAudioCameraButtonController(
         });
 
     const auto updateButton = [this]() { d->updateButton(); };
-    connect(d->controller.get(), &TwoWayAudioController::availabilityChanged, this, updateButton);
-    connect(this, &BaseCameraButtonController::hasRequiredPermissionsChanged, this, updateButton);
-    connect(this, &BaseCameraButtonController::cameraChanged, d->controller.get(),
+    d->connections << connect(
+        d->controller.get(), &TwoWayAudioController::availabilityChanged, this, updateButton);
+    d->connections << connect(
+        this, &BaseCameraButtonController::hasRequiredPermissionsChanged, this, updateButton);
+    d->connections << connect(this, &BaseCameraButtonController::cameraChanged, d->controller.get(),
         [this, updateButton](const auto& camera, const auto& previousCamera)
         {
             if (previousCamera)
