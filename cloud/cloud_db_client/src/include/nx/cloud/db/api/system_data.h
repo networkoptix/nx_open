@@ -140,8 +140,6 @@ struct SystemData
     // in the JSON document.
     AttributesList attributes;
 
-    std::string organizationId;
-
     bool operator==(const SystemData& right) const
     {
         return
@@ -152,7 +150,7 @@ struct SystemData
             systemSequence == right.systemSequence &&
             opaque == right.opaque &&
             system2faEnabled == right.system2faEnabled &&
-            organizationId == right.organizationId;
+            attributes == right.attributes;
     }
 
     std::string ownerAccountEmail() const
@@ -167,7 +165,7 @@ struct SystemData
 };
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(authKeyHash) \
-    (status)(systemSequence) (opaque)(registrationTime)(system2faEnabled)(attributes)(organizationId)
+    (status)(systemSequence) (opaque)(registrationTime)(system2faEnabled)(attributes)
 
 NX_REFLECTION_INSTRUMENT(SystemData, SystemData_Fields)
 

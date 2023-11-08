@@ -79,7 +79,8 @@ QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
             systemData.lastLoginTime.time_since_epoch())
                                         .count();
         system.version = QString::fromStdString(systemData.version);
-        system.organizationId = QString::fromStdString(systemData.organizationId);
+        system.organizationId = QString::fromStdString(
+            nx::cloud::db::api::getAttrValueOr(systemData.attributes, "organizationId", ""));
         result.append(system);
     }
 
