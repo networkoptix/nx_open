@@ -560,8 +560,9 @@ void QnServerSettingsWidget::showCertificateMismatchBanner(bool dataLoaded)
 int QnServerSettingsWidget::updateCertificatesLabels()
 {
     // Clear certificates layout.
-    while (auto item = ui->certificateLayout->takeAt(0))
+    while (ui->certificateLayout->count() > 0)
     {
+        auto item = ui->certificateLayout->takeAt(0);
         delete item->widget();
         delete item;
     }
