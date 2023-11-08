@@ -15,6 +15,8 @@ struct ResourceManagementIni: public nx::kit::IniConfig
     NX_INI_INT(32, maxResourceDiscoveryThreadCount,
         "The maximum number of threads for the thread pool of the Resource Discovery Manager.\n"
         "Up to 5.0, for ARM32 devices it used to be 8.");
+    NX_INI_INT(15'000, upnpDiscoveryIntervalMs,
+        "Wait at least this many milliseconds between the UPnP discovery attempts.");
 };
 
 NX_VMS_COMMON_API ResourceManagementIni& resourceManagementIni();
