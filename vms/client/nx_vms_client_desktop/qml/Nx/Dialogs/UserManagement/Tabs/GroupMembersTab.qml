@@ -68,7 +68,7 @@ MembershipSettings
     {
         enabled: control.enabled && model.canEditParents
         offset: model.offset
-        iconSource: iconPath(model)
+        iconSource: iconPath(model) + "?primary=light10&secondary=light4"
         GlobalToolTip.text: model.offset > 0 ? qsTr("Inherits membership in current group") : ""
     }
 

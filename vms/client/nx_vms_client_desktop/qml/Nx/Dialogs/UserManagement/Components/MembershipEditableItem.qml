@@ -55,7 +55,7 @@ Rectangle
             width: 20
             height: 20
 
-            source: iconPath(model)
+            source: iconPath(model) + "?primary=light10&secondary=light4"
             sourceSize: Qt.size(width, height)
 
             opacity: groupCheckbox.enabled ? 1.0 : 0.3
