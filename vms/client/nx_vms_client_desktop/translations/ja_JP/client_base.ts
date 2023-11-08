@@ -12086,7 +12086,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation>フルスクリーンに設定</translation>
+      <translation>フルスクリーン表示</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
