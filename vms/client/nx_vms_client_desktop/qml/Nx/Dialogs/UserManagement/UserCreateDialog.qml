@@ -61,6 +61,7 @@ DialogWithState
     property alias linkValidUntil: generalSettings.linkValidUntil
     property alias expiresAfterLoginS: generalSettings.expiresAfterLoginS
     property alias revokeAccessEnabled: generalSettings.revokeAccessEnabled
+    property int displayOffsetMs  //< Not used by current dialog type.
     property bool nameIsUnique //< Not used by current dialog type.
 
     // Mapped to dialog property.
