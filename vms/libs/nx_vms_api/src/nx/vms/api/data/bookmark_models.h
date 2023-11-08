@@ -100,7 +100,7 @@ struct NX_VMS_API Bookmark
     /**%apidoc Device id. */
     QString deviceId;
 
-    /**%apidoc[opt] Server id where Bookmark is stored. */
+    /**%apidoc[immutable] Server id where Bookmark is stored. */
     QnUuid serverId;
 
     /**%apidoc Caption of the Bookmark.
@@ -123,13 +123,13 @@ struct NX_VMS_API Bookmark
     std::set<QString> tags;
 
     /**%apidoc[readonly] Id of the User created this bookmark. */
-    QnUuid creatorUserId;
+    std::optional<QnUuid> creatorUserId;
 
-    /**%apidoc[opt]
+    /**%apidoc[readonly]
      * Time of the Bookmark creation in milliseconds since epoch. Equals to startTimeMs field if
      * the Bookmark is created by the System.
      */
-    std::chrono::milliseconds creationTimeMs{0};
+    std::optional<std::chrono::milliseconds> creationTimeMs{0};
 
     QnUuid getId() const { return id; }
     void setId(QnUuid id_) { id = std::move(id_); }
