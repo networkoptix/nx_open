@@ -83,6 +83,7 @@ DialogWithState
 
         dialogLeftPadding: dialog.leftPadding
         dialogRightPadding: dialog.rightPadding
+        tabBar.spacing: 0
 
         Tab
         {
