@@ -374,7 +374,7 @@
     </message>
     <message>
       <source>Exit full screen</source>
-      <translation>全画面表示を終了</translation>
+      <translation>フルスクリーン表示終了</translation>
     </message>
     <message>
       <source>Save page</source>
