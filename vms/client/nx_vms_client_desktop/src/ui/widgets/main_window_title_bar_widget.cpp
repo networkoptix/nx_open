@@ -394,6 +394,11 @@ void QnMainWindowTitleBarWidget::dragEnterEvent(QDragEnterEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
     d->mimeData.reset(new MimeData{event->mimeData()});
+
+    // Check whether mime data is made by the same user from the same system.
+    if (!d->mimeData->allowedInWindowContext(windowContext()))
+        return;
+
     if (d->mimeData->isEmpty())
         return;
 
@@ -421,6 +426,11 @@ void QnMainWindowTitleBarWidget::dragLeaveEvent(QDragLeaveEvent* /*event*/)
 void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
+
+    // Check whether mime data is made by the same user from the same system.
+    if (!d->mimeData->allowedInWindowContext(windowContext()))
+        return;
+
     if (d->mimeData->isEmpty())
         return;
 

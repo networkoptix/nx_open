@@ -439,14 +439,15 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event)
         QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
 
         m_mimeData.reset(new MimeData{de->mimeData()});
-        if (!m_mimeData->resources().empty())
+        if (m_mimeData->allowedInWindowContext(windowContext()) && !m_mimeData->resources().empty())
             de->acceptProposedAction();
+
         return true;
     }
     else if (event->type() == QEvent::Drop)
     {
         QDropEvent* de = static_cast<QDropEvent*>(event);
-        if (!m_mimeData->resources().empty())
+        if (m_mimeData->allowedInWindowContext(windowContext()) && !m_mimeData->resources().empty())
         {
             if (object == ui->eventDefinitionGroupBox)
             {

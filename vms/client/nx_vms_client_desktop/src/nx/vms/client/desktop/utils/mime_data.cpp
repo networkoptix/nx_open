@@ -8,6 +8,7 @@
 
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
@@ -17,6 +18,8 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/common/system_settings.h>
 
 namespace {
 
@@ -47,6 +50,8 @@ Q_GLOBAL_STATIC_WITH_ARGS(quint64, qn_localMagic, (QDateTime::currentMSecsSinceE
 
 static const QString kInternalMimeType = "application/x-noptix-resources";
 static const QString kUriListMimeType = "text/uri-list"; //< Must be equal to Qt internal type.
+static const QString kUserIdMimeType = "application/x-user-id";
+static const QString kCloudSystemIdMimeType = "application/x-cloud-system-id";
 
 } // namespace
 
@@ -391,6 +396,41 @@ void MimeData::setArguments(const QHash<int, QVariant>& value)
 {
     d->arguments = value;
     d->updateInternalStorage();
+}
+
+void MimeData::addContextInformation(const WindowContext* context)
+{
+    const auto user = context->system()->user();
+    if (!user)
+        return;
+
+    setData(kUserIdMimeType, user->getId().toByteArray());
+
+    if (user->isCloud())
+    {
+        setData(
+            kCloudSystemIdMimeType, context->system()->globalSettings()->cloudSystemId().toUtf8());
+    }
+}
+
+bool MimeData::allowedInWindowContext(const WindowContext* context) const
+{
+    const auto userId = data(kUserIdMimeType);
+    if (userId.isEmpty())
+        return false;
+
+    const auto user = context->system()->user();
+    if (!user || user->getId() != QnUuid::fromString(userId.data()))
+        return false;
+
+    if (user->isCloud())
+    {
+        const auto cloudId = data(kCloudSystemIdMimeType);
+        if (cloudId != context->system()->globalSettings()->cloudSystemId())
+            return false;
+    }
+
+    return true;
 }
 
 } // namespace nx::vms::client::desktop

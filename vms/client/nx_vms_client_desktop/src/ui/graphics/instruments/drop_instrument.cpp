@@ -243,5 +243,9 @@ bool DropInstrument::delayedTriggerIfPossible(menu::IDType id, const menu::Param
 
 bool DropInstrument::isDragValid() const
 {
+    // Check whether mime data is made by the same user from the same system.
+    if (!m_mimeData->allowedInWindowContext(windowContext()))
+        return false;
+
     return !m_mimeData->isEmpty();
 }

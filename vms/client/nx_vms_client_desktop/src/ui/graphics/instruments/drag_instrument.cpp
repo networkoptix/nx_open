@@ -2,15 +2,14 @@
 
 #include "drag_instrument.h"
 
-#include <QtGui/QMouseEvent>
-#include <QtGui/QDrag>
 #include <QtCore/QMimeData>
+#include <QtGui/QDrag>
+#include <QtGui/QMouseEvent>
 
 #include <core/resource/resource.h>
-
-#include <ui/graphics/items/resource/resource_widget.h>
-
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -83,6 +82,7 @@ void DragInstrument::startDrag(DragInfo* info)
 
     MimeData data;
     data.setResources(resources);
+    data.addContextInformation(appContext()->mainWindowContext()); //< TODO: #mmalofeev use actual window context.
 
     auto drag = new QDrag(info->view());
     drag->setMimeData(data.createMimeData());
