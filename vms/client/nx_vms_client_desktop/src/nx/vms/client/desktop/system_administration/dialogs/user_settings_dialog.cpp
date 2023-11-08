@@ -144,6 +144,7 @@ struct UserSettingsDialog::Private
     QmlProperty<bool> continuousSync;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
+    QmlProperty<int> displayOffsetMs;
 
     QmlProperty<QDateTime> linkValidFrom;
     QmlProperty<QDateTime> linkValidUntil;
@@ -166,6 +167,7 @@ struct UserSettingsDialog::Private
         continuousSync(q->rootObjectHolder(), "continuousSync"),
         editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self"),
+        displayOffsetMs(q->rootObjectHolder(), "displayOffsetMs"),
         linkValidFrom(q->rootObjectHolder(), "linkValidFrom"),
         linkValidUntil(q->rootObjectHolder(), "linkValidUntil"),
         expiresAfterLoginS(q->rootObjectHolder(), "expiresAfterLoginS"),
@@ -182,6 +184,12 @@ struct UserSettingsDialog::Private
                     == nx::vms::api::LdapSettings::Sync::usersAndGroups;
             });
 
+        connect(
+            parent->systemContext()->serverTimeWatcher(),
+            &core::ServerTimeWatcher::displayOffsetsChanged,
+            q,
+            [this]{ updateDisplayOffset(); });
+
         continuousSync = q->globalSettings()->ldap().continuousSync
             == nx::vms::api::LdapSettings::Sync::usersAndGroups;
 
@@ -191,6 +199,19 @@ struct UserSettingsDialog::Private
             [this] { linkReady = true; });
 
         updateStateLinkReady();
+    }
+
+    void updateDisplayOffset() const
+    {
+        auto validUntilMs = linkValidUntil.value().toMSecsSinceEpoch();
+        if (revokeAccessEnabled && firstLoginTime.value().isValid())
+        {
+            validUntilMs = std::min(
+                validUntilMs,
+                firstLoginTime.value().toMSecsSinceEpoch() + expiresAfterLoginS * 1000);
+        }
+
+       displayOffsetMs = q->displayOffset(validUntilMs);
     }
 
     QString getTrafficRelayUrl() const
@@ -285,6 +306,8 @@ struct UserSettingsDialog::Private
         expiresAfterLoginS = revokeAccessEnabled
             ? temporaryToken.expiresAfterLoginS.count()
             : -1;
+
+        updateDisplayOffset();
     }
 
     nx::vms::api::UserModelV3 apiDataFromState(const UserSettingsDialogState& state) const

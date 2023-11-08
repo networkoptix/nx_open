@@ -53,6 +53,7 @@ Item
     property alias expiresAfterLoginS: linkDates.expiresAfterLoginS
     property alias revokeAccessEnabled: linkDates.revokeAccessEnabled
     property alias firstLoginTime: linkDates.firstLoginTime
+    property alias displayOffsetMs: linkDates.displayOffsetMs
 
     property bool ldapError: false
     property bool ldapOffline: true
