@@ -11,8 +11,9 @@ struct CloudCredentialsData
     QString cloudSystemID;
     QString cloudAuthKey;
     QString cloudAccountName;
+    QString organizationId;
 };
 
-#define CloudCredentialsData_Fields (cloudSystemID)(cloudAuthKey)(cloudAccountName)
+#define CloudCredentialsData_Fields (cloudSystemID)(cloudAuthKey)(cloudAccountName)(organizationId)
 
 QN_FUSION_DECLARE_FUNCTIONS(CloudCredentialsData, (json), NX_VMS_COMMON_API)

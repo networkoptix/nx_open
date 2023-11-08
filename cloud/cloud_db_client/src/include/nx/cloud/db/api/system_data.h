@@ -65,29 +65,29 @@ struct SystemRegistrationData
  */
 struct SystemAttributesUpdate
 {
-    std::optional<std::string> systemId = std::nullopt;
+    std::optional<std::string> systemId;
 
     /**%apidoc Non-unique system name. */
-    std::optional<std::string> name = std::nullopt;
+    std::optional<std::string> name;
 
     /**%apidoc Vms-specific data. Transparently stored and returned. */
-    std::optional<std::string> opaque = std::nullopt;
+    std::optional<std::string> opaque;
 
     /**%apidoc If set to true, then cloud users will be asked to enter 2FA code when logging
      * into this system.
      */
-    std::optional<bool> system2faEnabled = std::nullopt;
+    std::optional<bool> system2faEnabled;
 
     /**%apidoc
      * %deprecated Replaced by `mfaCode` attribute.
      * One-time password from the authenticator app.
      */
-    std::optional<std::string> totp = std::nullopt;;
+    std::optional<std::string> totp;
 
     /**%apidoc One-time password from the authenticator app.
      * Required and MUST be valid if changing system2faEnabled setting.
      */
-    std::optional<std::string> mfaCode = std::nullopt;
+    std::optional<std::string> mfaCode;
 };
 
 enum class SystemStatus
@@ -140,6 +140,8 @@ struct SystemData
     // in the JSON document.
     AttributesList attributes;
 
+    std::string organizationId;
+
     bool operator==(const SystemData& right) const
     {
         return
@@ -149,7 +151,8 @@ struct SystemData
             status == right.status &&
             systemSequence == right.systemSequence &&
             opaque == right.opaque &&
-            system2faEnabled == right.system2faEnabled;
+            system2faEnabled == right.system2faEnabled &&
+            organizationId == right.organizationId;
     }
 
     std::string ownerAccountEmail() const
@@ -164,7 +167,7 @@ struct SystemData
 };
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(authKeyHash) \
-    (status)(systemSequence) (opaque)(registrationTime)(system2faEnabled)(attributes)
+    (status)(systemSequence) (opaque)(registrationTime)(system2faEnabled)(attributes)(organizationId)
 
 NX_REFLECTION_INSTRUMENT(SystemData, SystemData_Fields)
 

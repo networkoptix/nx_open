@@ -19,13 +19,16 @@ public:
         const QString& ownerEmail,
         const QString& ownerFullName,
         bool running,
-        bool system2faEnabled);
+        bool system2faEnabled,
+        const QString& organizationId);
 
     virtual ~QnCloudSystemDescription() = default;
 
     void setOnline(bool online);
 
     void set2faEnabled(bool system2faEnabled);
+
+    void setOrganization(const QString& organizationId);
 
     void updateLastKnownVersion(const nx::utils::SoftwareVersion& version);
 
@@ -55,7 +58,8 @@ private:
         const QString& ownerEmail,
         const QString& ownerFullName,
         bool online,
-        bool system2faEnabled);
+        bool system2faEnabled,
+        const QString& organizationId);
 
 private:
     const QString m_ownerEmail;
@@ -64,6 +68,7 @@ private:
 
     bool m_online;
     bool m_system2faEnabled = false;
+    QString m_organizationId;
 };
 
 using QnCloudSystemDescriptionPtr = QSharedPointer<QnCloudSystemDescription>;

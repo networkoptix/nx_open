@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <nx/cloud/db/api/system_data.h>
+#include <nx/cloud/cps/channel_partner_client.h>
+#include <nx/cloud/cps/api/system_data.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <ui/workbench/workbench_state_manager.h>
 
@@ -16,6 +17,7 @@ class Connection;
 } // namespace nx::cloud::db::api
 
 namespace nx::vms::client::core { class CloudConnectionFactory; }
+namespace nx::vms::common { class SystemSettings; }
 
 namespace nx::vms::client::desktop {
 
@@ -30,7 +32,7 @@ class ConnectToCloudTool:
     using base_type = QObject;
 
 public:
-    ConnectToCloudTool(QWidget* parent);
+    ConnectToCloudTool(QWidget* parent, nx::vms::common::SystemSettings*);
     virtual ~ConnectToCloudTool() override;
 
     bool start();
@@ -52,7 +54,7 @@ private:
     bool processBindResult(nx::cloud::db::api::ResultCode result);
     void onBindFinished(
         nx::cloud::db::api::ResultCode result,
-        nx::cloud::db::api::SystemData systemData);
+        nx::cloud::cps::api::SystemRegistrationResponse systemData);
     void requestLocalSessionToken();
     void onLocalSessionTokenReady();
 
@@ -63,8 +65,10 @@ private:
 
     std::unique_ptr<core::CloudConnectionFactory> m_cloudConnectionFactory;
     std::unique_ptr<nx::cloud::db::api::Connection> m_cloudConnection;
+    std::unique_ptr<nx::cloud::cps::ChannelPartnerClient> m_channelPartnerClient;
     nx::vms::client::core::CloudAuthData m_cloudAuthData;
-    nx::cloud::db::api::SystemData m_systemData;
+    nx::cloud::cps::api::SystemRegistrationResponse m_systemData;
+    const nx::vms::common::SystemSettings* const m_systemSettings;
 };
 
 } // namespace nx::vms::client::desktop

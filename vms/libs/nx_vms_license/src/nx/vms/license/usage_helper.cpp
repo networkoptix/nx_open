@@ -738,31 +738,31 @@ VideoWallLicenseUsageProposer::~VideoWallLicenseUsageProposer()
 
 // --------------------------------------------------- ChannelPartnerServer ----------------------------------------------
 
-const QString ChannelPartnerServer::baseUrl(common::SystemContext* context)
+const QString ChannelPartnerServer::baseUrl(const common::SystemSettings* settings)
 {
-    auto result = context->globalSettings()->channelPartnerServerUrl().toString();
+    auto result = settings->channelPartnerServerUrl().toString();
     result = result.trimmed();
     while (result.endsWith('/'))
         result.chop(1);
-    return result;
+    return result + "/api/v2";
 }
 
-const nx::utils::Url ChannelPartnerServer::reportUrl(common::SystemContext* context)
+const nx::utils::Url ChannelPartnerServer::reportUrl(const common::SystemSettings* settings)
 {
-    const auto systemId = context->globalSettings()->cloudSystemId();
-    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/system_usage_report/", systemId);
+    const auto systemId = settings->cloudSystemId();
+    return baseUrl(settings) + NX_FMT("/partners/cloud_systems/%1/system_usage_report/", systemId);
 }
 
-const nx::utils::Url ChannelPartnerServer::saasServicesUrl(common::SystemContext* context)
+const nx::utils::Url ChannelPartnerServer::saasServicesUrl(const common::SystemSettings* settings)
 {
-    const auto systemId = context->globalSettings()->cloudSystemId();
-    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/services/", systemId);
+    const auto systemId = settings->cloudSystemId();
+    return baseUrl(settings) + NX_FMT("/partners/cloud_systems/%1/services/", systemId);
 }
 
-const nx::utils::Url ChannelPartnerServer::saasDataUrl(common::SystemContext* context)
+const nx::utils::Url ChannelPartnerServer::saasDataUrl(const common::SystemSettings* settings)
 {
-    const auto systemId = context->globalSettings()->cloudSystemId();
-    return baseUrl(context) + NX_FMT("/api/v2/partners/cloud_systems/%1/saas_report/", systemId);
+    const auto systemId = settings->cloudSystemId();
+    return baseUrl(settings) + NX_FMT("/partners/cloud_systems/%1/saas_report/", systemId);
 }
 
 } // namespace nx::vms::license

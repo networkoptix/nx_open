@@ -31,11 +31,11 @@ private:
 
 struct ChannelPartnerServer
 {
-    static const nx::utils::Url reportUrl(common::SystemContext* context);
-    static const nx::utils::Url saasServicesUrl(common::SystemContext* context);
-    static const nx::utils::Url saasDataUrl(common::SystemContext* context);
-private:
-    static const QString baseUrl(common::SystemContext* context);
+    static const nx::utils::Url reportUrl(const common::SystemSettings* settings);
+    static const nx::utils::Url saasServicesUrl(const common::SystemSettings* settings);
+    static const nx::utils::Url saasDataUrl(const common::SystemSettings* settings);
+
+    static const QString baseUrl(const common::SystemSettings* settings);
 };
 
 struct LicenseCompatibility;
