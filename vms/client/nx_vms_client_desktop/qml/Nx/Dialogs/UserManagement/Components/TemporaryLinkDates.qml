@@ -37,7 +37,7 @@ NxObject
     readonly property string expirationDateText:
     {
         const time = expirationDate.getTime()
-        const expirationDisplay = new Date(time + displayOffset(time))
+        const expirationDisplay = new Date(time + displayOffsetMs)
 
         const endOfDay = expirationDisplay.getHours() == 23
             && expirationDisplay.getMinutes() == 59
