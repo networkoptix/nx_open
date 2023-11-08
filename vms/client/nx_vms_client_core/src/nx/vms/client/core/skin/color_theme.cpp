@@ -206,6 +206,20 @@ QColor ColorTheme::transparent(const QColor& color, qreal alpha)
     return newColor;
 }
 
+QColor ColorTheme::blend(const QColor& background, const QColor& foreground, qreal alpha)
+{
+    const auto  bg = background.toRgb();
+    const auto  fg = foreground.toRgb();
+
+    const auto blend = [](qreal x, qreal y, qreal k) { return x * (1.0 - k) + y * k; };
+
+    return QColor::fromRgbF(
+        blend(bg.redF(), fg.redF(), alpha),
+        blend(bg.greenF(), fg.greenF(), alpha),
+        blend(bg.blueF(), fg.blueF(), alpha),
+        blend(bg.alphaF(), fg.alphaF(), alpha));
+}
+
 QColor ColorTheme::darker(const QColor& color, int offset) const
 {
     return lighter(color, -offset);

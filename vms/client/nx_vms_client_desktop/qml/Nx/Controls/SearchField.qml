@@ -23,6 +23,7 @@ Nx.TextField
     property alias iconSource: actionButton.icon.source
 
     placeholderText: qsTr("Search")
+    placeholderTextColor: ColorTheme.windowText
 
     leftPadding: actionButton.visible ? (actionButton.x + actionButton.width + spacing) : 8
     rightPadding: enabled ? (width - clearButton.x) : 8
