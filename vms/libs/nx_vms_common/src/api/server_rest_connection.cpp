@@ -604,6 +604,7 @@ Handle ServerConnection::bindSystemToCloud(
     const QString& cloudSystemId,
     const QString& cloudAuthKey,
     const QString& cloudAccountName,
+    const QString& organizationId,
     const std::string& ownerSessionToken,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
@@ -612,6 +613,7 @@ Handle ServerConnection::bindSystemToCloud(
     data.systemId = cloudSystemId;
     data.authKey = cloudAuthKey;
     data.owner = cloudAccountName;
+    data.organizationId = organizationId;
 
     auto request = prepareRestRequest(
         nx::network::http::Method::post,
