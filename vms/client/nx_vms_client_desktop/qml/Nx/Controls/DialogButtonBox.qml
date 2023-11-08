@@ -15,10 +15,10 @@ T.DialogButtonBox
 
     implicitWidth: Math.max(
         implicitBackgroundWidth + leftInset + rightInset,
-        (control.count === 1 ? implicitContentWidth * 2 : implicitContentWidth)
+        (control.count === 1 ? contentWidth * 2 : contentWidth)
             + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-        implicitContentHeight + topPadding + bottomPadding)
+        contentHeight + topPadding + bottomPadding)
     contentWidth: contentItem.implicitWidth
 
     width: parent ? parent.width : 0

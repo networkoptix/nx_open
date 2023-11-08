@@ -24,10 +24,9 @@ DialogWithState
 
     modality: Qt.ApplicationModal
 
-    width: minimumWidth
-    height: minimumHeight
-
-    minimumWidth: 768
+    width: 0
+    height: 0
+    minimumWidth: Math.max(768, tabControl.implicitWidth)
     minimumHeight: 672
 
     color: ColorTheme.colors.dark7

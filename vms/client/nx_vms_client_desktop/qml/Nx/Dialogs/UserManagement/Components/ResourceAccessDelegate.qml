@@ -28,19 +28,18 @@ Item
 
     property bool editingEnabled: true
 
-    property color hoverColor
-
     property bool automaticDependencies: false
 
     readonly property alias hoveredCell: cellsRow.hoveredCell
 
     readonly property var resourceTreeIndex: modelIndex
 
-    property bool isRowHovered: false
+    readonly property bool selected: isSelected //< TreeView delegate's context property.
+
     property int hoveredColumnAccessRight: 0
     property int externalNextCheckState: Qt.Checked
 
-    readonly property int externallySelectedAccessRight: isSelected
+    readonly property int externallySelectedAccessRight: root.selected
         ? hoveredColumnAccessRight
         : 0
 
@@ -63,7 +62,7 @@ Item
     readonly property var resource: (model && model.resource) || null
     readonly property var nodeType: (model && model.nodeType) || -1
 
-    signal triggered(int index)
+    signal triggered(var cell)
 
     implicitWidth: mainDelegate.implicitWidth + cellsRow.width + 1
     implicitHeight: 28
@@ -90,15 +89,6 @@ Item
 
         context: root.editingContext
         resourceTreeIndex: root.resourceTreeIndex
-    }
-
-    Rectangle
-    {
-        id: rowHoverMarker
-
-        anchors.fill: cellsRow
-        visible: root.isRowHovered && !isSelected
-        color: root.hoverColor
     }
 
     Row
@@ -234,21 +224,9 @@ Item
                         return false
                     }
 
-                    readonly property color backgroundColor:
-                    {
-                        if (cell.highlighted)
-                            return ColorTheme.colors.brand_core
-
-                        if (isSelected || root.isRowHovered)
-                            return "transparent"
-
-                        if (cell.relevant && (root.hoveredColumnAccessRight & cell.accessRight))
-                            return root.hoverColor
-
-                        return root.editingEnabled
-                            ? ColorTheme.colors.dark5
-                            : ColorTheme.colors.dark7
-                    }
+                    readonly property color backgroundColor: cell.highlighted
+                        ? ColorTheme.colors.brand_d2
+                        : "transparent"
 
                     readonly property color foregroundColor:
                     {
@@ -262,8 +240,8 @@ Item
                             return ColorTheme.colors.brand_core
                         }
 
-                        return isSelected //< TreeView delegate context property.
-                            ? ColorTheme.colors.light16
+                        return root.selected
+                            ? ColorTheme.colors.light10
                             : ColorTheme.colors.dark13
                     }
 
@@ -280,11 +258,8 @@ Item
                         if (!cell.relevant || !root.editingEnabled)
                             return
 
-                        accessRightsModel.toggle(
-                            modelIndex, index, root.automaticDependencies)
-
+                        root.triggered(cell)
                         cellsRow.hoveredCell = null
-                        root.triggered(index)
                     }
 
                     Rectangle
@@ -305,10 +280,7 @@ Item
                             width: cell.width + 2
                             height: cell.height + 2
                             color: "transparent"
-
-                            border.color: root.editingEnabled
-                                ? ColorTheme.colors.dark4
-                                : ColorTheme.colors.dark6
+                            border.color: ColorTheme.colors.dark6
                         }
                     }
 
