@@ -297,11 +297,12 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
             showFailure(errorMessage);
         });
 
+    using namespace nx::cloud::db::api;
     api->bindSystemToCloud(
         QString::fromStdString(m_systemData.id),
         QString::fromStdString(m_systemData.authKey),
         QString::fromStdString(m_cloudAuthData.credentials.username),
-        QString::fromStdString(m_systemData.organizationId),
+        QString::fromStdString(getAttrValueOr(m_systemData.attributes, "organizationId", "")),
         localToken.value,
         std::move(handleReply),
         m_parent->thread());
