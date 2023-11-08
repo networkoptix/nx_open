@@ -598,11 +598,6 @@ QSize UserGroupsWidget::sizeHint() const
     return QSize(200, 200);
 }
 
-void UserGroupsWidget::showEvent(QShowEvent*)
-{
-    d->ui->filterLineEdit->setFocus();
-}
-
 void UserGroupsWidget::Private::setMassDeleteInProgress(bool inProgress)
 {
     ui->groupsTable->setDisabled(inProgress);
