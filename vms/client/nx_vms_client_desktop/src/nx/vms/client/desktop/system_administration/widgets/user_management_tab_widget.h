@@ -29,6 +29,9 @@ public:
 
     void manageDigestUsers();
 
+protected:
+    virtual void showEvent(QShowEvent* event) override;
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
