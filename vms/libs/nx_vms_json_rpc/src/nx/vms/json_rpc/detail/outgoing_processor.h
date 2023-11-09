@@ -22,14 +22,17 @@ class OutgoingProcessor
 {
 public:
     using Id = std::variant<QString, int>;
-    using SendFunc = nx::utils::MoveOnlyFunc<void(QJsonValue)>;
+    using SendFunc = nx::utils::MoveOnlyFunc<void(QByteArray)>;
     OutgoingProcessor(SendFunc sendFunc): m_sendFunc(std::move(sendFunc)) {}
     ~OutgoingProcessor() { clear(SystemError::interrupted); }
 
     void clear(SystemError::ErrorCode error);
 
     using ResponseHandler = nx::utils::MoveOnlyFunc<void(nx::vms::api::JsonRpcResponse)>;
-    void processRequest(nx::vms::api::JsonRpcRequest jsonRpcRequest, ResponseHandler handler);
+    void processRequest(
+        nx::vms::api::JsonRpcRequest request,
+        ResponseHandler handler,
+        QByteArray serializedRequest);
 
     using BatchResponseHandler =
         nx::utils::MoveOnlyFunc<void(std::vector<nx::vms::api::JsonRpcResponse>)>;
@@ -39,7 +42,7 @@ public:
     void onResponse(const QJsonValue& data);
 
 private:
-    void send(nx::vms::api::JsonRpcRequest jsonRpcRequest) const;
+    void send(nx::vms::api::JsonRpcRequest request, QByteArray serializedRequest) const;
     void send(std::vector<nx::vms::api::JsonRpcRequest> jsonRpcRequests) const;
     void onResponse(const QJsonArray& list);
 

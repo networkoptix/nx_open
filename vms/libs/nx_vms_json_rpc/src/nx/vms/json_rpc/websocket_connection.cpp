@@ -119,12 +119,16 @@ void WebSocketConnection::stopWhileInAioThread()
 }
 
 void WebSocketConnection::send(
-    nx::vms::api::JsonRpcRequest jsonRpcRequest, ResponseHandler handler)
+    nx::vms::api::JsonRpcRequest request, ResponseHandler handler, QByteArray serializedRequest)
 {
     dispatch(
-        [this, jsonRpcRequest = std::move(jsonRpcRequest), handler = std::move(handler)]() mutable
+        [this,
+            request = std::move(request),
+            handler = std::move(handler),
+            serializedRequest = std::move(serializedRequest)]() mutable
         {
-            m_outgoingProcessor->processRequest(std::move(jsonRpcRequest), std::move(handler));
+            m_outgoingProcessor->processRequest(
+                std::move(request), std::move(handler), std::move(serializedRequest));
         });
 }
 
@@ -177,10 +181,7 @@ void WebSocketConnection::readHandler(const nx::Buffer& buffer)
     catch (api::JsonRpcError e)
     {
         NX_DEBUG(this, "Error %1 processing received message", QJson::serialized(e));
-        QJsonValue serialized;
-        QJson::serialize(
-            api::JsonRpcResponse::makeError(std::nullptr_t(), std::move(e)), &serialized);
-        send(std::move(serialized));
+        send(QJson::serialized(api::JsonRpcResponse::makeError(std::nullptr_t(), std::move(e))));
     }
 }
 
@@ -197,16 +198,16 @@ void WebSocketConnection::processQueuedRequest()
         [this](QJsonValue response)
         {
             if (!response.isNull())
-                send(std::move(response));
+                send(QJson::serialized(response));
             m_queuedRequests.pop();
             if (!m_queuedRequests.empty())
                 processQueuedRequest();
         });
 }
 
-void WebSocketConnection::send(QJsonValue data)
+void WebSocketConnection::send(QByteArray data)
 {
-    auto buffer = std::make_unique<nx::Buffer>(QJson::serialized(data));
+    auto buffer = std::make_unique<nx::Buffer>(std::move(data));
     auto bufferPtr = buffer.get();
     logMessage("send to", m_socket->socket()->getForeignAddress(), *bufferPtr);
     m_socket->sendAsync(bufferPtr,

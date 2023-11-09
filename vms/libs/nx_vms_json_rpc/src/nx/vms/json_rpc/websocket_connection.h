@@ -33,7 +33,10 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     void start();
-    void send(nx::vms::api::JsonRpcRequest jsonRpcRequest, ResponseHandler handler = nullptr);
+    void send(
+        nx::vms::api::JsonRpcRequest request,
+        ResponseHandler handler = {},
+        QByteArray serializedRequest = {});
 
     using BatchResponseHandler =
         nx::utils::MoveOnlyFunc<void(std::vector<nx::vms::api::JsonRpcResponse>)>;
@@ -49,7 +52,7 @@ private:
     void readHandler(const nx::Buffer& buffer);
     void processRequest(const QJsonValue& data);
     void processQueuedRequest();
-    void send(QJsonValue data);
+    void send(QByteArray data);
 
 private:
     OnDone m_onDone;
