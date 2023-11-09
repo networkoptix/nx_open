@@ -69,24 +69,24 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
 }
 
 void OutgoingProcessor::processRequest(
-    nx::vms::api::JsonRpcRequest jsonRpcRequest, ResponseHandler handler)
+    nx::vms::api::JsonRpcRequest request, ResponseHandler handler, QByteArray serializedRequest)
 {
-    if (!jsonRpcRequest.id)
+    if (!request.id)
     {
-        NX_DEBUG(this, "Send request with notification method %1", jsonRpcRequest.method);
-        send(std::move(jsonRpcRequest));
+        NX_DEBUG(this, "Send request with notification method %1", request.method);
+        send(std::move(request), std::move(serializedRequest));
         if (handler)
             handler({});
         return;
     }
 
-    auto id = *jsonRpcRequest.id;
+    auto id = *request.id;
     if (m_awaitingBatchResponses.contains(id) || m_awaitingResponses.contains(id))
     {
         NX_DEBUG(this, "Id %1 is already used", id);
         if (handler)
         {
-            handler(api::JsonRpcResponse::makeError(jsonRpcRequest.responseId(),
+            handler(api::JsonRpcResponse::makeError(request.responseId(),
                 {Error::invalidRequest, "Invalid parameter 'id': Already used"}));
         }
         return;
@@ -94,7 +94,7 @@ void OutgoingProcessor::processRequest(
 
     NX_DEBUG(this, "Send request with %1 id", id);
     m_awaitingResponses[std::move(id)] = std::move(handler);
-    send(std::move(jsonRpcRequest));
+    send(std::move(request), std::move(serializedRequest));
 }
 
 void OutgoingProcessor::processBatchRequest(
@@ -182,19 +182,21 @@ void OutgoingProcessor::processBatchRequest(
     send(std::move(goodRequests));
 }
 
-void OutgoingProcessor::send(nx::vms::api::JsonRpcRequest jsonRpcRequest) const
+void OutgoingProcessor::send(
+    nx::vms::api::JsonRpcRequest request, QByteArray serializedRequest) const
 {
-    QJsonValue serialized;
-    QJson::serialize(jsonRpcRequest, &serialized);
-    m_sendFunc(std::move(serialized));
+    NX_ASSERT_HEAVY_CONDITION(
+        serializedRequest.isEmpty() || serializedRequest == QJson::serialized(request),
+        "Request: `%1`, serialized: `%2`", QJson::serialized(request), serializedRequest);
+    if (serializedRequest.isEmpty())
+        serializedRequest = QJson::serialized(request);
+    m_sendFunc(std::move(serializedRequest));
 }
 
 void OutgoingProcessor::send(
     std::vector<nx::vms::api::JsonRpcRequest> jsonRpcRequests) const
 {
-    QJsonValue serialized;
-    QJson::serialize(jsonRpcRequests, &serialized);
-    m_sendFunc(std::move(serialized));
+    m_sendFunc(QJson::serialized(jsonRpcRequests));
 }
 
 void OutgoingProcessor::onResponse(const QJsonValue& data)

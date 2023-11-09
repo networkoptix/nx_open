@@ -25,7 +25,7 @@ TEST(OutgoingProcessor, batchRequest)
     detail::OutgoingProcessor processor(
         [](auto value)
         {
-            ASSERT_EQ(QJson::serialized(value).toStdString(),
+            ASSERT_EQ(value.toStdString(),
                 "[{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"method1\"},"
                 "{\"id\":\"2\",\"jsonrpc\":\"2.0\",\"method\":\"method2\"}]");
         });
