@@ -42,6 +42,8 @@ SwipeView
             height: 24
 
             icon.source: "image://svg/skin/text_buttons/cross_close_20.svg"
+            icon.width: closeButton.width
+            icon.height: closeButton.height
             color: pressed || hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light9
 
             onClicked: control.closeRequested()

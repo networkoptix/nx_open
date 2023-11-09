@@ -12,8 +12,6 @@ Control
 {
     id: control
 
-    padding: 24
-
     background: null
 
     signal closeRequested()
@@ -73,6 +71,13 @@ Control
                 "imageUrl": "image://svg/skin/promo/ptz_promo_tracking.svg"
             })
         }
+
+        pagesModel.append({
+            "title": "",
+            "text": qsTr("You can enable this guide again by going to "
+                + "Local Settings > Advanced > Reset All Warnings"),
+            "imageUrl": "image://svg/skin/promo/ptz_promo_show_again.svg"
+        })
 
         pagesRepeater.model = pagesModel
     }
