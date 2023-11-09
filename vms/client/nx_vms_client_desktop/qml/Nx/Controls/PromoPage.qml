@@ -79,6 +79,8 @@ Item
             id: textItem
 
             Layout.fillWidth: true
+            Layout.leftMargin: 13
+            Layout.rightMargin: 13
 
             horizontalAlignment: Text.AlignHCenter
 
