@@ -749,6 +749,7 @@ QString QnResourceWidget::tooltipText(const QString& toolTip, const QString& hot
 }
 
 bool QnResourceWidget::isVideoWallLicenseValid() const
+//TODO @pprivalov: code duplication with resource_status_helper
 {
     auto helper = qnClientModule->videoWallLicenseUsageHelper();
     if (helper->isValid())

@@ -60,7 +60,7 @@ enum class BackgroundType
 
 BackgroundType backgroundTypeFromLayout(const LayoutResourcePtr& layout)
 {
-    if (layout->backgroundImageFilename().isEmpty())
+    if (!layout->hasBackground())
     {
         const auto workbenchLayout = QnWorkbenchLayout::instance(layout);
         if (workbenchLayout && workbenchLayout->flags().testFlag(QnLayoutFlag::SpecialBackground))
@@ -385,7 +385,7 @@ void QnGridBackgroundItem::update(const LayoutResourcePtr& layout)
         d->image = QImage();
     #endif
 
-    updateDisplay();
+    updateConnectedState();
 }
 
 QRect QnGridBackgroundItem::sceneBoundingRect() const
@@ -418,7 +418,7 @@ void QnGridBackgroundItem::updateConnectedState()
 {
     Q_D(QnGridBackgroundItem);
 
-    d->connected = !context()->user().isNull();
+    d->connected = !context()->currentServer().isNull();
     updateDisplay();
 }
 
