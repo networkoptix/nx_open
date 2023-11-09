@@ -680,7 +680,7 @@ std::pair<int, bool> MainWindow::calculateHelpTopic() const
             if (resource->isFile())
                 return{HelpTopic::Id::MainWindow_Tree_MultiVideo, true};
 
-            if (!resource->backgroundImageFilename().isEmpty())
+            if (resource->hasBackground())
                 return {HelpTopic::Id::MainWindow_Scene_EMapping, false};
         }
     }
