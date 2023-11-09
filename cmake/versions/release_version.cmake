@@ -2,5 +2,5 @@
 
 # ATTENTION: When updating the VMS version, reset the Protocol version in the following file:
 # open/cmake/versions/vms_protocol_version.cmake
-set(releaseVersion 5.1.2)
+set(releaseVersion 5.1.3)
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
