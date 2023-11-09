@@ -719,11 +719,13 @@ public:
 
     Handle ldapAuthenticateAsync(
         const nx::vms::api::Credentials& credentials,
+        bool localOnly,
         LdapAuthenticateCallback&& callback,
         QThread* targetThread = nullptr);
 
     Handle loginInfoAsync(
         const QString& login,
+        bool localOnly,
         Result<ErrorOrData<nx::vms::api::LoginUser>>::type&& callback,
         QThread* targetThread = nullptr);
 
