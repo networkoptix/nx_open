@@ -2087,14 +2087,16 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
 
 Handle ServerConnection::ldapAuthenticateAsync(
     const nx::vms::api::Credentials& credentials,
+    bool localOnly,
     LdapAuthenticateCallback&& callback,
     QThread* targetThread)
 {
+    nx::network::rest::Params params;
+    if (localOnly)
+        params.insert("_local", true);
     auto request = prepareRequest(
         nx::network::http::Method::post,
-        prepareUrl(
-            "/rest/v3/ldap/authenticate",
-            /*params*/ {}),
+        prepareUrl("/rest/v3/ldap/authenticate", params),
         nx::network::http::header::ContentType::kJson.toString(),
         nx::reflect::json::serialize(credentials));
 
@@ -2194,10 +2196,14 @@ Handle ServerConnection::modifyLdapSettingsAsync(
 
 Handle ServerConnection::loginInfoAsync(
     const QString& login,
+    bool localOnly,
     Result<ErrorOrData<nx::vms::api::LoginUser>>::type&& callback,
     QThread* targetThread)
 {
-    return executeGet("/rest/v3/login/users/" + login, {}, callback, targetThread);
+    nx::network::rest::Params params;
+    if (localOnly)
+        params.insert("_local", true);
+    return executeGet("/rest/v3/login/users/" + login, params, callback, targetThread);
 }
 
 Handle ServerConnection::getLdapSettingsAsync(
