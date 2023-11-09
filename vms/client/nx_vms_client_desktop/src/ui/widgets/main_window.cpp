@@ -686,7 +686,7 @@ std::pair<int, bool> MainWindow::calculateHelpTopic() const
             if (resource->isFile())
                 return{Qn::MainWindow_Tree_MultiVideo_Help, true};
 
-            if (!resource->backgroundImageFilename().isEmpty())
+            if (resource->hasBackground())
                 return {Qn::MainWindow_Scene_EMapping_Help, false};
         }
     }
