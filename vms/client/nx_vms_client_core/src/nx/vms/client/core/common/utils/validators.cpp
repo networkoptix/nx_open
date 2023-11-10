@@ -27,7 +27,8 @@ int IntValidator::highest()
     return std::numeric_limits<int>::max();
 }
 
-DoubleValidator::DoubleValidator(QObject* parent): QDoubleValidator(parent)
+DoubleValidator::DoubleValidator(QObject* parent):
+    QDoubleValidator(lowest(), highest(), /*decimals*/ -1, parent)
 {
 }
 
@@ -38,12 +39,16 @@ void DoubleValidator::registerQmlType()
 
 double DoubleValidator::lowest()
 {
-    return std::numeric_limits<double>::lowest();
+    // QDoubleValidator works correctly only when the range values are within the int limits,
+    // because it casts double to int during validation.
+    return std::numeric_limits<int>::min() + 1;
 }
 
 double DoubleValidator::highest()
 {
-    return std::numeric_limits<double>::max();
+    // QDoubleValidator works correctly only when the range values are within the int limits,
+    // because it casts double to int during validation.
+    return std::numeric_limits<int>::max();
 }
 
 } // namespace nx::vms::client::core
