@@ -59,9 +59,9 @@ public:
 
     /*
      * @return Information about cameras which consume SAAS integration services.
-     * key - serviceId, value - the list of consumed cameras.
+     * key - serviceId, value - the physicalId list of consumed cameras.
      */
-    std::map<QnUuid, std::set<QnUuid>> camerasByService() const;
+    std::map<QnUuid, std::set<QString>> camerasByService() const;
 
     struct Propose
     {
@@ -176,10 +176,10 @@ public:
 
     /*
      * @return Information about cameras which consumes SAAS services.
-     *     key - serviceId, value - camera id list. If there is not enough services for some camera
+     *     key - serviceId, value - camera physicalId list. If there is not enough services for some camera
      *     then the service value is an empty UUID.
      */
-    std::map<QnUuid, std::set<QnUuid>> camerasByService() const;
+    std::map<QnUuid, std::set<QString>> camerasByService() const;
 
 };
 
