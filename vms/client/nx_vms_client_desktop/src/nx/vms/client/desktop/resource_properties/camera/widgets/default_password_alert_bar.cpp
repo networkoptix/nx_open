@@ -62,23 +62,25 @@ void DefaultPasswordAlertBar::setUseMultipleForm(bool value)
 
 void DefaultPasswordAlertBar::updateState()
 {
-    static const auto kSingleCameraAlertText = tr(
-        "This camera requires password to be set up.");
+    static const auto kSingleCameraAdminAlertText =
+        tr("This camera requires password to be set up");
+    static const auto kMultipleCameraAdminAlertText =
+        tr("Some of selected cameras require password to be set up");
+    static const auto kSingleCameraAlertText =
+        tr("This camera requires password to be set up. Ask your system administrator to do it.");
     static const auto kMultipleCameraAlertText = tr(
-        "Some of selected cameras require password to be set up.");
-    static const auto kAskAdministratorText = ' ' +
-        tr("Ask your system administrator to do it.");
+        "Some of selected cameras require password to be set up."
+        " Ask your system administrator to do it.");
 
     const bool hasAdminAccess = systemContext()->accessController()->hasGlobalPermissions(
         GlobalPermission::powerUser);
 
-    const auto suffix = hasAdminAccess ? QString() : kAskAdministratorText;
     if (m_cameras.empty())
         setText(QString());
     else if (m_useMultipleForm)
-        setText(kMultipleCameraAlertText + suffix);
+        setText(hasAdminAccess ? kMultipleCameraAdminAlertText : kMultipleCameraAlertText);
     else
-        setText(kSingleCameraAlertText + suffix);
+        setText(hasAdminAccess ? kSingleCameraAdminAlertText : kSingleCameraAlertText);
 
     m_setPasswordButton->setVisible(hasAdminAccess);
 }
