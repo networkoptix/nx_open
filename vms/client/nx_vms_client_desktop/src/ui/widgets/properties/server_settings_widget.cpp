@@ -551,10 +551,10 @@ void QnServerSettingsWidget::showCertificateMismatchBanner(bool dataLoaded)
         ? kBase + " " + nx::vms::common::html::localLink(tr("Details"), kMismatchedCertificateLink)
         : kBase);
 
-    ui->alertBar->show();
-
     // Fixup link color.
-    ui->alertBar->repaint();
+    ui->alertBar->hide();
+
+    ui->alertBar->show();
 }
 
 int QnServerSettingsWidget::updateCertificatesLabels()
