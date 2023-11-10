@@ -5,6 +5,7 @@
 #include <chrono>
 #include <vector>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QVariant>
 #include <QtGui/private/qinputcontrol_p.h>
 #include <QtQml/QQmlEngine>

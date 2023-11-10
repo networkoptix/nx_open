@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtGui/QColor>
 #include <QtQuick/QQuickItem>
 
 #include <nx/utils/impl_ptr.h>
