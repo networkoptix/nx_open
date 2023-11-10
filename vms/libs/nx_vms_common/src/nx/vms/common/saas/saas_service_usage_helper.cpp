@@ -191,9 +191,9 @@ bool IntegrationServiceUsageHelper::isOverflow() const
     return false;
 }
 
-std::map<QnUuid, std::set<QnUuid>> IntegrationServiceUsageHelper::camerasByService() const
+std::map<QnUuid, std::set<QString>> IntegrationServiceUsageHelper::camerasByService() const
 {
-    std::map<QnUuid, std::set<QnUuid>> result;
+    std::map<QnUuid, std::set<QString>> result;
 
     // Update integration info
     QMap<QString, QnUuid> serviceByIntegration;
@@ -211,7 +211,7 @@ std::map<QnUuid, std::set<QnUuid>> IntegrationServiceUsageHelper::camerasByServi
                 if (manufest.isLicenseRequired)
                 {
                     const auto& serviceId = serviceByIntegration.value(manufest.id);
-                    result[serviceId].insert(camera->getId());
+                    result[serviceId].insert(camera->getPhysicalId());
                 }
             }
         }
@@ -496,9 +496,9 @@ LocalRecordingUsageHelper::LocalRecordingUsageHelper(
 {
 }
 
-std::map<QnUuid, std::set<QnUuid>> LocalRecordingUsageHelper::camerasByService() const
+std::map<QnUuid, std::set<QString>> LocalRecordingUsageHelper::camerasByService() const
 {
-    std::map<QnUuid, std::set<QnUuid>> result;
+    std::map<QnUuid, std::set<QString>> result;
 
     // Update integration info
     std::map<QnUuid, int> channelsByService;
@@ -520,7 +520,7 @@ std::map<QnUuid, std::set<QnUuid>> LocalRecordingUsageHelper::camerasByService()
             if (--it->second == 0)
                 channelsByService.erase(it);
         }
-        result[serviceId].insert(camera->getId());
+        result[serviceId].insert(camera->getPhysicalId());
     }
     return result;
 }
