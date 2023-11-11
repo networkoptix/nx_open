@@ -1628,7 +1628,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation>間違っています</translation>
+      <translation>不正</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
