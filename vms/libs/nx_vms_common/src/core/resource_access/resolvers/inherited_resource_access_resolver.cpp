@@ -186,8 +186,7 @@ InheritedResourceAccessResolver::Private::ResourceAccessData
     if (cachedAccessData.contains(subjectId))
         return cachedAccessData.value(subjectId);
 
-    ResourceAccessData& cachedAccessDataRef = cachedAccessData[subjectId];
-    cachedAccessDataRef.accessMap = baseResolver->resourceAccessMap(subjectId);
+    cachedAccessData[subjectId].accessMap = baseResolver->resourceAccessMap(subjectId);
 
     ResourceAccessMap inheritedAccessMap;
     const auto parents = subjectHierarchy->directParents(subjectId);
@@ -196,8 +195,9 @@ InheritedResourceAccessResolver::Private::ResourceAccessData
         inheritedAccessMap += ensureResourceAccessDataUnsafe(parent, visitedSubjectIds).accessMap;
 
     baseResolver->notifier()->subscribeSubjects({subjectId});
-    cachedAccessDataRef.accessMap += inheritedAccessMap;
 
+    ResourceAccessData& cachedAccessDataRef = cachedAccessData[subjectId];
+    cachedAccessDataRef.accessMap += inheritedAccessMap;
     cachedAccessDataRef.accessMap.remove(QnUuid{}); //< For compatibility with intermediate version.
 
     NX_DEBUG(q, "Resolved and cached an access map for %1", subjectId);
