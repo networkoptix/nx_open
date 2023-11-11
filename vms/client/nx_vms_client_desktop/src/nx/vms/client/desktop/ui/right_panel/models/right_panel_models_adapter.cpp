@@ -487,7 +487,7 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
 
 bool RightPanelModelsAdapter::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if (role != Private::ItemIsVisibleRole || !NX_ASSERT(checkIndex(index)))
+    if (role != Private::ItemIsVisibleRole || !index.isValid() || !NX_ASSERT(checkIndex(index)))
         return false;
 
     return d->setVisible(index, value.toBool());
