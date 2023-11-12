@@ -4823,7 +4823,7 @@ to %1</source>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+        <numerusform>Sunucu, kimliğini doğrulamak için bu %n SSL sertifikalarını kullanır</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
       </translation>
     </message>
@@ -5644,10 +5644,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+      <translation>%1
+açmaya çalışıyorsunuz ancak bu web sayfası güvenilmeyen bir sertifika kimlik doğrulaması sundu.
+Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfasını açabilirsiniz.</translation>
     </message>
     <message>
       <source>Open this integration?</source>
@@ -6236,7 +6235,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Tüm içeriğin proxylenmesi, sunucu&apos; ağındaki herhangi bir hizmeti veya cihazı bu web sayfasının kullanıcılarına sunar.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
@@ -7043,7 +7042,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Unknown resolution</source>
-      <translation type="unfinished">Unknown resolution</translation>
+      <translation>Bilinmeyen çözünürlük</translation>
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
@@ -7065,7 +7064,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Toplu düzenleme için birden fazla cihaz seçmek üzere %1 veya %2 kullanın. Tüm cihazları seçmek için %3 kullanın.</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7078,7 +7077,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>Set for %n selected devices</source>
       <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
+        <numerusform>%n seçili cihaz(lar) için ayarla</numerusform>
         <numerusform>Set for %n selected devices</numerusform>
       </translation>
     </message>
@@ -7164,14 +7163,14 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
       <translation type="unfinished">
-        <numerusform>%n cihazlar için yedekleme etkinleştirildi</numerusform>
+        <numerusform>Yedekleme %n cihazlar için etkinleştirildi</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>%n kameralar için yedekleme etkinleştirildi</numerusform>
+        <numerusform>Yedekleme %n kameralar için etkinleştirildi</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
       </translation>
     </message>
@@ -7738,7 +7737,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>%n cihazlarda ses etkinleştirilemedi</numerusform>
+        <numerusform>Ses %n cihazlarda etkinleştirilemedi</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
       </translation>
     </message>
@@ -8043,11 +8042,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation type="unfinished">Enter access link to continue your session</translation>
+      <translation>Oturumunuza devam etmek için erişim bağlantısını girin</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+      <translation>Oturumunuz sona erdi. Devam etmek için lütfen bağlantınızla tekrar oturum açın.</translation>
     </message>
     <message>
       <source>Authentication details are incorrect</source>
@@ -8880,7 +8879,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Group with the same name already exists</source>
-      <translation type="unfinished">Group with the same name already exists</translation>
+      <translation>Aynı isme sahip bir grup zaten var</translation>
     </message>
     <message>
       <source>Failed to apply changes to %1 group</source>
@@ -9042,7 +9041,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>DIŞA AKTARIM İZNİ YOK</translation>
     </message>
   </context>
   <context>
@@ -9554,11 +9553,11 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>Sunucuya bağlantı kurulamadı. Sunucu&apos; sertifikası geçersiz.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>Sunucuya bağlantı kurulamadı. Sunucu&apos; sertifikası reddedildi.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -10239,7 +10238,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Tüm içeriğin proxylenmesi, sunucu&apos; ağındaki herhangi bir hizmeti veya cihazı bu web sayfasının kullanıcılarına sunar</translation>
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
@@ -10629,18 +10628,18 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Kalite ve FPS ayarları, &quot;Sistem Yönetimi&quot; iletişim kutusundaki &quot;Sistemin kamera ayarlarını optimize etmesine izin ver&quot; seçeneği nedeniyle devre dışı bırakıldı.
+Kaliteyi ve FPS'yi doğrudan kameradan değiştirmeye devam edebilirsiniz.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled for some of the selected cameras.</translation>
+      <translation>Seçilen kameralardan bazıları için kalite ve FPS ayarları devre dışı bırakıldı.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>&quot;Uzman&quot; sekmesindeki &quot;Kamera akışını ve profil ayarlarını koru&quot; seçeneği nedeniyle kalite ve FPS ayarları devre dışı bırakıldı.
+Kaliteyi ve FPS'yi doğrudan kameradan değiştirmeye devam edebilirsiniz.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -10805,7 +10804,7 @@ Dikkat: Bu parola sıfırlanamaz. Kaybederseniz arşiv kurtarılamaz.</translati
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
       <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%1 kullanıcıdan %n özet kimlik doğrulamasını kullanmasına izin veriliyor (güvenli değildir).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
       </translation>
     </message>
@@ -10838,7 +10837,7 @@ Dikkat: Bu parola sıfırlanamaz. Kaybederseniz arşiv kurtarılamaz.</translati
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+      <translation>Bu sertifika, %1 sabitlendiği sertifikayla eşleşmiyor.</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
@@ -11723,7 +11722,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>Erişim Bağlantısını Kopyala</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
@@ -11768,7 +11767,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>Giriş alanı boş olamaz</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
@@ -11935,7 +11934,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>%1 giriş menüsüne dilediğiniz zaman navigasyon panelindeki bulut simgesine tıklayarak erişebileceksiniz.</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -12313,7 +12312,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
+      <translation>Belirtilen öğeye karşılık gelen bir widget bulunamıyor.</translation>
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
@@ -12685,7 +12684,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>Etkinlik yalnızca özelliklerden herhangi biriyle eşleşme olması durumunda tetiklenecektir. Niteliklerin adlarını ve değerlerini Nesneler sekmesinde görebilirsiniz.</translation>
     </message>
   </context>
   <context>
@@ -13052,7 +13051,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>Kullanılabilir hale gelen sonraki yapılara yükseltilemez.</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
@@ -13086,7 +13085,7 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>Yeterli erişim hakkı yok</translation>
     </message>
   </context>
   <context>

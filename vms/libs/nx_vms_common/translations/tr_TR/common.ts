@@ -1133,7 +1133,7 @@
     <message>
       <source>Sec</source>
       <comment>Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>Saniye</translation>
     </message>
     <message>
       <source>Min</source>
@@ -1169,7 +1169,7 @@
       <source>Milliseconds</source>
       <comment>Capitalized full suffix for displaying milliseconds</comment>
       <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
+        <numerusform>Milisaniye</numerusform>
         <numerusform>Milliseconds</numerusform>
       </translation>
     </message>
@@ -1177,7 +1177,7 @@
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
       <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
+        <numerusform>Saniye</numerusform>
         <numerusform>Seconds</numerusform>
       </translation>
     </message>
@@ -1185,7 +1185,7 @@
       <source>Minutes</source>
       <comment>Capitalized full suffix for displaying minutes</comment>
       <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
+        <numerusform>Dakika</numerusform>
         <numerusform>Minutes</numerusform>
       </translation>
     </message>
@@ -1193,7 +1193,7 @@
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
       <translation type="unfinished">
-        <numerusform>Hours</numerusform>
+        <numerusform>Saat</numerusform>
         <numerusform>Hours</numerusform>
       </translation>
     </message>
@@ -2527,7 +2527,7 @@
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
+      <translation>LDAP Senkronizasyon Sorunu</translation>
     </message>
     <message>
       <source>Failed to connect to LDAP</source>
