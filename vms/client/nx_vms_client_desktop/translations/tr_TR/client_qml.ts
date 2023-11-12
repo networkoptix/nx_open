@@ -346,19 +346,19 @@
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Etkin</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Devre Dışı</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Güvenli olmayan (özet) kimlik doğrulama</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>mevcut değeri koru</translation>
     </message>
   </context>
   <context>
@@ -467,7 +467,7 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Askıya alınmış</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -535,11 +535,11 @@
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Giriş DN boş olamaz</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Parola boş olamaz</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
@@ -2426,11 +2426,11 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Erişim Bağlantısı</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Bağlantıyı Kopyala</translation>
     </message>
     <message>
       <source>Terminate</source>

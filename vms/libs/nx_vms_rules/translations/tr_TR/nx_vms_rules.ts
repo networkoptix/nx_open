@@ -48,11 +48,11 @@
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Ve Başlık</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Ve Açıklama</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Yer İşareti Oluştur</translation>
     </message>
     <message>
       <source>At</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Sabit Süre</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Etiket ekle</translation>
     </message>
   </context>
   <context>
@@ -285,7 +285,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Sabit Süre</translation>
     </message>
   </context>
   <context>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Fixed Duration</source>
-      <translation type="unfinished">Fixed Duration</translation>
+      <translation>Sabit Süre</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -331,7 +331,7 @@
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Düzende</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
@@ -343,14 +343,14 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Geri sarma</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ExitFullscreenAction</name>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Düzende</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -369,7 +369,7 @@
     </message>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Fan sorunu</translation>
     </message>
     <message>
       <source>At</source>
@@ -396,15 +396,15 @@
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>Ve Kaynak</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Ve Başlık</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Ve Açıklama</translation>
     </message>
   </context>
   <context>
@@ -423,7 +423,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>HTTP(S) İsteği</translation>
     </message>
     <message>
       <source>URL</source>
@@ -450,7 +450,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>Ldap Sync Issue Event</source>
-      <translation type="unfinished">Ldap Sync Issue Event</translation>
+      <translation>Ldap Senkronizasyon Sorunu Etkinliği</translation>
     </message>
   </context>
   <context>
@@ -591,7 +591,7 @@
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Masaüstü Bildirimini Göster</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Geri sarma</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -644,7 +644,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Kullanıcılara</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -667,11 +667,11 @@
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Ve Başlık</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Ve Açıklama</translation>
     </message>
     <message>
       <source>And Level Is</source>
@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>Poe güç yetersizliği</translation>
     </message>
     <message>
       <source>Begin When</source>
@@ -710,7 +710,7 @@
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>PTZ ön ayarını çalıştır</translation>
     </message>
     <message>
       <source>At</source>
@@ -718,7 +718,7 @@
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>PTZ ön tanımlı pozisyon</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -749,7 +749,7 @@
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>Kaynak Cihaz adını Gövdeye ekleyin</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -888,7 +888,7 @@
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Alarm Ekranını Açmaya Zorla</translation>
     </message>
   </context>
   <context>
@@ -942,11 +942,11 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>Cihazda</translation>
     </message>
     <message>
       <source>To users</source>
-      <translation type="unfinished">To users</translation>
+      <translation>Kullanıcılara</translation>
     </message>
     <message>
       <source>Interval of Action</source>
