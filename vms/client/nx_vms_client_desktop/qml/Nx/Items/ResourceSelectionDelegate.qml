@@ -150,7 +150,7 @@ Item
             leftPadding: 1
 
             width: Math.min(implicitWidth, delegateItem.availableWidth - x)
-            color: ColorTheme.colors.dark17
+            color: delegateItem.extraColor
         }
     }
 
@@ -255,4 +255,8 @@ Item
     readonly property color color: highlighted
         ? ColorTheme.colors.light4
         : ColorTheme.colors.light10
+
+    readonly property color extraColor: highlighted
+        ? ColorTheme.colors.light10
+        : (isSelected ? ColorTheme.colors.light14 : ColorTheme.colors.dark17)
 }

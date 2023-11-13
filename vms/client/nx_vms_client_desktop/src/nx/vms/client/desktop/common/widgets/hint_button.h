@@ -48,8 +48,7 @@ public:
      */
     void addHintLine(const QString& hintLine);
 
-    static const QColor kBasicColor;
-    static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions;
+    static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubstitutions;
 
 protected:
     virtual bool event(QEvent* event) override;

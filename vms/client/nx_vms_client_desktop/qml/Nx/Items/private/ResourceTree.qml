@@ -52,6 +52,7 @@ TreeView
     dropHighlightColor: ColorTheme.transparent(ColorTheme.colors.brand_core, 0.6)
     rootIndex: resourceTreeModel.rootIndex
     autoExpandRoleName: "autoExpand"
+    selectAllSiblingsRoleName: "nodeType"
 
     expandsOnDoubleClick: (modelIndex => resourceTreeModel.expandsOnDoubleClick(modelIndex))
     activateOnSingleClick: (modelIndex => resourceTreeModel.activateOnSingleClick(modelIndex))

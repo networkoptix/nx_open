@@ -88,7 +88,6 @@ signals:
 private:
     void clearResourceSelection();
     void handleNewResourceItemAction();
-    void handleSelectAllAction();
     void beforeGroupProcessing();
     void afterGroupProcessing(menu::IDType eventType);
     void acquireClientState();
