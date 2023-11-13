@@ -120,6 +120,18 @@ void SystemManager::getCloudUsersOfSystem(
         });
 }
 
+void SystemManager::saveCloudUserOfSystem(
+    const std::string& systemId,
+    const api::SystemSharing& userData,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    m_requestsExecutor->executeRequest</*Output*/ void>(
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
+        userData,
+        std::move(completionHandler));
+}
+
 void SystemManager::getAccessRoleList(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)

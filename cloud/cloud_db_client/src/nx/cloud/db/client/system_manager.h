@@ -52,6 +52,11 @@ public:
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) override;
 
+    virtual void saveCloudUserOfSystem(
+        const std::string& systemId,
+        const api::SystemSharing& userData,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
     virtual void getAccessRoleList(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler) override;
