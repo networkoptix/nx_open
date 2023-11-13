@@ -703,6 +703,14 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::ldap, nx::vms::api::LdapSettings(), this,
         [] { return tr("LDAP settings"); });
 
+    m_cloudPollingIntervalAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        Names::cloudPollingIntervalS, 60, [](const int& value) { return value >= 0; }, this,
+        []
+        {
+            return tr("Interval between the Cloud polling HTTP requests to synchronize the data, "
+                "if zero then the transaction message bus is used");
+        });
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -1004,6 +1012,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         &SystemSettings::masterCloudSyncChanged,
         Qt::QueuedConnection);
 
+    connect(
+        m_cloudPollingIntervalAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::cloudPollingIntervalChanged,
+        Qt::QueuedConnection);
+
     AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -1088,6 +1103,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_ldapAdaptor
         << m_exposeServerEndpointsAdaptor
         << m_cloudStorageUpdatePeriodAdaptor
+        << m_cloudPollingIntervalAdaptor
     ;
 
     return result;
@@ -2129,6 +2145,11 @@ bool SystemSettings::system2faEnabled() const
     return m_system2faEnabledAdaptor->value();
 }
 
+void SystemSettings::setSystem2faEnabled(bool value)
+{
+    m_system2faEnabledAdaptor->setValue(value);
+}
+
 std::vector<QnUuid> SystemSettings::masterCloudSyncList() const
 {
     std::vector<QnUuid> result;
@@ -2193,6 +2214,16 @@ bool SystemSettings::isInsecureDeprecatedApiInUseEnabled() const
 void SystemSettings::enableInsecureDeprecatedApiInUse(bool value)
 {
     m_insecureDeprecatedApiInUseEnabledAdaptor->setValue(value);
+}
+
+std::chrono::seconds SystemSettings::cloudPollingInterval() const
+{
+    return std::chrono::seconds(m_cloudPollingIntervalAdaptor->value());
+}
+
+void SystemSettings::setCloudPollingInterval(std::chrono::seconds period)
+{
+    m_cloudPollingIntervalAdaptor->setValue(period.count());
 }
 
 void SystemSettings::update(const vms::api::SystemSettings& value)
