@@ -16,6 +16,7 @@ FocusScope
     property alias text: edit.text
     property alias readOnly: edit.readOnly
     property alias wrapMode: edit.wrapMode
+    property alias textArea: edit
 
     property var cursorShape: Qt.IBeamCursor
 
