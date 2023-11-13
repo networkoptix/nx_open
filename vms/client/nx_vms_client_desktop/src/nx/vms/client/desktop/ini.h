@@ -368,6 +368,9 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, showBorderInVideoWallMode,
         "[Support] Show window border in Video Wall mode to workaround graphics drivers issues.");
 
+    NX_INI_FLAG(false, continuePtzActionOnCameraDeselect,
+        "[Support] Continue PTZ camera actions when other camera is selected on the layout.");
+
     // ---------------------------------------------------------------------------------------------
     // CI section.
     // Flags here are used for the client functional unit tests.
