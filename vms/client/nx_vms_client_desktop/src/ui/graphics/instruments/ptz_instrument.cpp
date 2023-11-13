@@ -1612,9 +1612,9 @@ void PtzInstrument::at_display_widgetAboutToBeChanged(Qn::ItemRole role)
     if (role != Qn::CentralRole)
         return;
 
-    QnPtzObject ptzObject;
     if (const auto* mediaWidget = qobject_cast<QnMediaResourceWidget*>(display()->widget(role)))
     {
+        QnPtzObject ptzObject;
         auto ptzController = mediaWidget->ptzController();
         ptzController->getActiveObject(&ptzObject);
 
@@ -1627,6 +1627,9 @@ void PtzInstrument::at_display_widgetAboutToBeChanged(Qn::ItemRole role)
         // Forcefully stop ptz movement on a camera.
         if (mediaWidget->item()->layout())
         {
+            if (ini().continuePtzActionOnCameraDeselect)
+                return;
+
             menu()->triggerIfPossible(menu::PtzContinuousMoveAction, menu::Parameters()
                 .withArgument(Qn::ItemDataRole::PtzSpeedRole, QVariant::fromValue(QVector3D()))
                 .withArgument(Qn::ItemDataRole::ForceRole, true));
