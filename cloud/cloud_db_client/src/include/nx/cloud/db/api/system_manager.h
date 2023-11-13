@@ -86,6 +86,15 @@ public:
         std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) = 0;
 
     /**
+     * Shares the System to the User or modifies User permissions for the System if such User
+     * exists.
+     */
+    virtual void saveCloudUserOfSystem(
+        const std::string& systemId,
+        const api::SystemSharing& userData,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
+
+    /**
      * Returns list of access roles which can be used to share system systemId.
      * @note request is authorized with account credentials.
      */
