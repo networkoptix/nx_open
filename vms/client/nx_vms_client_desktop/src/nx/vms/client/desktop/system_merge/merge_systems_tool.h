@@ -95,7 +95,8 @@ signals:
     void systemFound(
         MergeSystemsStatus mergeStatus,
         const QString& errorText,
-        const nx::vms::api::ModuleInformation& moduleInformation);
+        const nx::vms::api::ModuleInformation& moduleInformation,
+        const nx::vms::api::MergeStatusReply& reply);
     void mergeFinished(
         MergeSystemsStatus mergeStatus,
         const QString& errorText,
@@ -118,7 +119,8 @@ private:
         const Context& ctx,
         MergeSystemsStatus status,
         const QString& errorText = QString(),
-        bool removeCtx = true);
+        bool removeCtx = true,
+        const nx::vms::api::MergeStatusReply& reply = {});
 
     void mergeSystemDryRun(const Context& ctx);
 

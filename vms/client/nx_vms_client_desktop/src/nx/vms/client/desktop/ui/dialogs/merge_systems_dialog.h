@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/url.h>
+#include <nx/vms/api/data/merge_status_reply.h>
 #include <nx/vms/api/data/module_information.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -46,7 +47,8 @@ private slots:
     void at_mergeTool_systemFound(
         MergeSystemsStatus mergeStatus,
         const QString& errorText,
-        const nx::vms::api::ModuleInformation& moduleInformation);
+        const nx::vms::api::ModuleInformation& moduleInformation,
+        const nx::vms::api::MergeStatusReply& reply);
 
     void at_mergeTool_mergeFinished(
         MergeSystemsStatus mergeStatus,
