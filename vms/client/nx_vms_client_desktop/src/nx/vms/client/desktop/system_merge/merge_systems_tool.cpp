@@ -171,7 +171,8 @@ void MergeSystemsTool::mergeSystemDryRun(const Context& ctx)
                         *ctx,
                         MergeSystemsStatus::ok,
                         /*errorText*/ {},
-                        /*removeCtx*/ false);
+                        /*removeCtx*/ false,
+                        *status);
                 }
                 else if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
                 {
@@ -179,7 +180,8 @@ void MergeSystemsTool::mergeSystemDryRun(const Context& ctx)
                         this, "Can't dry run merge, rest result: %1", QJson::serialized(*error));
 
                     reportSystemFound(
-                        *ctx, mergeStatusFromResult(*error), error->errorString, true);
+                        *ctx, mergeStatusFromResult(*error), error->errorString, true,
+                        nx::vms::api::MergeStatusReply());
                 }
             }
         };
@@ -264,7 +266,8 @@ void MergeSystemsTool::reportSystemFound(
     const Context& ctx,
     MergeSystemsStatus status,
     const QString& errorText,
-    bool removeCtx)
+    bool removeCtx,
+    const nx::vms::api::MergeStatusReply& reply)
 {
     NX_DEBUG(this, "System found, target: %1, status: %2, error: %3",
         ctx.target, status, errorText);
@@ -274,7 +277,7 @@ void MergeSystemsTool::reportSystemFound(
     if (removeCtx)
         m_contextMap.erase(ctx.mergeData.remoteServerId);
 
-    emit systemFound(status, errorText, targetInfo);
+    emit systemFound(status, errorText, targetInfo, reply);
 }
 
 void MergeSystemsTool::at_serverInfoReceived(

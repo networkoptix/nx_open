@@ -35,8 +35,14 @@ struct NX_VMS_API SystemInformation
     /**%apidoc Presented if the System is bound to the Cloud. */
     std::optional<QnUuid> cloudOwnerId;
 
+    /**%apidoc Presented if the System is bound to the Cloud and belongs to the Organization. */
+    std::optional<QnUuid> organizationId;
+
     /**%apidoc For local System only. */
     std::optional<std::vector<QnUuid>> servers;
+
+    /**%apidoc Amount of edge Servers in the System. */
+    int edgeServerCount = 0;
 
     /**%apidoc For local System only. */
     std::optional<std::vector<QnUuid>> devices;
@@ -64,7 +70,8 @@ struct NX_VMS_API SystemInformation
 };
 #define SystemInformation_Fields \
     (name)(customization)(version)(protoVersion)(cloudHost)(localId)(cloudId)(cloudOwnerId) \
-    (endpoint)(servers)(devices)(status)(ldapSyncId)(synchronizedTimeMs)
+    (organizationId)(endpoint)(servers)(edgeServerCount)(devices)(status)(ldapSyncId) \
+    (synchronizedTimeMs)
 NX_VMS_API_DECLARE_STRUCT_EX(SystemInformation, (json))
 
 struct NX_VMS_API OtherSystemRequest

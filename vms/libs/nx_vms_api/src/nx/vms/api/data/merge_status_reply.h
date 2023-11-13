@@ -20,8 +20,9 @@ struct NX_VMS_API MergeStatusReply
 
     /**%apidoc List of unmerged servers. */
     std::vector<ServerMergeData> unmergedServers;
+    std::vector<std::string> warnings;
 };
-#define MergeStatusReply_Fields (mergeId)(mergeInProgress)(unmergedServers)
+#define MergeStatusReply_Fields (mergeId)(mergeInProgress)(unmergedServers)(warnings)
 NX_VMS_API_DECLARE_STRUCT(MergeStatusReply)
 
 } // namespace nx::vms::api

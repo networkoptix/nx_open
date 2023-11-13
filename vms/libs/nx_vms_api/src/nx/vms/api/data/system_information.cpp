@@ -13,6 +13,7 @@ SystemInformation::SystemInformation(const ModuleInformation& module):
     protoVersion(module.protoVersion),
     cloudHost(module.cloudHost),
     cloudOwnerId(module.cloudOwnerId),
+    organizationId(module.organizationId),
     synchronizedTimeMs(module.synchronizedTimeMs)
 {
     if (!module.localSystemId.isNull())
