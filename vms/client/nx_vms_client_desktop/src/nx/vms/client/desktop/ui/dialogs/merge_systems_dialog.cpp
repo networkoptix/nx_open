@@ -24,6 +24,8 @@
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/licensing/customer_support.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
