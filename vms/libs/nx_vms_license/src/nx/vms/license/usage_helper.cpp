@@ -143,14 +143,13 @@ UsageHelper::UsageHelper(common::SystemContext* context, QObject* parent):
     base_type(parent),
     common::SystemContextAware(context),
     m_dirty(true),
-    m_validator(new Validator(context))
+    m_validator(new Validator(context)),
+    m_invalidateTimer(nx::utils::ElapsedTimerState::started)
 {
-    m_invalidateTimer.start(kLicenseRefreshInterval, [this]() { invalidate(); });
 }
 
 UsageHelper::~UsageHelper()
 {
-    m_invalidateTimer.cancelSync();
 }
 
 int UsageHelper::borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses) const
@@ -229,10 +228,11 @@ void UsageHelper::setCustomValidator(std::unique_ptr<Validator> validator)
 
 void UsageHelper::updateCache() const
 {
-    if (!m_dirty)
+    if (!m_dirty && !m_invalidateTimer.hasExpired(kLicenseRefreshInterval))
         return;
     /* Need to set flag right here as virtual methods may call various cache-dependent getters. */
     m_dirty = false;
+    m_invalidateTimer.restart();
 
     m_cache.licenses.update(m_context->licensePool()->getLicenses());
 
