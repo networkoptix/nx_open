@@ -35,14 +35,10 @@ Item
 
         background: Rectangle
         {
-            radius: 3
+            radius: 2
 
-            color: button.down || dropDownMenu.visible
-                ? ColorTheme.colors.dark5
-                : button.hovered ? ColorTheme.colors.dark8 : "transparent"
-
-            border.color: button.down || dropDownMenu.visible
-                ? ColorTheme.colors.dark4
+            color: button.hovered && !button.down
+                ? ColorTheme.colors.dark12
                 : ColorTheme.colors.dark11
         }
 
@@ -57,12 +53,32 @@ Item
             {
                 id: image
 
-                sourceSize: Qt.size(24, 20)
                 anchors.centerIn: content
+                source: "image://svg/skin/buttons/filter_16x16.svg"
+                sourceSize: Qt.size(16, 16)
+            }
 
-                source: button.selection !== undefined
-                    ? "image://svg/skin/user_settings/filter_drop_set.svg"
-                    : "image://svg/skin/user_settings/filter_drop.svg"
+            Rectangle
+            {
+                id: filtersCounter
+
+                x: image.x + 9
+                y: image.y - 4
+                width: 11
+                height: 11
+                radius: 5
+                color: ColorTheme.colors.attention.red
+                visible: button.selection !== undefined
+
+                Text
+                {
+                    anchors.centerIn: filtersCounter
+                    anchors.verticalCenterOffset: -1
+                    color: ColorTheme.colors.light1
+                    font.pixelSize: 8
+                    font.bold: true
+                    text: "1"
+                }
             }
         }
 

@@ -35,16 +35,16 @@ QString makeColoredText(const QString& text, const QColor& color)
 
 namespace nx::vms::client::desktop {
 
-const QColor HintButton::kBasicColor = "#49626F";
-const nx::vms::client::core::SvgIconColorer::IconSubstitutions HintButton::kIconSubstitutions = {
-    {QIcon::Normal, {{kBasicColor, "dark15"}}},
-    {QIcon::Active, {{kBasicColor, "dark14"}}},
-};
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions HintButton::kIconSubstitutions = {
+    {QIcon::Normal, {.primary = "dark14"}},
+    {QIcon::Active, {.primary = "dark15"}}};
 
 HintButton::HintButton(QWidget* parent):
     base_type(parent),
-    m_regularPixmap(qnSkin->icon("buttons/context_hint_16.svg", kIconSubstitutions).pixmap(QSize(16,16))),
-    m_highlightedPixmap(qnSkin->icon("buttons/context_hint_16.svg", kIconSubstitutions).pixmap(QSize(16,16), QIcon::Mode::Active))
+    m_regularPixmap(qnSkin->icon("buttons/context_hint_16.svg", kIconSubstitutions)
+        .pixmap(QSize(16,16))),
+    m_highlightedPixmap(qnSkin->icon("buttons/context_hint_16.svg", kIconSubstitutions)
+        .pixmap(QSize(16,16), QIcon::Mode::Active))
 {
     const auto pixmapSizeScaled = m_regularPixmap.size() / m_regularPixmap.devicePixelRatioF();
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

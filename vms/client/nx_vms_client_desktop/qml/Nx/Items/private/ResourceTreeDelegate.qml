@@ -154,7 +154,7 @@ FocusScope
                     case ResourceTree.ItemState.selected:
                         return ColorTheme.colors.light10
                     default:
-                        return ColorTheme.colors.dark17
+                        return isSelected ? ColorTheme.colors.light14 : ColorTheme.colors.dark17
                 }
             }
         }

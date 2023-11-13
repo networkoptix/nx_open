@@ -195,9 +195,6 @@ ResourceBrowserWrapper::ResourceBrowserWrapper(
     connect(action(ui::action::CustomGroupRenamedEvent), &QAction::triggered, this,
         [this]() { afterGroupProcessing(ui::action::CustomGroupRenamedEvent); });
 
-    connect(action(ui::action::SelectAllAction), &QAction::triggered,
-        this, &ResourceBrowserWrapper::handleSelectAllAction);
-
     // Initialization after the QML component is loaded.
     tree.connectNotifySignal(
         [this]()
@@ -272,26 +269,6 @@ void ResourceBrowserWrapper::handleNewResourceItemAction()
 
     action(ui::action::ResourcesTabAction)->trigger();
     tree.setSelection(indexes);
-}
-
-void ResourceBrowserWrapper::handleSelectAllAction()
-{
-    if (menu()->targetProvider()->currentScope() != ui::action::TreeScope || !tree)
-        return;
-
-    const auto currentIndex = tree.currentIndex.value();
-    if (!currentIndex.isValid())
-        return;
-
-    // Select all siblings of the current index that have the same node type.
-    const auto indicesToSelect = tree.model.value()->match(
-        currentIndex,
-        Qn::NodeTypeRole,
-        currentIndex.data(Qn::NodeTypeRole),
-        -1,
-        {Qt::MatchExactly, Qt::MatchWrap});
-
-    tree.setSelection(indicesToSelect);
 }
 
 std::pair<QModelIndex, int /*depth*/> ResourceBrowserWrapper::findResourceIndex(

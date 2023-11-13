@@ -40,6 +40,7 @@ Control
             acceptedButtons: Qt.LeftButton
 
             GlobalToolTip.delay: 0
+            GlobalToolTip.enabled: !!toolTipText
             GlobalToolTip.text:
             {
                 var text = "<p>" + toolTipText + "</p>"

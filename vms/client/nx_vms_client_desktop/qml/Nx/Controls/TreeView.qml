@@ -31,6 +31,10 @@ FocusScope
     property alias scrollStepSize: listView.scrollStepSize //< In pixels.
     property alias spacing: listView.spacing
 
+    // If this data role is defined, Ctrl+A shortcut selects all siblings of the current index
+    // that share the same value of this data role.
+    property string selectAllSiblingsRoleName
+
     // Whether the selection overlaps spacing between items. As in that case neighboring selection
     // lines overlap each other, `selectionHighlightColor` must be opaque.
     property bool selectionOverlapsSpacing: false
@@ -152,6 +156,22 @@ FocusScope
 
         for (let i = 1; i < linearIndexes.length; ++i)
             selectionModel.select(linearIndexes[i], ItemSelectionModel.Select)
+    }
+
+    /**
+     * Changes selection to all siblings of the current index that share with it
+     * the same value of the specified `roleName`.
+     */
+    function selectAllSiblings(roleName)
+    {
+        if (!currentIndex.valid)
+            return
+
+        setSelection(NxGlobals.modelFindAll(
+            currentIndex,
+            roleName,
+            NxGlobals.modelData(currentIndex, roleName),
+            Qt.MatchExactly | Qt.MatchWrap))
     }
 
     function isSelected(index)
@@ -963,5 +983,17 @@ FocusScope
                 event.accepted = false
                 break
         }
+    }
+
+    Keys.onShortcutOverride: (event) =>
+    {
+        if (event.key != Qt.Key_A || event.modifiers != Qt.ControlModifier)
+            return
+
+        if (!selectionEnabled || !keyNavigationEnabled || !selectAllSiblingsRoleName)
+            return
+
+        event.accepted = true
+        selectAllSiblings(selectAllSiblingsRoleName)
     }
 }
