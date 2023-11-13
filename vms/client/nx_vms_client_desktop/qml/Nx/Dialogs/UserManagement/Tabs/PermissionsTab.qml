@@ -229,6 +229,8 @@ Item
 
         filterText: searchField.text
 
+        selectAllSiblingsRoleName: "nodeType"
+
         function updateNextBatchCheckState()
         {
             if (!hoveredColumnAccessRight || !control.editingContext)
@@ -352,8 +354,6 @@ Item
 
                 return false
             }
-
-            property bool parentNodeSelected: false
 
             onResourceTreeIndexChanged:
                 rowAccess.parentNodeSelected = rowAccess.isParentNodeSelected()
@@ -511,12 +511,21 @@ Item
         rightPadding: 16
         spacing: 16
 
+        ContextHintButton
+        {
+            anchors.verticalCenter: footerRow.verticalCenter
+            toolTipText: ""
+            helpTopic: HelpTopic.UserSettings
+        }
+
         Text
         {
             font.pixelSize: 14
             color: ColorTheme.colors.light16
             height: footerRow.height
             verticalAlignment: Text.AlignVCenter
+            visible: control.editingEnabled
+                && !GlobalTemporaries.automaticAccessDependencySwitchVisible
 
             text: qsTr("Use %1 or %2 to select multiple lines, or %3 to clear the selection",
                 "%1, %2 and %3 will be replaced with keyboard key names")

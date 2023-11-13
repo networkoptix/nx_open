@@ -39,13 +39,15 @@ Item
     property int hoveredColumnAccessRight: 0
     property int externalNextCheckState: Qt.Checked
 
-    readonly property int externallySelectedAccessRight: root.selected
+    readonly property int externallySelectedAccessRight: (selected || parentNodeSelected)
         ? hoveredColumnAccessRight
         : 0
 
     property var externallyHoveredGroups // {indexes[], accessRight, toggledOn, fromSelection}
 
-    readonly property bool isParentHovered:
+    property bool parentNodeSelected: false
+
+    readonly property bool parentNodeHovered:
     {
         if (!externallyHoveredGroups)
             return false
@@ -172,7 +174,7 @@ Item
                         const hg = root.externallyHoveredGroups
 
                         if (hg
-                            && root.isParentHovered
+                            && root.parentNodeHovered
                             && hg.toggledOn === toggledOn
                             && (hg.fromSelection || root.editingEnabled)
                             && (accessRightsModel.relevantAccessRights & hg.accessRight))

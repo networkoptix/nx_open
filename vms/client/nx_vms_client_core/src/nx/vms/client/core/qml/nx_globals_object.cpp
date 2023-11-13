@@ -134,6 +134,33 @@ Qt::ItemFlags NxGlobalsObject::itemFlags(const QModelIndex& index) const
         : Qt::ItemFlags{};
 }
 
+QModelIndex NxGlobalsObject::modelFindOne(const QModelIndex& start, const QString& roleName,
+    const QVariant& value, Qt::MatchFlags flags) const
+{
+    if (!start.isValid())
+        return {};
+
+    const int role = start.model()->roleNames().key(roleName.toLatin1(), -1);
+    if (role == -1)
+        return {};
+
+    const auto result = start.model()->match(start, role, value, 1, flags);
+    return result.empty() ? QModelIndex{} : result[0];
+}
+
+QModelIndexList NxGlobalsObject::modelFindAll(const QModelIndex& start, const QString& roleName,
+    const QVariant& value, Qt::MatchFlags flags) const
+{
+    if (!start.isValid())
+        return {};
+
+    const int role = start.model()->roleNames().key(roleName.toLatin1(), -1);
+    if (role == -1)
+        return {};
+
+    return start.model()->match(start, role, value, /*all hits*/-1, flags);
+}
+
 QVariantList NxGlobalsObject::toQVariantList(const QModelIndexList& indexList) const
 {
     return nx::utils::toQVariantList(indexList);

@@ -35,9 +35,13 @@ public:
     Q_INVOKABLE QModelIndex fromPersistent(const QPersistentModelIndex& index) const;
     Q_INVOKABLE QVariant modelData(const QModelIndex& index, const QString& roleName) const;
     Q_INVOKABLE bool isRecursiveChildOf(const QModelIndex& child, const QModelIndex& parent) const;
-
     Q_INVOKABLE bool hasChildren(const QModelIndex& index) const;
     Q_INVOKABLE Qt::ItemFlags itemFlags(const QModelIndex& index) const;
+
+    Q_INVOKABLE QModelIndex modelFindOne(const QModelIndex& start, const QString& roleName,
+        const QVariant& value, Qt::MatchFlags flags) const;
+    Q_INVOKABLE QModelIndexList modelFindAll(const QModelIndex& start, const QString& roleName,
+        const QVariant& value, Qt::MatchFlags flags) const;
 
     /** Operations with QModelIndexList in QML are incredibly slow, pass QVariantList instead. */
     Q_INVOKABLE QVariantList toQVariantList(const QModelIndexList& indexList) const;
