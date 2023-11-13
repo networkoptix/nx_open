@@ -62,6 +62,7 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
 
     /**%apidoc Presented if the System is bound to the Cloud. */
     std::optional<QnUuid> cloudOwnerId;
+    std::optional<QnUuid> organizationId;
     nx::vms::api::SaasState saasState = nx::vms::api::SaasState::uninitialized;
 
     void fixRuntimeId();
@@ -95,6 +96,7 @@ struct NX_VMS_API ModuleInformation: ServerPortInformation
     (hwPlatform) \
     (synchronizedTimeMs) \
     (cloudOwnerId) \
+    (organizationId) \
     (saasState)
 NX_VMS_API_DECLARE_STRUCT_EX(ModuleInformation, (ubjson)(json)(xml)(csv_record))
 NX_REFLECTION_INSTRUMENT(ModuleInformation, ModuleInformation_Fields);

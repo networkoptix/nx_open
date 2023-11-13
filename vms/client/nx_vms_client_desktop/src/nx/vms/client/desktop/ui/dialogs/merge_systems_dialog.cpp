@@ -18,11 +18,12 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
-#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -30,8 +31,10 @@
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/system_merge/merge_systems_tool.h>
 #include <nx/vms/client/desktop/system_merge/merge_systems_validator.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
+#include <ui/common/palette.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/util.h>
 
@@ -58,6 +61,17 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
     setHelpTopic(this, HelpTopic::Id::Systems_MergeSystems);
 
     setWarningStyle(ui->errorLabel);
+
+    ui->warnWidget->setHidden(true);
+    ui->warnIconLabel->setPixmap(qnSkin->pixmap("tree/warning_yellow.svg"));
+    setPaletteColor(ui->warningLabel, QPalette::WindowText, core::colorTheme()->color("yellow_d2"));
+    setPaletteColor(ui->contactSupportLabel, QPalette::WindowText, core::colorTheme()->color("yellow_d2"));
+
+    CustomerSupport customerSupport(systemContext());
+    const QUrl url(customerSupport.systemContact.address.rawData);
+    ui->contactSupportLabel->setText(tr("We recommend that you consult with %1 before proceeding.")
+        .arg(nx::vms::common::html::link(tr("support"), url)));
+    ui->contactSupportLabel->setOpenExternalLinks(url.isValid());
 
     buttonBox()->setStandardButtons(QDialogButtonBox::Cancel);
     m_mergeButton = buttonBox()->addButton(QString(), QDialogButtonBox::ActionRole);
@@ -261,7 +275,8 @@ void MergeSystemsDialog::at_mergeButton_clicked()
 void MergeSystemsDialog::at_mergeTool_systemFound(
     MergeSystemsStatus mergeStatus,
     const QString& errorText,
-    const nx::vms::api::ModuleInformation& moduleInformation)
+    const nx::vms::api::ModuleInformation& moduleInformation,
+    const nx::vms::api::MergeStatusReply& reply)
 {
     ui->buttonBox->hideProgress();
     ui->credentialsGroupBox->setEnabled(true);
@@ -274,6 +289,12 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
         mergeStatus = MergeSystemsValidator::checkCloudCompatibility(
             system()->currentServer(), moduleInformation);
     }
+
+    ui->warnWidget->setHidden(reply.warnings.empty());
+    QStringList warnings;
+    for (const auto& warning: reply.warnings)
+        warnings << QString::fromStdString(warning);
+    ui->warningLabel->setText(warnings.join(". "));
 
     if (!allowsToMerge(mergeStatus))
     {
