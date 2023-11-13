@@ -9,6 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
 #include <nx/network/aio/repetitive_timer.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/url.h>
 #include <nx/vms/common/system_context_aware.h>
 
@@ -156,7 +157,7 @@ private:
     mutable Cache m_cache;
 
     std::unique_ptr<Validator> m_validator;
-    nx::network::aio::RepetitiveTimer m_invalidateTimer;
+    mutable nx::utils::ElapsedTimer m_invalidateTimer;
 };
 
 class CamLicenseUsageHelper: public UsageHelper
