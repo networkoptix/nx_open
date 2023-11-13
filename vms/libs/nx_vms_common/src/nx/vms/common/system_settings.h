@@ -42,11 +42,12 @@ struct SystemSettingNames
     #define DECLARE_SETTING_NAME(NAME) static const inline QString NAME = NX_FMT( #NAME )
 
     DECLARE_SETTING_NAME(backupSettings);
+    DECLARE_SETTING_NAME(channelPartnerServer);
     DECLARE_SETTING_NAME(cloudAccountName);
-    DECLARE_SETTING_NAME(organizationId);
     DECLARE_SETTING_NAME(cloudAuthKey);
     DECLARE_SETTING_NAME(cloudHost);
     DECLARE_SETTING_NAME(cloudNotificationsLanguage);
+    DECLARE_SETTING_NAME(cloudPollingIntervalS);
     DECLARE_SETTING_NAME(cloudSystemID); //< TODO: rename it to cloudSystemId
     DECLARE_SETTING_NAME(disabledVendors);
     DECLARE_SETTING_NAME(exposeDeviceCredentials);
@@ -58,9 +59,9 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(lastMergeSlaveId);
     DECLARE_SETTING_NAME(ldap);
     DECLARE_SETTING_NAME(licenseServer);
-    DECLARE_SETTING_NAME(channelPartnerServer);
     DECLARE_SETTING_NAME(localSystemId);
     DECLARE_SETTING_NAME(maxHttpTranscodingSessions);
+    DECLARE_SETTING_NAME(organizationId);
     DECLARE_SETTING_NAME(primaryTimeServer);
     DECLARE_SETTING_NAME(remoteSessionTimeoutS);
     DECLARE_SETTING_NAME(remoteSessionUpdateS);
@@ -83,13 +84,13 @@ struct SystemSettingNames
 
     static const inline std::set<QString> kReadOnlyNames = {
         cloudAccountName,
-        organizationId,
         cloudAuthKey,
         cloudHost,
         cloudSystemID,
         lastMergeMasterId,
         lastMergeSlaveId,
         localSystemId,
+        organizationId,
         specificFeatures,
         statisticsReportLastNumber,
         statisticsReportLastTime,
@@ -102,10 +103,11 @@ struct SystemSettingNames
     };
 
     static const inline std::set<QString> kSecurityNames = {
+        channelPartnerServer,
+        cloudPollingIntervalS,
         disabledVendors,
         insecureDeprecatedApiEnabled,
         licenseServer,
-        channelPartnerServer,
         maxHttpTranscodingSessions,
         remoteSessionTimeoutS,
         remoteSessionUpdateS,
@@ -490,12 +492,16 @@ public:
     void setShowMouseTimelinePreview(bool value);
 
     bool system2faEnabled() const;
+    void setSystem2faEnabled(bool value);
 
     std::vector<QnUuid> masterCloudSyncList() const;
     void setMasterCloudSyncList(const std::vector<QnUuid>& idList) const;
 
     std::chrono::seconds cloudStorageUpdatePeriod() const;
     void setCloudStorageUpdatePeriod(std::chrono::seconds period);
+
+    std::chrono::seconds cloudPollingInterval() const;
+    void setCloudPollingInterval(std::chrono::seconds value);
 
     void update(const vms::api::SystemSettings& value);
 
@@ -550,6 +556,7 @@ signals:
     void cloudStorageUpdatePeriodChanged();
     void masterCloudSyncChanged();
     void securityForPowerUsersChanged();
+    void cloudPollingIntervalChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -696,6 +703,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_exposeServerEndpointsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_showMouseTimelinePreviewAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_cloudStorageUpdatePeriodAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_cloudPollingIntervalAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 
