@@ -7,7 +7,11 @@
 #include <ui/dialogs/common/dialog.h>
 
 namespace nx::network::http { class Credentials; }
-namespace nx::vms::client::core { struct CloudAuthData; }
+namespace nx::vms::client::core
+{
+    struct CloudAuthData;
+    struct CloudBindData;
+}
 
 namespace nx::vms::client::desktop {
 
@@ -43,11 +47,14 @@ public:
     virtual ~OauthLoginDialog() override;
 
     const nx::vms::client::core::CloudAuthData& authData() const;
+    const nx::vms::client::core::CloudBindData& cloudBindData() const;
 
     void setCredentials(const nx::network::http::Credentials& credentials);
+    void setSystemName(const QString& systenName);
 
 signals:
     void authDataReady();
+    void bindToCloudDataReady();
 
 private:
     void loadPage();

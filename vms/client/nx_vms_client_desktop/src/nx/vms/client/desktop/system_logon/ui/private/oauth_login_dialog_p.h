@@ -48,6 +48,9 @@ public:
 
     // Native client methods.
     Q_INVOKABLE void setCode(const QString& code);
+
+    Q_INVOKABLE void setBindInfo(const QJsonObject& jsonObject);
+
     Q_INVOKABLE void twoFaVerified(const QString& code);
     Q_INVOKABLE void openUrlInBrowser(const QString& path);
     Q_INVOKABLE QString username();

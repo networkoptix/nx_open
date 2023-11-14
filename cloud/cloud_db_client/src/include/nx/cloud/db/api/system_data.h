@@ -104,6 +104,10 @@ struct SystemData
     /**%apidoc If true, then all cloud users are asked to use 2FA to log in to this system. */
     bool system2faEnabled = false;
 
+    /**%apidoc[opt] Optional organizationId.
+     * Field `ownerAccountEmail` if filled in case of system is bound to a user,
+     * `organizationId` is filled in case of system is bound to a organization.
+     */
     std::string organizationId;
 
     bool operator==(const SystemData& right) const

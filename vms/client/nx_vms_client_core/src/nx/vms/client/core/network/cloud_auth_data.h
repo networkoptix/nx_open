@@ -28,4 +28,19 @@ struct CloudAuthData
     }
 };
 
+struct CloudBindData
+{
+    /**%apidoc Globally unique id of System assigned by Cloud. */
+    QString systemId;
+
+    /**%apidoc Key, System uses to authenticate requests to any Cloud module. */
+    QString authKey;
+
+    /**%apidoc[opt] Cloud System owner email. Either `owner` or `organizationId` Must be filled. */
+    QString owner;
+
+    /**%apidoc[opt] Either `owner` or `organizationId` Must be filled. */
+    QString organizationId;
+};
+
 } // namespace nx::vms::client::core
