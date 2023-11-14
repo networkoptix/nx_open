@@ -1895,8 +1895,11 @@ struct ModifyCameraAttributesAccess
 	if (!param.motionMask.isEmpty() && !parseMotionRegionList(param.motionMask))
         {
             return Result(ErrorCode::badRequest,
-                NX_FMT("Motion mask should be in range [0,0 %1x%2]",
-                    Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+                nx::format(ServerApiErrors::tr("Motion mask should be in range: x in [0, %1], y in [0, %2], width in [1, %3], height in [1, %4]"),
+                    Qn::kMotionGridWidth - 1,
+                    Qn::kMotionGridHeight - 1,
+                    Qn::kMotionGridWidth,
+                    Qn::kMotionGridHeight));
         }
 
         // Check the license if and only if recording goes from 'off' to 'on' state
