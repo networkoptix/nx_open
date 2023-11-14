@@ -2031,6 +2031,7 @@ struct ModifyCameraAttributesListAccess
         QnVirtualCameraResourceList cameras;
 
         const auto& resPool = systemContext->resourcePool();
+        bool recordingWasEnabled = false;
         for (const auto& p: param)
         {
             auto camera = resPool->getResourceById(
@@ -2043,15 +2044,23 @@ struct ModifyCameraAttributesListAccess
             cameras.push_back(camera);
             const bool prevScheduleEnabled = camera->isScheduleEnabled();
             if (prevScheduleEnabled != p.scheduleEnabled)
+            {
                 licenseUsageHelper.propose(camera, p.scheduleEnabled);
+                recordingWasEnabled |= p.scheduleEnabled;
+            }
         }
 
-        for (const auto& camera : cameras)
-            if (licenseUsageHelper.isOverflowForCamera(camera))
+        if (recordingWasEnabled)
+        {
+            for (const auto& camera: cameras)
             {
-                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                    "There is not enough license for camera %1"), camera->getId()));
+                if (licenseUsageHelper.isOverflowForCamera(camera))
+                {
+                    return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                        "There is no license for camera %1"), camera->getId()));
+                }
             }
+        }
         return Result();
     }
 };
