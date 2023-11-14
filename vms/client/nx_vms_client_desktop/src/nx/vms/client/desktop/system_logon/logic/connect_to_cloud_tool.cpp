@@ -9,7 +9,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
-#include <nx/cloud/cps/api/system_data.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -29,7 +28,6 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 using namespace nx::cloud::db::api;
-using namespace nx::cloud::cps::api;
 using namespace std::chrono;
 
 namespace {
@@ -137,14 +135,39 @@ void ConnectToCloudTool::requestCloudAuthData()
         &OauthLoginDialog::authDataReady,
         this,
         &ConnectToCloudTool::onCloudAuthDataReady);
-    connect(m_oauthLoginDialog, &OauthLoginDialog::rejected, this, &ConnectToCloudTool::cancel);
+    connect(
+        m_oauthLoginDialog,
+        &OauthLoginDialog::bindToCloudDataReady,
+        this,
+        &ConnectToCloudTool::onBindToCloudDataReady);
+    connect(
+        m_oauthLoginDialog,
+        &OauthLoginDialog::rejected,
+        this,
+        &ConnectToCloudTool::cancel);
     m_oauthLoginDialog->setWindowModality(Qt::ApplicationModal);
 
     // Prefill cloud username, if client is logged in.
     m_oauthLoginDialog->setCredentials(
         nx::network::http::Credentials(qnCloudStatusWatcher->credentials().username, {}));
+    m_oauthLoginDialog->setSystemName(systemSettings()->systemName());
 
     m_oauthLoginDialog->show();
+}
+
+void ConnectToCloudTool::onBindToCloudDataReady()
+{
+    const auto bindResult = m_oauthLoginDialog->cloudBindData();
+
+    nx::cloud::db::api::SystemData systemData;
+    systemData.id = bindResult.systemId.toStdString();
+    systemData.authKey = bindResult.authKey.toStdString();
+    if (!bindResult.owner.isEmpty())
+        systemData.setOwnerAccountEmail(bindResult.owner.toStdString());
+    if (!bindResult.organizationId.isEmpty())
+        systemData.setOrganizationId(bindResult.organizationId.toStdString());
+
+    onBindFinished(std::move(systemData));
 }
 
 void ConnectToCloudTool::onCloudAuthDataReady()
@@ -152,33 +175,19 @@ void ConnectToCloudTool::onCloudAuthDataReady()
     m_cloudAuthData = m_oauthLoginDialog->authData();
     NX_ASSERT(!m_cloudAuthData.empty());
 
-    SystemRegistrationRequest request;
+    SystemRegistrationData request;
     request.name = system()->globalSettings()->systemName().toStdString();
     request.customization = nx::branding::customization().toStdString();
 
-    // TODO: Fill organization here from dialog data.
-    request.organization = std::string();
-
     auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
-        [this](ResultCode result, SystemRegistrationResponse data)
+        [this](ResultCode result, nx::cloud::db::api::SystemData data)
         {
             onBindFinished(result, std::move(data));
         });
 
-    if (request.organization.empty())
-    {
-        m_cloudConnection = m_cloudConnectionFactory->createConnection();
-        m_cloudConnection->setCredentials(m_cloudAuthData.credentials);
-        m_cloudConnection->systemManager()->bindSystem(request, std::move(handler));
-    }
-    else
-    {
-        nx::utils::Url url(nx::vms::license::ChannelPartnerServer::baseUrl(m_systemSettings));
-        m_channelPartnerClient = std::make_unique<nx::cloud::cps::ChannelPartnerClient>(
-            m_systemSettings->cloudHost().toStdString(), url);
-        m_channelPartnerClient->setHttpCredentials(m_cloudAuthData.credentials);
-        m_channelPartnerClient->bindSystemToOrganization(std::move(request), std::move(handler));
-    }
+    m_cloudConnection = m_cloudConnectionFactory->createConnection();
+    m_cloudConnection->setCredentials(m_cloudAuthData.credentials);
+    m_cloudConnection->systemManager()->bindSystem(request, std::move(handler));
 }
 
 bool ConnectToCloudTool::processBindResult(ResultCode result)
@@ -220,13 +229,18 @@ bool ConnectToCloudTool::processBindResult(ResultCode result)
     return false;
 }
 
-void ConnectToCloudTool::onBindFinished(ResultCode result, SystemRegistrationResponse systemData)
+void ConnectToCloudTool::onBindFinished(ResultCode result, nx::cloud::db::api::SystemData systemData)
 {
     NX_DEBUG(this, "Cloud DB bind finished, result: %1", result);
 
     if (!processBindResult(result))
         return;
+    onBindFinished(std::move(systemData));
+}
 
+void ConnectToCloudTool::onBindFinished(nx::cloud::db::api::SystemData systemData)
+{
+    NX_DEBUG(this, "Cloud DB bind finished");
     qnCloudStatusWatcher->resumeCloudInteraction();
 
     m_cloudAuthData.credentials.username = systemData.ownerAccountEmail();

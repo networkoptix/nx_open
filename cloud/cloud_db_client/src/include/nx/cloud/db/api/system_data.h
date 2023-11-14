@@ -40,6 +40,8 @@ using AttributesList = std::vector<Attribute>;
 
 std::string getAttrValueOr(
     const AttributesList& attrs, const std::string& name, const std::string& defaultV);
+void setAttrValue(
+    AttributesList& attrs, const std::string& name, const std::string& value);
 
 /**
  * Information required to register system in cloud.
@@ -156,6 +158,21 @@ struct SystemData
     std::string ownerAccountEmail() const
     {
         return getAttrValueOr(attributes, "ownerAccountEmail", std::string());
+    }
+
+    void setOwnerAccountEmail(const std::string& value)
+    {
+        setAttrValue(attributes, "ownerAccountEmail", value);
+    }
+
+    std::string organizationId() const
+    {
+        return getAttrValueOr(attributes, "organizationId", std::string());
+    }
+
+    void setOrganizationId(const std::string& value)
+    {
+        setAttrValue(attributes, "organizationId", value);
     }
 
     std::string ownerFullName() const

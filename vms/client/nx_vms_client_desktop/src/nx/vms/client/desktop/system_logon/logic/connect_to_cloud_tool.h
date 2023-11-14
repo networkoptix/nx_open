@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include <nx/cloud/cps/channel_partner_client.h>
-#include <nx/cloud/cps/api/system_data.h>
+#include <nx/cloud/db/api/system_data.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <ui/workbench/workbench_state_manager.h>
 
@@ -54,9 +53,15 @@ private:
     bool processBindResult(nx::cloud::db::api::ResultCode result);
     void onBindFinished(
         nx::cloud::db::api::ResultCode result,
-        nx::cloud::cps::api::SystemRegistrationResponse systemData);
+        nx::cloud::db::api::SystemData systemData);
+    void onBindFinished(nx::cloud::db::api::SystemData systemData);
     void requestLocalSessionToken();
     void onLocalSessionTokenReady();
+    void bindSystemToCloud(
+        nx::network::http::Credentials credentials,
+        const QString& organizationId = QString());
+
+    void onBindToCloudDataReady();
 
 private:
     QWidget* m_parent;
@@ -65,9 +70,8 @@ private:
 
     std::unique_ptr<core::CloudConnectionFactory> m_cloudConnectionFactory;
     std::unique_ptr<nx::cloud::db::api::Connection> m_cloudConnection;
-    std::unique_ptr<nx::cloud::cps::ChannelPartnerClient> m_channelPartnerClient;
     nx::vms::client::core::CloudAuthData m_cloudAuthData;
-    nx::cloud::cps::api::SystemRegistrationResponse m_systemData;
+    nx::cloud::db::api::SystemData m_systemData;
     const nx::vms::common::SystemSettings* const m_systemSettings;
 };
 
