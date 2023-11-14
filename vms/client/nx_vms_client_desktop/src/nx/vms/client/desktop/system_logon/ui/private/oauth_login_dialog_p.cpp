@@ -2,6 +2,7 @@
 
 #include "oauth_login_dialog_p.h"
 
+#include <QtCore/QJsonObject>
 #include <QtGui/QDesktopServices>
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QLineEdit>
@@ -193,6 +194,17 @@ void OauthLoginDialogPrivate::displayUrl(const nx::utils::Url& url)
 void OauthLoginDialogPrivate::setCode(const QString& code)
 {
     m_oauthClient->setCode(code);
+}
+
+void OauthLoginDialogPrivate::setBindInfo(const QJsonObject& jsonObject)
+{
+    CloudBindData info;
+    info.systemId = jsonObject["systemId"].toString();
+    info.authKey = jsonObject["authKey"].toString();
+    info.owner = jsonObject["owner"].toString();
+    info.organizationId = jsonObject["organizationId"].toString();
+
+    m_oauthClient->setBindInfo(std::move(info));
 }
 
 void OauthLoginDialogPrivate::twoFaVerified(const QString& code)

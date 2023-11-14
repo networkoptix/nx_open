@@ -55,6 +55,7 @@ OauthLoginDialog::OauthLoginDialog(
 
     const auto helper = d->oauthClient();
     connect(helper, &core::OauthClient::authDataReady, this, &OauthLoginDialog::authDataReady);
+    connect(helper, &core::OauthClient::bindToCloudDataReady, this, &OauthLoginDialog::bindToCloudDataReady);
     connect(helper, &core::OauthClient::cancelled, this, &OauthLoginDialog::reject);
 }
 
@@ -116,9 +117,19 @@ const nx::vms::client::core::CloudAuthData& OauthLoginDialog::authData() const
     return d->oauthClient()->authData();
 }
 
+const nx::vms::client::core::CloudBindData& OauthLoginDialog::cloudBindData() const
+{
+    return d->oauthClient()->cloudBindData();
+}
+
 void OauthLoginDialog::setCredentials(const nx::network::http::Credentials& credentials)
 {
     d->oauthClient()->setCredentials(credentials);
+}
+
+void OauthLoginDialog::setSystemName(const QString& systenName)
+{
+    d->oauthClient()->setSystemName(systenName);
 }
 
 } // namespace nx::vms::client::desktop
