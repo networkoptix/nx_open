@@ -31,6 +31,8 @@ struct OauthClient::Private: public QObject
     const std::chrono::seconds refreshTokenLifetime;
     QString locale;
     CloudAuthData authData;
+    CloudBindData cloudBindData;
+    QString systemName;
     std::unique_ptr<Connection> m_connection;
     std::unique_ptr<CloudConnectionFactory> m_cloudConnectionFactory;
 
@@ -165,6 +167,9 @@ QUrl OauthClient::url() const
         .addQueryItem("view_type", nx::reflect::toString(d->viewType))
         .addQueryItem("redirect_url", "redirect-oauth");
 
+    if (!d->systemName.isEmpty())
+        builder.addQueryItem("system_name", d->systemName);
+
     if (!d->clientId.empty())
         builder.addQueryItem("client_id", d->clientId);
 
@@ -179,7 +184,8 @@ QUrl OauthClient::url() const
     if (!d->locale.isEmpty())
         builder.addQueryItem("lang", d->locale);
 
-    return builder.toUrl().toQUrl();
+    auto result = builder.toUrl().toQUrl();
+    return result;
 }
 
 void OauthClient::setCredentials(const nx::network::http::Credentials& credentials)
@@ -194,9 +200,26 @@ void OauthClient::setLocale(const QString& locale)
     d->locale = locale;
 }
 
+void OauthClient::setSystemName(const QString& value)
+{
+    d->systemName = value;
+}
+
 const CloudAuthData& OauthClient::authData() const
 {
     return d->authData;
+}
+
+const CloudBindData& OauthClient::cloudBindData() const
+{
+    return d->cloudBindData;
+}
+
+void OauthClient::setBindInfo(const CloudBindData& info)
+{
+    NX_DEBUG(this, "Setting cloud bind data: %1", info.systemId);
+    d->cloudBindData = info;
+    emit bindToCloudDataReady();
 }
 
 void OauthClient::setCode(const QString& code)

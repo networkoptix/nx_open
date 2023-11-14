@@ -13,6 +13,7 @@ namespace nx::network::http { class Credentials; }
 namespace nx::vms::client::core {
 
 struct CloudAuthData;
+struct CloudBindData;
 
 /**
  * Implements logic for OAuth authentication process. Constructs URL to be used for the
@@ -57,8 +58,17 @@ public:
     /** Set locale code for URL construction. */
     void setLocale(const QString& locale);
 
+    /**
+     * Set system name. Setting a system name change web dialog behaviour.
+     * After a authentication it bind system to the cloud or cloud organization.
+     */
+    void setSystemName(const QString& value);
+
     /** Final authetication data. */
     const CloudAuthData& authData() const;
+
+    /** Bind to cloud parameters. */
+    const CloudBindData& cloudBindData() const;
 
     /** Set code returned by cloud on login to cloud operation. */
     Q_INVOKABLE void setCode(const QString& code);
@@ -66,7 +76,11 @@ public:
     /** Set code after 2FA verification. */
     Q_INVOKABLE void twoFaVerified(const QString& code);
 
+    /** Callback is called when system is bound to the cloud. */
+    Q_INVOKABLE void setBindInfo(const CloudBindData& info);
+
 signals:
+    void bindToCloudDataReady();
     void authDataReady();
     void cancelled();
 
