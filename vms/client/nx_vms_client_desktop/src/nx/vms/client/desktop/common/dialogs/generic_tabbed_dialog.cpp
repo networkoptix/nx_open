@@ -39,9 +39,17 @@ void GenericTabbedDialog::setCurrentPage(int key)
     if (page == m_pages.cend())
         return;
 
-    NX_ASSERT(page->isValid());
-    if (page->isValid())
-        m_tabWidget->setCurrentWidget(page->widget);
+    if (!NX_ASSERT(page->isValid(),
+        "Page '%1' under key %2 is not valid (visible: %3, enabled: %4)",
+        page->title,
+        key,
+        page->visible,
+        page->enabled))
+    {
+        return;
+    }
+
+    m_tabWidget->setCurrentWidget(page->widget);
 }
 
 void GenericTabbedDialog::addPage(int key, QWidget* widget, const QString& title)
