@@ -43,8 +43,8 @@ private:
     bool isReconnectRequired(const QnUserResourcePtr &user);
     void reconnect();
 
-    size_t combinedAccessRightsHash() const;
-    bool updateCombinedAccessRights();
+    QSet<QnUuid> allParentGroups() const;
+    bool updateParentGroups();
 
 private:
     QString m_userName;
@@ -52,7 +52,7 @@ private:
     QByteArray m_userDigest;
     QnUserResourcePtr m_user;
     bool m_reconnectOnPasswordChange = true;
-    size_t m_accessRightsHash = 0;
+    QSet<QnUuid> m_allParentGroups;
 };
 
 } // namespace nx::vms::client::desktop
