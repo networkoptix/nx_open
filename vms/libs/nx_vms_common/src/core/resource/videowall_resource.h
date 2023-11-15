@@ -23,9 +23,9 @@ class NX_VMS_COMMON_API QnVideoWallResource:
 public:
     QnVideoWallResource();
 
-    QnThreadsafeItemStorage<QnVideoWallItem> *items() const;
-    QnThreadsafeItemStorage<QnVideoWallPcData> *pcs() const;
-    QnThreadsafeItemStorage<QnVideoWallMatrix> *matrices() const;
+    QnThreadsafeItemStorage<QnVideoWallItem>* items() const;
+    QnThreadsafeItemStorage<QnVideoWallPcData>* pcs() const;
+    QnThreadsafeItemStorage<QnVideoWallMatrix>* matrices() const;
 
     /** \returns Whether the videowall should be started when the PC boots up. */
     bool isAutorun() const;
@@ -34,24 +34,25 @@ public:
     bool isTimelineEnabled() const;
     void setTimelineEnabled(bool value);
 
-    /** Utility method to get IDs of all online items.  */
+    /** Utility method to get IDs of all online items. */
     QList<QnUuid> onlineItems() const;
 
     virtual nx::vms::api::ResourceStatus getStatus() const override;
 
 signals:
-    void itemAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
-    void itemRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
-    void itemChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallItem& item,
+    void itemAdded(const QnVideoWallResourcePtr& resource, const QnVideoWallItem& item);
+    void itemRemoved(const QnVideoWallResourcePtr& resource, const QnVideoWallItem& item);
+    void itemChanged(const QnVideoWallResourcePtr& resource, const QnVideoWallItem& item,
         const QnVideoWallItem& oldItem);
 
-    void pcAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
-    void pcRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
-    void pcChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
+    void pcAdded(const QnVideoWallResourcePtr& resource, const QnVideoWallPcData& pc);
+    void pcRemoved(const QnVideoWallResourcePtr& resource, const QnVideoWallPcData& pc);
+    void pcChanged(const QnVideoWallResourcePtr& resource, const QnVideoWallPcData& pc);
 
-    void matrixAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
-    void matrixRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
-    void matrixChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
+    void matrixAdded(const QnVideoWallResourcePtr& resource, const QnVideoWallMatrix& matrix);
+    void matrixRemoved(const QnVideoWallResourcePtr& resource, const QnVideoWallMatrix& matrix);
+    void matrixChanged(const QnVideoWallResourcePtr& resource, const QnVideoWallMatrix& matrix,
+        const QnVideoWallMatrix& oldMatrix);
 
     void autorunChanged(const QnVideoWallResourcePtr& videowall);
     void timelineEnabledChanged(const QnVideoWallResourcePtr& videowall);
@@ -81,7 +82,7 @@ private:
     bool m_autorun = false;
     bool m_timelineEnabled = false;
 
-    QScopedPointer<QnThreadsafeItemStorage<QnVideoWallItem> > m_items;
-    QScopedPointer<QnThreadsafeItemStorage<QnVideoWallPcData> > m_pcs;
-    QScopedPointer<QnThreadsafeItemStorage<QnVideoWallMatrix> > m_matrices;
+    QScopedPointer<QnThreadsafeItemStorage<QnVideoWallItem>> m_items;
+    QScopedPointer<QnThreadsafeItemStorage<QnVideoWallPcData>> m_pcs;
+    QScopedPointer<QnThreadsafeItemStorage<QnVideoWallMatrix>> m_matrices;
 };

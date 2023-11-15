@@ -556,6 +556,32 @@ TEST_F(LayoutItemAccessResolverTest, sharedLayoutRemoved)
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), kNoAccessRights);
 }
 
+TEST_F(LayoutItemAccessResolverTest, videowallLayoutRemoved)
+{
+    auto camera = addCamera();
+    auto videowall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videowall);
+    addToLayout(layout, camera);
+
+    manager->setOwnResourceAccessMap(
+        kTestSubjectId, {{videowall->getId(), kVideoWallControlAccessRights}});
+
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kViewAccessRights);
+
+    QnVideoWallItem item = *videowall->items()->getItems().cbegin();
+    item.layout = {};
+    videowall->items()->updateItem(item);
+
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
+
+    resourcePool()->removeResource(layout);
+
+    NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
+}
+
 TEST_F(LayoutItemAccessResolverTest, videowallLayoutRemovedFromThePoolFirst)
 {
     auto camera = addCamera();
@@ -580,6 +606,72 @@ TEST_F(LayoutItemAccessResolverTest, videowallLayoutRemovedFromThePoolFirst)
 
     NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
+}
+
+TEST_F(LayoutItemAccessResolverTest, videowallMatrixLayouts)
+{
+    manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideoWallsGroupId, AccessRight::edit}});
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+
+    auto videowall = addVideoWall();
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+
+    auto layout1 = addLayout();
+    layout1->setParentId(videowall->getId());
+    auto layout2 = addLayout();
+    layout2->setParentId(videowall->getId());
+    auto layout3 = addLayout();
+    layout3->setParentId(videowall->getId());
+
+    const auto cameras = addCameras(3);
+    addToLayout(layout1, cameras[0]);
+    addToLayout(layout2, cameras[1]);
+    addToLayout(layout3, cameras[2]);
+
+    const auto item1 = addVideoWallItem(videowall, {});
+    const auto item2 = addVideoWallItem(videowall, {});
+    NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
+    const auto item3 = addVideoWallItem(videowall, layout3);
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[0]), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[1]), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[2]), AccessRight::view);
+
+    QnVideoWallMatrix matrix;
+    matrix.uuid = QnUuid::createUuid();
+    matrix.layoutByItem[item1] = layout1->getId();
+    matrix.layoutByItem[item2] = layout2->getId();
+    matrix.layoutByItem[item3] = layout3->getId();
+    videowall->matrices()->addItem(matrix);
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[0]), AccessRight::view);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[1]), AccessRight::view);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[2]), AccessRight::view);
+
+    ASSERT_TRUE(changeVideoWallItem(videowall, item3, {}));
+    NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[0]), AccessRight::view);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[1]), AccessRight::view);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[2]), AccessRight::view);
+
+    matrix.layoutByItem[item3] = {};
+    videowall->matrices()->addOrUpdateItem(matrix);
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[0]), AccessRight::view);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[1]), AccessRight::view);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[2]), AccessRights{});
+
+    videowall->items()->removeItem(item1);
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[0]), AccessRights{});
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[1]), AccessRight::view);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[2]), AccessRights{});
+
+    videowall->matrices()->removeItem(matrix);
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[0]), AccessRights{});
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[1]), AccessRights{});
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, cameras[2]), AccessRights{});
 }
 
 TEST_F(LayoutItemAccessResolverTest, noSignalsForPrivateLayoutChanges)

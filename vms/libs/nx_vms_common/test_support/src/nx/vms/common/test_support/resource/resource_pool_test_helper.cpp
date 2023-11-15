@@ -194,6 +194,29 @@ QnUuid QnResourcePoolTestHelper::addVideoWallItem(const QnVideoWallResourcePtr& 
     return vwitem.uuid;
 }
 
+bool QnResourcePoolTestHelper::changeVideoWallItem(
+    const QnVideoWallResourcePtr& videoWall,
+    const QnUuid& itemId,
+    const QnLayoutResourcePtr& itemLayout)
+{
+    auto vwitem = videoWall->items()->getItem(itemId);
+    if (vwitem.uuid.isNull())
+        return false;
+
+    if (itemLayout)
+    {
+        itemLayout->setParentId(videoWall->getId());
+        vwitem.layout = itemLayout->getId();
+    }
+    else
+    {
+        vwitem.layout = {};
+    }
+
+    videoWall->items()->addOrUpdateItem(vwitem);
+    return true;
+}
+
 QnLayoutResourcePtr QnResourcePoolTestHelper::addLayoutForVideoWall(
     const QnVideoWallResourcePtr& videoWall)
 {
