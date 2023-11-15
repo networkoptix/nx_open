@@ -532,7 +532,7 @@ bool ModuleConnector::Module::saveConnection(
     saveEndpoint(endpoint);
     if (m_connectedReader)
         return true;
-\
+
     m_attemptingReaders.clear();
     m_disconnectTimer.cancelSync();
 
