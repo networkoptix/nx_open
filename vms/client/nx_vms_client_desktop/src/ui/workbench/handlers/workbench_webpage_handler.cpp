@@ -64,8 +64,11 @@ void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subty
         new QnWebpageDialog(mainWindowWidget(), QnWebpageDialog::AddPage));
 
     const auto params = menu()->currentParameters(sender());
-    if (const auto server = params.resource().dynamicCast<QnMediaServerResource>())
+    if (params.size() > 0)
+    {
+        const auto server = params.resource().dynamicCast<QnMediaServerResource>();
         dialog->setProxyId(server->getId());
+    }
 
     dialog->setSubtype(subtype);
 
