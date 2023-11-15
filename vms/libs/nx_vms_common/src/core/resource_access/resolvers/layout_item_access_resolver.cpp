@@ -50,8 +50,8 @@ private:
     void handleCameraAdded(const QnVirtualCameraResourcePtr& camera);
     void handleCameraRemoved(const QnVirtualCameraResourcePtr& camera);
 
-    void handleVideowallLayoutAddedOrRemoved(const QnVideoWallResourcePtr& videowall,
-        const QnUuid& layoutId);
+    void handleVideowallLayoutsAdded(const QnVideoWallResourcePtr& videowall,
+        const QVector<QnUuid>& layoutIds);
 
     void handleLayoutItemAddedOrRemoved(
         const QnUuid& resourceId, const QnLayoutResourcePtr& storedLayout);
@@ -240,8 +240,8 @@ LayoutItemAccessResolver::Private::Private(
             }
         }, Qt::DirectConnection);
 
-    connect(videowallWatcher.get(), &VideowallLayoutWatcher::videowallLayoutAdded,
-        this, &Private::handleVideowallLayoutAddedOrRemoved, Qt::DirectConnection);
+    connect(videowallWatcher.get(), &VideowallLayoutWatcher::videowallLayoutsAdded,
+        this, &Private::handleVideowallLayoutsAdded, Qt::DirectConnection);
 
     connect(&sharedLayoutItemsWatcher, &LayoutItemWatcher::addedToLayout,
         this, &Private::handleLayoutItemAddedOrRemoved, Qt::DirectConnection);
@@ -473,22 +473,25 @@ void LayoutItemAccessResolver::Private::handleLayoutParentChanged(
     handleLayoutSharingMaybeChanged(layout);
 }
 
-void LayoutItemAccessResolver::Private::handleVideowallLayoutAddedOrRemoved(
-    const QnVideoWallResourcePtr& videowall, const QnUuid& layoutId)
+void LayoutItemAccessResolver::Private::handleVideowallLayoutsAdded(
+    const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds)
 {
-    const auto layout = resourcePool
-        ? resourcePool->getResourceById<QnLayoutResource>(layoutId)
-        : QnLayoutResourcePtr();
+    for (const auto& layoutId: layoutIds)
+    {
+        const auto layout = resourcePool
+            ? resourcePool->getResourceById<QnLayoutResource>(layoutId)
+            : QnLayoutResourcePtr();
 
-    if (layout)
-    {
-        NX_VERBOSE(q, "Videowall %1 %2 added or removed", videowall, layoutInfo(layout));
-        handleLayoutSharingMaybeChanged(layout);
-    }
-    else
-    {
-        NX_VERBOSE(q, "Videowall %1 layout %2 (not in the pool) added or removed",
-            videowall, layoutId);
+        if (layout)
+        {
+            NX_VERBOSE(q, "Videowall %1 %2 added or removed", videowall, layoutInfo(layout));
+            handleLayoutSharingMaybeChanged(layout);
+        }
+        else
+        {
+            NX_VERBOSE(q, "Videowall %1 layout %2 (not in the pool) added or removed",
+                videowall, layoutId);
+        }
     }
 }
 
