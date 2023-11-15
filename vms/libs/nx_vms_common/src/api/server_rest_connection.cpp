@@ -351,6 +351,7 @@ struct ServerConnection::Private
         nx::network::SocketAddress address;
         nx::network::http::Credentials credentials;
     };
+    QnUuid userId;
     std::optional<DirectConnect> directConnect;
 
     using ResendRequestFunc = std::function<void(std::optional<nx::network::http::AuthToken>)>;
@@ -448,6 +449,12 @@ void ServerConnection::updateCredentials(nx::network::http::Credentials credenti
     // credentials are session ones.
     if (NX_ASSERT(d->directConnect) && credentials.authToken.isBearerToken())
         d->directConnect->credentials = std::move(credentials);
+}
+
+void ServerConnection::setUserId(const QnUuid& id)
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    d->userId = id;
 }
 
 void ServerConnection::setDefaultTimeouts(nx::network::http::AsyncClient::Timeouts timeouts)
@@ -3236,7 +3243,8 @@ bool setupAuth(
     const nx::vms::common::SystemContext* systemContext,
     const QnUuid& serverId,
     nx::network::http::ClientPool::Request& request,
-    const QUrl& url)
+    const QUrl& url,
+    const QnUuid& userId)
 {
     if (!NX_ASSERT(systemContext))
         return false;
@@ -3295,8 +3303,20 @@ bool setupAuth(
 
     request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     request.credentials = getRequestCredentials(connection, server);
-    request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
-        QString::fromStdString(request.credentials->username).toLower().toUtf8());
+
+    QString userName;
+    if (!userId.isNull())
+    {
+        if (auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(userId))
+            userName = user->getName();
+    }
+    else
+    {
+        userName = QString::fromStdString(request.credentials->username);
+    }
+
+    if (!userName.isEmpty())
+        request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, userName.toLower().toUtf8());
     if (!route.gatewayId.isNull())
         request.gatewayId = route.gatewayId;
 
@@ -3355,7 +3375,7 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     }
 
     if (!isDirect)
-        authIsSet = setupAuth(d->systemContext, d->serverId, request, url);
+        authIsSet = setupAuth(d->systemContext, d->serverId, request, url, d->userId);
 
     if (!authIsSet)
         return nx::network::http::ClientPool::Request();
