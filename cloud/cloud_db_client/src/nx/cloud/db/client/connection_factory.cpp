@@ -9,11 +9,9 @@
 
 namespace nx::cloud::db::client {
 
-constexpr static auto kDefaultRequestTimeout = std::chrono::seconds(11);
+static constexpr auto kDefaultRequestTimeout = std::chrono::seconds(11);
 
-ConnectionFactory::ConnectionFactory()
-{
-}
+ConnectionFactory::ConnectionFactory() = default;
 
 ConnectionFactory::~ConnectionFactory()
 {

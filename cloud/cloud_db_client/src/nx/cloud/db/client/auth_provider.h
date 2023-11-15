@@ -8,11 +8,10 @@
 namespace nx::cloud::db::client {
 
 class AuthProvider:
-    public api::AuthProvider,
-    public AsyncRequestsExecutor
+    public api::AuthProvider
 {
 public:
-    AuthProvider(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher);
+    AuthProvider(AsyncRequestsExecutor* requestsExecutor);
 
     virtual void getCdbNonce(
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) override;
@@ -51,6 +50,9 @@ public:
         std::function<void(api::ResultCode,
             api::VmsServerCertificatePublicKey,
             std::chrono::system_clock::time_point)> completionHandler) override;
+
+private:
+    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client

@@ -12,75 +12,68 @@ namespace nx::cloud::db::client {
 Connection::Connection(
     network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
     :
-    m_requestExecutor(endPointFetcher)
+    m_requestExecutor(endPointFetcher),
+    m_accountManager(&m_requestExecutor),
+    m_systemManager(&m_requestExecutor),
+    m_organizationManager(&m_requestExecutor),
+    m_authProvider(&m_requestExecutor),
+    m_maintenanceManager(&m_requestExecutor),
+    m_oauthManager(&m_requestExecutor),
+    m_twoFactorAuthManager(&m_requestExecutor),
+    m_batchUserProcessingManager(&m_requestExecutor)
 {
-    m_accountManager = std::make_unique<AccountManager>(endPointFetcher);
-    m_systemManager = std::make_unique<SystemManager>(endPointFetcher);
-    m_authProvider = std::make_unique<AuthProvider>(endPointFetcher);
-    m_maintenanceManager = std::make_unique<MaintenanceManager>(endPointFetcher);
-    m_oauthManager = std::make_unique<OauthManager>(endPointFetcher);
-    m_twoFactorAuthManager = std::make_unique<TwoFactorAuthManager>(endPointFetcher);
-
     bindToAioThread(m_requestExecutor.getAioThread());
-
-    setRequestTimeout(m_requestExecutor.requestTimeout());
 }
 
 api::AccountManager* Connection::accountManager()
 {
-    return m_accountManager.get();
+    return &m_accountManager;
 }
 
 api::SystemManager* Connection::systemManager()
 {
-    return m_systemManager.get();
+    return &m_systemManager;
+}
+
+api::OrganizationManager* Connection::organizationManager()
+{
+    return &m_organizationManager;
 }
 
 api::AuthProvider* Connection::authProvider()
 {
-    return m_authProvider.get();
+    return &m_authProvider;
 }
 
 api::MaintenanceManager* Connection::maintenanceManager()
 {
-    return m_maintenanceManager.get();
+    return &m_maintenanceManager;
 }
 
 api::OauthManager* Connection::oauthManager()
 {
-    return m_oauthManager.get();
+    return &m_oauthManager;
 }
 
 api::TwoFactorAuthManager* Connection::twoFactorAuthManager()
 {
-    return m_twoFactorAuthManager.get();
+    return &m_twoFactorAuthManager;
 }
 
+api::BatchUserProcessingManager* Connection::batchUserProcessingManager()
+{
+    return &m_batchUserProcessingManager;
+}
 
 void Connection::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
     m_requestExecutor.bindToAioThread(aioThread);
-
-    m_accountManager->bindToAioThread(aioThread);
-    m_systemManager->bindToAioThread(aioThread);
-    m_authProvider->bindToAioThread(aioThread);
-    m_maintenanceManager->bindToAioThread(aioThread);
-    m_oauthManager->bindToAioThread(aioThread);
-    m_twoFactorAuthManager->bindToAioThread(aioThread);
 }
 
 void Connection::setCredentials(nx::network::http::Credentials credentials)
 {
-    // TODO: #akolesnikov refactor: all managers should receive all needed data automatically,
-    // without iterating them here.
-
-    m_accountManager->setCredentials(credentials);
-    m_systemManager->setCredentials(credentials);
-    m_authProvider->setCredentials(credentials);
-    m_maintenanceManager->setCredentials(credentials);
-    m_oauthManager->setCredentials(credentials);
-    m_twoFactorAuthManager->setCredentials(credentials);
+    m_requestExecutor.setCredentials(credentials);
 }
 
 void Connection::setProxyVia(
@@ -89,36 +82,23 @@ void Connection::setProxyVia(
     nx::network::http::Credentials credentials,
     nx::network::ssl::AdapterFunc adapterFunc)
 {
-    m_accountManager->setProxyCredentials(credentials);
-    m_systemManager->setProxyCredentials(credentials);
-    m_authProvider->setProxyCredentials(credentials);
-    m_maintenanceManager->setProxyCredentials(credentials);
-    m_oauthManager->setProxyCredentials(credentials);
-    m_twoFactorAuthManager->setProxyCredentials(credentials);
-
-    const nx::network::SocketAddress proxyEndpoint(proxyHost, proxyPort);
-    m_accountManager->setProxyVia(proxyEndpoint, adapterFunc, /*isSecure*/ true);
-    m_systemManager->setProxyVia(proxyEndpoint, adapterFunc, /*isSecure*/ true);
-    m_authProvider->setProxyVia(proxyEndpoint, adapterFunc, /*isSecure*/ true);
-    m_maintenanceManager->setProxyVia(proxyEndpoint, adapterFunc, /*isSecure*/ true);
-    m_oauthManager->setProxyVia(proxyEndpoint, adapterFunc, /*isSecure*/ true);
-    m_twoFactorAuthManager->setProxyVia(proxyEndpoint, adapterFunc, /*isSecure*/ true);
+    m_requestExecutor.setProxyCredentials(credentials);
+    m_requestExecutor.setProxyVia({proxyHost, proxyPort}, adapterFunc, /*isSecure*/ true);
 }
 
 void Connection::setRequestTimeout(std::chrono::milliseconds timeout)
 {
-    m_accountManager->setRequestTimeout(timeout);
-    m_systemManager->setRequestTimeout(timeout);
-    m_authProvider->setRequestTimeout(timeout);
-    m_maintenanceManager->setRequestTimeout(timeout);
-    m_oauthManager->setRequestTimeout(timeout);
-    m_twoFactorAuthManager->setRequestTimeout(timeout);
     m_requestExecutor.setRequestTimeout(timeout);
 }
 
 std::chrono::milliseconds Connection::requestTimeout() const
 {
     return m_requestExecutor.requestTimeout();
+}
+
+void Connection::setAdditionalHeaders(nx::network::http::HttpHeaders headers)
+{
+    m_requestExecutor.setAdditionalHeaders(std::move(headers));
 }
 
 void Connection::ping(

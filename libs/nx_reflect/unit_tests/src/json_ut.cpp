@@ -296,6 +296,10 @@ TEST_F(Json, std_optional_is_supported)
 
     // Checking that an optional field is set to nullopt regardless of the default value.
     testSerialization(R"({"num":12})", FooOptionalWithCustomDefault{12, std::nullopt});
+
+    testSerialization(
+        R"(["Hello, world"])",
+        std::make_optional(std::vector<std::string>{{"Hello, world"}}));
 }
 
 TEST_F(Json, stringizable_type_is_supported)

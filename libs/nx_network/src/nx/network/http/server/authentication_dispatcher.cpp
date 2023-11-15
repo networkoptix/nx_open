@@ -15,7 +15,20 @@ void AuthenticationDispatcher::add(
     const std::regex& pathPattern,
     AbstractRequestHandler* authenticator)
 {
-    m_authenticatorsByRegex.emplace_back(pathPattern, authenticator);
+    add(pathPattern, nullptr, authenticator);
+}
+
+void AuthenticationDispatcher::add(
+    const std::regex& pathPattern,
+    nx::utils::MoveOnlyFunc<bool(const RequestContext&)> auxiliaryCondition,
+    AbstractRequestHandler* authenticator)
+{
+    auto ctx = std::make_unique<AuthenticatorContext>();
+    ctx->pathPattern = pathPattern;
+    ctx->cond = std::move(auxiliaryCondition);
+    ctx->authenticator = authenticator;
+
+    m_authenticators.push_back(std::move(ctx));
 }
 
 void AuthenticationDispatcher::add(
@@ -26,25 +39,26 @@ void AuthenticationDispatcher::add(
 }
 
 void AuthenticationDispatcher::serve(
-    RequestContext ctx,
+    RequestContext reqCtx,
     nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler)
 {
     AbstractRequestHandler* manager = nullptr;
-    std::string path = ctx.request.requestLine.url.path().toStdString();
+    std::string path = reqCtx.request.requestLine.url.path().toStdString();
 
-    for (const auto& element: m_authenticatorsByRegex)
+    for (const auto& ctx: m_authenticators)
     {
-        if (std::regex_match(path, element.first))
+        if (std::regex_match(path, ctx->pathPattern) &&
+            (!ctx->cond || ctx->cond(reqCtx)))
         {
-            manager = element.second;
+            manager = ctx->authenticator;
             break;
         }
     }
 
     if (manager)
-        manager->serve(std::move(ctx), std::move(completionHandler));
+        manager->serve(std::move(reqCtx), std::move(completionHandler));
     else if (nextHandler())
-        nextHandler()->serve(std::move(ctx), std::move(completionHandler));
+        nextHandler()->serve(std::move(reqCtx), std::move(completionHandler));
     else
         completionHandler(RequestResult(StatusCode::forbidden));
 }

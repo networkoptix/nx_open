@@ -422,6 +422,16 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
     }
 }
 
+template<typename T>
+DeserializationResult deserializeValue(const DeserializationContext& ctx, std::optional<T>* data)
+{
+    T val;
+    auto result = deserializeValue(ctx, &val);
+    if (result)
+        *data = std::move(val);
+    return result;
+}
+
 template<typename Data>
 class Deserializer:
     public nx::reflect::GenericVisitor<Deserializer<Data>>
@@ -588,7 +598,7 @@ std::tuple<Data, DeserializationResult> deserialize(
 {
     Data data;
     auto result = deserialize<Data>(json, &data, skipErrors);
-    return std::make_tuple(std::move(data), std::move(result));
+    return std::make_tuple(std::move(result.success ? data : Data()), std::move(result));
 }
 
 } // namespace json

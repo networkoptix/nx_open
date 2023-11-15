@@ -7,10 +7,11 @@
 
 namespace nx::cloud::db::client {
 
-class OauthManager: public api::OauthManager, public AsyncRequestsExecutor
+class OauthManager:
+    public api::OauthManager
 {
 public:
-    OauthManager(network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher);
+    OauthManager(AsyncRequestsExecutor* requestsExecutor);
 
     virtual void issueToken(
         const api::IssueTokenRequest& request,
@@ -42,6 +43,9 @@ public:
         const api::IssueStunTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)>
             completionHandler) override;
+
+private:
+    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client

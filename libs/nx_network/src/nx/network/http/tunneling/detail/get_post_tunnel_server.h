@@ -57,7 +57,7 @@ public:
 
     virtual void registerRequestHandlers(
         const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher) override;
+        AbstractMessageDispatcher* messageDispatcher) override;
 
 private:
     /**
@@ -95,7 +95,7 @@ GetPostTunnelServer<ApplicationData...>::~GetPostTunnelServer()
 template<typename ...ApplicationData>
 void GetPostTunnelServer<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
-    server::rest::MessageDispatcher* messageDispatcher)
+    AbstractMessageDispatcher* messageDispatcher)
 {
     const auto path = this->requestPath().empty()
         ? url::joinPath(basePath, kGetPostTunnelPath)

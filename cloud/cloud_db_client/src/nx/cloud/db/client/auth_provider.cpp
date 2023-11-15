@@ -11,15 +11,15 @@
 
 namespace nx::cloud::db::client {
 
-AuthProvider::AuthProvider(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
-    AsyncRequestsExecutor(cloudModuleEndPointFetcher)
+AuthProvider::AuthProvider(AsyncRequestsExecutor* requestsExecutor):
+    m_requestsExecutor(requestsExecutor)
 {
 }
 
 void AuthProvider::getCdbNonce(
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
-    executeRequest<api::NonceData>(
+    m_requestsExecutor->executeRequest<api::NonceData>(
         kAuthGetNoncePath,
         std::move(completionHandler));
 }
@@ -28,7 +28,7 @@ void AuthProvider::getCdbNonce(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
-    executeRequest<api::NonceData>(
+    m_requestsExecutor->executeRequest<api::NonceData>(
         nx::network::http::Method::get,
         kAuthGetNoncePath,
         api::SystemId(systemId),
@@ -39,7 +39,7 @@ void AuthProvider::getAuthenticationResponse(
     const api::AuthRequest& authRequest,
     std::function<void(api::ResultCode, api::AuthResponse)> completionHandler)
 {
-    executeRequest<api::AuthResponse>(
+    m_requestsExecutor->executeRequest<api::AuthResponse>(
         nx::network::http::Method::post,
         kAuthGetAuthenticationPath,
         authRequest,
@@ -62,7 +62,7 @@ void AuthProvider::resolveUserCredentials(
     const api::UserAuthorization& authorization,
     std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler)
 {
-    executeRequest<api::CredentialsDescriptor>(
+    m_requestsExecutor->executeRequest<api::CredentialsDescriptor>(
         nx::network::http::Method::post,
         kAuthResolveUserCredentials,
         authorization,
@@ -75,7 +75,8 @@ void AuthProvider::resolveUserCredentialsList(
         completionHandler)
 {
     static constexpr char kCacheControl[] = "Cache-Control";
-    executeRequest<api::CredentialsDescriptorList, HttpHeaderFetcher<kCacheControl>>(
+
+    m_requestsExecutor->executeRequest<api::CredentialsDescriptorList, HttpHeaderFetcher<kCacheControl>>(
         nx::network::http::Method::post,
         kAuthResolveUserCredentialsList,
         authorizationList,
@@ -87,7 +88,7 @@ void AuthProvider::getSystemAccessLevel(
     const api::UserAuthorization& authorization,
     std::function<void(api::ResultCode, api::SystemAccess)> completionHandler)
 {
-    executeRequest<api::SystemAccess>(
+    m_requestsExecutor->executeRequest<api::SystemAccess>(
         nx::network::http::Method::post,
         network::http::rest::substituteParameters(kAuthSystemAccessLevel, {systemId}),
         authorization,
@@ -111,7 +112,7 @@ void AuthProvider::getSystemAccessLevel(
     result->response.resize(requests.size());
     result->completionHandler = std::move(completionHandler);
 
-    post(
+    m_requestsExecutor->post(
         [this, requests, result]()
         {
             for (std::size_t i = 0; i < requests.size(); ++i)
@@ -169,8 +170,10 @@ void AuthProvider::getVmsServerTlsPublicKey(
         }
         completionHandler(res, std::move(body), validTo);
     };
+
     static constexpr char kExpiresHeader[] = "Expires";
-    executeRequest<api::VmsServerCertificatePublicKey, HttpHeaderFetcher<kExpiresHeader>>(
+
+    m_requestsExecutor->executeRequest<api::VmsServerCertificatePublicKey, HttpHeaderFetcher<kExpiresHeader>>(
         nx::network::http::Method::get,
         network::http::rest::substituteParameters(
             std::string(kAuthVmsServerCertificatePublicKey)

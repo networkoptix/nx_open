@@ -140,6 +140,7 @@ bool DbStructureUpdater::execDbUpdate(
 
     if (dbUpdate.func)
     {
+        NX_DEBUG(this, "DB schema %1. Applying update by invoking an external function", m_schemaName);
         if (auto result = dbUpdate.func(queryContext); result != nx::sql::DBResultCode::ok)
         {
             NX_WARNING(this, "Error executing update function. %1", result);
@@ -194,6 +195,8 @@ bool DbStructureUpdater::execSqlScript(
     else
         scriptText = sqlScript;
 
+    NX_DEBUG(this, "DB schema %1. Executing SQL script \n%2", m_schemaName, scriptText);
+
     nx::sql::SqlQueryExecutionHelper::execSQLScript(queryContext, scriptText);
 
     return true;
@@ -216,17 +219,51 @@ std::string DbStructureUpdater::fixSqlDialect(
     return script;
 }
 
+namespace {
+
+/**
+ * Replaces each occurence of token in text with subsequent element of args.
+ * Example:
+ * substituteArgs("? ? ?", "?", "one", "two", "three")
+ * provides
+ * "one two three"
+ */
+template<typename... FutherStrs>
+std::string substituteArgs(
+    const std::string& text,
+    const std::string_view& token,
+    const std::string_view& str,
+    const FutherStrs&... futherStrs)
+{
+    auto pos = text.find(token);
+    if (pos == std::string::npos)
+        return text; //< Nothing left to replace.
+
+    std::string result = text;
+    result.replace(pos, token.size(), str);
+    if constexpr (sizeof...(FutherStrs) == 0)
+        return result; //< No replacements left.
+    else
+        return substituteArgs(result, token, futherStrs...);
+}
+
+} // namespace
+
 void DbStructureUpdater::recordSuccessfulUpdate(
     nx::sql::QueryContext* const queryContext,
     const DbUpdate& dbUpdate)
 {
+    static constexpr char kSqlText[] =
+        "INSERT INTO db_schema_applied_scripts(schema_name, script_name) VALUES (?, ?)";
+
     auto query = queryContext->connection()->createQuery();
-    query->prepare(
-        "INSERT INTO db_schema_applied_scripts(schema_name, script_name) "
-        "VALUES (?, ?)");
+    query->prepare(kSqlText);
     query->addBindValue(m_schemaName);
     query->addBindValue(dbUpdate.name);
     query->exec();
+
+    NX_DEBUG(this, "DB schema %1. Saving update result \n%2\n", m_schemaName,
+        substituteArgs(kSqlText, "?",  "\"" + m_schemaName + "\"", "\"" + dbUpdate.name + "\""));
 }
 
 } // namespace nx::sql::detail

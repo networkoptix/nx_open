@@ -14,11 +14,10 @@
 
 namespace nx::cloud::db::api {
 
-#define SystemRegistrationData_Fields (name)(customization)(opaque)
-
+#define SystemRegistrationData_Fields (id)(name)(customization)(opaque)
 NX_REFLECTION_INSTRUMENT(SystemRegistrationData, SystemRegistrationData_Fields)
 
-// TODO: #akolesnikov Add corresponding parser/serializer to fusion and remove this function.
+// TODO: #akolesnikov Replace this and similar functions with nx::reflect::urlencoded.
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery);
 
@@ -33,16 +32,6 @@ NX_REFLECTION_INSTRUMENT_ENUM(SystemStatus,
 
 // TODO: #akolesnikov Add corresponding parser/serializer to fusion and remove this function.
 //bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
-
-#define SystemData_Fields (id)(name)(customization)(authKey)(authKeyHash)(ownerAccountEmail) \
-                          (status)(cloudConnectionSubscriptionStatus)(systemSequence) \
-                          (opaque)(registrationTime)(system2faEnabled)(organizationId)
-
-NX_REFLECTION_INSTRUMENT(SystemData, SystemData_Fields)
-
-#define SystemDataList_Fields (systems)
-
-NX_REFLECTION_INSTRUMENT(SystemDataList, SystemDataList_Fields)
 
 /**
  * For requests passing just system id.
@@ -115,38 +104,29 @@ NX_REFLECTION_INSTRUMENT(MergeRequest, MergeRequest_Fields)
 
 NX_REFLECTION_INSTRUMENT_ENUM(SystemAccessRole,
     none,
-    disabled,
     custom,
     liveViewer,
     viewer,
     advancedViewer,
     localAdmin,
     cloudAdmin,
-    maintenance,
     owner,
     system
 )
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
-void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
+#define ShareSystemRequestV1_Fields (accountEmail)(systemId)(accessRole)(userRoleId) \
+    (customPermissions)(isEnabled)(vmsUserId)
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing);
+NX_REFLECTION_INSTRUMENT(ShareSystemRequestV1, ShareSystemRequestV1_Fields)
 
-#define SystemSharing_Fields (accountEmail)(systemId)(accessRole)(userRoleId)(customPermissions)(isEnabled)(vmsUserId)
+#define SystemSharingV1_Fields ShareSystemRequestV1_Fields(accountId)(accountFullName) \
+    (usageFrequency)(lastLoginTime)
 
-NX_REFLECTION_INSTRUMENT(SystemSharing, SystemSharing_Fields)
+NX_REFLECTION_INSTRUMENT(SystemSharingV1, SystemSharingV1_Fields)
 
-#define SystemSharingList_Fields (sharing)
+#define SystemSharingV1List_Fields (sharing)
 
-NX_REFLECTION_INSTRUMENT(SystemSharingList, SystemSharingList_Fields)
-
-#define SystemSharingEx_Fields SystemSharing_Fields(accountId)(accountFullName)(usageFrequency)(lastLoginTime)
-
-NX_REFLECTION_INSTRUMENT(SystemSharingEx, SystemSharingEx_Fields)
-
-#define SystemSharingExList_Fields (sharing)
-
-NX_REFLECTION_INSTRUMENT(SystemSharingExList, SystemSharingExList_Fields)
+NX_REFLECTION_INSTRUMENT(SystemSharingV1List, SystemSharingV1List_Fields)
 
 #define SystemAccessRoleData_Fields (accessRole)
 
@@ -165,16 +145,6 @@ NX_REFLECTION_INSTRUMENT_ENUM(MergeRole, none, master, slave)
 #define SystemMergeInfo_Fields (role)(startTime)(anotherSystemId)
 
 NX_REFLECTION_INSTRUMENT(SystemMergeInfo, SystemMergeInfo_Fields)
-
-#define SystemDataEx_Fields SystemData_Fields \
-    (ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth) \
-    (usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(version)
-
-NX_REFLECTION_INSTRUMENT(SystemDataEx, SystemDataEx_Fields)
-
-#define SystemDataExList_Fields (systems)
-
-NX_REFLECTION_INSTRUMENT(SystemDataExList, SystemDataExList_Fields)
 
 //-------------------------------------------------------------------------------------------------
 // UserSessionDescriptor
@@ -209,4 +179,20 @@ NX_REFLECTION_INSTRUMENT(SystemOfferPatch, (comment)(status))
 
 NX_REFLECTION_INSTRUMENT(Attribute, (name)(value))
 
-} // namespace nx::cloud::client::data
+NX_REFLECTION_INSTRUMENT(SystemUsersBatchItem, (users)(systems)(roleIds)(attributes))
+
+NX_REFLECTION_INSTRUMENT(CreateBatchRequest, (items))
+
+NX_REFLECTION_INSTRUMENT(CreateBatchResponse, (batchId))
+
+NX_REFLECTION_INSTRUMENT(BatchState, (status) (operations))
+
+NX_REFLECTION_INSTRUMENT_ENUM(BatchStatus, inProgress, success, failure)
+
+NX_REFLECTION_INSTRUMENT(BatchErrorInfo, (uncommitted))
+
+NX_REFLECTION_INSTRUMENT(BatchItemErrorInfo, (description)(item))
+
+NX_REFLECTION_INSTRUMENT(SystemCredentials, (id)(authKey))
+
+} // namespace nx::cloud::db::api

@@ -14,12 +14,19 @@ using namespace nx::network;
 //-------------------------------------------------------------------------------------------------
 // class SystemRegistrationData
 
+MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, id)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, name)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, customization)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, opaque)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const data)
 {
+    if (urlQuery.hasQueryItem(SystemRegistrationData_id_field))
+    {
+        data->id = std::string();
+        url::deserializeField(urlQuery, SystemRegistrationData_opaque_field, &data->id.value());
+    }
+
     if (!url::deserializeField(urlQuery, SystemRegistrationData_name_field, &data->name))
         return false;
 
@@ -39,77 +46,12 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const d
 
 void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const urlQuery)
 {
+    if (data.id)
+        url::serializeField(urlQuery, SystemRegistrationData_id_field, *data.id);
     url::serializeField(urlQuery, SystemRegistrationData_name_field, data.name);
     url::serializeField(urlQuery, SystemRegistrationData_customization_field, data.customization);
     url::serializeField(urlQuery, SystemRegistrationData_opaque_field, data.opaque);
 }
-
-//-------------------------------------------------------------------------------------------------
-// class SystemSharing
-
-MAKE_FIELD_NAME_STR_CONST(SystemSharing, systemId)
-MAKE_FIELD_NAME_STR_CONST(SystemSharing, accountEmail)
-MAKE_FIELD_NAME_STR_CONST(SystemSharing, accessRole)
-MAKE_FIELD_NAME_STR_CONST(SystemSharing, userRoleId)
-MAKE_FIELD_NAME_STR_CONST(SystemSharing, customPermissions)
-MAKE_FIELD_NAME_STR_CONST(SystemSharing, isEnabled)
-
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing)
-{
-    if (!urlQuery.hasQueryItem(SystemSharing_systemId_field) ||
-        !urlQuery.hasQueryItem(SystemSharing_accountEmail_field))
-    {
-        return false;
-    }
-
-    systemSharing->systemId = urlQuery.queryItemValue(SystemSharing_systemId_field).toStdString();
-    systemSharing->accountEmail =
-        urlQuery.queryItemValue(SystemSharing_accountEmail_field).toStdString();
-    bool success = false;
-    systemSharing->accessRole = nx::reflect::fromString(
-        urlQuery.queryItemValue(SystemSharing_accessRole_field).toStdString(),
-        api::SystemAccessRole::none,
-        &success);
-    systemSharing->userRoleId =
-        urlQuery.queryItemValue(SystemSharing_userRoleId_field).toStdString();
-    systemSharing->customPermissions =
-        urlQuery.queryItemValue(SystemSharing_customPermissions_field).toStdString();
-    if (urlQuery.hasQueryItem(SystemSharing_isEnabled_field))
-        systemSharing->isEnabled =
-            urlQuery.queryItemValue(SystemSharing_isEnabled_field) == "true";
-    return success;
-}
-
-void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
-{
-    urlQuery->addQueryItem(
-        SystemSharing_systemId_field,
-        QString::fromStdString(data.systemId));
-    urlQuery->addQueryItem(
-        SystemSharing_accountEmail_field,
-        QString::fromStdString(data.accountEmail));
-    urlQuery->addQueryItem(
-        SystemSharing_accessRole_field,
-        QString::fromStdString(nx::reflect::toString(data.accessRole)));
-    urlQuery->addQueryItem(
-        SystemSharing_userRoleId_field,
-        QString::fromStdString(data.userRoleId));
-    urlQuery->addQueryItem(
-        SystemSharing_customPermissions_field,
-        QString::fromStdString(data.customPermissions));
-    urlQuery->addQueryItem(
-        SystemSharing_isEnabled_field,
-        data.isEnabled ? "true" : "false");
-}
-
-
-bool loadFromUrlQuery(const QUrlQuery& /*urlQuery*/, SystemSharingList* const /*systemSharing*/)
-{
-    //TODO
-    NX_ASSERT(false);
-    return false;
-}
-
 
 //-------------------------------------------------------------------------------------------------
 // class SystemId
@@ -211,6 +153,148 @@ void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const ur
 }
 
 //-------------------------------------------------------------------------------------------------
+// SystemDataEx
+
+namespace {
+
+template<typename T>
+static void writeJsonAttribute(
+    nx::reflect::json::SerializationContext* ctx,
+    const std::string& name,
+    const T& value)
+{
+    ctx->composer.writeAttributeName(name);
+    nx::reflect::json::serialize(ctx, value);
+}
+
+template<typename T>
+static void writeJsonAttribute(
+    nx::reflect::json::SerializationContext* ctx,
+    const std::string& name,
+    const std::optional<T>& value)
+{
+    if (!value)
+        return;
+
+    ctx->composer.writeAttributeName(name);
+    nx::reflect::json::serialize(ctx, *value);
+}
+
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
+// SystemData & SystemDataEx
+
+template<typename T>
+requires std::is_base_of_v<SystemData, T>
+static void serializeFlattenningAttrs(
+    nx::reflect::json::SerializationContext* ctx,
+    const T& value)
+{
+    ctx->composer.startObject();
+
+    nx::reflect::forEachField<T>(
+        [ctx, &value](const auto& field)
+        {
+            if (nx::reflect::isSameField(field, &SystemData::attributes))
+            {
+                // Serializing "attributes" values on the top level of the JSON document.
+                for (const auto& attr: value.attributes)
+                    writeJsonAttribute(ctx, attr.name, attr.value);
+            }
+            else
+            {
+                // Serializing each field but "attributes" as usual.
+                writeJsonAttribute(ctx, field.name(), field.get(value));
+            }
+        });
+
+    ctx->composer.endObject();
+}
+
+template<typename T>
+requires std::is_base_of_v<SystemData, T>
+static nx::reflect::DeserializationResult deserializeFlattenningAttrs(
+    const nx::reflect::json::DeserializationContext& ctx,
+    T* value)
+{
+    nx::reflect::DeserializationResult result;
+
+    std::set<typename std::decay_t<decltype(ctx.value)>::ConstMemberIterator> readMembers;
+
+    // Deserializing all fields but "attributes" as usual.
+    nx::reflect::forEachField<T>(
+        [&ctx, value, &result, &readMembers](const auto& field)
+        {
+            if (!result)
+                return; //< Error happened earlier. Skipping...
+
+            if (nx::reflect::isSameField(field, &SystemData::attributes))
+                return; //< Attributes will be parsed later.
+
+            auto it = ctx.value.FindMember(field.name());
+            if (it != ctx.value.MemberEnd())
+            {
+                typename std::decay_t<decltype(field)>::Type val;
+                result = nx::reflect::json::deserialize(
+                    nx::reflect::json::DeserializationContext{it->value, ctx.flags}, &val);
+                readMembers.insert(it);
+                if (result)
+                    field.set(value, val);
+            }
+        });
+
+    if (!result)
+        return result;
+
+    // Loading all remaining string members into "attributes".
+    value->attributes.reserve(ctx.value.MemberCount() - readMembers.size());
+    for (auto it = ctx.value.MemberBegin(); it != ctx.value.MemberEnd(); ++it)
+    {
+        if (!it->value.IsString())
+            continue;
+
+        if (!readMembers.contains(it))
+        {
+            Attribute attr;
+            attr.name.assign(it->name.GetString(), it->name.GetStringLength());
+            attr.value.assign(it->value.GetString(), it->value.GetStringLength());
+            value->attributes.push_back(std::move(attr));
+        }
+    }
+
+    return result;
+}
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const SystemData& value)
+{
+    serializeFlattenningAttrs(ctx, value);
+}
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& ctx,
+    SystemData* value)
+{
+    return deserializeFlattenningAttrs(ctx, value);
+}
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const SystemDataEx& value)
+{
+    serializeFlattenningAttrs(ctx, value);
+}
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& ctx,
+    SystemDataEx* value)
+{
+    return deserializeFlattenningAttrs(ctx, value);
+}
+
+//-------------------------------------------------------------------------------------------------
 // UserSessionDescriptor
 
 MAKE_FIELD_NAME_STR_CONST(UserSessionDescriptor, accountEmail)
@@ -243,6 +327,20 @@ void serializeToUrlQuery(const GetSystemUsersRequest& data, QUrlQuery* const url
     urlQuery->addQueryItem(
         GetSystemUsersRequest_localOnly_field,
         QString::number(data.localOnly));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+std::string getAttrValueOr(
+    const AttributesList& attrs, const std::string& name, const std::string& defaultV)
+{
+    for (const auto& attr: attrs)
+    {
+        if (attr.name == name)
+            return attr.value;
+    }
+
+    return defaultV;
 }
 
 } // namespace nx::cloud::db::api

@@ -17,14 +17,23 @@ Version getVersion()
     };
 }
 
+GetVersion::GetVersion(std::optional<std::string> version):
+    m_version(std::move(version))
+{
+}
+
 void GetVersion::processRequest(
     http::RequestContext /*requestContext*/,
     http::RequestProcessedHandler completionHandler)
 {
+    auto version = getVersion();
+    if (m_version)
+        version.version = *m_version;
+
     http::RequestResult result(http::StatusCode::ok);
     result.body = std::make_unique<http::BufferSource>(
         http::header::ContentType::kJson.toString(),
-        nx::reflect::json::serialize(getVersion()));
+        nx::reflect::json::serialize(version));
 
     completionHandler(std::move(result));
 }

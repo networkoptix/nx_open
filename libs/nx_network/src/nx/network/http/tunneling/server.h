@@ -57,7 +57,7 @@ public:
 
     void registerRequestHandlers(
         const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher);
+        AbstractMessageDispatcher* messageDispatcher);
 
 private:
     TunnelCreatedHandler m_tunnelCreatedHandler;
@@ -104,7 +104,7 @@ SpecificTunnelServer<ApplicationData...>& Server<ApplicationData...>::addTunnelS
 template<typename ...ApplicationData>
 void Server<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
-    server::rest::MessageDispatcher* messageDispatcher)
+    AbstractMessageDispatcher* messageDispatcher)
 {
     for (auto& tunnelServer: m_tunnelServers)
         tunnelServer->registerRequestHandlers(basePath, messageDispatcher);

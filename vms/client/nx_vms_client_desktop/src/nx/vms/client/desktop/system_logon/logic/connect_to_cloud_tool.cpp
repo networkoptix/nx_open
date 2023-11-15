@@ -167,8 +167,8 @@ void ConnectToCloudTool::onBindToCloudDataReady()
     nx::cloud::db::api::SystemData systemData;
     systemData.id = bindResult.systemId.toStdString();
     systemData.authKey = bindResult.authKey.toStdString();
-    systemData.ownerAccountEmail = bindResult.owner.toStdString();
-    systemData.organizationId = bindResult.organizationId.toStdString();
+    systemData.attributes.push_back({.name = "ownerAccountEmail", .value = bindResult.owner.toStdString()});
+    systemData.attributes.push_back({.name = "organizationId", .value = bindResult.organizationId.toStdString()});
 
     onBindFinished(std::move(systemData));
 }
@@ -246,7 +246,7 @@ void ConnectToCloudTool::onBindFinished(nx::cloud::db::api::SystemData systemDat
     NX_DEBUG(this, "Cloud DB bind finished");
     qnCloudStatusWatcher->resumeCloudInteraction();
 
-    m_cloudAuthData.credentials.username = systemData.ownerAccountEmail;
+    m_cloudAuthData.credentials.username = systemData.ownerAccountEmail();
     m_systemData = std::move(systemData);
 
     m_oauthLoginDialog->accept();
@@ -323,7 +323,7 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
         QString::fromStdString(m_systemData.id),
         QString::fromStdString(m_systemData.authKey),
         QString::fromStdString(m_cloudAuthData.credentials.username),
-        QString::fromStdString(m_systemData.organizationId),
+        QString::fromStdString(m_systemData.organizationId()),
         localToken.value,
         std::move(handleReply),
         m_parent->thread());

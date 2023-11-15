@@ -115,6 +115,10 @@ static constexpr char kDbMaxPeriodQueryWaitsForAvailableConnection[] =
 
 static constexpr char kDbFailOnDbTuneError[] = "failOnDbTuneError";
 static constexpr char kDbConcurrentModificationQueryLimit[] = "concurrentModificationQueryLimit";
+static constexpr char kDbReconnectAfterFailureDelay[] = "reconnectAfterFailureDelay";
+
+static constexpr char kDbMaxQueriesAggregatedUnderSingleTransaction[] =
+    "maxQueriesAggregatedUnderSingleTransaction";
 
 } // namespace
 
@@ -182,6 +186,18 @@ void ConnectionOptions::loadFromSettings(const QnSettings& settings, const QStri
 
     if (settingsReader.contains(kDbConcurrentModificationQueryLimit))
         concurrentModificationQueryLimit = settingsReader.value(kDbConcurrentModificationQueryLimit).toInt();
+
+    if (settingsReader.contains(kDbReconnectAfterFailureDelay))
+    {
+        reconnectAfterFailureDelay = nx::utils::parseTimerDuration(
+            settingsReader.value(kDbReconnectAfterFailureDelay).toString());
+    }
+
+    if (settingsReader.contains(kDbMaxQueriesAggregatedUnderSingleTransaction))
+    {
+        maxQueriesAggregatedUnderSingleTransaction =
+            settingsReader.value(kDbMaxQueriesAggregatedUnderSingleTransaction).toInt();
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
