@@ -57,8 +57,10 @@ signals:
     // These signals are sent when a set of videowall layouts is changed.
     // Only layout ids are watched, but not actual layout presence in the resource pool.
     // These signals are NOT sent when a videowall is added to or removed from the resource pool.
-    void videowallLayoutAdded(const QnVideoWallResourcePtr& videowall, const QnUuid& layoutId);
-    void videowallLayoutRemoved(const QnVideoWallResourcePtr& videowall, const QnUuid& layoutId);
+    void videowallLayoutsAdded(
+        const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds);
+    void videowallLayoutsRemoved(
+        const QnVideoWallResourcePtr& videowall, const QVector<QnUuid>& layoutIds);
 
 private:
     class Private;
