@@ -71,14 +71,14 @@ QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
         system.online = (systemData.stateOfHealth == SystemHealth::online);
         system.system2faEnabled = systemData.system2faEnabled;
         system.name = QString::fromStdString(systemData.name);
-        system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
-        system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
+        system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail());
+        system.ownerFullName = QString::fromStdString(systemData.ownerFullName());
         system.authKey = {}; //< Intentionally skip saving.
         system.weight = systemData.usageFrequency;
         system.lastLoginTimeUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>
             (systemData.lastLoginTime.time_since_epoch()).count();
         system.version = QString::fromStdString(systemData.version);
-        system.organizationId = QString::fromStdString(systemData.organizationId);
+        system.organizationId = QString::fromStdString(systemData.organizationId());
         result.append(system);
     }
 

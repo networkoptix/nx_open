@@ -2,8 +2,6 @@
 
 #include "async_http_requests_executor.h"
 
-#include <nx/network/deprecated/asynchttpclient.h>
-
 namespace nx::cloud::db::client {
 
 AsyncRequestsExecutor::AsyncRequestsExecutor(
@@ -57,6 +55,18 @@ void AsyncRequestsExecutor::setRequestTimeout(
 std::chrono::milliseconds AsyncRequestsExecutor::requestTimeout() const
 {
     return m_requestTimeout;
+}
+
+void AsyncRequestsExecutor::setAdditionalHeaders(nx::network::http::HttpHeaders headers)
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    m_additionalHeaders = std::move(headers);
+}
+
+nx::network::http::HttpHeaders AsyncRequestsExecutor::additionalHeaders() const
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    return m_additionalHeaders;
 }
 
 void AsyncRequestsExecutor::bindToAioThread(

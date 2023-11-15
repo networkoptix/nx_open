@@ -7,8 +7,10 @@
 #include "account_manager.h"
 #include "async_http_requests_executor.h"
 #include "auth_provider.h"
+#include "batch_user_processing_manager.h"
 #include "maintenance_manager.h"
 #include "oauth_manager.h"
+#include "organization_manager.h"
 #include "system_manager.h"
 #include "two_factor_auth_manager.h"
 
@@ -18,28 +20,22 @@ class Connection:
     public api::Connection
 {
 public:
-    Connection(
-        network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
+    Connection(network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
 
-    /** Implementation of api::Connection::getAccountManager(). */
     virtual api::AccountManager* accountManager() override;
-    /** Implementation of api::Connection::getAccountManager(). */
     virtual api::SystemManager* systemManager() override;
-    /** Implementation of api::Connection::authProvider(). */
+    virtual api::OrganizationManager* organizationManager() override;
     virtual api::AuthProvider* authProvider() override;
-    /** Implementation of api::Connection::maintenanceManager(). */
     virtual api::MaintenanceManager* maintenanceManager() override;
-    /** Implementation of api::Connection::OauthManager(). */
     virtual api::OauthManager* oauthManager() override;
-    /** Implementation of api::Connection::TwoFactorAuthManager(). */
     virtual api::TwoFactorAuthManager* twoFactorAuthManager() override;
+
+    virtual api::BatchUserProcessingManager* batchUserProcessingManager() override;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
-    /** Implementation of api::Connection::setCredentials(). */
     virtual void setCredentials(nx::network::http::Credentials credentials) override;
 
-    /** Implementation of api::Connection::setProxyVia(). */
     virtual void setProxyVia(
         const std::string& proxyHost,
         std::uint16_t proxyPort,
@@ -49,18 +45,21 @@ public:
     virtual void setRequestTimeout(std::chrono::milliseconds) override;
     virtual std::chrono::milliseconds requestTimeout() const override;
 
-    //** Implementation of api::Connection::ping(). */
+    virtual void setAdditionalHeaders(nx::network::http::HttpHeaders headers) override;
+
     virtual void ping(
         std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) override;
 
 private:
-    std::unique_ptr<AccountManager> m_accountManager;
-    std::unique_ptr<SystemManager> m_systemManager;
-    std::unique_ptr<AuthProvider> m_authProvider;
-    std::unique_ptr<MaintenanceManager> m_maintenanceManager;
-    std::unique_ptr<OauthManager> m_oauthManager;
-    std::unique_ptr<TwoFactorAuthManager> m_twoFactorAuthManager;
     AsyncRequestsExecutor m_requestExecutor;
+    AccountManager m_accountManager;
+    SystemManager m_systemManager;
+    OrganizationManager m_organizationManager;
+    AuthProvider m_authProvider;
+    MaintenanceManager m_maintenanceManager;
+    OauthManager m_oauthManager;
+    TwoFactorAuthManager m_twoFactorAuthManager;
+    BatchUserProcessingManager m_batchUserProcessingManager;
 };
 
 } // namespace nx::cloud::db::client

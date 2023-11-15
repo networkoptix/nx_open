@@ -51,7 +51,7 @@ struct AuthResponse
     std::chrono::seconds validPeriod = std::chrono::seconds::zero();
 
     /**%apidoc Contains user info and access rights. */
-    SystemSharingEx authenticatedAccountData;
+    SystemSharing authenticatedAccountData;
 
     /**%apidoc Duplicates authenticatedAccountData.accessRole. */
     api::SystemAccessRole accessRole = api::SystemAccessRole::none;

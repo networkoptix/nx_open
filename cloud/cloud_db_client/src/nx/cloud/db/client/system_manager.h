@@ -10,11 +10,10 @@
 namespace nx::cloud::db::client {
 
 class SystemManager:
-    public api::SystemManager,
-    public AsyncRequestsExecutor
+    public api::SystemManager
 {
 public:
-    SystemManager(network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher);
+    SystemManager(AsyncRequestsExecutor* requestsExecutor);
 
     virtual void bindSystem(
         api::SystemRegistrationData registrationData,
@@ -40,7 +39,8 @@ public:
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;
 
     virtual void shareSystem(
-        api::SystemSharing sharingData,
+        const std::string& systemId,
+        api::ShareSystemRequest sharingData,
         std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) override;
 
     virtual void revokeUserAccess(
@@ -50,7 +50,7 @@ public:
 
     virtual void getCloudUsersOfSystem(
         const std::string& systemId,
-        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
+        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) override;
 
     virtual void getAccessRoleList(
         const std::string& systemId,
@@ -136,6 +136,32 @@ public:
         const std::string& systemId,
         const std::string& attrName,
         std::function<void(api::ResultCode)> completionHandler) override;
+
+    virtual void updateUserAttributes(
+        const std::string& systemId,
+        const std::string& email,
+        const std::vector<api::Attribute>& attributes,
+        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) override;
+
+    virtual void updateUserAttribute(
+        const std::string& systemId,
+        const std::string& email,
+        const api::Attribute& attribute,
+        std::function<void(api::ResultCode, api::Attribute)> completionHandler) override;
+
+    virtual void getUserAttributes(
+        const std::string& systemId,
+        const std::string& email,
+        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) override;
+
+    virtual void deleteUserAttribute(
+        const std::string& systemId,
+        const std::string& email,
+        const std::string& attrName,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
+private:
+    AsyncRequestsExecutor* m_requestsExecutor = nullptr;
 };
 
 } // namespace nx::cloud::db::client

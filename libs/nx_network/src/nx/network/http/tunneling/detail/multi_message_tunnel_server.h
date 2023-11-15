@@ -27,7 +27,7 @@ public:
 
     virtual void registerRequestHandlers(
         const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher) override;
+        AbstractMessageDispatcher* messageDispatcher) override;
 };
 
 template<typename ...ApplicationData>
@@ -39,7 +39,7 @@ MultiMessageTunnelServer<ApplicationData...>::~MultiMessageTunnelServer()
 template<typename ...ApplicationData>
 void MultiMessageTunnelServer<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
-    server::rest::MessageDispatcher* messageDispatcher)
+    AbstractMessageDispatcher* messageDispatcher)
 {
     messageDispatcher->registerRequestProcessorFunc(
         nx::network::http::Method::get,

@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "serialization_utils.h"
+#include <sstream>
 
 namespace nx::reflect {
 
@@ -25,6 +26,16 @@ DeserializationResult::DeserializationResult(
 DeserializationResult::operator bool() const noexcept
 {
     return success;
+}
+
+std::string DeserializationResult::toString() const
+{
+    std::ostringstream errorString;
+    errorString << "Error description: \"" << errorDescription << "\", ";
+    errorString << "First bad fragment: \"" << firstBadFragment << "\"";
+    if (firstNonDeserializedField != std::nullopt)
+        errorString << ", First non-deserialized field: \"" << *firstNonDeserializedField << "\"";
+    return errorString.str();
 }
 
 } // namespace nx::reflect

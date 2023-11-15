@@ -346,4 +346,53 @@ TEST(Reflection, tags)
     static_assert(!FooTag((const NonTaggedFoo*) nullptr));
 }
 
+//-------------------------------------------------------------------------------------------------
+
+struct Foo351
+{
+    int x = 0;
+    double y = 0;
+    TaggedFoo z;
+};
+
+NX_REFLECTION_INSTRUMENT(Foo351, (x)(y)(z))
+
+namespace {
+
+template<typename T> struct TestTypeName {};
+template<> struct TestTypeName<int> { static constexpr char value[] = "int"; };
+template<> struct TestTypeName<double> { static constexpr char value[] = "double"; };
+template<> struct TestTypeName<TaggedFoo> { static constexpr char value[] = "TaggedFoo"; };
+
+template<typename... Args> static constexpr auto TestTypeNameV = TestTypeName<Args...>::value;
+
+} // namespace
+
+TEST(Reflection, iterating_fields)
+{
+    std::ostringstream ss;
+    forEachField<Foo351>([&ss](const auto& field)
+    {
+        ss << field.name() << ":" <<
+            TestTypeNameV<typename std::decay_t<decltype(field)>::Type> << ",";
+    });
+
+    ASSERT_EQ("x:int,y:double,z:TaggedFoo,", ss.str());
+}
+
+TEST(Reflection, detect_certain_field)
+{
+    std::ostringstream ss;
+    forEachField<Foo351>([&ss](const auto& field)
+    {
+        if (isSameField(field, &Foo351::x))
+        {
+            ss << field.name() << ":" <<
+                TestTypeNameV<typename std::decay_t<decltype(field)>::Type> << ",";
+        }
+    });
+
+    ASSERT_EQ("x:int,", ss.str());
+}
+
 } // namespace nx::reflect::test

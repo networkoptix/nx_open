@@ -41,9 +41,7 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     const ConnectionOptions& connectionOptions)
     :
     m_connectionOptions(connectionOptions),
-    m_statisticsCollector(
-        kDefaultStatisticsAggregationPeriod,
-        m_queryQueue)
+    m_statisticsCollector(kDefaultStatisticsAggregationPeriod, m_queryQueue)
 {
     m_dropConnectionThread = nx::utils::thread(
         std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
@@ -51,6 +49,9 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     m_queryQueue.setOnItemStayTimeout([this](auto&&... args) {
         reportQueryCancellation(std::forward<decltype(args)>(args)...);
     });
+
+    m_queryQueue.setAggregationLimit(
+        m_connectionOptions.maxQueriesAggregatedUnderSingleTransaction);
 
     if (m_connectionOptions.maxPeriodQueryWaitsForAvailableConnection
             > std::chrono::minutes::zero())
@@ -183,9 +184,14 @@ void AsyncSqlQueryExecutor::reserveConnections(int count)
         openNewConnection(lock);
 }
 
-QueryQueueStats AsyncSqlQueryExecutor::stats() const
+QueryQueueStats AsyncSqlQueryExecutor::queryQueueStatistics() const
 {
     return m_queryQueue.stats();
+}
+
+QueryStatistics AsyncSqlQueryExecutor::queryStatistics() const
+{
+    return m_statisticsCollector.getQueryStatistics();
 }
 
 void AsyncSqlQueryExecutor::createCursorImpl(

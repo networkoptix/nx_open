@@ -20,11 +20,13 @@ public:
     virtual QVariant value(
         const QString& key,
         const QVariant& defaultValue = QVariant()) const = 0;
+
+    virtual std::multimap<QString, QString> allArgs() const = 0;
 };
 
 /**
  * Able to take settings from QSettings class (win32 registry or linux ini file) or from
- *  command line arguments.
+ * command line arguments.
  *
  * Value defined as command line argument has preference over registry.
  *
@@ -64,6 +66,8 @@ public:
         const QString& key,
         const QVariant& defaultValue = QVariant()) const override;
 
+    virtual std::multimap<QString, QString> allArgs() const override;
+
     QVariant value(
         const std::string_view& key,
         const QVariant& defaultValue = QVariant()) const;
@@ -71,8 +75,6 @@ public:
     QVariant value(
         const char* key,
         const QVariant& defaultValue = QVariant()) const;
-
-    std::multimap<QString, QString> allArgs() const;
 
     const QString getApplicationName() const { return m_applicationName; }
     const QString getModuleName() const { return m_moduleName; }
@@ -109,6 +111,8 @@ public:
     virtual QVariant value(
         const QString& key,
         const QVariant& defaultValue = QVariant()) const override;
+
+    virtual std::multimap<QString, QString> allArgs() const override;
 
 private:
     const SettingsReader& m_settings;

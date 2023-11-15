@@ -27,7 +27,7 @@ public:
 
     virtual void registerRequestHandlers(
         const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher) override;
+        AbstractMessageDispatcher* messageDispatcher) override;
 
     void setProtocolName(const std::string& protocolName);
     std::string protocolName() const;
@@ -65,7 +65,7 @@ ConnectionUpgradeTunnelServer<ApplicationData...>::~ConnectionUpgradeTunnelServe
 template<typename ...ApplicationData>
 void ConnectionUpgradeTunnelServer<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
-    server::rest::MessageDispatcher* messageDispatcher)
+    AbstractMessageDispatcher* messageDispatcher)
 {
     using namespace std::placeholders;
 

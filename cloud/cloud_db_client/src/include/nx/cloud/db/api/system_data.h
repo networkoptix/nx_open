@@ -3,19 +3,54 @@
 #pragma once
 
 #include <chrono>
+#include <compare>
 #include <cstdint>
 #include <map>
 #include <optional>
 #include <string>
 #include <vector>
 
+#include <nx/reflect/instrument.h>
+#include <nx/reflect/json.h>
+#include <nx/utils/std/cpp20.h>
+
+#include "permissions.h"
+
 namespace nx::cloud::db::api {
+
+/**
+ * System attribute.
+ */
+struct Attribute
+{
+    /**%apidoc Unique attribute name. */
+    std::string name;
+
+    /**%apidoc Attribute value. */
+    std::string value;
+
+    bool operator==(const Attribute& rhs) const
+    {
+        return name == rhs.name && value == rhs.value;
+    }
+};
+
+/**%apidoc Array of Attributes. */
+using AttributesList = std::vector<Attribute>;
+
+std::string getAttrValueOr(
+    const AttributesList& attrs, const std::string& name, const std::string& defaultV);
 
 /**
  * Information required to register system in cloud.
  */
 struct SystemRegistrationData
 {
+    /**%apidoc If specified, then an attempt to assign this id will be made.
+     * If the id was alredy taken, an error is raised.
+     */
+    std::optional<std::string> id = std::nullopt;
+
     /**%apidoc Non-unique system name. */
     std::string name;
 
@@ -84,11 +119,7 @@ struct SystemData
 
     // TODO: #akolesnikov. This field does not belong here. It is not a part of the API.
     std::string authKeyHash;
-    std::string ownerAccountEmail;
     SystemStatus status = SystemStatus::invalid;
-
-    /**%apidoc DEPRECATED. true, if cloud connection is activated for this system. */
-    bool cloudConnectionSubscriptionStatus = true;
 
     /**%apidoc MUST be used as upper 64 bits of 128-bit transaction timestamp. */
     std::uint64_t systemSequence = 0;
@@ -104,11 +135,10 @@ struct SystemData
     /**%apidoc If true, then all cloud users are asked to use 2FA to log in to this system. */
     bool system2faEnabled = false;
 
-    /**%apidoc[opt] Optional organizationId.
-     * Field `ownerAccountEmail` if filled in case of system is bound to a user,
-     * `organizationId` is filled in case of system is bound to a organization.
-     */
-    std::string organizationId;
+    // System attributes. These attributes are present on the same level with other fields
+    // of this structure in the JSON document. They are NOT represented as an "attributes" array
+    // in the JSON document.
+    AttributesList attributes;
 
     bool operator==(const SystemData& right) const
     {
@@ -116,21 +146,52 @@ struct SystemData
             id == right.id &&
             name == right.name &&
             customization == right.customization &&
-            ownerAccountEmail == right.ownerAccountEmail &&
             status == right.status &&
-            cloudConnectionSubscriptionStatus == right.cloudConnectionSubscriptionStatus &&
             systemSequence == right.systemSequence &&
             opaque == right.opaque &&
             system2faEnabled == right.system2faEnabled &&
-            organizationId == right.organizationId;
+            attributes == right.attributes;
+    }
+
+    std::string ownerAccountEmail() const
+    {
+        return getAttrValueOr(attributes, "ownerAccountEmail", std::string());
+    }
+
+    std::string ownerFullName() const
+    {
+        return getAttrValueOr(attributes, "ownerFullName", std::string());
+    }
+
+    std::string organizationId() const
+    {
+        return getAttrValueOr(attributes, "organizationId", std::string());
     }
 };
+
+#define SystemData_Fields (id)(name)(customization)(authKey)(authKeyHash) \
+    (status)(systemSequence) (opaque)(registrationTime)(system2faEnabled)(attributes)
+
+NX_REFLECTION_INSTRUMENT(SystemData, SystemData_Fields)
+
+// Providing custom JSON serialization functions so that SystemData::attributes are added on the
+// same level with other fields in the resulting JSON document.
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const SystemData& value);
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& ctx,
+    SystemData* value);
 
 struct SystemDataList
 {
     /**%apidoc Systems attributes. */
     std::vector<SystemData> systems;
 };
+
+NX_REFLECTION_INSTRUMENT(SystemDataList, (systems))
 
 ////////////////////////////////////////////////////////////
 //// system sharing data
@@ -139,23 +200,22 @@ struct SystemDataList
 enum class SystemAccessRole
 {
     none = 0,
-    disabled,
-    custom,
-    liveViewer,
-    viewer,
-    advancedViewer,
-    localAdmin,
-    cloudAdmin,
-    maintenance,
-    owner,
+    custom = 2,
+    liveViewer = 3,
+    viewer = 4,
+    advancedViewer = 5,
+    localAdmin = 6,
+    cloudAdmin = 7,
+    owner = 9,
 
     /**%apidoc This special value is used when the system is being requested using the system
-     * credentials (likely, by a mediaserver).
+     * credentials (likely, by a VMS server).
      */
-    system,
+    system = 10,
 };
 
-struct SystemSharing
+// Deprecated share system request. Preserved for the backward compatibility.
+struct ShareSystemRequestV1
 {
     /**%apidoc The account to share the system with. */
     std::string accountEmail;
@@ -178,17 +238,17 @@ struct SystemSharing
 
     bool isEnabled = true;
 
-    //TODO #akolesnikov this field is redundant here. Move it to libcloud_db internal data structures
+    // User id to set in the VMS DB.
     std::string vmsUserId;
 
-    bool operator<(const SystemSharing& rhs) const
+    bool operator<(const ShareSystemRequestV1& rhs) const
     {
         if (accountEmail != rhs.accountEmail)
             return accountEmail < rhs.accountEmail;
         return systemId < rhs.systemId;
     }
 
-    bool operator==(const SystemSharing& rhs) const
+    bool operator==(const ShareSystemRequestV1& rhs) const
     {
         return accountEmail == rhs.accountEmail
             && systemId == rhs.systemId
@@ -199,16 +259,10 @@ struct SystemSharing
     }
 };
 
-struct SystemSharingList
-{
-    /**%apidoc List of accounts the system has been shared with. */
-    std::vector<SystemSharing> sharing;
-};
-
 /**
- * Expands SystemSharing to contain more data.
+ * Describes an account to system relation.
  */
-struct SystemSharingEx: SystemSharing
+struct SystemSharingV1: ShareSystemRequestV1
 {
     /**%apidoc Globally unique account id. */
     std::string accountId;
@@ -221,24 +275,115 @@ struct SystemSharingEx: SystemSharing
     /**%apidoc UTC time of the last login of user to the system. */
     std::chrono::system_clock::time_point lastLoginTime;
 
-    bool operator==(const SystemSharingEx& rhs) const
+    bool operator==(const SystemSharingV1& rhs) const
     {
-        return static_cast<const SystemSharing&>(*this) == static_cast<const SystemSharing&>(rhs)
+        return static_cast<const ShareSystemRequestV1&>(*this) == static_cast<const ShareSystemRequestV1&>(rhs)
             && accountId == rhs.accountId
             && accountFullName == rhs.accountFullName;
     }
 
-    bool operator<(const SystemSharingEx& rhs) const
+    bool operator<(const SystemSharingV1& rhs) const
     {
         return std::tie(accountId, systemId) < std::tie(rhs.accountId, rhs.systemId);
     }
 };
 
-struct SystemSharingExList
+struct SystemSharingV1List
 {
     /**%apidoc List of accounts the system has been shared with. */
-    std::vector<SystemSharingEx> sharing;
+    std::vector<SystemSharingV1> sharing;
 };
+
+/**
+ * Request to share a system with a new user or to modify the access rights of an existing user.
+ * Provides improved support for permissions and roles.
+ * This is the current version of the request. Corresponds to the version 2 of the API.
+ */
+struct ShareSystemRequest
+{
+    /**%apidoc The account to share the system with. */
+    std::string accountEmail;
+
+    /**%apidoc List of roles to assign to the user.
+     * This can be both cloud and VMS-specific roles. Cloud uses those roles it recognizes
+     * while authorizing user requests.
+     */
+    std::vector<std::string> roleIds;
+
+    /**%apidoc List of specific permissions to grant to the user. This extends the list of roles.
+     * This can be both cloud and VMS-specific permissions. Cloud uses those permissions it
+     * recognizes while authorizing user requests.
+     */
+    std::vector<std::string> permissions;
+
+    /**%apidoc Allows to disable/re-enable user. Disabled user does not have access to the system.
+     * But, still present in the system.
+     */
+    bool isEnabled = true;
+
+    // User id to set in the VMS DB.
+    std::string vmsUserId;
+
+    // NOTE: Cannot use operator<=> due to lack of compiler support on some platforms.
+    bool operator==(const ShareSystemRequest& rhs) const
+    {
+        return std::tie(accountEmail, roleIds, permissions, isEnabled, vmsUserId)
+            == std::tie(rhs.accountEmail, rhs.roleIds, rhs.permissions, rhs.isEnabled, rhs.vmsUserId);
+    }
+
+    bool operator<(const ShareSystemRequest& rhs) const
+    {
+        return std::tie(accountEmail, roleIds, permissions, isEnabled, vmsUserId)
+            < std::tie(rhs.accountEmail, rhs.roleIds, rhs.permissions, rhs.isEnabled, rhs.vmsUserId);
+    }
+};
+
+NX_REFLECTION_INSTRUMENT(ShareSystemRequest, (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId))
+
+/**
+ * Describes an account to system relation.
+ */
+struct SystemSharing: ShareSystemRequest
+{
+    using base_type = ShareSystemRequest;
+
+    /**%apidoc Id of the system. */
+    std::string systemId;
+
+    /**%apidoc Globally unique account id. */
+    std::string accountId;
+
+    /**%apidoc Account full name. */
+    std::string accountFullName;
+
+    /**%apidoc Shows how often user accesses given system in comparison to other user's systems. */
+    float usageFrequency = 0.0;
+
+    /**%apidoc UTC time of the last login of user to the system. */
+    std::chrono::system_clock::time_point lastLoginTime;
+
+    bool operator==(const SystemSharing& rhs) const
+    {
+        return std::tie(static_cast<const base_type&>(*this), systemId, accountId, accountFullName)
+            == std::tie(static_cast<const base_type&>(rhs), rhs.systemId, rhs.accountId,
+                rhs.accountFullName);
+    }
+
+    bool operator<(const SystemSharing& rhs) const
+    {
+        return std::tie(static_cast<const base_type&>(*this), systemId, accountId, accountFullName)
+            < std::tie(static_cast<const base_type&>(rhs), rhs.systemId, rhs.accountId,
+                rhs.accountFullName);
+    }
+};
+
+#define SystemSharing_Fields (systemId)(accountId)(accountFullName)(usageFrequency)(lastLoginTime) \
+    (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)
+
+NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(usageFrequency) \
+    (lastLoginTime))
+
+using SystemSharingList = std::vector<SystemSharing>;
 
 struct ShareSystemQuery
 {
@@ -297,15 +442,17 @@ struct SystemMergeInfo
     std::string anotherSystemId;
 };
 
+/**%apidoc Extended system information.
+ * Adds information that is defined by the request context. E.g., user access level,
+ * system health, etc...
+ * Also, system attributes managed via a separate "system attributes" API are also present here.
+ */
 struct SystemDataEx: SystemData
 {
-    std::string ownerFullName;
+    using base_type = SystemData;
 
     /**%apidoc Access role of the entity (usually, an account) that requested the system information. */
     SystemAccessRole accessRole = SystemAccessRole::none;
-
-    /**%apidoc Permissions, account can share current system with. */
-    std::vector<SystemAccessRoleData> sharingPermissions;
 
     SystemHealth stateOfHealth = SystemHealth::offline;
 
@@ -336,10 +483,31 @@ struct SystemDataEx: SystemData
     }
 };
 
+// NOTE: Have to move NX_REFLECTION_INSTRUMENT here because otherwise custom serialization functions
+// will not been seen anywhere SystemDataEx type is used.
+// TODO: #akolesnikov Move NX_REFLECTION_INSTRUMENT for other types here as well.
+NX_REFLECTION_INSTRUMENT(SystemDataEx,
+    (accessRole)(stateOfHealth)(usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(version))
+
+// Providing custom JSON serialization functions so that SystemDataEx::attributes are added on the
+// same level with other fields in the resulting JSON document.
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const SystemDataEx& value);
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& ctx,
+    SystemDataEx* value);
+
 struct SystemDataExList
 {
     std::vector<SystemDataEx> systems;
 };
+
+NX_REFLECTION_INSTRUMENT(SystemDataExList, (systems))
+
+//-------------------------------------------------------------------------------------------------
 
 struct SystemHealthHistoryItem
 {
@@ -469,18 +637,93 @@ struct SystemOfferPatch
 };
 
 /**
- * System attribute
- */
-struct Attribute
+* One system users batch item.
+*/
+struct SystemUsersBatchItem
 {
-    /**%apidoc Unique attribute name. */
-    std::string name;
+    /**%apidoc Users emails. */
+    std::vector<std::string> users;
 
-    /**%apidoc Attribute value. */
-    std::string value;
+    /**%apidoc System ids. */
+    std::vector<std::string> systems;
+
+    /**%apidoc Roles to be assigned. Empty array is used for revoking access. */
+    std::vector<std::string> roleIds;
+
+    /**%apidoc Custom attributes to assign. */
+    std::map<std::string, std::string> attributes;
 };
 
-/**%apidoc Array of Attributes. */
-using AttributesList = std::vector<Attribute>;
+/**
+* Create async processing batch request.
+*/
+struct CreateBatchRequest
+{
+    /**%apidoc Batch items to process. */
+    std::vector<SystemUsersBatchItem> items;
+};
+
+/**
+ * Create batch response with request traking id assigned.
+*/
+struct CreateBatchResponse
+{
+    /**%apidoc Batch traking id*/
+    std::string batchId;
+};
+
+/**
+*  Current batch status.
+*/
+enum class BatchStatus
+{
+    /**apidoc Processing in progress*/
+    inProgress = 1,
+    /**apidoc Successfully processed all items*/
+    success,
+    /**apidoc Processed all items but contains some errors*/
+    failure
+};
+
+/**
+*  Batch state response.
+*  Contains number of operations by status: pending, failed, complete
+*  Batch has been processed completely if pending operations is zero
+*  Batch hase been processed without errors if failed operations is zero
+*/
+struct BatchState
+{
+    /**%apidoc Current batch status. */
+    BatchStatus status = BatchStatus::inProgress;
+    /**%apidoc Number of operations by status: pending, failed, complete */
+    std::map<std::string, int> operations;
+};
+
+/**
+*  Failed to prcess batch item with error description.
+*/
+struct BatchItemErrorInfo
+{
+    /**apidoc Error description*/
+    std::string description;
+
+    /**apidoc Uncommitted item*/
+    SystemUsersBatchItem item;
+};
+
+/**
+*  Batch error response.
+*/
+struct BatchErrorInfo
+{
+    /**%apidoc Uncommited batch items */
+    std::vector<BatchItemErrorInfo> uncommitted;
+};
+
+struct SystemCredentials
+{
+    std::string id;
+    std::string authKey;
+};
 
 } // namespace nx::cloud::db::api

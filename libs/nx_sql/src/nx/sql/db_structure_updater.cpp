@@ -43,7 +43,7 @@ static constexpr char kAddMissingPrimaryKeys_sqlite[] = R"sql(
 ALTER TABLE db_schema_applied_scripts RENAME TO db_schema_applied_scripts_bak;
 
 CREATE TABLE db_schema_applied_scripts(
-    schema_name VARCHAR(64),
+    schema_name VARCHAR(128),
     script_name VARCHAR(64),
     PRIMARY KEY(schema_name, script_name)
 );
@@ -211,15 +211,21 @@ void DbStructureUpdater::createAppliedScriptsTable(QueryContext* queryContext)
 {
     NX_DEBUG(this, "Creating db_schema_applied_scripts table");
 
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(R"sql(
-        CREATE TABLE db_schema_applied_scripts(
-            schema_name VARCHAR(64),
-            script_name VARCHAR(64),
-            CONSTRAINT UC_script UNIQUE (schema_name, script_name)
-        )
-    )sql");
-    query->exec();
+    SqlQueryExecutionHelper::execSQLScript(
+        queryContext,
+        R"sql(
+            CREATE TABLE db_schema_applied_scripts(
+                schema_name VARCHAR(128),
+                script_name VARCHAR(64),
+                PRIMARY KEY(schema_name, script_name)
+            );
+
+            INSERT INTO db_schema_applied_scripts(schema_name, script_name)
+                VALUES("maintenance_C5DB4205-00E8-4BB0-8DEC-E982C7C9AFEF", "kMakeSchemaNameColumnLonger");
+
+            INSERT INTO db_schema_applied_scripts(schema_name, script_name)
+                VALUES("maintenance_C5DB4205-00E8-4BB0-8DEC-E982C7C9AFEF", "kAddMissingPrimaryKeys");
+        )sql");
 }
 
 void DbStructureUpdater::updateMaintenanceDbScheme(QueryContext* queryContext)

@@ -52,6 +52,20 @@ void HtdigestAuthenticationProvider::getPasswordByUserName(
     completionHandler(std::move(result));
 }
 
+std::vector<std::string> HtdigestAuthenticationProvider::usernames() const
+{
+    std::vector<std::string> result;
+
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        result.reserve(m_credentials.size());
+        for (const auto& [username, ha1]: m_credentials)
+            result.push_back(username);
+    }
+
+    return result;
+}
+
 void HtdigestAuthenticationProvider::load(std::istream& input)
 {
     std::string line;

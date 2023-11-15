@@ -22,8 +22,6 @@ static constexpr char kAccountEmailParam[] = "accountEmail";
 //-------------------------------------------------------------------------------------------------
 
 static constexpr char kSystemBindPath[] = "/cdb/systems/bind";
-static constexpr char kSystemSharePath[] = "/cdb/systems/share";
-static constexpr char kSystemGetAccessRoleListPath[] = "/cdb/systems/getAccessRoleList";
 static constexpr char kSystemRecordUserSessionStartPath[] = "/cdb/systems/recordUserSessionStart";
 
 static constexpr char kSystemsPath[] = "/cdb/systems";
@@ -32,11 +30,13 @@ static constexpr char kSystemPath[] = "/cdb/systems/{systemId}";
 static constexpr char kSystemHealthHistoryPath[] = "/cdb/systems/{systemId}/health-history";
 static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/systems/{systemId}/merged_systems/";
 static constexpr char kSystemsValidateMSSignature[] = "/cdb/systems/{systemId}/signature/validate";
-static constexpr char kSystemUsersPath[] = "/cdb/systems/{systemId}/users";
-static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{accountEmail}";
+static constexpr char kSystemUsersPath[] = "/cdb/v2/systems/{systemId}/users";
+static constexpr char kSystemUserPath[] = "/cdb/v2/systems/{systemId}/users/{accountEmail}";
 
 static constexpr char kSystemAttributesPath[] = "/cdb/systems/{systemId}/attributes";
 static constexpr char kSystemAttributePath[] = "/cdb/systems/{systemId}/attributes/{attributeName}";
+static constexpr char kSystemUserAttributesPath[] = "/cdb/systems/{systemId}/users/{accountEmail}/attributes";
+static constexpr char kSystemUserAttributePath[] = "/cdb/systems/{systemId}/users/{accountEmail}/attributes/{attributeName}";
 static constexpr char kSystemAttributeParam[] = "attributeName";
 
 static constexpr char kSendNotificationQueryParam[] = "sendNotification";
@@ -68,6 +68,26 @@ static constexpr char kCodeParam[] = "code";
 
 static constexpr char kSystemOwnershipOffers[] = "/cdb/offered-systems";
 static constexpr char kSystemOwnershipOffer[] = "/cdb/offered-systems/{systemId}";
+
+//-------------------------------------------------------------------------------------------------
+
+static constexpr char kSystemUsersBatchPath[] = "/cdb/systems/users/batch";
+static constexpr char kSystemUsersBatchStatePath[] = "/cdb/systems/users/batch/{batchId}/state";
+static constexpr char kSystemUsersBatchErrorInfoPath[] = "/cdb/systems/users/batch/{batchId}/error";
+static constexpr char kBatchIdParam[] = "batchId";
+
+//-------------------------------------------------------------------------------------------------
+// Organizations.
+
+static constexpr char kOrganizationSystemsPath[] = "/cdb/organizations/{organizationId}/systems";
+
+static constexpr char kOrganizationSystemPath[] =
+    "/cdb/organizations/{organizationId}/systems/{systemId}";
+
+static constexpr char kOrganizationSystemUsersPath[] =
+    "/cdb/organizations/{organizationId}/systems/{systemId}/users";
+
+static constexpr char kOrganizationIdParam[] = "organizationId";
 
 //-------------------------------------------------------------------------------------------------
 
@@ -115,6 +135,11 @@ static constexpr char kSystemGetPath[] = "/cdb/systems/get";
 static constexpr char kSystemRenamePath[] = "/cdb/systems/rename";
 static constexpr char kSystemUpdatePath[] = "/cdb/systems/update";
 static constexpr char kSystemGetCloudUsersPath[] = "/cdb/systems/getCloudUsers";
+
+static constexpr char kSystemGetAccessRoleListPath[] = "/cdb/systems/getAccessRoleList";
+static constexpr char kSystemSharePath[] = "/cdb/systems/share";
+static constexpr char kSystemUsersPath[] = "/cdb/systems/{systemId}/users";
+static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{accountEmail}";
 
 } // namespace deprecated
 

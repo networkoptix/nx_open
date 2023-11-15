@@ -23,7 +23,7 @@ public:
 
     virtual void registerRequestHandlers(
         const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher) = 0;
+        AbstractMessageDispatcher* messageDispatcher) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------

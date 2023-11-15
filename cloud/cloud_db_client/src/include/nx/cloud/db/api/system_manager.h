@@ -65,7 +65,8 @@ public:
      * @note sharing is removed if sharingData.accessRole is api::SystemAccessRole::none.
      */
     virtual void shareSystem(
-        SystemSharing sharingData,
+        const std::string& systemId,
+        ShareSystemRequest sharingData,
         std::function<void(ResultCode, SystemSharing)> completionHandler) = 0;
 
     /**
@@ -82,7 +83,7 @@ public:
      */
     virtual void getCloudUsersOfSystem(
         const std::string& systemId,
-        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) = 0;
 
     /**
      * Returns list of access roles which can be used to share system systemId.
@@ -191,6 +192,32 @@ public:
 
     virtual void deleteSystemAttribute(
         const std::string& systemId,
+        const std::string& attrName,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
+
+    //---------------------------------------------------------------------------------------------
+    // User attributes methods.
+
+    virtual void updateUserAttributes(
+        const std::string& systemId,
+        const std::string& email,
+        const std::vector<api::Attribute>& attributes,
+        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) = 0;
+
+    virtual void getUserAttributes(
+        const std::string& systemId,
+        const std::string& email,
+        std::function<void(api::ResultCode, std::vector<api::Attribute>)> completionHandler) = 0;
+
+    virtual void updateUserAttribute(
+        const std::string& systemId,
+        const std::string& email,
+        const api::Attribute& attribute,
+        std::function<void(api::ResultCode, api::Attribute)> completionHandler) = 0;
+
+    virtual void deleteUserAttribute(
+        const std::string& systemId,
+        const std::string& email,
         const std::string& attrName,
         std::function<void(api::ResultCode)> completionHandler) = 0;
 };

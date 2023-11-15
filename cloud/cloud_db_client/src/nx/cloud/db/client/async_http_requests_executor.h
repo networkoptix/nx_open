@@ -15,10 +15,9 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/stoppable.h>
 
-#include "data/account_data.h"
+#include <nx/cloud/db/api/result_code.h>
+
 #include "data/types.h"
-#include "include/nx/cloud/db/api/account_manager.h"
-#include "include/nx/cloud/db/api/result_code.h"
 
 namespace nx::cloud::db::client {
 
@@ -55,6 +54,9 @@ public:
 
     void setRequestTimeout(std::chrono::milliseconds);
     std::chrono::milliseconds requestTimeout() const;
+
+    void setAdditionalHeaders(nx::network::http::HttpHeaders headers);
+    nx::network::http::HttpHeaders additionalHeaders() const;
 
     /**
      * Asynchronously fetches url and executes request.
@@ -178,6 +180,7 @@ private:
         network::cloud::CloudModuleUrlFetcher::ScopedOperation
     > m_cdbEndPointFetcher;
     std::chrono::milliseconds m_requestTimeout;
+    nx::network::http::HttpHeaders m_additionalHeaders;
 
     /**
      * @param completionHandler Can be invoked within this call if failed to initiate async request.
@@ -286,6 +289,7 @@ private:
         client->bindToAioThread(getAioThread());
 
         client->setRequestTimeout(m_requestTimeout);
+        client->httpClient().setAdditionalHeaders(additionalHeaders());
 
         m_runningRequests.push_back(std::unique_ptr<network::aio::BasicPollable>());
         auto thisClient = client.get();

@@ -8,16 +8,15 @@
 
 namespace nx::cloud::db::client {
 
-TwoFactorAuthManager::TwoFactorAuthManager(
-    network::cloud::CloudModuleUrlFetcher* cloudModuleUrlFetcher):
-    AsyncRequestsExecutor(cloudModuleUrlFetcher)
+TwoFactorAuthManager::TwoFactorAuthManager(AsyncRequestsExecutor* requestsExecutor):
+    m_requestsExecutor(requestsExecutor)
 {
 }
 
 void TwoFactorAuthManager::generateTotpKey(
     std::function<void(api::ResultCode, api::GenerateKeyResponse)> completionHandler)
 {
-    executeRequest<api::GenerateKeyResponse>(
+    m_requestsExecutor->executeRequest<api::GenerateKeyResponse>(
         nx::network::http::Method::post,
         kTwoFactorAuthGetKey,
         std::move(completionHandler));
@@ -27,7 +26,7 @@ void TwoFactorAuthManager::generateBackupCodes(
     const api::GenerateBackupCodesRequest& request,
     std::function<void(api::ResultCode, api::BackupCodes)> completionHandler)
 {
-    executeRequest<api::BackupCodes>(
+    m_requestsExecutor->executeRequest<api::BackupCodes>(
         nx::network::http::Method::post,
         kTwoFactorAuthBackupCodes,
         request,
@@ -42,7 +41,7 @@ void TwoFactorAuthManager::validateTotpKey(
     const auto requestPath =
         nx::network::http::rest::substituteParameters(kTwoFactorAuthValidateKey, {key});
 
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::get,
         requestPath,
         request,
@@ -57,7 +56,7 @@ void TwoFactorAuthManager::validateBackupCode(
     const auto requestPath =
         nx::network::http::rest::substituteParameters(kTwoFactorAuthBackupCode, {code});
 
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::get,
         requestPath,
         request,
@@ -71,7 +70,7 @@ void TwoFactorAuthManager::deleteBackupCodes(
     const auto requestPath =
         nx::network::http::rest::substituteParameters(kTwoFactorAuthBackupCode, {codes});
 
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::delete_,
         requestPath,
         std::move(completionHandler));
@@ -79,14 +78,14 @@ void TwoFactorAuthManager::deleteBackupCodes(
 
 void TwoFactorAuthManager::deleteTotpKey(std::function<void(api::ResultCode)> completionHandler)
 {
-    executeRequest</*Output*/ void>(
+    m_requestsExecutor->executeRequest</*Output*/ void>(
         nx::network::http::Method::delete_, kTwoFactorAuthGetKey, std::move(completionHandler));
 }
 
 void TwoFactorAuthManager::getBackupCodes(
     std::function<void(api::ResultCode, api::BackupCodes)> completionHandler)
 {
-    executeRequest<api::BackupCodes>(
+    m_requestsExecutor->executeRequest<api::BackupCodes>(
         nx::network::http::Method::get,
         kTwoFactorAuthBackupCodes,
         std::move(completionHandler));

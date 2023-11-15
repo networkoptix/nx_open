@@ -33,6 +33,7 @@ public:
     static bool execSQLFile(const QString& fileName, AbstractDbConnection& dbConnection);
 
     /**
+     * Execute multiple SQL queries separated with semicolon.
      * Throws on failure.
      */
     static void execSQLScript(
