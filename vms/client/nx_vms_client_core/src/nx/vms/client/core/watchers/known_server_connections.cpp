@@ -85,7 +85,8 @@ void KnownServerConnections::Private::start()
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened, this,
         [this]()
         {
-            saveConnection(connection()->moduleInformation().id, connectionAddress());
+            if (!connection()->connectionInfo().isTemporary())
+                saveConnection(connection()->moduleInformation().id, connectionAddress());
         });
 }
 

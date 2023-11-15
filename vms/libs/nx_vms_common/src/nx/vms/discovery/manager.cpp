@@ -113,8 +113,11 @@ struct Manager::Private
                     resolver.removeFixedAddress(oldCloudHost);
 
                 // Add fixed address only if not a cloud address used for connection to avoid loop.
+                // It is impossible to fix a resolved address for DNS, since it is not always
+                // possible to establish a connection at such an address.
                 if (!newCloudHost.isEmpty()
                     && !resolver.isCloudHostname(module.endpoint.address.toString())
+                    && module.endpoint.address.isIpAddress()
                     && resolvedEndpoint.address.isIpAddress()
                     && resolvedEndpoint.port > 0)
                 {
