@@ -678,10 +678,6 @@ void ConnectActionsHandler::storeConnectionRecord(
     const nx::vms::api::ModuleInformation& info,
     ConnectionOptions options)
 {
-    // Recent connection address info is stored anyway.
-    core::appContext()->knownServerConnectionsWatcher()->saveConnection(info.id,
-        connectionInfo.address);
-
     /**
      * Note! We don't save connection to new systems. But we have to update
      * weights for any connection using its local id
@@ -692,6 +688,10 @@ void ConnectActionsHandler::storeConnectionRecord(
 
     if (connectionInfo.isTemporary())
         return;
+
+    // Recent connection address info is stored anyway.
+    core::appContext()->knownServerConnectionsWatcher()->saveConnection(info.id,
+        connectionInfo.address);
 
     const bool storePassword = options.testFlag(StorePassword);
     if (!storePassword && ::helpers::isNewSystem(info))
