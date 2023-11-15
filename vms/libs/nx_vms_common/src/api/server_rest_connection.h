@@ -176,6 +176,8 @@ public:
      */
     void updateCredentials(nx::network::http::Credentials credentials);
 
+    void setUserId(const QnUuid& userId);
+
     /**
      * Set timeouts for all http requests.
      */
