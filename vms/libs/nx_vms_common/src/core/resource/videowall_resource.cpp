@@ -109,12 +109,12 @@ void QnVideoWallResource::setTimelineEnabled(bool value)
     emit timelineEnabledChanged(::toSharedPointer(this));
 }
 
-Qn::Notifier QnVideoWallResource::storedItemAdded(const QnVideoWallItem &item)
+Qn::Notifier QnVideoWallResource::storedItemAdded(const QnVideoWallItem& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->itemAdded(r, item); };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item)
+Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallItem& item)
 {
     return [r = toSharedPointer(this), item]
         {
@@ -139,7 +139,7 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item)
             const auto& items = r->items()->getItems();
             const bool lastItemFromThisPc = std::all_of(
                 items.begin(), items.end(),
-                [pcUuid = item.pcUuid](const QnVideoWallItem &item)
+                [pcUuid = item.pcUuid](const QnVideoWallItem& item)
                 {
                     return item.pcUuid != pcUuid;
                 });
@@ -155,12 +155,12 @@ Qn::Notifier QnVideoWallResource::storedItemChanged(const QnVideoWallItem& item,
     return [r = toSharedPointer(this), item, oldItem]{ emit r->itemChanged(r, item, oldItem); };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemAdded(const QnVideoWallPcData &item)
+Qn::Notifier QnVideoWallResource::storedItemAdded(const QnVideoWallPcData& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->pcAdded(r, item); };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallPcData &item)
+Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallPcData& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->pcRemoved(r, item); };
 }
@@ -172,21 +172,21 @@ Qn::Notifier QnVideoWallResource::storedItemChanged(
     return [r = toSharedPointer(this), item]{ emit r->pcChanged(r, item); };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemAdded(const QnVideoWallMatrix &item)
+Qn::Notifier QnVideoWallResource::storedItemAdded(const QnVideoWallMatrix& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->matrixAdded(r, item); };
 }
 
-Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallMatrix &item)
+Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallMatrix& item)
 {
     return [r = toSharedPointer(this), item]{ emit r->matrixRemoved(r, item); };
 }
 
 Qn::Notifier QnVideoWallResource::storedItemChanged(
     const QnVideoWallMatrix& item,
-    const QnVideoWallMatrix& /*oldItem*/)
+    const QnVideoWallMatrix& oldItem)
 {
-    return [r = toSharedPointer(this), item]{ emit r->matrixChanged(r, item); };
+    return [r = toSharedPointer(this), item, oldItem]{ emit r->matrixChanged(r, item, oldItem); };
 }
 
 QList<QnUuid> QnVideoWallResource::onlineItems() const

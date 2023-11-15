@@ -70,6 +70,8 @@ public:
     QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall);
     QnUuid addVideoWallItem(const QnVideoWallResourcePtr& videoWall,
         const QnLayoutResourcePtr& itemLayout);
+    bool changeVideoWallItem(const QnVideoWallResourcePtr& videoWall, const QnUuid& itemId,
+        const QnLayoutResourcePtr& itemLayout);
 
     QnMediaServerResourcePtr addServer(nx::vms::api::ServerFlags additionalFlags = nx::vms::api::SF_None);
 
