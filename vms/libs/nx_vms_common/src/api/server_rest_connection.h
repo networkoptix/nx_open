@@ -578,10 +578,6 @@ public:
         Result<RestResultWithData<QList<nx::vms::api::ModuleInformation>>>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle getMediaServers(
-        Result<nx::vms::api::MediaServerDataList>::type callback,
-        QThread* targetThread = nullptr);
-
     /**
      * Request servers information.
      * @param onlyFreshInfo Flag to filter out Server Info from offline Servers. If `false` is

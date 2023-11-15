@@ -649,14 +649,6 @@ Handle ServerConnection::getModuleInformationAll(
     return executeGet("/api/moduleInformation", params, std::move(callback), targetThread);
 }
 
-Handle ServerConnection::getMediaServers(
-    Result<nx::vms::api::MediaServerDataList>::type callback,
-    QThread* targetThread)
-{
-    nx::network::rest::Params params;
-    return executeGet("/ec2/getMediaServers", params, std::move(callback), targetThread);
-}
-
 Handle ServerConnection::getServersInfo(
     bool onlyFreshInfo,
     Result<ErrorOrData<nx::vms::api::ServerInformationV1List>>::type&& callback,
