@@ -51,19 +51,6 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
                 reconnect();
         });
 
-    connect(
-        systemContext()->accessRightsManager(),
-        &nx::core::access::AbstractAccessRightsManager::ownAccessRightsChanged,
-        this,
-        [this](QSet<QnUuid> subjectIds)
-        {
-            if (!m_user || m_user->hasFlags(Qn::removed))
-                return;
-
-            if (systemContext()->accessSubjectHierarchy()->isWithin(m_user->getId(), subjectIds))
-                reconnect();
-        });
-
     connect(systemContext()->accessSubjectHierarchy(),
         &nx::core::access::SubjectHierarchy::changed, this,
         [this](
@@ -81,7 +68,7 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
             if (groupsWithChangedMembers.empty() && subjectsWithChangedParents.empty())
                 return;
 
-            if (updateCombinedAccessRights())
+            if (updateParentGroups())
                 reconnect();
         });
 
@@ -89,7 +76,7 @@ ContextCurrentUserWatcher::ContextCurrentUserWatcher(QObject *parent):
         &nx::vms::common::UserGroupManager::addedOrUpdated, this,
         [this](const nx::vms::api::UserGroupData&)
         {
-            if (updateCombinedAccessRights())
+            if (updateParentGroups())
                 reconnect();
         });
 }
@@ -98,38 +85,28 @@ ContextCurrentUserWatcher::~ContextCurrentUserWatcher()
 {
 }
 
-bool ContextCurrentUserWatcher::updateCombinedAccessRights()
+bool ContextCurrentUserWatcher::updateParentGroups()
 {
-    const auto accessRightsHash = combinedAccessRightsHash();
-    if (accessRightsHash == m_accessRightsHash)
+    const auto groups = allParentGroups();
+    if (groups == m_allParentGroups)
         return false;
 
-    m_accessRightsHash = accessRightsHash;
+    m_allParentGroups = groups;
 
     return true;
 }
 
-size_t ContextCurrentUserWatcher::combinedAccessRightsHash() const
+QSet<QnUuid> ContextCurrentUserWatcher::allParentGroups() const
 {
     if (!m_user)
-        return 0;
+        return {};
 
     const auto directParents = m_user->groupIds();
     QSet<QnUuid> parentIds = {directParents.begin(), directParents.end()};
     parentIds += systemContext()->accessSubjectHierarchy()->recursiveParents(parentIds);
     parentIds.insert(m_user->getId());
 
-    nx::core::access::ResourceAccessMap accessMap;
-
-    for (const auto& id: parentIds)
-    {
-        const auto ownAccessMap = systemContext()->accessRightsManager()->ownResourceAccessMap(id);
-
-        for (const auto& [resourceId, accessRights]: ownAccessMap.asKeyValueRange())
-            accessMap[resourceId] |= accessRights;
-    }
-
-    return qHashMulti(0, accessMap, parentIds);
+    return parentIds;
 }
 
 void ContextCurrentUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
@@ -154,7 +131,7 @@ void ContextCurrentUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
             &ContextCurrentUserWatcher::at_user_resourceChanged);
     }
 
-    m_accessRightsHash = combinedAccessRightsHash();
+    m_allParentGroups = allParentGroups();
 }
 
 void ContextCurrentUserWatcher::setUserPassword(const QString &password)
