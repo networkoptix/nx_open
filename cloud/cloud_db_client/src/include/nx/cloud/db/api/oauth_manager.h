@@ -8,6 +8,7 @@
 #include "oauth_data.h"
 
 #include <nx/network/http/http_types.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx::cloud::db::api {
 
