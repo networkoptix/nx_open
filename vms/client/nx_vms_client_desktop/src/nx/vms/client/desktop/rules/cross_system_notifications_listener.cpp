@@ -76,9 +76,7 @@ public:
 
                 auto urlCloud = nx::utils::Url::fromQUrl(cloudUrlHelper.mainUrl());
 
-                nx::network::SocketAddress address{urlCloud.host().toStdString(),
-                    (quint16) urlCloud.port(
-                        http::defaultPortForScheme(urlCloud.scheme().toStdString()))};
+                const auto address = nx::network::SocketAddress::fromUrl(urlCloud, true);
 
                 http::HttpHeaders httpHeaders;
                 websocket::addClientHeaders(&httpHeaders,

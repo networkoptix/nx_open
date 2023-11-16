@@ -7,6 +7,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 
+#include <nx/network/http/http_types.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/url.h>
 
@@ -573,12 +574,15 @@ SocketAddress SocketAddress::fromString(const std::string_view& str)
     return SocketAddress(str);
 }
 
-SocketAddress SocketAddress::fromUrl(const nx::utils::Url& url)
+SocketAddress SocketAddress::fromUrl(const nx::utils::Url& url, bool useDefaultPortFromScheme)
 {
     if (!url.isValid() || url.isLocalFile())
         return {};
 
-    return {url.host().toStdString(), quint16(url.port(0))};
+    const auto defaultPort = useDefaultPortFromScheme
+        ? nx::network::http::defaultPortForScheme(url.scheme().toStdString())
+        : 0;
+    return {url.host().toStdString(), quint16(url.port(defaultPort))};
 }
 
 std::pair<std::string_view, std::optional<int>> SocketAddress::split(
