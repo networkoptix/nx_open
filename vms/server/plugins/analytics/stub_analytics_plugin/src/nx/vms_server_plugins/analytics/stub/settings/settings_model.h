@@ -56,6 +56,11 @@ static const std::string kUrlId = "url";
 static const std::string kUseProxyId = "useProxy";
 static const std::string kUseDeviceCredentialsId = "authDevice";
 
+static const std::string kActiveCheckBoxForValueSetChangeId = "activeCheckBoxForValueSetChange";
+static const std::string kComboBoxForValueSetChangeId = "comboBoxForValueSetChange";
+static const std::string kComboBoxForValueSetChangeValuePermanent = "Permanent";
+static const std::string kComboBoxForValueSetChangeValueOptional = "Optional";
+
 static const std::string kParametersModel = /*suppress newline*/ 1 + R"json(
 {
     "type": "Settings",
@@ -795,6 +800,24 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                             "caption": "Use device credentials",
                             "defaultValue": false
                         }
+                    ]
+                },
+                {
+                    "type": "CheckBox",
+                    "name": ")json" + kActiveCheckBoxForValueSetChangeId + R"json(",
+                    "caption": "Add optional value to combo-box:",
+                    "defaultValue": true,
+                    "isActive": true
+                },
+                {
+                    "type": "ComboBox",
+                    "name": ")json" + kComboBoxForValueSetChangeId + R"json(",
+                    "caption": "Values",
+                    "defaultValue": ")json" + kComboBoxForValueSetChangeValuePermanent + R"json(",
+                    "range":
+                    [
+                        ")json" + kComboBoxForValueSetChangeValuePermanent + R"json(",
+                        ")json" + kComboBoxForValueSetChangeValueOptional + R"json("
                     ]
                 }
             ]
