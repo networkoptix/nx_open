@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "active_settings_rules.h"
+#include "nx/kit/debug.h"
 #include "settings_model.h"
 
 #include <string>
@@ -53,7 +54,9 @@ const std::map<
     {{kActiveComboBoxId, kShowAdditionalComboBoxValue}, showAdditionalComboBox},
     {{kActiveCheckBoxId, kShowAdditionalCheckBoxValue}, showAdditionalCheckBox},
     {{kActiveRadioButtonGroupId, kShowAdditionalRadioButtonValue}, showAdditionalRadioButton},
-    {{kActiveRadioButtonGroupId, kHideAdditionalRadioButtonValue}, hideAdditionalRadioButton}
+    {{kActiveRadioButtonGroupId, kHideAdditionalRadioButtonValue}, hideAdditionalRadioButton},
+    {{kActiveCheckBoxForValueSetChangeId, "true"}, addOptionalValueToComboBox},
+    {{kActiveCheckBoxForValueSetChangeId, "false"}, removeOptionalValueToComboBox}
 };
 
 const std::map<
@@ -225,6 +228,43 @@ void hideAdditionalRadioButton(Json* inOutModel, std::map<std::string, std::stri
         kActiveRadioButtonGroupId,
         kHideAdditionalRadioButtonValue,
         kDefaultActiveRadioButtonGroupValue);
+}
+
+void addOptionalValueToComboBox(Json* inOutModel, std::map<std::string, std::string>* /*inOutValues*/)
+{
+    Json::array items = inOutModel->array_items();
+    auto comboBoxIt = findSetting(kComboBoxForValueSetChangeId, &items);
+    if (!NX_KIT_ASSERT(comboBoxIt != items.end()))
+        return;
+
+    Json::object settingWithRange = comboBoxIt->object_items();
+
+    settingWithRange[kRange] = Json::array{
+        kComboBoxForValueSetChangeValuePermanent,
+        kComboBoxForValueSetChangeValueOptional,
+    };
+
+    *comboBoxIt = Json(settingWithRange);
+    *inOutModel = Json(items);
+}
+
+void removeOptionalValueToComboBox(Json* inOutModel, std::map<std::string, std::string>* inOutValues)
+{
+    Json::array items = inOutModel->array_items();
+    auto comboBoxIt = findSetting(kComboBoxForValueSetChangeId, &items);
+    if (!NX_KIT_ASSERT(comboBoxIt != items.end()))
+        return;
+
+    Json::object settingWithRange = comboBoxIt->object_items();
+
+    settingWithRange[kRange] = Json::array{
+        kComboBoxForValueSetChangeValuePermanent,
+    };
+
+    *comboBoxIt = Json(settingWithRange);
+    *inOutModel = Json(items);
+
+    (*inOutValues)[kComboBoxForValueSetChangeId] = kComboBoxForValueSetChangeValuePermanent;
 }
 
 void updateMinMaxSpinBoxes(
