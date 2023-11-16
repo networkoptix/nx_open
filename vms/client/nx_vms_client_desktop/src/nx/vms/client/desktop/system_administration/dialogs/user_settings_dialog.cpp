@@ -221,7 +221,10 @@ struct UserSettingsDialog::Private
 
     void updateStateLinkReady()
     {
-        linkReady = !getTrafficRelayUrl().isEmpty();
+        if (!q->systemSettings()->cloudSystemId().isEmpty())
+            linkReady = !getTrafficRelayUrl().isEmpty();
+        else
+            linkReady = true;
     }
 
     QDateTime serverDate(milliseconds msecsSinceEpoch) const

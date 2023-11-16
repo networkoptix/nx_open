@@ -250,7 +250,7 @@ public:
 
     static std::string_view trimIpV6(const std::string_view& str);
     static SocketAddress fromString(const std::string_view& str);
-    static SocketAddress fromUrl(const nx::utils::Url& url);
+    static SocketAddress fromUrl(const nx::utils::Url& url, bool useDefaultPortFromScheme = false);
 
     /**
      * Split host:port string to host and port. Port is optional.
