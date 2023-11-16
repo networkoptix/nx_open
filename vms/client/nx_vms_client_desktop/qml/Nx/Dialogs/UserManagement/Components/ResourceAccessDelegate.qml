@@ -257,7 +257,7 @@ Item
 
                     onClicked:
                     {
-                        if (!cell.relevant || !root.editingEnabled)
+                        if (!cell.relevant || !root.editingEnabled || cell !== root.hoveredCell)
                             return
 
                         root.triggered(cell)
