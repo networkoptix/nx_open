@@ -49,6 +49,14 @@ void updateMinMaxSpinBoxes(
     nx::kit::Json* inOutModel,
     std::map<std::string, std::string>* inOutValues);
 
+void addOptionalValueToComboBox(
+    nx::kit::Json* inOutModel,
+    std::map<std::string, std::string>* inOutValues);
+
+void removeOptionalValueToComboBox(
+    nx::kit::Json* inOutModel,
+    std::map<std::string, std::string>* inOutValues);
+
 } // namespace settings
 } // namespace stub
 } // namespace analytics
