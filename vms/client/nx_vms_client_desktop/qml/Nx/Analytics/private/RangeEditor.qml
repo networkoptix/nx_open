@@ -25,6 +25,8 @@ RowLayout
     {
         id: fromInput
 
+        color: ColorTheme.brightText
+        placeholderTextColor: ColorTheme.windowText
         placeholderText: selectedValue
             ? Utils.getValue(minimum, /*negative infinity*/ "-\u221E")
             : qsTr("from")
@@ -52,6 +54,8 @@ RowLayout
     {
         id: toInput
 
+        color: ColorTheme.brightText
+        placeholderTextColor: ColorTheme.windowText
         placeholderText: selectedValue
             ? Utils.getValue(maximum, /*infinity*/ "\u221E")
             : qsTr("to")

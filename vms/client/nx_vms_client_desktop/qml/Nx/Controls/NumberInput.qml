@@ -33,7 +33,9 @@ Item
         setValue(undefined)
     }
 
+    property alias color: textField.color
     property alias placeholderText: textField.placeholderText //< Displayed when value is undefined.
+    property alias placeholderTextColor: textField.placeholderTextColor
     property alias prefix: prefixText.text
     property alias background: textField.background
 

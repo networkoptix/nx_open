@@ -2,6 +2,7 @@
 
 import QtQuick 2.14
 
+import Nx 1.0
 import Nx.Controls 1.0
 
 TextField
@@ -9,6 +10,10 @@ TextField
     id: control
 
     property var selectedValue: undefined
+
+    color: ColorTheme.brightText
+    placeholderText: qsTr("Min 3 characters")
+    placeholderTextColor: ColorTheme.windowText
 
     onTextChanged:
         selectedValue = text || undefined
