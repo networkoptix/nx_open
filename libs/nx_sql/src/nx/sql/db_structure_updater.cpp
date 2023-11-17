@@ -190,21 +190,7 @@ void DbStructureUpdater::renameSchema(
 
 bool DbStructureUpdater::appliedScriptsTableExists(QueryContext* queryContext)
 {
-    auto query = queryContext->connection()->createQuery();
-    try
-    {
-        query->prepare(
-            "SELECT schema_name, script_name "
-            "FROM db_schema_applied_scripts");
-        query->exec();
-        return true;
-    }
-    catch (const Exception& e)
-    {
-        NX_VERBOSE(this, "db_schema_applied_scripts table presence check failed. %1", e.what());
-        // It is better to check error type here, but qt does not always return proper error code.
-        return false;
-    }
+    return queryContext->connection()->tableExist("db_schema_applied_scripts");
 }
 
 void DbStructureUpdater::createAppliedScriptsTable(QueryContext* queryContext)
@@ -244,19 +230,7 @@ void DbStructureUpdater::updateMaintenanceDbScheme(QueryContext* queryContext)
 
 bool DbStructureUpdater::dbVersionTableExists(QueryContext* queryContext)
 {
-    auto query = queryContext->connection()->createQuery();
-    try
-    {
-        query->prepare("SELECT count(*) FROM db_version_data");
-        query->exec();
-        return true;
-    }
-    catch (const Exception& e)
-    {
-        NX_VERBOSE(this, "db_version_data table presence check failed. %1", e.what());
-        // It is better to check error type here, but qt does not always return proper error code.
-        return false;
-    }
+    return queryContext->connection()->tableExist("db_version_data");
 }
 
 void DbStructureUpdater::syncDbVersionAndAppliedScriptsTables(QueryContext* queryContext)

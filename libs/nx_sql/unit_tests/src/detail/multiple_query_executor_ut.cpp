@@ -62,6 +62,11 @@ public:
         return nullptr;
     }
 
+    virtual bool tableExist(const std::string_view&) override
+    {
+        return true;
+    }
+
     int totalTransactionCount() const
     {
         return m_totalTransactionCount;
