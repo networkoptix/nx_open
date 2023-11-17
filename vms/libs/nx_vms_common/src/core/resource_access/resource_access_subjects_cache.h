@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <core/resource_access/resource_access_subject.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/common/system_context_aware.h>
 

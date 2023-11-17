@@ -2,13 +2,13 @@
 
 #include "base_resource_access_provider.h"
 
+#include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/user_resource.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/common/system_context.h>
@@ -84,7 +84,9 @@ bool BaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subjec
     const auto result = (iterator == m_accessibleResources.end())
         ? false
         : iterator->contains(resource->getId());
-    NX_VERBOSE(this, "%1 -> %2 is %3 from cache", subject, resource, result ? "accessible" : "inaccessible");
+    NX_TRACE(this, "%1 -> %2 is %3 from cache",
+        subject, resource, result ? "accessible" : "inaccessible");
+
     return result;
 }
 

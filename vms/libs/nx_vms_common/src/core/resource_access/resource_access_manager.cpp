@@ -251,13 +251,13 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubje
             std::shared_lock lock(m_permissionsCacheMutex);
             if (auto permissions = m_permissionsCache->permissions(subjectId, resourceId))
             {
-                NX_VERBOSE(this, "Cached permissions for %1 ower %2 is %3",
+                NX_TRACE(this, "Cached permissions for %1 ower %2 is %3",
                     subject, resource, *permissions);
                 return *permissions;
             }
         }
         const auto result = calculatePermissions(subject, resource);
-        NX_VERBOSE(this, "Caching calculated permissions for %1 ower %2 is %3",
+        NX_TRACE(this, "Caching calculated permissions for %1 ower %2 is %3",
             subject, resourceId, result);
         {
             std::unique_lock lock(m_permissionsCacheMutex);
