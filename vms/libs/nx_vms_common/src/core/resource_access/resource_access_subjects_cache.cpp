@@ -2,10 +2,10 @@
 
 #include "resource_access_subjects_cache.h"
 
+#include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/user_resource.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/common/system_context.h>
