@@ -13,7 +13,7 @@ bool LayoutItemData::operator==(const LayoutItemData& other) const
         // ResourceDescriptor::name comparision skipped intensionally as it is a temporary solution
         // for the cross system layouts which must not affects on LayoutItemData items comparision.
         // TODO: #mmalofeev remove this workaround when cross-system layouts will not
-        // require this property any more.
+        // require this property any more.
         && uuid == other.uuid
         && flags == other.flags
         && qFuzzyEquals(combinedGeometry, other.combinedGeometry)
