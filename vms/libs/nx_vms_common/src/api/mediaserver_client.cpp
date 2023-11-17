@@ -97,6 +97,78 @@ void MediaServerClient::setRequestTimeout(std::chrono::milliseconds timeout)
 }
 
 //-------------------------------------------------------------------------------------------------
+// /rest/ requests
+
+void MediaServerClient::getUsers(
+    std::function<void(ec2::ErrorCode, std::vector<nx::vms::api::UserModel>)> completionHandler)
+{
+    performAsyncCall(Method::get, "rest/v3/users", std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::getUsers(std::vector<nx::vms::api::UserModel>* result)
+{
+    using GetUsersAsyncFuncPointer = void (MediaServerClient::*)(
+        std::function<void(ec2::ErrorCode, std::vector<nx::vms::api::UserModel>)>);
+
+    return syncCallWrapper(
+        this, static_cast<GetUsersAsyncFuncPointer>(&MediaServerClient::getUsers), result);
+}
+
+void MediaServerClient::getUser(const QnUuid& id,
+    std::function<void(ec2::ErrorCode, nx::vms::api::UserModel)> completionHandler)
+{
+    performAsyncCall(
+        Method::get, "rest/v3/users/" + id.toSimpleStdString(), std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::getUser(const QnUuid& id, nx::vms::api::UserModel* result)
+{
+    using GetUsersAsyncFuncPointer = void (MediaServerClient::*)(
+        const QnUuid&, std::function<void(ec2::ErrorCode, nx::vms::api::UserModel)>);
+
+    return syncCallWrapper(
+        this, static_cast<GetUsersAsyncFuncPointer>(&MediaServerClient::getUser), id, result);
+}
+
+void MediaServerClient::saveUser(
+    const nx::vms::api::UserModel& request,
+    std::function<void(ec2::ErrorCode)> completionHandler)
+{
+    QnJsonContext context;
+    context.setSerializeMapToObject(true);
+    QJsonValue serialized;
+    QJson::serialize(&context, request, &serialized);
+    performAsyncCall(Method::put,
+        "rest/v3/users/" + request.id.toSimpleStdString(), serialized, std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::saveUser(const nx::vms::api::UserModel& request)
+{
+    using SaveUserAsyncFuncPointer = void (MediaServerClient::*)(
+        const nx::vms::api::UserModel& request, std::function<void(ec2::ErrorCode)>);
+
+    return syncCallWrapper(
+        this, static_cast<SaveUserAsyncFuncPointer>(&MediaServerClient::saveUser), request);
+}
+
+void MediaServerClient::removeUser(
+    const QnUuid& id, std::function<void(ec2::ErrorCode)> completionHandler)
+{
+    performAsyncCall(
+        Method::delete_, "rest/v3/users/" + id.toSimpleStdString(), std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::removeUser(const QnUuid& id)
+{
+    using Ec2RemoveUserAsyncFuncPointer =
+        void (MediaServerClient::*)(const QnUuid& id, std::function<void(ec2::ErrorCode)>);
+
+    return syncCallWrapper(
+        this, static_cast<Ec2RemoveUserAsyncFuncPointer>(&MediaServerClient::removeUser), id);
+}
+
+
+//-------------------------------------------------------------------------------------------------
 // /api/ requests
 
 void MediaServerClient::getModuleInformation(
@@ -129,66 +201,10 @@ void MediaServerClient::deprecatedMergeSystems(
 //-------------------------------------------------------------------------------------------------
 // /ec2/ requests
 
-void MediaServerClient::ec2GetUsers(
-    std::function<void(ec2::ErrorCode, nx::vms::api::UserDataList)> completionHandler)
-{
-    performAsyncEc2Call(Method::get, "ec2/getUsers", std::move(completionHandler));
-}
-
-ec2::ErrorCode MediaServerClient::ec2GetUsers(nx::vms::api::UserDataList* result)
-{
-    using Ec2GetUsersAsyncFuncPointer =
-        void(MediaServerClient::*)(
-            std::function<void(ec2::ErrorCode, nx::vms::api::UserDataList)>);
-
-    return syncCallWrapper(
-        this,
-        static_cast<Ec2GetUsersAsyncFuncPointer>(&MediaServerClient::ec2GetUsers),
-        result);
-}
-
-void MediaServerClient::ec2SaveUser(
-    const nx::vms::api::UserData& request,
-    std::function<void(ec2::ErrorCode)> completionHandler)
-{
-    performAsyncEc2Call(Method::post, "ec2/saveUser", request, std::move(completionHandler));
-}
-
-ec2::ErrorCode MediaServerClient::ec2SaveUser(const nx::vms::api::UserData& request)
-{
-    using Ec2SaveUserAsyncFuncPointer =
-        void(MediaServerClient::*)(
-            const nx::vms::api::UserData& request,
-            std::function<void(ec2::ErrorCode)>);
-
-    return syncCallWrapper(
-        this,
-        static_cast<Ec2SaveUserAsyncFuncPointer>(&MediaServerClient::ec2SaveUser),
-        request);
-}
-
-void MediaServerClient::ec2RemoveUser(
-    const QnUuid& id,
-    std::function<void(ec2::ErrorCode)> completionHandler)
-{
-    performAsyncEc2Call(Method::post, "ec2/removeUser", nx::vms::api::IdData(id), std::move(completionHandler));
-}
-
-ec2::ErrorCode MediaServerClient::ec2RemoveUser(const QnUuid& id)
-{
-    using Ec2RemoveUserAsyncFuncPointer =
-        void(MediaServerClient::*)(const QnUuid& id, std::function<void(ec2::ErrorCode)>);
-
-    return syncCallWrapper(
-        this,
-        static_cast<Ec2RemoveUserAsyncFuncPointer>(&MediaServerClient::ec2RemoveUser),
-        id);
-}
-
 void MediaServerClient::ec2GetMediaServersEx(
     std::function<void(ec2::ErrorCode, nx::vms::api::MediaServerDataExList)> completionHandler)
 {
-    performAsyncEc2Call(Method::get, "ec2/getMediaServersEx", std::move(completionHandler));
+    performAsyncCall(Method::get, "ec2/getMediaServersEx", std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2GetMediaServersEx(
@@ -209,7 +225,7 @@ void MediaServerClient::ec2SaveMediaServer(
     const nx::vms::api::MediaServerData& request,
     std::function<void(ec2::ErrorCode)> completionHandler)
 {
-    performAsyncEc2Call(Method::post, "ec2/saveMediaServer", request, std::move(completionHandler));
+    performAsyncCall(Method::post, "ec2/saveMediaServer", request, std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2SaveMediaServer(
@@ -242,7 +258,7 @@ void MediaServerClient::ec2GetStorages(
         requestPath = "ec2/getStorages";
     }
 
-    performAsyncEc2Call(Method::get, requestPath, std::move(completionHandler));
+    performAsyncCall(Method::get, requestPath, std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2GetStorages(
@@ -265,7 +281,7 @@ ec2::ErrorCode MediaServerClient::ec2GetStorages(
 void MediaServerClient::ec2GetSettings(
     std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)> completionHandler)
 {
-    performAsyncEc2Call(Method::get, "ec2/getSettings", std::move(completionHandler));
+    performAsyncCall(Method::get, "ec2/getSettings", std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2GetSettings(nx::vms::api::ResourceParamDataList* result)
@@ -284,7 +300,7 @@ void MediaServerClient::ec2SetResourceParams(
     const nx::vms::api::ResourceParamWithRefDataList& inputData,
     std::function<void(ec2::ErrorCode)> completionHandler)
 {
-    performAsyncEc2Call(Method::post, "ec2/setResourceParams", inputData, std::move(completionHandler));
+    performAsyncCall(Method::post, "ec2/setResourceParams", inputData, std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2SetResourceParams(
@@ -306,7 +322,7 @@ void MediaServerClient::ec2GetResourceParams(
     const QnUuid& resourceId,
     std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)> completionHandler)
 {
-    performAsyncEc2Call(
+    performAsyncCall(
         Method::get,
         nx::format("ec2/getResourceParams?id=%1")
             .arg(resourceId.toSimpleString().toStdString()).toStdString(),
@@ -333,7 +349,7 @@ ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
 void MediaServerClient::ec2GetSystemMergeHistory(std::function<
     void(ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)> completionHandler)
 {
-    performAsyncEc2Call(Method::get, "ec2/getSystemMergeHistory", std::move(completionHandler));
+    performAsyncCall(Method::get, "ec2/getSystemMergeHistory", std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2GetSystemMergeHistory(
@@ -364,7 +380,7 @@ void MediaServerClient::ec2AnalyticsLookupObjectTracks(
         requestPath += lit("?") + queryParams.toUrlQuery().toString(QUrl::FullyDecoded);
     }
 
-    performAsyncEc2Call(
+    performAsyncCall(
         Method::get,
         requestPath.toStdString(),
         std::move(completionHandler));
@@ -389,7 +405,7 @@ ec2::ErrorCode MediaServerClient::ec2AnalyticsLookupObjectTracks(
 void MediaServerClient::ec2DumpDatabase(
     std::function<void(ec2::ErrorCode, nx::vms::api::DatabaseDumpData)> completionHandler)
 {
-    performAsyncEc2Call(
+    performAsyncCall(
         Method::get,
         "ec2/dumpDatabase",
         std::move(completionHandler));
@@ -411,7 +427,7 @@ void MediaServerClient::ec2RestoreDatabase(
     const nx::vms::api::DatabaseDumpData& dump,
     std::function<void(ec2::ErrorCode)> completionHandler)
 {
-    performAsyncEc2Call(Method::post, "ec2/restoreDatabase", std::move(dump), std::move(completionHandler));
+    performAsyncCall(Method::post, "ec2/restoreDatabase", std::move(dump), std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2RestoreDatabase(
@@ -431,7 +447,7 @@ ec2::ErrorCode MediaServerClient::ec2RestoreDatabase(
 void MediaServerClient::ec2GetCameras(
     std::function<void(ec2::ErrorCode, nx::vms::api::CameraDataList)> completionHandler)
 {
-    performAsyncEc2Call(Method::get, "/ec2/getCameras", std::move(completionHandler));
+    performAsyncCall(Method::get, "/ec2/getCameras", std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2GetCameras(
@@ -471,8 +487,20 @@ ec2::ErrorCode MediaServerClient::toEc2ErrorCode(
 {
     if (systemErrorCode != SystemError::noError)
         return ec2::ErrorCode::ioError;
-    if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
-        return ec2::ErrorCode::forbidden;
+    if (nx::network::http::StatusCode::isSuccessCode(statusCode))
+        return ec2::ErrorCode::ok;
 
-    return ec2::ErrorCode::ok;
+    switch (statusCode)
+    {
+        case nx::network::http::StatusCode::badRequest:
+            return ec2::ErrorCode::badRequest;
+        case nx::network::http::StatusCode::forbidden:
+            return ec2::ErrorCode::forbidden;
+        case nx::network::http::StatusCode::notFound:
+            return ec2::ErrorCode::notFound;
+        case nx::network::http::StatusCode::unauthorized:
+            return ec2::ErrorCode::unauthorized;
+        default:
+            return ec2::ErrorCode::failure;
+    }
 }
