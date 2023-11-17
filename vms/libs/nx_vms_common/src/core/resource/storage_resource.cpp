@@ -251,7 +251,7 @@ nx::vms::api::StoragePersistentFlags QnStorageResource::persistentStatusFlags() 
 
 void QnStorageResource::setStorageArchiveMode(nx::vms::api::StorageArchiveMode value)
 {
-    setProperty(ResourcePropertyKey::Server::kOwnArchiveDirectoryOnly,
+    setProperty(ResourcePropertyKey::kStorageArchiveMode,
         value == kStorageArchiveModeDefaultValue
             ? QString()
             : QString::fromStdString(nx::reflect::toString(value))
@@ -261,6 +261,6 @@ void QnStorageResource::setStorageArchiveMode(nx::vms::api::StorageArchiveMode v
 nx::vms::api::StorageArchiveMode QnStorageResource::storageArchiveMode() const
 {
     return nx::reflect::fromString<nx::vms::api::StorageArchiveMode>(
-        getProperty(ResourcePropertyKey::Server::kOwnArchiveDirectoryOnly).toStdString(),
+        getProperty(ResourcePropertyKey::kStorageArchiveMode).toStdString(),
         kStorageArchiveModeDefaultValue);
 }
