@@ -29,6 +29,14 @@ void SqlQuery::setForwardOnly(bool val)
 
 void SqlQuery::prepare(const std::string_view& query)
 {
+    m_unpreparedQuery.reset();
+
+    if (!shouldPrepare(query))
+    {
+        m_unpreparedQuery = QString::fromUtf8(query);
+        return;
+    }
+
     if (!m_sqlQuery.prepare(QString::fromUtf8(query.data(), query.size())))
     {
         NX_DEBUG(this, "Error preparing query %1. %2", query, m_sqlQuery.lastError().text());
@@ -72,11 +80,34 @@ void SqlQuery::bindValue(int pos, const std::string_view& value) noexcept
 
 void SqlQuery::exec()
 {
+    exec(std::nullopt);
+}
+
+void SqlQuery::exec(const std::string_view& query)
+{
+    exec(std::optional<std::string_view>(query));
+}
+
+void SqlQuery::exec(const std::optional<std::string_view>& query)
+{
     using namespace std::chrono;
 
     const auto t0 = steady_clock::now();
 
-    const auto ok = m_sqlQuery.exec();
+    bool ok;
+
+    if (query)
+    {
+        ok = m_sqlQuery.exec(QString::fromUtf8(query->data(), query->size()));
+    }
+    else if (m_unpreparedQuery)
+    {
+        ok = m_sqlQuery.exec(*m_unpreparedQuery);
+    }
+    else
+    {
+        ok = m_sqlQuery.exec();
+    }
 
     if (ok)
     {
@@ -90,6 +121,14 @@ void SqlQuery::exec()
 
         throw Exception(getLastError());
     }
+}
+
+bool SqlQuery::shouldPrepare(const std::string_view& query)
+{
+    auto stmt = QString::fromUtf8(query);
+    return !stmt.startsWith("ALTER", Qt::CaseInsensitive)
+        && !stmt.startsWith("CREATE", Qt::CaseInsensitive)
+        && !stmt.startsWith("DROP", Qt::CaseInsensitive);
 }
 
 bool SqlQuery::next()

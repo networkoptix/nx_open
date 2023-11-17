@@ -101,6 +101,11 @@ public:
         return m_delegate->impl();
     }
 
+    virtual void exec(const std::string_view& query) override
+    {
+        m_delegate->exec(query);
+    }
+
 private:
     std::unique_ptr<AbstractSqlQuery> m_delegate;
 };
@@ -159,6 +164,11 @@ public:
     virtual QSqlDatabase* qtSqlConnection()
     {
         return m_delegate->qtSqlConnection();
+    }
+
+    virtual bool tableExist(const std::string_view& tableName)
+    {
+        return m_delegate->tableExist(tableName);
     }
 
 private:

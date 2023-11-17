@@ -35,6 +35,7 @@ public:
     virtual void bindValue(int pos, const std::string_view& value) noexcept = 0;
 
     virtual void exec() = 0;
+    virtual void exec(const std::string_view& query) = 0;
 
     virtual bool next() = 0;
 
@@ -100,6 +101,7 @@ public:
     virtual void bindValue(int pos, const std::string_view& value) noexcept override;
 
     virtual void exec() override;
+    virtual void exec(const std::string_view& query) override;
 
     virtual bool next() override;
     virtual QVariant value(int index) const override;
@@ -116,6 +118,13 @@ public:
 
 private:
     QSqlQuery m_sqlQuery;
+
+    std::optional<QString> m_unpreparedQuery;
+
+private:
+    void exec(const std::optional<std::string_view>& query);
+
+    bool shouldPrepare(const std::string_view& query);
 
     DBResult getLastError();
 };

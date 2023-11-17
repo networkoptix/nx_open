@@ -30,6 +30,8 @@ public:
 
     virtual QSqlDatabase* qtSqlConnection() override;
 
+    virtual bool tableExist(const std::string_view& tableName) override;
+
 private:
     QString m_connectionName;
     QSqlDatabase m_connection;

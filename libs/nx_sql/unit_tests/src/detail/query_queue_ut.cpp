@@ -122,6 +122,11 @@ public:
     {
         return nullptr;
     }
+
+    virtual bool tableExist(const std::string_view&)
+    {
+        return true;
+    }
 };
 
 } // namespace
