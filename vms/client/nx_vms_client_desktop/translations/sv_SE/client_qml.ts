@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Lägg till post</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Avancerade inställningar</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,11 +24,11 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Inloggningsattribut</translation>
     </message>
     <message>
       <source>Allow digest authentication for imported users</source>
-      <translation type="unfinished">Allow digest authentication for imported users</translation>
+      <translation>Tillåt digest -autentisering för importerade användare</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -36,11 +36,11 @@
     </message>
     <message>
       <source>Name Attribute</source>
-      <translation type="unfinished">Name Attribute</translation>
+      <translation>Namnattribut</translation>
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Medlemskap</translation>
     </message>
     <message>
       <source>Misc</source>
@@ -64,11 +64,11 @@
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>För att aktivera digestautentisering för LDAP-användare som redan har lagts till i VMS-databasen, måste du aktivera det direkt i dessa användares&apos; -inställningar.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>För att inaktivera digestautentisering för LDAP-användare som redan har lagts till i WMS-databasen, du måste inaktivera det direkt i dessa användare&apos; inställningar.</translation>
     </message>
   </context>
   <context>
@@ -247,7 +247,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API-integrationer</translation>
     </message>
   </context>
   <context>
@@ -261,23 +261,23 @@
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>API-integrationer</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>API-integrationer interagerar med %1 Server via REST API och utbyter metadata</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Nya förfrågningar</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>API Integration kan aktiveras efter verifiering av koden som mottagits från Integration provider. Nya förfrågningar kan inaktiveras för att förhindra oönskade interaktioner.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Aktivera %1?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
