@@ -24,17 +24,11 @@ public:
 class SinglePointEvent: public BaseEvent
 {
     Q_OBJECT
-
     Q_PROPERTY(QPointF localPosition MEMBER localPosition CONSTANT)
     Q_PROPERTY(QPointF windowPosition MEMBER windowPosition CONSTANT)
     Q_PROPERTY(QPointF screenPosition MEMBER screenPosition CONSTANT)
     Q_PROPERTY(QPoint position READ position CONSTANT)
     Q_PROPERTY(QPoint globalPosition READ globalPosition CONSTANT)
-
-    Q_PROPERTY(int buttons MEMBER buttons CONSTANT)
-    Q_PROPERTY(int modifiers MEMBER modifiers CONSTANT)
-
-    Q_PROPERTY(bool accepted MEMBER accepted)
 
 public:
     SinglePointEvent(const QSinglePointEvent* event);
@@ -55,6 +49,8 @@ class MouseEvent: public SinglePointEvent
 {
     Q_OBJECT
     Q_PROPERTY(int button MEMBER button CONSTANT)
+    Q_PROPERTY(int buttons MEMBER buttons CONSTANT)
+    Q_PROPERTY(int modifiers MEMBER modifiers CONSTANT)
 
 public:
     MouseEvent(const QMouseEvent* event);
@@ -63,7 +59,6 @@ public:
 class WheelEvent: public SinglePointEvent
 {
     Q_OBJECT
-
     Q_PROPERTY(QPoint angleDelta MEMBER angleDelta CONSTANT)
     Q_PROPERTY(QPoint pixelDelta MEMBER pixelDelta CONSTANT)
     Q_PROPERTY(bool inverted MEMBER inverted CONSTANT)
@@ -76,15 +71,12 @@ public:
     bool inverted = false;
 };
 
-class HoverEvent: public BaseEvent
+class HoverEvent: public SinglePointEvent
 {
     Q_OBJECT
-    Q_PROPERTY(QPoint position MEMBER position CONSTANT)
 
 public:
     HoverEvent(const QHoverEvent* event);
-
-    QPoint position;
 };
 
 class KeyEvent: public BaseEvent

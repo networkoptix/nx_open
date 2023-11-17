@@ -13,14 +13,17 @@ Instrument
 
     hoverEnabled: true
 
-    onHoverEnter:
+    onHoverEnter: (event) =>
+    {
+        d.position = event.localPosition
         d.hovered = true
+    }
 
     onHoverLeave:
         d.hovered = false
 
     onHoverMove: (event) =>
-        d.position = event.position
+        d.position = event.localPosition
 
     readonly property QtObject d: QtObject
     {
