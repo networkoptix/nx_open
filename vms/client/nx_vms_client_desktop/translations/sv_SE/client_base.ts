@@ -9055,11 +9055,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation type="unfinished">Disconnect LDAP server?</translation>
+      <translation>Koppla bort LDAP-servern?</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted from the system.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Alla LDAP-användare och grupper kommer att tas bort från systemet.&lt;br&gt;&lt;br&gt;LDAP-inställningar kommer också att raderas.</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -9067,7 +9067,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Reset Settings</source>
-      <translation type="unfinished">Reset Settings</translation>
+      <translation>Återställ inställningar</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -9083,11 +9083,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
-      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+      <translation>Ta bort befintliga LDAP-användare och grupper?</translation>
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
-      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+      <translation>Det verkar som om du har ändrat LDAP-server. Det rekommenderas att ta bort alla befintliga LDAP-användare och grupper innan du importerar användare och grupper från en ny LDAP-server.</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -9103,15 +9103,15 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
-      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+      <translation>Synkronisera LDAP-användare och grupper</translation>
     </message>
     <message>
       <source>Synchronize</source>
-      <translation type="unfinished">Synchronize</translation>
+      <translation>Synkronisera</translation>
     </message>
     <message>
       <source>Connection OK</source>
-      <translation type="unfinished">Connection OK</translation>
+      <translation>Anslutning OK</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -9243,7 +9243,7 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
     </message>
     <message>
       <source>The provided link is not valid or has expired</source>
-      <translation type="unfinished">The provided link is not valid or has expired</translation>
+      <translation>Den angivna länken är inte giltig eller har löpt ut</translation>
     </message>
   </context>
   <context>
@@ -9286,15 +9286,15 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
     </message>
     <message>
       <source>Default Logging level</source>
-      <translation type="unfinished">Default Logging level</translation>
+      <translation>Standard Loggningsnivå</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to “info”</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to “info”</translation>
+      <translation>Loggningsnivå som inte är standard. Vi rekommenderar att du ställer in den till ”info”</translation>
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
-      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+      <translation>Loggningsnivån försämrar systemets prestanda</translation>
     </message>
   </context>
   <context>
@@ -9372,7 +9372,7 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
     <message>
       <source>Network request failed</source>
-      <translation type="unfinished">Network request failed</translation>
+      <translation>Nätverksbegäran misslyckades</translation>
     </message>
   </context>
   <context>
@@ -9413,7 +9413,7 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
+      <translation>Ärvd från %1</translation>
     </message>
   </context>
   <context>
@@ -9902,7 +9902,7 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>
-      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+      <translation>Laddar upp offlineuppdateringspaket till servrar...</translation>
     </message>
   </context>
   <context>
@@ -10002,11 +10002,11 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <name>nx::vms::client::desktop::ParentGroupsProvider</name>
     <message>
       <source>LDAP group membership is managed in LDAP</source>
-      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
+      <translation>Medlemskap i LDAP-gruppen hanteras i LDAP</translation>
     </message>
     <message>
       <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
+      <translation>Ärvd från %1</translation>
     </message>
   </context>
   <context>
@@ -10123,7 +10123,7 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <name>nx::vms::client::desktop::PlaybackPositionItem</name>
     <message>
       <source>video is paused</source>
-      <translation type="unfinished">video is paused</translation>
+      <translation>videon är pausad</translation>
     </message>
   </context>
   <context>
