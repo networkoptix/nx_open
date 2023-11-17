@@ -106,12 +106,13 @@ Window
         anchors.bottom: parent.bottom
         anchors.top: tabBar.bottom
 
-        Item
+        Rectangle
         {
             id: filtersPanel
 
             width: Metrics.kMinimumFilterColumnWidth
             height: content.height
+            color: ColorTheme.colors.dark4
 
             Scrollable
             {

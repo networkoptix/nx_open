@@ -113,12 +113,6 @@ Column
                 icon.height: 20
                 Layout.alignment: Qt.AlignRight
 
-                background: Rectangle
-                {
-                    radius: 2
-                    color: clearButton.hovered ? ColorTheme.colors.dark6 : ColorTheme.colors.dark5
-                }
-
                 onClicked:
                     panel.clearRequested()
             }
