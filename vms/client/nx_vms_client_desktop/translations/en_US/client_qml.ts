@@ -27,15 +27,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow digest authentication for imported users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name Attribute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -44,10 +36,6 @@
     </message>
     <message>
         <source>Misc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Group Attribute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -68,6 +56,14 @@
     </message>
     <message>
         <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow insecure (digest) authentication for imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group Members Attribute</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1613,11 +1609,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Advanced Mode On</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Advanced Mode Off</source>
+        <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
+        <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1751,6 +1744,10 @@ to activate PTZ</source>
     </message>
     <message>
         <source>Alt + Click to follow object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
