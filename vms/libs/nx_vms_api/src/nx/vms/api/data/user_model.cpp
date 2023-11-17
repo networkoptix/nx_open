@@ -45,7 +45,7 @@ UserDataEx UserModelBase::toUserData() &&
     if (externalId)
         user.externalId = std::move(*externalId);
     user.attributes = attributes;
-    if (!isHttpDigestEnabled)
+    if (!isHttpDigestEnabled && user.type != UserType::cloud)
         user.digest = UserData::kHttpIsDisabledStub;
     if (isHttpDigestEnabled && user.digest == UserData::kHttpIsDisabledStub)
         user.digest.clear();
@@ -60,7 +60,8 @@ UserModelBase UserModelBase::fromUserData(UserData&& baseData)
     model.type = std::move(baseData.type);
     model.fullName = std::move(baseData.fullName);
     model.email = std::move(baseData.email);
-    model.isHttpDigestEnabled = (baseData.digest != UserData::kHttpIsDisabledStub);
+    model.isHttpDigestEnabled = baseData.digest != UserData::kHttpIsDisabledStub
+        && baseData.digest != UserData::kCloudPasswordStub;
     model.isEnabled = std::move(baseData.isEnabled);
     if (!baseData.externalId.dn.isEmpty())
         model.externalId = std::move(baseData.externalId);

@@ -30,7 +30,7 @@
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/system_merge_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
-#include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/data/user_model.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/nxfusion_wrapper.h>
 
@@ -79,6 +79,26 @@ public:
     void setRequestTimeout(std::chrono::milliseconds timeout);
 
     //---------------------------------------------------------------------------------------------
+    // /rest/ requests
+
+    void getUsers(
+        std::function<void(ec2::ErrorCode, std::vector<nx::vms::api::UserModel>)> completionHandler);
+    ec2::ErrorCode getUsers(std::vector<nx::vms::api::UserModel>* result);
+
+    void getUser(
+        const QnUuid& id,
+        std::function<void(ec2::ErrorCode, nx::vms::api::UserModel)> completionHandler);
+    ec2::ErrorCode getUser(const QnUuid& id, nx::vms::api::UserModel* result);
+
+    void saveUser(
+        const nx::vms::api::UserModel& request,
+        std::function<void(ec2::ErrorCode)> completionHandler);
+    ec2::ErrorCode saveUser(const nx::vms::api::UserModel& request);
+
+    void removeUser(const QnUuid& id, std::function<void(ec2::ErrorCode)> completionHandler);
+    ec2::ErrorCode removeUser(const QnUuid& id);
+
+    //---------------------------------------------------------------------------------------------
     // /api/ requests
 
     void getModuleInformation(
@@ -93,20 +113,6 @@ public:
 
     //---------------------------------------------------------------------------------------------
     // /ec2/ requests
-
-    void ec2GetUsers(
-        std::function<void(ec2::ErrorCode, nx::vms::api::UserDataList)> completionHandler);
-    ec2::ErrorCode ec2GetUsers(nx::vms::api::UserDataList* result);
-
-    void ec2SaveUser(
-        const nx::vms::api::UserData& request,
-        std::function<void(ec2::ErrorCode)> completionHandler);
-    ec2::ErrorCode ec2SaveUser(const nx::vms::api::UserData& request);
-
-    void ec2RemoveUser(
-        const QnUuid& id,
-        std::function<void(ec2::ErrorCode)> completionHandler);
-    ec2::ErrorCode ec2RemoveUser(const QnUuid& id);
 
     void ec2GetMediaServersEx(
         std::function<void(ec2::ErrorCode, nx::vms::api::MediaServerDataExList)> completionHandler);
@@ -251,7 +257,7 @@ protected:
     }
 
     template<typename Input, typename ... Output>
-    void performGetRequest(
+    void performRequest(
         nx::network::http::Method httpMethod,
         const std::string& requestPath,
         const Input& inputData,
@@ -262,7 +268,7 @@ protected:
     {
         using ActualOutputType = nx::utils::tuple_first_element_t<std::tuple<Output...>>;
 
-        performGetRequest(
+        performRequest(
             httpMethod,
             [&inputData, this](const nx::utils::Url& url, nx::network::http::Credentials credentials)
             {
@@ -275,7 +281,7 @@ protected:
     }
 
     template<typename ... Output>
-    void performGetRequest(
+    void performRequest(
         nx::network::http::Method httpMethod,
         const std::string& requestPath,
         std::function<void(
@@ -285,7 +291,7 @@ protected:
     {
         using ActualOutputType = nx::utils::tuple_first_element_t<std::tuple<Output...>>;
 
-        performGetRequest(
+        performRequest(
             httpMethod,
             [this](const nx::utils::Url& url, nx::network::http::Credentials credentials)
             {
@@ -298,7 +304,7 @@ protected:
     }
 
     template<typename CreateHttpClientFunc, typename ... Output>
-    void performGetRequest(
+    void performRequest(
         nx::network::http::Method httpMethod,
         CreateHttpClientFunc createHttpClientFunc,
         std::string requestPath,
@@ -420,7 +426,7 @@ protected:
         const Input& input,
         std::function<void(nx::network::rest::JsonResult)> completionHandler)
     {
-        performGetRequest<Input, nx::network::rest::JsonResult>(
+        performRequest<Input, nx::network::rest::JsonResult>(
             httpMethod,
             requestName,
             input,
@@ -449,7 +455,7 @@ protected:
         const std::string& requestName,
         std::function<void(nx::network::rest::JsonResult, Output...)> completionHandler)
     {
-        performGetRequest<nx::network::rest::JsonResult>(
+        performRequest<nx::network::rest::JsonResult>(
             httpMethod,
             requestName,
             std::function<void(
@@ -503,13 +509,13 @@ protected:
     }
 
     template<typename Input, typename ... Output>
-    void performAsyncEc2Call(
+    void performAsyncCall(
         nx::network::http::Method httpMethod,
         const std::string& requestName,
         const Input& request,
         std::function<void(ec2::ErrorCode, Output...)> completionHandler)
     {
-        performGetRequest<Output...>(
+        performRequest<Output...>(
             httpMethod,
             requestName,
             request,
@@ -526,12 +532,12 @@ protected:
     }
 
     template<typename ... Output>
-    void performAsyncEc2Call(
+    void performAsyncCall(
         nx::network::http::Method httpMethod,
         const std::string& requestName,
         std::function<void(ec2::ErrorCode, Output...)> completionHandler)
     {
-        performGetRequest<Output...>(
+        performRequest<Output...>(
             httpMethod,
             requestName,
             std::function<void(SystemError::ErrorCode, nx::network::http::StatusCode::Value, Output...)>(
