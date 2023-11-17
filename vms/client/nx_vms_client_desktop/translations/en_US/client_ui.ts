@@ -1851,6 +1851,18 @@
         <source>Take system name and settings from:</source>
         <translation></translation>
     </message>
+    <message>
+        <source>warn icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Warning label&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiServerUpdatesWidget</name>

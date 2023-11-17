@@ -1806,6 +1806,10 @@
         <comment>%1 is a company name</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Organization Id</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TimeFormat</name>
@@ -2533,26 +2537,6 @@
         <source>LDAP Sync Issue</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Failed to connect to LDAP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to complete sync within a %1 timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to complete sync within a given timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There are zero LDAP users in VMS after sync</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some LDAP users were not found in LDAP</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
@@ -2560,6 +2544,27 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Failed to connect to the LDAP server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to complete the sync within a %1 timeout.</source>
+        <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to complete the sync within a given timeout.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No user accounts on LDAP server match the synchronization settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some LDAP users or groups were not found in the LDAP database.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

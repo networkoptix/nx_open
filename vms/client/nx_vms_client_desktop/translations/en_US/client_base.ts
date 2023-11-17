@@ -8281,20 +8281,24 @@ We recommend you not to open this integration. If you understand the risks, you 
 <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
-        <source>This camera requires password to be set up.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Some of selected cameras require password to be set up.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ask your system administrator to do it.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Set Password</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>This camera requires password to be set up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some of selected cameras require password to be set up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9531,6 +9535,14 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
         <source>Failed to merge Systems</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>We recommend that you consult with %1 before proceeding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>support</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11553,10 +11565,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
 <context>
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
-        <source>Request error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Invalid JSON</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11577,11 +11585,39 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown error - code %1</source>
+        <source>Connection failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection failure</source>
+        <source>Invalid encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid encoding charset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server error code %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reserved error code %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error code %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
