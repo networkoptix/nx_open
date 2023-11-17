@@ -98,7 +98,7 @@ Item
         id: cellsRow
 
         x: mainDelegate.width
-        spacing: 1
+        spacing: 0
 
         property Item hoveredCell: null
 
@@ -112,8 +112,8 @@ Item
                 {
                     id: cell
 
-                    width: root.columnWidth - 1
-                    height: root.height
+                    width: root.columnWidth
+                    height: root.height + 1
 
                     hoverEnabled: true
                     acceptedButtons: Qt.LeftButton
@@ -269,6 +269,8 @@ Item
                         id: backgroundRect
 
                         anchors.fill: cell
+                        anchors.rightMargin: 1
+                        anchors.bottomMargin: 1
 
                         color: cell.backgroundColor
                         visible: cell.relevant
@@ -279,18 +281,11 @@ Item
 
                             x: -1
                             y: -1
-                            width: cell.width + 2
-                            height: cell.height + 2
+                            width: backgroundRect.width + 2
+                            height: backgroundRect.height + 2
                             color: "transparent"
                             border.color: ColorTheme.colors.dark6
                         }
-                    }
-
-                    Item
-                    {
-                        anchors.fill: cell
-
-                        visible: cell.relevant
 
                         IconImage
                         {
