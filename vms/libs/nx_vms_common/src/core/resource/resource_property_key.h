@@ -170,7 +170,6 @@ NX_VMS_COMMON_API extern const QString kCertificate;
 NX_VMS_COMMON_API extern const QString kUserProvidedCertificate;
 NX_VMS_COMMON_API extern const QString kWebCamerasDiscoveryEnabled;
 NX_VMS_COMMON_API extern const QString kMetadataStorageIdKey;
-NX_VMS_COMMON_API extern const QString kOwnArchiveDirectoryOnly;
 
 } // namespace Server
 
@@ -178,6 +177,7 @@ NX_VMS_COMMON_API extern const std::set<QString> kWriteOnlyNames;
 
 // Storage
 NX_VMS_COMMON_API extern const QString kPersistentStorageStatusFlagsKey;
+NX_VMS_COMMON_API extern const QString kStorageArchiveMode;
 
 } // namespace ResourcePropertyKey
 

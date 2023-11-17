@@ -118,7 +118,6 @@ const QString kCertificate("certificate");
 const QString kUserProvidedCertificate("userProvidedCertificate");
 const QString kWebCamerasDiscoveryEnabled("webCamerasDiscoveryEnabled");
 const QString kMetadataStorageIdKey("metadataStorageId");
-const QString kOwnArchiveDirectoryOnly("ownArchiveDirectoryOnly");
 
 } // namespace ResourcePropertyKey::Server
 
@@ -129,6 +128,7 @@ const std::set<QString> kWriteOnlyNames{
 
 // Storage
 const QString kPersistentStorageStatusFlagsKey("persistentStorageStatusFlags");
+const QString kStorageArchiveMode("storageArchiveMode");
 
 } // namespace ResourcePropertyKey
 
