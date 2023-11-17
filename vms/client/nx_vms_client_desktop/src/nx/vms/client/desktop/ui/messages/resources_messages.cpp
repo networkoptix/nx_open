@@ -294,7 +294,8 @@ bool Resources::deleteResources(
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, infoLevel, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(resources, infoLevel, &messageBox),
+        QnMessageBox::Layout::AfterMainLabel);
     if (allowSilent)
         messageBox.setCheckBoxEnabled();
 

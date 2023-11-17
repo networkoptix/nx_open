@@ -101,7 +101,8 @@ bool UserGroups::removeGroups(QWidget* parent, const QSet<QnUuid>& groups, bool 
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
-    messageBox.addCustomWidget(createGroupListWidget(&messageBox, groups));
+    messageBox.addCustomWidget(createGroupListWidget(&messageBox, groups),
+        QnMessageBox::Layout::AfterMainLabel);
 
     if (allowSilent)
         messageBox.setCheckBoxEnabled();
