@@ -24,7 +24,7 @@ Item
 
     readonly property int columnCount: availableAccessRightDescriptors.length
 
-    readonly property int kRowHeight: 28
+    readonly property int kRowHeight: 27
     readonly property int kMinColumnWidth: 64
 
     property var buttonBox
@@ -48,7 +48,7 @@ Item
         id: accessRightsHeader
 
         property int columnWidth: Math.max(control.kMinColumnWidth,
-             Math.round((control.width * 0.5) / control.columnCount))
+            Math.round((control.width * 0.5) / (control.columnCount * 16)) * 16)
 
         anchors.right: control.right
         anchors.rightMargin: 9
