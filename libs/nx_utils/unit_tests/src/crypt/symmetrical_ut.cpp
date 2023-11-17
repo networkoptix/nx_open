@@ -30,21 +30,34 @@ const std::vector<std::vector<uint8_t>> kVariableKeys = {
      0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x76, 0xff},
 };
 
+/**
+ * The escaped unicode codepoints represent cyrillic letters, but they don't form coherent text,
+ * it's only test data.
+ */
 const std::vector<QByteArray> kTestData{
-    (const char*) u8"1",
-    (const char*) u8"",
-    (const char*) u8"abcdefghefjklmnoprstuvwxyz",
-    (const char*) u8"abcdefghefjklmnopfавыф фывав rstuvwxyzabcdefg hefj klmnoprstuvwxyzabcdefghefjklmnoprstuvwxyz",
-    (const char*) u8"0",
-    (const char*) u8"00",
-    (const char*) u8"0123456789",
-    (const char*) u8"9876543 210",
-    (const char*) u8"101",
-    (const char*) u8"0bcdefg hefjklmnoprstuvwxyzabcdefgh efj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0 \
+    "1",
+    "",
+    "abcdefghefjklmnoprstuvwxyz",
+    "abcdefghefjklmnopf\u0430\u0432\u044b\u0444 \u0444\u044b\u0432\u0430\u0432 rstuvwxyzabcdefg "
+        "hefj klmnoprstuvwxyzabcdefghefjklmnoprstuvwxyz",
+    "0",
+    "00",
+    "0123456789",
+    "9876543 210",
+    "101",
+    "0bcdefg hefjklmnoprstuvwxyzabcdefgh efj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0 \
      0bcdefghefjklmnoprstuvwxyzabcdefghefj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0",
-    (const char*) u8"0bcdefghefjklmnoprstuvwxyzabавыф фывафы  вфыавыфа фываcdefghe fj9lmno3rs0uv1xyzabcdefghefjklmnoprstuvwxy0",
-    (const char*) u8"авыфлдж выфаджлулдощш лд903лд0 9шщ12",
-    (const char*) u8"авыфлдж выфаджлулдощш лд903лд0 9шщ12 аыфдлафыджвлавыджлаоджлауцйащшзуцоащш оывал дуцйщшзак уцщйзо",
+    "0bcdefghefjklmnoprstuvwxyzab\u0430\u0432\u044b\u0444 \u0444\u044b\u0432\u0430\u0444\u044b  "
+        "\u0432\u0444\u044b\u0430\u0432\u044b\u0444\u0430 \u0444\u044b\u0432\u0430cdefghe fj9lmn"
+        "o3rs0uv1xyzabcdefghefjklmnoprstuvwxy0",
+    "\u0430\u0432\u044b\u0444\u043b\u0434\u0436 \u0432\u044b\u0444\u0430\u0434\u0436\u043b\u0443"
+        "\u043b\u0434\u043e\u0449\u0448 \u043b\u0434903\u043b\u04340 9\u0448\u044912",
+    "\u0430\u0432\u044b\u0444\u043b\u0434\u0436 \u0432\u044b\u0444\u0430\u0434\u0436\u043b\u0443"
+        "\u043b\u0434\u043e\u0449\u0448 \u043b\u0434903\u043b\u04340 9\u0448\u044912 \u0430\u044b"
+        "\u0444\u0434\u043b\u0430\u0444\u044b\u0434\u0436\u0432\u043b\u0430\u0432\u044b\u0434"
+        "\u0436\u043b\u0430\u043e\u0434\u0436\u043b\u0430\u0443\u0446\u0439\u0430\u0449\u0448"
+        "\u0437\u0443\u0446\u043e\u0430\u0449\u0448 \u043e\u044b\u0432\u0430\u043b \u0434\u0443"
+        "\u0446\u0439\u0449\u0448\u0437\u0430\u043a \u0443\u0446\u0449\u0439\u0437\u043e",
 };
 
 } // namespace
