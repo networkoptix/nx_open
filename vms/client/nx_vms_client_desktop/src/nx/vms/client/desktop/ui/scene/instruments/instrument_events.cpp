@@ -35,16 +35,14 @@ WheelEvent::WheelEvent(const QWheelEvent* event):
 }
 
 HoverEvent::HoverEvent(const QHoverEvent* event):
-    position(event->pos())
+    SinglePointEvent(event)
 {
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 KeyEvent::KeyEvent(const QKeyEvent* event):
     key(event->key()),
     modifiers(event->modifiers())
 {
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 } // namespace scene
