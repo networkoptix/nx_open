@@ -377,7 +377,7 @@ Item
                 anchors.topMargin: -tree.spacing
                 anchors.bottomMargin: -tree.spacing
 
-                z: -1
+                z: selectionItem.z - 1 //< selectionItem is TreeView delegate's context property.
                 color: ColorTheme.colors.dark8
                 visible: rowAccess.parentNodeSelected && !isSelected
             }

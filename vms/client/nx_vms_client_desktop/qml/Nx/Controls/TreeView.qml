@@ -424,6 +424,17 @@ FocusScope
                 ListView.onPooled: inUse = false
                 ListView.onReused: inUse = true
 
+                containmentMask: QtObject
+                {
+                    function contains(point: point): bool
+                    {
+                        const extra = treeView.selectionOverlapsSpacing ? treeView.spacing : 0
+
+                        return point.x >= 0 && point.y >= 0 && point.x < listItem.width
+                            && point.y < listItem.height + extra
+                    }
+                }
+
                 function tryStartEditing()
                 {
                     if (isCurrent && isEditable)
@@ -547,6 +558,8 @@ FocusScope
                     id: mouseArea
 
                     anchors.fill: parent
+                    anchors.bottomMargin: treeView.selectionOverlapsSpacing ? -treeView.spacing : 0
+
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     visible: listItem.inUse
 
@@ -719,6 +732,7 @@ FocusScope
                     readonly property bool isSelected: listItem.isSelected
 
                     readonly property Item rowItem: listItem
+                    readonly property Item selectionItem: selectionHighlight
 
                     readonly property real itemIndent: x
 
