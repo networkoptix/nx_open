@@ -106,6 +106,7 @@ Item
         anchors.topMargin: - textField.topPadding
 
         anchors.right: parent.right
+        fixupFunc: text => text.trim()
 
         onFocusChanged:
         {
