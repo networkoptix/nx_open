@@ -14,7 +14,7 @@ Rectangle
 
     color: focused
         ? ColorTheme.colors.dark3
-        : (hovered ? ColorTheme.colors.dark5 : ColorTheme.colors.dark4)
+        : (hovered ? ColorTheme.colors.dark6 : ColorTheme.colors.dark5)
 
     Rectangle
     {
