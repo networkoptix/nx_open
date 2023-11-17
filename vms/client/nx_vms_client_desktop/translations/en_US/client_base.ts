@@ -1247,15 +1247,15 @@
     <name>FileExtensions</name>
     <message>
         <source>Pictures</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Video</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>All Files</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11461,16 +11461,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
         <source>%n existing LDAP groups are not found in the LDAP database.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n existing LDAP group is not found in the LDAP database.</numerusform>
+            <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n groups</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Delete %n group</numerusform>
+            <numerusform>Delete %n groups</numerusform>
         </translation>
     </message>
     <message>
@@ -11483,9 +11483,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
         <source>Failed to delete %n groups.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Failed to delete %n group.</numerusform>
+            <numerusform>Failed to delete %n groups.</numerusform>
         </translation>
     </message>
 </context>
@@ -11584,16 +11584,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
         <source>Delete %n users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Delete %n user</numerusform>
+            <numerusform>Delete %n users</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>LDAP server is offline. %n users are not able to log in.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>LDAP server is offline. %n user is not able to log in.</numerusform>
+            <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
         </translation>
     </message>
     <message>
@@ -11602,9 +11602,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
         <source>Failed to delete %n users.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Failed to delete %n user.</numerusform>
+            <numerusform>Failed to delete %n users.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n existing LDAP users are not found in the LDAP database</source>
+        <translation>
+            <numerusform>%n existing LDAP user is not found in the LDAP database</numerusform>
+            <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
         </translation>
     </message>
 </context>
