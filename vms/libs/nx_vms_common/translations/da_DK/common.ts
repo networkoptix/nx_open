@@ -1648,7 +1648,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
-      <translation type="unfinished">RTP timeout (milliseconds)</translation>
+      <translation>RTP-timeout (millisekunder)</translation>
     </message>
   </context>
   <context>
