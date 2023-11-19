@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Prendre le nom et les paramètres du système à partir de :</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation>icône d'avertissement</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation>&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Attention! Limite de puissance dépassée</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Changer mot de passe...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Le chiffrage du trafic vidéo augmentera considérablement l'utilisation du processeur.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>La connexion avec les caméras qui ne prennent pas en charge HTTPS sera perdue.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>Forcer les serveurs à accepter uniquement les connexions chiffrées</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Détails</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Épingler à ce certificat</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Voir le certificat épinglé</translation>
     </message>
   </context>
   <context>
@@ -2794,22 +2783,6 @@
     <message>
       <source>Reindex Backup</source>
       <translation>Réindexer Sauvegarde</translation>
-    </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>L'enregistrement vers l'emplacement de stockage désactivé s'arrêtera. Cependant, la suppression des séquences obsolètes se poursuivra.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>L'enregistrement a été activé sur le stockage USB</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Les données d'analyse peuvent prendre une grande quantité d'espace. Nous vous recommandons de choisir un autre emplacement à la place de la partition système.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Les données d'analyse et de mouvement continueront d'être stockées sur le stockage désactivé.</translation>
     </message>
   </context>
   <context>

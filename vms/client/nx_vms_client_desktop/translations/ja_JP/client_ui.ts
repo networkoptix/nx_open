@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>次のシステム名および設定を使用:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>情報</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>注意！電力制限を超えました</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>パスワードの変更...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>ビデオトラフィックを暗号化すると、CPU使用率が大幅に増加します。</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>HTTPS に対応していないカメラとの接続は失われます。</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>暗号化された接続のみを受け入れるようサーバーに強制する</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>詳細</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>この証明書に固定する</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>固定された証明書を表示する</translation>
     </message>
   </context>
   <context>
@@ -2794,22 +2783,6 @@
     <message>
       <source>Reindex Backup</source>
       <translation>バックアップの再インデックス</translation>
-    </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>無効化された保存先への録画は停止しますが、古い映像は引き続き削除されます。</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>USBストレージで録画が有効になりました</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>分析データは大量のスペースを占有する可能性があります。システムパーティションではなく、別の場所を選択することをお勧めします。</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>分析およびモーションデータは、無効なストレージに引き続き保存されます。</translation>
     </message>
   </context>
   <context>

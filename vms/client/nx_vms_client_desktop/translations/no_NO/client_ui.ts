@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Ta systemnavn og innstillinger fra:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation>&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Merk følgende! Effektgrensen overskredet</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Bytt passord...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Kryptering av videotrafikk vil øke CPU-bruken betydelig.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Forbindelsen med kameraer som ikke støtter HTTPS vil gå tapt.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>Tving servere til å akseptere kun krypterte tilkoblinger</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Detaljer</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Fest til dette sertifikatet</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Vis festet sertifikat</translation>
     </message>
   </context>
   <context>
@@ -2795,22 +2784,6 @@
       <source>Reindex Backup</source>
       <translation>Reindekserer sikkerhetskopi</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Opptak til deaktivert lagringsplass vil stoppe. Men utdaterte opptak vil fremdeles slettes.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Innspilling aktivert på USB-lagringen</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Analytics-data kan ta opp store mengder plass. Vi anbefaler å velge en annen plassering for den i stedet for systempartisjonen.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Analyse-data vil fortsette å bli lagret på den deaktiverte stasjonen.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2945,7 +2918,7 @@
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Legg til gruppe</translation>
     </message>
     <message>
       <source>Ctrl+F</source>
@@ -2964,7 +2937,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Legge til bruker</translation>
     </message>
     <message>
       <source>Ctrl+F</source>

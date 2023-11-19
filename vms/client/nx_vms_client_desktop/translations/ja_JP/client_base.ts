@@ -1129,6 +1129,10 @@
       <translation>なし</translation>
     </message>
     <message>
+      <source>automatic</source>
+      <translation>オート</translation>
+    </message>
+    <message>
       <source>Event Occurs</source>
       <translation>イベント発生時</translation>
     </message>
@@ -1139,10 +1143,6 @@
     <message>
       <source>Event Stops</source>
       <translation>イベント停止時</translation>
-    </message>
-    <message>
-      <source>automatic</source>
-      <translation>オート</translation>
     </message>
   </context>
   <context>
@@ -1388,10 +1388,6 @@
       <translation>ライセンスは既に別のサーバーで使用されています</translation>
     </message>
     <message>
-      <source>You already activated this license</source>
-      <translation>このライセンスは既に有効化されています</translation>
-    </message>
-    <message>
       <source>To activate License Key manually please contact %1.</source>
       <translation>ライセンスキーを手動で有効化するには、 %1 までご連絡ください。</translation>
     </message>
@@ -1444,6 +1440,10 @@ License Key: %2</source>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
       <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を 地域/ライセンスサポートチーム に送信してアクティベーションファイルを取得してください。</translation>
+    </message>
+    <message>
+      <source>License has already been activated</source>
+      <translation type="unfinished">License has already been activated</translation>
     </message>
   </context>
   <context>
@@ -1656,10 +1656,6 @@ License Key: %2</source>
       <translation>安全でない</translation>
     </message>
     <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation>アクティブなサーバーのいずれにもインターネット接続がないため、電子メール設定をテストできません</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>接続に失敗しました</translation>
     </message>
@@ -1670,6 +1666,22 @@ License Key: %2</source>
     <message>
       <source>Password cannot be empty</source>
       <translation>パスワードを入力してください</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation>ユーザーはメールを受信しています</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation>設定を適用すると、 ユーザーへのメール配信がすぐに始まります</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation>SMTPサーバーをテストできません</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation>追加情報が必要です</translation>
     </message>
   </context>
   <context>
@@ -1709,14 +1721,6 @@ License Key: %2</source>
       <translation>不正</translation>
     </message>
     <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>英数字およびキーボードの記号%1のみが許可されます。</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>ラテン文字、数字、およびキーボードの記号のみが許可されます</translation>
-    </message>
-    <message>
       <source>Password should contain different types of symbols</source>
       <translation>パスワードには異なる種類の文字を含める必要があります</translation>
     </message>
@@ -1747,6 +1751,14 @@ License Key: %2</source>
     <message>
       <source>This password is in list of the most popular passwords</source>
       <translation>このパスワードは、最も一般的なパスワードのひとつです</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
+      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols are allowed</source>
+      <translation>英数字、およびキーボードの記号のみ使用できます</translation>
     </message>
   </context>
   <context>
@@ -1874,6 +1886,18 @@ License Key: %2</source>
     <message>
       <source>Regional / License support</source>
       <translation>地域/ライセンスサポート</translation>
+    </message>
+    <message>
+      <source>Partner information</source>
+      <translation type="unfinished">Partner information</translation>
+    </message>
+    <message>
+      <source>Phones</source>
+      <translation type="unfinished">Phones</translation>
+    </message>
+    <message>
+      <source>Emails</source>
+      <translation type="unfinished">Emails</translation>
     </message>
   </context>
   <context>
@@ -3972,15 +3996,6 @@ to %1</source>
       <source>Lo-Res</source>
       <translation>低解像度</translation>
     </message>
-    <message>
-      <source>press and hold</source>
-      <comment>Soft Trigger</comment>
-      <translation>長押し</translation>
-    </message>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>スケジュールで無効</translation>
-    </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
       <translation>
@@ -4002,6 +4017,15 @@ to %1</source>
     <message>
       <source>Hotspots</source>
       <translation>ホットスポット</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Soft Trigger</comment>
+      <translation>長押し</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>スケジュールで無効</translation>
     </message>
   </context>
   <context>
@@ -4140,8 +4164,8 @@ to %1</source>
   <context>
     <name>QnPopupSettingsWidget</name>
     <message>
-      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation>これらの設定はログインしているシステムにのみ適用され、将来のバージョンで削除されます。</translation>
+      <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
+      <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
     </message>
   </context>
   <context>
@@ -4914,12 +4938,12 @@ to %1</source>
       <translation>提供</translation>
     </message>
     <message>
-      <source>SAAS SHUT DOWN</source>
-      <translation>SAAS はシャットダウンされました</translation>
-    </message>
-    <message>
       <source>NO EXPORT PERMISSION</source>
       <translation>エクスポート権限がありません</translation>
+    </message>
+    <message>
+      <source>SAAS SHUT DOWN</source>
+      <translation>SAAS はシャットダウンされました</translation>
     </message>
     <message>
       <source>NO CONNECTION TO THE LICENSE SERVER</source>
@@ -5049,6 +5073,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Insufficient permissions to store analytics data.</source>
       <translation>分析データを保存する権限がありません。</translation>
     </message>
+    <message>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation>分析データは大量のスペースを占有する可能性があります。システムパーティションではなく、別の場所を選択することをお勧めします。</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage</source>
+      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>無効化された保存先への録画は停止しますが、古い映像は引き続き削除されます。</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>USBストレージで録画が有効になりました</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
+      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
+      <translation type="unfinished">If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -5139,6 +5187,26 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Stores analytics and motion data</source>
       <translation>分析データとモーションデータの保存先</translation>
+    </message>
+    <message>
+      <source>cloud</source>
+      <translation>クラウド</translation>
+    </message>
+    <message>
+      <source>Path</source>
+      <translation type="unfinished">Path</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>タイプ</translation>
+    </message>
+    <message>
+      <source>Purpose</source>
+      <translation type="unfinished">Purpose</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>サイズ</translation>
     </message>
   </context>
   <context>
@@ -6205,17 +6273,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       </translation>
     </message>
     <message numerus="yes">
-      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <comment>Numerical form depends on layouts count</comment>
-      <translation>
-        <numerusform>これらのレイアウトは他のユーザーと共有されており、共有しているユーザーのアカウントでも削除されます。</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Delete user?</source>
-      <translation>ユーザーを削除しますか?</translation>
-    </message>
-    <message numerus="yes">
       <source>%n items were not deleted.</source>
       <translation>
         <numerusform>%n 項目は削除されませんでした。</numerusform>
@@ -6226,11 +6283,22 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>レイアウトを削除しますか?</translation>
     </message>
     <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerical form depends on layouts count</comment>
+      <translation>
+        <numerusform>これらのレイアウトは他のユーザーと共有されており、共有しているユーザーのアカウントでも削除されます。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
       <translation>
         <numerusform>%n レイアウトは他のユーザーと共有されており、共有しているユーザーのアカウントでも削除されます。</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>ユーザーを削除しますか?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
@@ -6632,48 +6700,24 @@ We recommend you not to open this integration. If you understand the risks, you 
   <context>
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
-      <source>Has access to a resource, can view live footage from a camera</source>
-      <translation>リソースにアクセスでき、カメラのライブ映像を表示できます</translation>
-    </message>
-    <message>
       <source>View Archive</source>
       <translation>アーカイブの表示</translation>
-    </message>
-    <message>
-      <source>Can view archive footage</source>
-      <translation>アーカイブ映像を表示できます</translation>
     </message>
     <message>
       <source>Export Archive</source>
       <translation>アーカイブのエクスポート</translation>
     </message>
     <message>
-      <source>Can export parts of archive</source>
-      <translation>アーカイブの一部をエクスポートできます</translation>
-    </message>
-    <message>
       <source>View Bookmarks</source>
       <translation>ブックマークの表示</translation>
-    </message>
-    <message>
-      <source>Can view bookmarks</source>
-      <translation>ブックマークを表示できます</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
       <translation>ブックマークの管理</translation>
     </message>
     <message>
-      <source>Can modify bookmarks</source>
-      <translation>ブックマークを変更できます</translation>
-    </message>
-    <message>
       <source>User Input</source>
       <translation>ユーザー入力</translation>
-    </message>
-    <message>
-      <source>Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</source>
-      <translation>カメラの PTZ 状態の変更、およびソフトトリガー、双方向音声、I/O ボタンの使用が可能</translation>
     </message>
     <message>
       <source>Edit Settings</source>
@@ -6690,6 +6734,22 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
       <translation>リソースの種類に応じて、ユーザーはデバイス設定を変更することも、ビデオ ウォールを制御することもできます。</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation>ライブの表示.</translation>
+    </message>
+    <message>
+      <source>Allows users to access a resource and view live footage from a camera.</source>
+      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+    </message>
+    <message>
+      <source>Modify Bookmarks</source>
+      <translation type="unfinished">Modify Bookmarks</translation>
+    </message>
+    <message>
+      <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
+      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
     </message>
   </context>
   <context>
@@ -6996,18 +7056,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>新規追加されたカメラ</translation>
     </message>
     <message>
-      <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation>新しく追加されたカメラの設定は、システム内のすべてのサーバーに適用されます。</translation>
-    </message>
-    <message>
-      <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation>システム内いずれかのサーバーに新しく追加されたカメラのバックアップがオンになります。</translation>
-    </message>
-    <message>
-      <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation>システム内いずれかのサーバーに新しく追加されたカメラのバックアップはオフになります。</translation>
-    </message>
-    <message>
       <source>Storage Management</source>
       <translation>ストレージ管理</translation>
     </message>
@@ -7032,6 +7080,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
       <translation>クラウドストレージへのバックアップを実行するには、SaaS がアクティブな状態である必要があります。 %1</translation>
+    </message>
+    <message>
+      <source>– Applies to all servers</source>
+      <translation type="unfinished">– Applies to all servers</translation>
     </message>
   </context>
   <context>
@@ -7115,17 +7167,13 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Applying changes...</source>
       <translation>変更の適応中...</translation>
     </message>
+    <message>
+      <source>Force Motion Detection</source>
+      <translation>強制的にモーション検知を行う</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
-    <message>
-      <source>Heater</source>
-      <translation>ヒーター</translation>
-    </message>
-    <message>
-      <source>Wiper</source>
-      <translation>ワイパー</translation>
-    </message>
     <message>
       <source>Mute</source>
       <translation>ミュート</translation>
@@ -7133,6 +7181,14 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Unmute</source>
       <translation>ミュート解除</translation>
+    </message>
+    <message>
+      <source>Heater</source>
+      <translation>ヒーター</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>ワイパー</translation>
     </message>
     <message>
       <source>Open Door</source>
@@ -7200,10 +7256,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>パン＆チルト</translation>
     </message>
     <message>
-      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>録画スケジュールの画質 (ビットレート) とフレームレート (FPS) はカメラに設定されなくなります。</translation>
-    </message>
-    <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>サーバーは時刻設定をカメラに通知しません。</translation>
     </message>
@@ -7223,6 +7275,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
       <translation>システム追加後のカメラまたはサーバーのオフライン期間のみが自動的にインポートされます。</translation>
+    </message>
+    <message>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
+      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</translation>
     </message>
   </context>
   <context>
@@ -7261,6 +7317,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>NO DATA</source>
       <translation>データがありません</translation>
+    </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>アクセスできません</translation>
     </message>
   </context>
   <context>
@@ -7365,12 +7425,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>強制的にモーション検知を行う</translation>
     </message>
     <message>
-      <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation>選択した感度を適用するには、プレビュー上の領域を選択します。</translation>
+      <source>Select areas on the preview to set chosen sensitivity for</source>
+      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for</translation>
     </message>
     <message>
-      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation>モーション検出感度を選択し、適用する領域をプレビュー上で選択してください。</translation>
+      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for</source>
+      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for</translation>
     </message>
   </context>
   <context>
@@ -7440,24 +7500,24 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>サーバー時刻基準</translation>
     </message>
     <message>
-      <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>選択したパラメーターを適用するスケジュール領域を指定してください。</translation>
-    </message>
-    <message>
-      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>録画パラメーターを指定した後、スケジュールグリッドの領域を選択することで録画スケジュールが設定されます。</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>高い最小値は、他のデバイスのアーカイブ期間を減少させる可能性があります</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>高い最小値は、他のカメラのアーカイブ期間を減少させる可能性があります</translation>
-    </message>
-    <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
       <translation>プレ録画時間が長いと、サーバーのRAM使用率が増加します</translation>
+    </message>
+    <message>
+      <source>Select areas on the schedule to apply chosen parameters to</source>
+      <translation type="unfinished">Select areas on the schedule to apply chosen parameters to</translation>
+    </message>
+    <message>
+      <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
+      <translation type="unfinished">Set recording parameters and select areas on the schedule grid to apply them to</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices</source>
+      <translation type="unfinished">High minimum value can lead to archive length decrease on other devices</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras</source>
+      <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras</translation>
     </message>
   </context>
   <context>
@@ -8106,20 +8166,24 @@ We recommend you not to open this integration. If you understand the risks, you 
   <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
-      <source>This camera requires password to be set up.</source>
-      <translation>このカメラにはパスワードを設定する必要があります。</translation>
-    </message>
-    <message>
-      <source>Some of selected cameras require password to be set up.</source>
-      <translation>選択されたカメラの中には、パスワードの設定が必要なものがあります。</translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>システム管理者に依頼してください</translation>
-    </message>
-    <message>
       <source>Set Password</source>
       <translation>パスワードの設定</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up</source>
+      <translation type="unfinished">This camera requires password to be set up</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up</source>
+      <translation type="unfinished">Some of selected cameras require password to be set up</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
+      <translation type="unfinished">This camera requires password to be set up. Ask your system administrator to do it.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
+      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your system administrator to do it.</translation>
     </message>
   </context>
   <context>
@@ -8256,6 +8320,13 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>System Administration</source>
       <translation>システム管理</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DirectParentsModel</name>
+    <message>
+      <source>LDAP group membership is managed in LDAP</source>
+      <translation>LDAP グループのメンバーシップは LDAP で管理されます</translation>
     </message>
   </context>
   <context>
@@ -8984,6 +9055,10 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>LDAP</source>
       <translation>LDAP</translation>
     </message>
+    <message>
+      <source>Cannot connect to LDAP server</source>
+      <translation type="unfinished">Cannot connect to LDAP server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LicenseManagerWidget</name>
@@ -9264,13 +9339,6 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::MembersModel</name>
-    <message>
-      <source>Inherited from %1</source>
-      <translation>%1 から継承</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -9336,6 +9404,14 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Failed to merge Systems</source>
       <translation>システム統合に失敗しました</translation>
+    </message>
+    <message>
+      <source>We recommend that you consult with %1 before proceeding.</source>
+      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
+    </message>
+    <message>
+      <source>support</source>
+      <translation>サポート</translation>
     </message>
   </context>
   <context>
@@ -9428,13 +9504,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 システムのオーナーが異なります。統合は許容されません。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MessageBar</name>
-    <message>
-      <source>Close</source>
-      <translation>閉じる</translation>
     </message>
   </context>
   <context>
@@ -9742,10 +9811,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>インターネット上でアップデートを確認できません</translation>
     </message>
     <message>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>週末にシステムの更新プログラムを適用することは推奨されません</translation>
-    </message>
-    <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>現在、カスタムクライアントを使用しています。更新手順については、 %1 にお問い合わせください。</translation>
     </message>
@@ -9756,6 +9821,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Uploading offline update packages to Servers...</source>
       <translation>オフライン更新パッケージをサーバーにアップロードしています...</translation>
+    </message>
+    <message>
+      <source>Applying System updates at the end of the week is not recommended</source>
+      <translation type="unfinished">Applying System updates at the end of the week is not recommended</translation>
     </message>
   </context>
   <context>
@@ -9819,10 +9888,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>レイアウトを選択...</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners.</source>
-      <translation>ローカルレイアウトはその所有者にのみ表示できます。</translation>
-    </message>
-    <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>選択されたユーザーロールにはユーザーが含まれていません。アクションは機能しません。</translation>
     </message>
@@ -9833,6 +9898,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
       <translation>ローカルレイアウトをお探しですか？ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners</source>
+      <translation type="unfinished">Local layouts can only be shown to their owners</translation>
     </message>
   </context>
   <context>
@@ -9848,17 +9917,6 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Learn more</source>
       <translation>詳細</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ParentGroupsProvider</name>
-    <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation>LDAP グループのメンバーシップは LDAP で管理されます</translation>
-    </message>
-    <message>
-      <source>Inherited from %1</source>
-      <translation>%1 から継承</translation>
     </message>
   </context>
   <context>
@@ -10032,6 +10090,13 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::PoeSettingsWidget</name>
+    <message>
+      <source>Attention! Power limit exceeded</source>
+      <translation>注意！電力制限を超えました</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
     <message>
       <source>Added</source>
@@ -10152,6 +10217,14 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Edit Proxied Integration</source>
       <translation>プロキシされたインテグレーションを編集</translation>
+    </message>
+    <message>
+      <source>To allow the use of a client API, create a web integration instead. %1</source>
+      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+    </message>
+    <message>
+      <source>Learn more...</source>
+      <translation>詳細...</translation>
     </message>
   </context>
   <context>
@@ -10666,6 +10739,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
       <translation>透かし模様は、パワーユーザー以外のユーザーのライブ、アーカイブ、エクスポート後の映像に表示されます。あなたや他のパワーユーザーが透かし模様を見ることはありません。</translation>
     </message>
+    <message>
+      <source>Encrypting video traffic may significantly increase CPU usage</source>
+      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+    </message>
+    <message>
+      <source>Connection with cameras that do not support HTTPS will be lost</source>
+      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
@@ -10727,16 +10808,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>不明な証明書</translation>
     </message>
     <message>
-      <source>Not Part Of Certificate</source>
-      <translation>証明書の一部ではありません</translation>
-    </message>
-    <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
       <translation>この問題を解決するには、管理者権限を持つユーザーに連絡してください。</translation>
+    </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation>証明書の一部ではありません</translation>
+    </message>
+    <message>
+      <source>View pinned certificate</source>
+      <translation>固定された証明書を表示する</translation>
+    </message>
+    <message>
+      <source>Pin to this certificate</source>
+      <translation>この証明書に固定する</translation>
     </message>
   </context>
   <context>
@@ -11304,6 +11393,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>説明</translation>
     </message>
     <message>
+      <source>You do not have permissions to modify or delete this group.</source>
+      <translation>このグループを変更または削除する権限がありません。</translation>
+    </message>
+    <message>
       <source>Group is not found in the LDAP database.</source>
       <translation>グループが LDAP データベース内に見つかりません。</translation>
     </message>
@@ -11314,10 +11407,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
       <translation>グループは、他のグループの親かつ子である、あるいはそういった循環参照の一部となっています。これにより、権限が正しく計算されない可能性があります。</translation>
-    </message>
-    <message>
-      <source>You do not have permissions to modify or delete this group.</source>
-      <translation>このグループを変更または削除する権限がありません。</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11331,12 +11420,60 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
   <context>
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
-      <source>Group does not exist</source>
-      <translation>グループが存在しません</translation>
+      <source>Invalid JSON</source>
+      <translation type="unfinished">Invalid JSON</translation>
     </message>
     <message>
-      <source>User does not exist</source>
-      <translation>ユーザーが存在しません</translation>
+      <source>Invalid request</source>
+      <translation type="unfinished">Invalid request</translation>
+    </message>
+    <message>
+      <source>Method not found</source>
+      <translation type="unfinished">Method not found</translation>
+    </message>
+    <message>
+      <source>Invalid parameters</source>
+      <translation>無効なパラメータ</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>内部エラー</translation>
+    </message>
+    <message>
+      <source>Connection failure</source>
+      <translation type="unfinished">Connection failure</translation>
+    </message>
+    <message>
+      <source>Invalid encoding</source>
+      <translation type="unfinished">Invalid encoding</translation>
+    </message>
+    <message>
+      <source>Invalid encoding charset</source>
+      <translation type="unfinished">Invalid encoding charset</translation>
+    </message>
+    <message>
+      <source>Application Error</source>
+      <translation type="unfinished">Application Error</translation>
+    </message>
+    <message>
+      <source>System Error</source>
+      <translation type="unfinished">System Error</translation>
+    </message>
+    <message>
+      <source>Transport Error</source>
+      <translation type="unfinished">Transport Error</translation>
+    </message>
+    <message>
+      <source>Server error code %1</source>
+      <translation type="unfinished">Server error code %1</translation>
+    </message>
+    <message>
+      <source>Reserved error code %1</source>
+      <translation type="unfinished">Reserved error code %1</translation>
+    </message>
+    <message>
+      <source>Unknown error code %1</source>
+      <translation type="unfinished">Unknown error code %1</translation>
     </message>
   </context>
   <context>
@@ -11354,20 +11491,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>検索条件を変更するか、新しいグループを作成してください</translation>
     </message>
     <message>
-      <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation>グループ &quot;%1&quot; の削除に失敗しました。</translation>
-    </message>
-    <message>
-      <source>Failed to delete group.</source>
-      <translation> グループの削除に失敗しました。</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n groups.</source>
-      <translation>
-        <numerusform>%n グループの削除に失敗しました。</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
       <translation>複数のグループが同じ名前を共有しているため、混乱が生じる可能性があります。明確で組織的な構造を維持するために、各グループに一意の名前を付けることをお勧めします。</translation>
     </message>
@@ -11382,6 +11505,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>
         <numerusform>%n グループを削除</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation>グループ &quot;%1&quot; の削除に失敗しました。</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation> グループの削除に失敗しました。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation>
+        <numerusform>%n グループの削除に失敗しました。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
     </message>
   </context>
   <context>
@@ -11416,8 +11557,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>カスタム</translation>
     </message>
     <message>
-      <source>Full Name</source>
-      <translation>フルネーム</translation>
+      <source>You do not have permissions to modify this user.</source>
+      <translation>このユーザーを変更する権限がありません。</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
@@ -11432,8 +11573,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>一時ユーザー</translation>
     </message>
     <message>
-      <source>You do not have permissions to modify this user.</source>
-      <translation>このユーザーを変更する権限がありません。</translation>
+      <source>Full Name</source>
+      <translation>フルネーム</translation>
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
@@ -11471,12 +11612,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>複数のユーザーが同じログイン名を共有すると、ログインに失敗します。この問題を解決するには、影響を受けるユーザーのログイン名を更新するか、重複ユーザーを無効化または削除します。</translation>
     </message>
     <message numerus="yes">
-      <source>%n existing LDAP users are not found in the LDAP database.</source>
-      <translation>
-        <numerusform>%n 名の既存 LDAP ユーザーが LDAP データベース内に見つかりません。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Delete %n users</source>
       <translation>
         <numerusform>%n ユーザーを削除</numerusform>
@@ -11496,6 +11631,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>Failed to delete %n users.</source>
       <translation>
         <numerusform>%n ユーザーの削除に失敗しました。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation type="unfinished">
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
       </translation>
     </message>
   </context>
@@ -11550,12 +11691,28 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>破棄</translation>
     </message>
     <message>
+      <source>Copy Access Link</source>
+      <translation>アクセスリンクをコピー</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation>現在のパスワードと一致しません</translation>
+    </message>
+    <message>
       <source>Email cannot be empty</source>
       <translation>メールアドレスを入力してください</translation>
     </message>
     <message>
-      <source>Copy Access Link</source>
-      <translation>アクセスリンクをコピー</translation>
+      <source>Login cannot be empty</source>
+      <translation>ログイン名を入力してください</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed</source>
+      <translation>文字、数字、記号 %1 のみ使用できます</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists</source>
+      <translation>指定されたログイン名を持つユーザーは既に存在します</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
@@ -11582,37 +11739,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>作成</translation>
     </message>
     <message>
-      <source>Access link has been successfully created!</source>
-      <translation>アクセスリンクが正常に作成されました。</translation>
-    </message>
-    <message>
-      <source>and</source>
-      <comment>Example: 1 month and 2 days</comment>
-      <translation>と</translation>
-    </message>
-    <message>
-      <source>User %1 has been successfully created!</source>
-      <translation>ユーザー %1 が正常に作成されました。</translation>
-    </message>
-    <message>
-      <source>Invalid current password</source>
-      <translation>現在のパスワードと一致しません</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty</source>
-      <translation>ログイン名を入力してください</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed</source>
-      <translation>文字、数字、記号 %1 のみ使用できます</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists</source>
-      <translation>指定されたログイン名を持つユーザーは既に存在します</translation>
-    </message>
-    <message>
       <source>New Link - %1</source>
       <translation>新しいリンク - %1</translation>
+    </message>
+    <message>
+      <source>Access link has been successfully created!</source>
+      <translation>アクセスリンクが正常に作成されました。</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
@@ -11623,13 +11755,31 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>一時ユーザーへの幅広い権限の付与は推奨されません。</translation>
     </message>
     <message>
-      <source>in %1</source>
-      <comment>%1 is a duration</comment>
-      <translation>%1後</translation>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation>と</translation>
     </message>
     <message>
       <source>New User</source>
       <translation>新規ユーザー</translation>
+    </message>
+    <message>
+      <source>User %1 has been successfully created!</source>
+      <translation>ユーザー %1 が正常に作成されました。</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation type="unfinished">Obtaining Link...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+    </message>
+    <message>
+      <source>in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation>%1後</translation>
     </message>
   </context>
   <context>
@@ -12367,12 +12517,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>少なくとも一つのレイアウトを選択してください</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners.</source>
-      <translation>ローカルレイアウトはその所有者にのみ表示できます。</translation>
-    </message>
-    <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
       <translation>ローカルレイアウトをお探しですか？ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners</source>
+      <translation type="unfinished">Local layouts can only be shown to their owners</translation>
     </message>
   </context>
   <context>
@@ -12900,6 +13050,14 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Not enough access rights</source>
       <translation>十分なアクセス権がありません</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to open this camera on the layout</source>
+      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to open some of selected cameras on the layout</source>
+      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
     </message>
   </context>
   <context>

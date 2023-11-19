@@ -202,29 +202,29 @@
       <translation>Systemstatus brukere</translation>
     </message>
     <message>
-      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Medlemmer av denne gruppen har ubegrensede systemrettigheter. Administratorer kan opprette og endre Power Users, og slå sammen systemer og koble til eller frakoble til %1 kontoer.</translation>
-    </message>
-    <message>
-      <source>Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation>Medlemmer av denne gruppen har kontroll over det meste av systemkonfigurasjonen, men har ikke lov til å endre noen administratorinnstillinger, slette eller endre sine egne grupper og tillatelser, og kan ikke opprette eller redigere andre avanserte brukere.</translation>
-    </message>
-    <message>
-      <source>Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation>Medlemmer av denne gruppen kan se og kjøre PTZ-posisjoner og PTZ-turer, bruke 2-veis lyd, betjene I/O-modulknapper, opprette og redigere bokmerker og se hendelsesloggen.</translation>
-    </message>
-    <message>
-      <source>Members of this group can view and export archive and Bookmarks.</source>
-      <translation>Medlemmer av denne gruppen kan vise og eksportere arkiv og bokmerker.</translation>
-    </message>
-    <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
       <translation>Medlemmer av denne gruppen kan se live-videoer, I/O-moduler og nettsider.</translation>
     </message>
     <message>
-      <source>Members of this group can view System Health Monitoring information.</source>
-      <translation>Medlemmer av denne gruppen kan se informasjon om systemhelseovervåking.</translation>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Medlemmer av denne gruppen har ubegrensede systemrettigheter. Administratorer kan opprette og endre Power Users, slå sammen systemer og koble til eller fra System til  %1.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation>Medlemmer av denne gruppen kan, i tillegg til tillatelsene gitt av Advanced Viewers-gruppen, kontrollere det meste av systemkonfigurasjonen, men har ikke lov til å endre noen administratorrelaterte innstillinger, som å slette eller endre sine egne grupper og tillatelser, og kan ikke opprette eller redigere andre avanserte brukere.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+      <translation>Medlemmer av denne gruppen kan, i tillegg til tillatelsene gitt av seergruppen, se og aktivere PTZ-posisjoner og PTZ-turer, bruke 2-veis lyd, betjene I/O-modulknapper, opprette og redigere bokmerker og se hendelsesloggen.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+      <translation>Medlemmer av denne gruppen kan, i tillegg til tillatelsene gitt av Live Viewers-gruppen, se og eksportere arkiv og bokmerker.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
+      <translation>Medlemmer av denne gruppen kan se System Health Monitoring-informasjon og serverprosessorbelastning i sanntid (Server Monitoring).</translation>
     </message>
   </context>
   <context>
@@ -1570,10 +1570,6 @@
       <translation>Maks. postkø størrelse (elementer, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>Antall RTP-forsøk på nytt</translation>
-    </message>
-    <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP timeout (millisekunder)</translation>
     </message>
@@ -1786,11 +1782,6 @@
       <translation>Levetid for autorisasjonsøkttoken (sekunder)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Aktiver utdaterte API-funksjoner som brukes av %1 programvare (usikkert)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Semikolon-separert liste over servere som er utpekt til å koble til skyen. Servere på toppen av listen har høyere prioritet. Hvis listen er tom, velges en Server for Cloud-tilkoblingen automatisk.</translation>
     </message>
@@ -1801,6 +1792,23 @@
     <message>
       <source>Enable deprecated API functions (insecure)</source>
       <translation>Aktiver utdaterte API-funksjoner (usikker)</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>Maksimalt antall påfølgende RTP-feil før serveren kobler til RTSP-økten på nytt.</translation>
+    </message>
+    <message>
+      <source>Channel partners service</source>
+      <translation>Kanalpartnertjeneste</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Aktiver utdaterte API-funksjoner som brukes av %1 programvare (usikker)</translation>
+    </message>
+    <message>
+      <source>Organization Id</source>
+      <translation>Organisasjons-ID</translation>
     </message>
   </context>
   <context>
@@ -2529,26 +2537,6 @@
       <source>LDAP Sync Issue</source>
       <translation>LDAP-synkroniseringsproblem</translation>
     </message>
-    <message>
-      <source>Failed to connect to LDAP</source>
-      <translation>Kunne ikke koble til LDAP</translation>
-    </message>
-    <message>
-      <source>Failed to complete sync within a %1 timeout</source>
-      <translation>Kunne ikke fullføre synkronisering innen et tidsavbrudd på %1</translation>
-    </message>
-    <message>
-      <source>Failed to complete sync within a given timeout</source>
-      <translation>Kunne ikke fullføre synkroniseringen innen et gitt tidsavbrudd</translation>
-    </message>
-    <message>
-      <source>There are zero LDAP users in VMS after sync</source>
-      <translation>Det er ingen LDAP-brukere i VMS etter synkronisering</translation>
-    </message>
-    <message>
-      <source>Some LDAP users were not found in LDAP</source>
-      <translation>Noen LDAP-brukere ble ikke funnet i LDAP</translation>
-    </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
@@ -2556,6 +2544,27 @@
         <numerusform>%1 (%n ganger)</numerusform>
         <numerusform>%1 (%n ganger)</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation>Kunne ikke koble til LDAP-serveren.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation>Kunne ikke fullføre synkroniseringen innen et tidsavbrudd på %1.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a given timeout.</source>
+      <translation>Kunne ikke fullføre synkroniseringen innen et gitt tidsavbrudd.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation>Ingen brukerkontoer på LDAP-serveren samsvarer med synkroniseringsinnstillingene.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation>Noen LDAP-brukere eller -grupper ble ikke funnet i LDAP-databasen.</translation>
     </message>
   </context>
 </TS>

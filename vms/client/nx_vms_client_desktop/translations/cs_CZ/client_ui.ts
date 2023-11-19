@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Převzít název systému a nastavení z:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation type="unfinished">&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Pozor! Byl překročen limit výkonu</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Změnit heslo...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Šifrování přenosu videa výrazně zvýší zatížení procesoru.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation type="unfinished">Force servers to accept only encrypted connections</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Detaily</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
     </message>
   </context>
   <context>
@@ -2794,22 +2783,6 @@
     <message>
       <source>Reindex Backup</source>
       <translation>Reindexovat zálohu</translation>
-    </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Nahrávání na nepovolené úložiště se zastaví. Smazání zastaralých záznamů však bude pokračovat.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Záznam byl povolen na USB úložišti</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
     </message>
   </context>
   <context>
@@ -2964,7 +2937,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Přidat uživatele</translation>
     </message>
     <message>
       <source>Ctrl+F</source>

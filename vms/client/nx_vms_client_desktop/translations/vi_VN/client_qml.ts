@@ -27,16 +27,8 @@
       <translation>Thuộc tính đăng nhập</translation>
     </message>
     <message>
-      <source>Allow digest authentication for imported users</source>
-      <translation>Cho phép xác thực thông báo cho người dùng đã nhập</translation>
-    </message>
-    <message>
       <source>Groups</source>
       <translation>Các nhóm</translation>
-    </message>
-    <message>
-      <source>Name Attribute</source>
-      <translation>Thuộc tính tên</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -45,10 +37,6 @@
     <message>
       <source>Misc</source>
       <translation>Khác</translation>
-    </message>
-    <message>
-      <source>Group Attribute</source>
-      <translation>Thuộc tính nhóm</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
@@ -69,6 +57,14 @@
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
       <translation>Để tắt xác thực thông báo cho người dùng LDAP đã được thêm vào cơ sở dữ liệu VMS, bạn cần tắt nó trực tiếp trong cài đặt người dùng.</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication for imported users</source>
+      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+    </message>
+    <message>
+      <source>Group Members Attribute</source>
+      <translation type="unfinished">Group Members Attribute</translation>
     </message>
   </context>
   <context>
@@ -932,8 +928,16 @@
       <translation>Nhóm quyền</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation>Khi Đồng bộ hóa liên tục bị tắt, các nhóm sẽ không tự động đồng bộ hóa. Để cập nhật nhóm này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
+      <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
+      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</translation>
+    </message>
+    <message>
+      <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
+      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+    </message>
+    <message>
+      <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
+      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
     </message>
   </context>
   <context>
@@ -1190,10 +1194,6 @@
       <translation>LDAP chưa được định cấu hình</translation>
     </message>
     <message>
-      <source>Connect your System to a LDAP server for easier user management</source>
-      <translation>Kết nối Hệ thống của bạn với máy chủ LDAP để quản lý người dùng dễ dàng hơn</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>Kết nối</translation>
     </message>
@@ -1262,16 +1262,20 @@
       <translation>VMS đồng bộ người dùng với máy chủ LDAP khi họ đăng nhập vào hệ thống. Các nhóm được đồng bộ hóa trong thời gian thực.</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
-      <translation>Nhập liên tục từ LDAP bị vô hiệu hóa đối với hệ thống này. Việc cập nhật các nhóm và tư cách thành viên của người dùng cũng như của nhóm sẽ chỉ diễn ra thông qua đồng bộ hóa thủ công.</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation>Không có người dùng hoặc nhóm nào phù hợp với cài đặt đồng bộ hóa và được thêm vào cơ sở dữ liệu hệ thống. Đảm bảo các tham số và bộ lọc của máy chủ LDAP được định cấu hình chính xác.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
       <translation>Vui lòng cẩn thận khi thay đổi cài đặt LDAP. Cấu hình không chính xác có thể làm gián đoạn tính khả dụng của hệ thống đối với một số lượng lớn người dùng cùng một lúc.</translation>
+    </message>
+    <message>
+      <source>Connect your System to an LDAP server for easier user management</source>
+      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
     </message>
   </context>
   <context>
@@ -1542,8 +1546,19 @@
       <translation>Thành viên của</translation>
     </message>
     <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
       <source>Built-in</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
       <translation>Tích hợp sẵn</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation>Tùy chỉnh</translation>
     </message>
   </context>
   <context>
@@ -1591,8 +1606,9 @@
       <translation>Tự động thêm quyền phụ thuộc</translation>
     </message>
     <message>
-      <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation>Bảng tài nguyên cung cấp cho bạn cái nhìn tổng quan về quyền của dùng hoặc nhóm và cho phép bạn chỉ định quyền cho các tài nguyên cụ thể. Nhấp vào các ô để chọn và bỏ chọn chúng. Sử dụng kéo&amp;thả và Shift+kéo&amp;thả để chỉnh sửa hàng loạt. Nếu bạn chọn một quyền phụ thuộc vào một quyền khác thì cả hai quyền đó sẽ được cấp tự động.</translation>
+      <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
+      <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
+      <translation type="unfinished">Use %1 or %2 to select multiple lines, or %3 to clear the selection</translation>
     </message>
   </context>
   <context>
@@ -1705,28 +1721,32 @@ to activate PTZ</source>
 để kích hoạt PTZ</translation>
     </message>
     <message>
-      <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>Nhấn các phím mũi tên để di chuyển và các phím cộng hoặc trừ để thu phóng</translation>
-    </message>
-    <message>
-      <source>Use the mouse wheel to zoom</source>
-      <translation>Sử dụng con lăn chuột để thu phóng</translation>
-    </message>
-    <message>
-      <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>Nhấp, nhấp đúp hoặc kéo con trỏ chuột cùng với nhấn phím Shift để sử dụng trình PTZ nâng cao</translation>
-    </message>
-    <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
       <translation>Đi tới Cài đặt cục bộ để bật điểm đánh dấu kéo vào trung tâm của video</translation>
     </message>
     <message>
-      <source>Target lock tracking</source>
-      <translation>Theo dõi khóa mục tiêu</translation>
+      <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
+      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
     </message>
     <message>
-      <source>Alt + Click to follow the object</source>
-      <translation>Alt + Nhấp để theo dõi đối tượng</translation>
+      <source>Use mouse wheel to zoom</source>
+      <translation type="unfinished">Use mouse wheel to zoom</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
+      <translation type="unfinished">Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Target Lock Tracking</source>
+      <translation type="unfinished">Target Lock Tracking</translation>
+    </message>
+    <message>
+      <source>Alt + Click to follow object</source>
+      <translation type="unfinished">Alt + Click to follow object</translation>
+    </message>
+    <message>
+      <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
+      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
     </message>
   </context>
   <context>
@@ -1854,6 +1874,10 @@ to activate PTZ</source>
       <source>OUTDATED</source>
       <translation>Quá hạn</translation>
     </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>KHÔNG TRUY CẬP</translation>
+    </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
@@ -1929,6 +1953,25 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SaasBanner</name>
+    <message>
+      <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+  </context>
+  <context>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
@@ -1955,6 +1998,13 @@ to activate PTZ</source>
     <message>
       <source>Search</source>
       <translation>Tìm kiếm</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecurityOverlay</name>
+    <message>
+      <source>No access</source>
+      <translation>Không có quyền truy cập</translation>
     </message>
   </context>
   <context>
@@ -2324,7 +2374,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Mật khẩu không trùng nhau</translation>
     </message>
   </context>
   <context>
@@ -2348,6 +2398,11 @@ to activate PTZ</source>
     <message>
       <source>Global Permissions</source>
       <translation>Quyền toàn cầu</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Người dùng này chưa đăng ký %1</translation>
     </message>
   </context>
   <context>
@@ -2413,7 +2468,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Liên kết truy cập</translation>
     </message>
     <message>
       <source>Copy Link</source>
@@ -2421,11 +2476,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Chấm dứt</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Liên Kết Mới...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
@@ -2434,11 +2489,28 @@ to activate PTZ</source>
     <message>
       <source>Copied</source>
       <comment>Copied here means that a link is copied</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Đã sao chép</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <source>Obtaining Link...</source>
+      <translation type="unfinished">Obtaining Link...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+    </message>
+    <message>
+      <source>LDAP server is offline. User is not able to log in.</source>
+      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+    </message>
+    <message>
+      <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation type="unfinished">When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
     </message>
   </context>
   <context>

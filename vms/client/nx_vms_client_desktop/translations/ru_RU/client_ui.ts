@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Получить имя системы и настройки из:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation type="unfinished">&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>ИНФО</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Внимание! Превышен предел мощности</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Изменить пароль...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Шифрование видео трафика значительно увеличит нагрузку на процессор.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Соединение с камерами, не поддерживающими HTTPS, будет потеряно.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>Принудительно принимать только зашифрованные соединения</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Детали</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Прикрепить к этому сертификату</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Просмотр закрепленного сертификата</translation>
     </message>
   </context>
   <context>
@@ -2795,22 +2784,6 @@
       <source>Reindex Backup</source>
       <translation>Переиндексировать резервную копию</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Запись на отключённое хранилище прекратится. Однако, удаление устаревших записей будет продолжаться.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Запись была включена на USB-накопителе</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2858,7 +2831,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Группы</translation>
     </message>
   </context>
   <context>
@@ -2964,7 +2937,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Добавить пользователя</translation>
     </message>
     <message>
       <source>Ctrl+F</source>

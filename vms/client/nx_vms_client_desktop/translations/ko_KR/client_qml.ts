@@ -27,16 +27,8 @@
       <translation type="unfinished">Login Attribute</translation>
     </message>
     <message>
-      <source>Allow digest authentication for imported users</source>
-      <translation type="unfinished">Allow digest authentication for imported users</translation>
-    </message>
-    <message>
       <source>Groups</source>
       <translation type="unfinished">Groups</translation>
-    </message>
-    <message>
-      <source>Name Attribute</source>
-      <translation type="unfinished">Name Attribute</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -45,10 +37,6 @@
     <message>
       <source>Misc</source>
       <translation>기타</translation>
-    </message>
-    <message>
-      <source>Group Attribute</source>
-      <translation type="unfinished">Group Attribute</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
@@ -69,6 +57,14 @@
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
       <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication for imported users</source>
+      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+    </message>
+    <message>
+      <source>Group Members Attribute</source>
+      <translation type="unfinished">Group Members Attribute</translation>
     </message>
   </context>
   <context>
@@ -331,8 +327,8 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n 사용자</numerusform>
       </translation>
     </message>
     <message>
@@ -342,11 +338,11 @@
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>활성화</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>비활성화</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
@@ -533,7 +529,7 @@
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>비밀번호는 필수 정보입니다.</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
@@ -932,8 +928,16 @@
       <translation type="unfinished">Permission Groups</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
+      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</translation>
+    </message>
+    <message>
+      <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
+      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+    </message>
+    <message>
+      <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
+      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
     </message>
   </context>
   <context>
@@ -1190,10 +1194,6 @@
       <translation type="unfinished">LDAP is not configured yet</translation>
     </message>
     <message>
-      <source>Connect your System to a LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to a LDAP server for easier user management</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>연결</translation>
     </message>
@@ -1262,16 +1262,20 @@
       <translation type="unfinished">VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
       <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+    </message>
+    <message>
+      <source>Connect your System to an LDAP server for easier user management</source>
+      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
     </message>
   </context>
   <context>
@@ -1432,7 +1436,7 @@
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>만들다</translation>
     </message>
   </context>
   <context>
@@ -1542,8 +1546,19 @@
       <translation type="unfinished">Member of</translation>
     </message>
     <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation type="unfinished">LDAP</translation>
+    </message>
+    <message>
       <source>Built-in</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
       <translation type="unfinished">Built-in</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation>사용자 정의</translation>
     </message>
   </context>
   <context>
@@ -1570,7 +1585,7 @@
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>패스워드가 일치하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -1591,8 +1606,9 @@
       <translation type="unfinished">Automatically add dependent permissions</translation>
     </message>
     <message>
-      <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
+      <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
+      <translation type="unfinished">Use %1 or %2 to select multiple lines, or %3 to clear the selection</translation>
     </message>
   </context>
   <context>
@@ -1704,28 +1720,32 @@ to activate PTZ</source>
 내 아무 영역을 드래그하십시오.</translation>
     </message>
     <message>
-      <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>이동하려면 화살표 키를 누르고 확대 / 축소하려면 더하기 또는 빼기 키를 누릅니다.</translation>
-    </message>
-    <message>
-      <source>Use the mouse wheel to zoom</source>
-      <translation>마우스 휠을 사용하여 확대 / 축소</translation>
-    </message>
-    <message>
-      <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>고급 PTZ를 사용하려면 Shift 키를 누른 상태에서 마우스 포인터를 클릭, 더블 클릭 또는 드래그하십시오.</translation>
-    </message>
-    <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
       <translation>로컬 설정으로 이동하여 비디오 중앙 위로 드래그 마커를 활성화하십시오.</translation>
     </message>
     <message>
-      <source>Target lock tracking</source>
-      <translation type="unfinished">Target lock tracking</translation>
+      <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
+      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
     </message>
     <message>
-      <source>Alt + Click to follow the object</source>
-      <translation type="unfinished">Alt + Click to follow the object</translation>
+      <source>Use mouse wheel to zoom</source>
+      <translation type="unfinished">Use mouse wheel to zoom</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
+      <translation type="unfinished">Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Target Lock Tracking</source>
+      <translation type="unfinished">Target Lock Tracking</translation>
+    </message>
+    <message>
+      <source>Alt + Click to follow object</source>
+      <translation type="unfinished">Alt + Click to follow object</translation>
+    </message>
+    <message>
+      <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
+      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
     </message>
   </context>
   <context>
@@ -1853,6 +1873,10 @@ to activate PTZ</source>
       <source>OUTDATED</source>
       <translation>구식인</translation>
     </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>액세스 불가</translation>
+    </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
@@ -1928,6 +1952,25 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SaasBanner</name>
+    <message>
+      <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+  </context>
+  <context>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
@@ -1954,6 +1997,13 @@ to activate PTZ</source>
     <message>
       <source>Search</source>
       <translation>검색</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecurityOverlay</name>
+    <message>
+      <source>No access</source>
+      <translation>접근 금지</translation>
     </message>
   </context>
   <context>
@@ -2323,7 +2373,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>패스워드가 일치하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -2347,6 +2397,11 @@ to activate PTZ</source>
     <message>
       <source>Global Permissions</source>
       <translation type="unfinished">Global Permissions</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>이 사용자는 아직 %1에 가입하지 않았습니다.</translation>
     </message>
   </context>
   <context>
@@ -2433,11 +2488,28 @@ to activate PTZ</source>
     <message>
       <source>Copied</source>
       <comment>Copied here means that a link is copied</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>복사됨</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <source>Obtaining Link...</source>
+      <translation type="unfinished">Obtaining Link...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+    </message>
+    <message>
+      <source>LDAP server is offline. User is not able to log in.</source>
+      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+    </message>
+    <message>
+      <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation type="unfinished">When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
     </message>
   </context>
   <context>

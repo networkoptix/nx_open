@@ -884,7 +884,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Geri sarma</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
