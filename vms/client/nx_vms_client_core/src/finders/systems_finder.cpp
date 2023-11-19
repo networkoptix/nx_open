@@ -166,7 +166,7 @@ void QnSystemsFinder::onSystemLost(const QString& systemId, int priority)
 
     if (aggregator->isAggregator())
     {
-        aggregator->removeSystem(priority);
+        aggregator->removeSystem(systemId, priority);
         return;
     }
 
