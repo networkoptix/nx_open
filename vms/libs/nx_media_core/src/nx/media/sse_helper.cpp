@@ -101,7 +101,14 @@ QString getCPUString()
 // TODO: ARM: sse analog
 
 #if defined(__arm__) || defined(__aarch64__) || defined(Q_OS_IOS)
-    bool useSSE2() { return false; }
+    bool useSSE2()
+    {
+        #if defined(NX_SSE2_SUPPORTED)
+            return true;
+        #else
+            return false;
+        #endif
+    }
     bool useSSE3() { return false; }
     bool useSSSE3() { return false; }
     bool useSSE41() { return false; }
