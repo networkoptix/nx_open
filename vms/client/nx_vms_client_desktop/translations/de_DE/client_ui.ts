@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Nehmen Sie den Systemnamen und die Einstellungen von:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Achtung! Leistungsgrenze überschritten</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Passwort ändern...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Die Verschlüsselung des Videoverkehrs wird die CPU-Auslastung deutlich erhöhen.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Die Verbindung mit Kameras, die HTTPS nicht unterstützen, geht verloren.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>Server zwingen, nur verschlüsselte Verbindungen zu akzeptieren</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Details</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>An dieses Zertifikat anheften</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Angepinntes Zertifikat anzeigen</translation>
     </message>
   </context>
   <context>
@@ -2795,22 +2784,6 @@
       <source>Reindex Backup</source>
       <translation>Neuindizierung der Sicherung</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Die Aufnahme in den deaktivierten Speicherort wird gestoppt. Das Löschen von veraltetem Filmmaterial wird jedoch fortgesetzt.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Die Aufnahme wurde auf dem USB-Speicher aktiviert</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2945,7 +2918,7 @@
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Gruppe hinzufügen</translation>
     </message>
     <message>
       <source>Ctrl+F</source>
@@ -2964,7 +2937,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Benutzer hinzufügen</translation>
     </message>
     <message>
       <source>Ctrl+F</source>

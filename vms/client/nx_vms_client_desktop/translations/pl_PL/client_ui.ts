@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Nazwę systemu i ustawienia pobierz od:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Uwaga! Przekroczono limit mocy</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Zmień hasło...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Szyfrowanie transmisji wideo znacząco zwiększy użycie procesora.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Połączenie z kamerami, które nie obsługują protokołu HTTPS, zostanie utracone.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>Wymuś akceptowanie tylko zaszyfrowanych połączeń</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Szczegóły</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Podepnij do tego certyfikatu</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Wyświetl podłączony certyfikat</translation>
     </message>
   </context>
   <context>
@@ -2794,22 +2783,6 @@
     <message>
       <source>Reindex Backup</source>
       <translation>Indeksuj backup</translation>
-    </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Nagrywanie na wyłączonym archiwum zostanie wstrzymane. Jednak usuwanie przestarzałego materiału z tego archiwum będzie nadal kontynuowane.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Nagrywanie zostało włączone na nośniku USB</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Dane analityczne mogą zajmować dużo przestrzeni dyskowej. Zalecamy wybranie innej lokalizacji zamiast partycji systemowej.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Dane analityczne będą nadal przechowywane w wyłączonym archiwum.</translation>
     </message>
   </context>
   <context>

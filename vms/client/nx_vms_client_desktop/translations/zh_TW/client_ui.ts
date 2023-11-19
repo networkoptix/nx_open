@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>使用此系統的名稱與設定：</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>信息</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>請注意！超出供電上限</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>更改密碼⋯</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>對影像串流通訊加密會大幅提高CPU使用率。</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>若攝影機不支援 HTTPS ，則無法與攝影機進行連線。</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>強制伺服器僅允許加密的連線連入</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>細節</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>綁定此憑證</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>檢視綁定的憑證</translation>
     </message>
   </context>
   <context>
@@ -2795,22 +2784,6 @@
       <source>Reindex Backup</source>
       <translation>重新建立備份索引檔</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>將停止錄影到停用的儲存裝置上, 而且舊的錄影資料將繼續被刪除.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>已啟用錄影於USB儲存裝置上</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>分析資料可能會佔用大量硬碟空間。建議選擇其他位置，不要存放於系統磁區。</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>分析與位移資料將持續儲存於已停用的儲存裝置上。</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2945,7 +2918,7 @@
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>新增群組</translation>
     </message>
     <message>
       <source>Ctrl+F</source>
@@ -2964,7 +2937,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>新增使用者</translation>
     </message>
     <message>
       <source>Ctrl+F</source>

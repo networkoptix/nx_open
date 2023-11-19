@@ -196,29 +196,29 @@
       <translation>システムヘルスビューアー</translation>
     </message>
     <message>
-      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>このグループのメンバーには無制限のシステム権限があります。管理者は、パワーユーザーの作成および変更、システムの統合、 %1 アカウントへの紐づけまたは解除ができます。</translation>
-    </message>
-    <message>
-      <source>Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation>このグループのメンバーは、システム構成の大部分を制御できますが、管理者向け設定の変更、および自身に対するグループと権限の変更や削除は許可されておらず、他のパワーユーザーの作成や編集もできません。</translation>
-    </message>
-    <message>
-      <source>Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation>このグループのメンバーは、PTZポジションおよびPTZツアーの表示と実行、双方向音声の使用、I/Oモジュールボタンの操作、ブックマークの作成と編集、イベントログの表示が可能です。</translation>
-    </message>
-    <message>
-      <source>Members of this group can view and export archive and Bookmarks.</source>
-      <translation>このグループのメンバーは、アーカイブとブックマークの表示およびエクスポートが可能です。</translation>
-    </message>
-    <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
       <translation>このグループのメンバーは、ライブ映像、I/Oモジュール、Webページを表示できます。</translation>
     </message>
     <message>
-      <source>Members of this group can view System Health Monitoring information.</source>
-      <translation>このグループのメンバーは、システムの状態監視に関する情報を表示できます。</translation>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
+      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
     </message>
   </context>
   <context>
@@ -1514,10 +1514,6 @@
       <translation>レコードキューの最大サイズ (要素数, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>RTPリトライ回数</translation>
-    </message>
-    <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTPタイムアウト (ミリ秒)</translation>
     </message>
@@ -1730,11 +1726,6 @@
       <translation>認証セッショントークンの有効期間 (秒)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>クラウドに接続するように指定されたサーバーのセミコロン区切りのリスト。リストの先頭にあるサーバーの優先度が高くなります。リストが空の場合、クラウド接続用のサーバーが自動的に選択されます。</translation>
     </message>
@@ -1745,6 +1736,23 @@
     <message>
       <source>Enable deprecated API functions (insecure)</source>
       <translation>非推奨の API 関数を有効にする (非セキュア)</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>サーバーが RTSP セッションに再接続するまでの連続 RTP エラーの最大数。</translation>
+    </message>
+    <message>
+      <source>Channel partners service</source>
+      <translation type="unfinished">Channel partners service</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+    </message>
+    <message>
+      <source>Organization Id</source>
+      <translation type="unfinished">Organization Id</translation>
     </message>
   </context>
   <context>
@@ -2458,32 +2466,33 @@
       <source>LDAP Sync Issue</source>
       <translation>LDAP 同期の問題</translation>
     </message>
-    <message>
-      <source>Failed to connect to LDAP</source>
-      <translation>LDAP への接続に失敗しました</translation>
-    </message>
-    <message>
-      <source>Failed to complete sync within a %1 timeout</source>
-      <translation>%1 のタイムアウト以内に同期を完了できませんでした</translation>
-    </message>
-    <message>
-      <source>Failed to complete sync within a given timeout</source>
-      <translation>指定されたタイムアウト以内に同期を完了できませんでした</translation>
-    </message>
-    <message>
-      <source>There are zero LDAP users in VMS after sync</source>
-      <translation>同期後、VMS 上の LDAP ユーザーは存在しなくなります</translation>
-    </message>
-    <message>
-      <source>Some LDAP users were not found in LDAP</source>
-      <translation>一部の LDAP ユーザーが LDAP 上で見つかりませんでした</translation>
-    </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
       <translation>
         <numerusform>%1 (%n 回)</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a given timeout.</source>
+      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
     </message>
   </context>
 </TS>

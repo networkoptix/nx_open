@@ -35,7 +35,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>시스템 이벤트</translation>
     </message>
   </context>
   <context>
@@ -1129,6 +1129,10 @@
       <translation>없음</translation>
     </message>
     <message>
+      <source>automatic</source>
+      <translation>자동 설정</translation>
+    </message>
+    <message>
       <source>Event Occurs</source>
       <translation type="unfinished">Event Occurs</translation>
     </message>
@@ -1139,10 +1143,6 @@
     <message>
       <source>Event Stops</source>
       <translation type="unfinished">Event Stops</translation>
-    </message>
-    <message>
-      <source>automatic</source>
-      <translation>자동 설정</translation>
     </message>
   </context>
   <context>
@@ -1388,10 +1388,6 @@
       <translation>이미 다른 서버에서 활성화된 라이선스 입니다.</translation>
     </message>
     <message>
-      <source>You already activated this license</source>
-      <translation>이 라이선스를 이미 활성화했습니다.</translation>
-    </message>
-    <message>
       <source>To activate License Key manually please contact %1.</source>
       <translation>라이선스 키를 수동으로 활성화하려면 %1에 연락하십시오.</translation>
     </message>
@@ -1444,6 +1440,10 @@ License Key: %2</translation>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
       <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+    </message>
+    <message>
+      <source>License has already been activated</source>
+      <translation type="unfinished">License has already been activated</translation>
     </message>
   </context>
   <context>
@@ -1656,10 +1656,6 @@ License Key: %2</translation>
       <translation type="unfinished">Insecure</translation>
     </message>
     <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>연결 실패</translation>
     </message>
@@ -1669,7 +1665,23 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>비밀번호는 필수 정보입니다.</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation type="unfinished">Users are receiving emails</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation type="unfinished">Unable to test SMTP server</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation type="unfinished">Additional info required</translation>
     </message>
   </context>
   <context>
@@ -1709,44 +1721,44 @@ License Key: %2</translation>
       <translation>사용불가</translation>
     </message>
     <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>라틴 문자, 숫자 및 키보드 기호 %1 만 허용됩니다.</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>숫자, 영문자, 키보드 특수문자만 입력할 수 있습니다.</translation>
-    </message>
-    <message>
       <source>Password should contain different types of symbols</source>
-      <translation type="unfinished">Password should contain different types of symbols</translation>
+      <translation>암호는 다양한 유형의 기호를 포함 해야 합니다.</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>암호는 %n 개 이상의 문자 이어야 합니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
+      <translation>
+        <numerusform>암호는 %n 이상의 문자를 초과 할수 없습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>암호는 %n개 이상의 같은문자가 연속으로 함께 포함되어서는 안됩니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>암호는 %n 개 이상의 반복문자가 포함되어서는 안됩니다</numerusform>
       </translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
-      <translation type="unfinished">This password is in list of the most popular passwords</translation>
+      <translation>이 암호는 가장 흔한 암호입니다</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
+      <translation>라틴 문자, 숫자 및 키보드 기호 %1 만 허용됩니다</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols are allowed</source>
+      <translation>라틴 문자, 숫자 및 키보드 기호만 사용할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -1874,6 +1886,18 @@ License Key: %2</translation>
     <message>
       <source>Regional / License support</source>
       <translation>지역 / 라이선스 지원</translation>
+    </message>
+    <message>
+      <source>Partner information</source>
+      <translation type="unfinished">Partner information</translation>
+    </message>
+    <message>
+      <source>Phones</source>
+      <translation type="unfinished">Phones</translation>
+    </message>
+    <message>
+      <source>Emails</source>
+      <translation type="unfinished">Emails</translation>
     </message>
   </context>
   <context>
@@ -2876,7 +2900,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>패스워드가 일치하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -2902,15 +2926,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>패스워드가 일치하지 않습니다.</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>비밀 번호를 수정 하려면 기존암호를 입력하세요</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>현재 비밀번호는 유효하지 않습니다</translation>
     </message>
   </context>
   <context>
@@ -3188,7 +3212,7 @@ to %1</source>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>세션이 만료되었습니다.</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
@@ -3972,15 +3996,6 @@ to %1</source>
       <source>Lo-Res</source>
       <translation>저해상도</translation>
     </message>
-    <message>
-      <source>press and hold</source>
-      <comment>Soft Trigger</comment>
-      <translation>누르고 있음</translation>
-    </message>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>일정에 따라 중지됨</translation>
-    </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
       <translation>
@@ -4002,6 +4017,15 @@ to %1</source>
     <message>
       <source>Hotspots</source>
       <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Soft Trigger</comment>
+      <translation>누르고 있음</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>일정에 따라 중지됨</translation>
     </message>
   </context>
   <context>
@@ -4140,8 +4164,8 @@ to %1</source>
   <context>
     <name>QnPopupSettingsWidget</name>
     <message>
-      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
+      <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
+      <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
     </message>
   </context>
   <context>
@@ -4914,12 +4938,12 @@ to %1</source>
       <translation type="unfinished">Provide</translation>
     </message>
     <message>
-      <source>SAAS SHUT DOWN</source>
-      <translation type="unfinished">SAAS SHUT DOWN</translation>
-    </message>
-    <message>
       <source>NO EXPORT PERMISSION</source>
       <translation type="unfinished">NO EXPORT PERMISSION</translation>
+    </message>
+    <message>
+      <source>SAAS SHUT DOWN</source>
+      <translation type="unfinished">SAAS SHUT DOWN</translation>
     </message>
     <message>
       <source>NO CONNECTION TO THE LICENSE SERVER</source>
@@ -5049,6 +5073,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Insufficient permissions to store analytics data.</source>
       <translation>분석 데이터를 저장할 수있는 권한이 없습니다.</translation>
     </message>
+    <message>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage</source>
+      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>비활성화 된 저장 장치에 녹화는 중지됩니다. 그러나 오래된 영상을 삭제하는 것은 계속합니다.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>USB 저장소에서 저장이 활성화되었습니다.</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
+      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
+      <translation type="unfinished">If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -5139,6 +5187,26 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Stores analytics and motion data</source>
       <translation type="unfinished">Stores analytics and motion data</translation>
+    </message>
+    <message>
+      <source>cloud</source>
+      <translation>클라우드</translation>
+    </message>
+    <message>
+      <source>Path</source>
+      <translation type="unfinished">Path</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>방식</translation>
+    </message>
+    <message>
+      <source>Purpose</source>
+      <translation type="unfinished">Purpose</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>크기</translation>
     </message>
   </context>
   <context>
@@ -5247,7 +5315,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>서비스</translation>
     </message>
   </context>
   <context>
@@ -5514,11 +5582,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>비밀번호는 필수 정보입니다.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
-      <translation type="unfinished">Avoid leading and trailing spaces</translation>
+      <translation>앞뒤공백을 두지 마십시오</translation>
     </message>
   </context>
   <context>
@@ -6207,17 +6275,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       </translation>
     </message>
     <message numerus="yes">
-      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Delete user?</source>
-      <translation>사용자 삭제?</translation>
-    </message>
-    <message numerus="yes">
       <source>%n items were not deleted.</source>
       <translation type="unfinished">
         <numerusform>%n items were not deleted.</numerusform>
@@ -6228,11 +6285,22 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation type="unfinished">Delete layout?</translation>
     </message>
     <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerical form depends on layouts count</comment>
+      <translation type="unfinished">
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
       <translation type="unfinished">
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>사용자 삭제?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
@@ -6634,48 +6702,24 @@ We recommend you not to open this integration. If you understand the risks, you 
   <context>
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
-      <source>Has access to a resource, can view live footage from a camera</source>
-      <translation type="unfinished">Has access to a resource, can view live footage from a camera</translation>
-    </message>
-    <message>
       <source>View Archive</source>
       <translation type="unfinished">View Archive</translation>
-    </message>
-    <message>
-      <source>Can view archive footage</source>
-      <translation type="unfinished">Can view archive footage</translation>
     </message>
     <message>
       <source>Export Archive</source>
       <translation type="unfinished">Export Archive</translation>
     </message>
     <message>
-      <source>Can export parts of archive</source>
-      <translation type="unfinished">Can export parts of archive</translation>
-    </message>
-    <message>
       <source>View Bookmarks</source>
       <translation type="unfinished">View Bookmarks</translation>
-    </message>
-    <message>
-      <source>Can view bookmarks</source>
-      <translation type="unfinished">Can view bookmarks</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
       <translation>즐겨찾기 관리</translation>
     </message>
     <message>
-      <source>Can modify bookmarks</source>
-      <translation type="unfinished">Can modify bookmarks</translation>
-    </message>
-    <message>
       <source>User Input</source>
       <translation>사용자 입력</translation>
-    </message>
-    <message>
-      <source>Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</source>
-      <translation type="unfinished">Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</translation>
     </message>
     <message>
       <source>Edit Settings</source>
@@ -6692,6 +6736,22 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
       <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation type="unfinished">View Live.</translation>
+    </message>
+    <message>
+      <source>Allows users to access a resource and view live footage from a camera.</source>
+      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+    </message>
+    <message>
+      <source>Modify Bookmarks</source>
+      <translation type="unfinished">Modify Bookmarks</translation>
+    </message>
+    <message>
+      <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
+      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
     </message>
   </context>
   <context>
@@ -6952,7 +7012,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>해상도:</translation>
     </message>
   </context>
   <context>
@@ -6998,18 +7058,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>새로 추가된 카메라</translation>
     </message>
     <message>
-      <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation>새로 추가된 카메라 설정은 시스템의 모든 서버에 적용됩니다.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation>시스템의 모든 서버에 새로 추가된 카메라에 대한 백업이 켜집니다.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation>시스템의 모든 서버에 새로 추가된 카메라에 대한 백업이 해제됩니다.</translation>
-    </message>
-    <message>
       <source>Storage Management</source>
       <translation>저장장치 관리자</translation>
     </message>
@@ -7025,7 +7073,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>서버는 오프 라인 입니다</translation>
     </message>
     <message>
       <source>Backup settings are not available</source>
@@ -7034,6 +7082,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
       <translation type="unfinished">To perform backup to the cloud storage SaaS must be in active state. %1</translation>
+    </message>
+    <message>
+      <source>– Applies to all servers</source>
+      <translation type="unfinished">– Applies to all servers</translation>
     </message>
   </context>
   <context>
@@ -7117,17 +7169,13 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Applying changes...</source>
       <translation>변경 적용</translation>
     </message>
+    <message>
+      <source>Force Motion Detection</source>
+      <translation>포스 모션 감지</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
-    <message>
-      <source>Heater</source>
-      <translation>히터</translation>
-    </message>
-    <message>
-      <source>Wiper</source>
-      <translation>와이퍼</translation>
-    </message>
     <message>
       <source>Mute</source>
       <translation type="unfinished">Mute</translation>
@@ -7135,6 +7183,14 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Unmute</source>
       <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Heater</source>
+      <translation>히터</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>와이퍼</translation>
     </message>
     <message>
       <source>Open Door</source>
@@ -7202,10 +7258,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>팬 &amp; 틸트</translation>
     </message>
     <message>
-      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>녹화 일정의 화질 및 프레임 속도 (FPS) 설정은 관련성이 없어집니다.</translation>
-    </message>
-    <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>서버는 카메라에 시간 설정을 푸시하지 않습니다.</translation>
     </message>
@@ -7225,6 +7277,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
       <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+    </message>
+    <message>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
+      <translation>녹화 일정의 화질 및 프레임 속도 (FPS) 설정은 관련성이 없어집니다</translation>
     </message>
   </context>
   <context>
@@ -7263,6 +7319,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>NO DATA</source>
       <translation>데이터 없음</translation>
+    </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>액세스 불가</translation>
     </message>
   </context>
   <context>
@@ -7367,12 +7427,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>포스 모션 감지</translation>
     </message>
     <message>
-      <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation>미리보기에서 선택한 감도를 설정할 영역을 선택합니다.</translation>
+      <source>Select areas on the preview to set chosen sensitivity for</source>
+      <translation>미리보기에서 선택한 감도를 설정할 영역을 선택합니다</translation>
     </message>
     <message>
-      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation>모션 감지 감도를 선택하고 미리보기에서 설정할 일부 영역을 선택합니다.</translation>
+      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for</source>
+      <translation>모션 감지 감도를 선택하고 미리보기에서 설정할 일부 영역을 선택합니다</translation>
     </message>
   </context>
   <context>
@@ -7442,24 +7502,24 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>서버 시간에 따라</translation>
     </message>
     <message>
-      <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>선택한 매개 변수를 적용 하려면 영역을 선택 하세요</translation>
-    </message>
-    <message>
-      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>녹화 매개 변수를 설정 하 고 그들을 적용 하려면 스케쥴영역을 선택 합니다.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>High minimum value can lead to archive length decrease on other devices.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>High minimum value can lead to archive length decrease on other cameras.</translation>
-    </message>
-    <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
       <translation>사전녹화 시간을 늘리면 서버의 RAM 사용률이 증가됩니다.</translation>
+    </message>
+    <message>
+      <source>Select areas on the schedule to apply chosen parameters to</source>
+      <translation type="unfinished">Select areas on the schedule to apply chosen parameters to</translation>
+    </message>
+    <message>
+      <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
+      <translation>녹화 매개 변수를 설정 하 고 그들을 적용 하려면 스케쥴영역을 선택 합니다</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices</source>
+      <translation>High minimum value can lead to archive length decrease on other devices</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras</source>
+      <translation>High minimum value can lead to archive length decrease on other cameras</translation>
     </message>
   </context>
   <context>
@@ -8107,20 +8167,24 @@ We recommend you not to open this integration. If you understand the risks, you 
   <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
-      <source>This camera requires password to be set up.</source>
-      <translation>이 카메라는 패스워드를 설정해야합니다.</translation>
-    </message>
-    <message>
-      <source>Some of selected cameras require password to be set up.</source>
-      <translation>선택한 카메라 중 일부는 암호를 설정해야합니다.</translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>시스템 관리자에게 요청하십시오.</translation>
-    </message>
-    <message>
       <source>Set Password</source>
       <translation>암호 설정</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up</source>
+      <translation>이 카메라는 암호설정이 요구됩니다</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up</source>
+      <translation>선택한 카메라 중 일부는 암호를 설정해야합니다</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
+      <translation type="unfinished">This camera requires password to be set up. Ask your system administrator to do it.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
+      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your system administrator to do it.</translation>
     </message>
   </context>
   <context>
@@ -8257,6 +8321,13 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>System Administration</source>
       <translation>시스템 관리자</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DirectParentsModel</name>
+    <message>
+      <source>LDAP group membership is managed in LDAP</source>
+      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
     </message>
   </context>
   <context>
@@ -8985,6 +9056,10 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>LDAP</source>
       <translation type="unfinished">LDAP</translation>
     </message>
+    <message>
+      <source>Cannot connect to LDAP server</source>
+      <translation type="unfinished">Cannot connect to LDAP server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LicenseManagerWidget</name>
@@ -9265,13 +9340,6 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::MembersModel</name>
-    <message>
-      <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -9337,6 +9405,14 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Failed to merge Systems</source>
       <translation>시스템을 병합 하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>We recommend that you consult with %1 before proceeding.</source>
+      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
+    </message>
+    <message>
+      <source>support</source>
+      <translation>지원</translation>
     </message>
   </context>
   <context>
@@ -9429,13 +9505,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 시스템에는 다른 소유자가 있습니다. 병합은 허용되지 않습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MessageBar</name>
-    <message>
-      <source>Close</source>
-      <translation>닫기</translation>
     </message>
   </context>
   <context>
@@ -9743,10 +9812,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>인터넷에서 업데이트를 확인할 수 없습니다</translation>
     </message>
     <message>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>금요일에 시스템 업데이트를 적용 하는 것은 권장 하지 않습니다.</translation>
-    </message>
-    <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>사용자 지정 클라이언트를 사용하고 있습니다. 업데이트 지침을 보려면 %1에 문의하십시오.</translation>
     </message>
@@ -9757,6 +9822,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Uploading offline update packages to Servers...</source>
       <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+    </message>
+    <message>
+      <source>Applying System updates at the end of the week is not recommended</source>
+      <translation>금요일에 시스템 업데이트를 적용 하는 것은 권장 하지 않습니다</translation>
     </message>
   </context>
   <context>
@@ -9820,10 +9889,6 @@ You can force it, but it may significantly increase CPU load.</source>
       <translation>레이아웃 선택...</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners.</source>
-      <translation>로컬 레이아웃은 소유자에게만 표시 할 수 있습니다.</translation>
-    </message>
-    <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>선택된 사용자 역할 중 어느 것도 사용자를 포함하지 않습니다. 작동하지 않을것입니다.</translation>
     </message>
@@ -9834,6 +9899,10 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
       <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners</source>
+      <translation>로컬 레이아웃은 소유자에게만 표시 할 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -9849,17 +9918,6 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Learn more</source>
       <translation>자세히 알아보기</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ParentGroupsProvider</name>
-    <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
-    </message>
-    <message>
-      <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
     </message>
   </context>
   <context>
@@ -10033,6 +10091,13 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::PoeSettingsWidget</name>
+    <message>
+      <source>Attention! Power limit exceeded</source>
+      <translation>주의! 전력 한도 초과</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
     <message>
       <source>Added</source>
@@ -10153,6 +10218,14 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Edit Proxied Integration</source>
       <translation type="unfinished">Edit Proxied Integration</translation>
+    </message>
+    <message>
+      <source>To allow the use of a client API, create a web integration instead. %1</source>
+      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+    </message>
+    <message>
+      <source>Learn more...</source>
+      <translation>자세히 알아보기...</translation>
     </message>
   </context>
   <context>
@@ -10668,6 +10741,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
       <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
     </message>
+    <message>
+      <source>Encrypting video traffic may significantly increase CPU usage</source>
+      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+    </message>
+    <message>
+      <source>Connection with cameras that do not support HTTPS will be lost</source>
+      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
@@ -10729,16 +10810,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Unknown Certificate</translation>
     </message>
     <message>
-      <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
-    </message>
-    <message>
       <source>OK</source>
       <translation>확인</translation>
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
       <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+    </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation type="unfinished">Not Part Of Certificate</translation>
+    </message>
+    <message>
+      <source>View pinned certificate</source>
+      <translation>고정된 인증서 보기</translation>
+    </message>
+    <message>
+      <source>Pin to this certificate</source>
+      <translation>이 인증서에 고정</translation>
     </message>
   </context>
   <context>
@@ -11306,6 +11395,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>상세설명</translation>
     </message>
     <message>
+      <source>You do not have permissions to modify or delete this group.</source>
+      <translation type="unfinished">You do not have permissions to modify or delete this group.</translation>
+    </message>
+    <message>
       <source>Group is not found in the LDAP database.</source>
       <translation type="unfinished">Group is not found in the LDAP database.</translation>
     </message>
@@ -11316,10 +11409,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
       <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
-    </message>
-    <message>
-      <source>You do not have permissions to modify or delete this group.</source>
-      <translation type="unfinished">You do not have permissions to modify or delete this group.</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11333,12 +11422,60 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
   <context>
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
-      <source>Group does not exist</source>
-      <translation type="unfinished">Group does not exist</translation>
+      <source>Invalid JSON</source>
+      <translation type="unfinished">Invalid JSON</translation>
     </message>
     <message>
-      <source>User does not exist</source>
-      <translation type="unfinished">User does not exist</translation>
+      <source>Invalid request</source>
+      <translation type="unfinished">Invalid request</translation>
+    </message>
+    <message>
+      <source>Method not found</source>
+      <translation type="unfinished">Method not found</translation>
+    </message>
+    <message>
+      <source>Invalid parameters</source>
+      <translation>유효하지 않은 파라미터</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>내부 오류</translation>
+    </message>
+    <message>
+      <source>Connection failure</source>
+      <translation type="unfinished">Connection failure</translation>
+    </message>
+    <message>
+      <source>Invalid encoding</source>
+      <translation type="unfinished">Invalid encoding</translation>
+    </message>
+    <message>
+      <source>Invalid encoding charset</source>
+      <translation type="unfinished">Invalid encoding charset</translation>
+    </message>
+    <message>
+      <source>Application Error</source>
+      <translation type="unfinished">Application Error</translation>
+    </message>
+    <message>
+      <source>System Error</source>
+      <translation type="unfinished">System Error</translation>
+    </message>
+    <message>
+      <source>Transport Error</source>
+      <translation type="unfinished">Transport Error</translation>
+    </message>
+    <message>
+      <source>Server error code %1</source>
+      <translation type="unfinished">Server error code %1</translation>
+    </message>
+    <message>
+      <source>Reserved error code %1</source>
+      <translation type="unfinished">Reserved error code %1</translation>
+    </message>
+    <message>
+      <source>Unknown error code %1</source>
+      <translation type="unfinished">Unknown error code %1</translation>
     </message>
   </context>
   <context>
@@ -11356,20 +11493,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Change search criteria or create a new group</translation>
     </message>
     <message>
-      <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
       <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
     </message>
@@ -11384,6 +11507,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">
         <numerusform>Delete %n groups</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation type="unfinished">Failed to delete group.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n groups.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
     </message>
   </context>
   <context>
@@ -11418,8 +11559,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>사용자 정의</translation>
     </message>
     <message>
-      <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <source>You do not have permissions to modify this user.</source>
+      <translation type="unfinished">You do not have permissions to modify this user.</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
@@ -11434,8 +11575,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Temporary user</translation>
     </message>
     <message>
-      <source>You do not have permissions to modify this user.</source>
-      <translation type="unfinished">You do not have permissions to modify this user.</translation>
+      <source>Full Name</source>
+      <translation type="unfinished">Full Name</translation>
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
@@ -11473,15 +11614,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
     </message>
     <message numerus="yes">
-      <source>%n existing LDAP users are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Delete %n users</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users</numerusform>
+      <translation>
+        <numerusform>%n 사용자 삭제</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11498,6 +11633,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Failed to delete %n users.</source>
       <translation type="unfinished">
         <numerusform>Failed to delete %n users.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation type="unfinished">
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
       </translation>
     </message>
   </context>
@@ -11552,12 +11693,28 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>무시</translation>
     </message>
     <message>
+      <source>Copy Access Link</source>
+      <translation type="unfinished">Copy Access Link</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation>현재 비밀번호는 유효하지 않습니다</translation>
+    </message>
+    <message>
       <source>Email cannot be empty</source>
       <translation>이메일은 필수 정보입니다.</translation>
     </message>
     <message>
-      <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <source>Login cannot be empty</source>
+      <translation>로그인은 필수 정보입니다.</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed</source>
+      <translation>문자, 숫자 및 기호 %1 만 허용됩니다</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists</source>
+      <translation>지정된 사용자가 이미 존재합니다</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
@@ -11584,37 +11741,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>만들다</translation>
     </message>
     <message>
-      <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
-    </message>
-    <message>
-      <source>and</source>
-      <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
-    </message>
-    <message>
-      <source>User %1 has been successfully created!</source>
-      <translation type="unfinished">User %1 has been successfully created!</translation>
-    </message>
-    <message>
-      <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists</source>
-      <translation type="unfinished">User with specified login already exists</translation>
-    </message>
-    <message>
       <source>New Link - %1</source>
       <translation type="unfinished">New Link - %1</translation>
+    </message>
+    <message>
+      <source>Access link has been successfully created!</source>
+      <translation type="unfinished">Access link has been successfully created!</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
@@ -11625,13 +11757,31 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
     </message>
     <message>
-      <source>in %1</source>
-      <comment>%1 is a duration</comment>
-      <translation type="unfinished">in %1</translation>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation type="unfinished">and</translation>
     </message>
     <message>
       <source>New User</source>
       <translation type="unfinished">New User</translation>
+    </message>
+    <message>
+      <source>User %1 has been successfully created!</source>
+      <translation type="unfinished">User %1 has been successfully created!</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation type="unfinished">Obtaining Link...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+    </message>
+    <message>
+      <source>in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation>%1에서</translation>
     </message>
   </context>
   <context>
@@ -11750,7 +11900,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Developer Tools</source>
-      <translation type="unfinished">Developer Tools</translation>
+      <translation>개발자 도구</translation>
     </message>
   </context>
   <context>
@@ -12369,12 +12519,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>레이아웃 선택...</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners.</source>
-      <translation>로컬 레이아웃은 소유자에게만 표시 할 수 있습니다.</translation>
-    </message>
-    <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
       <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners</source>
+      <translation>로컬 레이아웃은 소유자에게만 표시 할 수 있습니다</translation>
     </message>
   </context>
   <context>
@@ -12465,7 +12615,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>전체</translation>
     </message>
     <message>
       <source>Used</source>
@@ -12902,6 +13052,14 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     <message>
       <source>Not enough access rights</source>
       <translation type="unfinished">Not enough access rights</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to open this camera on the layout</source>
+      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to open some of selected cameras on the layout</source>
+      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
     </message>
   </context>
   <context>

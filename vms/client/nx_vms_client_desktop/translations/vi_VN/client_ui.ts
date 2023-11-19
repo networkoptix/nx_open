@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Lấy tên hệ thống và cài đặt từ:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>THÔNG TIN</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Chú ý! Vượt quá giới hạn công suất</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Thay đổi mật khẩu...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Mã hóa lưu lượng video sẽ tăng đáng kể việc sử dụng CPU.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Sẽ bị mất kết nối với camera không hỗ trợ HTTPS.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>Buộc các máy chủ chỉ chấp nhận các kết nối được mã hóa</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Chi tiết</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Ghim vào chứng chỉ này</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Xem chứng chỉ đã ghim</translation>
     </message>
   </context>
   <context>
@@ -2794,22 +2783,6 @@
     <message>
       <source>Reindex Backup</source>
       <translation>Lập lại chỉ mục Sao lưu</translation>
-    </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Ghi vào vị trí lưu trữ bị vô hiệu hóa sẽ dừng lại. Tuy nhiên, việc xóa các đoạn phim lỗi thời khỏi nó sẽ tiếp tục.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Dữ liệu phân tích có thể chiếm một lượng lớn dung lượng. Chúng tôi khuyên bạn nên chọn một vị trí khác thay vì phân vùng hệ thống.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Dữ liệu phân tích và chuyển động sẽ tiếp tục được lưu trữ trên bộ nhớ đã bị vô hiệu hóa.</translation>
     </message>
   </context>
   <context>

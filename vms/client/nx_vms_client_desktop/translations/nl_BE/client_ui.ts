@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Neem de systeemnaam en instellingen over van:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation>&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Opgelet! Stroomlimiet overschreden</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Wachtwoord wijzigen...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Versleuteling van videoverkeer zal het CPU-gebruik aanzienlijk verhogen.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Verbinding met camera's die geen HTTPS ondersteunen, wordt verbroken.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>Forceer servers alleen versleutelde verbindingen te accepteren</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Details</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Dit certificaat vastmaken</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Vastgezet certificaat weergeven</translation>
     </message>
   </context>
   <context>
@@ -2794,22 +2783,6 @@
     <message>
       <source>Reindex Backup</source>
       <translation>Backup herindexeren</translation>
-    </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Opname van de uitgeschakelde opslag zal stoppen. Echter, het overschrijven dan de oudste beelden gaat gewoon door.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Opname is ingeschakeld op de USB-opslag</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
     </message>
   </context>
   <context>
@@ -2964,7 +2937,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Gebruiker toevoegen</translation>
     </message>
     <message>
       <source>Ctrl+F</source>

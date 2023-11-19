@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Sistem adını ve ayarlarını al:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>BİLGİ</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Dikkat! Güç sınırı aşıldı</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Parolayı değiştir...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Video trafiğini şifrelemek, CPU kullanımını önemli ölçüde artıracaktır.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>HTTPS'yi desteklemeyen kameralarla bağlantı kesilecek.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>Sunucuları yalnızca şifrelenmiş bağlantıları kabul etmeye zorla</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Detaylar</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Bu sertifikaya sabitle</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Sabitlenmiş sertifikayı görüntüle</translation>
     </message>
   </context>
   <context>
@@ -2794,22 +2783,6 @@
     <message>
       <source>Reindex Backup</source>
       <translation>Yedeklemeyi tekrar indexle</translation>
-    </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Kayıt depolama durduralacaktır. Hedef dışı kayıtlar silinmeye devam edecektir.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>USB depolamada kayıt etkinleştirildi</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Analitik verileri büyük miktarda yer kaplayabilir. Bunun için sistem bölümü yerine başka bir konum seçmenizi öneririz.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Analitik ve hareket verileri, devre dışı bırakılan depolama alanında saklanmaya devam edecektir.</translation>
     </message>
   </context>
   <context>

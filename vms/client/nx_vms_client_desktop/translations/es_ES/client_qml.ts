@@ -27,16 +27,8 @@
       <translation type="unfinished">Login Attribute</translation>
     </message>
     <message>
-      <source>Allow digest authentication for imported users</source>
-      <translation type="unfinished">Allow digest authentication for imported users</translation>
-    </message>
-    <message>
       <source>Groups</source>
       <translation type="unfinished">Groups</translation>
-    </message>
-    <message>
-      <source>Name Attribute</source>
-      <translation type="unfinished">Name Attribute</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -45,10 +37,6 @@
     <message>
       <source>Misc</source>
       <translation>Misc</translation>
-    </message>
-    <message>
-      <source>Group Attribute</source>
-      <translation type="unfinished">Group Attribute</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
@@ -69,6 +57,14 @@
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
       <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication for imported users</source>
+      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+    </message>
+    <message>
+      <source>Group Members Attribute</source>
+      <translation type="unfinished">Group Members Attribute</translation>
     </message>
   </context>
   <context>
@@ -334,9 +330,9 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Usuarios</numerusform>
+        <numerusform>%n Usuarios</numerusform>
       </translation>
     </message>
     <message>
@@ -346,11 +342,11 @@
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Habilitado</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Desactivado</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
@@ -539,7 +535,7 @@
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>El campo de Contraseña no puede estar vacío</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
@@ -938,8 +934,16 @@
       <translation type="unfinished">Permission Groups</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
+      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</translation>
+    </message>
+    <message>
+      <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
+      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+    </message>
+    <message>
+      <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
+      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
     </message>
   </context>
   <context>
@@ -1197,10 +1201,6 @@
       <translation type="unfinished">LDAP is not configured yet</translation>
     </message>
     <message>
-      <source>Connect your System to a LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to a LDAP server for easier user management</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>Conexión</translation>
     </message>
@@ -1269,16 +1269,20 @@
       <translation>VMS sincroniza a los usuarios con el servidor LDAP cuando inician sesión en el sistema. Los grupos se sincronizan en tiempo real.</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
-      <translation>La importación continua desde LDAP está deshabilitada para este sistema. Las actualizaciones de grupos y membresías de usuarios y grupos; se realizarán únicamente mediante sincronización manual.</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation>Ningún usuario o grupo coincide con la configuración de sincronización y se agrega a la base de datos del sistema. Asegúrese de que los parámetros y filtros del servidor LDAP estén configurados correctamente.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
       <translation>Tenga cuidado al modificar la configuración de LDAP. Una configuración incorrecta podría alterar la disponibilidad del sistema para una gran cantidad de usuarios simultáneamente.</translation>
+    </message>
+    <message>
+      <source>Connect your System to an LDAP server for easier user management</source>
+      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
     </message>
   </context>
   <context>
@@ -1551,8 +1555,19 @@
       <translation>Miembro de</translation>
     </message>
     <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation type="unfinished">LDAP</translation>
+    </message>
+    <message>
       <source>Built-in</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
       <translation>Integrado</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation>Personalizado</translation>
     </message>
   </context>
   <context>
@@ -1600,8 +1615,9 @@
       <translation>Agregar automáticamente permisos dependientes</translation>
     </message>
     <message>
-      <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation>La tabla de recursos le brinda una descripción general de los permisos de los usuarios o del grupo y le permite asignar permisos para recursos específicos. Haga clic en las celdas para seleccionarlas y deseleccionarlas. Utilice arrastrar y soltar y Mayús+arrastrar y soltar para editar por lotes. Si selecciona un permiso que depende de otro permiso, ambos permisos se otorgarán automáticamente.</translation>
+      <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
+      <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
+      <translation type="unfinished">Use %1 or %2 to select multiple lines, or %3 to clear the selection</translation>
     </message>
   </context>
   <context>
@@ -1716,28 +1732,32 @@ to activate PTZ</source>
 para activar PTZ</translation>
     </message>
     <message>
-      <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>Presione las teclas de flechas para moverse y las teclas más o menos para hacer zoom</translation>
-    </message>
-    <message>
-      <source>Use the mouse wheel to zoom</source>
-      <translation>Usa la rueda del mouse para hacer zoom</translation>
-    </message>
-    <message>
-      <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>Haga clic, doble clic o arrastre el puntero del mouse mientras presiona la tecla Shift para usar PTZ avanzado</translation>
-    </message>
-    <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
       <translation>Vaya a Configuración local para habilitar un marcador de arrastre sobre el centro del video</translation>
     </message>
     <message>
-      <source>Target lock tracking</source>
-      <translation type="unfinished">Target lock tracking</translation>
+      <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
+      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
     </message>
     <message>
-      <source>Alt + Click to follow the object</source>
-      <translation type="unfinished">Alt + Click to follow the object</translation>
+      <source>Use mouse wheel to zoom</source>
+      <translation type="unfinished">Use mouse wheel to zoom</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
+      <translation type="unfinished">Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Target Lock Tracking</source>
+      <translation type="unfinished">Target Lock Tracking</translation>
+    </message>
+    <message>
+      <source>Alt + Click to follow object</source>
+      <translation type="unfinished">Alt + Click to follow object</translation>
+    </message>
+    <message>
+      <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
+      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
     </message>
   </context>
   <context>
@@ -1866,6 +1886,10 @@ para activar PTZ</translation>
       <source>OUTDATED</source>
       <translation>Desactualizado</translation>
     </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>SIN ACCESO</translation>
+    </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
@@ -1941,6 +1965,25 @@ para activar PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SaasBanner</name>
+    <message>
+      <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+    </message>
+  </context>
+  <context>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
@@ -1967,6 +2010,13 @@ para activar PTZ</translation>
     <message>
       <source>Search</source>
       <translation>Búsqueda</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecurityOverlay</name>
+    <message>
+      <source>No access</source>
+      <translation>Sin acceso</translation>
     </message>
   </context>
   <context>
@@ -2363,6 +2413,11 @@ para activar PTZ</translation>
       <source>Global Permissions</source>
       <translation type="unfinished">Global Permissions</translation>
     </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Este usuario aún no está registrado en %1</translation>
+    </message>
   </context>
   <context>
     <name>UserEnabledSwitch</name>
@@ -2451,8 +2506,25 @@ para activar PTZ</translation>
       <translation>Copiado</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation>Cuando se deshabilita la sincronización continua, la membresía del usuario en grupos no se sincroniza automáticamente. Para actualizar esta información, inicie una sincronización manual.</translation>
+      <source>Obtaining Link...</source>
+      <translation type="unfinished">Obtaining Link...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+    </message>
+    <message>
+      <source>LDAP server is offline. User is not able to log in.</source>
+      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+    </message>
+    <message>
+      <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation type="unfinished">When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
     </message>
   </context>
   <context>

@@ -496,7 +496,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Начать, когда</translation>
     </message>
     <message>
       <source>Occurs at</source>
@@ -713,7 +713,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Начать, когда</translation>
     </message>
   </context>
   <context>

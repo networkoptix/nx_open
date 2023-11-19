@@ -676,7 +676,7 @@
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1851,6 +1851,18 @@
       <source>Take system name and settings from:</source>
       <translation>Ta systemnamn och inställningar från:</translation>
     </message>
+    <message>
+      <source>warn icon</source>
+      <translation type="unfinished">warn icon</translation>
+    </message>
+    <message>
+      <source>&lt;Warning label&gt;</source>
+      <translation>&lt;Warning label&gt;</translation>
+    </message>
+    <message>
+      <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
+      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+    </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
@@ -2053,13 +2065,6 @@
     <message>
       <source>INFO</source>
       <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Uppmärksamhet! Effektbegränsningen överskreds</translation>
     </message>
   </context>
   <context>
@@ -2574,14 +2579,6 @@
       <translation>Ändra lösenord...</translation>
     </message>
     <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Kryptering av videotrafik ökar väsentligt CPU-användningen.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Anslutning med kameror som inte stöder HTTPS kommer att gå förlorade.</translation>
-    </message>
-    <message>
       <source>Force servers to accept only encrypted connections</source>
       <translation>Tvinga servrar att endast acceptera krypterade anslutningar</translation>
     </message>
@@ -2642,14 +2639,6 @@
     <message>
       <source>Details</source>
       <translation>Detaljer</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Fäst på detta certifikat</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Visa fäst certifikat</translation>
     </message>
   </context>
   <context>
@@ -2795,22 +2784,6 @@
       <source>Reindex Backup</source>
       <translation>Återskapa Backup</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Inspelning till avaktiverad lagring stoppas. Men det kommer att fortsätta att radera utdaterat material från det.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Inspelningen aktiverades på USB-minnet</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Analysdata kan ta stora mängder utrymme. Vi rekommenderar att du väljer en annan plats för den istället för systempartitionen.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Analys- och rörelsedata kommer att fortsätta att lagras på den inaktiverade lagringen.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2945,7 +2918,7 @@
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Lägg till grupp</translation>
     </message>
     <message>
       <source>Ctrl+F</source>
@@ -2964,7 +2937,7 @@
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Lägg till användare</translation>
     </message>
     <message>
       <source>Ctrl+F</source>

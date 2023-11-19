@@ -38,7 +38,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Системна Подія</translation>
     </message>
   </context>
   <context>
@@ -1138,6 +1138,10 @@
       <translation>Ні</translation>
     </message>
     <message>
+      <source>automatic</source>
+      <translation>автоматично</translation>
+    </message>
+    <message>
       <source>Event Occurs</source>
       <translation type="unfinished">Event Occurs</translation>
     </message>
@@ -1148,10 +1152,6 @@
     <message>
       <source>Event Stops</source>
       <translation type="unfinished">Event Stops</translation>
-    </message>
-    <message>
-      <source>automatic</source>
-      <translation>автоматично</translation>
     </message>
   </context>
   <context>
@@ -1406,10 +1406,6 @@
       <translation>Ліцензія вже активована на іншому сервері</translation>
     </message>
     <message>
-      <source>You already activated this license</source>
-      <translation>Ви вже активували цю ліцензію</translation>
-    </message>
-    <message>
       <source>To activate License Key manually please contact %1.</source>
       <translation>Щоб активувати ліцензійний ключ вручну, зв'яжіться з %1.</translation>
     </message>
@@ -1462,6 +1458,10 @@ License Key: %2</translation>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
       <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+    </message>
+    <message>
+      <source>License has already been activated</source>
+      <translation type="unfinished">License has already been activated</translation>
     </message>
   </context>
   <context>
@@ -1695,10 +1695,6 @@ License Key: %2</translation>
       <translation type="unfinished">Insecure</translation>
     </message>
     <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
-    </message>
-    <message>
       <source>Connection failed</source>
       <translation>Помилка підключення</translation>
     </message>
@@ -1708,7 +1704,23 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Пароль не може бути порожнім</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation type="unfinished">Users are receiving emails</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation type="unfinished">Unable to test SMTP server</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation type="unfinished">Additional info required</translation>
     </message>
   </context>
   <context>
@@ -1751,56 +1763,56 @@ License Key: %2</translation>
       <translation>Некорректний</translation>
     </message>
     <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Дозволено лише латинські літери, цифри та символи клавіатури %1.</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>Дозволено лише латинські літери, цифри та символи клавіатури.</translation>
-    </message>
-    <message>
       <source>Password should contain different types of symbols</source>
-      <translation type="unfinished">Password should contain different types of symbols</translation>
+      <translation>Пароль повинен містити різні типи символів</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
-        <numerusform>Password must be at least %n characters long</numerusform>
+      <translation>
+        <numerusform>Пароль повинен мати мінімум %n символів</numerusform>
+        <numerusform>Пароль повинен мати мінімум %n символів</numerusform>
+        <numerusform>Пароль повинен мати мінімум %n символів</numerusform>
+        <numerusform>Пароль повинен мати мінімум %n символів</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
-        <numerusform>Password must be no longer than %n characters</numerusform>
+      <translation>
+        <numerusform>Пароль повинен бути довжиною не більше %n символів</numerusform>
+        <numerusform>Пароль повинен бути довжиною не більше %n символів</numerusform>
+        <numerusform>Пароль повинен бути довжиною не більше %n символів</numerusform>
+        <numerusform>Пароль повинен бути довжиною не більше %n символів</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together</numerusform>
+      <translation>
+        <numerusform>Пароль не повинен містити %n або більше послідовних символів разом</numerusform>
+        <numerusform>Пароль не повинен містити %n або більше послідовних символів разом</numerusform>
+        <numerusform>Пароль не повинен містити %n або більше послідовних символів разом</numerusform>
+        <numerusform>Пароль не повинен містити %n або більше послідовних символів разом</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>Пароль не повинен містити %n або більше повторюваних символів</numerusform>
+        <numerusform>Пароль не повинен містити %n або більше повторюваних символів</numerusform>
+        <numerusform>Пароль не повинен містити %n або більше повторюваних символів</numerusform>
+        <numerusform>Пароль не повинен містити %n або більше повторюваних символів</numerusform>
       </translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords</source>
-      <translation type="unfinished">This password is in list of the most popular passwords</translation>
+      <translation>Цей пароль знаходиться в списку найпопулярніших паролів</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
+      <translation>Дозволенi лише латинські літери, цифри та символи клавіатури %1</translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols are allowed</source>
+      <translation>Дозволено лише латинські літери, цифри та символи клавіатури</translation>
     </message>
   </context>
   <context>
@@ -1928,6 +1940,18 @@ License Key: %2</translation>
     <message>
       <source>Regional / License support</source>
       <translation>Регіональна / Ліцензійна підтримка</translation>
+    </message>
+    <message>
+      <source>Partner information</source>
+      <translation type="unfinished">Partner information</translation>
+    </message>
+    <message>
+      <source>Phones</source>
+      <translation type="unfinished">Phones</translation>
+    </message>
+    <message>
+      <source>Emails</source>
+      <translation type="unfinished">Emails</translation>
     </message>
   </context>
   <context>
@@ -2990,7 +3014,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Паролі не співпадають</translation>
     </message>
   </context>
   <context>
@@ -3016,15 +3040,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Паролі не співпадають</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>Щоб змінити свій пароль, введіть поточний пароль</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>Некоректний поточний пароль</translation>
     </message>
   </context>
   <context>
@@ -3308,7 +3332,7 @@ to %1</source>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Час сесії минув</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
@@ -4116,15 +4140,6 @@ to %1</source>
       <source>Lo-Res</source>
       <translation>Низька роздiльна здатнiсть</translation>
     </message>
-    <message>
-      <source>press and hold</source>
-      <comment>Soft Trigger</comment>
-      <translation>натисніть та утримуйте</translation>
-    </message>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Відключено за розкладом</translation>
-    </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
       <translation>
@@ -4149,6 +4164,15 @@ to %1</source>
     <message>
       <source>Hotspots</source>
       <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Soft Trigger</comment>
+      <translation>натисніть та утримуйте</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Відключено за розкладом</translation>
     </message>
   </context>
   <context>
@@ -4287,8 +4311,8 @@ to %1</source>
   <context>
     <name>QnPopupSettingsWidget</name>
     <message>
-      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
+      <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
+      <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
     </message>
   </context>
   <context>
@@ -5109,12 +5133,12 @@ to %1</source>
       <translation type="unfinished">Provide</translation>
     </message>
     <message>
-      <source>SAAS SHUT DOWN</source>
-      <translation type="unfinished">SAAS SHUT DOWN</translation>
-    </message>
-    <message>
       <source>NO EXPORT PERMISSION</source>
       <translation type="unfinished">NO EXPORT PERMISSION</translation>
+    </message>
+    <message>
+      <source>SAAS SHUT DOWN</source>
+      <translation type="unfinished">SAAS SHUT DOWN</translation>
     </message>
     <message>
       <source>NO CONNECTION TO THE LICENSE SERVER</source>
@@ -5247,6 +5271,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Insufficient permissions to store analytics data.</source>
       <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
     </message>
+    <message>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage</source>
+      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Запис на недійсне сховище припиниться. Однак, видалення застарілих записів триватиме.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>Запис було увімкнено на USB-накопичувачі</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
+      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
+      <translation type="unfinished">If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -5337,6 +5385,26 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Stores analytics and motion data</source>
       <translation type="unfinished">Stores analytics and motion data</translation>
+    </message>
+    <message>
+      <source>cloud</source>
+      <translation>хмарний</translation>
+    </message>
+    <message>
+      <source>Path</source>
+      <translation type="unfinished">Path</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Тип</translation>
+    </message>
+    <message>
+      <source>Purpose</source>
+      <translation type="unfinished">Purpose</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>Розмір</translation>
     </message>
   </context>
   <context>
@@ -5445,7 +5513,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Сервіси</translation>
     </message>
   </context>
   <context>
@@ -5712,11 +5780,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Пароль не може бути порожнім</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
-      <translation type="unfinished">Avoid leading and trailing spaces</translation>
+      <translation>Уникайте пробіли на початку і кінці</translation>
     </message>
   </context>
   <context>
@@ -6489,20 +6557,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       </translation>
     </message>
     <message numerus="yes">
-      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <comment>Numerical form depends on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Delete user?</source>
-      <translation>Видалити користувача?</translation>
-    </message>
-    <message numerus="yes">
       <source>%n items were not deleted.</source>
       <translation type="unfinished">
         <numerusform>%n items were not deleted.</numerusform>
@@ -6516,6 +6570,16 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation type="unfinished">Delete layout?</translation>
     </message>
     <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <comment>Numerical form depends on layouts count</comment>
+      <translation type="unfinished">
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
       <comment>Numerical form depends on layouts count</comment>
       <translation type="unfinished">
@@ -6524,6 +6588,10 @@ We recommend you not to open this integration. If you understand the risks, you 
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>Видалити користувача?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
@@ -6949,48 +7017,24 @@ We recommend you not to open this integration. If you understand the risks, you 
   <context>
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
-      <source>Has access to a resource, can view live footage from a camera</source>
-      <translation type="unfinished">Has access to a resource, can view live footage from a camera</translation>
-    </message>
-    <message>
       <source>View Archive</source>
       <translation type="unfinished">View Archive</translation>
-    </message>
-    <message>
-      <source>Can view archive footage</source>
-      <translation type="unfinished">Can view archive footage</translation>
     </message>
     <message>
       <source>Export Archive</source>
       <translation type="unfinished">Export Archive</translation>
     </message>
     <message>
-      <source>Can export parts of archive</source>
-      <translation type="unfinished">Can export parts of archive</translation>
-    </message>
-    <message>
       <source>View Bookmarks</source>
       <translation type="unfinished">View Bookmarks</translation>
-    </message>
-    <message>
-      <source>Can view bookmarks</source>
-      <translation type="unfinished">Can view bookmarks</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
       <translation>Керування Закладками</translation>
     </message>
     <message>
-      <source>Can modify bookmarks</source>
-      <translation type="unfinished">Can modify bookmarks</translation>
-    </message>
-    <message>
       <source>User Input</source>
       <translation>Дії Користувача</translation>
-    </message>
-    <message>
-      <source>Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</source>
-      <translation type="unfinished">Can change camera PTZ state, use Soft Triggers, 2-Way Audio and I/O buttons</translation>
     </message>
     <message>
       <source>Edit Settings</source>
@@ -7007,6 +7051,22 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
       <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation type="unfinished">View Live.</translation>
+    </message>
+    <message>
+      <source>Allows users to access a resource and view live footage from a camera.</source>
+      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+    </message>
+    <message>
+      <source>Modify Bookmarks</source>
+      <translation type="unfinished">Modify Bookmarks</translation>
+    </message>
+    <message>
+      <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
+      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
     </message>
   </context>
   <context>
@@ -7282,7 +7342,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Роздільна здатність</translation>
     </message>
   </context>
   <context>
@@ -7331,18 +7391,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation type="unfinished">New added cameras</translation>
     </message>
     <message>
-      <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
-    </message>
-    <message>
       <source>Storage Management</source>
       <translation>Управління Сховищем</translation>
     </message>
@@ -7358,7 +7406,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Сервер не в мережі</translation>
     </message>
     <message>
       <source>Backup settings are not available</source>
@@ -7367,6 +7415,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>To perform backup to the cloud storage SaaS must be in active state. %1</source>
       <translation type="unfinished">To perform backup to the cloud storage SaaS must be in active state. %1</translation>
+    </message>
+    <message>
+      <source>– Applies to all servers</source>
+      <translation type="unfinished">– Applies to all servers</translation>
     </message>
   </context>
   <context>
@@ -7459,17 +7511,13 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Applying changes...</source>
       <translation>Застосувати зміни...</translation>
     </message>
+    <message>
+      <source>Force Motion Detection</source>
+      <translation type="unfinished">Force Motion Detection</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraButtonController</name>
-    <message>
-      <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
-    </message>
-    <message>
-      <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
-    </message>
     <message>
       <source>Mute</source>
       <translation type="unfinished">Mute</translation>
@@ -7477,6 +7525,14 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Unmute</source>
       <translation type="unfinished">Unmute</translation>
+    </message>
+    <message>
+      <source>Heater</source>
+      <translation type="unfinished">Heater</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation type="unfinished">Wiper</translation>
     </message>
     <message>
       <source>Open Door</source>
@@ -7547,10 +7603,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation type="unfinished">Pan &amp; Tilt</translation>
     </message>
     <message>
-      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>Налаштування якості та частоти кадрів (FPS) у розкладі записів стануть неактуальними.</translation>
-    </message>
-    <message>
       <source>Server will not push time settings to the camera.</source>
       <translation type="unfinished">Server will not push time settings to the camera.</translation>
     </message>
@@ -7570,6 +7622,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
       <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+    </message>
+    <message>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
+      <translation>Налаштування якості та частоти кадрів (FPS) у розкладі записів стануть неактуальними</translation>
     </message>
   </context>
   <context>
@@ -7608,6 +7664,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>NO DATA</source>
       <translation>НЕМАЄ ДАНИХ</translation>
+    </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>НЕМАЄ ДОСТУПУ</translation>
     </message>
   </context>
   <context>
@@ -7715,12 +7775,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation type="unfinished">Force Motion Detection</translation>
     </message>
     <message>
-      <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
+      <source>Select areas on the preview to set chosen sensitivity for</source>
+      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for</translation>
     </message>
     <message>
-      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
+      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for</source>
+      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for</translation>
     </message>
   </context>
   <context>
@@ -7790,24 +7850,24 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>на основі часу сервера</translation>
     </message>
     <message>
-      <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>Виберіть області на розкладі для застосування обраних параметрів.</translation>
-    </message>
-    <message>
-      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>Встановіть параметри запису і виберіть області на сітці розкладу, на які застосувати їх.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Високе мінімальне значення може привести до зменшення розміру архіву на інших пристроях.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Високе мінімальне значення може привести до зменшення розміру архіву на інших камерах.</translation>
-    </message>
-    <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
       <translation>Тривалий час попереднього запису збільшить завантаження оперативної пам'яті на сервері</translation>
+    </message>
+    <message>
+      <source>Select areas on the schedule to apply chosen parameters to</source>
+      <translation>Виберіть області на розкладі для застосування обраних параметрів</translation>
+    </message>
+    <message>
+      <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
+      <translation>Встановіть параметри запису і виберіть області на сітці розкладу, на які застосувати їх</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices</source>
+      <translation>Високе мінімальне значення може привести до зменшення розміру архіву на інших пристроях</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras</source>
+      <translation>Високе мінімальне значення може привести до зменшення розміру архіву на інших камерах</translation>
     </message>
   </context>
   <context>
@@ -8482,20 +8542,24 @@ We recommend you not to open this integration. If you understand the risks, you 
   <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
-      <source>This camera requires password to be set up.</source>
-      <translation>Ця камера потребує встановлення пароля.</translation>
-    </message>
-    <message>
-      <source>Some of selected cameras require password to be set up.</source>
-      <translation>Для деяких обраних камер потрібно встановити пароль.</translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>Для виконання цієї дії слід звернутися до системного адміністратора.</translation>
-    </message>
-    <message>
       <source>Set Password</source>
       <translation>Встановити Пароль</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up</source>
+      <translation>Ця камера потребує встановлення пароля</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up</source>
+      <translation>Для деяких обраних камер потрібно встановити пароль</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
+      <translation type="unfinished">This camera requires password to be set up. Ask your system administrator to do it.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
+      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your system administrator to do it.</translation>
     </message>
   </context>
   <context>
@@ -8641,6 +8705,13 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>System Administration</source>
       <translation>Адміністрування системи</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DirectParentsModel</name>
+    <message>
+      <source>LDAP group membership is managed in LDAP</source>
+      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
     </message>
   </context>
   <context>
@@ -9387,6 +9458,10 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>LDAP</source>
       <translation type="unfinished">LDAP</translation>
     </message>
+    <message>
+      <source>Cannot connect to LDAP server</source>
+      <translation type="unfinished">Cannot connect to LDAP server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LicenseManagerWidget</name>
@@ -9694,13 +9769,6 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::MembersModel</name>
-    <message>
-      <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>You are about to merge the current System %1 with System</source>
@@ -9766,6 +9834,14 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Failed to merge Systems</source>
       <translation>Не вдалося об'єднати Системи</translation>
+    </message>
+    <message>
+      <source>We recommend that you consult with %1 before proceeding.</source>
+      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
+    </message>
+    <message>
+      <source>support</source>
+      <translation>підтримка</translation>
     </message>
   </context>
   <context>
@@ -9858,13 +9934,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MessageBar</name>
-    <message>
-      <source>Close</source>
-      <translation>Закрити</translation>
     </message>
   </context>
   <context>
@@ -10175,10 +10244,6 @@ You can force it, but it may significantly increase CPU load.</translation>
       <translation>Не вдається перевірити оновлення в Інтернеті</translation>
     </message>
     <message>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Не рекомендується оновлювати систему в кінці тижня.</translation>
-    </message>
-    <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
     </message>
@@ -10189,6 +10254,10 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Uploading offline update packages to Servers...</source>
       <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+    </message>
+    <message>
+      <source>Applying System updates at the end of the week is not recommended</source>
+      <translation>Не рекомендується оновлювати систему в кінці тижня</translation>
     </message>
   </context>
   <context>
@@ -10255,10 +10324,6 @@ You can force it, but it may significantly increase CPU load.</translation>
       <translation>Виберіть розкладку...</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners.</source>
-      <translation>Локальні розкладки можуть бути показані лише їх власникам.</translation>
-    </message>
-    <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Жодна з обраних ролей не містить користувачів. Дія не спрацює.</translation>
     </message>
@@ -10269,6 +10334,10 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
       <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners</source>
+      <translation>Місцеві розкладки можуть бути показані лише їх власникам</translation>
     </message>
   </context>
   <context>
@@ -10284,17 +10353,6 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Learn more</source>
       <translation>Дізнатися більше</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ParentGroupsProvider</name>
-    <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
-    </message>
-    <message>
-      <source>Inherited from %1</source>
-      <translation type="unfinished">Inherited from %1</translation>
     </message>
   </context>
   <context>
@@ -10468,6 +10526,13 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::PoeSettingsWidget</name>
+    <message>
+      <source>Attention! Power limit exceeded</source>
+      <translation>Увага! Ліміт потужності перевищено</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
     <message>
       <source>Added</source>
@@ -10594,6 +10659,14 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Edit Proxied Integration</source>
       <translation type="unfinished">Edit Proxied Integration</translation>
+    </message>
+    <message>
+      <source>To allow the use of a client API, create a web integration instead. %1</source>
+      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+    </message>
+    <message>
+      <source>Learn more...</source>
+      <translation>Дізнатися більше...</translation>
     </message>
   </context>
   <context>
@@ -11139,6 +11212,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
       <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
     </message>
+    <message>
+      <source>Encrypting video traffic may significantly increase CPU usage</source>
+      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+    </message>
+    <message>
+      <source>Connection with cameras that do not support HTTPS will be lost</source>
+      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
@@ -11200,16 +11281,24 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Unknown Certificate</translation>
     </message>
     <message>
-      <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
-    </message>
-    <message>
       <source>OK</source>
       <translation>Добре</translation>
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
       <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+    </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation type="unfinished">Not Part Of Certificate</translation>
+    </message>
+    <message>
+      <source>View pinned certificate</source>
+      <translation type="unfinished">View pinned certificate</translation>
+    </message>
+    <message>
+      <source>Pin to this certificate</source>
+      <translation type="unfinished">Pin to this certificate</translation>
     </message>
   </context>
   <context>
@@ -11804,6 +11893,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Опис</translation>
     </message>
     <message>
+      <source>You do not have permissions to modify or delete this group.</source>
+      <translation type="unfinished">You do not have permissions to modify or delete this group.</translation>
+    </message>
+    <message>
       <source>Group is not found in the LDAP database.</source>
       <translation type="unfinished">Group is not found in the LDAP database.</translation>
     </message>
@@ -11814,10 +11907,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
       <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
-    </message>
-    <message>
-      <source>You do not have permissions to modify or delete this group.</source>
-      <translation type="unfinished">You do not have permissions to modify or delete this group.</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11831,12 +11920,60 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
   <context>
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
-      <source>Group does not exist</source>
-      <translation type="unfinished">Group does not exist</translation>
+      <source>Invalid JSON</source>
+      <translation type="unfinished">Invalid JSON</translation>
     </message>
     <message>
-      <source>User does not exist</source>
-      <translation type="unfinished">User does not exist</translation>
+      <source>Invalid request</source>
+      <translation type="unfinished">Invalid request</translation>
+    </message>
+    <message>
+      <source>Method not found</source>
+      <translation type="unfinished">Method not found</translation>
+    </message>
+    <message>
+      <source>Invalid parameters</source>
+      <translation>Недійсні параметри</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Внутрішня помилка</translation>
+    </message>
+    <message>
+      <source>Connection failure</source>
+      <translation type="unfinished">Connection failure</translation>
+    </message>
+    <message>
+      <source>Invalid encoding</source>
+      <translation type="unfinished">Invalid encoding</translation>
+    </message>
+    <message>
+      <source>Invalid encoding charset</source>
+      <translation type="unfinished">Invalid encoding charset</translation>
+    </message>
+    <message>
+      <source>Application Error</source>
+      <translation type="unfinished">Application Error</translation>
+    </message>
+    <message>
+      <source>System Error</source>
+      <translation type="unfinished">System Error</translation>
+    </message>
+    <message>
+      <source>Transport Error</source>
+      <translation type="unfinished">Transport Error</translation>
+    </message>
+    <message>
+      <source>Server error code %1</source>
+      <translation type="unfinished">Server error code %1</translation>
+    </message>
+    <message>
+      <source>Reserved error code %1</source>
+      <translation type="unfinished">Reserved error code %1</translation>
+    </message>
+    <message>
+      <source>Unknown error code %1</source>
+      <translation type="unfinished">Unknown error code %1</translation>
     </message>
   </context>
   <context>
@@ -11852,23 +11989,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Change search criteria or create a new group</source>
       <translation type="unfinished">Change search criteria or create a new group</translation>
-    </message>
-    <message>
-      <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
-      </translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
@@ -11891,6 +12011,27 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>Delete %n groups</numerusform>
         <numerusform>Delete %n groups</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation type="unfinished">Failed to delete group.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
     </message>
   </context>
   <context>
@@ -11925,8 +12066,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Особливі</translation>
     </message>
     <message>
-      <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <source>You do not have permissions to modify this user.</source>
+      <translation type="unfinished">You do not have permissions to modify this user.</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
@@ -11941,8 +12082,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Temporary user</translation>
     </message>
     <message>
-      <source>You do not have permissions to modify this user.</source>
-      <translation type="unfinished">You do not have permissions to modify this user.</translation>
+      <source>Full Name</source>
+      <translation type="unfinished">Full Name</translation>
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
@@ -11980,21 +12121,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
     </message>
     <message numerus="yes">
-      <source>%n existing LDAP users are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Delete %n users</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
+      <translation>
+        <numerusform>Видалити %n користувачів</numerusform>
+        <numerusform>Видалити %n користувачів</numerusform>
+        <numerusform>Видалити %n користувачів</numerusform>
+        <numerusform>Видалити %n користувачів</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -12017,6 +12149,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>Failed to delete %n users.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation type="unfinished">
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
       </translation>
     </message>
   </context>
@@ -12071,12 +12212,28 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Відхилити</translation>
     </message>
     <message>
+      <source>Copy Access Link</source>
+      <translation type="unfinished">Copy Access Link</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation>Некоректний поточний пароль</translation>
+    </message>
+    <message>
       <source>Email cannot be empty</source>
       <translation>Поле електронної пошти не може бути порожнім</translation>
     </message>
     <message>
-      <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <source>Login cannot be empty</source>
+      <translation>Логін повинен бути заданий</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed</source>
+      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists</source>
+      <translation>Користувач з таким іменем вже існує</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
@@ -12103,37 +12260,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Create</translation>
     </message>
     <message>
-      <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
-    </message>
-    <message>
-      <source>and</source>
-      <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
-    </message>
-    <message>
-      <source>User %1 has been successfully created!</source>
-      <translation type="unfinished">User %1 has been successfully created!</translation>
-    </message>
-    <message>
-      <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists</source>
-      <translation type="unfinished">User with specified login already exists</translation>
-    </message>
-    <message>
       <source>New Link - %1</source>
       <translation type="unfinished">New Link - %1</translation>
+    </message>
+    <message>
+      <source>Access link has been successfully created!</source>
+      <translation type="unfinished">Access link has been successfully created!</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
@@ -12144,13 +12276,31 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
     </message>
     <message>
-      <source>in %1</source>
-      <comment>%1 is a duration</comment>
-      <translation type="unfinished">in %1</translation>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation type="unfinished">and</translation>
     </message>
     <message>
       <source>New User</source>
       <translation type="unfinished">New User</translation>
+    </message>
+    <message>
+      <source>User %1 has been successfully created!</source>
+      <translation type="unfinished">User %1 has been successfully created!</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation type="unfinished">Obtaining Link...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+    </message>
+    <message>
+      <source>in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation>через %1</translation>
     </message>
   </context>
   <context>
@@ -12272,7 +12422,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Developer Tools</source>
-      <translation type="unfinished">Developer Tools</translation>
+      <translation>Інструменти розробника</translation>
     </message>
   </context>
   <context>
@@ -12909,12 +13059,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Виберіть Розкладку...</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners.</source>
-      <translation>Локальні розкладки можуть бути показані лише їх власникам.</translation>
-    </message>
-    <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
       <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners</source>
+      <translation>Місцеві розкладки можуть бути показані лише їх власникам</translation>
     </message>
   </context>
   <context>
@@ -13008,7 +13158,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>Всього</translation>
     </message>
     <message>
       <source>Used</source>
@@ -13475,6 +13625,14 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Not enough access rights</source>
       <translation type="unfinished">Not enough access rights</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to open this camera on the layout</source>
+      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to open some of selected cameras on the layout</source>
+      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
     </message>
   </context>
   <context>

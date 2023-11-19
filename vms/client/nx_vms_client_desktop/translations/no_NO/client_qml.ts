@@ -27,16 +27,8 @@
       <translation type="unfinished">Login Attribute</translation>
     </message>
     <message>
-      <source>Allow digest authentication for imported users</source>
-      <translation type="unfinished">Allow digest authentication for imported users</translation>
-    </message>
-    <message>
       <source>Groups</source>
       <translation>Grupper</translation>
-    </message>
-    <message>
-      <source>Name Attribute</source>
-      <translation type="unfinished">Name Attribute</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -45,10 +37,6 @@
     <message>
       <source>Misc</source>
       <translation>Diverse</translation>
-    </message>
-    <message>
-      <source>Group Attribute</source>
-      <translation>Gruppeattributt</translation>
     </message>
     <message>
       <source>Synchronization&lt;br&gt;Interval</source>
@@ -69,6 +57,14 @@
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
       <translation>For å deaktivere sammendragsgodkjenning for LDAP-brukere som allerede er lagt til VMS-databasen, må du deaktivere den direkte i disse brukernes&apos; innstillinger.</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication for imported users</source>
+      <translation>Tillat usikker (digest) autentisering for importerte brukere</translation>
+    </message>
+    <message>
+      <source>Group Members Attribute</source>
+      <translation>Gruppemedlemmer-attributt</translation>
     </message>
   </context>
   <context>
@@ -938,8 +934,16 @@
       <translation>Tillgangsgrupper</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
+      <translation>Når Kontinuerlig synkronisering er deaktivert, synkroniseres ikke grupper automatisk. Start en manuell synkronisering for å oppdatere denne gruppen.</translation>
+    </message>
+    <message>
+      <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
+      <translation>En annen gruppe med samme navn finnes i systemet. Det anbefales å tildele unike navn til gruppene.</translation>
+    </message>
+    <message>
+      <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
+      <translation>Gruppen har en annen gruppe som både sin forelder, og som et underordnet medlem, eller er en del av en slik sirkulær referansekjede. Løs denne kjeden for å forhindre feilaktig beregning av tillatelser.</translation>
     </message>
   </context>
   <context>
@@ -1197,10 +1201,6 @@
       <translation>LDAP er ikke konfigurert ennå</translation>
     </message>
     <message>
-      <source>Connect your System to a LDAP server for easier user management</source>
-      <translation>Koble systemet til en LDAP-server for enklere brukeradministrasjon</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>Koble til</translation>
     </message>
@@ -1269,16 +1269,20 @@
       <translation>VMS synkroniserer brukere med LDAP-server når de logger på systemet. Grupper synkroniseres i sanntid.</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP is disabled for this system. Updates to groups and user&apos;s and groups&apos; membership will occur solely through manual synchronization.</source>
-      <translation>Kontinuerlig import fra LDAP er deaktivert for dette systemet. Oppdateringer til grupper og bruker&apos;er og gruppe&apos; -medlemskap vil kun skje gjennom manuell synkronisering.</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation>Ingen brukere eller grupper samsvarer med synkroniseringsinnstillinger og legges til i systemdatabasen. Sørg for at LDAP-serverparametere og -filtre er riktig konfigurert.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
       <translation>Vær forsiktig når du endrer LDAP-innstillinger. Feil konfigurasjon kan forstyrre systemets tilgjengelighet for et stort antall brukere samtidig.</translation>
+    </message>
+    <message>
+      <source>Connect your System to an LDAP server for easier user management</source>
+      <translation>Koble systemet til en LDAP-server for enklere brukeradministrasjon</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
+      <translation>Kontinuerlig import fra LDAP-server er deaktivert for dette systemet. Oppdateringer av grupper og bruker- og gruppemedlemskap skjer kun gjennom manuell synkronisering.</translation>
     </message>
   </context>
   <context>
@@ -1551,8 +1555,19 @@
       <translation>Medlem av</translation>
     </message>
     <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
       <source>Built-in</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
       <translation>Innebygd</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation>Egendefinert</translation>
     </message>
   </context>
   <context>
@@ -1600,8 +1615,9 @@
       <translation>Legg automatisk til avhengige tillatelser</translation>
     </message>
     <message>
-      <source>Resources table gives you an overview of user&apos;s or group permissions and allows you to assign permissions for specific resources.Click on the cells to select and unselect them. Use drag&amp;drop and Shift+drag&amp;drop for batch edit. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation>Ressurstabell gir deg en oversikt over bruker-&apos;-er eller gruppetillatelser og lar deg tildele tillatelser for spesifikke ressurser. Klikk på cellene for å velge og oppheve valget av dem. Bruk dra&amp;slipp og Shift+dra&amp;slipp for batchredigering. Hvis du velger en tillatelse som avhenger av en annen tillatelse, vil begge tillatelsene bli gitt automatisk.</translation>
+      <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
+      <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
+      <translation>Bruk %1 eller %2 for å velge flere linjer, eller %3 for å fjerne valget</translation>
     </message>
   </context>
   <context>
@@ -1716,28 +1732,32 @@ to activate PTZ</source>
 for å aktivere PTZ</translation>
     </message>
     <message>
-      <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>Trykk på piltastene for å flytte og pluss- eller minustastene for å zoome</translation>
-    </message>
-    <message>
-      <source>Use the mouse wheel to zoom</source>
-      <translation>Bruk musehjulet for å zoome</translation>
-    </message>
-    <message>
-      <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>Klikk, dobbeltklikk eller dra musepekeren mens du trykker på Shift-tasten for å bruke avansert PTZ</translation>
-    </message>
-    <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
       <translation>Gå til lokale innstillinger for å aktivere en dramarkør over midten av videoen</translation>
     </message>
     <message>
-      <source>Target lock tracking</source>
-      <translation type="unfinished">Target lock tracking</translation>
+      <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
+      <translation>Trykk på piltastene for å flytte rundt. Bruk pluss- og minustastene for å zoome.</translation>
     </message>
     <message>
-      <source>Alt + Click to follow the object</source>
-      <translation type="unfinished">Alt + Click to follow the object</translation>
+      <source>Use mouse wheel to zoom</source>
+      <translation>Bruk musehjulet for å zoome</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
+      <translation>Klikk, dobbeltklikk eller dra musepekeren mens du trykker på Shift-tasten for å bruke avansert PTZ</translation>
+    </message>
+    <message>
+      <source>Target Lock Tracking</source>
+      <translation>Mållåssporing</translation>
+    </message>
+    <message>
+      <source>Alt + Click to follow object</source>
+      <translation>Alt + klikk for å følge objektet</translation>
+    </message>
+    <message>
+      <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
+      <translation>Du kan aktivere denne veiledningen igjen ved å gå til Lokale innstillinger &gt; Avansert &gt; Tilbakestill alle advarsler</translation>
     </message>
   </context>
   <context>
@@ -1866,6 +1886,10 @@ for å aktivere PTZ</translation>
       <source>OUTDATED</source>
       <translation>UTDATERT</translation>
     </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>INGEN TILGANG</translation>
+    </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
@@ -1941,6 +1965,25 @@ for å aktivere PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SaasBanner</name>
+    <message>
+      <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
+      <translation>Systemet er suspendert. For å aktivere/deaktivere integreringsbruken for gjeldende enhet, må systemet være i aktiv tilstand. Kontakt kanalpartneren din for detaljer</translation>
+    </message>
+    <message>
+      <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
+      <translation>Systemet er suspendert. For å aktivere/deaktivere integreringsbruken for noen enheter må systemet være i aktiv tilstand. Kontakt kanalpartneren din for detaljer</translation>
+    </message>
+    <message>
+      <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
+      <translation>Systemet er slått av. For å aktivere denne integreringsbruken for gjeldende enhet må systemet være i aktiv tilstand. Kontakt kanalpartneren din for detaljer</translation>
+    </message>
+    <message>
+      <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
+      <translation>Systemet er slått av. For å aktivere denne integreringsbruken for noen enheter må systemet være i aktiv tilstand. Kontakt kanalpartneren din for detaljer</translation>
+    </message>
+  </context>
+  <context>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
@@ -1967,6 +2010,13 @@ for å aktivere PTZ</translation>
     <message>
       <source>Search</source>
       <translation>Søk</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecurityOverlay</name>
+    <message>
+      <source>No access</source>
+      <translation>Ingen tilgang</translation>
     </message>
   </context>
   <context>
@@ -2294,7 +2344,7 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Fullt navn</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2363,6 +2413,11 @@ for å aktivere PTZ</translation>
       <source>Global Permissions</source>
       <translation>Globale tillatelser</translation>
     </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Denne brukeren har ennå ikke registrert seg for %1</translation>
+    </message>
   </context>
   <context>
     <name>UserEnabledSwitch</name>
@@ -2391,7 +2446,7 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Fullt navn</translation>
     </message>
     <message>
       <source>Account Settings</source>
@@ -2451,8 +2506,25 @@ for å aktivere PTZ</translation>
       <translation>Kopiert</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, user’s membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation>Når Kontinuerlig synkronisering er deaktivert, synkroniseres ikke brukerens medlemskap i grupper automatisk. Start en manuell synkronisering for å oppdatere denne informasjonen.</translation>
+      <source>Obtaining Link...</source>
+      <translation>Skaffer lenke...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Sørg for at denne datamaskinen er i stand til å koble til %1</translation>
+    </message>
+    <message>
+      <source>LDAP server is offline. User is not able to log in.</source>
+      <translation>LDAP-serveren er frakoblet. Brukeren kan ikke logge inn.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>Denne brukerens pålogging dupliserer påloggingen til en annen bruker. Ingen av dem klarer å logge på. For å løse dette problemet kan du endre brukerens pålogging eller deaktivere eller slette brukere med dupliserte pålogginger.</translation>
+    </message>
+    <message>
+      <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation>Når Kontinuerlig synkronisering er deaktivert, synkroniseres ikke brukermedlemskap i grupper automatisk. Start en manuell synkronisering for å oppdatere denne informasjonen.</translation>
     </message>
   </context>
   <context>

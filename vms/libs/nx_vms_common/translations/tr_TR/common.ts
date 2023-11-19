@@ -202,29 +202,29 @@
       <translation>Sistem Sağlığı Görüntüleyicileri</translation>
     </message>
     <message>
-      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, and merge Systems and link or unlink to %1 accounts.</translation>
-    </message>
-    <message>
-      <source>Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group have control of most of System configuration, but are not allowed to change any Administrator settings, delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
-    </message>
-    <message>
-      <source>Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can see and run PTZ positions and PTZ Tours, use 2-way audio, operate I/O Module buttons, create and edit Bookmarks, and view the Event Log.</translation>
-    </message>
-    <message>
-      <source>Members of this group can view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can view and export archive and Bookmarks.</translation>
-    </message>
-    <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
       <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
     </message>
     <message>
-      <source>Members of this group can view System Health Monitoring information.</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information.</translation>
+      <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
+      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
     </message>
   </context>
   <context>
@@ -1184,9 +1184,9 @@
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Dakika</numerusform>
-        <numerusform>Minutes</numerusform>
+        <numerusform>Dakika</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1570,10 +1570,6 @@
       <translation>Maksimum kayıt kuyruğu boyutu (öğeler, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>RTP deneme sayısı</translation>
-    </message>
-    <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP zaman aşımı (milisaniye)</translation>
     </message>
@@ -1786,11 +1782,6 @@
       <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions currently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Şu anda %1 tarafından kullanılan, kullanımdan kaldırılmış API fonksiyonlarını etkinleştir (güvenli değil)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Buluta bağlanmak üzere belirlenmiş Sunucuların noktalı virgülle ayrılmış listesi. Listenin en üstündeki sunucular daha yüksek önceliğe sahiptir. Liste boşsa Bulut bağlantısı için bir Sunucu otomatik olarak seçilir.</translation>
     </message>
@@ -1801,6 +1792,23 @@
     <message>
       <source>Enable deprecated API functions (insecure)</source>
       <translation>Kullanımdan kaldırılan API fonksiyonlarını etkinleştir (güvenli değil)</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>Sunucu RTSP oturumuna yeniden bağlanmadan önce art arda meydana gelebilecek maksimum RTP hatası sayısı.</translation>
+    </message>
+    <message>
+      <source>Channel partners service</source>
+      <translation type="unfinished">Channel partners service</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+    </message>
+    <message>
+      <source>Organization Id</source>
+      <translation type="unfinished">Organization Id</translation>
     </message>
   </context>
   <context>
@@ -2520,42 +2528,43 @@
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n Gruplar</numerusform>
+        <numerusform>%n Gruplar</numerusform>
       </translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
       <translation>LDAP Senkronizasyon Sorunu</translation>
     </message>
-    <message>
-      <source>Failed to connect to LDAP</source>
-      <translation>LDAP' ile bağlantı kurulamadı</translation>
-    </message>
-    <message>
-      <source>Failed to complete sync within a %1 timeout</source>
-      <translation type="unfinished">Failed to complete sync within a %1 timeout</translation>
-    </message>
-    <message>
-      <source>Failed to complete sync within a given timeout</source>
-      <translation type="unfinished">Failed to complete sync within a given timeout</translation>
-    </message>
-    <message>
-      <source>There are zero LDAP users in VMS after sync</source>
-      <translation type="unfinished">There are zero LDAP users in VMS after sync</translation>
-    </message>
-    <message>
-      <source>Some LDAP users were not found in LDAP</source>
-      <translation type="unfinished">Some LDAP users were not found in LDAP</translation>
-    </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n defa)</numerusform>
+        <numerusform>%1 (%n defa)</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a given timeout.</source>
+      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
     </message>
   </context>
 </TS>
