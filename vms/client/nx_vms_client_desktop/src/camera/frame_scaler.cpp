@@ -12,8 +12,7 @@ extern "C" {
 
 namespace {
 
-#if !defined(__arm__) && !defined(__aarch64__)
-
+#if defined(NX_SSE2_SUPPORTED)
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff);
 
@@ -70,7 +69,18 @@ void downscalePlate_factor2_sse2_intr(
         src_line2 += src_stride*2;
     }
 }
+#else // defined(NX_SSE2_SUPPORTED)
 
+void downscalePlate_factor2_sse2_intr(
+    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+    const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
+{
+    NX_CRITICAL(false);
+}
+
+#endif // defined(NX_SSE2_SUPPORTED)
+
+#if !defined(__arm__) && !defined(__aarch64__)
 void sse4_attribute downscalePlate_factor4_ssse3_intr(
     unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
     const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
@@ -175,13 +185,6 @@ void downscalePlate_factor8_sse41_intr(
 }
 
 #else // !defined(__arm__) && !defined(__aarch64__)
-
-void downscalePlate_factor2_sse2_intr(
-    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
-    const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
-{
-    NX_CRITICAL(false);
-}
 
 void downscalePlate_factor4_ssse3_intr(
     unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
