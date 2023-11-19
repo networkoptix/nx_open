@@ -93,9 +93,8 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
     if (!system)
         return;
 
-    const bool exists = m_systems.contains(priority);
-    if (exists)
-        return;
+    if (m_systems.contains(priority))
+        removeSystem(m_systems[priority]->id(), priority);
 
     m_systems.insert(priority, system);
 
@@ -185,15 +184,17 @@ void QnSystemDescriptionAggregator::onOnlineStateChanged()
     emit onlineStateChanged();
 }
 
-void QnSystemDescriptionAggregator::removeSystem(int priority)
+void QnSystemDescriptionAggregator::removeSystem(const QString& systemId, int priority)
 {
-    const bool exist = m_systems.contains(priority);
-    NX_ASSERT(exist, "System does not exist");
-    if (!exist)
+    if (!m_systems.contains(priority))
+        return;
+
+    const auto& system = m_systems[priority];
+
+    if (system->id() != systemId)
         return;
 
     const auto oldServers = servers();
-    const auto system = m_systems.value(priority);
 
     disconnect(system.data(), nullptr, this, nullptr);
     m_systems.remove(priority);
