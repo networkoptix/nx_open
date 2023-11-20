@@ -95,4 +95,18 @@ size_t qHash(const OsInfo& osInfo, size_t seed)
     return ::qHash(osInfo.platform + osInfo.variant + osInfo.variantVersion, seed);
 }
 
+QString OsInfo::flavor()
+{
+    // Currently has the format "flavor:NAME", where NAME is one of "axis_acap", "hanwha_edge1",
+    // "vca_edge1", "vivotek_edge1".
+    NX_WRITE_LOCKER lock(&mutex());
+    const QString variant = currentVariantOverride;
+    const QString defaultFlavorName = "default";
+    const QString flavorPrefix = "flavor:";
+    if (variant.isEmpty() || !variant.startsWith(flavorPrefix))
+        return defaultFlavorName;
+    const QString flavor = QString(variant).replace(flavorPrefix, "");
+    return flavor;
+}
+
 } // namespace nx::utils
