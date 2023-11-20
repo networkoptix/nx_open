@@ -8,6 +8,8 @@
 namespace nx::analytics::db {
 
 using namespace nx::common::metadata;
+static const int kMinTokenLength = 3;
+
 
 std::vector<TextSearchCondition> UserTextSearchExpressionParser::parse(const QString& text)
 {
@@ -82,6 +84,28 @@ void TextMatcher::parse(const QString& text)
     m_conditions = parser.parse(text);
     m_conditionsMatched.clear();
     m_conditionsMatched.resize(m_conditions.size(), false);
+}
+
+bool TextMatcher::hasShortTokens() const
+{
+    return std::any_of(m_conditions.begin(), m_conditions.end(),
+        [](const auto& condition)
+        {
+            switch (condition.type)
+            {
+                case ConditionType::numericRangeMatch:
+                    return false;
+                case ConditionType::attributePresenceCheck:
+                    return condition.name.length() < kMinTokenLength;
+                case ConditionType::textMatch:
+                    return condition.text.length() < kMinTokenLength;
+                case ConditionType::attributeValueMatch:
+                    return condition.name.length() < kMinTokenLength
+                     || condition.valueToken.value.length() < kMinTokenLength;
+                default:
+                    return false;
+            }
+        });
 }
 
 bool TextMatcher::empty() const
@@ -197,7 +221,7 @@ void TextMatcher::matchAttributeValues(
         const auto& condition = m_conditions[i];
         if (condition.type == ConditionType::textMatch)
         {
-            if (condition.text.length() < 3)
+            if (condition.text.length() < kMinTokenLength)
             {
                 // Match the text in the same way as the SQL trigram matcher. It can match >= 3 symbols only.
                 continue;

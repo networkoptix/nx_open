@@ -185,6 +185,8 @@ public:
      */
     bool matched() const;
 
+    bool hasShortTokens() const;
+
 private:
     void matchExactAttributes(
         const nx::common::metadata::Attributes& attributes);
