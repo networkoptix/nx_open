@@ -157,6 +157,12 @@ bool AccessController::hasPermissions(const QnUuid& subjectId, Qn::Permissions d
     return user ? hasPermissions(user, desired) : false;
 }
 
+bool AccessController::hasAnyPermission(
+    const QnResourcePtr& targetResource, Qn::Permissions desired) const
+{
+    return (permissions(targetResource) & desired) != Qn::NoPermissions;
+}
+
 GlobalPermissions AccessController::globalPermissions() const
 {
     return d->globalPermissions();
