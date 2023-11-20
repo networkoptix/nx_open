@@ -2595,7 +2595,8 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
         if (d->isPlayingLive())
         {
-            return d->accessController()->hasPermissions(d->camera, Qn::UserInputPermissions)
+            return d->accessController()->
+                hasAnyPermission(d->camera, Qn::ViewLivePermission | Qn::UserInputPermissions)
                 ? Qn::EmptyOverlay
                 : Qn::AccessDeniedOverlay;
         }
