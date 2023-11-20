@@ -208,23 +208,23 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
+      <translation>Bu grubun üyeleri sınırsız Sistem ayrıcalıklarına sahiptir. Yöneticiler Yetkili Kullanıcılar oluşturabilir ve değiştirebilir, Sistemleri birleştirebilir ve Sistemi  %1 ile bağlayabilir veya bağlantısını kesebilir.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Bu grubun üyeleri, Gelişmiş Görüntüleyiciler grubu tarafından verilen izinlere ek olarak, Sistem yapılandırmasının çoğunu kontrol ederler, ancak kendi gruplarını ve izinlerini silmek veya değiştirmek gibi Yöneticiyle ilgili ayarları değiştirmelerine izin verilmez ve başka Yetkili Kullanıcılar oluşturamaz veya düzenleyemezler.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Bu grubun üyeleri, İzleyici grubu tarafından verilen izinlere ek olarak, PTZ konumlarını ve PTZ turlarını görebilir ve etkinleştirebilir, 2 yönlü ses kullanabilir, G/Ç modülü düğmelerini çalıştırabilir, yer imleri oluşturup düzenleyebilir ve Olay Günlüğünü görüntüleyebilir.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Bu grubun üyeleri, Canlı İzleyici grubu tarafından verilen izinlere ek olarak arşivi ve Yer İşaretlerini görüntüleyebilir ve dışa aktarabilir.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Bu grubun üyeleri Sistem Sağlığı İzleme bilgilerini ve sunucu işlemci yükünü gerçek zamanlı olarak görüntüleyebilir (Sunucu İzleme).</translation>
     </message>
   </context>
   <context>
@@ -1799,16 +1799,16 @@
     </message>
     <message>
       <source>Channel partners service</source>
-      <translation type="unfinished">Channel partners service</translation>
+      <translation>Kanal iş ortakları hizmeti</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>Şu anda %1 yazılımı tarafından kullanılan, kullanımdan kaldırılmış API işlevlerini etkinleştirin (güvenli değil)</translation>
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>Kuruluş Kimliği</translation>
     </message>
   </context>
   <context>
@@ -2547,24 +2547,24 @@
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>LDAP sunucusuna bağlanılamadı.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>Senkronizasyon %1 zaman aşımı süresi içinde tamamlanamadı.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a given timeout.</source>
-      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+      <translation>Belirli bir zaman aşımı süresinde senkronizasyon tamamlanamadı.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>LDAP sunucusundaki hiçbir kullanıcı hesabı senkronizasyon ayarlarıyla eşleşmiyor.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>Bazı LDAP kullanıcıları veya grupları LDAP veritabanında bulunamadı.</translation>
     </message>
   </context>
 </TS>

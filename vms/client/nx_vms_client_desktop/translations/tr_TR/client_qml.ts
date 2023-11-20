@@ -60,11 +60,11 @@
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>İçe aktarılan kullanıcılar için güvenli olmayan (özet) kimlik doğrulamasına izin ver</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Grup Üyeleri Niteliği</translation>
     </message>
   </context>
   <context>
@@ -935,15 +935,15 @@
     </message>
     <message>
       <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Sürekli Senkronizasyon devre dışı bırakıldığında gruplar otomatik olarak senkronize edilmez. Bu grubu güncellemek için manuel senkronizasyon başlatın.</translation>
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+      <translation>Sistemde aynı isimde başka bir grup daha bulunmaktadır. Gruplara benzersiz adlar atamanız önerilir.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Grubun hem ebeveyni hem de alt üyesi olarak başka bir grubu vardır veya böyle bir döngüsel referans zincirinin parçasıdır. İzinlerin yanlış hesaplanmasını önlemek için bu zinciri çözün.</translation>
     </message>
   </context>
   <context>
@@ -1278,11 +1278,11 @@
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>Daha kolay kullanıcı yönetimi için Sisteminizi bir LDAP sunucusuna bağlayın</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Bu sistem için LDAP sunucusundan sürekli içe aktarma devre dışı bırakıldı. Gruplara ve kullanıcı ve grup üyeliğine ilişkin güncellemeler yalnızca el ile senkronizasyon yoluyla gerçekleştirilecektir.</translation>
     </message>
   </context>
   <context>
@@ -1562,7 +1562,7 @@
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Dahili</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1617,7 +1617,7 @@
     <message>
       <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple lines, or %3 to clear the selection</translation>
+      <translation>Birden fazla satırı seçmek için %1 veya %2 , seçimi temizlemek için %3 kullanın</translation>
     </message>
   </context>
   <context>
@@ -1736,27 +1736,27 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Hareket etmek için ok tuşlarına basın. Yakınlaştırmak için artı ve eksi tuşlarını kullanın.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Yakınlaştırmak için fare tekerleğini kullanın</translation>
     </message>
     <message>
       <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</translation>
+      <translation>Gelişmiş PTZ'yi kullanmak için Shift tuşuna basarken fare işaretçisini tıklayın, çift tıklayın veya sürükleyin</translation>
     </message>
     <message>
       <source>Target Lock Tracking</source>
-      <translation type="unfinished">Target Lock Tracking</translation>
+      <translation>Hedef Kilit Takibi</translation>
     </message>
     <message>
       <source>Alt + Click to follow object</source>
-      <translation type="unfinished">Alt + Click to follow object</translation>
+      <translation>Nesneyi takip etmek için Alt + klik</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Yerel Ayarlar &gt; Gelişmiş &gt; Tüm Uyarıları Sıfırla seçeneğine giderek bu kılavuzu tekrar etkinleştirebilirsiniz</translation>
     </message>
   </context>
   <context>
@@ -1967,19 +1967,19 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Sistem askıya alındı. Mevcut cihaz için entegrasyon kullanımını etkinleştirmek/devre dışı bırakmak için Sistemin aktif durumda olması gerekir. Ayrıntılar için kanal ortağınızla iletişime geçin</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Sistem askıya alındı. Bazı cihazlar için entegrasyon kullanımını etkinleştirmek/devre dışı bırakmak için Sistemin aktif durumda olması gerekir. Ayrıntılar için kanal ortağınızla iletişime geçin</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Sistem kapatıldı. Mevcut cihazda bu entegrasyonun kullanılabilmesi için Sistemin aktif durumda olması gerekmektedir. Ayrıntılar için kanal ortağınızla iletişime geçin</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Sistem kapatıldı. Bazı cihazlar için bu entegrasyon kullanımını etkinleştirmek için Sistemin aktif durumda olması gerekir. Ayrıntılar için kanal ortağınızla iletişime geçin</translation>
     </message>
   </context>
   <context>
@@ -2506,24 +2506,24 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Bağlantı Alınıyor...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Bu bilgisayarın %1 bağlanabildiğinden emin olun</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>LDAP sunucusu çevrimdışı. Kullanıcı oturum açamıyor.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Bu kullanıcının oturum açma bilgileri başka bir kullanıcının oturum açma bilgileri ile aynı. Hiçbiri giriş yapamıyor. Bu sorunu çözmek için kullanıcının oturum açma bilgilerini değiştirebilir veya oturum açma bilgileri kopyalanan kullanıcıları devre dışı bırakabilir veya silebilirsiniz.</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Sürekli Senkronizasyon devre dışı bırakıldığında gruplardaki kullanıcı üyelikleri otomatik olarak senkronize edilmez. Bu bilgileri güncellemek için senkronizasyon el ile başlatın.</translation>
     </message>
   </context>
   <context>
