@@ -224,8 +224,12 @@ Item
             visible: !truncated && (content.status == AbstractResourceThumbnail.Status.unavailable
                 || loadingIndicator.timedOut)
 
-            color: accessHelper.canViewLive ? preview.foregroundColor : ColorTheme.colors.red_core
-            text: accessHelper.canViewLive ? preview.noDataText : preview.noAccessText
+            color: accessHelper.canViewLive || accessHelper.passwordRequired
+                ? preview.foregroundColor
+                : ColorTheme.colors.red_core
+            text: accessHelper.canViewLive || accessHelper.passwordRequired
+                ? preview.noDataText
+                : preview.noAccessText
         }
 
         ScaleAdjuster
