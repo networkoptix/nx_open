@@ -42,6 +42,7 @@ struct NX_UTILS_API OsInfo
 
     static OsInfo current();
     static void overrideVariant(const QString& variant, const QString& variantVersion);
+    static QString flavor();
 };
 #define OsInfo_Fields (platform)(variant)(variantVersion)
 NX_REFLECTION_INSTRUMENT(OsInfo, OsInfo_Fields);
