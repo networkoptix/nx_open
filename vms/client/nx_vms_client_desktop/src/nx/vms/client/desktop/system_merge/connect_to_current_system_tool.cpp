@@ -6,7 +6,6 @@
 
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
@@ -15,6 +14,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -38,21 +38,6 @@ static const int kStartProgress = 25;
 static const int kHalfProgress = 50;
 static const int kAlmostDoneProgress = 75;
 static const milliseconds kWaitTimeout = 2min;
-
-QnFakeMediaServerResourcePtr incompatibleServerForOriginalId(
-    const QnUuid& id, const QnResourcePool* resourcePool)
-{
-    for (const auto& server: resourcePool->getIncompatibleServers())
-    {
-        if (const auto& fakeServer = server.dynamicCast<QnFakeMediaServerResource>())
-        {
-            if (fakeServer->getOriginalGuid() == id)
-                return fakeServer;
-        }
-    }
-
-    return {};
-}
 
 } // namespace
 
@@ -78,39 +63,39 @@ bool ConnectToCurrentSystemTool::tryClose(bool /*force*/)
     return true;
 }
 
-void ConnectToCurrentSystemTool::start(const QnUuid& targetId)
+void ConnectToCurrentSystemTool::start(const QnUuid& targetOtherServerId)
 {
-    NX_DEBUG(this, "Try to connect server with id: %1", targetId);
+    NX_DEBUG(this, "Try to connect server with id: %1", targetOtherServerId);
 
-    if (!NX_ASSERT(!targetId.isNull()))
+    if (!NX_ASSERT(!targetOtherServerId.isNull()))
     {
         finish(MergeSystemsStatus::notFound, {}, {});
         return;
     }
 
-    auto server = system()->resourcePool()->getIncompatibleServerById(targetId, true);
-    if (!NX_ASSERT(server))
+    if (!NX_ASSERT(systemContext()->otherServersManager()->containsServer(targetOtherServerId)))
     {
         finish(MergeSystemsStatus::notFound, {}, {});
         return;
     }
 
-    auto serverInformation = server->getModuleInformation();
+    const auto moduleInformation =
+        systemContext()->otherServersManager()->getModuleInformationWithAddresses(targetOtherServerId);
 
     // Following checks can be run before requesting password, so do it now.
     MergeSystemsStatus mergeStatus = MergeSystemsValidator::checkCloudCompatibility(
-        system()->currentServer(), serverInformation);
+        system()->currentServer(), moduleInformation);
 
     if (mergeStatus == MergeSystemsStatus::ok)
-        mergeStatus = MergeSystemsValidator::checkVersionCompatibility(serverInformation);
+        mergeStatus = MergeSystemsValidator::checkVersionCompatibility(moduleInformation);
 
     if (mergeStatus != MergeSystemsStatus::ok)
     {
-        finish(mergeStatus, {}, serverInformation);
+        finish(mergeStatus, {}, moduleInformation);
         return;
     }
 
-    const QString password = helpers::isNewSystem(serverInformation)
+    const QString password = helpers::isNewSystem(moduleInformation)
         ? helpers::kFactorySystemPassword
         : requestPassword();
 
@@ -120,15 +105,14 @@ void ConnectToCurrentSystemTool::start(const QnUuid& targetId)
         return;
     }
 
-    m_targetId = targetId;
-    m_originalTargetId = server->getOriginalGuid();
-    m_serverName = server->getName();
+    m_targetServerId = moduleInformation.id;
+    m_serverName = moduleInformation.name;
 
     NX_DEBUG(this,
-        "Start connecting server %1 (id=%2, url=%3",
+        "Start connecting server %1 (id=%2, url=%3)",
         m_serverName,
-        m_originalTargetId,
-        server->getApiUrl());
+        m_targetServerId,
+        systemContext()->otherServersManager()->getUrl(targetOtherServerId));
 
     emit progressChanged(kStartProgress);
     mergeServer(password);
@@ -171,13 +155,10 @@ void ConnectToCurrentSystemTool::mergeServer(const QString& adminPassword)
 {
     NX_ASSERT(!m_mergeTool);
 
-    const auto server = incompatibleServerForOriginalId(
-        m_originalTargetId, system()->resourcePool());
-
-    if (!server)
+    if (!systemContext()->otherServersManager()->containsServer(m_targetServerId))
     {
         const auto compatibleServer =
-            system()->resourcePool()->getResourceById<QnMediaServerResource>(m_originalTargetId);
+            system()->resourcePool()->getResourceById<QnMediaServerResource>(m_targetServerId);
         if (compatibleServer && compatibleServer->getStatus() == nx::vms::api::ResourceStatus::online)
         {
             finish(MergeSystemsStatus::ok, {}, {});
@@ -225,7 +206,7 @@ void ConnectToCurrentSystemTool::mergeServer(const QString& adminPassword)
 
     m_mergeContextId = m_mergeTool->pingSystem(
         proxy,
-        server->getApiUrl(),
+        systemContext()->otherServersManager()->getUrl(m_targetServerId),
         auth);
 }
 
@@ -326,7 +307,7 @@ void ConnectToCurrentSystemTool::waitServer()
             finish(mergeStatus, {}, {});
         };
 
-    if (system()->resourcePool()->getIncompatibleServerById(m_targetId, true))
+    if (systemContext()->otherServersManager()->containsServer(m_targetServerId))
     {
         finishMerge(MergeSystemsStatus::ok);
         return;
@@ -335,7 +316,7 @@ void ConnectToCurrentSystemTool::waitServer()
     auto handleResourceChanged =
         [this, finishMerge](const QnResourcePtr& resource)
         {
-            if ((resource->getId() == m_originalTargetId)
+            if ((resource->getId() == m_targetServerId)
                 && (resource->getStatus() != nx::vms::api::ResourceStatus::offline))
             {
                 finishMerge(MergeSystemsStatus::ok);

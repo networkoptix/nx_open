@@ -87,11 +87,6 @@ void QnResourcePool::addResource(const QnResourcePtr& resource, AddResourceFlags
         addResources({{resource}}, flags);
 }
 
-void QnResourcePool::addIncompatibleServer(const QnMediaServerResourcePtr& server)
-{
-    addResources({{server}}, UseIncompatibleServerPool);
-}
-
 void QnResourcePool::addNewResources(const QnResourceList& resources, AddResourceFlags /*flags*/)
 {
     addResources(
@@ -122,27 +117,14 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         if (resource->getId().isNull())
             continue;
 
-        if (!flags.testFlag(UseIncompatibleServerPool))
+        if (const auto updateExisting = insertOrUpdateResource(resource, &m_resources))
         {
-            if (auto updateExisting = insertOrUpdateResource(resource, &m_resources))
-            {
-                updateExistingResources.push_back(std::move(updateExisting));
-            }
-            else
-            {
-                d->handleResourceAdded(resource);
-                newResources.insert(resource->getId(), resource);
-            }
-            m_incompatibleServers.remove(resource->getId());
+            updateExistingResources.push_back(std::move(updateExisting));
         }
         else
         {
-            auto server = resource.dynamicCast<QnMediaServerResource>();
-            NX_ASSERT(server, "Only fake servers allowed here");
-            if (auto updateExisting = insertOrUpdateResource(server, &m_incompatibleServers))
-                updateExistingResources.push_back(std::move(updateExisting));
-            else
-                newResources.insert(resource->getId(), resource);
+            d->handleResourceAdded(resource);
+            newResources.insert(resource->getId(), resource);
         }
     }
 
@@ -227,15 +209,6 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
             d->handleResourceRemoved(resource);
             m_resources.erase(resIter);
             appendRemovedResource(resource);
-        }
-        else
-        {
-            const auto iter = m_incompatibleServers.find(resource->getId());
-            if (iter != m_incompatibleServers.end())
-            {
-                m_incompatibleServers.erase(iter);
-                appendRemovedResource(resource);
-            }
         }
     }
 
@@ -513,12 +486,9 @@ void QnResourcePool::clear()
             tempList.append(resource);
         for (const auto& resource: std::as_const(m_tmpResources))
             tempList.append(resource);
-        for (const auto& resource: std::as_const(m_incompatibleServers))
-            tempList.append(resource);
 
         m_tmpResources.clear();
         m_resources.clear();
-        m_incompatibleServers.clear();
         m_adminResource.clear();
 
         d->ioModules.clear();
@@ -541,31 +511,6 @@ void QnResourcePool::clear()
 bool QnResourcePool::containsIoModules() const
 {
     return d->hasIoModules;
-}
-
-QnMediaServerResourcePtr QnResourcePool::getIncompatibleServerById(
-    const QnUuid& id,
-    bool useCompatible) const
-{
-    NX_READ_LOCKER locker(&m_resourcesMutex);
-
-    auto it = m_incompatibleServers.constFind(id);
-    if (it != m_incompatibleServers.cend())
-        return it.value();
-
-    if (useCompatible)
-    {
-        locker.unlock();
-        return getResourceById<QnMediaServerResource>(id);
-    }
-
-    return QnMediaServerResourcePtr();
-}
-
-QnMediaServerResourceList QnResourcePool::getIncompatibleServers() const
-{
-    NX_READ_LOCKER locker(&m_resourcesMutex);
-    return m_incompatibleServers.values();
 }
 
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QnUuid& uuid) const

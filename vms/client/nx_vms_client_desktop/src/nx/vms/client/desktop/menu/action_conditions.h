@@ -520,22 +520,6 @@ public:
     virtual ActionVisibility check(const QnResourceList& resources, WindowContext* context) override;
 };
 
-class MergeToCurrentSystemCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const QnResourceList& resources, WindowContext* context) override;
-};
-
-class FakeServerCondition: public Condition
-{
-public:
-    FakeServerCondition(bool allResources);
-    virtual ActionVisibility check(const QnResourceList& resources, WindowContext* context) override;
-
-private:
-    bool m_all;
-};
-
 class CloudServerCondition: public Condition
 {
 public:

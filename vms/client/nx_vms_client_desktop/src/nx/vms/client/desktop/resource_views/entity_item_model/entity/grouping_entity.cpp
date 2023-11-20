@@ -352,9 +352,11 @@ void GroupingEntity<GroupKey, Key>::updateItemGroup(const Key& itemKey)
 
 template class NX_VMS_CLIENT_DESKTOP_API GroupDefiningDataChangeObserver<QnResourcePtr>;
 template class NX_VMS_CLIENT_DESKTOP_API GroupDefiningDataChangeObserver<int>;
+template class NX_VMS_CLIENT_DESKTOP_API GroupDefiningDataChangeObserver<QnUuid>;
 
 template class NX_VMS_CLIENT_DESKTOP_API GroupingEntity<QString, QnResourcePtr>;
 template class NX_VMS_CLIENT_DESKTOP_API GroupingEntity<QString, int>;
+template class NX_VMS_CLIENT_DESKTOP_API GroupingEntity<QString, QnUuid>;
 
 } // namespace entity_item_model
 } // namespace nx::vms::client::desktop

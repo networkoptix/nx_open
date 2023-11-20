@@ -43,8 +43,7 @@ public:
 private:
     void onServerAdded(const QnResourcePtr& resource)
     {
-        const auto server = resource.dynamicCast<core::ServerResource>();
-        if (server && !server->hasFlags(Qn::fake))
+        if (const auto server = resource.dynamicCast<core::ServerResource>())
         {
             onServerAddedInternal(server);
 
@@ -62,7 +61,7 @@ private:
 
     void onServerAddedInternal(const QnMediaServerResourcePtr& server)
     {
-        NX_ASSERT(server && !server->hasFlags(Qn::fake));
+        NX_ASSERT(server);
 
         connect(server.get(), &QnMediaServerResource::statusChanged,
             this, &TimeSynchronizationServerStateWatcher::Private::onStatusChanged);
@@ -74,7 +73,7 @@ private:
     void onServerRemoved(const QnResourcePtr& resource)
     {
         const auto& server = resource.dynamicCast<QnMediaServerResource>();
-        if (server && !server->hasFlags(Qn::fake))
+        if (server)
         {
             server->disconnect(this);
             m_store->removeServer(server->getId());
@@ -84,7 +83,7 @@ private:
     void onStatusChanged(const QnResourcePtr& resource)
     {
         const auto& server = resource.dynamicCast<QnMediaServerResource>();
-        NX_ASSERT(server && !server->hasFlags(Qn::fake));
+        NX_ASSERT(server);
 
         m_store->setServerOnline(
             server->getId(), server->getStatus() == nx::vms::api::ResourceStatus::online);
@@ -93,7 +92,7 @@ private:
     void onFlagsChanged(const QnResourcePtr& resource)
     {
         const auto& server = resource.dynamicCast<QnMediaServerResource>();
-        NX_ASSERT(server && !server->hasFlags(Qn::fake));
+        NX_ASSERT(server);
 
         m_store->setServerOnline(server->getId(), server->hasInternetAccess());
     }

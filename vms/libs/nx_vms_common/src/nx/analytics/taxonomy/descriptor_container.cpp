@@ -27,8 +27,7 @@ DescriptorContainer::DescriptorContainer(
         {kDescriptorsProperty},
         [](const QnResourcePtr& res)
         {
-            auto server = res.dynamicCast<QnMediaServerResource>();
-            return server && !server->flags().testFlag(Qn::fake);
+            return res->hasFlags(Qn::server);
         });
 }
 

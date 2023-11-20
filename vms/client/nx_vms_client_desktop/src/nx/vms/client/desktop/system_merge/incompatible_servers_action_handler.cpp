@@ -4,7 +4,6 @@
 
 #include <QtGui/QAction>
 
-#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -14,10 +13,12 @@
 #include <nx/build_info.h>
 #include <nx/vms/client/core/system_logon/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/system_merge/connect_to_current_system_tool.h>
 #include <nx/vms/client/desktop/ui/dialogs/merge_systems_dialog.h>
@@ -57,36 +58,20 @@ void IncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered
         return;
     }
 
-    const auto resources = menu()->currentParameters(sender()).resources();
-    NX_ASSERT(resources.size() == 1, "We can't connect/merge more then one server");
-    if (resources.isEmpty())
-        return;
+    const auto serverId =
+        menu()->currentParameters(sender()).argument(Qn::UuidRole).value<QnUuid>();
 
-    const auto resource = resources.first();
-    const auto status = resource->getStatus();
-    if (status != nx::vms::api::ResourceStatus::incompatible && status != nx::vms::api::ResourceStatus::unauthorized)
-        return;
-
-    const auto serverResource = resource.dynamicCast<QnFakeMediaServerResource>();
-    NX_ASSERT(serverResource);
-    if (!serverResource)
-        return;
-
-    connectToCurrentSystem(serverResource);
+    connectToCurrentSystem(serverId);
 }
 
-void IncompatibleServersActionHandler::connectToCurrentSystem(
-    const QnFakeMediaServerResourcePtr& server)
+void IncompatibleServersActionHandler::connectToCurrentSystem(const QnUuid& serverId)
 {
-    NX_ASSERT(server);
-    NX_ASSERT(!m_connectTool);
-    if (m_connectTool || !server)
+    if (!NX_ASSERT(!serverId.isNull()) || !NX_ASSERT(!m_connectTool))
         return;
 
-    const auto moduleInformation = server->getModuleInformation();
-    QnUuid target = server->getId();
-    if (target.isNull())
-        return;
+    const auto otherServersManager = context()->systemContext()->otherServersManager();
+    const auto moduleInformation =
+        otherServersManager->getModuleInformationWithAddresses(serverId);
 
     auto delegate = createConnectionUserInteractionDelegate(
         [this]() { return mainWindowWidget(); });
@@ -125,7 +110,7 @@ void IncompatibleServersActionHandler::connectToCurrentSystem(
     // The captured scenario guard will be deleted after tool is destroyed.
     connect(m_connectTool, &ConnectToCurrentSystemTool::destroyed, this, [mergeScenario] {});
 
-    m_connectTool->start(target);
+    m_connectTool->start(serverId);
 }
 
 void IncompatibleServersActionHandler::at_mergeSystemsAction_triggered()

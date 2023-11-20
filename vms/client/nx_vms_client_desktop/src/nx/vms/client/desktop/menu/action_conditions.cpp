@@ -14,7 +14,6 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
@@ -695,9 +694,6 @@ ActionVisibility ResourceRemovalCondition::check(
                 return true;
             }
 
-            if (resource->hasFlags(Qn::fake))
-                return false;
-
             if (resource->hasFlags(Qn::cross_system))
                 return false;
 
@@ -771,10 +767,6 @@ ActionVisibility RenameResourceCondition::check(const Parameters& parameters, Wi
 
             /* Edge servers renaming is forbidden. */
             if (QnMediaServerResource::isEdgeServer(target))
-                return InvisibleAction;
-
-            /* Incompatible resources cannot be renamed */
-            if (target.dynamicCast<QnFakeMediaServerResource>())
                 return InvisibleAction;
 
             return EnabledAction;
@@ -1759,51 +1751,6 @@ ActionVisibility IoModuleCondition::check(const QnResourceList& resources, Windo
     return pureIoModules ? EnabledAction : InvisibleAction;
 }
 
-ActionVisibility MergeToCurrentSystemCondition::check(const QnResourceList& resources, WindowContext* /*context*/)
-{
-    if (resources.size() != 1)
-        return InvisibleAction;
-
-    QnMediaServerResourcePtr server = resources.first().dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return InvisibleAction;
-
-    const auto status = server->getStatus();
-    if (status != nx::vms::api::ResourceStatus::incompatible
-        && status != nx::vms::api::ResourceStatus::unauthorized
-        && status != nx::vms::api::ResourceStatus::mismatchedCertificate)
-    {
-        return InvisibleAction;
-    }
-
-    if (helpers::serverBelongsToCurrentSystem(server))
-        return InvisibleAction;
-
-    return EnabledAction;
-}
-
-FakeServerCondition::FakeServerCondition(bool allResources):
-    m_all(allResources)
-{
-}
-
-ActionVisibility FakeServerCondition::check(const QnResourceList& resources, WindowContext* /*context*/)
-{
-    bool found = false;
-    foreach(const QnResourcePtr &resource, resources)
-    {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        if (server.dynamicCast<QnFakeMediaServerResource>())
-            found = true;
-        else if (m_all)
-            return InvisibleAction;
-    }
-    return found ? EnabledAction : InvisibleAction;
-}
-
 CloudServerCondition::CloudServerCondition(MatchMode matchMode):
     m_matchMode(matchMode)
 {
@@ -1824,7 +1771,7 @@ ActionVisibility ReachableServerCondition::check(
     const Parameters& parameters, WindowContext* /*context*/)
 {
     const auto server = parameters.resource().dynamicCast<QnMediaServerResource>();
-    if (!server || server->hasFlags(Qn::fake))
+    if (!server)
         return InvisibleAction;
 
     const auto currentSession = qnClientCoreModule->networkModule()->session();
@@ -1855,7 +1802,7 @@ ActionVisibility HideServersInTreeCondition::check(
     const auto server = parameters.size() > 0
         ? parameters.resource().dynamicCast<QnMediaServerResource>()
         : QnMediaServerResourcePtr{};
-    if (!server || server->hasFlags(Qn::fake))
+    if (!server)
         return InvisibleAction;
 
     const auto parentNodeType =
@@ -1888,7 +1835,7 @@ ActionVisibility ToggleProxiedResourcesCondition::check(
         ? parameters.resource().dynamicCast<QnMediaServerResource>()
         : QnMediaServerResourcePtr{};
 
-    if (!server || server->hasFlags(Qn::fake))
+    if (!server)
         return InvisibleAction;
 
     const auto parentNodeType =

@@ -90,6 +90,8 @@ public:
     // Resource Tree Cloud Layout item.
     AbstractItemPtr createCloudLayoutItem(const QnLayoutResourcePtr& layout);
 
+    AbstractItemPtr createOtherServerItem(const QnUuid& serverId);
+
 private:
     QHash<QnResourcePtr, entity_item_model::SharedItemOriginPtr> m_resourceItemCache;
 };

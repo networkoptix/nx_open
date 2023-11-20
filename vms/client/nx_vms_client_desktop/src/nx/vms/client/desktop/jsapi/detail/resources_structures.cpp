@@ -26,7 +26,7 @@ ResourceType resourceType(const QnResourcePtr& resource)
         return ResourceType::local_image;
     if (flags.testFlag(Qn::local_video))
         return ResourceType::local_video;
-    if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake_server))
+    if (flags.testFlag(Qn::server))
         return ResourceType::server;
     if (flags.testFlag(Qn::live_cam))
         return ResourceType::camera;

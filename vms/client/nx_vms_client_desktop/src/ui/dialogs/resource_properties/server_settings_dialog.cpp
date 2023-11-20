@@ -8,7 +8,6 @@
 #include <QtWidgets/QPushButton>
 
 #include <api/server_rest_connection.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/http_types.h>
@@ -141,10 +140,10 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
             if (isHidden())
                 return;
 
-            auto servers = resources.filtered<QnMediaServerResource>(
+            const auto servers = resources.filtered<QnMediaServerResource>(
                 [](const QnMediaServerResourcePtr &server)
                 {
-                    return !server.dynamicCast<QnFakeMediaServerResource>();
+                    return server.dynamicCast<QnMediaServerResource>();
                 });
 
             if (!servers.isEmpty())

@@ -12,7 +12,6 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -25,11 +24,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
+#include <nx/vms/client/desktop/test_support/message_processor_mock.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
@@ -56,6 +57,8 @@ void ResourceTreeModelTest::SetUp()
         /*resourceTreeSettings*/ nullptr));
 
     m_resourceTreeComposer->attachModel(m_newResourceTreeModel.get());
+
+    createMessageProcessor();
 }
 
 void ResourceTreeModelTest::TearDown()
@@ -130,12 +133,18 @@ QnMediaServerResourcePtr ResourceTreeModelTest::addEdgeServer(const QString& nam
     return server;
 }
 
-QnMediaServerResourcePtr ResourceTreeModelTest::addFakeServer(const QString& name) const
+void ResourceTreeModelTest::addOtherServer(const QString& name) const
 {
-    QnMediaServerResourcePtr server(new QnFakeMediaServerResource());
-    server->setName(name);
-    resourcePool()->addResource(server);
-    return server;
+    auto messageProcessor = dynamic_cast<MessageProcessorMock*>(systemContext()->messageProcessor());
+
+    nx::vms::api::DiscoveredServerData discoveredServer;
+    discoveredServer.name = name;
+    discoveredServer.id = QnUuid::createUuid();
+    discoveredServer.status = nx::vms::api::ResourceStatus::incompatible;
+    discoveredServer.version = nx::utils::SoftwareVersion(2, 3, 0, 1); //< Min suitable version.
+
+    messageProcessor->emulateConnectionOpened();
+    messageProcessor->emulatateServerInitiallyDiscovered(discoveredServer);
 }
 
 QnAviResourcePtr ResourceTreeModelTest::addLocalMedia(const QString& path) const

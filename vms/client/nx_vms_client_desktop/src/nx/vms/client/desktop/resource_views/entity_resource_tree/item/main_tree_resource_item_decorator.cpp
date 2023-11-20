@@ -22,21 +22,13 @@ bool hasItemIsDragEnabledFlag(const QnResourcePtr& resource)
     static constexpr Qn::ResourceFlags kDraggableTypeFlags =
         {Qn::server, Qn::web_page, Qn::layout, Qn::media, Qn::videowall};
 
-    // Any resource node with flags intersecting with combination above is considered
-    // as draggable for anyone except fake servers within 'Other Systems' group.
-    if (resource->hasFlags(Qn::fake_server))
-        return false;
-
     return (resource->flags() & kDraggableTypeFlags) != 0;
 }
 
 bool hasItemIsDropEnabledFlag(const QnResourcePtr& resource, Permissions permissions)
 {
-    if ((resource->hasFlags(Qn::server) || resource->hasFlags(Qn::user))
-        && !resource->hasFlags(Qn::fake))
-    {
+    if (resource->hasFlags(Qn::server) || resource->hasFlags(Qn::user))
         return permissions.hasPowerUserPermissions;
-    }
 
     if (resource->hasFlags(Qn::videowall))
         return permissions.permissions.testFlag(Qn::ReadWriteSavePermission);
@@ -50,7 +42,7 @@ bool hasItemIsEditableFlag(
     Permissions permissions)
 {
     // Users or servers within 'Other Systems' group cannot be renamed.
-    if (resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake_server))
+    if (resource->hasFlags(Qn::user))
         return false;
 
     if (nodeType == ResourceTree::NodeType::layoutItem)
@@ -123,7 +115,7 @@ QVariant MainTreeResourceItemDecorator::data(int role) const
         && (m_nodeType == NodeType::sharedResource || m_nodeType == NodeType::layoutItem))
     {
         const auto flags = m_sourceItem->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
-        if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
+        if (flags.testFlag(Qn::server))
         {
             const auto resource = m_sourceItem->data(Qn::ResourceRole).value<QnResourcePtr>();
             const auto overridenIcon = resource->isOnline()

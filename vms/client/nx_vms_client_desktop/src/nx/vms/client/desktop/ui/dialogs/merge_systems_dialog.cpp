@@ -22,6 +22,8 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
+#include <nx/vms/client/desktop/other_servers/other_server_display_info.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
@@ -135,13 +137,15 @@ void MergeSystemsDialog::updateKnownSystems()
     ui->urlComboBox->clear();
 
     std::multimap<QString, QString> labelUrlMap;
-    for (const auto& server: system()->resourcePool()->getIncompatibleServers())
-    {
-        QString url = server->getApiUrl().toString();
-        QString label = QnResourceDisplayInfo(server).toString(
-            appContext()->localSettings()->resourceInfoLevel());
 
-        const auto moduleInformation = server->getModuleInformation();
+    for (const QnUuid& otherServerId: systemContext()->otherServersManager()->getServers())
+    {
+        QString url = systemContext()->otherServersManager()->getUrl(otherServerId).toString();
+        QString label = OtherServerDisplayInfo(otherServerId, systemContext()->otherServersManager())
+            .toString(appContext()->localSettings()->resourceInfoLevel());
+
+        const auto moduleInformation =
+            systemContext()->otherServersManager()->getModuleInformationWithAddresses(otherServerId);
 
         QString systemName = helpers::getSystemName(moduleInformation);
         if (!systemName.isEmpty())

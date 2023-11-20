@@ -31,6 +31,17 @@ void MessageProcessorMock::emulateConnectionEstablished()
     emit initialResourcesReceived();
 }
 
+void MessageProcessorMock::emulateConnectionOpened()
+{
+    emit connectionOpened();
+}
+
+void MessageProcessorMock::emulatateServerInitiallyDiscovered(
+    const nx::vms::api::DiscoveredServerData& discoveredServer)
+{
+    emit gotInitialDiscoveredServers({discoveredServer});
+}
+
 QnResourceFactory* MessageProcessorMock::getResourceFactory() const
 {
     return d->resourceFactory.get();

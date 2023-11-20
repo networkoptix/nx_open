@@ -27,8 +27,7 @@ void ControllerPool::registerResource(const QnResourcePtr &resource)
 {
     base_type::registerResource(resource);
 
-    if (auto server = resource.dynamicCast<QnMediaServerResource>();
-        server && !server->hasFlags(Qn::fake))
+    if (auto server = resource.dynamicCast<QnMediaServerResource>())
     {
         reinitServerCameras(server);
         return;

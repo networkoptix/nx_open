@@ -118,9 +118,9 @@ public:
     UniqueResourceSourcePtr localMediaSource();
 
     /**
-     * Provides fake server resources stored in the resource pool.
+     * Provides other server ids which are stored in the other servers manager.
      */
-    UniqueResourceSourcePtr fakeServerResourcesSource();
+    UniqueUuidSourcePtr otherServersSource();
 
     /**
      * Provides ids of cloud systems retrieved from the CloudSystemsFinder instance.

@@ -169,7 +169,7 @@ NX_VMS_COMMON_API void deserializeNetAddrList(
     QList<nx::network::SocketAddress>& target,
     int defaultPort);
 
-QList<nx::network::SocketAddress> moduleInformationEndpoints(
+NX_VMS_COMMON_API QList<nx::network::SocketAddress> moduleInformationEndpoints(
     const nx::vms::api::ModuleInformationWithAddresses& data);
 
 NX_VMS_COMMON_API void setModuleInformationEndpoints(

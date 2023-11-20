@@ -18,12 +18,6 @@ namespace nx::vms::client::desktop {
 
 class SystemContext;
 
-namespace update_verification {
-// This property is used in unit tests to make update verification procedure think that a server is
-// linked to cloud.
-inline const char* kServerIsLinkedToCloudTestProperty = "__nx_server_is_linked_to_cloud";
-} // namespace update_verification
-
 struct UpdateStrings
 {
     Q_DECLARE_TR_FUNCTIONS(UpdateStrings)

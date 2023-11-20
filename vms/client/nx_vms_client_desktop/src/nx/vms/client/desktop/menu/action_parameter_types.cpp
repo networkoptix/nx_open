@@ -105,6 +105,11 @@ bool isValid(const LayoutItemIndex& value)
     return !value.isNull();
 }
 
+bool isValid(const QnUuid& value)
+{
+    return !value.isNull();
+}
+
 template<class List, class T>
 List makeList(const T& value)
 {

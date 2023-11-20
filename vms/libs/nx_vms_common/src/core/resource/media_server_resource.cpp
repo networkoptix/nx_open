@@ -97,9 +97,6 @@ void QnMediaServerResource::at_propertyChanged(const QnResourcePtr& /*res*/, con
 
 void QnMediaServerResource::at_cloudSettingsChanged()
 {
-    if (hasFlags(Qn::fake_server))
-        return;
-
     emit auxUrlsChanged(toSharedPointer(this));
 }
 
@@ -273,7 +270,6 @@ QList<nx::network::SocketAddress> QnMediaServerResource::getAllAvailableAddresse
 bool QnMediaServerResource::hasInternetAccess() const
 {
     return getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP)
-        && !hasFlags(Qn::fake)
         && getStatus() == nx::vms::api::ResourceStatus::online;
 }
 
@@ -281,7 +277,6 @@ bool QnMediaServerResource::isMasterCloudSync() const
 {
     const auto flags = systemContext()->runtimeInfoManager()->item(getId()).data.flags;
     return flags.testFlag(nx::vms::api::RuntimeFlag::masterCloudSync)
-        && !hasFlags(Qn::fake)
         && getStatus() == nx::vms::api::ResourceStatus::online;
 }
 

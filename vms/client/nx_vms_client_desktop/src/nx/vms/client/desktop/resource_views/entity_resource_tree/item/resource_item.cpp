@@ -31,9 +31,6 @@ QVariant resourceHelpTopic(const QnResourcePtr& resource)
     if (resource.isNull())
         return QVariant();
 
-    if (resource->hasFlags(Qn::fake_server))
-        return HelpTopic::Id::OtherSystems;
-
     if (resource->hasFlags(Qn::server))
         return HelpTopic::Id::MainWindow_Tree_Servers;
 

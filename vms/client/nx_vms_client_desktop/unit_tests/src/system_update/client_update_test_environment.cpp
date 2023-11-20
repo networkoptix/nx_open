@@ -34,18 +34,13 @@ ClientVerificationData ClientUpdateTestEnvironment::makeClientData(nx::utils::So
 
 QnMediaServerResourcePtr ClientUpdateTestEnvironment::makeServer(
     nx::utils::SoftwareVersion version,
-    bool online,
-    bool compatibleServer)
+    bool online)
 {
     QnMediaServerResourcePtr server(new nx::vms::client::desktop::ServerResource());
     server->setVersion(version);
     server->setIdUnsafe(QnUuid::createUuid());
     server->setOsInfo(os::windows);
-    resourcePool()->addResource(
-        server,
-        compatibleServer
-            ? QnResourcePool::NoAddResourceFlags
-            : QnResourcePool::UseIncompatibleServerPool);
+    resourcePool()->addResource(server);
 
     server->setStatus(online
         ? nx::vms::api::ResourceStatus::online

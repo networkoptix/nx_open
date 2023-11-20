@@ -58,7 +58,7 @@ int CurrentSystemServers::serversCount() const
 void CurrentSystemServers::tryAddServer(const QnResourcePtr& resource)
 {
     const auto server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || server->hasFlags(Qn::fake_server))
+    if (!server)
         return;
 
     if (contains(m_servers, server))

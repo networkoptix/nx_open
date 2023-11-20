@@ -244,7 +244,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
         {
             for (const auto& resource: resources)
             {
-                if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+                if (resource->hasFlags(Qn::server))
                 {
                     updateServerEventsMenu();
                     break;

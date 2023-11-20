@@ -224,8 +224,7 @@ NodePtr filterNodeInclusiveRecursive(NodePtr node, NodeFilter includeNode)
 /** Filter resources which addition or removing can affect tree building result. */
 bool isManageableResource(const QnResourcePtr& resource)
 {
-    return resource->hasFlags(Qn::server_live_cam)
-        || (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake));
+    return resource->hasFlags(Qn::server_live_cam) || resource->hasFlags(Qn::server);
 }
 
 } // namespace

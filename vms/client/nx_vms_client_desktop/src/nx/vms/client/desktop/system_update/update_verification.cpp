@@ -9,6 +9,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
@@ -33,17 +34,8 @@ QSet<QnUuid> getServersLinkedToCloud(SystemContext* systemContext, const QSet<Qn
 
     for (const auto& id: peers)
     {
-        const auto server = systemContext->resourcePool()->getIncompatibleServerById(id);
-        if (!server)
+        if (!systemContext->otherServersManager()->containsServer(id))
             continue;
-
-        // This property is set in unit tests only.
-        if (server->QObject::property(
-            update_verification::kServerIsLinkedToCloudTestProperty).toBool())
-        {
-            result.insert(id);
-            continue;
-        }
 
         const auto module = moduleManager->getModule(id);
         if (module && !module->cloudSystemId.isEmpty())
@@ -301,11 +293,6 @@ bool verifyUpdateContents(
     // Checking if all servers have update packages.
     for (auto& [id, server]: activeServers)
     {
-        bool isOurServer = !server->hasFlags(Qn::fake_server)
-            || helpers::serverBelongsToCurrentSystem(server);
-        if (!isOurServer)
-            continue;
-
         allServers.insert(id);
 
         const auto& osInfo = server->getOsInfo();

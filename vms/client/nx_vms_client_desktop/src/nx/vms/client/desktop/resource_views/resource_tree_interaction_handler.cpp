@@ -271,6 +271,13 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
                 return withNodeType(parameters);
             }
 
+            case NodeType::otherSystemServer:
+            {
+                const auto parameters = menu::Parameters()
+                    .withArgument(Qn::UuidRole, index.data(Qn::ItemUuidRole));
+                return withNodeType(parameters);
+            }
+
             default:
                 break;
         }
@@ -594,8 +601,8 @@ void ResourceTreeInteractionHandler::activateItem(const QModelIndex& index,
         default:
         {
             const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-            // Do not open users or fake servers.
-            if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake_server))
+            // Do not open users.
+            if (!resource || resource->hasFlags(Qn::user))
                 break;
 
             // Do not open servers of admin.

@@ -55,12 +55,9 @@ std::function<AbstractItemPtr(const QnResourcePtr&)> serverItemCreator()
     return
         [](const QnResourcePtr& serverResource) -> AbstractItemPtr
         {
-            if (serverResource.isNull()
-                || !serverResource->hasFlags(Qn::server)
-                || serverResource->hasFlags(Qn::fake_server))
-            {
+            if (serverResource.isNull() || !serverResource->hasFlags(Qn::server))
                 return entity_item_model::AbstractItemPtr();
-            }
+
             return createServerItem(serverResource);
         };
 }

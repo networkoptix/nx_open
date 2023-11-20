@@ -391,14 +391,6 @@ TEST_F(UpdateVerificationTest, cloudCompatibilityCheck)
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, common::update::InformationError::incompatibleCloudHost);
     EXPECT_FALSE(contents.cloudIsCompatible);
-
-    commonModule()->globalSettings()->setCloudSystemId({});
-    const auto incompatibleServer = makeServer(kCurrentVersion, false, false);
-    incompatibleServer->QObject::setProperty(
-        update_verification::kServerIsLinkedToCloudTestProperty, true);
-    verifyUpdateContents(contents, getAllServers(), clientData, options);
-    EXPECT_EQ(contents.error, common::update::InformationError::incompatibleCloudHost);
-    EXPECT_FALSE(contents.cloudIsCompatible);
 }
 
 } // namespace nx::vms::client::desktop::test

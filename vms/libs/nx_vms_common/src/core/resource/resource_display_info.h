@@ -23,7 +23,7 @@ private:
 private:
     QnResourcePtr m_resource;
 
-    /** How deep are have constructed the info. */
+    /** How detailed the info should be constructed. */
     mutable Qn::ResourceInfoLevel m_detailLevel = Qn::RI_Invalid;
 
     mutable QString m_name;

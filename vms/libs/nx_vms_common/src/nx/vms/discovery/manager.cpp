@@ -279,11 +279,7 @@ void Manager::start(QnResourcePool* resourcePool)
         [handleServerAdded](const QnResourcePtr& resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-            {
-                // Skip endpoints from servers, discovered by the remote server.
-                if (!server->hasFlags(Qn::fake_server))
-                    handleServerAdded(server);
-            }
+                handleServerAdded(server);
         });
 
     d->resourcePoolConnections << connect(

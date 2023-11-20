@@ -1,21 +1,23 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "incompatible_server_watcher.h"
+#include "other_servers_manager.h"
 
 #include <client/client_message_processor.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/server.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
-using namespace nx::vms::client::desktop;
+
+#include <nx/network/http/http_types.h>
+#include <nx/network/url/url_builder.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 namespace {
 
@@ -26,12 +28,13 @@ bool isSuitable(const nx::vms::api::ModuleInformation& moduleInformation)
 
 } // namespace
 
-struct QnIncompatibleServerWatcher::Private
+namespace nx::vms::client::desktop {
+
+struct OtherServersManager::Private
 {
     struct DiscoveredServerItem
     {
         nx::vms::api::DiscoveredServerData serverData;
-        bool keep = false;
         bool removed = false;
 
         DiscoveredServerItem() = default;
@@ -41,12 +44,11 @@ struct QnIncompatibleServerWatcher::Private
         }
     };
 
-    QnIncompatibleServerWatcher* const q;
-    mutable nx::Mutex mutex;
-    QHash<QnUuid, QnUuid> fakeUuidByServerUuid;
-    QHash<QnUuid, QnUuid> serverUuidByFakeUuid;
+    OtherServersManager* const q;
     QHash<QnUuid, DiscoveredServerItem> discoveredServerItemById;
     nx::utils::ScopedConnections connections;
+
+    QSet<QnUuid> otherServers;
 
     void at_resourcePool_statusChanged(const QnResourcePtr& resource)
     {
@@ -54,11 +56,8 @@ struct QnIncompatibleServerWatcher::Private
         if (!server)
             return;
 
-        QnUuid id = server->getId();
-
         {
-            NX_MUTEX_LOCKER lock(&mutex);
-            if (serverUuidByFakeUuid.contains(id))
+            if (otherServers.contains(server->getId()))
                 return;
         }
 
@@ -69,21 +68,18 @@ struct QnIncompatibleServerWatcher::Private
             && helpers::serverBelongsToCurrentSystem(moduleInformation, q->systemContext())
             && nx::vms::common::ServerCompatibilityValidator::isCompatible(moduleInformation))
         {
-            removeResource(getFakeId(id));
+            removeOtherServer(server->getId());
         }
         else if (status == nx::vms::api::ResourceStatus::offline)
         {
-            NX_MUTEX_LOCKER lock(&mutex);
-            auto it = discoveredServerItemById.find(id);
+            auto it = discoveredServerItemById.find(server->getId());
             if (it != discoveredServerItemById.end())
             {
-                lock.unlock();
-
                 // TODO: should we add Server with mismatchedCertificate status here?
                 if (it->serverData.status == nx::vms::api::ResourceStatus::incompatible
                     || it->serverData.status == nx::vms::api::ResourceStatus::unauthorized)
                 {
-                    addResource(it->serverData);
+                    addOtherServer(it->serverData);
                 }
             }
         }
@@ -91,7 +87,6 @@ struct QnIncompatibleServerWatcher::Private
 
     void at_discoveredServerChanged(const nx::vms::api::DiscoveredServerData& serverData)
     {
-        NX_MUTEX_LOCKER lock(&mutex);
         auto it = discoveredServerItemById.find(serverData.id);
 
         switch (serverData.status)
@@ -110,8 +105,6 @@ struct QnIncompatibleServerWatcher::Private
                     discoveredServerItemById.insert(serverData.id, serverData);
                 }
 
-                lock.unlock();
-
                 bool createResource = false;
                 if (serverData.status == nx::vms::api::ResourceStatus::incompatible)
                 {
@@ -125,9 +118,9 @@ struct QnIncompatibleServerWatcher::Private
                 }
 
                 if (createResource)
-                    addResource(serverData);
+                    addOtherServer(serverData);
                 else
-                    removeResource(getFakeId(serverData.id));
+                    removeOtherServer(serverData.id);
 
                 break;
             }
@@ -139,22 +132,16 @@ struct QnIncompatibleServerWatcher::Private
 
                 it->removed = true;
 
-                if (it->keep)
-                    break;
-
                 discoveredServerItemById.remove(serverData.id);
 
-                lock.unlock();
-
-                removeResource(getFakeId(serverData.id));
+                removeOtherServer(serverData.id);
 
                 break;
             }
         }
     }
 
-    void addResource(
-        const nx::vms::api::DiscoveredServerData& serverData)
+    void addOtherServer(const nx::vms::api::DiscoveredServerData& serverData)
     {
         auto server = q->resourcePool()->getResourceById<ServerResource>(serverData.id);
 
@@ -165,97 +152,45 @@ struct QnIncompatibleServerWatcher::Private
             server->setDetached(serverData.status == nx::vms::api::ResourceStatus::unauthorized);
         }
 
-        QnUuid id = getFakeId(serverData.id);
-
-        if (id.isNull())
+        if (auto iter = otherServers.find(serverData.id); iter == otherServers.end())
         {
-            // add a resource
             if (!isSuitable(serverData))
                 return;
 
             NX_ASSERT(serverData.status != nx::vms::api::ResourceStatus::offline,
                 "Offline status is a mark to remove fake server.");
-            QnMediaServerResourcePtr server = makeResource(serverData);
-            {
-                NX_MUTEX_LOCKER lock(&mutex);
-                fakeUuidByServerUuid[serverData.id] = server->getId();
-                serverUuidByFakeUuid[server->getId()] = serverData.id;
-            }
-            q->resourcePool()->addIncompatibleServer(server);
+
+            otherServers.insert(serverData.id);
 
             NX_DEBUG(this, lit("Add incompatible server %1 at %2 [%3]")
                 .arg(serverData.id.toString())
                 .arg(serverData.systemName)
                 .arg(QStringList(serverData.remoteAddresses.values()).join(", ")));
+            emit q->serverAdded(serverData.id);
         }
         else
         {
-            // update the resource
-            auto fakeServer = q->resourcePool()->getIncompatibleServerById(id)
-                .dynamicCast<QnFakeMediaServerResource>();
-
-            NX_ASSERT(fakeServer, "There must be a resource in the resource pool.");
-
-            if (!fakeServer)
-                return;
-
-            fakeServer->setFakeServerModuleInformation(serverData);
-            if (server)
-                fakeServer->setOsInfo(server->getOsInfo());
-
-            NX_DEBUG(this, lit("Update incompatible server %1 at %2 [%3]")
-                .arg(serverData.id.toString())
-                .arg(serverData.systemName)
-                .arg(QStringList(serverData.remoteAddresses.values()).join(", ")));
+            emit q->serverUpdated(serverData.id);
         }
     }
 
-    void removeResource(const QnUuid &id)
+    void removeOtherServer(const QnUuid& serverId)
     {
-        if (id.isNull())
+        if (!NX_ASSERT(!serverId.isNull()))
             return;
 
         // Updating compatibility and merge statuses for the original server.
-        if (auto server = q->resourcePool()->getResourceById<ServerResource>(id))
+        if (auto server = q->resourcePool()->getResourceById<ServerResource>(serverId))
         {
             server->setCompatible(true);
             server->setDetached(false);
         }
 
-        QnUuid serverId;
+        if (auto iter = otherServers.find(serverId); iter != otherServers.end())
         {
-            NX_MUTEX_LOCKER lock(&mutex);
-            serverId = serverUuidByFakeUuid.take(id);
-            if (serverId.isNull())
-                return;
-
-            fakeUuidByServerUuid.remove(serverId);
+            otherServers.erase(iter);
+            emit q->serverRemoved(serverId);
         }
-
-        if (auto server = q->resourcePool()->getIncompatibleServerById(id))
-        {
-            NX_DEBUG(this, lit("Remove incompatible server %1 at %2")
-                .arg(serverId.toString())
-                .arg(server->getModuleInformation().systemName));
-
-            q->resourcePool()->removeResource(server);
-        }
-    }
-
-    QnUuid getFakeId(const QnUuid &realId) const
-    {
-        NX_MUTEX_LOCKER lock(&mutex);
-        return fakeUuidByServerUuid.value(realId);
-    }
-
-    QnMediaServerResourcePtr makeResource(
-        const nx::vms::api::DiscoveredServerData& serverData) const
-    {
-        QnFakeMediaServerResourcePtr fakeServer(new QnFakeMediaServerResource());
-        fakeServer->setFakeServerModuleInformation(serverData);
-        if (auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(serverData.id))
-            fakeServer->setOsInfo(server->getOsInfo());
-        return fakeServer;
     }
 
     void createInitialServers(
@@ -264,9 +199,27 @@ struct QnIncompatibleServerWatcher::Private
         for (const auto& discoveredServer: discoveredServers)
             at_discoveredServerChanged(discoveredServer);
     }
+
+    nx::network::SocketAddress getPrimaryAddress(const QnUuid& serverId) const
+    {
+        if (!NX_ASSERT(otherServers.contains(serverId)))
+            return {};
+
+        const auto iter = discoveredServerItemById.find(serverId);
+        if (!NX_ASSERT(iter != discoveredServerItemById.end()))
+            return {};
+
+        QList<nx::network::SocketAddress> addressList =
+            ec2::moduleInformationEndpoints(iter->serverData);
+
+        if (addressList.isEmpty())
+            return nx::network::SocketAddress();
+
+        return addressList.first();
+    }
 };
 
-QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(
+OtherServersManager::OtherServersManager(
     nx::vms::common::SystemContext* systemContext,
     QObject *parent)
     :
@@ -276,20 +229,20 @@ QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(
 {
 }
 
-QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher()
+OtherServersManager::~OtherServersManager()
 {
     stop();
 }
 
-void QnIncompatibleServerWatcher::setMessageProcessor(QnClientMessageProcessor* messageProcessor)
+void OtherServersManager::setMessageProcessor(QnClientMessageProcessor* messageProcessor)
 {
     if (messageProcessor)
     {
         connect(messageProcessor, &QnClientMessageProcessor::connectionOpened, this,
-            &QnIncompatibleServerWatcher::start);
+            &OtherServersManager::start);
 
         connect(messageProcessor, &QnClientMessageProcessor::connectionClosed, this,
-            &QnIncompatibleServerWatcher::stop);
+            &OtherServersManager::stop);
     }
     else
     {
@@ -297,7 +250,7 @@ void QnIncompatibleServerWatcher::setMessageProcessor(QnClientMessageProcessor* 
     }
 }
 
-void QnIncompatibleServerWatcher::start()
+void OtherServersManager::start()
 {
     d->connections << connect(
         clientMessageProcessor(),
@@ -327,48 +280,41 @@ void QnIncompatibleServerWatcher::start()
         });
 }
 
-void QnIncompatibleServerWatcher::stop()
+void OtherServersManager::stop()
 {
     d->connections.reset();
 
-    QList<QnUuid> ids;
-
-    {
-        NX_MUTEX_LOCKER lock(&d->mutex);
-        ids = d->fakeUuidByServerUuid.values();
-        d->fakeUuidByServerUuid.clear();
-        d->serverUuidByFakeUuid.clear();
-        d->discoveredServerItemById.clear();
-    }
-
-    QnResourceList servers;
-    for (const QnUuid& id: ids)
-    {
-        if (auto server = resourcePool()->getIncompatibleServerById(id))
-            servers.push_back(server);
-    }
-    NX_DEBUG(this, "Stop watching");
-
-    if (!servers.empty())
-        resourcePool()->removeResources(servers);
+    d->otherServers.clear();
 }
 
-void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep)
+QnUuidList OtherServersManager::getServers() const
 {
-    NX_MUTEX_LOCKER lock(&d->mutex);
-
-    auto it = d->discoveredServerItemById.find(id);
-    if (it == d->discoveredServerItemById.end())
-        return;
-
-    it->keep = keep;
-
-    if (!keep && it->removed)
-    {
-        d->discoveredServerItemById.erase(it);
-
-        lock.unlock();
-
-        d->removeResource(d->getFakeId(id));
-    }
+    return d->otherServers.values();
 }
+
+bool OtherServersManager::containsServer(const QnUuid& serverId) const
+{
+    return d->otherServers.contains(serverId);
+}
+
+nx::vms::api::ModuleInformationWithAddresses OtherServersManager::getModuleInformationWithAddresses(
+    const QnUuid& serverId) const
+{
+    if (!NX_ASSERT(d->otherServers.contains(serverId)))
+        return {};
+
+    const auto iter = d->discoveredServerItemById.find(serverId);
+    if (NX_ASSERT(iter != d->discoveredServerItemById.end()))
+        return iter->serverData;
+
+    return {};
+}
+
+nx::utils::Url OtherServersManager::getUrl(const QnUuid& serverId) const
+{
+    return nx::network::url::Builder()
+        .setScheme(nx::network::http::kSecureUrlSchemeName)
+        .setEndpoint(d->getPrimaryAddress(serverId)).toUrl();
+}
+
+} // namespace nx::vms::client::desktop

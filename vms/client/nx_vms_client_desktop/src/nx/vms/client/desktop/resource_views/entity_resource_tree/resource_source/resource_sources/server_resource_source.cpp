@@ -19,7 +19,7 @@ ServerResourceSource::ServerResourceSource(const QnResourcePool* resourcePool)
     connect(m_resourcePool, &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
-            if (!resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
+            if (!resource->hasFlags(Qn::server))
                 return;
 
             const auto server = resource.staticCast<QnMediaServerResource>();
@@ -29,7 +29,7 @@ ServerResourceSource::ServerResourceSource(const QnResourcePool* resourcePool)
     connect(m_resourcePool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
-            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+            if (resource->hasFlags(Qn::server))
                 emit resourceRemoved(resource);
         });
 }

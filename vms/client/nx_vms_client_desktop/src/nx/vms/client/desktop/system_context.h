@@ -19,6 +19,7 @@ namespace nx::vms::client::desktop {
 
 class AnalyticsEventsSearchTreeBuilder;
 class DefaultPasswordCamerasWatcher;
+class OtherServersManager;
 class LayoutSnapshotManager;
 class LdapStatusWatcher;
 class LogsManagementWatcher;
@@ -97,6 +98,7 @@ public:
     RestApiHelper* restApiHelper() const;
     QnUuid localSystemId() const;
     Q_INVOKABLE nx::vms::client::desktop::analytics::TaxonomyManager* taxonomyManager() const;
+    OtherServersManager* otherServersManager() const;
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;
     DefaultPasswordCamerasWatcher* defaultPasswordCamerasWatcher() const;
     SystemHealthState* systemHealthState() const;

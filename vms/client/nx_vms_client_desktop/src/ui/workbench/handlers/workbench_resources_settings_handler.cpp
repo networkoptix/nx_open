@@ -9,7 +9,6 @@
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
@@ -137,7 +136,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
     const QnMediaServerResourceList servers = params.resources().filtered<QnMediaServerResource>(
         [](const QnMediaServerResourcePtr& server)
         {
-            return server && !server->hasFlags(Qn::removed) && !server->hasFlags(Qn::fake);
+            return server && !server->hasFlags(Qn::removed);
         });
 
     NX_ASSERT(servers.size() == 1, "Invalid action condition");

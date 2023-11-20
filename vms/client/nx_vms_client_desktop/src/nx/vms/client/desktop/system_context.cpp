@@ -11,13 +11,13 @@
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
-#include <core/resource_management/incompatible_server_watcher.h>
 #include <nx/branding.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
@@ -60,7 +60,7 @@ struct SystemContext::Private
     SystemContext* const q;
     std::unique_ptr<VideoWallOnlineScreensWatcher> videoWallOnlineScreensWatcher;
     std::unique_ptr<LdapStatusWatcher> ldapStatusWatcher;
-    std::unique_ptr<QnIncompatibleServerWatcher> incompatibleServerWatcher;
+    std::unique_ptr<OtherServersManager> otherServersManager;
     std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;
     std::unique_ptr<QnServerStorageManager> serverStorageManager;
     std::unique_ptr<QnCameraBookmarksManager> cameraBookmarksManager;
@@ -112,13 +112,14 @@ SystemContext::SystemContext(
         ? new CachingAccessController(this)
         : new AccessController(this));
 
+    d->otherServersManager = std::make_unique<OtherServersManager>(this);
+
     switch (mode)
     {
         case Mode::client:
             d->initLocalRuntimeInfo();
             d->videoWallOnlineScreensWatcher = std::make_unique<VideoWallOnlineScreensWatcher>(
                 this);
-            d->incompatibleServerWatcher = std::make_unique<QnIncompatibleServerWatcher>(this);
             d->serverRuntimeEventConnector = std::make_unique<ServerRuntimeEventConnector>();
             // Depends on ServerRuntimeEventConnector.
             d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
@@ -291,6 +292,11 @@ analytics::TaxonomyManager* SystemContext::taxonomyManager() const
     return d->taxonomyManager.get();
 }
 
+OtherServersManager* SystemContext::otherServersManager() const
+{
+    return d->otherServersManager.get();
+}
+
 common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const
 {
     return d->restApiHelper->getSessionTokenHelper();
@@ -321,7 +327,7 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     if (!NX_ASSERT(clientMessageProcessor, "Invalid message processor type"))
         return;
 
-    d->incompatibleServerWatcher->setMessageProcessor(clientMessageProcessor);
+    d->otherServersManager->setMessageProcessor(clientMessageProcessor);
     d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
     d->logsManagementWatcher->setMessageProcessor(clientMessageProcessor);
     d->intercomManager = std::make_unique<IntercomManager>(this);

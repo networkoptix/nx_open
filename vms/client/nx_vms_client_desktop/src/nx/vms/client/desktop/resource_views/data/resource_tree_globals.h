@@ -66,6 +66,7 @@ NX_REFLECTION_ENUM_CLASS(NodeType,
     cloudSystem, //< Available cloud system.
     cloudSystemStatus, //< Cross-System Resources status preloader for the Cloud System.
     localSystem, //< Local system but the current.
+    otherSystemServer, //< Server which does not belong to the current System.
 
     // Resource dialogs specific types, never occur in the main resource tree.
 
