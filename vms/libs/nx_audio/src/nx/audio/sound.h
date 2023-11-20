@@ -9,7 +9,8 @@
 #include <nx/media/audio/format.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/timer.h>
+
+#include "high_resolution_elapsed_timer.h"
 
 class AudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
@@ -114,7 +115,7 @@ private:
     bool m_deinitialized;
     bool m_paused;
 
-    nx::ElapsedTimer m_timer;
+    HighResolutionElapsedTimer m_timer;
     qint64 m_queuedDurationUs;
 
 private:
