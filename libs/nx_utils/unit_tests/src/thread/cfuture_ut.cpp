@@ -2,9 +2,13 @@
 
 #include <gtest/gtest.h>
 
+#include <exception>
 #include <thread>
 
 #include <nx/utils/thread/cf/cfuture.h>
+#include <nx/utils/thread/cf/sync_executor.h>
+
+namespace {
 
 template<typename T>
 cf::future<T> returnAsync(T value)
@@ -21,6 +25,13 @@ cf::future<T> returnAsync(T value)
     thread.detach();
     return future;
 }
+
+cf::future<cf::unit> initiate()
+{
+    return cf::initiate([]() -> cf::unit { throw std::runtime_error("error"); });
+}
+
+} // namespace
 
 TEST(CFuture, Sync)
 {
@@ -44,4 +55,48 @@ TEST(CFuture, Async)
 
     EXPECT_EQ(value1.load(), 1);
     EXPECT_EQ(value2.load(), 2);
+}
+
+TEST(CFuture, CatchException)
+{
+    cf::sync_executor exec;
+
+    // .then(...)
+    {
+        auto future = initiate().then([](auto&&) { return cf::unit{}; });
+        EXPECT_NO_THROW(future.get());
+    }
+    {
+        auto future = initiate().then([](auto&&) { return cf::make_ready_future(cf::unit{}); });
+        EXPECT_NO_THROW(future.get());
+    }
+    {
+        auto future = initiate().then(exec, [](auto&&) { return cf::unit{}; });
+        EXPECT_NO_THROW(future.get());
+    }
+    {
+        auto future =
+            initiate().then(exec, [](auto&&) { return cf::make_ready_future(cf::unit{}); });
+        EXPECT_NO_THROW(future.get());
+    }
+
+    // .catch_(...)
+    {
+        auto future = initiate().catch_([](const std::exception&) { return cf::unit{}; });
+        EXPECT_NO_THROW(future.get());
+    }
+    {
+        auto future = initiate().catch_(
+            [](const std::exception&) { return cf::make_ready_future(cf::unit{}); });
+        EXPECT_NO_THROW(future.get());
+    }
+    {
+        auto future = initiate().catch_(exec, [](const std::exception&) { return cf::unit{}; });
+        EXPECT_NO_THROW(future.get());
+    }
+    {
+        auto future = initiate().catch_(
+            exec, [](const std::exception&) { return cf::make_ready_future(cf::unit{}); });
+        EXPECT_NO_THROW(future.get());
+    }
 }
