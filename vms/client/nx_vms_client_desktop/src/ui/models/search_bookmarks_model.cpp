@@ -226,7 +226,12 @@ bool QnSearchBookmarksModelPrivate::isUpdating() const
 nx::utils::SharedGuardPtr QnSearchBookmarksModelPrivate::startUpdateOperation()
 {
     if (isUpdating())
+    {
+        if (m_query && m_query->filter() == m_filter)
+            return {}; //< Makes no sense to send a new request with the same filter data.
+
         cancelUpdatingOperation();
+    }
 
     Q_Q(QnSearchBookmarksModel);
 
@@ -241,6 +246,8 @@ nx::utils::SharedGuardPtr QnSearchBookmarksModelPrivate::startUpdateOperation()
 void QnSearchBookmarksModelPrivate::applyFilter()
 {
     const auto endUpdateOperationGuard = startUpdateOperation();
+    if (!endUpdateOperationGuard)
+        return;
 
     // FIXME: #sivanov Ensure request is sent to the correct system context (or to all required).
     auto bookmarksManager = appContext()->currentSystemContext()->cameraBookmarksManager();

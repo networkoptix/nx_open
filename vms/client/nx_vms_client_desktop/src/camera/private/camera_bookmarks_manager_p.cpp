@@ -336,11 +336,9 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
     }
 
     if (handle != kInvalidRequestId)
-        m_operations[handle] = OperationInfo(operationType, bookmark.guid, callback);
+        m_operations[handle] = OperationInfo(operationType, bookmark.guid, std::move(callback));
     else
-    {
         callback(false);
-    }
 
     addUpdatePendingBookmark(bookmark);
 }
@@ -356,7 +354,9 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(
     QnUpdateBookmarkRequestData request(bookmark);
     int handle = sendPostRequest("/ec2/bookmarks/update", request);
     m_operations[handle] = OperationInfo(
-        OperationInfo::OperationType::Update, bookmark.guid, callback);
+        OperationInfo::OperationType::Update,
+        bookmark.guid,
+        std::move(callback));
 
     addUpdatePendingBookmark(bookmark);
 }
@@ -368,7 +368,9 @@ void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(
     QnDeleteBookmarkRequestData request(bookmarkId);
     int handle = sendPostRequest("/ec2/bookmarks/delete", request);
     m_operations[handle] = OperationInfo(
-        OperationInfo::OperationType::Delete, bookmarkId, callback);
+        OperationInfo::OperationType::Delete,
+        bookmarkId,
+        std::move(callback));
 
     addRemovePendingBookmark(bookmarkId);
 }
@@ -387,7 +389,12 @@ void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(bool success, int 
 
     const auto bookIt = m_pendingBookmarks.find(operationInfo.bookmarkId);
     if (bookIt != m_pendingBookmarks.end())
-        bookIt->discardTimer.start();
+    {
+        if (success)
+            m_pendingBookmarks.erase(bookIt);
+        else
+            bookIt->discardTimer.start();
+    }
 }
 
 bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId)
@@ -552,16 +559,18 @@ void QnCameraBookmarksManagerPrivate::handleQueryReply(
         NX_VERBOSE(this, "Reply %1 for query %2 is not actual", requestId, queryId);
         if (callback)
             callback(success, requestId, bookmarks);
+
         return;
     }
 
     QueryInfo& info = m_queries[queryId];
+    const QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
     NX_VERBOSE(this,
-        "Processing reply [%1]: %2 bookmarks received (%3)",
+        "Processing reply [%1]: %2 bookmarks received (%3)%4",
         requestId,
         bookmarks.size(),
-        debugBookmarksRange(bookmarks));
-    const QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
+        debugBookmarksRange(bookmarks),
+        (query ? QString{", query state is %1"}.arg(query->state()) : QString{}));
     if (!query)
         return;
 
@@ -585,7 +594,7 @@ void QnCameraBookmarksManagerPrivate::handleQueryReply(
 
     if (isPartialData && !limitExceeded)
     {
-        sendQueryTailRequest(query, bookmarks.last().startTimeMs, callback);
+        sendQueryTailRequest(query, bookmarks.last().startTimeMs, std::move(callback));
     }
     else
     {

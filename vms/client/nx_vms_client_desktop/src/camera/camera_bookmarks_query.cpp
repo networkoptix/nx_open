@@ -100,7 +100,7 @@ bool QnCameraBookmarksQuery::removeCamera(const QnUuid& value)
     return true;
 }
 
-QnCameraBookmarkSearchFilter QnCameraBookmarksQuery::filter() const
+const QnCameraBookmarkSearchFilter& QnCameraBookmarksQuery::filter() const
 {
     return m_filter;
 }
