@@ -153,6 +153,8 @@ namespace Server {
 
 NX_VMS_COMMON_API extern const QString kCpuArchitecture;
 NX_VMS_COMMON_API extern const QString kCpuModelName;
+NX_VMS_COMMON_API extern const QString kFlavor;
+NX_VMS_COMMON_API extern const QString kOsInfo;
 NX_VMS_COMMON_API extern const QString kPhysicalMemory;
 NX_VMS_COMMON_API extern const QString kGuidConflictDetected;
 // TODO: #rvasilenko Can we change the property text safely?

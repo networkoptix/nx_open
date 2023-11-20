@@ -102,6 +102,8 @@ namespace Server {
 
 const QString kCpuArchitecture("cpuArchitecture");
 const QString kCpuModelName("cpuModelName");
+const QString kFlavor("flavor");
+const QString kOsInfo("osInfo");
 const QString kPhysicalMemory("physicalMemory");
 const QString kGuidConflictDetected("guidConflictDetected");
 const QString kBrand("productNameShort");
