@@ -594,10 +594,7 @@ future<T>::then_impl(F&& f) {
 
     try {
       auto&& result = f(std::move(arg_future));
-      if (sp_state->has_exception())
-        p.set_exception(sp_state->get_exception());
-      else
-        p.set_value(std::move(result));
+      p.set_value(std::move(result));
     } catch (...) {
       p.set_exception(std::current_exception());
     }
@@ -695,10 +692,7 @@ future<T>::then_impl(F&& f, Executor& executor) {
     executor.post([arg_future_ptr, lstate, sp_state] () mutable {
       try {
         auto&& result = lstate->f(std::move(*arg_future_ptr));
-        if (sp_state->has_exception())
-          lstate->p.set_exception(sp_state->get_exception());
-        else
-          lstate->p.set_value(std::move(result));
+        lstate->p.set_value(std::move(result));
       } catch (...) {
         lstate->p.set_exception(std::current_exception());
       }
