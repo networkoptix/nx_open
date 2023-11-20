@@ -32,6 +32,7 @@ class AccessHelper:
     Q_PROPERTY(bool canUseTwoWayAudio READ canUseTwoWayAudio NOTIFY permissionsChanged)
     Q_PROPERTY(bool canUseSoftTriggers READ canUseSoftTriggers NOTIFY permissionsChanged)
     Q_PROPERTY(bool canUseDeviceIO READ canUseDeviceIO NOTIFY permissionsChanged)
+    Q_PROPERTY(bool passwordRequired READ passwordRequired NOTIFY permissionsChanged)
 
 public:
     explicit AccessHelper(SystemContext* context, QObject* parent = nullptr);
@@ -57,6 +58,7 @@ public:
     bool canUseTwoWayAudio() const;
     bool canUseSoftTriggers() const;
     bool canUseDeviceIO() const;
+    bool passwordRequired() const;
 
     static void registerQmlType();
 
