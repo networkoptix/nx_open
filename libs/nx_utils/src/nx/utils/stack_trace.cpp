@@ -12,6 +12,11 @@
 
 #include <QtCore/QProcess>
 
+// Define should be checked after Qt includes.
+#if defined(Q_OS_WIN)
+    #include <process.h>
+#endif
+
 #include <nx/build_info.h>
 #include <nx/utils/log/format.h>
 
