@@ -28,6 +28,9 @@ Rectangle
         if (ScreenRecording.isOn && !accessHelper.canExportArchive)
             return true
 
+        if (accessHelper.passwordRequired)
+            return false
+
         const hasPermissions = mode == SecurityOverlay.Live
             ? accessHelper.canViewLive
             : accessHelper.canViewArchive

@@ -7,6 +7,7 @@
 #include <common/common_globals.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/security_cam_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/system_context.h>
@@ -170,6 +171,12 @@ bool AccessHelper::canUseSoftTriggers() const
 bool AccessHelper::canUseDeviceIO() const
 {
     return d->permissions.testFlag(Qn::DeviceInputPermission);
+}
+
+bool AccessHelper::passwordRequired() const
+{
+    const auto camera = d->resource.dynamicCast<QnSecurityCamResource>();
+    return camera && camera->needsToChangeDefaultPassword();
 }
 
 void AccessHelper::registerQmlType()
