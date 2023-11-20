@@ -107,7 +107,7 @@ public:
      * Query loads bookmarks filtered by the given filter.
      * @return Current filter.
      */
-    QnCameraBookmarkSearchFilter filter() const;
+    const QnCameraBookmarkSearchFilter& filter() const;
 
     /**
      * Set filter that will control which bookmarks should be loaded and how. Actual data will
