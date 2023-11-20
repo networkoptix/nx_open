@@ -6737,7 +6737,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>View Live.</source>
-      <translation>ライブの表示.</translation>
+      <translation>ライブの表示。</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
@@ -11433,7 +11433,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Invalid parameters</source>
-      <translation>無効なパラメータ</translation>
+      <translation>無効なパラメーター</translation>
     </message>
     <message>
       <source>Internal error</source>

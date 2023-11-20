@@ -1448,7 +1448,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>Lisans zaten etkinleştirildi</translation>
     </message>
   </context>
   <context>
@@ -1906,15 +1906,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Partner information</source>
-      <translation type="unfinished">Partner information</translation>
+      <translation>İş ortağı bilgileri</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>Telefonlar</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>E-postalar</translation>
     </message>
   </context>
   <context>
@@ -4211,7 +4211,7 @@ to %1</source>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
+      <translation>Bu ayarlar yalnızca oturum açtığınız sistem için geçerlidir. Gelecek sürümlerde kaldırılacaktır.</translation>
     </message>
   </context>
   <context>
@@ -5153,11 +5153,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+      <translation>Yedekleme için bulut depolama etkinleştirilirse, diğer yedekleme depoları devre dışı bırakılacak ve önceden yapılandırılmış cihazlar için "Tüm arşiv" seçeneği "Hareket, Nesne, Yer İmleri" olarak değiştirilecektir</translation>
     </message>
     <message>
       <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation type="unfinished">If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+      <translation>Yedekleme için bulut depolama etkinleştirilirse önceden yapılandırılmış cihazlar için "Tüm arşiv" seçeneği "Hareket, Nesne, Yer İmleri" olarak değiştirilecektir</translation>
     </message>
   </context>
   <context>
@@ -5256,7 +5256,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Yol</translation>
     </message>
     <message>
       <source>Type</source>
@@ -5264,7 +5264,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Purpose</source>
-      <translation type="unfinished">Purpose</translation>
+      <translation>Amaç</translation>
     </message>
     <message>
       <source>Size</source>
@@ -6843,15 +6843,15 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
-      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+      <translation>Kullanıcıların bir kaynağa erişmesine ve bir kameradan canlı görüntüleri görüntülemesine olanak tanır.</translation>
     </message>
     <message>
       <source>Modify Bookmarks</source>
-      <translation type="unfinished">Modify Bookmarks</translation>
+      <translation>Yerimlerini değiştir</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
-      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+      <translation>Kullanıcının PTZ'yi kontrol etmesine, 2 Yönlü Ses, Yazılımsal Tetikleyiciler ve G/Ç düğmelerini kullanmasına olanak tanır.</translation>
     </message>
   </context>
   <context>
@@ -7191,7 +7191,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>– Applies to all servers</source>
-      <translation type="unfinished">– Applies to all servers</translation>
+      <translation>– Tüm sunucular için geçerlidir</translation>
     </message>
   </context>
   <context>
@@ -8300,11 +8300,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your system administrator to do it.</translation>
+      <translation>Bu kameranın ayarlanması için şifre gerekiyor. Bunu yapmasını sistem yöneticinizden isteyin.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your system administrator to do it.</translation>
+      <translation>Seçilen kameralardan bazıları, kurulum için şifre gerektirir. Bunu yapmasını sistem yöneticinizden isteyin.</translation>
     </message>
   </context>
   <context>
@@ -8450,7 +8450,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed in LDAP</source>
-      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
+      <translation>LDAP grup üyeliği LDAP içinde yönetilir</translation>
     </message>
   </context>
   <context>
@@ -9187,7 +9187,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>LDAP sunucusuna bağlanılamıyor</translation>
     </message>
   </context>
   <context>
@@ -9546,7 +9546,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
+      <translation>Devam etmeden önce %1 danışmanızı öneririz.</translation>
     </message>
     <message>
       <source>support</source>
@@ -10363,7 +10363,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
     <message>
       <source>To allow the use of a client API, create a web integration instead. %1</source>
-      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+      <translation>İstemci API'sinin kullanımına izin vermek için bunun yerine bir web entegrasyonu oluşturun. %1</translation>
     </message>
     <message>
       <source>Learn more...</source>
@@ -11581,15 +11581,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
       <source>Invalid JSON</source>
-      <translation type="unfinished">Invalid JSON</translation>
+      <translation>Geçersiz JSON</translation>
     </message>
     <message>
       <source>Invalid request</source>
-      <translation type="unfinished">Invalid request</translation>
+      <translation>Geçersiz istek</translation>
     </message>
     <message>
       <source>Method not found</source>
-      <translation type="unfinished">Method not found</translation>
+      <translation>Yöntem bulunamadı</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -11601,39 +11601,39 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Connection failure</source>
-      <translation type="unfinished">Connection failure</translation>
+      <translation>Bağlantı hatası</translation>
     </message>
     <message>
       <source>Invalid encoding</source>
-      <translation type="unfinished">Invalid encoding</translation>
+      <translation>Geçersiz kodlama</translation>
     </message>
     <message>
       <source>Invalid encoding charset</source>
-      <translation type="unfinished">Invalid encoding charset</translation>
+      <translation>Geçersiz kodlama karakter kümesi</translation>
     </message>
     <message>
       <source>Application Error</source>
-      <translation type="unfinished">Application Error</translation>
+      <translation>Uygulama Hatası</translation>
     </message>
     <message>
       <source>System Error</source>
-      <translation type="unfinished">System Error</translation>
+      <translation>Sistem Hatası</translation>
     </message>
     <message>
       <source>Transport Error</source>
-      <translation type="unfinished">Transport Error</translation>
+      <translation>Aktarım Hatası</translation>
     </message>
     <message>
       <source>Server error code %1</source>
-      <translation type="unfinished">Server error code %1</translation>
+      <translation>Sunucu hata kodu %1</translation>
     </message>
     <message>
       <source>Reserved error code %1</source>
-      <translation type="unfinished">Reserved error code %1</translation>
+      <translation>Ayrılmış hata kodu %1</translation>
     </message>
     <message>
       <source>Unknown error code %1</source>
-      <translation type="unfinished">Unknown error code %1</translation>
+      <translation>Bilinmeyen hata kodu %1</translation>
     </message>
   </context>
   <context>
@@ -11685,7 +11685,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+      <translation>Bazı gruplar hem ebeveyn hem de çocuk üye olarak birbirlerine sahiptirler veya bu tür döngüsel bir referans zincirinin parçalarıdırlar. Bu, yanlış izin hesaplamalarına yol açabilir.</translation>
     </message>
   </context>
   <context>
@@ -11802,7 +11802,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
       <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>LDAP veritabanında %n mevcut LDAP kullanıcısı bulunamadı</numerusform>
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
       </translation>
     </message>
@@ -11936,12 +11936,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Bağlantı Alınıyor...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Bu bilgisayarın %1 bağlanabildiğinden emin olun</translation>
     </message>
     <message>
       <source>in %1</source>
@@ -13239,11 +13239,11 @@ Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi
     </message>
     <message>
       <source>You do not have permissions to open this camera on the layout</source>
-      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+      <translation>Bu kamerayı ekran düzeninde açma izniniz yok</translation>
     </message>
     <message>
       <source>You do not have permissions to open some of selected cameras on the layout</source>
-      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
+      <translation>Ekran düzeninde seçili kameralardan bazılarını açma izniniz yok</translation>
     </message>
   </context>
   <context>
