@@ -6,7 +6,6 @@
 #include <algorithm>
 
 #include <common/common_module.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
@@ -579,7 +578,7 @@ void QnRoutingManagementWidget::reportUrlEditingError(int error) {
 
 void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || server.dynamicCast<QnFakeMediaServerResource>())
+    if (!server)
         return;
 
     m_serverListModel->addResource(resource);
@@ -587,7 +586,7 @@ void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePt
 
 void QnRoutingManagementWidget::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || server.dynamicCast<QnFakeMediaServerResource>())
+    if (!server)
         return;
 
     m_serverListModel->removeResource(resource);

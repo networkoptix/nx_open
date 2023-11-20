@@ -241,7 +241,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     const auto updateServerEventsMenuIfNeeded =
         [this](const QnResourcePtr& resource)
         {
-            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+            if (resource->hasFlags(Qn::server))
                 updateServerEventsMenu();
         };
 

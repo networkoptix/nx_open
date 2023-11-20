@@ -372,7 +372,7 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
 
             if ((nodeType == ResourceTree::NodeType::layoutItem
                 || nodeType == ResourceTree::NodeType::sharedResource)
-                && resourceFlags.testFlag(Qn::server) && !resourceFlags.testFlag(Qn::fake))
+                && resourceFlags.testFlag(Qn::server))
             {
                 return QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("Health Monitor"));
             }

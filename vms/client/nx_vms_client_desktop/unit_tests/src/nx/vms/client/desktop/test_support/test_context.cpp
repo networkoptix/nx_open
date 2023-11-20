@@ -11,6 +11,7 @@
 #include <common/static_common_module.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/message_processor_mock.h>
@@ -58,7 +59,11 @@ SystemContext* Context::systemContext() const
 
 MessageProcessorMock* ContextBasedTest::createMessageProcessor()
 {
-    return systemContext()->createMessageProcessor<MessageProcessorMock>();
+    auto messageProcessor = systemContext()->createMessageProcessor<MessageProcessorMock>();
+
+    systemContext()->otherServersManager()->setMessageProcessor(messageProcessor);
+
+    return messageProcessor;
 }
 
 QnLayoutResourcePtr ContextBasedTest::createLayout()

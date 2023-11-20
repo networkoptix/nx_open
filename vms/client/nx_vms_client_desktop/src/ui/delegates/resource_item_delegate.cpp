@@ -696,8 +696,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
 
         if ((nodeType == ResourceTree::NodeType::layoutItem
                 || nodeType == ResourceTree::NodeType::sharedResource)
-            && resource->hasFlags(Qn::server)
-            && !resource->hasFlags(Qn::fake))
+            && resource->hasFlags(Qn::server))
         {
             extInfo = QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("Health Monitor"));
         }

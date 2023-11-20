@@ -4,8 +4,8 @@
 
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -15,6 +15,7 @@
 #include <finders/systems_finder.h>
 #include <network/system_description.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
@@ -52,6 +53,7 @@ using namespace nx::vms::api;
 
 using NodeType = ResourceTree::NodeType;
 using ResourceItemCreator = std::function<AbstractItemPtr(const QnResourcePtr&)>;
+using UuidItemCreator = std::function<AbstractItemPtr(const QnUuid&)>;
 
 using UserdDefinedGroupIdGetter = std::function<QString(const QnResourcePtr&, int)>;
 using UserdDefinedGroupItemCreator = std::function<AbstractItemPtr(const QString&)>;
@@ -197,6 +199,18 @@ ResourceItemCreator webPageItemCreator(
             return std::make_unique<WebPageDecorator>(
                 factory->createResourceItem(resource),
                 hasPowerUserPermissions);
+        };
+}
+
+UuidItemCreator otherServerItemCreator(
+    ResourceTreeItemFactory* factory,
+    const QnUserResourcePtr& user,
+    bool hasPowerUserPermissions = false)
+{
+    return
+        [=](const QnUuid& serverId) -> AbstractItemPtr
+        {
+            return factory->createOtherServerItem(serverId);
         };
 }
 
@@ -891,14 +905,14 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createVideowallsEntity() const
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createLocalOtherSystemsEntity() const
 {
-    using GroupingRule = GroupingRule<QString, QnResourcePtr>;
-    using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
+    using GroupingRule = GroupingRule<QString, QnUuid>;
+    using GroupingRuleStack = GroupingEntity<QString, QnUuid>::GroupingRuleStack;
 
-    const auto systemGetter =
-        [](const QnResourcePtr& resource, int/* order*/)
+    const auto systemNameGetter =
+        [this](const QnUuid& serverId, int /*order*/) -> QString
         {
-            const auto server = resource.staticCast<QnFakeMediaServerResource>();
-            const auto moduleInformation = server->getModuleInformation();
+            const auto moduleInformation =
+                systemContext()->otherServersManager()->getModuleInformationWithAddresses(serverId);
 
             return moduleInformation.isNewSystem()
                 ? tr("New System")
@@ -912,19 +926,19 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLocalOtherSystemsEntity() con
         };
 
     const GroupingRule otherSystemsGroupingRule =
-        {systemGetter,
+        {systemNameGetter,
         systemItemCreator,
         Qn::UuidRole,
         1, //< Dimension
         numericOrder()};
 
-    auto otherSystemsGroupingEntity = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
-        resourceItemCreator(m_itemFactory.get(), user()),
-        Qn::ResourceRole,
+    auto otherSystemsGroupingEntity = std::make_unique<GroupingEntity<QString, QnUuid>>(
+        otherServerItemCreator(m_itemFactory.get(), user()),
+        Qn::UuidRole,
         numericOrder(),
         GroupingRuleStack{otherSystemsGroupingRule});
 
-    otherSystemsGroupingEntity->installItemSource(m_itemKeySourcePool->fakeServerResourcesSource());
+    otherSystemsGroupingEntity->installItemSource(m_itemKeySourcePool->otherServersSource());
 
     return otherSystemsGroupingEntity;
 }

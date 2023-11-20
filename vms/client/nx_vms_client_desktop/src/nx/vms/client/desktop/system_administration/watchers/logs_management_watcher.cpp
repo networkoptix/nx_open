@@ -1162,8 +1162,7 @@ LogsManagementWatcher::LogsManagementWatcher(SystemContext* context, QObject* pa
 
                 for (const auto& resource: resources)
                 {
-                    if (auto server = resource.dynamicCast<QnMediaServerResource>();
-                        server && !server->hasFlags(Qn::fake_server))
+                    if (auto server = resource.dynamicCast<QnMediaServerResource>())
                     {
                         auto unit = Unit::Private::createServerUnit(server);
                         d->servers << unit;

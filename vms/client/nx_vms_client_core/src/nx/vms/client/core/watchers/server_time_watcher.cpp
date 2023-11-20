@@ -183,7 +183,7 @@ qint64 ServerTimeWatcher::localOffset(
 
 void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
 {
-    if (server->getStatus() != nx::vms::api::ResourceStatus::online || server->hasFlags(Qn::fake))
+    if (server->getStatus() != nx::vms::api::ResourceStatus::online)
         return;
 
     auto connection = this->connection();
@@ -214,7 +214,7 @@ void ServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr& server)
 void ServerTimeWatcher::handleResourceAdded(const QnResourcePtr& resource)
 {
     const auto server = resource.dynamicCast<ServerResource>();
-    if (!server || server->hasFlags(Qn::fake))
+    if (!server)
         return;
 
     const auto updateServer = [this, server]{ sendRequest(server); };

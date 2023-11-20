@@ -58,7 +58,7 @@ protected:
         const std::optional<QnUuid>& groupId = std::nullopt) const;
     ServerResourcePtr addServer(const QString& name) const;
     QnMediaServerResourcePtr addEdgeServer(const QString& name, const QString& address) const;
-    QnMediaServerResourcePtr addFakeServer(const QString& name) const;
+    void addOtherServer(const QString& name) const;
     QnAviResourcePtr addLocalMedia(const QString& path) const;
     QnFileLayoutResourcePtr addFileLayout(const QString& path,
         bool isEncrypted = false) const;

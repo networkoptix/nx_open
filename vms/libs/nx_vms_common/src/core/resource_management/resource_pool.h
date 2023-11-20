@@ -56,8 +56,7 @@ public:
     enum AddResourceFlag
     {
         NoAddResourceFlags = 0x00,
-        UseIncompatibleServerPool = 0x01,
-        SkipAddingTransaction = 0x02, //< Add resource instantly even if transaction is open.
+        SkipAddingTransaction = 0x01, //< Add resource instantly even if transaction is open.
     };
     Q_DECLARE_FLAGS(AddResourceFlags, AddResourceFlag);
 
@@ -77,9 +76,6 @@ public:
         AddResourceFlags flags = NoAddResourceFlags);
 
     void addResource(const QnResourcePtr& resource, AddResourceFlags flags = NoAddResourceFlags);
-
-    // TODO: We need to remove this function. Client should use separate instance of resource pool instead
-    void addIncompatibleServer(const QnMediaServerResourcePtr& server);
 
     void beginTran();
     void commit();
@@ -207,7 +203,7 @@ public:
         const QnResourcePtr& server,  bool ignoreDesktopCameras = false) const;
 
     /**
-     * All Servers in the System. Never returns fake servers.
+     * All Servers in the System.
      */
     QnMediaServerResourceList servers() const;
 
@@ -215,7 +211,7 @@ public:
     QnStorageResourceList storages() const;
 
     /**
-     * All Servers with given status in the System. Never returns fake servers.
+     * All Servers with given status in the System.
      */
     QnMediaServerResourceList getAllServers(nx::vms::api::ResourceStatus status) const;
 
@@ -231,8 +227,6 @@ public:
 
     // Returns list of resources with such flag.
     QnResourceList getResourcesWithFlag(Qn::ResourceFlag flag) const;
-
-    QnMediaServerResourceList getIncompatibleServers() const;
 
     //---------------------------------------------------------------------------------------------
     // Methods to get single resource by various conditions.
@@ -292,10 +286,6 @@ public:
 
     QnNetworkResourcePtr getNetworkResourceByPhysicalId(const QString& physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString& mac) const;
-
-    QnMediaServerResourcePtr getIncompatibleServerById(
-        const QnUuid& id,
-        bool useCompatible = false) const;
 
     QnUserResourcePtr getAdministrator() const;
 
@@ -384,7 +374,6 @@ private:
 
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;
-    QHash<QnUuid, QnMediaServerResourcePtr> m_incompatibleServers;
     mutable QnUserResourcePtr m_adminResource;
     std::unique_ptr<QThreadPool> m_threadPool;
 };

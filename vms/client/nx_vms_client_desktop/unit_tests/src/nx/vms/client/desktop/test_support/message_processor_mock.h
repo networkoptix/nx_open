@@ -4,6 +4,7 @@
 
 #include <client/client_message_processor.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/api/data/discovery_data.h>
 
 namespace nx::vms::client::desktop {
 
@@ -20,6 +21,10 @@ public:
     virtual ~MessageProcessorMock() override;
 
     void emulateConnectionEstablished();
+
+    void emulateConnectionOpened();
+    void emulatateServerInitiallyDiscovered(
+        const nx::vms::api::DiscoveredServerData& discoveredServer);
 
 protected:
     virtual void onResourceStatusChanged(

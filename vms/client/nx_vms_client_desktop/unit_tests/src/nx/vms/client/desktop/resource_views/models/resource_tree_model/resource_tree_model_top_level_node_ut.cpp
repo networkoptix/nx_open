@@ -161,7 +161,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
     static constexpr auto kSystemName = "test_system";
     static constexpr auto kUserName = "test_owner";
     static constexpr auto kServerName = "test_server";
-    static constexpr auto kFakeServerName = "fake_server";
+    static constexpr auto kOtherServerName = "other_server";
     static constexpr auto kWebPageName = "web_page";
     static constexpr auto kVideowallName = "videowall";
 
@@ -170,7 +170,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
     const auto user = loginAsAdministrator(kUserName);
     const auto userId = user->getId();
     addServer(kServerName);
-    addFakeServer(kFakeServerName);
+    addOtherServer(kOtherServerName);
     addLayout("layout", userId);
     addVideoWall(kVideowallName);
     addShowreel("showreel", userId);

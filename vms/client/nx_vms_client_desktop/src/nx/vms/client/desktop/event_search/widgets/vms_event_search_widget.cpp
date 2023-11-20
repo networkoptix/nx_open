@@ -107,12 +107,13 @@ VmsEventSearchWidget::Private::Private(VmsEventSearchWidget* q):
             if (std::any_of(
                 resources.begin(),
                 resources.end(),
-                [this](const QnResourcePtr& resource) {
-                    return resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake);
-                }))
+                [this](const QnResourcePtr& resource)
                 {
-                    updateServerEventsMenu();
-                }
+                    return resource->hasFlags(Qn::server);
+                }))
+            {
+                updateServerEventsMenu();
+            }
         };
 
     connect(q->system()->resourcePool(), &QnResourcePool::resourcesAdded,

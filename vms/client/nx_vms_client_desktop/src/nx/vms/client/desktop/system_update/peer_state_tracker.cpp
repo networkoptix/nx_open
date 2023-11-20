@@ -68,6 +68,7 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
     QObject::disconnect(m_onRemovedResource);
 
     m_resourcePool = nullptr;
+
     auto itemsCache = m_items;
     /// Reversing item list just to make sure we remove rows from the table from last to first.
     for (auto it = m_items.rbegin(); it != m_items.rend(); ++it)
@@ -137,10 +138,7 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(const UpdateItemPtr& item) 
 {
     if (!item || !m_resourcePool)
         return QnMediaServerResourcePtr();
-    QnMediaServerResourcePtr result = m_resourcePool->getResourceById<QnMediaServerResource>(item->id);
-    if (!result && item->incompatible)
-        return m_resourcePool->getIncompatibleServerById(item->id);
-    return result;
+    return m_resourcePool->getResourceById<QnMediaServerResource>(item->id);
 }
 
 QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
@@ -1433,8 +1431,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     bool changed = false;
     auto status = server->getStatus();
 
-    bool incompatible = status == nx::vms::api::ResourceStatus::incompatible
-        || server->hasFlags(Qn::fake_server);
+    bool incompatible = status == nx::vms::api::ResourceStatus::incompatible;
 
     if (const auto serverResource = server.dynamicCast<ServerResource>(); NX_ASSERT(serverResource))
         incompatible |= !serverResource->isCompatible();

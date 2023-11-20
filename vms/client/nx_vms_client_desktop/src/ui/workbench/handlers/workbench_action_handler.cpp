@@ -33,7 +33,6 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/layout_item_data.h>

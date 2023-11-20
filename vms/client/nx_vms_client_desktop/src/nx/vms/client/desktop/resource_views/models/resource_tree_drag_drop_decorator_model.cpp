@@ -246,7 +246,7 @@ bool ResourceTreeDragDropDecoratorModel::canDropMimeData(const QMimeData* mimeDa
     }
 
     // Don't allow to drop camera items from layouts to the main devices tree.
-    if ((hasResourceFlags(targetIndex, Qn::server) && !hasResourceFlags(targetIndex, Qn::fake))
+    if (hasResourceFlags(targetIndex, Qn::server)
         || hasNodeType(targetIndex, NodeType::camerasAndDevices)
         || hasNodeType(targetIndex, NodeType::customResourceGroup))
     {
@@ -373,7 +373,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
 
     // Drop device or web page item on the server allows to move devices or proxied web pages
     // between servers.
-    if (hasResourceFlags(index, Qn::server) && !hasResourceFlags(index, Qn::fake))
+    if (hasResourceFlags(index, Qn::server))
     {
         const auto server = index.data(Qn::ResourceRole).value<QnResourcePtr>()
             .dynamicCast<QnMediaServerResource>();

@@ -8,7 +8,6 @@
 #include <client/client_module.h>
 #include <common/common_module.h>
 #include <core/resource/client_storage_resource.h>
-#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -233,7 +232,7 @@ void QnServerStorageManager::handleResourceAdded(const QnResourcePtr& resource)
     }
 
     const auto server = resource.objectCast<QnMediaServerResource>();
-    if (!server || server->hasFlags(Qn::fake) || server->hasFlags(Qn::cross_system))
+    if (!server || server->hasFlags(Qn::cross_system))
         return;
 
     m_serverInfo.insert(server, ServerInfo());
@@ -273,7 +272,7 @@ void QnServerStorageManager::handleResourceRemoved(const QnResourcePtr& resource
     }
 
     const auto server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || server.dynamicCast<QnFakeMediaServerResource>())
+    if (!server)
         return;
 
     server->disconnect(this);

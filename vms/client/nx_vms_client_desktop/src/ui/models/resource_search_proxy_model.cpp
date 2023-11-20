@@ -183,7 +183,7 @@ bool QnResourceSearchProxyModel::isAcceptedIndex(
     switch (allowedNode)
     {
         case NodeType::servers:
-            return resourceFlags.testFlag(Qn::server) && !resourceFlags.testFlag(Qn::fake);
+            return resourceFlags.testFlag(Qn::server);
         case NodeType::layouts:
             return resourceFlags.testFlag(Qn::layout)
                 && (!resourceFlags.testFlag(Qn::local)

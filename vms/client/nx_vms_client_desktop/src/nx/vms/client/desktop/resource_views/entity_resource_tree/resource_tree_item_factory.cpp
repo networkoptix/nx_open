@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/item/cloud_system_status_item.h>
@@ -295,6 +296,44 @@ GenericItem::FlagsProvider cloudLayoutFlagsProvider(const QnLayoutResourcePtr& l
 
             return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
         };
+}
+
+GenericItem::DataProvider otherServerNameProvider(const QnUuid& serverId, SystemContext* systemContext)
+{
+    return [serverId, systemContext]
+        {
+            return systemContext->otherServersManager()
+                ->getModuleInformationWithAddresses(serverId).name;
+        };
+}
+
+InvalidatorPtr otherServerNameInvalidator(const QnUuid& id, SystemContext* systemContext)
+{
+    auto result = std::make_shared<Invalidator>();
+
+    result->connections()->add(QObject::connect(
+        systemContext->otherServersManager(),
+        &OtherServersManager::serverUpdated,
+        [invalidator = result.get(), id](const QnUuid& serverId)
+        {
+            if (id == serverId)
+                invalidator->invalidate();
+        }));
+
+    return result;
+}
+
+GenericItem::DataProvider otherServerIconProvider()
+{
+    return []
+        {
+            return static_cast<int>(QnResourceIconCache::Server);
+        };
+}
+
+InvalidatorPtr otherServerIconInvalidator()
+{
+    return std::make_shared<Invalidator>();
 }
 
 } // namespace
@@ -631,6 +670,19 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudLayoutItem(const QnLayoutRes
         .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::resource))
         .withFlags(flagsProvider);
+}
+
+AbstractItemPtr ResourceTreeItemFactory::createOtherServerItem(const QnUuid& serverId)
+{
+    const auto nameProvider = otherServerNameProvider(serverId, systemContext());
+    const auto nameInvalidator = otherServerNameInvalidator(serverId, systemContext());
+
+    return GenericItemBuilder()
+        .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
+        .withRole(Qn::ResourceIconKeyRole, otherServerIconProvider(), otherServerIconInvalidator())
+        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::otherSystemServer))
+        .withRole(Qn::ItemUuidRole, QVariant::fromValue(serverId))
+        .withRole(Qn::HelpTopicIdRole, HelpTopic::Id::OtherSystems);
 }
 
 } // namespace entity_resource_tree

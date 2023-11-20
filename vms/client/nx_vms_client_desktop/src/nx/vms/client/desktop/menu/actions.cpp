@@ -1668,8 +1668,7 @@ void initialize(Manager* manager, Action* root)
             ? ContextMenu::tr("New")
             : ContextMenu::tr("Add"))
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
-            && ConditionWrapper(new EdgeServerCondition(false))
-            && !ConditionWrapper(new FakeServerCondition(true)));
+            && ConditionWrapper(new EdgeServerCondition(false)));
 
     factory.beginSubMenu();
     {
@@ -1712,7 +1711,6 @@ void initialize(Manager* manager, Action* root)
         .requiredPowerUserPermissions()
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
-            && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::showreelIsRunning()
             && condition::scoped(SceneScope, !condition::isShowreelReviewMode()));
 
@@ -1724,7 +1722,6 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Server Logs..."))
         .requiredPowerUserPermissions()
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
-            && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::showreelIsRunning()
             && condition::scoped(SceneScope, !condition::isShowreelReviewMode())
             && ConditionWrapper(new ResourceStatusCondition(
@@ -1736,7 +1733,6 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Server Diagnostics..."))
         .requiredGlobalPermission(GlobalPermission::viewLogs)
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
-            && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::showreelIsRunning()
             && condition::scoped(SceneScope, !condition::isShowreelReviewMode()));
 
@@ -1745,7 +1741,6 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Server Web Page..."))
         .requiredPowerUserPermissions()
         .condition(condition::hasFlags(Qn::remote_server, MatchMode::exactlyOne)
-            && !ConditionWrapper(new FakeServerCondition(true))
             && !ConditionWrapper(new CloudServerCondition(MatchMode::any))
             && !condition::showreelIsRunning()
             && condition::scoped(SceneScope, !condition::isShowreelReviewMode()));
@@ -1759,18 +1754,16 @@ void initialize(Manager* manager, Action* root)
                 /*require*/ Qn::remote_server,
                 /*exclude*/ Qn::cross_system,
                 MatchMode::exactlyOne)
-            && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::showreelIsRunning()
             && condition::scoped(SceneScope, !condition::isShowreelReviewMode()));
 
     factory(ConnectToCurrentSystem)
-        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
+        // Actually, it is single-target, but the target type is not registered in Parameters.
+        .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Merge to Currently Connected System..."))
         .condition(
-            condition::treeNodeType(ResourceTree::NodeType::resource)
-            && ConditionWrapper(new MergeToCurrentSystemCondition())
-            && ConditionWrapper(new RequiresAdministratorCondition())
-        );
+            condition::treeNodeType(ResourceTree::NodeType::otherSystemServer)
+            && ConditionWrapper(new RequiresAdministratorCondition()));
 
     factory()
         .flags(Scene | NoTarget)

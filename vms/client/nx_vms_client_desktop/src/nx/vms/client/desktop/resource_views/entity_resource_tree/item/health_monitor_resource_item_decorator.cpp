@@ -27,7 +27,7 @@ QVariant HealthMonitorResourceItemDecorator::data(int role) const
     if (role == Qn::ResourceIconKeyRole)
     {
         const auto flags = m_sourceItem->data(Qn::ResourceFlagsRole).value<Qn::ResourceFlags>();
-        if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
+        if (flags.testFlag(Qn::server))
         {
             auto iconKey = static_cast<QnResourceIconCache::Key>(m_sourceItem->data(role).toInt());
             iconKey &= !QnResourceIconCache::TypeMask;

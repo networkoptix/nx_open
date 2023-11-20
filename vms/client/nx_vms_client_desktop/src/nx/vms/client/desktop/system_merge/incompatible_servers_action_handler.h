@@ -32,7 +32,7 @@ public:
     ~IncompatibleServersActionHandler();
 
 private:
-    void connectToCurrentSystem(const QnFakeMediaServerResourcePtr& server);
+    void connectToCurrentSystem(const QnUuid& otherServerId);
 
     QString requestPassword() const;
 

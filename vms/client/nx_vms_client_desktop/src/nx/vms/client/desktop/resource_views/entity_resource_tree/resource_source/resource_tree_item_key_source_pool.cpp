@@ -234,10 +234,9 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::localMediaSource()
         std::make_unique<LocalMediaSource>(resourcePool()));
 }
 
-UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::fakeServerResourcesSource()
+UniqueUuidSourcePtr ResourceTreeItemKeySourcePool::otherServersSource()
 {
-    return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<FakeServerResourceSource>(resourcePool()));
+    return std::make_shared<OtherServersSource>(systemContext()->otherServersManager());
 }
 
 UniqueStringSourcePtr ResourceTreeItemKeySourcePool::cloudSystemsSource()

@@ -126,7 +126,6 @@ namespace Qn {
         local_image = local_media | still_image, /**< Local still image file. */
 
         web_page = url | remote, /**< Web-page resource */
-        fake_server = remote_server | fake
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_FLAG_NS(ResourceFlags)

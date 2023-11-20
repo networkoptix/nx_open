@@ -29,8 +29,7 @@ public:
 
     QnMediaServerResourcePtr makeServer(
         nx::utils::SoftwareVersion version,
-        bool online = true,
-        bool compatibleServer = true);
+        bool online = true);
 
     std::map<QnUuid, QnMediaServerResourcePtr> getAllServers();
 

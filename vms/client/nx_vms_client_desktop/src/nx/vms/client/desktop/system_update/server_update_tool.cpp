@@ -10,9 +10,7 @@
 #include <QtCore/QStorageInfo>
 #include <QtCore/QThread>
 
-#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_management/incompatible_server_watcher.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -397,25 +395,7 @@ void ServerUpdateTool::atExtractFilesFinished(nx::zip::Extractor::Error code)
 
 QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
 {
-    QnMediaServerResourceList result = {currentServer()};
-#if 0 // Disabled for now, until 4.1 happens.
-    auto items = m_stateTracker->allItems();
-    for (const auto& record: items)
-    {
-        auto server = m_stateTracker->getServer(record);
-        if (!server)
-            continue;
-        bool isOurServer = !server->hasFlags(Qn::fake_server)
-            || helpers::serverBelongsToCurrentSystem(server);
-
-        auto status = server->getStatus();
-        bool online = status == nx::vms::api::ResourceStatus::online;
-
-        if (isOurServer && online && record->storeUpdates)
-            result.push_back(server);
-    }
-#endif
-    return result;
+    return {currentServer()};
 }
 
 ServerUpdateTool::OfflineUpdateState ServerUpdateTool::getUploaderState() const
