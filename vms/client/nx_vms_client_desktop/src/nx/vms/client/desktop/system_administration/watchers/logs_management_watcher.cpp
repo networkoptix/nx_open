@@ -156,14 +156,12 @@ void ClientLogCollector::run()
 {
     using namespace nx::utils::log;
 
-    QFileInfo fileInfo(m_target);
-    const auto& tempTarget = fileInfo.dir().filePath(
-        fileInfo.baseName() + kPartialSuffix + '.' + fileInfo.completeSuffix());
+    static const QString kSelfUpdateFilter = "*self_update*.log";
 
-    auto file = std::make_unique<QFile>(tempTarget);
+    auto file = std::make_unique<QFile>(m_target);
     if (!file->open(QIODevice::ReadWrite))
     {
-        NX_ERROR(this, "Could not open file for writing: %1", tempTarget);
+        NX_ERROR(this, "Could not open file for writing: %1", m_target);
         emit error();
         return;
     }
@@ -177,168 +175,235 @@ void ClientLogCollector::run()
         return;
     }
 
+    auto logger = mainLogger();
+    std::optional<QString> baseFileName = logger->filePath();
+
+    if (!baseFileName)
+    {
+        NX_ERROR(this, "Log file not found");
+        emit error();
+        return;
+    }
+
+    auto calculationSize =
+        [&]()
+        {
+            int size = 0;
+
+            for (int rotation = 0; !m_cancelled && rotation <= kMaxLogRotation; rotation++)
+            {
+                for (const auto extension: {File::Extension::log, File::Extension::zip})
+                {
+                    const auto path = File::makeFileName(*baseFileName, rotation, extension);
+                    if (!QFile::exists(path))
+                        continue;
+
+                    size += QFileInfo(path).size();
+                }
+            }
+
+            const auto directory = QFileInfo(*baseFileName).absoluteDir();
+            QFileInfoList list = directory.entryInfoList({kSelfUpdateFilter});
+            for (const auto& fileInfo: list)
+                size += fileInfo.size();
+
+            return size;
+        };
+
     // TODO: support customized logs.
     const auto name = "client_log";
+    static constexpr int kBufferSize = 64 * 1024;
+    uint64_t currentSize = 0;
+    uint64_t fileSize = calculationSize();
+
+    auto addFileToArchiveWithRotation =
+        [&](const QString& path, const File::Extension extension)
+        {
+            QuaZip rotatedArchive(path);
+            if (!rotatedArchive.open(QuaZip::Mode::mdUnzip))
+            {
+                NX_ERROR(this, "Could not open zipped log file for %1 at the path %2", name, path);
+                emit error();
+                return false;
+            }
+            if (!rotatedArchive.goToFirstFile())
+            {
+                NX_ERROR(this,
+                    "Could not find a log file for %1 inside the archive at the path %2: %3",
+                    name,
+                    path,
+                    rotatedArchive.getZipError());
+                emit error();
+                return false;
+            }
+
+            int method = Z_DEFLATED, level = Z_DEFAULT_COMPRESSION;
+            QuaZipFile deflatedLog(&rotatedArchive);
+            // Open for reading in raw mode to avoid uncompressing.
+            if (!deflatedLog.open(QIODevice::ReadOnly, &method, &level, true))
+            {
+                NX_ERROR(this,
+                    "Could not open the log file for %1 inside the archive at the path %2: %3",
+                    name,
+                    path,
+                    deflatedLog.getZipError());
+                emit error();
+                return false;
+            }
+
+            QuaZipFileInfo64 info;
+            rotatedArchive.getCurrentFileInfo(&info);
+
+            QFileInfo fileName(path);
+            QuaZipNewInfo newInfo(
+                fileName.fileName().replace(toQString(extension), toQString(File::Extension::log)),
+                path);
+            newInfo.uncompressedSize = info.uncompressedSize;
+
+            QuaZipFile zip(&archive);
+            // Open for writing in raw mode to avoid compressing.
+            if (!zip.open(QIODevice::WriteOnly, newInfo, NULL, info.crc, method, level, true))
+            {
+                NX_ERROR(this,
+                    "Could not add the log file for %1 to the archive: %2",
+                    name,
+                    zip.getZipError());
+                emit error();
+                return false;
+            }
+
+            while (!m_cancelled && deflatedLog.pos() < deflatedLog.size()
+                && deflatedLog.getZipError() == 0 && zip.getZipError() == 0)
+            {
+                const auto buf = deflatedLog.read(kBufferSize);
+                emit progressChanged((currentSize += kBufferSize) * 100.0 / fileSize);
+                if (!buf.isEmpty())
+                    zip.write(buf);
+            }
+            zip.close();
+
+            if (deflatedLog.getZipError() != 0)
+            {
+                NX_ERROR(this,
+                    "Error while reading the log file for %1 at the path %2: %3",
+                    name,
+                    path,
+                    deflatedLog.getZipError());
+                emit error();
+                return false;
+            }
+            if (zip.getZipError() != 0)
+            {
+                NX_ERROR(this,
+                    "Error while zipping the log file for %1 at the path %2: %3",
+                    name,
+                    path,
+                    zip.getZipError());
+                emit error();
+                return false;
+            }
+
+            return true;
+        };
+
+    auto addLogFileToArchive =
+        [&](const QString& path)
+        {
+            QFile textLog(path);
+            if (!textLog.open(QIODevice::ReadOnly))
+            {
+                NX_ERROR(this, "Could not open the log file for %1 at path %2", name, path);
+                emit error();
+                return false;
+            }
+
+            QuaZipFile zip(&archive);
+            if (!zip.open(QIODevice::WriteOnly, QuaZipNewInfo(File::makeBaseFileName(path), path)))
+            {
+                NX_ERROR(this,
+                    "Could not add the log file for %1 to the archive: %2",
+                    name,
+                    zip.getZipError());
+                emit error();
+                return false;
+            }
+
+            while (!m_cancelled && !textLog.atEnd() && textLog.error() == QFileDevice::NoError
+                && zip.getZipError() == 0)
+            {
+                const auto buf = textLog.read(kBufferSize);
+                emit progressChanged((currentSize += kBufferSize) * 100.0 / fileSize);
+                if (!buf.isEmpty())
+                    zip.write(buf);
+            }
+            zip.close();
+
+            if (textLog.error() != QFileDevice::NoError)
+            {
+                NX_ERROR(this,
+                    "Error while reading the log file for %1 at the path %2: %3",
+                    name,
+                    path,
+                    textLog.error());
+                emit error();
+                return false;
+            }
+            if (zip.getZipError() != 0)
+            {
+                NX_DEBUG(this,
+                    "Error while zipping the log file for %1 at the path %2: %3",
+                    name,
+                    path,
+                    zip.getZipError());
+                emit error();
+                return false;
+            }
+
+            return true;
+        };
 
     for (int rotation = 0; !m_cancelled && rotation <= kMaxLogRotation; rotation++)
     {
-        NX_VERBOSE(this, "Archiving %1 for %2", (rotation == 0)
-            ? "current log file" : NX_FMT("rotated log file %1", rotation), name);
-
-        auto logger = mainLogger();
-        std::optional<QString> baseFileName = logger->filePath();
-
-        if (!baseFileName)
-        {
-            NX_ERROR(this, "Log file for %1 is stderr", name);
-            emit error();
-            return;
-        }
+        NX_VERBOSE(this,
+            "Archiving %1 for %2",
+            (rotation == 0) ? "current log file" : NX_FMT("rotated log file %1", rotation),
+            name);
 
         for (const auto extension: {File::Extension::log, File::Extension::zip})
         {
             const auto path = File::makeFileName(*baseFileName, rotation, extension);
             if (!QFile::exists(path))
             {
-                NX_VERBOSE(this, "Log file for %1 does not exist at the path %2, skipping it", name, path);
+                NX_VERBOSE(this,
+                    "Log file for %1 does not exist at the path %2, skipping it",
+                    name,
+                    path);
                 continue;
             }
 
-            static constexpr int kBufferSize = 64 * 1024;
-            uint64_t currentSize = 0;
-            uint64_t fileSize = 0;
             if (rotation && extension == File::Extension::zip)
             {
-                QuaZip rotatedArchive(path);
-                if (!rotatedArchive.open(QuaZip::Mode::mdUnzip))
-                {
-                    NX_ERROR(this, "Could not open zipped log file for %1 at the path %2", name, path);
-                    emit error();
+                if (!addFileToArchiveWithRotation(path, extension))
                     return;
-                }
-                if (!rotatedArchive.goToFirstFile())
-                {
-                    NX_ERROR(this, "Could not find a log file for %1 inside the archive at the path %2: %3",
-                        name, path, rotatedArchive.getZipError());
-                    emit error();
-                    return;
-                }
-
-                int method = Z_DEFLATED, level = Z_DEFAULT_COMPRESSION;
-                QuaZipFile deflatedLog(&rotatedArchive);
-                // Open for reading in raw mode to avoid uncompressing.
-                if (!deflatedLog.open(QIODevice::ReadOnly, &method, &level, true))
-                {
-                    NX_ERROR(this, "Could not open the log file for %1 inside the archive at the path %2: %3",
-                        name, path, deflatedLog.getZipError());
-                    emit error();
-                    return;
-                }
-
-                QuaZipFileInfo64 info;
-                rotatedArchive.getCurrentFileInfo(&info);
-
-                QFileInfo fileName(path);
-                QuaZipNewInfo newInfo(fileName.fileName().replace(toQString(extension),
-                    toQString(File::Extension::log)), path);
-                newInfo.uncompressedSize = info.uncompressedSize;
-
-                QuaZipFile zip(&archive);
-                // Open for writing in raw mode to avoid compressing.
-                if (!zip.open(QIODevice::WriteOnly, newInfo, NULL, info.crc, method, level, true))
-                {
-                    NX_ERROR(this, "Could not add the log file for %1 to the archive: %2",
-                        name, zip.getZipError());
-                    emit error();
-                    return;
-                }
-
-                fileSize = fileName.size();
-                while (!m_cancelled
-                    && deflatedLog.pos() < deflatedLog.size()
-                    && deflatedLog.getZipError() == 0 && zip.getZipError() == 0)
-                {
-                    const auto buf = deflatedLog.read(kBufferSize);
-                    emit progressChanged((currentSize += kBufferSize) * 100.0 / fileSize);
-                    if (!buf.isEmpty())
-                        zip.write(buf);
-                }
-                zip.close();
-
-                if (deflatedLog.getZipError() != 0)
-                {
-                    NX_ERROR(this, "Error while reading the log file for %1 at the path %2: %3",
-                        name, path, deflatedLog.getZipError());
-                    emit error();
-                    return;
-                }
-                if (zip.getZipError() != 0)
-                {
-                    NX_ERROR(this, "Error while zipping the log file for %1 at the path %2: %3",
-                        name, path, zip.getZipError());
-                    emit error();
-                    return;
-                }
             }
             else
             {
-                QFile textLog(path);
-                if (!textLog.open(QIODevice::ReadOnly))
-                {
-                    NX_ERROR(this, "Could not open the log file for %1 at path %2", name, path);
-                    emit error();
+                if (!addLogFileToArchive(path))
                     return;
-                }
-
-                QuaZipFile zip(&archive);
-                if (!zip.open(QIODevice::WriteOnly, QuaZipNewInfo(File::makeBaseFileName(path), path)))
-                {
-                    NX_ERROR(this, "Could not add the log file for %1 to the archive: %2",
-                        name, zip.getZipError());
-                    emit error();
-                    return;
-                }
-
-                fileSize = textLog.size();
-                while (!m_cancelled && !textLog.atEnd()
-                    && textLog.error() == QFileDevice::NoError && zip.getZipError() == 0)
-                {
-                    const auto buf = textLog.read(kBufferSize);
-                    emit progressChanged((currentSize += kBufferSize) * 100.0 / fileSize);
-                    if (!buf.isEmpty())
-                        zip.write(buf);
-                }
-                zip.close();
-
-                if (textLog.error() != QFileDevice::NoError)
-                {
-                    NX_ERROR(this, "Error while reading the log file for %1 at the path %2: %3",
-                            name, path, textLog.error());
-                    emit error();
-                    return;
-                }
-                if (zip.getZipError() != 0)
-                {
-                    NX_DEBUG(this, "Error while zipping the log file for %1 at the path %2: %3",
-                        name, path, zip.getZipError());
-                    emit error();
-                    return;
-                }
             }
         }
     }
 
-    archive.close();
+    const auto directory = QFileInfo(*baseFileName).absoluteDir();
+    QFileInfoList list = directory.entryInfoList({kSelfUpdateFilter});
+    for (const auto& fileInfo: list)
+    {
+        if (!addLogFileToArchive(fileInfo.absoluteFilePath()))
+            return;
+    }
 
-    if (QFile::rename(tempTarget, m_target))
-    {
-        emit success();
-    }
-    else
-    {
-        NX_DEBUG(this, "Error renaming temporary log file %1 to %2", tempTarget, m_target);
-        emit error();
-    }
+    archive.close();
+    emit success();
 }
 
 struct LogsManagementWatcher::Unit::Private
@@ -460,7 +525,8 @@ struct LogsManagementWatcher::Unit::Private
 
         m_collector->start();
         m_state = DownloadState::loading;
-
+        lock.unlock();
+        renameFileForCurrentState(sourceFilePath);
     }
 
     void startServerDownload(
