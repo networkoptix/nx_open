@@ -223,7 +223,6 @@ qint64  Sound::extraAudioDelayUs() const
 #endif
 }
 
-
 qint64 Sound::maxAudioJitterUs() const
 {
     return kDefaultMaxAudioJitterUs;
@@ -302,9 +301,9 @@ bool Sound::playImpl()
         {
             // play
             auto timerState = m_timer.state();
-            if (timerState == nx::ElapsedTimer::State::Stopped)
+            if (timerState == HighResolutionElapsedTimer::State::Stopped)
                 m_timer.restart();
-            else if (timerState == nx::ElapsedTimer::State::Paused)
+            else if (timerState == HighResolutionElapsedTimer::State::Paused)
                 m_timer.resume();
             alSourcePlay(m_source);
             checkOpenALErrorDebug(m_device);

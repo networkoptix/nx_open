@@ -5,9 +5,9 @@
 #include <atomic>
 #include <chrono>
 
-namespace nx {
+namespace nx::audio {
     ///
-    class ElapsedTimer
+    class HighResolutionElapsedTimer
     {
     public:
         typedef std::chrono::high_resolution_clock Clock;
@@ -19,7 +19,7 @@ namespace nx {
             Paused
         };
 
-        ElapsedTimer(bool start = false):
+        HighResolutionElapsedTimer(bool start = false):
             m_state(State::Stopped)
         {
             if (start)
@@ -69,4 +69,4 @@ namespace nx {
         State m_state;
         qint64 m_previousInterval;
     };
-} // namespace nx
+} // namespace nx::audio
