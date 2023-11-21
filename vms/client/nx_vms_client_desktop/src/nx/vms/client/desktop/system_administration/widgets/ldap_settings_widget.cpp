@@ -209,10 +209,10 @@ struct LdapSettingsWidget::Private
                 .filter = filter.filter
             });
         }
-        state.continuousSync =
-            settings.continuousSync == nx::vms::api::LdapSettings::Sync::usersAndGroups;
-        state.continuousSyncEditable =
+
+        state.continuousSyncEnabled =
             settings.continuousSync != nx::vms::api::LdapSettings::Sync::disabled;
+        state.continuousSync = (int) settings.continuousSync;
 
         state.loginAttribute = settings.loginAttribute;
         state.groupObjectClass = settings.groupObjectClass;
@@ -256,16 +256,7 @@ struct LdapSettingsWidget::Private
             });
         }
 
-        if (state.continuousSyncEditable)
-        {
-            settings.continuousSync = state.continuousSync
-                ? nx::vms::api::LdapSettings::Sync::usersAndGroups
-                : nx::vms::api::LdapSettings::Sync::groupsOnly;
-        }
-        else
-        {
-            settings.continuousSync = nx::vms::api::LdapSettings::Sync::disabled;
-        }
+        settings.continuousSync = (nx::vms::api::LdapSettings::Sync) state.continuousSync;
 
         settings.loginAttribute = state.loginAttribute;
         settings.groupObjectClass = state.groupObjectClass;
