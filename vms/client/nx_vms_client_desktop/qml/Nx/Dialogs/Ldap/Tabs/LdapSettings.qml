@@ -25,8 +25,8 @@ Rectangle
     property bool startTls: false
     property bool ignoreCertErrors: false
     property alias filters: filtersModel.filters
-    property bool continuousSync: true
-    property bool continuousSyncEditable: true
+    property bool continuousSyncEnabled: true
+    property var continuousSync
     property bool isValid
     property string loginAttribute
     property string groupObjectClass
@@ -74,6 +74,8 @@ Rectangle
         {
             transientParent: control.Window.window
 
+            continuousSyncEnabled: control.continuousSyncEnabled
+
             SessionAware.onTryClose: reject()
 
             onAccepted:
@@ -81,6 +83,7 @@ Rectangle
                 control.loginAttribute = loginAttribute
                 control.groupObjectClass = groupObjectClass
                 control.memberAttribute = memberAttribute
+                control.continuousSync = continuousSync
                 control.syncIntervalS = syncIntervalS
                 control.searchTimeoutS = searchTimeoutS
                 control.preferredSyncServer = preferredSyncServer
@@ -114,8 +117,8 @@ Rectangle
             {
                 if (!control.hasConfig)
                 {
-                    control.continuousSync = true
-                    control.continuousSyncEditable = true
+                    control.continuousSyncEnabled = true
+                    control.continuousSync = LdapSettings.Sync.usersAndGroups
                     control.lastSync = ""
 
                     control.syncIntervalS = kDefaultSyncIntervalS
@@ -347,7 +350,8 @@ Rectangle
 
                         Spinner
                         {
-                            running: control.showSpinners && control.continuousSync
+                            running: control.showSpinners
+                                && control.continuousSync == LdapSettings.Sync.usersAndGroups
                         }
                     }
 
@@ -502,6 +506,7 @@ Rectangle
                             advancedSettingsDialog.memberAttributeAuto =
                                 control.memberAttribute == ""
 
+                            advancedSettingsDialog.continuousSync = control.continuousSync
                             advancedSettingsDialog.syncIntervalS = control.syncIntervalS
                             advancedSettingsDialog.searchTimeoutS = control.searchTimeoutS
                             advancedSettingsDialog.preferredSyncServer = control.preferredSyncServer
@@ -527,91 +532,6 @@ Rectangle
                         onClicked: self.requestLdapReset()
                     }
                 }
-            }
-        }
-
-        SectionHeader
-        {
-            id: continuousImportHeader
-
-            text: qsTr("Continuous User Import")
-            textLeftMargin: continuousImportSwitch.width + 4
-
-            Layout.fillWidth: true
-            Layout.leftMargin: 16
-            Layout.rightMargin: 16
-
-            enabled: control.continuousSyncEditable
-
-            SwitchIcon
-            {
-                id: continuousImportSwitch
-
-                height: 16
-                y: continuousImportHeader.baselineOffset - height + 1
-
-                enabled: control.continuousSyncEditable
-                checkState: control.continuousSync ? Qt.Checked : Qt.Unchecked
-                hovered: continuousImportSwitchMouserArea.containsMouse
-
-                MouseArea
-                {
-                    id: continuousImportSwitchMouserArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked:
-                    {
-                        control.continuousSync = !control.continuousSync
-                    }
-                }
-            }
-        }
-
-        Text
-        {
-            text: control.continuousSync
-                ? qsTr("VMS imports and synchronizes users and groups with LDAP server in real time")
-                : qsTr("VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.")
-            font: Qt.font({pixelSize: 14, weight: Font.Normal})
-            color: ColorTheme.colors.light16
-
-            Layout.fillWidth: true
-            Layout.leftMargin: 16
-            Layout.rightMargin: 16
-
-            visible: control.continuousSyncEditable
-
-            wrapMode: Text.WordWrap
-        }
-
-        RowLayout
-        {
-            Layout.fillWidth: true
-            Layout.leftMargin: 16
-            Layout.rightMargin: 16
-
-            visible: !control.continuousSync && control.continuousSyncEditable
-
-            spacing: 8
-
-            Image
-            {
-                Layout.alignment: Qt.AlignTop
-                source: "image://svg/skin/user_settings/warning_icon.svg"
-                sourceSize: Qt.size(20, 20)
-            }
-
-            Text
-            {
-                Layout.fillWidth: true
-                topPadding: 2
-                bottomPadding: 2
-
-                text: qsTr("LDAP users that have never logged in to the system are not displayed"
-                    + " in the list of users. Use groups to configure permissions for such users.")
-                font { pixelSize: 14; weight: Font.Normal }
-                color: ColorTheme.colors.yellow_core
-                wrapMode: Text.WordWrap
             }
         }
 
@@ -806,7 +726,7 @@ Rectangle
 
             DialogBanner
             {
-                visible: !control.continuousSyncEditable
+                visible: !control.continuousSyncEnabled
 
                 style: DialogBanner.Style.Info
 

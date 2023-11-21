@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/api/data/ldap.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -24,6 +25,14 @@ public:
         error,
     };
     Q_ENUM(TestState)
+
+    enum class Sync
+    {
+        disabled = (int) nx::vms::api::LdapSettings::Sync::disabled,
+        groupsOnly = (int) nx::vms::api::LdapSettings::Sync::groupsOnly,
+        usersAndGroups = (int) nx::vms::api::LdapSettings::Sync::usersAndGroups,
+    };
+    Q_ENUM(Sync)
 
 public:
     explicit LdapSettingsWidget(QWidget* parent = nullptr);

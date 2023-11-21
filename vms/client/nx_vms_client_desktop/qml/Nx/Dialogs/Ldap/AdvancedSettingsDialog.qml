@@ -18,6 +18,8 @@ Dialog
 {
     id: dialog
 
+    property bool continuousSyncEnabled: true
+
     property alias isHttpDigestEnabledOnImport: digestCheckBox.checked
     property bool isHttpDigestEnabledOnImportInitial
 
@@ -32,6 +34,8 @@ Dialog
     property alias searchTimeoutS: searchTimeoutSpinBox.seconds
 
     property alias preferredSyncServer: serverComboBox.selectedServer
+
+    property alias continuousSync: syncComboBox.selectedSync
 
     modality: Qt.ApplicationModal
 
@@ -61,6 +65,93 @@ Dialog
         anchors.rightMargin: 16
 
         spacing: 8
+
+        SectionHeader
+        {
+            text: qsTr("General")
+        }
+
+        CenteredField
+        {
+            text: qsTr("Synchronize Users")
+
+            leftSideMargin: 180
+            rightSideMargin: 0
+
+            RowLayout
+            {
+                width: parent.width
+
+                SyncComboBox
+                {
+                    id: syncComboBox
+
+                    Layout.fillWidth: true
+
+                    syncEnabled: dialog.continuousSyncEnabled
+                }
+
+                Item
+                {
+                    implicitWidth: loginAttributeTextField.checkBoxWidth
+                    implicitHeight: serverComboBox.height
+                }
+            }
+        }
+
+        CenteredField
+        {
+            text: qsTr("Sync Interval")
+
+            leftSideMargin: 180
+            rightSideMargin: 0
+
+            TimeDuration
+            {
+                id: syncIntervalSpinBox
+
+                enabled: syncComboBox.selectedSync != LdapSettings.Sync.disabled
+            }
+        }
+
+        CenteredField
+        {
+            text: qsTr("Search Timeout")
+
+            leftSideMargin: 180
+            rightSideMargin: 0
+
+            TimeDuration
+            {
+                id: searchTimeoutSpinBox
+            }
+        }
+
+        CenteredField
+        {
+            text: qsTr("Proxy LDAP requests %1 via server", "%1 is a line break").arg("<br>")
+
+            leftSideMargin: 180
+            rightSideMargin: 0
+
+            RowLayout
+            {
+                width: parent.width
+
+                ServerComboBox
+                {
+                    id: serverComboBox
+
+                    Layout.fillWidth: true
+                }
+
+                Item
+                {
+                    implicitWidth: loginAttributeTextField.checkBoxWidth
+                    implicitHeight: serverComboBox.height
+                }
+            }
+        }
 
         SectionHeader
         {
@@ -104,7 +195,7 @@ Dialog
 
         CenteredField
         {
-            text: "objectClass"
+            text: "Name Attribute"
 
             leftSideMargin: 180
             rightSideMargin: 0
@@ -123,7 +214,7 @@ Dialog
 
         CenteredField
         {
-            text: qsTr("Group Members Attribute")
+            text: qsTr("Group Attribute")
 
             leftSideMargin: 180
             rightSideMargin: 0
@@ -132,63 +223,6 @@ Dialog
             {
                 id: userMembershipAttributeTextField
                 width: parent.width
-            }
-        }
-
-        SectionHeader
-        {
-            text: qsTr("Misc")
-        }
-
-        CenteredField
-        {
-            text: qsTr("Synchronization<br>Interval")
-
-            leftSideMargin: 180
-            rightSideMargin: 0
-
-            TimeDuration
-            {
-                id: syncIntervalSpinBox
-            }
-        }
-
-        CenteredField
-        {
-            text: qsTr("Search Timeout")
-
-            leftSideMargin: 180
-            rightSideMargin: 0
-
-            TimeDuration
-            {
-                id: searchTimeoutSpinBox
-            }
-        }
-
-        CenteredField
-        {
-            text: qsTr("Proxy LDAP requests<br>via server")
-
-            leftSideMargin: 180
-            rightSideMargin: 0
-
-            RowLayout
-            {
-                width: parent.width
-
-                ServerComboBox
-                {
-                    id: serverComboBox
-
-                    Layout.fillWidth: true
-                }
-
-                Item
-                {
-                    implicitWidth: loginAttributeTextField.checkBoxWidth
-                    implicitHeight: serverComboBox.height
-                }
             }
         }
     }
