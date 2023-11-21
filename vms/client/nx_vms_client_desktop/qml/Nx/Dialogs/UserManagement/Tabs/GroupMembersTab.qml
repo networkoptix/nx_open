@@ -66,7 +66,7 @@ MembershipSettings
 
     component SummaryItem: MembershipTreeItem
     {
-        enabled: control.enabled && model.canEditParents
+        enabled: control.enabled && !!model.canEditParents //< model.canEditParents can be undefined
         offset: model.offset
         iconSource: iconPath(model) + "?primary=light10&secondary=light4"
         GlobalToolTip.text: model.offset > 0 ? qsTr("Inherits membership in current group") : ""
