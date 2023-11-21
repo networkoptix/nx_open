@@ -60,7 +60,7 @@
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>インポートされるユーザーに対して、安全でない (Digest) 認証を許可する</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
@@ -929,15 +929,15 @@
     </message>
     <message>
       <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</translation>
+      <translation>継続的同期が無効になっている場合、グループは自動的に同期しません。このグループを更新するには、手動同期を開始してください。</translation>
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+      <translation>同じ名前の別のグループがシステム内に存在します。グループには一意の名前を割り当てることをお勧めします。</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>このグループは、他のグループの親かつ子メンバーである、あるいはそういった循環参照の一部となっています。これにより、権限が正しく計算されない可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -1271,11 +1271,11 @@
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>システムを LDAP サーバーに接続すると、ユーザー管理が容易になります</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>このシステムでは、LDAP サーバーからの継続的なインポートが無効になっています。グループ、ユーザーおよびグループのメンバーシップの更新は、手動同期によってのみ反映されます。</translation>
     </message>
   </context>
   <context>
@@ -1608,7 +1608,7 @@
     <message>
       <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple lines, or %3 to clear the selection</translation>
+      <translation>%1 または %2 を使用して複数行を選択、 %3 を使用して選択をクリア</translation>
     </message>
   </context>
   <context>
@@ -1724,27 +1724,27 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>移動には矢印キー、ズームにはプラス・マイナスキーを使用してください。</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>ズームするには、マウスホイールを使用してください</translation>
     </message>
     <message>
       <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</translation>
+      <translation>Shift キーを押しながらクリック、ダブルクリック、ドラッグ操作を行うことで、高度な PTZ を使用できます</translation>
     </message>
     <message>
       <source>Target Lock Tracking</source>
-      <translation type="unfinished">Target Lock Tracking</translation>
+      <translation>ターゲットロック追跡</translation>
     </message>
     <message>
       <source>Alt + Click to follow object</source>
-      <translation type="unfinished">Alt + Click to follow object</translation>
+      <translation>Alt + クリックでオブジェクトを追跡</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>このガイドを再度有効にするには、[ローカル設定 &gt; アドバンス &gt; すべての警告設定をリセット] を実行してください。</translation>
     </message>
   </context>
   <context>
@@ -1954,19 +1954,19 @@ PTZを行います</translation>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>システムは一時停止しています。現在のデバイスに対してインテグレーションの使用を有効化/無効化するには、システムがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>システムは一時停止しています。一部のデバイスに対してインテグレーションの使用を有効化/無効化するには、システムがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>システムはシャットダウンされました。現在のデバイスに対してこのインテグレーションの使用を有効化するには、システムがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>システムはシャットダウンされました。一部のデバイスに対してこのインテグレーションの使用を有効化するには、システムがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください</translation>
     </message>
   </context>
   <context>
@@ -2491,24 +2491,24 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>リンクを取得中...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>このコンピューターが %1に接続できることを確認してください</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>LDAPサーバーがオフラインです。ユーザーはログインできません。</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>このユーザーのログイン名は、別のユーザーのログイン名と重複しています。どちらのユーザーもログインできません。この問題を解決するには、ユーザーのログイン名を変更するか、ログイン名が重複しているユーザーを無効化または削除してください。</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>継続的同期が無効になっている場合、グループ内のユーザーメンバーシップは自動的に同期されません。この情報を更新するには、手動同期を開始してください。</translation>
     </message>
   </context>
   <context>

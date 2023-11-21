@@ -1853,7 +1853,7 @@
     </message>
     <message>
       <source>warn icon</source>
-      <translation type="unfinished">warn icon</translation>
+      <translation>警告アイコン</translation>
     </message>
     <message>
       <source>&lt;Warning label&gt;</source>
@@ -1861,7 +1861,7 @@
     </message>
     <message>
       <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
-      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+      <translation>&lt;We recommend that you consult with support before proceeding.&gt;</translation>
     </message>
   </context>
   <context>
