@@ -302,7 +302,6 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
             if (std::holds_alternative<rest::Empty>(reply))
             {
                 NX_DEBUG(this, "Server bind succeded");
-                qnCloudStatusWatcher->setAuthData(m_cloudAuthData);
                 showSuccess(QString::fromStdString(m_cloudAuthData.credentials.username));
                 return;
             }
