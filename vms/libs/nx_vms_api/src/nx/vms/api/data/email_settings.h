@@ -52,10 +52,13 @@ struct NX_VMS_API EmailSettings
     /**%apidoc EHLO SMTP command argument. */
     std::optional<QString> smtpEhloName;
 
+    /**%apidoc[opt] Use a cloud service to send email. */
+    bool useCloudServiceToSendEmail = false;
+
     bool operator==(const EmailSettings& other) const = default;
 };
 #define EmailSettings_Fields (server)(email)(user)(password)(signature)(supportAddress) \
-    (connectionType)(port)(timeoutS)(smtpEhloName)
+    (connectionType)(port)(timeoutS)(smtpEhloName)(useCloudServiceToSendEmail)
 
 NX_REFLECTION_INSTRUMENT(EmailSettings, EmailSettings_Fields)
 NX_REFLECTION_TAG_TYPE(EmailSettings, jsonSerializeChronoDurationAsNumber)

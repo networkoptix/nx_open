@@ -172,12 +172,6 @@ public:
     void setAutoUpdateThumbnailsEnabled(bool value);
 
     /**
-     * Send email via Cloud service instead of direct SMTP connection.
-     */
-    bool useCloudServiceToSendEmail() const;
-    void setUseCloudServiceToSendEmail(bool value);
-
-    /**
      * Override maximum allowed scene items count.
      */
     int maxSceneItemsOverride() const;
@@ -517,7 +511,6 @@ signals:
     void cameraSettingsOptimizationChanged();
     void useHttpsOnlyForCamerasChanged();
     void autoUpdateThumbnailsChanged();
-    void useCloudServiceToSendEmailChanged();
     void maxSceneItemsChanged();
     void useTextEmailFormatChanged();
     void useWindowsEmailLineFeedChanged();
@@ -573,7 +566,6 @@ private:
 private:
     QnResourcePropertyAdaptor<bool>* m_cameraSettingsOptimizationAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_autoUpdateThumbnailsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_useCloudServiceToSendEmailAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_useTextEmailFormatAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_useWindowsEmailLineFeedAdaptor = nullptr;

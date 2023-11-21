@@ -351,11 +351,25 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="nx::vms::client::desktop::InputField" name="supportSignatureInput" native="true">
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>0</number>
           </property>
-         </widget>
+          <item>
+           <widget class="nx::vms::client::desktop::InputField" name="supportSignatureInput" native="true">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="nx::vms::client::desktop::InputField" name="defaultSignatureInput" native="true">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
