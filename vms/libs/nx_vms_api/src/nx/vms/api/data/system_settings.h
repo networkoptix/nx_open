@@ -44,7 +44,6 @@ struct SystemSettings
     bool updateNotificationsEnabled = true;
 
     EmailSettings emailSettings;
-    bool useCloudServiceToSendEmail = false;
 
     bool timeSynchronizationEnabled = true;
     QnUuid primaryTimeServer;
@@ -63,8 +62,8 @@ NX_REFLECTION_INSTRUMENT(SystemSettings, (cloudAccountName)(organization)(cloudS
     (auditTrailEnabled)(trafficEncryptionForced)(useHttpsOnlyForCameras)
     (videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)
     (showServersInTreeForNonAdmins)(updateNotificationsEnabled)(emailSettings)
-    (useCloudServiceToSendEmail)(timeSynchronizationEnabled)(primaryTimeServer)
-    (customReleaseListUrl)(clientUpdateSettings)(backupSettings)(metadataStorageChangePolicy));
+    (timeSynchronizationEnabled)(primaryTimeServer)(customReleaseListUrl)(clientUpdateSettings)
+    (backupSettings)(metadataStorageChangePolicy));
 
 NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)
 

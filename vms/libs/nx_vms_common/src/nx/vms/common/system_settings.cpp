@@ -118,8 +118,20 @@ bool SystemSettings::isInitialized() const
 
 SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
 {
-    m_emailSettingsAdaptor = new QnJsonResourcePropertyAdaptor<nx::vms::api::EmailSettings>(
-        "emailSettings", nx::vms::api::EmailSettings{}, this, [] { return tr("SMTP settings"); });
+    const auto isValid =
+        [](const nx::vms::api::EmailSettings& s)
+        {
+            return !s.useCloudServiceToSendEmail
+                || s.supportAddress == nx::branding::supportAddress();
+        };
+
+    m_emailSettingsAdaptor =
+        new QnJsonResourcePropertyAdaptor<nx::vms::api::EmailSettings>(
+            "emailSettings",
+            nx::vms::api::EmailSettings{},
+            isValid,
+            this,
+            [] { return tr("SMTP settings"); });
 
     connect(
         m_emailSettingsAdaptor,
@@ -371,15 +383,6 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     m_autoUpdateThumbnailsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "autoUpdateThumbnails", true, this, [] { return tr("Thumbnails auto-update"); });
-
-    m_useCloudServiceToSendEmailAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "useCloudServiceToSendEmail", false, this,
-            []
-            {
-                //: %1 will be substituted with branded cloud service name e.g. "Nx Cloud".
-                return tr("Use %1 service to send emails instead of SMTP client")
-                    .arg(nx::branding::cloudName());
-            });
 
     m_maxSceneItemsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxSceneItems", 0, this, [] { return tr("Max scene items (0 means default)"); });
@@ -778,13 +781,6 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        m_useCloudServiceToSendEmailAdaptor,
-        &QnAbstractResourcePropertyAdaptor::valueChanged,
-        this,
-        &SystemSettings::useCloudServiceToSendEmailChanged,
-        Qt::QueuedConnection);
-
-    connect(
         m_maxSceneItemsAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
@@ -1017,7 +1013,6 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_autoUpdateThumbnailsAdaptor
-        << m_useCloudServiceToSendEmailAdaptor
         << m_maxSceneItemsAdaptor
         << m_useTextEmailFormatAdaptor
         << m_useWindowsEmailLineFeedAdaptor
@@ -1131,16 +1126,6 @@ bool SystemSettings::isAutoUpdateThumbnailsEnabled() const
 void SystemSettings::setAutoUpdateThumbnailsEnabled(bool value)
 {
     m_autoUpdateThumbnailsAdaptor->setValue(value);
-}
-
-bool SystemSettings::useCloudServiceToSendEmail() const
-{
-    return m_useCloudServiceToSendEmailAdaptor->value();
-}
-
-void SystemSettings::setUseCloudServiceToSendEmail(bool value)
-{
-    m_useCloudServiceToSendEmailAdaptor->setValue(value);
 }
 
 int SystemSettings::maxSceneItemsOverride() const
@@ -2232,7 +2217,6 @@ void SystemSettings::update(const vms::api::SystemSettings& value)
     m_showServersInTreeForNonAdminsAdaptor->setValue(value.showServersInTreeForNonAdmins);
     m_updateNotificationsEnabledAdaptor->setValue(value.updateNotificationsEnabled);
     m_emailSettingsAdaptor->setValue(value.emailSettings);
-    m_useCloudServiceToSendEmailAdaptor->setValue(value.useCloudServiceToSendEmail);
     m_timeSynchronizationEnabledAdaptor->setValue(value.timeSynchronizationEnabled);
     m_primaryTimeServerAdaptor->setValue(value.primaryTimeServer);
     m_customReleaseListUrlAdaptor->setValue(value.customReleaseListUrl);
