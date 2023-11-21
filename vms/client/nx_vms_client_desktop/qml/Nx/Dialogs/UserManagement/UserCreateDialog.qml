@@ -137,7 +137,7 @@ DialogWithState
 
                 enabled: !dialog.isSaving
 
-                onAddGroupRequested: dialog.addGroupRequested(null)
+                onAddGroupRequested: dialog.addGroupRequested()
             }
         }
         Tab
