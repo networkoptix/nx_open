@@ -143,7 +143,7 @@ DialogWithState
                 enabled: !dialog.isSaving
                 editable: dialog.parentGroupsEditable
 
-                onAddGroupRequested: dialog.addGroupRequested(null)
+                onAddGroupRequested: dialog.addGroupRequested()
             }
         }
 
