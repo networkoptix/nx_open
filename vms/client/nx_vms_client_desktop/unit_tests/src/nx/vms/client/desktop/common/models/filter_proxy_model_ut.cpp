@@ -7,6 +7,7 @@
 
 #include <QtCore/QPointer>
 #include <QtCore/QSortFilterProxyModel> //< For layout change testing.
+#include <QtTest/QAbstractItemModelTester>
 
 #include <nx/utils/log/format.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
@@ -58,11 +59,15 @@ public:
         testModel->setDebugChecksEnabled(true);
         testModel->setSourceModel(sourceModel.get());
 
+        modelTester.reset(new QAbstractItemModelTester(testModel.get(),
+            QAbstractItemModelTester::FailureReportingMode::Fatal));
+
         transactionChecker = nx::utils::ModelTransactionChecker::install(testModel.get());
     }
 
     virtual void TearDown() override
     {
+        modelTester.reset();
         testModel.reset();
         sourceModel.reset();
     }
@@ -169,6 +174,7 @@ private:
 public:
     std::unique_ptr<TestItemModel> sourceModel;
     std::unique_ptr<FilterProxyModel> testModel;
+    std::unique_ptr<QAbstractItemModelTester> modelTester;
     QPointer<nx::utils::ModelTransactionChecker> transactionChecker;
 };
 

@@ -3,12 +3,13 @@
 #include <gtest/gtest.h>
 
 #include <iostream>
+#include <memory>
 
 #include <QtCore/QObject>
-#include <QtCore/QScopedPointer>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QStringList>
 #include <QtGui/QStandardItemModel>
+#include <QtTest/QAbstractItemModelTester>
 
 #include <QtCore/private/qabstractitemmodel_p.h>
 
@@ -76,7 +77,10 @@ public:
         testModel.reset(new LinearizationListModel());
         testModel->setSourceModel(sourceModel.get());
 
-        QObject::connect(testModel.data(), &QAbstractItemModel::dataChanged,
+        modelTester.reset(new QAbstractItemModelTester(testModel.get(),
+            QAbstractItemModelTester::FailureReportingMode::Fatal));
+
+        QObject::connect(testModel.get(), &QAbstractItemModel::dataChanged,
             [this](const QModelIndex& top, const QModelIndex& bottom, const QVector<int>& roles)
             {
                 if (dataRoleFilter == -1)
@@ -85,7 +89,7 @@ public:
                     dataChanges << DataChange({{dataRoleFilter}, toString(top), toString(bottom)});
             });
 
-        QObject::connect(sourceModel.data(), &QAbstractItemModel::dataChanged,
+        QObject::connect(sourceModel.get(), &QAbstractItemModel::dataChanged,
             [this](const QModelIndex& top, const QModelIndex& bottom, const QVector<int>& roles)
             {
                 if (dataRoleFilter == -1)
@@ -94,7 +98,7 @@ public:
                     sourceDataChanges << DataChange({{dataRoleFilter}, toString(top), toString(bottom)});
             });
 
-        QObject::connect(testModel.data(), &QAbstractItemModel::rowsAboutToBeInserted,
+        QObject::connect(testModel.get(), &QAbstractItemModel::rowsAboutToBeInserted,
             [this](const QModelIndex& parent, int first, int last)
             {
                 previousRowCount = testModel->rowCount();
@@ -103,13 +107,13 @@ public:
                 ASSERT_TRUE(first >= 0 && first <= previousRowCount);
             });
 
-        QObject::connect(testModel.data(), &QAbstractItemModel::rowsInserted,
+        QObject::connect(testModel.get(), &QAbstractItemModel::rowsInserted,
             [this](const QModelIndex& /*parent*/, int first, int last)
             {
                 ASSERT_EQ(previousRowCount + (last - first + 1), testModel->rowCount());
             });
 
-        QObject::connect(testModel.data(), &QAbstractItemModel::rowsAboutToBeRemoved,
+        QObject::connect(testModel.get(), &QAbstractItemModel::rowsAboutToBeRemoved,
             [this](const QModelIndex& parent, int first, int last)
             {
                 previousRowCount = testModel->rowCount();
@@ -118,7 +122,7 @@ public:
                 ASSERT_TRUE(first >= 0 && last < previousRowCount);
             });
 
-        QObject::connect(testModel.data(), &QAbstractItemModel::rowsRemoved,
+        QObject::connect(testModel.get(), &QAbstractItemModel::rowsRemoved,
             [this](const QModelIndex& /*parent*/, int first, int last)
             {
                 ASSERT_EQ(previousRowCount - (last - first + 1), testModel->rowCount());
@@ -131,6 +135,7 @@ public:
 
     virtual void TearDown() override
     {
+        modelTester.reset();
         testModel.reset();
         sourceModel.reset();
     }
@@ -152,8 +157,9 @@ public:
 
     using LLM = LinearizationListModel;
 
-    QScopedPointer<TestItemModel> sourceModel;
-    QScopedPointer<LinearizationListModel> testModel;
+    std::unique_ptr<TestItemModel> sourceModel;
+    std::unique_ptr<LinearizationListModel> testModel;
+    std::unique_ptr<QAbstractItemModelTester> modelTester;
 
     QList<DataChange> sourceDataChanges;
     QList<DataChange> dataChanges;
