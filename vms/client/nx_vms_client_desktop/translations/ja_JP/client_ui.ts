@@ -2842,7 +2842,7 @@
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation>この証明書に固定する</translation>
+      <translation>この証明書にピン留めする</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
