@@ -7,6 +7,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/user_group_data.h>
 
 namespace nx::vms::client::desktop {
@@ -38,8 +39,8 @@ struct LdapSettings
     Q_PROPERTY(bool startTls MEMBER startTls)
     Q_PROPERTY(bool ignoreCertErrors MEMBER ignoreCertErrors)
     Q_PROPERTY(QList<LdapFilter> filters MEMBER filters)
-    Q_PROPERTY(bool continuousSync MEMBER continuousSync)
-    Q_PROPERTY(bool continuousSyncEditable MEMBER continuousSyncEditable)
+    Q_PROPERTY(bool continuousSyncEnabled MEMBER continuousSyncEnabled)
+    Q_PROPERTY(int continuousSync MEMBER continuousSync)
     Q_PROPERTY(int syncIntervalS MEMBER syncIntervalS)
     Q_PROPERTY(int searchTimeoutS MEMBER searchTimeoutS)
 
@@ -59,8 +60,8 @@ public:
     bool startTls = false;
     bool ignoreCertErrors = false;
     QList<LdapFilter> filters;
-    bool continuousSync = true;
-    bool continuousSyncEditable = true;
+    bool continuousSyncEnabled = true;
+    int continuousSync = (int) nx::vms::api::LdapSettings::Sync::usersAndGroups;
     int syncIntervalS = 3600; //< 1 hour.
     int searchTimeoutS = 60; //< 1 minute.
 
