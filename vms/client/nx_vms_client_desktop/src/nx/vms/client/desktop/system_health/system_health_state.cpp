@@ -123,9 +123,6 @@ SystemHealthState::Private::Private(SystemHealthState* q):
     update(SystemHealthIndex::noLicenses);
 
     // SmtpIsNotSet.
-
-    connect(systemSettings(), &SystemSettings::useCloudServiceToSendEmailChanged,
-        q, updateSlot(smtpIsNotSet));
     connect(systemSettings(), &SystemSettings::emailSettingsChanged,
         q, updateSlot(smtpIsNotSet));
     update(SystemHealthIndex::smtpIsNotSet);
@@ -375,7 +372,7 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
         case SystemHealthIndex::smtpIsNotSet:
             return hasPowerUserPermissions()
                 && !(systemSettings()->emailSettings().isValid()
-                    || systemSettings()->useCloudServiceToSendEmail());
+                    || systemSettings()->emailSettings().useCloudServiceToSendEmail);
 
         case SystemHealthIndex::defaultCameraPasswords:
             return hasPowerUserPermissions() && hasResourcesForMessageType(index);
