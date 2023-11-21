@@ -5,11 +5,11 @@
 #include <cmath> /* For std::fmod. */
 
 #include <QtCore/QSet>
+#include <QtGui/QAction>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
 #include <QtWidgets/QAbstractButton>
 #include <QtWidgets/QAbstractItemView>
-#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QHeaderView>
@@ -20,13 +20,14 @@
 #include <nx/build_info.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h>
 #include <utils/common/variant.h>
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
-
 
 namespace nx::vms::client::desktop {
 
@@ -164,10 +165,8 @@ void OldStyle::polish(QApplication* application)
 {
     base_type::polish(application);
 
-    QFont font;
-    font.setPixelSize(13);
+    QFont font = fontConfig()->normal();
     font.setStyle(QFont::StyleNormal);
-    font.setWeight(QFont::Normal);
     font.setFamily("Roboto");
     application->setFont(font);
 

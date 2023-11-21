@@ -1,15 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Effects 1.0
-import Nx.Items 1.0
-import Nx.RightPanel 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+import Nx.Effects
+import Nx.Items
+import Nx.RightPanel
 
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Bubble
 {
@@ -55,8 +56,8 @@ Bubble
 
             nameColor: ColorTheme.colors.light13
             valueColor: ColorTheme.colors.light7
-            nameFont { pixelSize: 11; weight: Font.Normal }
-            valueFont { pixelSize: 11; weight: Font.Medium }
+            nameFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
+            valueFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
         }
 
         Item
@@ -92,7 +93,7 @@ Bubble
             visible: relevant
 
             color: ColorTheme.colors.light13
-            font { pixelSize: 11; weight: Font.Normal }
+            font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
             wrapMode: Text.Wrap
         }
 

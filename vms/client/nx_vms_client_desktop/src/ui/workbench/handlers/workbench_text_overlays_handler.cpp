@@ -14,6 +14,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -29,6 +31,7 @@
 #include <utils/common/delayed.h>
 
 using namespace nx;
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -64,7 +67,7 @@ QString formatOverlayText(
     constexpr int kCaptionMaxLength = 64;
     constexpr int kDescriptionMaxLength = 512;
     constexpr int kCaptionPixelFontSize = 16;
-    constexpr int kDescriptionPixelFontSize = 13;
+    const auto kDescriptionPixelFontSize = fontConfig()->normal().pixelSize();
 
     QString textHtml;
 

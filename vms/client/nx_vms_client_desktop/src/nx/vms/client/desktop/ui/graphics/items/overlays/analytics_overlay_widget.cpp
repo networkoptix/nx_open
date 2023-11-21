@@ -4,25 +4,23 @@
 
 #include <QtCore/QVector>
 #include <QtGui/QPainter>
-
 #include <QtWidgets/QGraphicsSceneHoverEvent>
 
 #include <nx/utils/log/log.h>
-
+#include <nx/utils/pending_operation.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <ui/common/fixed_rotation.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/core/utils/geometry.h>
-#include <nx/utils/pending_operation.h>
-
 #include "area_tooltip_item.h"
-
 #include "figure/box.h"
-#include "figure/renderer.h"
 #include "figure/figure_item.h"
+#include "figure/renderer.h"
 
 namespace {
 
@@ -176,14 +174,14 @@ AreaTooltipItem::Fonts makeFonts(const QFont& baseFont)
 {
     AreaTooltipItem::Fonts result;
     result.name = baseFont;
-    result.name.setPixelSize(11);
+    result.name.setPixelSize(fontConfig()->small().pixelSize());
 
     result.value = baseFont;
-    result.value.setPixelSize(11);
+    result.value.setPixelSize(fontConfig()->small().pixelSize());
     result.value.setWeight(QFont::Medium);
 
     result.title = baseFont;
-    result.title.setPixelSize(13);
+    result.title.setPixelSize(fontConfig()->normal().pixelSize());
     result.title.setWeight(QFont::Medium);
 
     return result;

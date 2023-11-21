@@ -39,6 +39,7 @@
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -242,6 +243,14 @@ bool initializeLogFromFile(const QString& filename, const QString& suffix)
         nx::branding::desktopClientInternalName(),
         qApp->applicationFilePath(),
         suffix);
+}
+
+QString baseFontConfigPath()
+{
+    if (QString result = ini().fontConfigPath; !result.isEmpty())
+        return result;
+
+    return ":/skin/basic_fonts.json";
 }
 
 } // namespace
@@ -572,6 +581,7 @@ struct ApplicationContext::Private
     std::unique_ptr<RadassController> radassController;
     std::unique_ptr<ResourceFactory> resourceFactory;
     std::unique_ptr<UploadManager> uploadManager;
+    std::unique_ptr<FontConfig> fontConfig;
     std::unique_ptr<QnForgottenSystemsManager> forgottenSystemsManager;
     std::unique_ptr<ResourcesChangesManager> resourcesChangesManager;
     std::unique_ptr<WebPageIconCache> webPageIconCache;
@@ -607,6 +617,7 @@ ApplicationContext::ApplicationContext(
     initializeResources();
     initializeExternalResources();
     QnClientMetaTypes::initialize();
+    storeFontConfig(new FontConfig(baseFontConfigPath()));
     d->initializeSettings();
     d->initializeExceptionHandlerGuard();
 
@@ -923,5 +934,9 @@ nx::cloud::gateway::VmsGatewayEmbeddable* ApplicationContext::cloudGateway() con
     return d->cloudGateway.get();
 }
 
+FontConfig* ApplicationContext::fontConfig() const
+{
+    return static_cast<FontConfig*>(core::ApplicationContext::fontConfig());
+}
 
 } // namespace nx::vms::client::desktop

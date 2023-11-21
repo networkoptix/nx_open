@@ -11,6 +11,7 @@
 #include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 
 class QTextDocument;
 
@@ -71,7 +72,7 @@ struct NX_VMS_CLIENT_DESKTOP_API ExportTextOverlayPersistentSettingsBase:
     ExportOverlayPersistentSettings
 {
     QString text;
-    int fontSize = 15;
+    int fontSize = fontConfig()->large().pixelSize();
     int overlayWidth = 320;
     int indent = 12;
     QColor foreground = Qt::white;

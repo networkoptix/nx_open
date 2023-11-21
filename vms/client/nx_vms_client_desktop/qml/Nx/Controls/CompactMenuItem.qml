@@ -1,10 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
+import QtQuick
 
-import Nx 1.0
-import Nx.Controls 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Controls
+import Nx.Core
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 MenuItem
 {
@@ -22,7 +24,7 @@ MenuItem
         color: menuItem.hovered ? ColorTheme.colors.brand_contrast : ColorTheme.text
         opacity: menuItem.enabled ? 1.0 : 0.3
         verticalAlignment: Text.AlignVCenter
-        font.pixelSize: 13
+        font.pixelSize: FontConfig.normal.pixelSize
         text: menuItem.text
     }
 }

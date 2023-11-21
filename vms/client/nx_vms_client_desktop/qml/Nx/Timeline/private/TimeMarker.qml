@@ -2,6 +2,8 @@
 
 import QtQuick 2.15
 
+import Nx.Core
+import nx.vms.client.core
 import nx.vms.client.desktop 1.0
 
 SliderToolTip
@@ -63,7 +65,8 @@ SliderToolTip
             {
                 id: primaryLabel
 
-                font { pixelSize: 15; weight: Font.Bold }
+                font.pixelSize: FontConfig.large.pixelSize
+                font.bold: true
                 color: timeMarker.textColor
 
                 text: timeMarker.timeText ? timeMarker.timeText : timeMarker.dateText
@@ -74,7 +77,7 @@ SliderToolTip
             {
                 id: secondaryLabel
 
-                font { pixelSize: 15; weight: Font.Normal }
+                font.pixelSize: FontConfig.large.pixelSize
                 color: timeMarker.textColor
 
                 text: timeMarker.timeText ? timeMarker.dateText : ""

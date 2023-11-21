@@ -1,17 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.5
-import QtQuick.Controls 2.5
+import QtQuick
+import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 ToolTip
 {
     id: control
 
-    font.pixelSize: 13
+    font.pixelSize: FontConfig.normal.pixelSize
     leftPadding: 8
     rightPadding: 8
     topPadding: 4

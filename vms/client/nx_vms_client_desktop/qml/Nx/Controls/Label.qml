@@ -5,13 +5,14 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Core 1.0
 
+import nx.vms.client.core
 import nx.vms.client.desktop 1.0
 
 Text
 {
     color: ColorTheme.windowText
 
-    font.pixelSize: 13
+    font.pixelSize: FontConfig.normal.pixelSize
 
     MouseArea
     {

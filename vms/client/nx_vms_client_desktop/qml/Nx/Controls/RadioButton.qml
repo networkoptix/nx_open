@@ -7,6 +7,8 @@ import Nx
 import Nx.Core
 
 import nx.client.desktop
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 RadioButton
 {
@@ -29,7 +31,7 @@ RadioButton
     leftPadding: 20
     rightPadding: 0
 
-    font.pixelSize: 13
+    font.pixelSize: FontConfig.normal.pixelSize
     font.weight: Font.Normal
 
     // Allows to baseline-align other text-based items with the check box.

@@ -53,7 +53,6 @@ using namespace std::chrono;
 
 namespace {
 
-constexpr int kPlaceholderFontPixelSize = 15;
 constexpr int kCounterPanelHeight = 32;
 
 constexpr int kTextSearchHeight = 28;

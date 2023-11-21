@@ -1,10 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {
@@ -65,7 +68,7 @@ Item
                 horizontalAlignment: Text.AlignHCenter
                 textFormat: Text.RichText
                 wrapMode: Text.Wrap
-                font.pixelSize: 15
+                font.pixelSize: FontConfig.large.pixelSize
             }
 
             Text

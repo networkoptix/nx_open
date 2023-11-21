@@ -1,9 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {
@@ -38,6 +40,6 @@ Item
 
         wrapMode: Text.WordWrap
         color: ColorTheme.text
-        font.pixelSize: 13
+        font.pixelSize: FontConfig.normal.pixelSize
     }
 }
