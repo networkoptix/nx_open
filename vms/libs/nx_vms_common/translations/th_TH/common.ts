@@ -202,7 +202,7 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
+      <translation>สมาชิกของกลุ่มนี้ มีสิทธิ์ของระบบไม่จำกัด ผู้ดูแลระบบสามารถสร้างและแก้ไขผู้ใช้, รวมระบบ และเชื่อมต่อหรือยกเลิกการเชื่อมต่อระบบเป็น  %1</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
@@ -1743,7 +1743,7 @@
     </message>
     <message>
       <source>Channel partners service</source>
-      <translation type="unfinished">Channel partners service</translation>
+      <translation>บริการ Channel partners</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
@@ -1752,7 +1752,7 @@
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>องค์กร</translation>
     </message>
   </context>
   <context>

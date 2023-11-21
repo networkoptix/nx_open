@@ -1449,7 +1449,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>Licensen har redan aktiverats</translation>
     </message>
   </context>
   <context>
@@ -1907,15 +1907,15 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Partner information</source>
-      <translation type="unfinished">Partner information</translation>
+      <translation>Partnerinformation</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>Telefoner</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>E-post</translation>
     </message>
   </context>
   <context>
@@ -4216,7 +4216,7 @@ till %1</translation>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
+      <translation>Dessa inställningar gäller endast det system du är inloggad på och kommer att tas bort i framtida versioner.</translation>
     </message>
   </context>
   <context>
@@ -5159,11 +5159,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+      <translation>Om molnlagring aktiveras för säkerhetskopiering, kommer andra säkerhetskopieringslagringar att avaktiveras och alternativet "Allt arkiv" för redan konfigurerade enheter kommer att ändras till "Rörelse, Objekt, Bokmärken"</translation>
     </message>
     <message>
       <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation type="unfinished">If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+      <translation>Om molnlagring aktiveras för säkerhetskopiering, kommer andra säkerhetskopieringslagringar att avaktiveras och alternativet "Allt arkiv" för redan konfigurerade enheter kommer att ändras till "Rörelse, Objekt, Bokmärken"</translation>
     </message>
   </context>
   <context>
@@ -5262,7 +5262,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Sökväg</translation>
     </message>
     <message>
       <source>Type</source>
@@ -5270,7 +5270,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Purpose</source>
-      <translation type="unfinished">Purpose</translation>
+      <translation>Syfte</translation>
     </message>
     <message>
       <source>Size</source>
@@ -6850,15 +6850,15 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
-      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+      <translation>Tillåter användare att komma åt en resurs och se livebilder från en kamera.</translation>
     </message>
     <message>
       <source>Modify Bookmarks</source>
-      <translation type="unfinished">Modify Bookmarks</translation>
+      <translation>Ändra bokmärken</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
-      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+      <translation>Tillåter användaren att styra PTZ, använda 2-vägs ljud, mjuka utlösare och I/O-knappar.</translation>
     </message>
   </context>
   <context>
@@ -7198,7 +7198,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>– Applies to all servers</source>
-      <translation type="unfinished">– Applies to all servers</translation>
+      <translation>– Gäller för alla servrar</translation>
     </message>
   </context>
   <context>
@@ -8307,11 +8307,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your system administrator to do it.</translation>
+      <translation>Denna kamera kräver att lösenordet är konfigurerat. Be din systemadministratör att göra det.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your system administrator to do it.</translation>
+      <translation>Vissa av de valda kamerorna kräver att lösenordet sätts upp. Be systemadministratören att göra det.</translation>
     </message>
   </context>
   <context>
@@ -9194,7 +9194,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>Kan inte ansluta till LDAP-servern</translation>
     </message>
   </context>
   <context>
@@ -9553,7 +9553,7 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
     </message>
     <message>
       <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
+      <translation>Vi rekommenderar att du rådgör med %1 innan du fortsätter.</translation>
     </message>
     <message>
       <source>support</source>
@@ -10318,23 +10318,23 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+      <translation>En integration kan interagera med skrivbordsklienten och begära åtkomst till användarsessionen</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation type="unfinished">Proxy this integration through the server</translation>
+      <translation>Proxy denna integration via servern</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
-      <translation type="unfinished">Proxy this web page through the server</translation>
+      <translation>Proxy denna webbsida via servern</translation>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+      <translation>Tillåt att denna integration öppnas utan SSL-certifikatkontroll</translation>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+      <translation>Tillåt att öppna den här webbsidan utan SSL-certifikatkontroll</translation>
     </message>
     <message>
       <source>New Web Page</source>
@@ -10346,7 +10346,7 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>Ny proxywebbsida</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -10358,19 +10358,19 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>Edit Integration</source>
-      <translation type="unfinished">Edit Integration</translation>
+      <translation>Redigera integration</translation>
     </message>
     <message>
       <source>New Proxied Integration</source>
-      <translation type="unfinished">New Proxied Integration</translation>
+      <translation>Ny proxyintegration</translation>
     </message>
     <message>
       <source>Edit Proxied Integration</source>
-      <translation type="unfinished">Edit Proxied Integration</translation>
+      <translation>Redigera proxyintegration</translation>
     </message>
     <message>
       <source>To allow the use of a client API, create a web integration instead. %1</source>
-      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+      <translation>För att tillåta användning av ett klientAPI, skapa en webbintegration istället. %1</translation>
     </message>
     <message>
       <source>Learn more...</source>
@@ -10515,35 +10515,35 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
       <source>Access granted by %1 group</source>
-      <translation type="unfinished">Access granted by %1 group</translation>
+      <translation>Åtkomst beviljad av %1 grupp</translation>
     </message>
     <message numerus="yes">
       <source>Access granted by %n groups: %1</source>
-      <translation type="unfinished">
-        <numerusform>Access granted by %n groups: %1</numerusform>
-        <numerusform>Access granted by %n groups: %1</numerusform>
+      <translation>
+        <numerusform>Tillgång beviljad av %n grupper: %1</numerusform>
+        <numerusform>Tillgång beviljad av %n grupper: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Access granted by %1 layout</source>
-      <translation type="unfinished">Access granted by %1 layout</translation>
+      <translation>Åtkomst beviljas av %1 layout</translation>
     </message>
     <message numerus="yes">
       <source>Access granted by %n layouts: %1</source>
-      <translation type="unfinished">
-        <numerusform>Access granted by %n layouts: %1</numerusform>
-        <numerusform>Access granted by %n layouts: %1</numerusform>
+      <translation>
+        <numerusform>Tillgång beviljad av %n layouter: %1</numerusform>
+        <numerusform>Tillgång beviljad av %n layouter: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Access granted by %1 video wall</source>
-      <translation type="unfinished">Access granted by %1 video wall</translation>
+      <translation>Åtkomst beviljad av %1 videovägg</translation>
     </message>
     <message numerus="yes">
       <source>Access granted by %n video walls: %1</source>
-      <translation type="unfinished">
-        <numerusform>Access granted by %n video walls: %1</numerusform>
-        <numerusform>Access granted by %n video walls: %1</numerusform>
+      <translation>
+        <numerusform>Åtkomst beviljad av %n videoväggar: %1</numerusform>
+        <numerusform>Åtkomst beviljad av %n videoväggar: %1</numerusform>
       </translation>
     </message>
     <message>
@@ -10552,11 +10552,11 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Webbsidor och integrationer</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Hälsoövervakning</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -10564,16 +10564,16 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>User&apos;s custom permissions</source>
-      <translation type="unfinished">User&apos;s custom permissions</translation>
+      <translation>Användare&apos;anpassade behörigheter</translation>
     </message>
     <message>
       <source>Group&apos;s custom permissions</source>
-      <translation type="unfinished">Group&apos;s custom permissions</translation>
+      <translation>Gruppera&apos;anpassade behörigheter</translation>
     </message>
     <message>
       <source>Access granted by %1</source>
       <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
-      <translation type="unfinished">Access granted by %1</translation>
+      <translation>Åtkomst beviljad av %1</translation>
     </message>
   </context>
   <context>
@@ -10599,7 +10599,7 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
       <source>Password confirmation is required to apply changes</source>
-      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+      <translation>Lösenordsbekräftelse krävs för att tillämpa ändringar</translation>
     </message>
     <message>
       <source>Confirm</source>
@@ -10897,7 +10897,7 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+      <translation>Vattenstämplar kommer att visas över live, arkiverade och exporterade videor endast för icke-poweranvändare. Du och andra avancerade användare kommer inte att se dem.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
@@ -10973,11 +10973,11 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+      <translation>Kontakta en användare med administratörsbehörighet för att lösa problemet.</translation>
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>Inte del av certifikat</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
@@ -11176,15 +11176,15 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Åtkomstlänk</translation>
     </message>
     <message>
       <source>Invalid Link</source>
-      <translation type="unfinished">Invalid Link</translation>
+      <translation>Ogiltig länk</translation>
     </message>
     <message>
       <source>The provided link is not valid</source>
-      <translation type="unfinished">The provided link is not valid</translation>
+      <translation>Den angivna länken är inte giltig</translation>
     </message>
   </context>
   <context>
@@ -11341,7 +11341,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Add more services or fix overuse by stopping using services for some devices.</source>
-      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+      <translation>Lägg till fler tjänster eller åtgärda överanvändning genom att sluta använda tjänster för vissa enheter.</translation>
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
