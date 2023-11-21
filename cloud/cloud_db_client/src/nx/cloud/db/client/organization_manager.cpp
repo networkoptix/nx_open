@@ -31,27 +31,4 @@ void OrganizationManager::bindSystem(
         std::move(completionHandler));
 }
 
-void OrganizationManager::getSystems(
-    const std::string& organizationId,
-    std::function<void(api::ResultCode, std::vector<api::SystemDataEx>)> completionHandler)
-{
-    m_requestsExecutor->executeRequest<std::vector<api::SystemDataEx>>(
-        Method::get,
-        rest::substituteParameters(kOrganizationSystemsPath, {organizationId}),
-        std::move(completionHandler));
-}
-
-void OrganizationManager::shareSystem(
-    const std::string& organizationId,
-    const std::string& systemId,
-    const api::ShareSystemRequest& request,
-    std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
-{
-    m_requestsExecutor->executeRequest<api::SystemSharing>(
-        Method::post,
-        rest::substituteParameters(kOrganizationSystemUsersPath, {organizationId, systemId}),
-        request,
-        std::move(completionHandler));
-}
-
 } // namespace nx::cloud::db::client

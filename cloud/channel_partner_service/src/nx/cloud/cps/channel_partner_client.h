@@ -71,6 +71,10 @@ public:
         const std::string& systemId,
         const std::string& email,
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::User)> handler);
+
+    void getSystemUsers(
+        const std::string& systemId,
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<api::User>)> handler);
 };
 
 } // namespace nx::cloud::cps

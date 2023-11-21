@@ -86,4 +86,15 @@ void ChannelPartnerClient::getSystemUser(
         std::move(handler));
 }
 
+void ChannelPartnerClient::getSystemUsers(
+    const std::string& systemId,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<api::User>)> handler)
+{
+    base_type::template makeAsyncCall<std::vector<api::User>>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(
+            api::kInternalSystemUsersPath, {systemId}),
+        std::move(handler));
+}
+
 } // namespace nx::cloud::cps

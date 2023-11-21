@@ -26,19 +26,6 @@ public:
         const std::string& organizationId,
         SystemRegistrationData registrationData,
         std::function<void(ResultCode, SystemData)> completionHandler) = 0;
-
-    /**
-     * Get all systems bound to the given organization.
-     */
-    virtual void getSystems(
-        const std::string& organizationId,
-        std::function<void(api::ResultCode, std::vector<api::SystemDataEx>)> completionHandler) = 0;
-
-    virtual void shareSystem(
-        const std::string& organizationId,
-        const std::string& systemId,
-        const api::ShareSystemRequest& sharing,
-        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api
