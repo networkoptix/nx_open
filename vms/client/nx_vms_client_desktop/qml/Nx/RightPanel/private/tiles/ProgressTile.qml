@@ -1,9 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Layouts 1.11
+import QtQuick
+import QtQuick.Layouts
 
-import Nx.Controls 1.0
+import Nx.Controls
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 TileBase
 {
@@ -33,8 +35,8 @@ TileBase
                 value: (model && model.progressValue) || 0
                 title: (model && model.display) || ""
 
-                font { pixelSize: 13; weight: Font.DemiBold }
-                percentageFont.pixelSize: 11
+                font { pixelSize: FontConfig.normal.pixelSize; weight: Font.DemiBold }
+                percentageFont.pixelSize: FontConfig.small.pixelSize
             }
 
             Text
@@ -44,7 +46,7 @@ TileBase
                 wrapMode: Text.Wrap
                 visible: text.length
                 color: tile.secondaryForegroundColor
-                font { pixelSize: 11; weight: Font.Normal }
+                font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
 
                 text: (model && model.description) || ""
             }

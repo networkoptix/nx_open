@@ -214,6 +214,9 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, roundDpiScaling,
         "[Design] Whether a DPI scaling factor should be rounded to an integer value.");
 
+    NX_INI_STRING(nullptr, fontConfigPath,
+        "[Design] Path to a file with custom font config.");
+
     // ---------------------------------------------------------------------------------------------
     // Features section
     // Flags here can be removed when QA approves the feature to be definitely present in the

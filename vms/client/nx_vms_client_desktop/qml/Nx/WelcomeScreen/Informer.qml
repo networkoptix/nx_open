@@ -1,12 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQuick.Controls 2.14
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import nx.client.desktop 1.0
+import Nx
+import Nx.Core
+import Nx.Controls
+
+import nx.client.desktop
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {
@@ -37,7 +40,7 @@ Item
         height: control.height
 
         verticalAlignment: Label.AlignVCenter
-        font.pixelSize: 13
+        font.pixelSize: FontConfig.normal.pixelSize
         color: ColorTheme.lighter(ColorTheme.colors.red_core, 3)
     }
 }

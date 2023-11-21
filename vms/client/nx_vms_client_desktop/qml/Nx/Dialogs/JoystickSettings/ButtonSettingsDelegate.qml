@@ -7,6 +7,7 @@ import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Models 1.0
 
+import nx.vms.client.core
 import nx.vms.client.desktop 1.0
 
 Item
@@ -105,7 +106,7 @@ Item
                     maximumLineCount: 1
                     wrapMode: Text.WrapAnywhere
                     elide: Text.ElideRight
-                    font.pixelSize: 13
+                    font.pixelSize: FontConfig.normal.pixelSize
                     color: model.buttonPressed
                         ? ColorTheme.colors.light10
                         : ColorTheme.colors.light4
@@ -151,7 +152,7 @@ Item
                         maximumLineCount: 1
                         wrapMode: Text.WrapAnywhere
                         elide: Text.ElideRight
-                        font.pixelSize: 13
+                        font.pixelSize: FontConfig.normal.pixelSize
                         color: model.buttonPressed
                             ? ColorTheme.darker(ColorTheme.colors.brand_core, 1)
                             : ColorTheme.colors.brand_core

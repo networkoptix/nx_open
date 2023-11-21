@@ -5,6 +5,8 @@ import QtQuick.Layouts
 
 import Nx
 import Nx.Core
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {
@@ -85,8 +87,10 @@ Item
             horizontalAlignment: Text.AlignHCenter
 
             wrapMode: Text.Wrap
+
             font.weight: Font.Normal
-            font.pixelSize: 13
+            font.pixelSize: FontConfig.normal.pixelSize
+
             color: ColorTheme.colors.light4
 
             visible: !!text

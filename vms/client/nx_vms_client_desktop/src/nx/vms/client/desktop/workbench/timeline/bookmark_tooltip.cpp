@@ -3,15 +3,17 @@
 #include "bookmark_tooltip.h"
 
 #include <QtGui/QPainter>
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_bookmark.h>
 #include <flowlayout/flowlayout.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 
 namespace nx::vms::client::desktop::workbench::timeline {
 
@@ -150,7 +152,7 @@ QWidget* BookmarkTooltip::createMoreItemsLabel()
         .arg(core::colorTheme()->color("timeline.bookmark.more_items_label").name()));
 
     QFont font = moreItemsLabel->font();
-    font.setPixelSize(11);
+    font.setPixelSize(fontConfig()->small().pixelSize());
     font.setBold(true);
     moreItemsLabel->setFont(font);
     moreItemsLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);

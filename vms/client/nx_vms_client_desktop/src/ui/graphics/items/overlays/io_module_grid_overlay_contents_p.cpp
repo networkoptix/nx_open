@@ -10,7 +10,11 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -19,7 +23,6 @@ namespace {
 constexpr int kIdFontPixelSize = 12;
 constexpr auto kIdFontWeight = QFont::Normal;
 constexpr auto kActiveIdFontWeight = QFont::Bold;
-constexpr int kLabelFontPixelSize = 13;
 constexpr auto kLabelFontWeight = QFont::DemiBold;
 
 constexpr int kIndicatorWidth = 28;
@@ -52,7 +55,7 @@ static void setupFonts(
     activeIdFont = idFont;
     activeIdFont.setWeight(kActiveIdFontWeight);
     labelFont = baseFont;
-    labelFont.setPixelSize(kLabelFontPixelSize);
+    labelFont.setPixelSize(fontConfig()->normal().pixelSize());
     labelFont.setWeight(kLabelFontWeight);
 }
 

@@ -18,6 +18,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/crypt/crypt.h>
 #include <ui/common/palette.h>
@@ -43,7 +45,7 @@ EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(QWidget* parent):
 
     QFont font = ui->textLabel->font();
     font.setWeight(QFont::Medium);
-    font.setPixelSize(15);
+    font.setPixelSize(fontConfig()->large().pixelSize());
     ui->textLabel->setFont(font);
     setPaletteColor(ui->textLabel, QPalette::WindowText, core::colorTheme()->color("light10"));
 

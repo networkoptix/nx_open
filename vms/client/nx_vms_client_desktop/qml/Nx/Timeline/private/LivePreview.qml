@@ -6,6 +6,7 @@ import Nx
 import Nx.Core
 import Nx.Items
 
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 TimeMarker
@@ -25,7 +26,7 @@ TimeMarker
 
     color: ColorTheme.transparent(baseColor, 0.8)
     textColor: ColorTheme.colors.light1
-    font.pointSize: 11.25
+    font.pixelSize: FontConfig.small.pixelSize
 
     topOverhang: previewHolder.height
     bottomOverhang: markerLineLength

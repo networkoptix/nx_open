@@ -3,6 +3,9 @@
 import QtQuick
 import QtQuick.Layouts
 
+import nx.vms.client.core
+import nx.vms.client.desktop
+
 ColumnLayout
 {
     id: resourceList
@@ -29,7 +32,7 @@ ColumnLayout
             color: resourceList.color
             elide: Text.ElideRight
             text: resourceNames[index]
-            font { pixelSize: 11; weight: Font.Medium }
+            font { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
         }
     }
 
@@ -42,6 +45,6 @@ ColumnLayout
         text: qsTr("...and %n more", "", remainder)
         visible: remainder > 0
         topPadding: 4
-        font { pixelSize: 11; weight: Font.Normal }
+        font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
     }
 }

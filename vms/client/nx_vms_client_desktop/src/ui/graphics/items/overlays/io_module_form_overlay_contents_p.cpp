@@ -9,10 +9,14 @@
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -20,7 +24,6 @@ namespace {
 
 constexpr int kIdFontPixelSize = 12;
 constexpr auto kIdFontWeight = QFont::Normal;
-constexpr int kLabelFontPixelSize = 13;
 constexpr auto kLabelFontWeight = QFont::DemiBold;
 
 constexpr int kIndicatorWidth = 28;
@@ -56,7 +59,7 @@ static void setupFonts(
     idFont.setWeight(kIdFontWeight);
     activeIdFont = idFont;
     labelFont = baseFont;
-    labelFont.setPixelSize(kLabelFontPixelSize);
+    labelFont.setPixelSize(fontConfig()->normal().pixelSize());
     labelFont.setWeight(kLabelFontWeight);
 }
 

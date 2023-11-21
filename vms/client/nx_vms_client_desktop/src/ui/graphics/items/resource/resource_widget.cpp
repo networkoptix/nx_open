@@ -2,7 +2,6 @@
 
 #include "resource_widget.h"
 
-#include <cassert>
 #include <cmath>
 
 #include <QtGui/QPainter>
@@ -34,6 +33,7 @@
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -166,10 +166,7 @@ QnResourceWidget::QnResourceWidget(
         });
 
     /* Set up overlay widgets. */
-    QFont font = this->font();
-    font.setStyleName("Arial");
-    font.setPixelSize(15);
-    setFont(font);
+    setFont(fontConfig()->large());
 
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light1"));
     setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark5"));

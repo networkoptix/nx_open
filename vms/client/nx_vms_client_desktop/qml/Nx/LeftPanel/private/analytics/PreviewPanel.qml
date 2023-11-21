@@ -7,6 +7,7 @@ import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 
+import nx.vms.client.core
 import nx.vms.client.desktop 1.0
 
 import "../../../RightPanel/private"
@@ -199,7 +200,7 @@ Rectangle
                 color: ColorTheme.colors.light16
                 horizontalAlignment: Text.AlignHCenter
 
-                font.pointSize: 15
+                font.pixelSize: FontConfig.large.pixelSize
 
                 text: qsTr("No Preview")
             }
@@ -213,7 +214,7 @@ Rectangle
 
                 wrapMode: Text.WordWrap
                 width: 150
-                font.pointSize: 12
+                font.pixelSize: 12
 
                 text: qsTr("Select the object to display the preview")
             }
@@ -234,7 +235,7 @@ Rectangle
                 id: timeText
                 color: ColorTheme.colors.light16
                 anchors.right: parent.right
-                font.pointSize: 17
+                font.pixelSize: FontConfig.xLarge.pixelSize
                 text: previewPanel.selectedItem ? previewPanel.selectedItem.timestamp.split(" ", 2).pop() : ""
             }
 
@@ -243,7 +244,7 @@ Rectangle
                 id: dateText
                 color: ColorTheme.colors.light16
                 anchors.right: parent.right
-                font.pointSize: 11
+                font.pixelSize: FontConfig.small.pixelSize
                 text:
                 {
                     if (!previewPanel.selectedItem)
@@ -270,7 +271,7 @@ Rectangle
             {
                 id: displayText
                 color: ColorTheme.colors.light10
-                font.pointSize: 17
+                font.pixelSize: FontConfig.xLarge.pixelSize
 
                 width: parent.width
                 elide: Text.ElideRight
@@ -323,8 +324,8 @@ Rectangle
 
                 nameColor: ColorTheme.colors.light16
                 valueColor: ColorTheme.colors.light10
-                nameFont { pixelSize: 13; weight: Font.Normal }
-                valueFont { pixelSize: 13; weight: Font.Normal }
+                nameFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
+                valueFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
 
                 onSearchRequested: (row) =>
                     previewPanel.searchRequested(row)

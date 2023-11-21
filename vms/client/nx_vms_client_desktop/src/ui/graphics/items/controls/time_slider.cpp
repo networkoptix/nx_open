@@ -31,6 +31,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/graphics_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
@@ -180,7 +181,6 @@ const qreal kHoverEffectDistance = 5.0;
 
 const int kStartDragDistance = 5;
 
-const int kBookmarkFontHeight = 11;
 const auto kBookmarkFontWeight = QFont::DemiBold;
 const int kBookmarkTextPadding = 6;
 const int kMinBookmarkTextCharsVisible = 6;
@@ -3202,7 +3202,11 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         if (text != bookmark.name && text.length() - elideStringLength < kMinBookmarkTextCharsVisible)
             continue;
 
-        QPixmap pixmap = m_pixmapCache->textPixmap(text, kBookmarkFontHeight, palette().color(QPalette::BrightText), font);
+        QPixmap pixmap = m_pixmapCache->textPixmap(
+            text,
+            fontConfig()->small().pixelSize(),
+            palette().color(QPalette::BrightText),
+            font);
         const auto dpHeight = pixmap.height() / pixmap.devicePixelRatio();
         qreal textY = qRound(bookmarkRect.top() + (bookmarkRect.height() - dpHeight + 1.0) / 2.0);
         painter->drawPixmap(textRect.left(), textY, pixmap);

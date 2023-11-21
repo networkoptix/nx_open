@@ -7,6 +7,8 @@
 
 #include <common/common_module.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/license/validator.h>
 #include <ui/delegates/license_list_item_delegate.h>
@@ -17,7 +19,6 @@ using namespace nx::vms::client::desktop;
 
 namespace {
 
-static const int kLabelFontPixelSize = 15;
 static const auto kLabelFontWeight = QFont::Bold;
 
 auto licenseSortPriority =
@@ -81,7 +82,7 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget* parent, Qt::Wi
     ui->setupUi(this);
 
     QFont font;
-    font.setPixelSize(kLabelFontPixelSize);
+    font.setPixelSize(fontConfig()->large().pixelSize());
     font.setWeight(kLabelFontWeight);
     ui->label->setFont(font);
     ui->label->setProperty(nx::style::Properties::kDontPolishFontProperty, true);

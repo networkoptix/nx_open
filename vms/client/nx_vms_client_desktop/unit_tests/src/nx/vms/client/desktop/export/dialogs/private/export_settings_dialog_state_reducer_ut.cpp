@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/client/desktop/export/dialogs/private/export_settings_dialog_state.h>
+#include <nx/vms/client/desktop/test_support/test_context.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -11,7 +12,7 @@ namespace {
 
 } // namespace
 
-class ExportSettingsDialogStateReducerTest: public testing::Test
+class ExportSettingsDialogStateReducerTest: public ContextBasedTest
 {
 public:
     using State = ExportSettingsDialogState;

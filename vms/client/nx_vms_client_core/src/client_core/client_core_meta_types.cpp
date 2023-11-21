@@ -30,7 +30,6 @@
 #include <nx/vms/client/core/common/utils/property_update_filter.h>
 #include <nx/vms/client/core/common/utils/validators.h>
 #include <nx/vms/client/core/common/utils/velocity_meter.h>
-#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 #include <nx/vms/client/core/items/grid_viewport.h>
 #include <nx/vms/client/core/media/abstract_time_period_storage.h>
@@ -50,6 +49,8 @@
 #include <nx/vms/client/core/resource/resource_helper.h>
 #include <nx/vms/client/core/settings/global_temporaries.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/thumbnails/abstract_resource_thumbnail.h>
 #include <nx/vms/client/core/time/calendar_model.h>
 #include <nx/vms/client/core/time/date_range.h>
@@ -153,6 +154,7 @@ void initializeMetaTypes()
     AbstractTimePeriodStorage::registerQmlType();
     ChunkProvider::registerQmlType();
     ColorTheme::registerQmlType();
+    FontConfig::registerQmlType();
     GlobalTemporaries::registerQmlType();
     analytics::IconManager::registerQmlType();
     AccessHelper::registerQmlType();

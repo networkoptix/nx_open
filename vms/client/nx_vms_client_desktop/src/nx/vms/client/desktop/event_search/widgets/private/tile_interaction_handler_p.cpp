@@ -47,6 +47,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -718,7 +719,7 @@ QPixmap TileInteractionHandler::createDragPixmap(const QnResourceList& resources
         return {};
 
     static constexpr int kMaximumRows = 10;
-    static constexpr int kFontPixelSize = 13;
+    static const auto kFontPixelSize = fontConfig()->normal().pixelSize();
     static constexpr auto kFontWeight = QFont::Medium;
     static constexpr int kTextIndent = 4;
 

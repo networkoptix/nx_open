@@ -7,6 +7,9 @@ import Nx
 import Nx.Core
 import Nx.Controls
 
+import nx.vms.client.core
+import nx.vms.client.desktop
+
 import ".."
 import "../../globals.js" as RightPanelGlobals
 
@@ -44,7 +47,7 @@ TileBase
 
                 color: tile.secondaryForegroundColor
                 visible: !!text
-                font { pixelSize: 11; weight: Font.Normal }
+                font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
 
                 text: (model && model.timestamp) || ""
             }

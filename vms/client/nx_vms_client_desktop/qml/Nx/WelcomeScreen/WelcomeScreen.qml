@@ -365,7 +365,7 @@ Rectangle
 
             Label
             {
-                font.pixelSize: 13
+                font.pixelSize: FontConfig.normal.pixelSize
 
                 color: ColorTheme.colors.dark17
 
@@ -380,7 +380,7 @@ Rectangle
 
                 LinkButton
                 {
-                    font.pixelSize: 13
+                    font.pixelSize: FontConfig.normal.pixelSize
                     font.underline: true
 
                     text: qsTr("Official Website")
@@ -390,7 +390,7 @@ Rectangle
 
                 LinkButton
                 {
-                    font.pixelSize: 13
+                    font.pixelSize: FontConfig.normal.pixelSize
                     font.underline: true
 
                     text: qsTr("Help & User Manual")
@@ -400,7 +400,7 @@ Rectangle
 
                 LinkButton
                 {
-                    font.pixelSize: 13
+                    font.pixelSize: FontConfig.normal.pixelSize
                     font.underline: true
 
                     text: qsTr("Support")

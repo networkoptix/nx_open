@@ -1,11 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.11
-import QtQuick.Layouts 1.0
-import QtQuick.Controls 2.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 GroupBox
 {
@@ -16,7 +18,7 @@ GroupBox
     topPadding: 32
     bottomPadding: 20
 
-    font.pixelSize: 15
+    font.pixelSize: FontConfig.large.pixelSize
 
     property alias checkable: switchItem.visible
     property alias checked: switchItem.checked
