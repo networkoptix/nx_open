@@ -37,7 +37,6 @@ public:
 
     virtual QModelIndex buddy(const QModelIndex& index) const override;
     virtual QSize span(const QModelIndex& index) const override;
-    virtual bool hasChildren(const QModelIndex& parent = QModelIndex()) const override;
     virtual QModelIndex sibling(int row, int column, const QModelIndex& index) const override;
 
 protected:
@@ -111,6 +110,9 @@ QMap<int, QVariant> AbstractMultiMappingModel<Base>::itemData(const QModelIndex&
 template<class Base>
 Qt::ItemFlags AbstractMultiMappingModel<Base>::flags(const QModelIndex& index) const
 {
+    if (!index.isValid())
+        return {};
+
     const auto sourceIndex = mapToSource(index);
     return sourceIndex.model()
         ? sourceIndex.model()->flags(sourceIndex)
@@ -152,15 +154,6 @@ QSize AbstractMultiMappingModel<Base>::span(const QModelIndex& index) const
     return sourceIndex.model()
         ? sourceIndex.model()->span(sourceIndex)
         : QSize();
-}
-
-template<class Base>
-bool AbstractMultiMappingModel<Base>::hasChildren(const QModelIndex& parent) const
-{
-    const auto sourceParent = mapToSource(parent);
-    return sourceParent.model()
-        ? sourceParent.model()->hasChildren(sourceParent)
-        : false;
 }
 
 template<class Base>
