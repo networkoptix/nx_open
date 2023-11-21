@@ -26,7 +26,6 @@ struct SaveableSystemSettings
     std::optional<bool> cameraSettingsOptimization;
     std::optional<bool> statisticsAllowed;
     std::optional<QString> cloudNotificationsLanguage;
-    std::optional<bool> useCloudServiceToSendEmail;
     std::optional<EmailSettings> emailSettings;
 
     std::optional<bool> timeSynchronizationEnabled;
@@ -51,8 +50,7 @@ struct SaveableSystemSettings
 
 NX_REFLECTION_INSTRUMENT(SaveableSystemSettings,
     (systemName)(autoDiscoveryEnabled)(cameraSettingsOptimization)(statisticsAllowed)
-    (cloudNotificationsLanguage)(useCloudServiceToSendEmail)(emailSettings)
-    (timeSynchronizationEnabled)(primaryTimeServer)
+    (cloudNotificationsLanguage)(emailSettings)(timeSynchronizationEnabled)(primaryTimeServer)
     (watermarkSettings)(auditTrailEnabled)(trafficEncryptionForced)(useHttpsOnlyForCameras)
     (videoTrafficEncryptionForced)(sessionLimitS)(storageEncryption)(showServersInTreeForNonAdmins)
     (updateNotificationsEnabled)(customReleaseListUrl)(clientUpdateSettings)

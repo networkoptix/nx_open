@@ -224,6 +224,8 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
     ui->systemSignatureInput->setPlaceholderText(tr("Enter a short System description here."));
     ui->supportSignatureInput->setPlaceholderText(nx::branding::supportAddress());
+    ui->defaultSignatureInput->setText(nx::branding::supportAddress());
+    ui->defaultSignatureInput->setVisible(false);
 
     // Setup service type dropdown menu.
 
@@ -486,7 +488,7 @@ void OutgoingMailSettingsWidget::Private::updateCloudServiceStatus()
         const auto pendingCloudOptionText = tr("%1 users will start receiving emails immediately "
             "after you apply these settings").arg(nx::branding::shortCloudName());
 
-        setConfigurationStatusHint(q->systemSettings()->useCloudServiceToSendEmail()
+        setConfigurationStatusHint(q->systemSettings()->emailSettings().useCloudServiceToSendEmail
             ? activeCloudOptionText
             : pendingCloudOptionText);
     }
@@ -539,6 +541,9 @@ void OutgoingMailSettingsWidget::Private::setUseCloudServiceToDialog(bool useClo
     ui->serviceTypeDropdown->setMenu(!q->isReadOnly()
         ? effectiveServiceTypeDropdownMenu()
         : nullptr);
+
+    ui->supportSignatureInput->setVisible(!m_useCloudServiceToSendEmail);
+    ui->defaultSignatureInput->setVisible(m_useCloudServiceToSendEmail);
 }
 
 api::EmailSettings OutgoingMailSettingsWidget::Private::getEmailSettingsFromDialog(
@@ -547,7 +552,9 @@ api::EmailSettings OutgoingMailSettingsWidget::Private::getEmailSettingsFromDial
     api::EmailSettings emailSettings = q->systemSettings()->emailSettings();
 
     emailSettings.signature = ui->systemSignatureInput->text();
-    emailSettings.supportAddress = ui->supportSignatureInput->text();
+    emailSettings.supportAddress = getUseCloudServiceFromDialog()
+        ? nx::branding::supportAddress()
+        : ui->supportSignatureInput->text();
 
     if (emailContentsSettingsOnly)
         return emailSettings;
@@ -567,6 +574,8 @@ api::EmailSettings OutgoingMailSettingsWidget::Private::getEmailSettingsFromDial
     emailSettings.port =
         serverUrl.port(QnEmailSettings::defaultPort(emailSettings.connectionType));
 
+    emailSettings.useCloudServiceToSendEmail = getUseCloudServiceFromDialog();
+
     return emailSettings;
 }
 
@@ -575,8 +584,6 @@ void OutgoingMailSettingsWidget::Private::fillEmailSettingsFromDialog() const
     const bool savePassword = smtpSettingsChanged() || smtpSettingsPasswordChanged();
     const bool emailContentsSettingsOnly =
         getUseCloudServiceFromDialog() && emailContentsSettingsChanged();
-
-    q->editableSystemSettings->useCloudServiceToSendEmail = getUseCloudServiceFromDialog();
 
     api::EmailSettings emailSettings = getEmailSettingsFromDialog();
 
@@ -685,7 +692,8 @@ bool OutgoingMailSettingsWidget::Private::emailContentsSettingsChanged() const
 
 bool OutgoingMailSettingsWidget::Private::useCloudServiceChanged() const
 {
-    return q->systemSettings()->useCloudServiceToSendEmail() != getUseCloudServiceFromDialog();
+    return q->systemSettings()->emailSettings().useCloudServiceToSendEmail
+        != getUseCloudServiceFromDialog();
 }
 
 bool OutgoingMailSettingsWidget::Private::validate() const
@@ -741,7 +749,7 @@ OutgoingMailSettingsWidget::~OutgoingMailSettingsWidget()
 void OutgoingMailSettingsWidget::loadDataToUi()
 {
     d->loadEmailSettingsToDialog();
-    d->setUseCloudServiceToDialog(systemSettings()->useCloudServiceToSendEmail());
+    d->setUseCloudServiceToDialog(systemSettings()->emailSettings().useCloudServiceToSendEmail);
     d->updateConfigurationStatus();
 }
 
