@@ -18,16 +18,6 @@ public:
         api::SystemRegistrationData registrationData,
         std::function<void(api::ResultCode, api::SystemData)> completionHandler) override;
 
-    virtual void getSystems(
-        const std::string& organizationId,
-        std::function<void(api::ResultCode, std::vector<api::SystemDataEx>)> completionHandler) override;
-
-    virtual void shareSystem(
-        const std::string& organizationId,
-        const std::string& systemId,
-        const api::ShareSystemRequest& request,
-        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) override;
-
 private:
     AsyncRequestsExecutor* m_requestsExecutor = nullptr;
 };

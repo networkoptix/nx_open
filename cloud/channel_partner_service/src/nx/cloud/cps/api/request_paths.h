@@ -6,6 +6,9 @@ namespace nx::cloud::cps::api {
 
 static constexpr char kSystemBindToOrganizationPath[] = "/partners/cloud_systems/";
 
+static constexpr char kInternalSystemUsersPath[] =
+    "/internal/partners/systems/{systemId}/users";
+
 static constexpr char kInternalSystemUserPath[] =
     "/internal/partners/systems/{systemId}/users/{email}";
 
