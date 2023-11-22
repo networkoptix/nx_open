@@ -7,9 +7,11 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QPainter>
 
-#include <nx/vms/text/human_readable.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/text/human_readable.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 #include "../models/time_synchronization_servers_model.h"
@@ -26,7 +28,6 @@ static constexpr int kMinimumDateWidth = 84;
 static constexpr int kMinimumTimeWidth = 128;
 static constexpr int kRowHeight = 24;
 static constexpr int kExtraTextMargin = 5;
-static constexpr int kTimeOffsetFontSize = 11;
 
 static const QList<QColor> kOffsetColors = {
     QColor::fromRgb(0x91, 0xa7, 0xb2),
@@ -255,7 +256,7 @@ void TimeSynchronizationServersDelegate::paintTime(
         if (textEnd > textPos.x() && !main.elided() && !extraInfo.isEmpty())
         {
             option.font.setWeight(QFont::Normal);
-            option.font.setPixelSize(kTimeOffsetFontSize);
+            option.font.setPixelSize(fontConfig()->small().pixelSize());
 
             const auto extra = m_textPixmapCache.pixmap(
                 extraInfo,

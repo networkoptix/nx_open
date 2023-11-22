@@ -1,15 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Controls 2.5
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Controls 1.0
-import Nx.Core 1.0
-import Nx.Items 1.0
+import Nx
+import Nx.Controls
+import Nx.Core
+import Nx.Items
 
-import nx.vms.client.core 1.0
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 BubbleToolTip
 {
@@ -53,8 +53,8 @@ BubbleToolTip
 
                 nameColor: ColorTheme.colors.light13
                 valueColor: ColorTheme.colors.light7
-                nameFont { pixelSize: 11; weight: Font.Normal }
-                valueFont { pixelSize: 11; weight: Font.Medium }
+                nameFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
+                valueFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
             }
 
             Rectangle

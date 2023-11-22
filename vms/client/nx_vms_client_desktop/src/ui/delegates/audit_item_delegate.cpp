@@ -219,7 +219,7 @@ QSize QnAuditItemDelegate::descriptionSizeHint(const QStyleOptionViewItem& optio
                 if (QnAuditLogModel::hasDetail(record))
                 {
                     QFont smallFont(option.font);
-                    smallFont.setPixelSize(option.font.pixelSize() - 1);
+                    smallFont.setPixelSize(option.font.pixelSize() - 2);
                     QFontMetrics smallFontMetrics(smallFont);
                     result.setHeight(result.height() + (smallFontMetrics.height() + kDetailLineVerticalMargin * 2) * QnAuditLogModel::getCameras(record).size());
                 }
@@ -562,7 +562,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
     if (!cameras.empty() && QnAuditLogModel::hasDetail(record))
     {
         QFont smallFont(option.font);
-        smallFont.setPixelSize(option.font.pixelSize() - 1);
+        smallFont.setPixelSize(option.font.pixelSize() - 2);
         painter->setFont(smallFont);
         painter->setPen(option.palette.color(QPalette::WindowText));
 

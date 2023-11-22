@@ -1,12 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0 as Nx
-import nx.vms.client.core 1.0
+import Nx
+import Nx.Core
+import Nx.Controls as Nx
+
+import nx.vms.client.core
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Button
 {
@@ -51,7 +54,7 @@ Button
             y: 58
             height: 24
 
-            font.pixelSize: 17
+            font.pixelSize: FontConfig.xLarge.pixelSize
             color: ColorTheme.colors.light4
 
             text: qsTr("Log in to") + " " + Branding.cloudName()

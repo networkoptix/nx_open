@@ -9,6 +9,9 @@ import Nx.Core
 import Nx.Controls
 import Nx.Dialogs
 
+import nx.vms.client.core
+import nx.vms.client.desktop
+
 Dialog
 {
     id: dialog
@@ -69,7 +72,7 @@ Dialog
             {
                 text: settingsModel && settingsModel.header || qsTr("Enter parameters")
                 color: ColorTheme.light
-                font.pixelSize: 15
+                font.pixelSize: FontConfig.large.pixelSize
                 font.weight: Font.Bold
 
                 wrapMode: Text.Wrap
@@ -82,7 +85,7 @@ Dialog
                     || qsTr("This action requires some parameters to be filled.")
 
                 color: ColorTheme.windowText
-                font.pixelSize: 13
+                font.pixelSize: FontConfig.normal.pixelSize
 
                 wrapMode: Text.Wrap
                 Layout.fillWidth: true

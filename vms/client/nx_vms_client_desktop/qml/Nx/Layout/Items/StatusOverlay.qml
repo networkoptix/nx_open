@@ -201,7 +201,7 @@ Item
                             ? baseColor
                             : ColorTheme.transparent(baseColor, 0.8)
 
-                        font.pixelSize: 13
+                        font.pixelSize: FontConfig.normal.pixelSize
                         font.weight: Font.Medium
 
                         implicitHeight: 32

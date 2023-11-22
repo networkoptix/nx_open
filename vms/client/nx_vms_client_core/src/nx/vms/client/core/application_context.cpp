@@ -16,6 +16,7 @@
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
@@ -121,6 +122,7 @@ struct ApplicationContext::Private
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
     std::unique_ptr<QnVoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
     std::unique_ptr<ColorTheme> colorTheme;
+    std::unique_ptr<FontConfig> fontConfig;
     std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
     std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
 };
@@ -235,6 +237,16 @@ QnVoiceSpectrumAnalyzer* ApplicationContext::voiceSpectrumAnalyzer() const
 Settings* ApplicationContext::coreSettings() const
 {
     return d->settings.get();
+}
+
+void ApplicationContext::storeFontConfig(FontConfig* config)
+{
+    d->fontConfig.reset(config);
+}
+
+FontConfig* ApplicationContext::fontConfig() const
+{
+    return d->fontConfig.get();
 }
 
 watchers::KnownServerConnections* ApplicationContext::knownServerConnectionsWatcher() const

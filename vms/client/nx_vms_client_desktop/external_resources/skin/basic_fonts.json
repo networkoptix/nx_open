@@ -1,0 +1,6 @@
+{
+    "small": {"size": 11},
+    "normal": {"size": 13},
+    "large": {"size": 15},
+    "xLarge": {"size": 17}
+}

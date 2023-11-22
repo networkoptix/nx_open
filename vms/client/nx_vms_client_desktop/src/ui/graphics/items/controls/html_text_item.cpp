@@ -11,9 +11,13 @@
 
 #include <core/resource/camera_bookmark.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+using namespace nx::vms::client::desktop;
 
 QnHtmlTextItemOptions::QnHtmlTextItemOptions(const QColor &initBackgroundColor
     , bool initAutosize
@@ -77,15 +81,8 @@ void QnHtmlTextItemPrivate::updatePixmap() {
 
     const int maxTextWidth = (options.maxWidth - options.horPadding * 2);
 
-    static const QFont kDefaultFont = []()
-    {
-        QFont font;
-        font.setPixelSize(13);
-        return font;
-    }();
-
     QTextDocument td;
-    td.setDefaultFont(kDefaultFont);
+    td.setDefaultFont(fontConfig()->normal());
     td.setDocumentMargin(0);
     td.setIndentWidth(0);
     td.setHtml(html);
