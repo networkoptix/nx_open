@@ -161,7 +161,9 @@
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
+#include <ui/workbench/handlers/workbench_videowall_handler.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -1550,8 +1552,9 @@ void ActionHandler::at_moveCameraAction_triggered() {
 
 void ActionHandler::at_dropResourcesAction_triggered()
 {
+    const auto currentLayout = context()->workbench()->currentLayout();
     // Showreel Handler will process this action itself.
-    if (context()->workbench()->currentLayout()->isShowreelReviewLayout())
+    if (currentLayout->isShowreelReviewLayout())
         return;
 
     // This method can be called only from the GUI thread.
@@ -1576,13 +1579,19 @@ void ActionHandler::at_dropResourcesAction_triggered()
         foreach (QnVideoWallResourcePtr r, videowalls)
             resources.removeOne(r);
 
-        if (!workbench()->currentLayout()->resource())
+        if (currentLayout->resource()->layoutType() == LayoutResource::LayoutType::videoWall)
+        {
+            context()->instance<QnWorkbenchVideoWallHandler>()->
+                checkResourcesPermissions(resources);
+        }
+
+        if (!currentLayout->resource())
             menu()->trigger(action::OpenNewTabAction);
 
-        NX_ASSERT(workbench()->currentLayout()->resource());
+        NX_ASSERT(currentLayout->resource());
 
-        if (workbench()->currentLayout()->resource() &&
-            workbench()->currentLayout()->resource()->locked() &&
+        if (currentLayout->resource() &&
+            currentLayout->resource()->locked() &&
             !resources.empty() &&
             layouts.empty() &&
             videowalls.empty())
