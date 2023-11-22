@@ -16,10 +16,29 @@ ComboBox
 
     property var selectedValue
 
-    displayText: Utils.getValue(selectedValue, "")
-
+    editable: true
+    currentIndex: -1
     model: Utils.toArray(attribute && attribute.enumeration && attribute.enumeration.items)
 
-    onActivated:
-        selectedValue = currentText
+    onSelectedValueChanged:
+    {
+        editText = Utils.getValue(selectedValue, "")
+        currentIndex = find(editText)
+    }
+
+    function setSelected(value)
+    {
+        selectedValue = (value && find(value) !== -1) ? value : undefined
+        focus = false
+    }
+
+    Keys.onEscapePressed: setSelected(selectedValue)
+
+    onActivated: setSelected(editText)
+    onAccepted: setSelected(editText)
+    onActiveFocusChanged:
+    {
+        if (!activeFocus)
+            setSelected(editText)
+    }
 }

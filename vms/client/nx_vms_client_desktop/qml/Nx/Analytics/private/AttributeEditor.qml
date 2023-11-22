@@ -147,7 +147,11 @@ FocusScope
                         }
 
                         if (!LocalSettings.iniConfigValue("compactSearchFilterEditors"))
-                            return "EnumerationRadioGroup.qml"
+                        {
+                            return attributeEditor.attribute.enumeration.items.length < 10
+                                ? "EnumerationRadioGroup.qml"
+                                : "EnumerationComboBox.qml"
+                        }
 
                         return attributeEditor.attribute.enumeration.items.length < 5
                             ? "EnumerationTagGroup.qml"
