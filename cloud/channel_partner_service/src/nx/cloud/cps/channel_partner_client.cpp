@@ -92,8 +92,17 @@ void ChannelPartnerClient::getSystemUsers(
 {
     base_type::template makeAsyncCall<std::vector<api::User>>(
         nx::network::http::Method::get,
-        nx::network::http::rest::substituteParameters(
-            api::kInternalSystemUsersPath, {systemId}),
+        nx::network::http::rest::substituteParameters(api::kInternalSystemUsersPath, {systemId}),
+        std::move(handler));
+}
+
+void ChannelPartnerClient::getUserSystems(
+    const std::string& email,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<api::SystemAllowance>)> handler)
+{
+    base_type::template makeAsyncCall<std::vector<api::SystemAllowance>>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(api::kInternalUserSystemsPath, {email}),
         std::move(handler));
 }
 

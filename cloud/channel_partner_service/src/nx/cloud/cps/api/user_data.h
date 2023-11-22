@@ -9,6 +9,7 @@
 
 namespace nx::cloud::cps::api {
 
+// Describes organization's system user.
 struct User
 {
     std::string email;
@@ -20,6 +21,15 @@ struct User
     std::vector<std::string> vmsRoles;
 };
 
-NX_REFLECTION_INSTRUMENT(User, (email)(vmsRoles))
+NX_REFLECTION_INSTRUMENT(User, (email)(roles)(vmsRoles))
+
+// Describes user's access to a system.
+struct SystemAllowance
+{
+    std::string system_id;
+    std::vector<std::string> vmsRoles;
+};
+
+NX_REFLECTION_INSTRUMENT(SystemAllowance, (system_id)(vmsRoles))
 
 } // namespace nx::cloud::cps::api
