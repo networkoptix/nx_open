@@ -72,9 +72,16 @@ public:
         const std::string& email,
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::User)> handler);
 
+    /**
+     * The request must be authorized using valid user's OAUTH2 token.
+     */
     void getSystemUsers(
         const std::string& systemId,
         nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<api::User>)> handler);
+
+    void getUserSystems(
+        const std::string& email,
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<api::SystemAllowance>)> handler);
 };
 
 } // namespace nx::cloud::cps

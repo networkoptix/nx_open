@@ -12,4 +12,7 @@ static constexpr char kInternalSystemUsersPath[] =
 static constexpr char kInternalSystemUserPath[] =
     "/internal/partners/systems/{systemId}/users/{email}";
 
+static constexpr char kInternalUserSystemsPath[] =
+    "/internal/partners/users/{email}/systems";
+
 } // namespace nx::cloud::cps::api
