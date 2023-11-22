@@ -22,11 +22,6 @@ public:
         const std::string& organizationId,
         std::function<void(api::ResultCode, std::vector<api::SystemDataEx>)> completionHandler) override;
 
-    virtual void removeSystem(
-        const std::string& organizationId,
-        const std::string& systemId,
-        std::function<void(api::ResultCode)> completionHandler) override;
-
     virtual void shareSystem(
         const std::string& organizationId,
         const std::string& systemId,

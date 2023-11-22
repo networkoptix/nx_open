@@ -7,6 +7,9 @@
 #if defined(__APPLE__) && !defined(_GNU_SOURCE)
     #define _GNU_SOURCE
 #endif
+#if defined(_WIN32)
+    #include <process.h> // for getpid()
+#endif
 
 #include <boost/stacktrace.hpp>
 

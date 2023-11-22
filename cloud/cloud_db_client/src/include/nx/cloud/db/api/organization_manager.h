@@ -34,15 +34,6 @@ public:
         const std::string& organizationId,
         std::function<void(api::ResultCode, std::vector<api::SystemDataEx>)> completionHandler) = 0;
 
-    /**
-     * Remove organization-owned system.
-     * The calling user must the corresponding rights on the organization.
-     */
-    virtual void removeSystem(
-        const std::string& organizationId,
-        const std::string& systemId,
-        std::function<void(ResultCode)> completionHandler) = 0;
-
     virtual void shareSystem(
         const std::string& organizationId,
         const std::string& systemId,

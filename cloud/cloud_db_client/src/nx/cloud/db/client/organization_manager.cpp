@@ -41,17 +41,6 @@ void OrganizationManager::getSystems(
         std::move(completionHandler));
 }
 
-void OrganizationManager::removeSystem(
-    const std::string& organizationId,
-    const std::string& systemId,
-    std::function<void(api::ResultCode)> completionHandler)
-{
-    m_requestsExecutor->executeRequest<void>(
-        Method::delete_,
-        rest::substituteParameters(kOrganizationSystemPath, {organizationId, systemId}),
-        std::move(completionHandler));
-}
-
 void OrganizationManager::shareSystem(
     const std::string& organizationId,
     const std::string& systemId,
