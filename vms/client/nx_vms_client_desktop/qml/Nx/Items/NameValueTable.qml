@@ -280,7 +280,7 @@ Item
         anchors.fill: control
         hoverEnabled: true
 
-        onPositionChanged:
+        onPositionChanged: (mouse) =>
         {
             const row = grid.getRowAtY(mouse.y)
             if (!row)
@@ -291,9 +291,9 @@ Item
             highlight.rowIndex = row.index
         }
 
-        onClicked:
+        onClicked: (mouse) =>
         {
-            if (gridMouseArea.mouseX <= gridMouseArea.width - kCopyWidth)
+            if (mouse.x <= gridMouseArea.width - kCopyWidth)
                 return
 
             if (highlight.rowIndex >= 0)
