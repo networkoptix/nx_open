@@ -132,6 +132,9 @@ Item
                 clientCertSelection.selectNone()
         }
 
+        onFeaturePermissionRequested: (securityOrigin, feature) =>
+            grantFeaturePermission(securityOrigin, feature, false)
+
         function showDialog(methodName, request)
         {
             if (controller)
