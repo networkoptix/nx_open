@@ -2,11 +2,13 @@
 
 #include "placeholder_widget.h"
 
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QVBoxLayout>
 
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 
 namespace nx::vms::client::desktop {
@@ -14,7 +16,6 @@ namespace nx::vms::client::desktop {
 namespace {
 
 constexpr auto kPlaceholderSpacing = 16;
-constexpr auto kPlaceholderFontSize = 15;
 constexpr auto kPlaceholderMargins = 24;
 const auto kPlaceholderIconSize = QSize{64, 64};
 
@@ -33,10 +34,8 @@ PlaceholderWidget::PlaceholderWidget(QWidget* parent): QWidget{parent}
 
     m_placeholderText = new QLabel;
     m_placeholderText->setWordWrap(true);
-    QFont font;
-    font.setPixelSize(kPlaceholderFontSize);
     m_placeholderText->setProperty(style::Properties::kDontPolishFontProperty, true);
-    m_placeholderText->setFont(font);
+    m_placeholderText->setFont(fontConfig()->large());
     m_placeholderText->setForegroundRole(QPalette::Mid);
     m_placeholderText->setAlignment(Qt::AlignCenter);
     m_placeholderText->setWordWrap(true);

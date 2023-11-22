@@ -8,13 +8,15 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <ui/animation/opacity_animator.h>
 #include <qt_graphics_items/graphics_label.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <ui/animation/opacity_animator.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 using namespace std::chrono;
 using namespace nx::vms::client;
@@ -59,7 +61,7 @@ QnActionIndicatorItem::QnActionIndicatorItem(QGraphicsWidget* parent):
     d->indicator->setIndicatorColor(core::colorTheme()->color("light1"));
 
     QFont font;
-    font.setPixelSize(11);
+    fontConfig()->small().pixelSize();
     font.setWeight(QFont::Medium);
     d->label->setProperty(nx::style::Properties::kDontPolishFontProperty, true);
     d->label->setFont(font);

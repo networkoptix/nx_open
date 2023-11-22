@@ -6,6 +6,9 @@ import Nx
 import Nx.Core
 import Nx.Controls
 
+import nx.vms.client.core
+import nx.vms.client.desktop
+
 import "date_utils.js" as DateUtils
 
 Item
@@ -66,7 +69,7 @@ Item
             {
                 id: buttonText
                 anchors.centerIn: parent
-                font.pixelSize: 11
+                font.pixelSize: FontConfig.small.pixelSize
                 font.capitalization: Font.AllUppercase
                 topPadding: 2
                 bottomPadding: 2

@@ -9,6 +9,9 @@ import Nx.Controls
 import Nx.Effects
 import Nx.Items
 
+import nx.vms.client.core
+import nx.vms.client.desktop
+
 import ".."
 import "../../globals.js" as RightPanelGlobals
 import "metrics.js" as Metrics
@@ -87,7 +90,7 @@ TileBase
                 elide: Text.ElideRight
 
                 color: (model && model.foregroundColor) || tile.foregroundColor
-                font { pixelSize: 13; weight: Font.Medium }
+                font { pixelSize: FontConfig.normal.pixelSize; weight: Font.Medium }
 
                 rightPadding: (isCloseable && !timestamp.text.length)
                     ? closeButton.width
@@ -110,7 +113,7 @@ TileBase
                 topPadding: 2
                 color: tile.secondaryForegroundColor
                 visible: !!text && !(tile.isCloseable && tile.hovered)
-                font { pixelSize: 11; weight: Font.Normal }
+                font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
 
                 text: (model && model.timestamp) || ""
             }
@@ -173,7 +176,7 @@ TileBase
             visible: !!text
 
             color: tile.foregroundColor
-            font { pixelSize: 11; weight: Font.Normal }
+            font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
             textFormat: NxGlobals.mightBeHtml(textSource) ? Text.RichText : Text.PlainText
             wrapMode: Text.Wrap
 
@@ -196,8 +199,8 @@ TileBase
 
             nameColor: ColorTheme.colors.light16
             valueColor: ColorTheme.colors.light10
-            nameFont { pixelSize: 11; weight: Font.Normal }
-            valueFont { pixelSize: 11; weight: Font.Medium }
+            nameFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
+            valueFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
         }
 
         Text
@@ -208,7 +211,7 @@ TileBase
             visible: !!text
 
             color: tile.foregroundColor
-            font { pixelSize: 11; weight: Font.Normal }
+            font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
             textFormat: Text.RichText
             wrapMode: Text.Wrap
 

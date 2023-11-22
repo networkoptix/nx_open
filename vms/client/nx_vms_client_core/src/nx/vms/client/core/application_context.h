@@ -19,6 +19,7 @@ namespace nx::vms::client::core {
 
 class ColorTheme;
 class CloudStatusWatcher;
+class FontConfig;
 class Settings;
 
 namespace watchers { class KnownServerConnections; }
@@ -72,6 +73,11 @@ public:
     ColorTheme* colorTheme() const;
 
     watchers::KnownServerConnections* knownServerConnectionsWatcher() const;
+
+    FontConfig* fontConfig() const;
+
+protected:
+    void storeFontConfig(FontConfig* config);
 
 private:
     struct Private;

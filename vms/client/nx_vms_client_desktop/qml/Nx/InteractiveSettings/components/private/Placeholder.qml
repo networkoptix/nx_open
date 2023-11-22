@@ -8,6 +8,9 @@ import Nx
 import Nx.Core
 import Nx.Controls
 
+import nx.vms.client.core
+import nx.vms.client.desktop
+
 /**
  * Interactive Settings private type.
  */
@@ -46,7 +49,7 @@ Control
             color: ColorTheme.colors.dark17
             visible: text
             horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 15
+            font.pixelSize: FontConfig.large.pixelSize
             lineHeightMode: Text.FixedHeight
             lineHeight: 20
             wrapMode: Text.Wrap
@@ -68,7 +71,7 @@ Control
             color: ColorTheme.colors.dark17
             visible: text
             horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 13
+            font.pixelSize: FontConfig.large.pixelSize
             lineHeightMode: Text.FixedHeight
             lineHeight: 16
             wrapMode: Text.Wrap

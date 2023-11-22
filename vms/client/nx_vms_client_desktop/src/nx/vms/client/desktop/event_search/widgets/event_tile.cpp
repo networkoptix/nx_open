@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
@@ -46,13 +47,6 @@ static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewR
 
 static constexpr auto kRoundingRadius = 2;
 static constexpr int kTileTitleLineLimit = 2;
-
-static constexpr int kTitleFontPixelSize = 13;
-static constexpr int kTimestampFontPixelSize = 11;
-static constexpr int kDescriptionFontPixelSize = 11;
-static constexpr int kResourceListFontPixelSize = 11;
-static constexpr int kAndMoreFontPixelSize = 11; //< "...and n more"
-static constexpr int kFooterFontPixelSize = 11;
 
 static constexpr auto kTitleFontWeight = QFont::Medium;
 static constexpr auto kTimestampFontWeight = QFont::Normal;
@@ -249,7 +243,7 @@ struct EventTile::Private
                 text += nx::format("<p style='color: %1; font-size: %2px; font-weight: %3; margin-top: %4'>%5</p>")
                     .args(
                         q->palette().color(QPalette::WindowText).name(),
-                        kAndMoreFontPixelSize,
+                        fontConfig()->small().pixelSize(),
                         (int) kAndMoreFontWeight,
                         kAndMoreTopMargin,
                         tr("...and %n more", "", andMore));
@@ -395,18 +389,18 @@ EventTile::EventTile(QWidget* parent):
 
     QFont font;
     font.setWeight(kTitleFontWeight);
-    font.setPixelSize(kTitleFontPixelSize);
+    font.setPixelSize(fontConfig()->normal().pixelSize());
     ui->nameLabel->setFont(font);
     ui->nameLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->nameLabel->setOpenExternalLinks(false);
 
     font.setWeight(kTimestampFontWeight);
-    font.setPixelSize(kTimestampFontPixelSize);
+    font.setPixelSize(fontConfig()->small().pixelSize());
     ui->timestampLabel->setFont(font);
     ui->timestampLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
 
     font.setWeight(kDescriptionFontWeight);
-    font.setPixelSize(kDescriptionFontPixelSize);
+    font.setPixelSize(fontConfig()->small().pixelSize());
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->descriptionLabel->setOpenExternalLinks(false);
@@ -417,13 +411,13 @@ EventTile::EventTile(QWidget* parent):
     ui->debugPreviewTimeLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
 
     font.setWeight(kResourceListFontWeight);
-    font.setPixelSize(kResourceListFontPixelSize);
+    font.setPixelSize(fontConfig()->small().pixelSize());
     ui->resourceListLabel->setFont(font);
     ui->resourceListLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->resourceListLabel->setOpenExternalLinks(false);
 
     font.setWeight(kFooterFontWeight);
-    font.setPixelSize(kFooterFontPixelSize);
+    font.setPixelSize(fontConfig()->small().pixelSize());
     ui->attributeTable->setFont(font);
     ui->attributeTable->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->footerLabel->setFont(font);

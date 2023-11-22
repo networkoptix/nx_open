@@ -7,6 +7,8 @@ import Nx
 import Nx.Core
 
 import nx.client.desktop
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 AbstractButton
 {
@@ -19,7 +21,7 @@ AbstractButton
     property alias iconRotation: buttonIcon.rotation
     property alias truncated: buttonText.truncated
 
-    font.pixelSize: 13
+    font.pixelSize: FontConfig.normal.pixelSize
     hoverEnabled: enabled
     background: null
     spacing: text ? 2 : 0

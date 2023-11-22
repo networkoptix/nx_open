@@ -7,6 +7,8 @@ import QtQuick.Layouts
 import Nx
 import Nx.Core
 import Nx.Controls
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Button
 {
@@ -26,7 +28,7 @@ Button
     property int desiredState: SelectableTextButton.Unselected
     readonly property int state: d.state
 
-    font.pixelSize: 13
+    font.pixelSize: FontConfig.normal.pixelSize
     font.weight: Font.Normal
 
     implicitHeight: Math.max(topPadding + bottomPadding + implicitContentHeight, 24)

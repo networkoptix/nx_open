@@ -1,10 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
-import QtQuick.Controls 2.14
+import QtQuick
+import QtQuick.Controls
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 MenuItem
 {
@@ -65,7 +67,7 @@ MenuItem
                 height: menuItem.contentItem.implicitHeight
 
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 13
+                font.pixelSize: FontConfig.normal.pixelSize
                 color: hovered ? ColorTheme.highlightContrast : ColorTheme.text
 
                 text: menuItem.text
@@ -86,7 +88,7 @@ MenuItem
                 : ColorTheme.lighter(ColorTheme.windowText, 4)
 
             verticalAlignment: Text.AlignVCenter
-            font.pixelSize: 13
+            font.pixelSize: FontConfig.normal.pixelSize
 
             visible: action && (action.shortcut !== null)
             text: (action && action.shortcut) ? NxGlobals.shortcutText(action.shortcut) : ""

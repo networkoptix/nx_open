@@ -1,9 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.11
+import QtQuick
 
-import Nx 1.0
-import Nx.Core 1.0
+import Nx
+import Nx.Core
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Text
 {
@@ -16,7 +18,7 @@ Text
 
     leftPadding: 16
     rightPadding: 16
-    font.pixelSize: 13
+    font.pixelSize: FontConfig.normal.pixelSize
     width: parent.width
     height: 24
     verticalAlignment: Text.AlignVCenter

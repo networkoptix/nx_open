@@ -51,6 +51,7 @@
 #include <nx/vms/client/core/settings/global_temporaries.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/thumbnails/abstract_resource_thumbnail.h>
 #include <nx/vms/client/core/time/calendar_model.h>
 #include <nx/vms/client/core/time/date_range.h>
@@ -153,6 +154,7 @@ void initializeMetaTypes()
     AbstractTimePeriodStorage::registerQmlType();
     ChunkProvider::registerQmlType();
     ColorTheme::registerQmlType();
+    FontConfig::registerQmlType();
     GlobalTemporaries::registerQmlType();
     analytics::IconManager::registerQmlType();
     AbstractCameraButtonController::registerQmlType();

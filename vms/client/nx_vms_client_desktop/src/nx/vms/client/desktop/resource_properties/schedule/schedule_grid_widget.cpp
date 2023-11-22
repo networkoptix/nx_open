@@ -13,17 +13,20 @@
 #include <QtWidgets/QApplication>
 
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource_properties/schedule/schedule_cell_painter.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/common/utils/schedule.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+namespace nx::vms::client::desktop {
 
 namespace {
 
 static constexpr auto kRowCount = nx::vms::common::kDaysInWeek;
 static constexpr auto kColumnCount = nx::vms::common::kHoursInDay;
 
-static constexpr int kHeaderFontPixelSize = 13;
 static constexpr auto kHeaderFontWeight = QFont::Medium;
 
 static constexpr int kVerticalHeaderLabelsMargin = 8;
@@ -31,7 +34,7 @@ static constexpr int kVerticalHeaderLabelsMargin = 8;
 QFont headerFont()
 {
     QFont font;
-    font.setPixelSize(kHeaderFontPixelSize);
+    font.setPixelSize(fontConfig()->normal().pixelSize());
     font.setWeight(kHeaderFontWeight);
     return font;
 }
@@ -67,8 +70,6 @@ QMargins uniformMargins(int margin)
 }
 
 } // namespace
-
-namespace nx::vms::client::desktop {
 
 struct ScheduleGridWidget::Private
 {

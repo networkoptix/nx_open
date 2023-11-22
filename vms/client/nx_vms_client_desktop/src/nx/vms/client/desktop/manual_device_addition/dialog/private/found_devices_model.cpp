@@ -8,6 +8,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
+
+namespace nx::vms::client::desktop {
 
 namespace {
 
@@ -24,14 +28,12 @@ IdsSet extractIds(const std::vector<nx::vms::api::DeviceModelForSearch>& devices
 QFont selectionColumnFont()
 {
     QFont result;
-    result.setPixelSize(13);
+    result.setPixelSize(fontConfig()->normal().pixelSize());
     result.setWeight(QFont::Light);
     return result;
 }
 
 } // namespace
-
-namespace nx::vms::client::desktop {
 
 FoundDevicesModel::FoundDevicesModel(QObject* parent):
     base_type(parent)

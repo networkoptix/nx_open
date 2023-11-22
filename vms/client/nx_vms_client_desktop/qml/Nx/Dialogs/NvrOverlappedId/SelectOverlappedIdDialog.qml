@@ -10,6 +10,7 @@ import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Dialogs 1.0
 
+import nx.vms.client.core
 import nx.vms.client.desktop 1.0
 
 Dialog
@@ -58,7 +59,7 @@ Dialog
                 anchors.topMargin: 12
                 anchors.bottomMargin: 12
 
-                font.pixelSize: 13
+                font.pixelSize: FontConfig.normal.pixelSize
                 color: ColorTheme.colors.light10
                 wrapMode: Text.WordWrap
 

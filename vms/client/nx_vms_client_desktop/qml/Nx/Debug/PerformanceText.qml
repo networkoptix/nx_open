@@ -1,18 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+import QtQuick
 
-import QtQuick 2.6
+import Nx
+import Nx.Core
 
-import Nx 1.0
-import Nx.Core 1.0
-import nx.vms.client.desktop 1.0
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Text
 {
     text: performanceInfo.text
     textFormat: Text.RichText
     color: ColorTheme.highlight
-    font.pixelSize: 13
+    font.pixelSize: FontConfig.normal.pixelSize
 
     visible: performanceInfo.visible
 

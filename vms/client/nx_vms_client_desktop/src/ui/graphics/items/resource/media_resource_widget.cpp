@@ -80,6 +80,7 @@
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/camera_button_manager.h>
 #include <nx/vms/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -2124,8 +2125,6 @@ QString QnMediaResourceWidget::calculateDetailsText() const
         }
     }
 
-    static const int kDetailsTextPixelSize = 11;
-
     QString result;
     const auto addDetailsString =
         [&result](const QString& value)
@@ -2134,7 +2133,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
             {
                 result.append(html::styledParagraph(
                     value,
-                    kDetailsTextPixelSize,
+                    fontConfig()->small().pixelSize(),
                     /*bold*/ true));
             }
         };

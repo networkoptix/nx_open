@@ -1,8 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import Nx 1.0
-import Nx.Core 1.0
+import QtQuick
+import Nx
+import Nx.Core
+
+import nx.vms.client.core
+import nx.vms.client.desktop
 
 Item
 {
@@ -54,7 +57,7 @@ Item
         leftPadding: 3
         rightPadding: 3
 
-        font.pixelSize: 15
+        font.pixelSize: FontConfig.large.pixelSize
         font.weight: Font.Bold
 
         color: ColorTheme.brightText

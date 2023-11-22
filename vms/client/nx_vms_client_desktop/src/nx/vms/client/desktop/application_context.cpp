@@ -44,6 +44,7 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
@@ -261,6 +262,14 @@ bool initializeLogFromFile(const QString& filename, const QString& suffix)
         nx::branding::desktopClientInternalName(),
         qApp->applicationFilePath(),
         suffix);
+}
+
+QString baseFontConfigPath()
+{
+    if (QString result = ini().fontConfigPath; !result.isEmpty())
+        return result;
+
+    return ":/skin/basic_fonts.json";
 }
 
 QPalette makeApplicationPalette()
@@ -690,6 +699,7 @@ ApplicationContext::ApplicationContext(
     initializeResources();
     initializeExternalResources();
     QnClientMetaTypes::initialize();
+    storeFontConfig(new FontConfig(baseFontConfigPath()));
     d->initializeSettings();
     d->initializeExceptionHandlerGuard();
 
@@ -1021,6 +1031,11 @@ QnForgottenSystemsManager* ApplicationContext::forgottenSystemsManager() const
 nx::cloud::gateway::VmsGatewayEmbeddable* ApplicationContext::cloudGateway() const
 {
     return d->cloudGateway.get();
+}
+
+FontConfig* ApplicationContext::fontConfig() const
+{
+    return static_cast<FontConfig*>(core::ApplicationContext::fontConfig());
 }
 
 joystick::Manager* ApplicationContext::joystickManager() const

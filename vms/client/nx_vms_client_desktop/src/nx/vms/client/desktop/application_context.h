@@ -26,6 +26,7 @@ class ClientStateHandler;
 class CloudCrossSystemManager;
 class CloudLayoutsManager;
 class ContextStatisticsModule;
+class FontConfig;
 class LocalSettings;
 class ObjectDisplaySettings;
 class PerformanceMonitor;
@@ -235,6 +236,8 @@ public:
     WebPageIconCache* webPageIconCache() const;
 
     nx::cloud::gateway::VmsGatewayEmbeddable* cloudGateway() const;
+
+    FontConfig* fontConfig() const;
 
     joystick::Manager* joystickManager() const;
 
