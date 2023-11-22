@@ -36,9 +36,6 @@ Item
     readonly property var availableAccessRightDescriptors:
         Array.prototype.slice.call(AccessRightsList.items) //< Deep copy to JS for optimization.
 
-    readonly property var availableAccessRights:
-        Array.prototype.map.call(availableAccessRightDescriptors, item => item.accessRight)
-
     // Acts as a minimum width for the dialog.
     implicitWidth: Math.max(footerRow.width + control.buttonBox.implicitWidth,
         accessRightsHeader.width + 320 /*some sensible minimum for the tree*/)
@@ -132,8 +129,8 @@ Item
         {
             id: hoveredColumnBackground
 
-            readonly property int index:
-                control.availableAccessRights.indexOf(tree.hoveredColumnAccessRight)
+            readonly property int index: availableAccessRightDescriptors.findIndex(
+                item => item.accessRight === tree.hoveredColumnAccessRight)
 
             x: index * accessRightsHeader.columnWidth
 
@@ -166,6 +163,7 @@ Item
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
 
         property int nextBatchCheckState: Qt.Checked
+        property int selectionSize: 0
 
         property var currentSearchRegExp: null
 
@@ -201,6 +199,9 @@ Item
 
         hoverHighlightColor:
         {
+            if (!control.editingEnabled)
+                return "transparent"
+
             if (!hoveredItem)
                 return ColorTheme.colors.dark8
 
@@ -233,13 +234,17 @@ Item
 
         selectAllSiblingsRoleName: "nodeType"
 
-        function updateNextBatchCheckState()
+        function updateSelectionInfo()
         {
             if (!hoveredColumnAccessRight || !control.editingContext)
                 return
 
+            const selection = tree.selection()
+
             const currentCheckState = control.editingContext.combinedOwnCheckState(
-                tree.selection(), hoveredColumnAccessRight)
+                selection, hoveredColumnAccessRight)
+
+            selectionSize = selection.length
 
             nextBatchCheckState = currentCheckState === Qt.Checked
                 ? Qt.Unchecked
@@ -247,15 +252,15 @@ Item
         }
 
         onSelectionChanged:
-            updateNextBatchCheckState()
+            updateSelectionInfo()
 
         onHoveredColumnAccessRightChanged:
-            updateNextBatchCheckState()
+            updateSelectionInfo()
 
         Connections
         {
             target: control.editingContext
-            function onResourceAccessChanged() { tree.updateNextBatchCheckState() }
+            function onResourceAccessChanged() { tree.updateSelectionInfo() }
             function onSubjectChanged() { tree.clearSelection(/*clearCurrentIndex*/ true) }
         }
 
@@ -282,9 +287,10 @@ Item
             implicitHeight: control.kRowHeight
             editingEnabled: control.editingEnabled
             automaticDependencies: automaticDependenciesSwitch.checked
-            accessRightsList: control.availableAccessRights
+            accessRightDescriptors: control.availableAccessRightDescriptors
             highlightRegExp: tree.currentSearchRegExp
             hoveredColumnAccessRight: tree.hoveredColumnAccessRight
+            selectionSize: tree.selectionSize
 
             externalNextCheckState: tree.nextBatchCheckState
 
@@ -529,7 +535,7 @@ Item
             visible: control.editingEnabled
                 && !GlobalTemporaries.automaticAccessDependencySwitchVisible
 
-            text: qsTr("Use %1 or %2 to select multiple lines, or %3 to clear the selection",
+            text: qsTr("Use %1 or %2 to select multiple resources, or %3 to clear the selection",
                 "%1, %2 and %3 will be replaced with keyboard key names")
                     .arg("<b>" + NxGlobals.modifierName(Qt.ControlModifier) + "</b>")
                     .arg("<b>" + NxGlobals.modifierName(Qt.ShiftModifier) + "</b>")

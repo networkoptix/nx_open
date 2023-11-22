@@ -85,7 +85,10 @@ public:
         CheckedChildCountRole,
         CheckedAndInheritedChildCountRole,
         AccessRightRole,
-        EditableRole
+        InheritanceInfoTextRole,
+        EditableRole,
+        DependentAccessRightsRole,
+        RequiredAccessRightsRole
     };
 
 public:
