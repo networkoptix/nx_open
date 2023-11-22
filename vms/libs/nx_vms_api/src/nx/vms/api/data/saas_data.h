@@ -324,14 +324,4 @@ struct NX_VMS_API SaasData
 #define SaasData_fields (cloudSystemId)(channelPartner)(organization)(state)(services)(security)
 NX_REFLECTION_INSTRUMENT(SaasData, SaasData_fields)
 
-struct NX_VMS_API UpdateCloudDataRequest
-{
-    /**%apidoc Wait until request to the cloud service is completed. */
-    bool waitForDone = false;
-};
-#define UpdateCloudDataRequest_Fields (waitForDone)
-
-NX_REFLECTION_INSTRUMENT(UpdateCloudDataRequest, UpdateCloudDataRequest_Fields)
-NX_VMS_API_DECLARE_STRUCT_EX(UpdateCloudDataRequest, (json))
-
 } // namespace nx::vms::api
