@@ -74,6 +74,10 @@ public:
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) override;
 
+    virtual void getSystemDataSyncSettings(
+        const std::string& systemId,
+        std::function<void(api::ResultCode, api::DataSyncSettings)> completionHandler) override;
+
     virtual void startMerge(
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemBeingMerged,

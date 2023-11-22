@@ -176,6 +176,16 @@ void SystemManager::getSystemHealthHistory(
         std::move(completionHandler));
 }
 
+void SystemManager::getSystemDataSyncSettings(
+    const std::string& systemId,
+    std::function<void(api::ResultCode, api::DataSyncSettings)> completionHandler)
+{
+    m_requestsExecutor->executeRequest<api::DataSyncSettings>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(kSystemDataSyncSettingsPath, {systemId}),
+        std::move(completionHandler));
+}
+
 void SystemManager::startMerge(
     const std::string& idOfSystemToMergeTo,
     const std::string& idOfSystemBeingMerged,
