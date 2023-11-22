@@ -52,8 +52,8 @@ TabButton
 
     leftPadding: secondaryStyle ? 2 : 10
     rightPadding: secondaryStyle ? 2 : 10
-    topPadding: 6
-    bottomPadding: 6
+    topPadding: 8
+    bottomPadding: 8
     spacing: 4
 
     width: !tabButton.compact || isCurrent ? implicitWidth : (leftPadding + image.width + spacing)
