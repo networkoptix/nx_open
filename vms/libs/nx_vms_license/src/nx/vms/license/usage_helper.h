@@ -24,7 +24,6 @@ struct LicenseServer
     static const nx::utils::Url activateV2Url(common::SystemContext* context);
     static const nx::utils::Url deactivateUrl(common::SystemContext* context);
     static const nx::utils::Url validateUrl(common::SystemContext* context);
-    static const nx::utils::Url cloudLicensesUrl(common::SystemContext* context);
     static const nx::utils::Url inspectUrl(common::SystemContext* context);
 private:
     static const QString baseUrl(common::SystemContext* context);
