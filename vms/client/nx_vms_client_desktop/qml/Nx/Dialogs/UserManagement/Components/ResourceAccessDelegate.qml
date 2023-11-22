@@ -18,7 +18,7 @@ Item
     property alias selectionMode: mainDelegate.selectionMode
     property alias showResourceStatus: mainDelegate.showResourceStatus
 
-    property alias accessRightsList: accessRightsModel.accessRightsList
+    property var accessRightDescriptors: []
 
     property alias highlightRegExp: mainDelegate.highlightRegExp
 
@@ -42,6 +42,8 @@ Item
     readonly property int externallySelectedAccessRight: (selected || parentNodeSelected)
         ? hoveredColumnAccessRight
         : 0
+
+    property int selectionSize: 0
 
     property var externallyHoveredGroups // {indexes[], accessRight, toggledOn, fromSelection}
 
@@ -91,6 +93,7 @@ Item
 
         context: root.editingContext
         resourceTreeIndex: root.resourceTreeIndex
+        accessRightsList: root.accessRightDescriptors.map(item => item.accessRight)
     }
 
     Row
@@ -118,7 +121,85 @@ Item
                     hoverEnabled: true
                     acceptedButtons: Qt.LeftButton
 
-                    GlobalToolTip.text: model.toolTip
+                    GlobalToolTip.text:
+                        root.editingEnabled ? normalTooltipText() : readonlyTooltipText()
+
+                    function readonlyTooltipText()
+                    {
+                        const name = "<b>" + root.accessRightDescriptors[index].name + "</b>"
+
+                        if (toggledOn)
+                        {
+                            const ownPermissionText = qsTr("Has %1 permission",
+                                "%1 will be substituted with a permission name").arg(name)
+
+                            if (!model.inheritanceInfoText)
+                                return ownPermissionText
+
+                            return ownPermissionText + "<br><br>"
+                                + qsTr("Also inherits it from:", "'it' refers to a permission")
+                                + "<br>" + model.inheritanceInfoText
+                        }
+
+                        if (!model.inheritanceInfoText)
+                            return ""
+
+                        return qsTr("Inherits %1 permission from:",
+                            "%1 will be substituted with a permission name").arg(name)
+                                + "<br>" + model.inheritanceInfoText
+                    }
+
+                    function normalTooltipText()
+                    {
+                        const name = "<b>" + root.accessRightDescriptors[index].name + "</b>"
+                        let inheritance = (root.selectionSize > 1) ? "" : model.inheritanceInfoText
+                        let operation = ""
+
+                        const nextCheckState = root.hoveredColumnAccessRight
+                            ? root.externalNextCheckState
+                            : (toggledOn ? Qt.Unchecked : Qt.Checked)
+
+                        if (nextCheckState == Qt.Checked)
+                        {
+                            if (root.automaticDependencies && model.requiredAccessRights)
+                            {
+                                operation = qsTr("Add %1 and dependent permissions",
+                                    "%1 will be substituted with a permission name").arg(name)
+                            }
+                            else
+                            {
+                                operation = qsTr("Add %1 permission",
+                                    "%1 will be substituted with a permission name").arg(name)
+                            }
+
+                            if (inheritance)
+                            {
+                                inheritance = "<br><br>" + qsTr("Already inherited from:") + "<br>"
+                                    + inheritance
+                            }
+                        }
+                        else
+                        {
+                            if (root.automaticDependencies && model.dependentAccessRights)
+                            {
+                                operation = qsTr("Remove %1 and dependent permissions",
+                                    "%1 will be substituted with a permission name").arg(name)
+                            }
+                            else
+                            {
+                                operation = qsTr("Remove %1 permission",
+                                    "%1 will be substituted with a permission name").arg(name)
+                            }
+
+                            if (inheritance)
+                            {
+                                inheritance = "<br><br>" + qsTr("Will stay inherited from:")
+                                    + "<br>" + inheritance
+                            }
+                        }
+
+                        return operation + inheritance
+                    }
 
                     readonly property int accessRight: model.accessRight
                     readonly property bool relevant: model.editable

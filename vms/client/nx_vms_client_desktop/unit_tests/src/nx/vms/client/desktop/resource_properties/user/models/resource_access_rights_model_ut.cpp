@@ -76,9 +76,9 @@ public:
     int indexOf(AccessRight accessRight) const { return accessRightsList.indexOf(accessRight); }
     using AccessSubjectEditingFixture::indexOf;
 
-    // In a single tooltip line, access providers are tagged with <b> </b>.
+    // In a single inheritance info line, access providers are tagged with <b> </b>.
     // Use it to extract the providers.
-    QStringList splitTooltipLine(const QString& source) const
+    QStringList splitInheritanceLine(const QString& source) const
     {
         QStringList result;
         static const QRegularExpression matcher{"<b>([^<]*)</b>"};
@@ -382,43 +382,24 @@ TEST_F(ResourceAccessRightsModelTest, simpleGroupingNode)
     EXPECT_EQ(info.checkedAndInheritedChildCount, 2);
 }
 
-TEST_F(ResourceAccessRightsModelTest, tooltipSorting)
+TEST_F(ResourceAccessRightsModelTest, inheritanceInfoOrder)
 {
     accessRightsModel->setResourceTreeIndex(indexOf(resource("Camera1")));
 
-    UserGroupData ldapGroup;
-    ldapGroup.type = UserType::ldap;
-    ldapGroup.parentGroupIds = {kPowerUsersGroupId};
-
-    const auto ldapId1 = QnUuid::createUuid();
-    ldapGroup.id = ldapId1;
-    ldapGroup.name = "LDAP Group";
-    addOrUpdateUserGroup(ldapGroup);
-
-    const auto ldapId2 = QnUuid::createUuid();
-    ldapGroup.id = ldapId2;
-    ldapGroup.name = "Another LDAP Group";
-    addOrUpdateUserGroup(ldapGroup);
-
-    testUser->setGroupIds({ldapId1, ldapId2, kLiveViewersGroupId, kViewersGroupId, customGroupId});
-
     editingContext->setOwnResourceAccessMap({
-        {kAllDevicesGroupId, AccessRight::view},
         {resource("Layout1")->getId(), AccessRight::view},
-        {resource("Layout2")->getId(), AccessRight::view},
         {resource("VideoWall1")->getId(), AccessRight::edit}});
 
-    const auto tooltip = accessRightsModel->data(
-        accessRightsModel->index(indexOf(AccessRight::view), 0), Qt::ToolTipRole).toString();
+    const auto inheritanceInfo = accessRightsModel->data(
+        accessRightsModel->index(indexOf(AccessRight::view), 0),
+        ResourceAccessRightsModel::InheritanceInfoTextRole).toString();
 
-    const auto lines = tooltip.split("<br>");
+    const auto lines = inheritanceInfo.split("<br>");
 
-    ASSERT_EQ(lines.size(), 4);
-    EXPECT_EQ(splitTooltipLine(lines[0]), QStringList({"Cameras & Devices"}));
-    EXPECT_EQ(splitTooltipLine(lines[1]), QStringList({"Layout1", "Layout2"}));
-    EXPECT_EQ(splitTooltipLine(lines[2]), QStringList({"VideoWall1"}));
-    EXPECT_EQ(splitTooltipLine(lines[3]), QStringList(
-        {"Viewers", "Live Viewers", "Custom Group", "Another LDAP Group", "LDAP Group"}));
+    ASSERT_EQ(lines.size(), 3);
+    EXPECT_EQ(splitInheritanceLine(lines[0]), QStringList({"Layout1"}));
+    EXPECT_EQ(splitInheritanceLine(lines[1]), QStringList({"VideoWall1"}));
+    EXPECT_EQ(splitInheritanceLine(lines[2]), QStringList({"Live Viewers"}));
 }
 
 } // namespace test

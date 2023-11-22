@@ -10,6 +10,7 @@ namespace UnicodeChars
 {
     inline constexpr QChar kEnDash = QChar(0x2013);
     inline constexpr QChar kEmDash = QChar(0x2014);
+    inline constexpr QChar kEllipsis = QChar(0x2026);
     inline constexpr QChar kLeftwardsArrow = QChar(0x2190);
     inline constexpr QChar kRightwardsArrow = QChar(0x2192);
     inline constexpr QChar kUpwardsWhiteArrow = QChar(0x21E7);
