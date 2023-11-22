@@ -632,7 +632,9 @@ struct RemoteConnectionFactory::Private
     {
         if (context)
         {
-            if (!NX_ASSERT(context->userType() == nx::vms::api::UserType::local))
+            // Cloud users are not allowed to be here.
+            if (!NX_ASSERT(context->userType() != nx::vms::api::UserType::cloud,
+                "Unexpected user type: %1", context->userType()))
             {
                 context->setError(RemoteConnectionErrorCode::internalError);
                 return {};
