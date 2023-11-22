@@ -583,6 +583,26 @@ struct GetSystemUsersRequest
     bool localOnly = false;
 };
 
+// VMS <-> Cloud data synchronization settings.
+struct DataSyncSettings
+{
+    /**%apidoc System online status expires if no requests from the system were received during
+     * this period.
+     */
+    std::chrono::milliseconds onlineStatusExpirationPeriodMs;
+
+    /**%apidoc The VMS is recommended to poll users with this periodicity. */
+    std::chrono::milliseconds recommendedUserListPollPeriodMs;
+
+    /**%apidoc The VMS is recommended to poll users with this periodicity. */
+    std::chrono::milliseconds recommendedSystemAttributesPollPeriodMs;
+
+    bool operator==(const DataSyncSettings&) const = default;
+};
+
+NX_REFLECTION_INSTRUMENT(DataSyncSettings, (onlineStatusExpirationPeriodMs) \
+    (recommendedUserListPollPeriodMs)(recommendedSystemAttributesPollPeriodMs))
+
 //-------------------------------------------------------------------------------------------------
 
 struct CreateSystemOfferRequest
