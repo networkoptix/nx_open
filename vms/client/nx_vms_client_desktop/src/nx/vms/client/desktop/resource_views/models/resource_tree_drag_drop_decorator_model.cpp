@@ -11,12 +11,14 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 
@@ -359,8 +361,17 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         const auto layout = resource.staticCast<LayoutResource>();
 
-        const auto droppable =
-            data.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
+        const auto droppable = data.resources()
+            .filtered([](const QnResourcePtr& resource)
+            {
+                if (!QnResourceAccessFilter::isOpenableInLayout(resource))
+                    return false;
+
+                const auto accessController =
+                    SystemContext::fromResource(resource)->accessController();
+                return accessController->
+                    hasAnyPermission(resource, Qn::ViewLivePermission | Qn::ViewFootagePermission);
+            });
         if (droppable.isEmpty())
             return true;
 

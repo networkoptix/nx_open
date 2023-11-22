@@ -17,6 +17,7 @@
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -83,6 +84,7 @@
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/widgets/word_wrapped_label.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
@@ -2070,8 +2072,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         targetResources = parameters.resources();
     }
 
-    nx::utils::erase_if(targetResources,
-        [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
+    checkResourcesPermissions(targetResources);
 
     if (targetResources.isEmpty())
         return;
@@ -3193,6 +3194,57 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(
     }
 
     return !videowalls.isEmpty();
+}
+
+void QnWorkbenchVideoWallHandler::checkResourcesPermissions(QnResourceList& resources)
+{
+    QnVirtualCameraResourceList noAccessResources;
+    nx::utils::erase_if(resources,
+        [&noAccessResources](const QnResourcePtr& resource)
+        {
+            if (resource->hasFlags(Qn::cross_system))
+                return true;
+
+            const auto accessController =
+                SystemContext::fromResource(resource)->accessController();
+            if (accessController->hasPermissions(resource, Qn::ViewLivePermission))
+                return false;
+            if (auto virtualCamera = resource.dynamicCast<QnVirtualCameraResource>())
+                noAccessResources << virtualCamera;
+            return true;
+        });
+
+    if (!noAccessResources.empty())
+    {
+        auto showMessage = [this, noAccessResources]()
+        {
+            const auto count = noAccessResources.size();
+            QString text = QnDeviceDependentStrings::getNameFromSet(
+                resourcePool(),
+                QnCameraDeviceStringSet(
+                    tr("Failed to open %n devices on the video wall:", "", count),
+                    tr("Failed to open %n cameras on the video wall:", "", count)),
+                noAccessResources);
+            QString infoText = QnDeviceDependentStrings::getNameFromSet(
+                resourcePool(),
+                QnCameraDeviceStringSet(
+                    tr("You cannot add to the video wall devices for which you do not have View "
+                       "Live permission.", "", count),
+                    tr("You cannot add to the video wall cameras for which you do not have View "
+                       "Live permission.", "", count)),
+                noAccessResources);
+            QnSessionAwareMessageBox messageBox(mainWindowWidget());
+            messageBox.setIcon(QnMessageBoxIcon::Critical);
+            messageBox.setText(text);
+            messageBox.addCustomWidget(new QnResourceListView(noAccessResources, &messageBox));
+            QnWordWrappedLabel infoLabel(&messageBox);
+            infoLabel.setText(infoText);
+            messageBox.addCustomWidget(&infoLabel);
+            messageBox.setStandardButtons(QDialogButtonBox::Ok);
+            messageBox.exec();
+        };
+        executeDelayed(showMessage);
+    }
 }
 
 void QnWorkbenchVideoWallHandler::setItemOnline(const QnUuid &instanceGuid, bool online)
