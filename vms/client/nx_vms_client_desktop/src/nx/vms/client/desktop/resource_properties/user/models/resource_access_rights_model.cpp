@@ -222,20 +222,36 @@ QVariant ResourceAccessRightsModel::data(const QModelIndex& index, int role) con
     {
         case ProviderRole:
             return static_cast<int>(d->info[index.row()].providedVia);
+
         case InheritedFromRole:
             return static_cast<int>(d->info[index.row()].inheritedFrom);
+
         case TotalChildCountRole:
             return static_cast<int>(d->info[index.row()].totalChildCount);
+
         case CheckedChildCountRole:
             return static_cast<int>(d->info[index.row()].checkedChildCount);
+
         case CheckedAndInheritedChildCountRole:
             return static_cast<int>(d->info[index.row()].checkedAndInheritedChildCount);
+
         case AccessRightRole:
             return static_cast<int>(d->accessRightList[index.row()]);
+
         case EditableRole:
             return d->isEditable(index.row());
-        case Qt::ToolTipRole:
+
+        case InheritanceInfoTextRole:
             return d->accessDetailsText(d->info[index.row()]);
+
+        case DependentAccessRightsRole:
+            return QVariant::fromValue(AccessSubjectEditingContext::dependentAccessRights(
+                d->accessRightList[index.row()]) & d->item.relevantAccessRights);
+
+        case RequiredAccessRightsRole:
+            return QVariant::fromValue(AccessSubjectEditingContext::requiredAccessRights(
+                d->accessRightList[index.row()]) & d->item.relevantAccessRights);
+
         default:
             return {};
     }
@@ -251,6 +267,10 @@ QHash<int, QByteArray> ResourceAccessRightsModel::roleNames() const
     names.insert(CheckedAndInheritedChildCountRole, "checkedAndInheritedChildCount");
     names.insert(AccessRightRole, "accessRight");
     names.insert(EditableRole, "editable");
+    names.insert(InheritanceInfoTextRole, "inheritanceInfoText");
+    names.insert(DependentAccessRightsRole, "dependentAccessRights");
+    names.insert(RequiredAccessRightsRole, "requiredAccessRights");
+
     return names;
 }
 
@@ -513,77 +533,41 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
     std::sort(videoWalls.begin(), videoWalls.end(), collator);
 
     const auto makeDescription =
-        [this](const QString& single, const QString& plural, QStringList list)
+        [this](const QString& single, const QString& plural, QStringList list) -> QString
         {
-            for (auto& name: list)
-                name = html::bold(name);
-
             return list.size() == 1
-                ? nx::format(single, list.front()).toQString()
-                : nx::format(plural, list.join(", ")).toQString();
+                ? nx::format(single, html::bold(list.front()))
+                : nx::format(plural, html::bold(list.front()));
         };
 
-    const auto resourceGroupName =
-        [this](const QnUuid& resourceGroupId) -> std::optional<QString>
-        {
-            const auto group = specialResourceGroup(resourceGroupId);
-            if (!group)
-                return {};
-
-            switch (*group)
-            {
-                case SpecialResourceGroup::allDevices:
-                    return tr("Cameras & Devices");
-
-                case SpecialResourceGroup::allWebPages:
-                    return tr("Web Pages & Integrations");
-
-                case SpecialResourceGroup::allServers:
-                    return tr("Health Monitors");
-
-                case SpecialResourceGroup::allVideowalls:
-                    return tr("Video Walls");
-            }
-
-            return {};
-        };
-
-    if (accessInfo.providedVia == ResourceAccessInfo::ProvidedVia::own)
-    {
-        descriptions <<
-            (context->currentSubjectType() == AccessSubjectEditingContext::SubjectType::user
-                ? tr("User's custom permissions")
-                : tr("Group's custom permissions"));
-    }
-    else if (const auto nodeName = resourceGroupName(accessInfo.parentResourceGroupId))
-    {
-        descriptions << tr("Access granted by %1",
-            "`%1` will be substituted with a resource group like `Cameras & Devices`")
-                .arg(html::bold(*nodeName));
-    }
+    const int numLines = (int) !layouts.empty() + (int) !videoWalls.empty() + (int) !groups.empty();
+    const auto linePrefix = numLines > 1 ? QString(" - ") : QString{};
 
     if (!layouts.empty())
     {
-        descriptions << makeDescription(
-            tr("Access granted by %1 layout"),
-            tr("Access granted by %n layouts: %1", "", layouts.size()),
-            layouts);
+        descriptions << (linePrefix + makeDescription(
+            tr("%1 layout", "%1 will be substituted with a layout name"),
+            tr("%1 and %n more layouts", "%1 will be substituted with a layout name",
+                layouts.size() - 1),
+            layouts));
     }
 
     if (!videoWalls.empty())
     {
-        descriptions << makeDescription(
-            tr("Access granted by %1 video wall"),
-            tr("Access granted by %n video walls: %1", "", videoWalls.size()),
-            videoWalls);
+        descriptions << (linePrefix + makeDescription(
+            tr("%1 video wall", "%1 will be substituted with a video wall name"),
+            tr("%1 and %n more video walls", "%1 will be substituted with a video wall name",
+                videoWalls.size() - 1),
+            videoWalls));
     }
 
     if (!groups.empty())
     {
-        descriptions << makeDescription(
-            tr("Access granted by %1 group"),
-            tr("Access granted by %n groups: %1", "", groups.size()),
-            groups);
+        descriptions << (linePrefix + makeDescription(
+            tr("%1 group", "%1 will be substituted with a user group name"),
+            tr("%1 and %n more groups", "%1 will be substituted with a user group name",
+                groups.size() - 1),
+            groups));
     }
 
     return descriptions.join("<br>");
