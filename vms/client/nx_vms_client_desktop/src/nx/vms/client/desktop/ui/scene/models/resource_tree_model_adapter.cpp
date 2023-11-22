@@ -12,6 +12,7 @@
 #include <common/common_globals.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -36,6 +37,8 @@
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/models/resource_search_proxy_model.h>
+#include <ui/widgets/views/resource_list_view.h>
+#include <ui/widgets/word_wrapped_label.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -332,7 +335,6 @@ void ResourceTreeModelAdapter::setContext(QnWorkbenchContext* context)
             d->context->instance<ui::workbench::ActionHandler>()));
 
         d->dragDropDecoratorModel->setSourceModel(d->resourceTreeModel.get());
-
         d->sortFilterModel->setSourceModel(d->dragDropDecoratorModel.get());
 
         d->resourceTreeComposer->attachModel(d->resourceTreeModel.get());
