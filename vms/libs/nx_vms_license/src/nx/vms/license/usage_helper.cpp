@@ -72,11 +72,6 @@ const nx::utils::Url LicenseServer::validateUrl(common::SystemContext* context)
     return baseUrl(context) + "/api/v1/validate/";
 }
 
-const nx::utils::Url LicenseServer::cloudLicensesUrl(common::SystemContext* context)
-{
-    return baseUrl(context) + "/api/v2/license/cloud/licenses";
-}
-
 const nx::utils::Url LicenseServer::inspectUrl(common::SystemContext* context)
 {
     return baseUrl(context) + "/api/v2/license/inspect/";
