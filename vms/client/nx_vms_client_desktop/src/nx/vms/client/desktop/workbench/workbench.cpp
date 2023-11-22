@@ -283,7 +283,12 @@ void Workbench::clear()
     for (const auto& layout: d->layouts)
         removedLayouts.insert(layout->resource());
 
-    d->layouts.clear();
+    // Ensure that d->layouts is empty because d->layoutIndex may be called during
+    // QnWorkbenchLayout destruction.
+    std::vector<std::unique_ptr<QnWorkbenchLayout>> layoutsToRemove;
+    std::swap(d->layouts, layoutsToRemove);
+    layoutsToRemove.clear();
+
     d->processRemovedLayouts(removedLayouts);
 
     emit layoutsChanged();
