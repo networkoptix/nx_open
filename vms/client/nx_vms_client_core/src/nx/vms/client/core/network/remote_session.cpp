@@ -443,6 +443,9 @@ void RemoteSession::reconnectStep()
                     case RemoteConnectionErrorCode::factoryServer:
                     case RemoteConnectionErrorCode::unauthorized:
 
+                    // User is disabled.
+                    case RemoteConnectionErrorCode::sessionExpired:
+
                     // Server was updated.
                     case RemoteConnectionErrorCode::customizationDiffers:
                     case RemoteConnectionErrorCode::cloudHostDiffers:
