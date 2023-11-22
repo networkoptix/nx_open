@@ -470,14 +470,14 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::calculateSupportedObjectTypes
 QnVirtualCameraResource::DeviceAgentManifestMap
     QnVirtualCameraResource::fetchDeviceAgentManifests() const
 {
+    const auto data = getProperty(kDeviceAgentManifestsProperty).toStdString();
+    if (data.empty())
+        return {};
+
     auto [deserializedManifestMap, result] =
-        nx::reflect::json::deserialize<DeviceAgentManifestMap>(getProperty(kDeviceAgentManifestsProperty).toUtf8().toStdString());
-
-    if (!result.success)
-    {
+        nx::reflect::json::deserialize<DeviceAgentManifestMap>(data);
+    if (!result)
         NX_WARNING(this, "Failed to deserialize manifest: %1", result.toString());
-    }
-
     return deserializedManifestMap;
 }
 
@@ -759,11 +759,15 @@ void QnVirtualCameraResource::setAvailableProfiles(const nx::vms::api::DevicePro
 
 nx::vms::api::DeviceProfiles QnVirtualCameraResource::availableProfiles() const
 {
-    nx::vms::api::DeviceProfiles profiles;
-    if (!nx::reflect::json::deserialize(
-        getProperty(ResourcePropertyKey::kAvailableProfiles).toStdString(), &profiles))
+    const auto data = getProperty(ResourcePropertyKey::kAvailableProfiles).toStdString();
+    if (data.empty())
+        return {};
+
+    auto [profiles, result] = nx::reflect::json::deserialize<nx::vms::api::DeviceProfiles>(data);
+    if (!result)
     {
-        NX_WARNING(this, "Failed to deserialize available profiles for device %1", getId());
+        NX_WARNING(this, "Failed to deserialize available profiles for device %1: %2",
+            getId(), result.toString());
     }
     return profiles;
 }
