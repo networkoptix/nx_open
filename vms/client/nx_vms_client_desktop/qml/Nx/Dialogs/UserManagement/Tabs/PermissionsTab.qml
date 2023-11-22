@@ -53,7 +53,7 @@ Item
         anchors.right: control.right
         anchors.rightMargin: 9
 
-        height: 64
+        height: 66
         width: control.columnCount * columnWidth
 
         property int hoveredAccessRight: 0
@@ -83,6 +83,8 @@ Item
                     color: tree.hoveredCell && tree.hoveredCell.accessRight == accessRight
                         ? ColorTheme.colors.light4
                         : ColorTheme.colors.light10
+
+                    text: modelData.name
 
                     enabled: control.editingEnabled
                     interactive: tree.hasSelection
@@ -180,7 +182,7 @@ Item
         }
 
         anchors.fill: parent
-        anchors.topMargin: accessRightsHeader.height - 4
+        anchors.topMargin: accessRightsHeader.height
         anchors.rightMargin: 8 - scrollBarWidth
         anchors.leftMargin: 16
 

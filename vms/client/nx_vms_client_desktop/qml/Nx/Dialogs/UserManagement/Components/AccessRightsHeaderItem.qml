@@ -11,10 +11,12 @@ Item
     id: item
 
     property alias icon: icon.source
+    property alias text: caption.text
     property alias color: icon.color
 
-    property alias enabled: mouseArea.enabled
+    property int textMargin: 4
 
+    property alias enabled: mouseArea.enabled
     property bool interactive: false
 
     readonly property alias hovered: mouseArea.hovered
@@ -73,8 +75,52 @@ Item
         IconImage
         {
             id: icon
-            anchors.centerIn: mouseArea
-            sourceSize: Qt.size(32, 32)
+
+            y: 8
+            sourceSize: Qt.size(24, 20)
+            anchors.horizontalCenter: mouseArea.horizontalCenter
+        }
+
+        Text
+        {
+            id: caption
+
+            anchors.horizontalCenter: mouseArea.horizontalCenter
+            anchors.verticalCenter: mouseArea.top
+            anchors.verticalCenterOffset: 44
+            width: item.width - indent * 2
+
+            font.pixelSize: 10
+            font.weight: Font.Medium
+            lineHeight: 0.9
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+
+            textFormat: Text.PlainText
+            wrapMode: Text.WordWrap
+            elide: Text.ElideRight
+            maximumLineCount: 2
+
+            color: item.color
+
+            FontMetrics
+            {
+                id: metrics
+                font: caption.font
+            }
+
+            readonly property int indent:
+            {
+                if (!caption.text.includes(" "))
+                    return item.textMargin
+
+                // Ensure that short captions with space are forcefully wrapped.
+
+                const textWidth = metrics.boundingRect(caption.text).width
+
+                return Math.max(Math.round((mouseArea.width - textWidth) / 2 + /*tolerance*/ 1),
+                    item.textMargin)
+            }
         }
     }
 }
