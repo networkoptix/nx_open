@@ -28,6 +28,7 @@ static constexpr char kSystemsPath[] = "/cdb/systems";
 
 static constexpr char kSystemPath[] = "/cdb/systems/{systemId}";
 static constexpr char kSystemHealthHistoryPath[] = "/cdb/systems/{systemId}/health-history";
+static constexpr char kSystemDataSyncSettingsPath[] = "/cdb/systems/{systemId}/data-sync-settings";
 static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/systems/{systemId}/merged_systems/";
 static constexpr char kSystemsValidateMSSignature[] = "/cdb/systems/{systemId}/signature/validate";
 static constexpr char kSystemUsersPath[] = "/cdb/v2/systems/{systemId}/users";
