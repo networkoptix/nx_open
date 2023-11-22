@@ -1327,19 +1327,22 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return camera->getRemoteArchiveSynchronizationMode();
         });
 
-    bool firstStep = true;
-    for (const auto& camera: cameras)
+    if (state.expert.areOnvifSettingsApplicable)
     {
-        if (firstStep)
+        bool firstStep = true;
+        for (const auto& camera: cameras)
         {
-            state.expert.availableProfiles = camera->availableProfiles();
+            if (firstStep)
+            {
+                state.expert.availableProfiles = camera->availableProfiles();
+            }
+            else
+            {
+                state.expert.availableProfiles = intersectProfiles(
+                    state.expert.availableProfiles, (camera->availableProfiles()));
+            }
+            firstStep = false;
         }
-        else
-        {
-            state.expert.availableProfiles =
-                intersectProfiles(state.expert.availableProfiles, (camera->availableProfiles()));
-        }
-        firstStep = false;
     }
 
     fetchFromCameras<bool>(state.expert.trustCameraTime, cameras,
