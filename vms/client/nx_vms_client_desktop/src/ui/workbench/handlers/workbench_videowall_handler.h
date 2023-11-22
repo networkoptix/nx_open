@@ -44,6 +44,8 @@ public:
         QnWorkbenchLayout* layout,
         std::function<void(int, ec2::ErrorCode)> callback);
 
+    void checkResourcesPermissions(QnResourceList& resources);
+
 private:
     enum class ItemAction
     {
