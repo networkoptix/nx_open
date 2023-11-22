@@ -77,6 +77,8 @@ Item
 
         Behavior on value
         {
+            enabled: preview && preview.isReady
+
             NumberAnimation
             {
                 easing.type: Easing.Linear

@@ -145,7 +145,7 @@ Item
                 return
 
             item.mediaPlayer.setPlaybackMask(preview.startTimeMs, preview.durationMs)
-            item.mediaPlayer.position = typeof position === "undefined" ? preview.startTimeMs : position
+            item.mediaPlayer.position = position ?? preview.startTimeMs
             item.mediaPlayer.play()
         }
 

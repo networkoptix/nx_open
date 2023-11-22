@@ -51,6 +51,19 @@ Rectangle
         }
     }
 
+    onSelectedItemChanged:
+    {
+        intervalPreview.resourceId = NxGlobals.uuid("")
+        intervalPreview.timestampMs = 0
+
+        if (selectedItem)
+        {
+            intervalPreview.resourceId = selectedItem.previewResourceId
+            intervalPreview.timestampMs = selectedItem.previewTimestampMs
+            intervalPreview.aspectRatio = selectedItem.previewAspectRatio
+        }
+    }
+
     Rectangle
     {
         id: playerContainer
@@ -79,13 +92,6 @@ Rectangle
             active: !!previewPanel.selectedItem
             loopDelayMs: 0 //< No need to pause because the user has manual controls.
             speedFactor: 1.0 //< This is a regular player (not tile preview) so use normal speed.
-
-            resourceId: previewPanel.selectedItem
-                ? previewPanel.selectedItem.previewResourceId : NxGlobals.uuid("")
-            timestampMs: previewPanel.selectedItem
-                ? NxGlobals.toDouble(previewPanel.selectedItem.previewTimestampMs) : 0
-            aspectRatio: previewPanel.selectedItem
-                ? previewPanel.selectedItem.previewAspectRatio : 1.0
 
             Rectangle
             {
