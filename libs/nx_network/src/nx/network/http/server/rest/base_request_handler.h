@@ -58,6 +58,26 @@ public:
     }
 };
 
+template<const char* Name>
+class HeaderFetcher
+{
+public:
+    using type = std::optional<std::string>;
+
+    static constexpr std::string_view kName{Name};
+
+    type operator()(const network::http::RequestContext& requestContext) const
+    {
+        if (auto it = requestContext.request.headers.find(kName);
+            it != requestContext.request.headers.end())
+        {
+            return it->second;
+        }
+
+        return std::nullopt;
+    }
+};
+
 class HostHeaderFetcher
 {
 public:
