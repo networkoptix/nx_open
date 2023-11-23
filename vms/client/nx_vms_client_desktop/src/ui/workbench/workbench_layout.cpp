@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -221,12 +222,18 @@ bool QnWorkbenchLayout::update(const LayoutResourcePtr& resource)
     for (auto item: d->items)
         item->setPinned(false);
 
+    QSet<QnUuid> removed;
+
+    for (auto item: items())
+        removed.insert(item->uuid());
+
     for (const auto& data: resource->getItems())
     {
         auto item = this->item(data.uuid);
         if (!item)
         {
-            if (const auto resource = getResourceByDescriptor(data.resource))
+            if (const auto resource = getResourceByDescriptor(data.resource); resource
+                && ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission))
             {
                 auto workbenchItem = new QnWorkbenchItem(resource, data, this);
                 // Each item must either be pinned or queued to be pinned.
@@ -235,26 +242,15 @@ bool QnWorkbenchLayout::update(const LayoutResourcePtr& resource)
                 addItem(workbenchItem);
             }
         }
-        else
+        else if (ResourceAccessManager::hasPermissions(item->resource(), Qn::ViewContentPermission))
         {
             result &= item->update(data);
+            removed.remove(item->uuid());
         }
     }
 
-    /* Some items may have been removed. */
-    if (items().size() > resource->getItems().size())
-    {
-        QSet<QnUuid> removed;
-
-        for (auto item: items())
-            removed.insert(item->uuid());
-
-        for (const auto& itemData: resource->getItems())
-            removed.remove(itemData.uuid);
-
-        for (const auto& uuid: removed)
-            delete item(uuid);
-    }
+    for (const auto& uuid: removed)
+        delete item(uuid);
 
     /* Update zoom targets. */
     for (const auto& data: resource->getItems())
