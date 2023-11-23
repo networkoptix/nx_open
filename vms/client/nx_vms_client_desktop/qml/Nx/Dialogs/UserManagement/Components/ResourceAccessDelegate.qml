@@ -121,6 +121,8 @@ Item
                     hoverEnabled: true
                     acceptedButtons: Qt.LeftButton
 
+                    GlobalToolTip.enabled: cell.relevant
+
                     GlobalToolTip.text:
                         root.editingEnabled ? normalTooltipText() : readonlyTooltipText()
 
