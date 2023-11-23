@@ -4,6 +4,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <utils/common/checked_cast.h>
@@ -177,7 +178,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(
         return;
 
     const auto resource = getResourceByDescriptor(itemData.resource);
-    if (!resource)
+    if (!resource || !ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission))
         return;
 
     QScopedValueRollback<bool> guard(m_submit, false);
