@@ -56,7 +56,7 @@ NxObject
         if (!revokeAccessEnabled || isLoginTimeValid)
         {
             //: Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)
-            return qsTr(`Valid from %1 to %2 (by server time)`)
+            return qsTr("Valid from %1 to %2 (by server time)")
                 .arg(dateFrom)
                 .arg(dateUntil)
         }
@@ -65,7 +65,7 @@ NxObject
             highlight(`${UserSettingsGlobal.humanReadableSeconds(expiresAfterLoginS)}`)
 
         //: Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login
-        return qsTr(`Valid from %1 to %2 (by server time) or for %3 after login`)
+        return qsTr("Valid from %1 to %2 (by server time) or for %3 after login")
             .arg(dateFrom)
             .arg(dateUntil)
             .arg(expires)
