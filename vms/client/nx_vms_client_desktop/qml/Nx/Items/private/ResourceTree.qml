@@ -408,16 +408,37 @@ TreeView
             enclosingRect = hoverData.item.mapFromItem(resourceTree,
                 resourceTree.toolTipEnclosingRect)
 
-            let text = modelDataAccessor.getHtmlEscapedData(hoverData.modelIndex, "display")
-            const extra = modelDataAccessor.getData(hoverData.modelIndex, "extraInfo")
-
-            if (text && extra)
-                text = `<b>${text}</b> ${extra}`
-
-            toolTip.text = text || ""
+            toolTip.text = toolTipText(hoverData.modelIndex)
 
             if (state !== BubbleToolTip.Suppressed)
                 show()
+        }
+
+        function toolTipText(modelIndex)
+        {
+            const customGroupId = modelDataAccessor.getData(modelIndex, "customGroupId")
+            if (customGroupId)
+            {
+                const namePos = customGroupId.lastIndexOf("\n") + 1
+                if (namePos <= 0)
+                    return NxGlobals.toHtmlEscaped(customGroupId)
+
+                const name = NxGlobals.toHtmlEscaped(customGroupId.substring(namePos))
+                const path = NxGlobals.toHtmlEscaped(
+                    customGroupId.substring(0, namePos).replace(/\n/g, "/"))
+
+                return `<span style="color: ${ColorTheme.colors.light10};">${path}</span>${name}`
+            }
+
+            const text = modelDataAccessor.getHtmlEscapedData(modelIndex, "display")
+            if (!text)
+                return ""
+
+            const extra = modelDataAccessor.getData(modelIndex, "extraInfo")
+
+            return extra
+                ? `<b>${text}</b> ${extra}`
+                : text
         }
     }
 }
