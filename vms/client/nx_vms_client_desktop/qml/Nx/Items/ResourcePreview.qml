@@ -212,7 +212,9 @@ Item
             verticalAlignment: Qt.AlignVCenter
             horizontalAlignment: Qt.AlignHCenter
 
-            font.pixelSize: accessHelper.canViewLive ? preview.textSize : 32
+            font.pixelSize: accessHelper.canViewLive || accessHelper.passwordRequired
+                ? preview.textSize
+                : 32
             font.weight: preview.fontWeight
             fontSizeMode: Text.Fit
             minimumPixelSize: 6
