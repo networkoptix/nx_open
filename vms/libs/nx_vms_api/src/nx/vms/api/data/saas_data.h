@@ -275,8 +275,8 @@ NX_REFLECTION_INSTRUMENT(Organization, Organization_fields)
 /**%apidoc SaasSecurity */
 struct NX_VMS_API SaasSecurity
 {
-    /**%apidoc Cloud licenses are periodically checked on the license server.
-     * VMS server should send license usage reports to the license server using this period.
+    /**%apidoc Data are periodically checked on the Channel Partner Server.
+     * VMS server should send usage reports to the Channel Partner Server using this period.
      */
     std::chrono::seconds checkPeriodS{};
 
@@ -324,14 +324,14 @@ struct NX_VMS_API SaasData
 #define SaasData_fields (cloudSystemId)(channelPartner)(organization)(state)(services)(security)
 NX_REFLECTION_INSTRUMENT(SaasData, SaasData_fields)
 
-struct NX_VMS_API UpdateCloudLicensesRequest
+struct NX_VMS_API UpdateCloudDataRequest
 {
-    /**%apidoc Wait until request to the Licensing server is completed. */
+    /**%apidoc Wait until request to the cloud service is completed. */
     bool waitForDone = false;
 };
-#define UpdateCloudLicensesRequest_Fields (waitForDone)
+#define UpdateCloudDataRequest_Fields (waitForDone)
 
-NX_REFLECTION_INSTRUMENT(UpdateCloudLicensesRequest, UpdateCloudLicensesRequest_Fields)
-NX_VMS_API_DECLARE_STRUCT_EX(UpdateCloudLicensesRequest, (json))
+NX_REFLECTION_INSTRUMENT(UpdateCloudDataRequest, UpdateCloudDataRequest_Fields)
+NX_VMS_API_DECLARE_STRUCT_EX(UpdateCloudDataRequest, (json))
 
 } // namespace nx::vms::api

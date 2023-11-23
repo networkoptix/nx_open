@@ -81,6 +81,6 @@ SaasCloudStorageParameters SaasCloudStorageParameters::fromParams(const SaasServ
     return result;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(UpdateCloudLicensesRequest, (json), UpdateCloudLicensesRequest_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(UpdateCloudDataRequest, (json), UpdateCloudDataRequest_Fields)
 
 } // namespace nx::vms::api
