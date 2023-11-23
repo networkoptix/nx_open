@@ -24,7 +24,7 @@ std::string Plugin::manifestString() const
 R"json(
 {
     "id": "nx.stub.object_actions",
-    "name": "Stub: Object Actions",
+    "name": "Stub, Object Actions",
     "description": "A plugin for testing and debugging Object Actions.",
     "version": "1.0.0",
     "vendor": "Plugin vendor"

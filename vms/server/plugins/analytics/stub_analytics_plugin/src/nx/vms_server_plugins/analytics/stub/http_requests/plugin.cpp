@@ -20,7 +20,7 @@ std::string Plugin::manifestString() const
 R"json(
 {
     "id": "nx.stub.http_requests",
-    "name": "Stub: HTTP Requests",
+    "name": "Stub, HTTP Requests",
     "description": "A plugin for testing and debugging HTTP requests from the Plugin to the Cloud or VMS Server.",
     "version": "1.0.0",
     "vendor": "Plugin vendor"

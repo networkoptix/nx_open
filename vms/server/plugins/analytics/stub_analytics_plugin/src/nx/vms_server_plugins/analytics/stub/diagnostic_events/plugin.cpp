@@ -28,7 +28,7 @@ std::string Plugin::manifestString() const
 R"json(
 {
     "id": ")json" + instanceId() + R"json(",
-    "name": "Stub: Plugin Diagnostic Events",
+    "name": "Stub, Plugin Diagnostic Events",
     "description": "A plugin for testing and debugging Plugin Diagnostic Events.",
     "version": "1.0.0",
     "vendor": "Plugin vendor",
