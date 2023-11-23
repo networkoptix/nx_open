@@ -1119,6 +1119,13 @@
     </message>
   </context>
   <context>
+    <name>DirectParentsModel</name>
+    <message>
+      <source>LDAP group membership is managed in LDAP</source>
+      <translation>Thành viên nhóm LDAP được quản lý trong LDAP</translation>
+    </message>
+  </context>
+  <context>
     <name>DropdownTextPickerWidgetStrings</name>
     <message>
       <source>Auto</source>
@@ -8319,13 +8326,6 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <message>
       <source>System Administration</source>
       <translation>Quản trị hệ thống</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::DirectParentsModel</name>
-    <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation>Thành viên nhóm LDAP được quản lý trong LDAP</translation>
     </message>
   </context>
   <context>

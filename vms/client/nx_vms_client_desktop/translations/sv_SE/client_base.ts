@@ -1122,6 +1122,13 @@
     </message>
   </context>
   <context>
+    <name>DirectParentsModel</name>
+    <message>
+      <source>LDAP group membership is managed in LDAP</source>
+      <translation>Medlemskap i LDAP-gruppen hanteras i LDAP</translation>
+    </message>
+  </context>
+  <context>
     <name>DropdownTextPickerWidgetStrings</name>
     <message>
       <source>Auto</source>
@@ -8454,13 +8461,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::DirectParentsModel</name>
-    <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation>Medlemskap i LDAP-gruppen hanteras i LDAP</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
     <message>
       <source>Decrypt</source>
@@ -12311,7 +12311,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Hälsoövervakning</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -12323,7 +12323,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Webbsidor och integrationer</translation>
     </message>
   </context>
   <context>

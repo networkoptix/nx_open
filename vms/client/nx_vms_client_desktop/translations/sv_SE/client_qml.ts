@@ -1851,7 +1851,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Webbsidor och integrationer</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1859,7 +1859,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Hälsoövervakning</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2482,7 +2482,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Åtkomstlänk</translation>
     </message>
     <message>
       <source>Copy Link</source>
