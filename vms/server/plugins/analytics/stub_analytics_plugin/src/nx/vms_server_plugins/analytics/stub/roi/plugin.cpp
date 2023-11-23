@@ -27,7 +27,7 @@ std::string Plugin::manifestString() const
     return /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": ")json" + instanceId() + R"json(",
-    "name": "Stub: ROI",
+    "name": "Stub, ROI",
     "description": "A plugin for testing and debugging Regions-Of-Interest (ROI).",
     "version": "1.0.0",
     "vendor": "Plugin vendor"

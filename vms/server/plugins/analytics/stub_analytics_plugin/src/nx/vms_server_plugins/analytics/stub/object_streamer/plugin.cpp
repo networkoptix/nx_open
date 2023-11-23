@@ -24,7 +24,7 @@ std::string Plugin::manifestString() const
 R"json(
 {
     "id": "nx.stub.object_streamer",
-    "name": "Stub: Object Streamer",
+    "name": "Stub, Object Streamer",
     "description": "A plugin for generating Objects from a prepared JSON file (the format is described in the readme.md file of this Plugin).",
     "version": "1.0.0",
     "vendor": "Plugin vendor"
