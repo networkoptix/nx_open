@@ -27,7 +27,7 @@ std::string Plugin::manifestString() const
     return /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": ")json" + instanceId() + R"json(",
-    "name": "Stub: Motion Metadata",
+    "name": "Stub, Motion Metadata",
     "description":
         "A plugin for testing and debugging Motion Metadata.",
     "version": "1.0.0",
