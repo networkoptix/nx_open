@@ -31,7 +31,7 @@ Item
     property string hostText: ""
     property int hostIndex: -1
 
-    property alias user: loginChooseItem.editText
+    property alias user: loginChooseItem.login
     property alias password: passwordItem.text
     property alias savePassword: savePasswordCheckbox.checked
 
@@ -214,10 +214,12 @@ Item
             {
                 id: loginChooseItem
 
+                readonly property string login: editText.trim()
+
                 readonly property bool warningState: openedTileItem.isLoginError
                     && openedTileItem.errorMessage
 
-                readonly property int editIndex: find(editText)
+                readonly property int editIndex: find(login)
 
                 function set(login)
                 {
@@ -427,7 +429,7 @@ Item
 
             function onEditTextChanged()
             {
-                impl.lastLogin = loginChooseItem.editText
+                impl.lastLogin = loginChooseItem.login
             }
 
             function onEditIndexChanged()
@@ -446,7 +448,7 @@ Item
             const isPasswordSaved = context.saveCredentialsAllowed
                 && credentials !== undefined
                 && credentials.isPasswordSaved
-                && credentials.user.toLowerCase() === loginChooseItem.editText.toLowerCase()
+                && credentials.user.toLowerCase() === loginChooseItem.login.toLowerCase()
 
             const isSavedPasswordChanged = isPasswordSaved != openedTileItem.isPasswordSaved
             if (isSavedPasswordChanged)
