@@ -725,7 +725,7 @@ void LicenseManagerWidget::handleWidgetStateChange()
         m_currentRequest = api->putRest(
             sessionTokenHelper,
             QString("/rest/v2/licenses/%1").arg(body.key),
-            nx::network::rest::Params{{{"lang", qnRuntime->locale()}}},
+            nx::network::rest::Params{},
             QByteArray::fromStdString(nx::reflect::json::serialize(body)),
             callback,
             this
