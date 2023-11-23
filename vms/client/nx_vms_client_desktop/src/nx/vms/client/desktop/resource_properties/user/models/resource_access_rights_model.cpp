@@ -575,7 +575,9 @@ QString ResourceAccessRightsModel::Private::accessDetailsText(
 
 bool ResourceAccessRightsModel::Private::isEditable(int index) const
 {
-    return item.relevantAccessRights.testFlag(accessRightList[index]);
+    return item.relevantAccessRights.testFlag(accessRightList[index])
+        && (item.type != ResourceAccessTreeItem::Type::groupingNode
+            || info[index].totalChildCount > 0);
 }
 
 } // namespace nx::vms::client::desktop
