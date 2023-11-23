@@ -10496,66 +10496,43 @@ You can force it, but it may significantly increase CPU load.</source>
 <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
-        <source>Access granted by %1 group</source>
+        <source>%1 layout</source>
+        <comment>%1 will be substituted with a layout name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Access granted by %n groups: %1</source>
+        <source>%1 and %n more layouts</source>
+        <comment>%1 will be substituted with a layout name</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <source>Access granted by %1 layout</source>
+        <source>%1 video wall</source>
+        <comment>%1 will be substituted with a video wall name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Access granted by %n layouts: %1</source>
+        <source>%1 and %n more video walls</source>
+        <comment>%1 will be substituted with a video wall name</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <source>Access granted by %1 video wall</source>
+        <source>%1 group</source>
+        <comment>%1 will be substituted with a user group name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Access granted by %n video walls: %1</source>
+        <source>%1 and %n more groups</source>
+        <comment>%1 will be substituted with a user group name</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Cameras &amp; Devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Web Pages &amp; Integrations</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Health Monitors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video Walls</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User&apos;s custom permissions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Group&apos;s custom permissions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Access granted by %1</source>
-        <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

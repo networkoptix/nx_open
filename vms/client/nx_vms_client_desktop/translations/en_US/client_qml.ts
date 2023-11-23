@@ -35,19 +35,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Misc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchronization&lt;br&gt;Interval</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Proxy LDAP requests&lt;br&gt;via server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -63,7 +51,24 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Group Members Attribute</source>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronize Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync Interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Proxy LDAP requests %1 via server</source>
+        <comment>%1 is a line break</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group Attribute</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1231,14 +1236,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Continuous User Import</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Filters</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1252,14 +1249,6 @@
     </message>
     <message>
         <source>No filters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1609,7 +1598,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
+        <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
         <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -1805,6 +1794,52 @@ to activate PTZ</source>
     <message>
         <source>Delete</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ResourceAccessDelegate</name>
+    <message>
+        <source>Has %1 permission</source>
+        <comment>%1 will be substituted with a permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Also inherits it from:</source>
+        <comment>&apos;it&apos; refers to a permission</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inherits %1 permission from:</source>
+        <comment>%1 will be substituted with a permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add %1 and dependent permissions</source>
+        <comment>%1 will be substituted with a permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add %1 permission</source>
+        <comment>%1 will be substituted with a permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already inherited from:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove %1 and dependent permissions</source>
+        <comment>%1 will be substituted with a permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove %1 permission</source>
+        <comment>%1 will be substituted with a permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Will stay inherited from:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2175,6 +2210,21 @@ to activate PTZ</source>
     <message>
         <source>Logical ID</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>SyncComboBox</name>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On Log In</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
