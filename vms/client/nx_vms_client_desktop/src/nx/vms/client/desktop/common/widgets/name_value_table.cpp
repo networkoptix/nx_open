@@ -20,13 +20,38 @@
 #include <QtQuick/QQuickGraphicsDevice>
 #include <QtQuick/QQuickWindow>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+    #include <rhi/qrhi.h>
+#else
+    #include <QtGui/private/qrhi_p.h>
+#endif
+
 #include <client_core/client_core_module.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <ui/widgets/main_window.h>
+#include <ui/workbench/workbench_context.h>
+
+namespace {
+
+QRhi* getRhi(QQuickWindow* window)
+{
+    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+        return window->rhi();
+    #else
+        const auto ri = window->rendererInterface();
+        return static_cast<QRhi*>(ri->getResource(window, QSGRendererInterface::RhiResource));
+    #endif
+}
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -128,6 +153,90 @@ public:
             return;
         }
 
+        if (quickWindow->rendererInterface()->graphicsApi() == QSGRendererInterface::Software)
+        {
+            quickWindow->setGeometry(QRect({}, outSize));
+
+            outPixmap = QPixmap::fromImage(quickWindow->grabWindow());
+            qDebug() << outPixmap.size() << quickWindow->size();
+            return;
+        }
+        else //if (quickWindow->graphicsApi() != QSGRendererInterface::OpenGL)
+        {
+            auto rhi = getRhi(quickWindow.get());
+
+            const auto pixelRatio = quickWindow->effectiveDevicePixelRatio();
+            const QSize deviceSize = outSize * pixelRatio;
+
+            std::unique_ptr<QRhiTexture> texture(rhi->newTexture(QRhiTexture::RGBA8, deviceSize, 1,
+                QRhiTexture::RenderTarget | QRhiTexture::UsedAsTransferSource));
+
+            if (!texture->create())
+                return;
+
+            std::unique_ptr<QRhiTextureRenderTarget> renderTarget(
+                rhi->newTextureRenderTarget({texture.get()}));
+            std::unique_ptr<QRhiRenderPassDescriptor> rp(
+                renderTarget->newCompatibleRenderPassDescriptor());
+
+            renderTarget->setRenderPassDescriptor(rp.get());
+
+            auto quickRenderTarget = QQuickRenderTarget::fromRhiRenderTarget(renderTarget.get());
+            quickRenderTarget.setDevicePixelRatio(pixelRatio);
+            quickWindow->setRenderTarget(quickRenderTarget);
+
+            connect(quickWindow.get(), &QQuickWindow::afterRendering, this,
+                [&outPixmap, this, rhi, &texture, pixelRatio]()
+                {
+                    QSGRendererInterface* rif = quickWindow->rendererInterface();
+                    QRhiCommandBuffer* cb =
+                        static_cast<QRhiCommandBuffer*>(
+                            rif->getResource(
+                                quickWindow.get(),
+                                QSGRendererInterface::RhiRedirectCommandBuffer));
+
+                    QRhiReadbackResult *rbResult = new QRhiReadbackResult();
+                    rbResult->completed =
+                        [rbResult, &outPixmap, pixelRatio, rhi]
+                        {
+                            const uchar* p = reinterpret_cast<const uchar*>(
+                                rbResult->data.constData());
+                            QImage image(
+                                p,
+                                rbResult->pixelSize.width(),
+                                rbResult->pixelSize.height(),
+                                QImage::Format_RGBA8888_Premultiplied);
+
+                            if (rhi->isYUpInFramebuffer())
+                                image.mirror(false, true);
+
+                            image.setDevicePixelRatio(pixelRatio);
+                            outPixmap = QPixmap::fromImage(std::move(image));
+
+                            delete rbResult;
+                        };
+
+                    QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
+                    QRhiReadbackDescription rb(texture.get());
+                    u->readBackTexture(rb, rbResult);
+
+                    cb->resourceUpdate(u);
+                },
+                Qt::DirectConnection);
+
+            renderControl->polishItems();
+
+            renderControl->beginFrame();
+            renderControl->sync();
+            renderControl->render();
+            renderControl->endFrame();
+
+            quickWindow->disconnect(this);
+            quickWindow->setRenderTarget({});
+
+            return;
+        }
+
         renderControl->setWidget(widget); //< For screen & devicePixelRatio detection.
 
         const auto contextGuard = bindContext();
@@ -198,9 +307,11 @@ private:
         surface->create();
 
         const auto contextGuard = bindContext();
-        quickWindow->setGraphicsDevice(
-            QQuickGraphicsDevice::fromOpenGLContext(QOpenGLContext::currentContext()));
-        renderControl->initialize();
+
+        const auto graphicsApi =
+            appContext()->mainWindowContext()->quickWindow()->rendererInterface()->graphicsApi();
+        if (graphicsApi != QSGRendererInterface::Software)
+            renderControl->initialize();
 
         quickWindow->setColor(Qt::transparent);
     }
