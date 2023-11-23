@@ -13,10 +13,8 @@
 namespace nx::vms::common::saas {
 
 /*
- *  Cloud/saas licenses is backward compatible with licenses v1.
- *  So, to control localRecording old class 'UsageHelper' can be used in the same way
- *  for local and cloud licenses.
- *  This class is intended to calculate other (new) services for cloud licenses
+ * This class is intended to calculate service usage for SaaS services
+ * that VMS reads from Channel Partner Server.
  */
 class NX_VMS_COMMON_API CloudServiceUsageHelper:
     public QObject,
