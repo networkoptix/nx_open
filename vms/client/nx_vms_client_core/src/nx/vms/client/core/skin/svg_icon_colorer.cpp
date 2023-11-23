@@ -165,7 +165,7 @@ const SvgIconColorer::IconSubstitutions SvgIconColorer::kDefaultIconSubstitution
 SvgIconColorer::SvgIconColorer(
     const QByteArray& sourceIconData,
     const QString& iconName,
-    const IconSubstitutions& substitutions, /*= kDefaultIconSubstitutions*/
+    const IconSubstitutions& substitutions, //< kDefaultIconSubstitutions.
     const QMap<QIcon::Mode, SvgIconColorer::ThemeColorsRemapData>& themeSubstitutions):
     m_sourceIconData(sourceIconData),
     m_iconName(iconName),
