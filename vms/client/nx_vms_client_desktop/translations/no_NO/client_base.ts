@@ -1122,6 +1122,13 @@
     </message>
   </context>
   <context>
+    <name>DirectParentsModel</name>
+    <message>
+      <source>LDAP group membership is managed in LDAP</source>
+      <translation>LDAP-gruppemedlemskap administreres i LDAP</translation>
+    </message>
+  </context>
+  <context>
     <name>DropdownTextPickerWidgetStrings</name>
     <message>
       <source>Auto</source>
@@ -8450,13 +8457,6 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     <message>
       <source>System Administration</source>
       <translation>Systemadministrasjon</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::DirectParentsModel</name>
-    <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation>LDAP-gruppemedlemskap administreres i LDAP</translation>
     </message>
   </context>
   <context>
