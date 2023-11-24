@@ -51,6 +51,7 @@ private:
     };
 
     UriHandlerUpdateResult registerUriHandler();
+    bool registerNovFilesAssociation();
     void updateApplauncher();
     bool updateMinilauncherOnWindows(bool hasAdminRights);
     bool updateHelpFile(const HelpFileDescription& helpDescription);
