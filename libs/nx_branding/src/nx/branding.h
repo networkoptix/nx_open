@@ -93,6 +93,9 @@ NX_BRANDING_API QString applauncherBinaryName();
 /** Internal name, used as a key in settings storage, data folder, etc. */
 NX_BRANDING_API QString applauncherInternalName();
 
+/** Name of the client binary in the filesystem (client-bin, HD Witness.exe). */
+NX_BRANDING_API QString desktopClientBinaryName();
+
 /**
  * Name of the client launcher in the filesystem. On Windows and MacOS actual client binary is
  * used (HD Witness.exe). On Linux separate `client` launcher is used.

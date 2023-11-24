@@ -3,56 +3,50 @@
     <Fragment>
         <DirectoryRef Id="INSTALLDIR">
             <Component Id="NovFileAssociation">
+                <!-- Keep this block synced with nov_association.cpp file content. -->
                 <RegistryValue
                     Root="HKCR"
                     Type="string"
-                    Key="HDW.nov"
+                    Key="NXFile"
                     Value="${customization.vmsName} Video (.nov)"
                     KeyPath="yes"/>
 
                 <RegistryValue
                     Root="HKCR"
                     Type="string"
-                    Key="HDW.nov\shell\open\command"
+                    Key="NXFile\shell\open\command"
                     Value="&quot;[#minilauncher_binary]&quot; &quot;%1&quot;"/>
 
                 <RegistryValue
                     Root="HKCR"
                     Type="string"
-                    Key="HDW.nov\DefaultIcon"
-                    Value="&quot;[#client.exe]&quot;"/>
+                    Key="NXFile\DefaultIcon"
+                    Value="&quot;[#minilauncher_binary]&quot;"/>
 
                 <RegistryValue
                     Root="HKCR"
                     Type="string"
                     Key=".nov"
-                    Value="HDW.nov" />
+                    Value="NXFile" />
 
                 <RegistryValue
                     Root="HKLM"
                     Type="string"
-                    Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${minilauncher.binary.name}"
+                    Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${customization}"
                     Value="Play with ${customization.vmsName}"/>
 
                 <RegistryValue
                     Root="HKLM"
                     Type="string"
-                    Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${minilauncher.binary.name}\command"
+                    Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${customization}\command"
                     Value="&quot;[#minilauncher_binary]&quot; &quot;%1&quot;"/>
 
                 <RegistryValue
                     Root="HKCR"
                     Type="string"
-                    Key="Applications\${client.binary.name}\SupportedTypes"
+                    Key="Applications\${minilauncher.binary.name}\SupportedTypes"
                     Name=".nov"
                     Value=""/>
-
-                <RegistryValue
-                    Root="HKLM"
-                    Type="string"
-                    Key="Software\Clients\Media\EVE media player\Capabilities\FileAssociations"
-                    Name=".nov"
-                    Value="HDW.nov"/>
             </Component>
         </DirectoryRef>
     </Fragment>
