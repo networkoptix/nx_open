@@ -131,7 +131,7 @@ public:
      */
     Error error = Error::NoError;
 
-    /**%apidoc Error message in English, or an empty string. */
+    /**%apidoc Error message or an empty string. */
     QString errorString;
 
     Result(Error error = Error::NoError, QString errorString = "");
