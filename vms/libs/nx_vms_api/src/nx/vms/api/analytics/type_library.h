@@ -16,7 +16,7 @@ struct NX_VMS_API TypeLibrary
     QList<ColorType> colorTypes;
     QList<HiddenExtendedType> extendedObjectTypes;
     QList<HiddenExtendedType> extendedEventTypes;
-    QList<AttributeList> attributeLists;
+    QList<AttributesWithId> attributeLists;
 };
 
 #define TypeLibrary_Fields \
