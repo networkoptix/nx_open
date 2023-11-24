@@ -118,8 +118,6 @@ QDateTime ServerTimeWatcher::serverTime(
     // Try to use actual server timezone when possible.
     if (NX_ASSERT(server) && ini().useNativeServerTimeZone)
     {
-        NX_VERBOSE(NX_SCOPE_TAG, "Calculating time based on server timezone %1",
-            server->timeZoneInfo().timezoneId);
         QByteArray timezoneId = server->timeZoneInfo().timezoneId.toUtf8();
         const bool isTzAvailable = QTimeZone::isTimeZoneIdAvailable(timezoneId);
         QTimeZone tz(timezoneId);
@@ -128,7 +126,8 @@ QDateTime ServerTimeWatcher::serverTime(
             QDateTime result;
             result.setTimeZone(tz);
             result.setMSecsSinceEpoch(msecsSinceEpoch);
-            NX_VERBOSE(NX_SCOPE_TAG, "Actual time is %1", result);
+            NX_TRACE(NX_SCOPE_TAG, "Calculated time based on server timezone %1 is %2",
+                server->timeZoneInfo().timezoneId, result);
             return result;
         }
         else
@@ -140,13 +139,13 @@ QDateTime ServerTimeWatcher::serverTime(
     // Intentionally fall-through to default calculation.
     {
         const auto utcOffset = duration_cast<seconds>(server->timeZoneInfo().utcOffset);
-        NX_VERBOSE(NX_SCOPE_TAG, "Calculating time based on server utc offset %1", utcOffset);
 
         QDateTime result;
         result.setTimeSpec(Qt::OffsetFromUTC);
         result.setOffsetFromUtc(utcOffset.count());
         result.setMSecsSinceEpoch(msecsSinceEpoch);
-        NX_VERBOSE(NX_SCOPE_TAG, "Actual time is %1", result);
+        NX_TRACE(NX_SCOPE_TAG, "Calculated time based on server utc offset %1 is %2",
+            utcOffset, result);
         return result;
     }
 }
