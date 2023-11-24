@@ -107,9 +107,14 @@ struct AttributeDescription
     QString subtype; //< One of: empty, a Name, "integer" or "float" for Numbers.
     std::optional<std::vector<QString>> items; //< Only for Enums.
     QString unit; //< Only for Number. Can be empty.
-    std::optional<double> minValue; //< Only for Number.
-    std::optional<double> maxValue; //< Only for Number.
-    QString attributeList; //< If not empty, all other fields are ignored.
+
+    /**%apidoc:integer */
+    std::optional<double> minValue; /**< Only for Number. */
+
+    /**%apidoc:integer */
+    std::optional<double> maxValue; /**< Only for Number. */
+
+    QString attributeList; /**< If not empty, all other fields are ignored. */
 
     /**
      * Condition string that defines whether this Attribute makes sense for the Object or Event
@@ -222,15 +227,15 @@ struct HiddenExtendedType
 #define HiddenExtendedType_Fields (id)(attributes)
 NX_REFLECTION_INSTRUMENT(HiddenExtendedType, HiddenExtendedType_Fields);
 
-struct AttributeList
+struct AttributesWithId
 {
     QString id;
     std::vector<AttributeDescription> attributes;
 
-    bool operator==(const AttributeList& other) const = default;
+    bool operator==(const AttributesWithId& other) const = default;
 };
-#define AttributeList_Fields (id)(attributes)
-NX_REFLECTION_INSTRUMENT(AttributeList, AttributeList_Fields)
+#define AttributesWithId_Fields (id)(attributes)
+NX_REFLECTION_INSTRUMENT(AttributesWithId, AttributesWithId_Fields)
 
 /**
  * Named group which is referenced from a "groupId" attribute of other types to group them.
@@ -269,7 +274,7 @@ QN_FUSION_DECLARE_FUNCTIONS(ExtendedType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(EventType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectType, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(HiddenExtendedType, (json), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(AttributeList, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(AttributesWithId, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(Group, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(TypeSupportInfo, (json), NX_VMS_API)
 

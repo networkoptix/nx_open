@@ -356,7 +356,7 @@ using ObjectTypeDescriptorMap = std::map<ObjectTypeId, ObjectTypeDescriptor>;
 using EnumTypeDescriptorMap = std::map<EnumTypeId, EnumTypeDescriptor>;
 using ColorTypeDescriptorMap = std::map<ColorTypeId, ColorTypeDescriptor>;
 
-using AttributeListMap = std::map<AttributeListId, AttributeList>;
+using AttributeListMap = std::map<AttributeListId, AttributesWithId>;
 
 using ScopedEventTypeIds = std::map<EngineId, std::map<GroupId, std::set<EventTypeId>>>;
 using ScopedObjectTypeIds = std::map<EngineId, std::map<GroupId, std::set<ObjectTypeId>>>;
