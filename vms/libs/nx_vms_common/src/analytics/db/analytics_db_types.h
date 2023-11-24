@@ -200,11 +200,28 @@ struct NX_VMS_COMMON_API Filter
         const AbstractObjectTypeDictionary& objectTypeDictionary,
         bool checkBoundingBox = true) const;
 
-    bool acceptsTrack(const ObjectTrack& track,
+    /*
+     * This context is used for multiple 'acceptsTrackInternal' calls.
+     * It allows to perform calculation only once to match multiple tracks.
+     */
+    struct AcceptTrackContext
+    {
+        AcceptTrackContext(const QString& text = QString()):
+            textMatcher(text)
+        {
+        }
+
+        TextMatcher textMatcher;
+    };
+    std::optional<AcceptTrackContext> context;
+
+    bool acceptsTrack(
+        const ObjectTrack& track,
         const AbstractObjectTypeDictionary& objectTypeDictionary,
         Options options = Option::none) const;
 
-    bool acceptsTrackEx(const ObjectTrackEx& track,
+    bool acceptsTrackEx(
+        const ObjectTrackEx& track,
         const AbstractObjectTypeDictionary& objectTypeDictionary,
         Options options = Option::none) const;
 
@@ -213,11 +230,13 @@ struct NX_VMS_COMMON_API Filter
 
 private:
     template<typename ObjectTrackType>
-    bool acceptsTrackInternal(const ObjectTrackType& track,
+    bool acceptsTrackInternal(
+        const ObjectTrackType& track,
         const AbstractObjectTypeDictionary& objectTypeDictionary,
         Options options) const;
 
-    bool matchText(TextMatcher* textMatcher,
+    bool matchText(
+        const TextMatcher* textMatcher,
         const ObjectTrack& track,
         const AbstractObjectTypeDictionary& objectTypeDictionary) const;
 };
