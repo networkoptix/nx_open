@@ -143,6 +143,11 @@ QString applauncherInternalName()
     return R"(${applauncher.name})";
 }
 
+QString desktopClientBinaryName()
+{
+    return R"(${client.binary.name})";
+}
+
 QString desktopClientLauncherName()
 {
     return R"(${client_launcher_name})";

@@ -109,7 +109,8 @@ bool launchInDir(const std::wstring& currentDirectory, int argc, LPWSTR* argv)
     for (int i = 1; i < argc; ++i)
     {
         std::wstring argument(argv[i]);
-        commandLine += kSpace + argument;
+        const auto quotedArgument = kQuote + argument + kQuote;
+        commandLine += kSpace + quotedArgument;
     }
 
     std::wcout << L"Command line: " << commandLine.c_str() << std::endl;

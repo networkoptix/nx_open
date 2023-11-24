@@ -9,25 +9,24 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QThread>
 
-#include <client/client_installations_manager.h>
-#include <client/client_module.h>
-#include <client/client_startup_parameters.h>
-#include <nx/build_info.h>
-#include <nx/vms/utils/platform/protocol_handler.h>
-
 #if defined(Q_OS_LINUX)
     #include <nx/vms/utils/desktop_file_linux.h>
 #endif // defined(Q_OS_LINUX)
 
+#include <client/client_installations_manager.h>
+#include <client/client_module.h>
+#include <client/client_startup_parameters.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/utils/file_system.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/utils/platform/protocol_handler.h>
 #include <platform/platform_abstraction.h>
 #include <platform/shortcuts/platform_shortcuts.h>
 #include <utils/applauncher_utils.h>
+#include <utils/platform/nov_association.h>
 
 namespace nx::vms::client::desktop {
 
@@ -147,7 +146,7 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
         m_clientVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
 
     bool hasAdminRights = startupParams.selfUpdateMode;
-    bool possiblyFixableWithAdminRightsErrorOccurred = false;
+    bool probablyPermissionError = false;
 
     /**
      * Developer builds cannot be run without predefined environment on windows. We must not use
@@ -155,14 +154,23 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
      */
     if (!isDeveloperBuildOnWindows())
     {
-        UriHandlerUpdateResult uriHandlerUpdateResult = registerUriHandler();
+        const auto uriHandlerUpdateResult = registerUriHandler();
+
         if (!uriHandlerUpdateResult.success)
         {
-            NX_WARNING(this,
-                "Unable to register URI handler (possibly because of insufficient permissions).");
+            if (hasAdminRights)
+                NX_WARNING(this, "Unable to register URI handler.");
+            else
+                probablyPermissionError = true;
+        }
 
-            if (!hasAdminRights)
-                possiblyFixableWithAdminRightsErrorOccurred = true;
+        // TODO: #alevenkov Remove this action in ( 5.1 + 3 releases ).
+        if (!registerNovFilesAssociation())
+        {
+            if (hasAdminRights)
+                NX_WARNING(this, "Unable to register nov files association.");
+            else
+                probablyPermissionError = true;
         }
 
         updateApplauncher();
@@ -195,16 +203,12 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
 
             for (const auto& helpFileDescription: helpFileDescriptions)
             {
-                bool result = updateHelpFile(helpFileDescription);
-
-                if (!result)
+                if (!updateHelpFile(helpFileDescription))
                 {
-                    NX_WARNING(this,
-                        "Unable to update %1 (possibly because of insufficient permissions).",
-                        helpFileDescription.helpName);
-
-                    if (!hasAdminRights)
-                        possiblyFixableWithAdminRightsErrorOccurred = true;
+                    if (hasAdminRights)
+                        NX_WARNING(this, "Unable to update %1.", helpFileDescription.helpName);
+                    else
+                        probablyPermissionError = true;
                 }
             }
         }
@@ -213,33 +217,26 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     // Update shortcuts for the current user / all users depending on the given access rights.
     if (nx::build_info::isWindows())
     {
-        bool result = updateMinilauncherOnWindows(hasAdminRights);
-
-        if (!result)
+        if (!updateMinilauncherOnWindows(hasAdminRights))
         {
-            NX_WARNING(this,
-                "Unable to update Minilauncher (possibly because of insufficient permissions).");
-
-            if (!hasAdminRights)
-                possiblyFixableWithAdminRightsErrorOccurred = true;
+            if (hasAdminRights)
+                NX_WARNING(this, "Unable to update Minilauncher.");
+            else
+                probablyPermissionError = true;
         }
 
-        if (possiblyFixableWithAdminRightsErrorOccurred)
+        if (probablyPermissionError)
             relaunchSelfUpdaterWithAdminPermissionsOnWindows();
     }
 }
 
 SelfUpdater::UriHandlerUpdateResult SelfUpdater::registerUriHandler()
 {
-    using nx::utils::SoftwareVersion;
-
     UriHandlerUpdateResult result;
 
-    QString binaryPath = qApp->applicationFilePath();
-
-    #if defined(Q_OS_LINUX)
-        binaryPath = qApp->applicationDirPath() + lit("/client");
-    #endif
+    QString binaryPath = nx::build_info::isLinux()
+        ? (qApp->applicationDirPath() + "/client")
+        : qApp->applicationFilePath();
 
     auto registerHandlerResult = nx::vms::utils::registerSystemUriProtocolHandler(
         /*protocol*/ nx::branding::nativeUriProtocol(),
@@ -249,19 +246,40 @@ SelfUpdater::UriHandlerUpdateResult SelfUpdater::registerUriHandler()
         /*customization*/ nx::branding::customization(),
         /*version*/ m_clientVersion);
 
-    result.success = registerHandlerResult.success;
+    if (!registerHandlerResult.success)
+        return result;
 
-    if (result.success)
+    result.success = true;
+
+    if (m_clientVersion > registerHandlerResult.previousVersion)
     {
-        result.upgrade = m_clientVersion > registerHandlerResult.previousVersion;
+        result.upgrade = true;
 
-        if (result.upgrade)
-            NX_DEBUG(this, "Upgrading from %1 to %2 detected during registering URI handler.",
-                registerHandlerResult.previousVersion,
-                m_clientVersion);
+        NX_DEBUG(this, "Upgrading from %1 to %2 detected during registering URI handler.",
+            registerHandlerResult.previousVersion,
+            m_clientVersion);
     }
 
     return result;
+}
+
+bool SelfUpdater::registerNovFilesAssociation()
+{
+    const auto minilauncherPath = QDir(qApp->applicationDirPath()).absoluteFilePath(
+        nx::branding::minilauncherBinaryName());
+    if (!QFileInfo::exists(minilauncherPath))
+    {
+        NX_ERROR(this, "Source minilauncher could not be found at %1!", minilauncherPath);
+        // Silently exiting because we still can't do anything.
+        return true;
+    }
+
+    return nx::vms::utils::registerNovFilesAssociation(
+        /*customizationId*/ nx::branding::customization(),
+        /*applicationLauncherBinaryPath*/ minilauncherPath,
+        /*applicationBinaryName*/ nx::branding::desktopClientBinaryName(),
+        /*applicationName*/ nx::branding::vmsName()
+    );
 }
 
 bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
