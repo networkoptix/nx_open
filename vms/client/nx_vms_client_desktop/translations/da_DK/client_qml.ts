@@ -35,20 +35,8 @@
       <translation type="unfinished">Membership</translation>
     </message>
     <message>
-      <source>Misc</source>
-      <translation type="unfinished">Misc</translation>
-    </message>
-    <message>
-      <source>Synchronization&lt;br&gt;Interval</source>
-      <translation type="unfinished">Synchronization&lt;br&gt;Interval</translation>
-    </message>
-    <message>
       <source>Search Timeout</source>
       <translation type="unfinished">Search Timeout</translation>
-    </message>
-    <message>
-      <source>Proxy LDAP requests&lt;br&gt;via server</source>
-      <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
@@ -63,8 +51,25 @@
       <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
     </message>
     <message>
-      <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <source>General</source>
+      <translation>Generelt</translation>
+    </message>
+    <message>
+      <source>Synchronize Users</source>
+      <translation type="unfinished">Synchronize Users</translation>
+    </message>
+    <message>
+      <source>Sync Interval</source>
+      <translation type="unfinished">Sync Interval</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests %1 via server</source>
+      <comment>%1 is a line break</comment>
+      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+    </message>
+    <message>
+      <source>Group Attribute</source>
+      <translation type="unfinished">Group Attribute</translation>
     </message>
   </context>
   <context>
@@ -220,19 +225,19 @@
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Tjek kameraindstillinger for at konfigurere dette plugin.</translation>
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>Tjek systemadministrationsindstillingerne for at konfigurere dette plugin.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>Dette plugin har ingen indstillinger på systemniveau.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Dette plugin har ingen indstillinger for dette kamera.</translation>
     </message>
   </context>
   <context>
@@ -379,7 +384,7 @@
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Tryk på hver knap flere gange, og skriv navnene på disse knapper i tabellen nedenfor.</translation>
     </message>
   </context>
   <context>
@@ -1018,11 +1023,11 @@
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Vælg joystick.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Ingen enheder tilsluttet.</translation>
     </message>
   </context>
   <context>
@@ -1130,11 +1135,11 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Gem</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Forrige</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1237,14 +1242,6 @@
       <translation>Afbryd</translation>
     </message>
     <message>
-      <source>Continuous User Import</source>
-      <translation type="unfinished">Continuous User Import</translation>
-    </message>
-    <message>
-      <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
-      <translation type="unfinished">LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation type="unfinished">Filters</translation>
     </message>
@@ -1259,14 +1256,6 @@
     <message>
       <source>No filters</source>
       <translation>Ingen filtre</translation>
-    </message>
-    <message>
-      <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
-      <translation type="unfinished">VMS imports and synchronizes users and groups with LDAP server in real time</translation>
-    </message>
-    <message>
-      <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
-      <translation type="unfinished">VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
@@ -1615,9 +1604,9 @@
       <translation type="unfinished">Automatically add dependent permissions</translation>
     </message>
     <message>
-      <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
+      <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple lines, or %3 to clear the selection</translation>
+      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
     </message>
   </context>
   <context>
@@ -1817,6 +1806,52 @@ for at aktivere PTZ</translation>
     </message>
   </context>
   <context>
+    <name>ResourceAccessDelegate</name>
+    <message>
+      <source>Has %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Has %1 permission</translation>
+    </message>
+    <message>
+      <source>Also inherits it from:</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation type="unfinished">Also inherits it from:</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from:</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Inherits %1 permission from:</translation>
+    </message>
+    <message>
+      <source>Add %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Add %1 and dependent permissions</translation>
+    </message>
+    <message>
+      <source>Add %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Add %1 permission</translation>
+    </message>
+    <message>
+      <source>Already inherited from:</source>
+      <translation type="unfinished">Already inherited from:</translation>
+    </message>
+    <message>
+      <source>Remove %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+    </message>
+    <message>
+      <source>Remove %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Remove %1 permission</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from:</source>
+      <translation type="unfinished">Will stay inherited from:</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourceBrowser</name>
     <message>
       <source>No local files</source>
@@ -1987,15 +2022,15 @@ for at aktivere PTZ</translation>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Vælg fil, der skal gemmes</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>JSON filer (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>Fil for at gemme resultaterne:</translation>
     </message>
   </context>
   <context>
@@ -2056,7 +2091,7 @@ for at aktivere PTZ</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>Denne handling kræver, at nogle parametre skal udfyldes.</translation>
     </message>
   </context>
   <context>
@@ -2184,6 +2219,21 @@ for at aktivere PTZ</translation>
     <message>
       <source>Logical ID</source>
       <translation>Logisk ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>SyncComboBox</name>
+    <message>
+      <source>Never</source>
+      <translation type="unfinished">Never</translation>
+    </message>
+    <message>
+      <source>Always</source>
+      <translation type="unfinished">Always</translation>
+    </message>
+    <message>
+      <source>On Log In</source>
+      <translation type="unfinished">On Log In</translation>
     </message>
   </context>
   <context>
@@ -2589,28 +2639,28 @@ for at aktivere PTZ</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Du har ikke adgang til %1. Tjek venligst din internetforbindelse.</translation>
     </message>
   </context>
   <context>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Bevæg joysticket til venstre og højre flere gange.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Bevæg joysticket op og ned flere gange.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Roter joysticket med uret og mod uret flere gange.</translation>
     </message>
   </context>
 </TS>

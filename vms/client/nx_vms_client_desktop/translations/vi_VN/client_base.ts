@@ -10362,63 +10362,40 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
   <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
-      <source>Access granted by %1 group</source>
-      <translation>Quyền truy cập được cấp bởi nhóm %1</translation>
+      <source>%1 layout</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation>bố cục %1</translation>
     </message>
     <message numerus="yes">
-      <source>Access granted by %n groups: %1</source>
-      <translation>
-        <numerusform>Quyền truy cập được cấp bởi %n nhóm: %1</numerusform>
+      <source>%1 and %n more layouts</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more layouts</numerusform>
       </translation>
     </message>
     <message>
-      <source>Access granted by %1 layout</source>
-      <translation>Quyền truy cập được cấp bởi bố cục %1</translation>
+      <source>%1 video wall</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">%1 video wall</translation>
     </message>
     <message numerus="yes">
-      <source>Access granted by %n layouts: %1</source>
-      <translation>
-        <numerusform>Quyền truy cập được cấp bởi %n bố cục: %1</numerusform>
+      <source>%1 and %n more video walls</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
       </translation>
     </message>
     <message>
-      <source>Access granted by %1 video wall</source>
-      <translation>Truy cập được cấp bởi %1 tường video</translation>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">%1 group</translation>
     </message>
     <message numerus="yes">
-      <source>Access granted by %n video walls: %1</source>
-      <translation>
-        <numerusform>Truy cập được cấp bởi %n tường video: %1</numerusform>
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Devices</source>
-      <translation>Camera và thiết bị</translation>
-    </message>
-    <message>
-      <source>Web Pages &amp; Integrations</source>
-      <translation>Trang web &amp; Tích hợp</translation>
-    </message>
-    <message>
-      <source>Health Monitors</source>
-      <translation>Theo dõi tài nguyên hệ thống</translation>
-    </message>
-    <message>
-      <source>Video Walls</source>
-      <translation>Tường video</translation>
-    </message>
-    <message>
-      <source>User&apos;s custom permissions</source>
-      <translation>Quyền tùy chỉnh của người dùng</translation>
-    </message>
-    <message>
-      <source>Group&apos;s custom permissions</source>
-      <translation>Quyền tùy chỉnh của nhóm</translation>
-    </message>
-    <message>
-      <source>Access granted by %1</source>
-      <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
-      <translation>Quyền truy cập được cấp bởi %1</translation>
     </message>
   </context>
   <context>

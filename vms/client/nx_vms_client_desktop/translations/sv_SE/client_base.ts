@@ -10514,66 +10514,43 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
   <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
-      <source>Access granted by %1 group</source>
-      <translation>Åtkomst beviljad av %1 grupp</translation>
+      <source>%1 layout</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation>%1 layout</translation>
     </message>
     <message numerus="yes">
-      <source>Access granted by %n groups: %1</source>
-      <translation>
-        <numerusform>Tillgång beviljad av %n grupper: %1</numerusform>
-        <numerusform>Tillgång beviljad av %n grupper: %1</numerusform>
+      <source>%1 and %n more layouts</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
       </translation>
     </message>
     <message>
-      <source>Access granted by %1 layout</source>
-      <translation>Åtkomst beviljas av %1 layout</translation>
+      <source>%1 video wall</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">%1 video wall</translation>
     </message>
     <message numerus="yes">
-      <source>Access granted by %n layouts: %1</source>
-      <translation>
-        <numerusform>Tillgång beviljad av %n layouter: %1</numerusform>
-        <numerusform>Tillgång beviljad av %n layouter: %1</numerusform>
+      <source>%1 and %n more video walls</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
       </translation>
     </message>
     <message>
-      <source>Access granted by %1 video wall</source>
-      <translation>Åtkomst beviljad av %1 videovägg</translation>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">%1 group</translation>
     </message>
     <message numerus="yes">
-      <source>Access granted by %n video walls: %1</source>
-      <translation>
-        <numerusform>Åtkomst beviljad av %n videoväggar: %1</numerusform>
-        <numerusform>Åtkomst beviljad av %n videoväggar: %1</numerusform>
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Devices</source>
-      <translation>Kameror &amp; resurser</translation>
-    </message>
-    <message>
-      <source>Web Pages &amp; Integrations</source>
-      <translation>Webbsidor och integrationer</translation>
-    </message>
-    <message>
-      <source>Health Monitors</source>
-      <translation>Hälsoövervakning</translation>
-    </message>
-    <message>
-      <source>Video Walls</source>
-      <translation>Videoväggar</translation>
-    </message>
-    <message>
-      <source>User&apos;s custom permissions</source>
-      <translation>Användare&apos;anpassade behörigheter</translation>
-    </message>
-    <message>
-      <source>Group&apos;s custom permissions</source>
-      <translation>Gruppera&apos;anpassade behörigheter</translation>
-    </message>
-    <message>
-      <source>Access granted by %1</source>
-      <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
-      <translation>Åtkomst beviljad av %1</translation>
     </message>
   </context>
   <context>

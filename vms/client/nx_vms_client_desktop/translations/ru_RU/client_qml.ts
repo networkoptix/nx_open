@@ -35,20 +35,8 @@
       <translation type="unfinished">Membership</translation>
     </message>
     <message>
-      <source>Misc</source>
-      <translation>Прочее</translation>
-    </message>
-    <message>
-      <source>Synchronization&lt;br&gt;Interval</source>
-      <translation type="unfinished">Synchronization&lt;br&gt;Interval</translation>
-    </message>
-    <message>
       <source>Search Timeout</source>
       <translation type="unfinished">Search Timeout</translation>
-    </message>
-    <message>
-      <source>Proxy LDAP requests&lt;br&gt;via server</source>
-      <translation type="unfinished">Proxy LDAP requests&lt;br&gt;via server</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
@@ -63,8 +51,25 @@
       <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
     </message>
     <message>
-      <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <source>General</source>
+      <translation>Общие</translation>
+    </message>
+    <message>
+      <source>Synchronize Users</source>
+      <translation>Синхронизировать пользователей</translation>
+    </message>
+    <message>
+      <source>Sync Interval</source>
+      <translation>Интервал синхронизации</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests %1 via server</source>
+      <comment>%1 is a line break</comment>
+      <translation>Проксирование LDAP-запросов %1 через сервер</translation>
+    </message>
+    <message>
+      <source>Group Attribute</source>
+      <translation>Атрибут группы</translation>
     </message>
   </context>
   <context>
@@ -1251,14 +1256,6 @@
       <translation>Отключить</translation>
     </message>
     <message>
-      <source>Continuous User Import</source>
-      <translation type="unfinished">Continuous User Import</translation>
-    </message>
-    <message>
-      <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
-      <translation type="unfinished">LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation type="unfinished">Filters</translation>
     </message>
@@ -1273,14 +1270,6 @@
     <message>
       <source>No filters</source>
       <translation type="unfinished">No filters</translation>
-    </message>
-    <message>
-      <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
-      <translation type="unfinished">VMS imports and synchronizes users and groups with LDAP server in real time</translation>
-    </message>
-    <message>
-      <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
-      <translation type="unfinished">VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
@@ -1633,9 +1622,9 @@
       <translation type="unfinished">Automatically add dependent permissions</translation>
     </message>
     <message>
-      <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
+      <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple lines, or %3 to clear the selection</translation>
+      <translation>Используйте %1 или %2, чтобы выбрать несколько ресурсов, или %3, чтобы очистить выбор</translation>
     </message>
   </context>
   <context>
@@ -1836,6 +1825,52 @@ to activate PTZ</source>
     <message>
       <source>Delete</source>
       <translation>Удалить</translation>
+    </message>
+  </context>
+  <context>
+    <name>ResourceAccessDelegate</name>
+    <message>
+      <source>Has %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Имеет разрешение %1</translation>
+    </message>
+    <message>
+      <source>Also inherits it from:</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>Также наследует его от:</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from:</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Наследует разрешение %1 от:</translation>
+    </message>
+    <message>
+      <source>Add %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Добавить %1 и зависимые разрешения</translation>
+    </message>
+    <message>
+      <source>Add %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Добавить разрешение %1</translation>
+    </message>
+    <message>
+      <source>Already inherited from:</source>
+      <translation>Уже унаследовано от:</translation>
+    </message>
+    <message>
+      <source>Remove %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Удалить %1 и зависимые разрешения</translation>
+    </message>
+    <message>
+      <source>Remove %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Удалить разрешение %1</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from:</source>
+      <translation>Останется унаследованным от:</translation>
     </message>
   </context>
   <context>
@@ -2210,6 +2245,21 @@ to activate PTZ</source>
     <message>
       <source>Logical ID</source>
       <translation>Логический ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>SyncComboBox</name>
+    <message>
+      <source>Never</source>
+      <translation>Никогда</translation>
+    </message>
+    <message>
+      <source>Always</source>
+      <translation>Всегда</translation>
+    </message>
+    <message>
+      <source>On Log In</source>
+      <translation>При входе в систему</translation>
     </message>
   </context>
   <context>

@@ -10507,66 +10507,43 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
   <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
-      <source>Access granted by %1 group</source>
-      <translation>%1 grup tarafından verilen erişim</translation>
+      <source>%1 layout</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation>%1 düzen</translation>
     </message>
     <message numerus="yes">
-      <source>Access granted by %n groups: %1</source>
+      <source>%1 and %n more layouts</source>
+      <comment>%1 will be substituted with a layout name</comment>
       <translation type="unfinished">
-        <numerusform>%n gruplar tarafından verilen erişim: %1</numerusform>
-        <numerusform>Access granted by %n groups: %1</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
       </translation>
     </message>
     <message>
-      <source>Access granted by %1 layout</source>
-      <translation type="unfinished">Access granted by %1 layout</translation>
+      <source>%1 video wall</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">%1 video wall</translation>
     </message>
     <message numerus="yes">
-      <source>Access granted by %n layouts: %1</source>
+      <source>%1 and %n more video walls</source>
+      <comment>%1 will be substituted with a video wall name</comment>
       <translation type="unfinished">
-        <numerusform>Access granted by %n layouts: %1</numerusform>
-        <numerusform>Access granted by %n layouts: %1</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
       </translation>
     </message>
     <message>
-      <source>Access granted by %1 video wall</source>
-      <translation type="unfinished">Access granted by %1 video wall</translation>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">%1 group</translation>
     </message>
     <message numerus="yes">
-      <source>Access granted by %n video walls: %1</source>
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>Access granted by %n video walls: %1</numerusform>
-        <numerusform>Access granted by %n video walls: %1</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Cameras &amp; Devices</source>
-      <translation>Kameralar ve Cihazlar</translation>
-    </message>
-    <message>
-      <source>Web Pages &amp; Integrations</source>
-      <translation>Web Sayfaları &amp; Entegrasyonlar</translation>
-    </message>
-    <message>
-      <source>Health Monitors</source>
-      <translation>Sistem Durumu İzleyicisi</translation>
-    </message>
-    <message>
-      <source>Video Walls</source>
-      <translation>Video Wall</translation>
-    </message>
-    <message>
-      <source>User&apos;s custom permissions</source>
-      <translation type="unfinished">User&apos;s custom permissions</translation>
-    </message>
-    <message>
-      <source>Group&apos;s custom permissions</source>
-      <translation type="unfinished">Group&apos;s custom permissions</translation>
-    </message>
-    <message>
-      <source>Access granted by %1</source>
-      <comment>`%1` will be substituted with a resource group like `Cameras &amp; Devices`</comment>
-      <translation>%1 grup tarafından verilen erişim</translation>
     </message>
   </context>
   <context>
