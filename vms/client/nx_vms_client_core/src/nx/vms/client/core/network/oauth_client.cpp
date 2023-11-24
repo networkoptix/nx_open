@@ -7,6 +7,7 @@
 #include <client_core/client_core_module.h>
 #include <nx/cloud/db/api/connection.h>
 #include <nx/cloud/db/api/oauth_data.h>
+#include <nx/cloud/db/client/oauth_manager.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
@@ -91,6 +92,7 @@ void OauthClient::Private::issueAccessToken()
             authData.credentials = nx::network::http::BearerAuthToken(response.access_token);
             authData.refreshToken = std::move(response.refresh_token);
             authData.expiresAt = response.expires_at;
+            authData.needValidateToken = response.error == OauthManager::k2faRequiredError;
             emit q->authDataReady();
         });
 
