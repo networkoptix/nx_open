@@ -61,7 +61,9 @@ BookmarkTooltip::BookmarkTooltip(
 
     QVBoxLayout* layout = new QVBoxLayout();
 
-    layout->setContentsMargins(1, 0, 1, 2 + tailGeometry().height);
+    constexpr auto kMainLayoutLeftRightMargin = 1;
+    layout->setContentsMargins(
+        kMainLayoutLeftRightMargin, 0, kMainLayoutLeftRightMargin, 2 + tailGeometry().height);
     layout->setSpacing(0);
 
     bool addSeparator = false;
@@ -82,8 +84,10 @@ BookmarkTooltip::BookmarkTooltip(
             addSeparator = true;
         }
 
+        constexpr auto kBookmarkLayoutLeftRightMargin = 14;
         QVBoxLayout* topBookmarkLayout = new QVBoxLayout();
-        topBookmarkLayout->setContentsMargins(14, 12, 14, 0);
+        topBookmarkLayout->setContentsMargins(
+            kBookmarkLayoutLeftRightMargin, 12, kBookmarkLayoutLeftRightMargin, 0);
         topBookmarkLayout->setSpacing(16);
 
         QVBoxLayout* nameLayout = new QVBoxLayout();
@@ -92,7 +96,12 @@ BookmarkTooltip::BookmarkTooltip(
         nameLayout->addWidget(createNameLabel(bookmark.name));
 
         if (!bookmark.description.isEmpty())
-            nameLayout->addWidget(createDescriptionLabel(bookmark.description));
+        {
+            const auto descriptionLabel = createDescriptionLabel(bookmark.description);
+            descriptionLabel->setFixedWidth(
+                kWidgetWidth - kMainLayoutLeftRightMargin * 2 - kBookmarkLayoutLeftRightMargin * 2);
+            nameLayout->addWidget(descriptionLabel);
+        }
 
         topBookmarkLayout->addLayout(nameLayout);
 
