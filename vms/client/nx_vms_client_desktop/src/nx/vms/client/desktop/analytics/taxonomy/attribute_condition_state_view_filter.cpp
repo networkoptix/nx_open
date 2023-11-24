@@ -67,9 +67,7 @@ bool AttributeConditionStateViewFilter::matches(
 
     nx::analytics::db::TextMatcher textMatcher;
     textMatcher.parse(condition);
-    textMatcher.matchAttributes(d->attributeValues);
-
-    return textMatcher.matched();
+    return textMatcher.matchAttributes(d->attributeValues);
 }
 
 } // namespace nx::vms::client::desktop::analytics::taxonomy
