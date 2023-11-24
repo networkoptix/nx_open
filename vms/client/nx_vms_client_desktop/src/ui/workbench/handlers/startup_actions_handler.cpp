@@ -46,6 +46,7 @@
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/webpage/default_webpage_handler.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
@@ -116,6 +117,7 @@ struct StartupActionsHandler::Private
 
     std::unique_ptr<LogonData> delayedLogonParameters;
     std::unique_ptr<QTimer> delayedLogonTimer;
+    std::unique_ptr<DefaultWebpageHandler> defaultWebpageHandler;
 
     Private(QnWorkbenchContext* context):
         context(context)
@@ -205,6 +207,13 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
     connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::cloudSystemsChanged, this,
         [this](const QnCloudSystemList &systems) { d->onCloudSystemsChanged(systems); },
         Qt::QueuedConnection);
+
+    if (ini().openDefaultWebPageOnConnect)
+    {
+        // Ensure class is initialized after this one to make sure saved session (if any) will be
+        // restored before the default web page is opened.
+        d->defaultWebpageHandler = std::make_unique<DefaultWebpageHandler>(context());
+    }
 }
 
 StartupActionsHandler::~StartupActionsHandler()

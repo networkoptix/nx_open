@@ -300,6 +300,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, nativeLinkForTemporaryUsers,
         "[Feature] Use native link type for temporary user");
 
+    // VMS-42600
+    NX_INI_FLAG(false, openDefaultWebPageOnConnect,
+        "[Feature] Open web page, marked as default, when client connects to a system.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move
