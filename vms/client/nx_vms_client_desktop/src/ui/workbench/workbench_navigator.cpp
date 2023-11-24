@@ -1138,6 +1138,12 @@ void QnWorkbenchNavigator::rewind(bool jumpToPreviousChunk)
     if (!m_currentMediaWidget)
         return;
 
+    if (m_skip1Step)
+    {
+        m_skip1Step = false;
+        return;
+    }
+
     const auto reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
@@ -1163,16 +1169,17 @@ void QnWorkbenchNavigator::rewind(bool jumpToPreviousChunk)
             return; //< Reader currently in some invalid state.
 
         std::chrono::milliseconds posMs = currentTimeMs - kShiftStepMs;
-        if (!curPeriod->contains(posMs))
+        if ((jumpToPreviousChunk || !curPeriod->contains(posMs)))
         {
-            if (jumpToPreviousChunk && curPeriod != periods.begin())
+            if (curPeriod == periods.begin())
             {
-                const auto prevPeriod = std::prev(curPeriod);
-                posMs = std::max(prevPeriod->startTime(), prevPeriod->endTime() - kShiftStepMs);
+                posMs = curPeriod->startTime();
             }
             else
             {
-                posMs = curPeriod->startTime();
+                const auto prevPeriod = std::prev(curPeriod);
+                posMs = std::max(prevPeriod->startTime(), prevPeriod->endTime() - kShiftStepMs);
+                m_skip1Step = !jumpToPreviousChunk;
             }
         }
 
