@@ -336,6 +336,11 @@ QString Url::query(QUrl::ComponentFormattingOptions options) const
     return m_url.query(options);
 }
 
+bool Url::hasQueryItem(const QString& key) const
+{
+    return QUrlQuery(m_url).hasQueryItem(key);
+}
+
 QString Url::queryItem(const QString& key) const
 {
     return QUrlQuery(m_url).queryItemValue(key);
