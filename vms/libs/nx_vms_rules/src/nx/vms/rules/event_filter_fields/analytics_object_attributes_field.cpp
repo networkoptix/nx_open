@@ -8,11 +8,8 @@ namespace nx::vms::rules {
 
 bool AnalyticsObjectAttributesField::match(const QVariant& eventValue) const
 {
-    nx::analytics::db::TextMatcher textMatcher;
-    textMatcher.parse(value());
-    textMatcher.matchAttributes(eventValue.value<nx::common::metadata::Attributes>());
-
-    return textMatcher.matched();
+    nx::analytics::db::TextMatcher textMatcher(value());
+    return textMatcher.matchAttributes(eventValue.value<nx::common::metadata::Attributes>());
 }
 
 } // namespace nx::vms::rules

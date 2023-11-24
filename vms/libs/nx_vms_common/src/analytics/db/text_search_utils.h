@@ -170,47 +170,51 @@ private:
 class NX_VMS_COMMON_API TextMatcher
 {
 public:
+    TextMatcher() = default;
+    TextMatcher(const QString& text);
+
     /**
      * Uses UserTextSearchExpressionParser to parse text.
      */
     void parse(const QString& text);
     bool empty() const;
 
-    void matchAttributes(const nx::common::metadata::Attributes& attributes);
-    void matchText(const QString& text);
+    bool matchAttributes(const nx::common::metadata::Attributes& attributes) const;
 
     /**
      * @return true If all tokens of the filter were matched
      * by calls to matchAttributes or matchText().
      */
-    bool matched() const;
+    bool matchText(const QString& text) const;
+
 
     bool hasShortTokens() const;
 
 private:
-    void matchExactAttributes(
-        const nx::common::metadata::Attributes& attributes);
+    uint64_t matchExactAttributes(
+        const nx::common::metadata::Attributes& attributes) const;
 
-    void checkAttributesPresence(
-        const nx::common::metadata::Attributes& attributes);
+    uint64_t checkAttributesPresence(
+        const nx::common::metadata::Attributes& attributes) const;
 
-    void matchAttributeValues(
-        const nx::common::metadata::Attributes& attributes);
+    uint64_t matchAttributeValues(
+        const nx::common::metadata::Attributes& attributes) const;
 
     bool wordMatchAnyOfAttributes(
         const QString& word,
-        const nx::common::metadata::Attributes& attributes);
+        const nx::common::metadata::Attributes& attributes) const;
 
     bool rangeMatchAttributes(
         const nx::common::metadata::NumericRange& range,
         const QString& paramName,
-        const nx::common::metadata::Attributes& attributes);
+        const nx::common::metadata::Attributes& attributes) const;
+
+    bool allConditionMatched(uint64_t result) const;
 
     static bool isAttributeNameMatching(const QString& attributeName, const QString& value);
 
 private:
     std::vector<TextSearchCondition> m_conditions;
-    std::vector<bool> m_conditionsMatched;
 };
 
 //-------------------------------------------------------------------------------------------------

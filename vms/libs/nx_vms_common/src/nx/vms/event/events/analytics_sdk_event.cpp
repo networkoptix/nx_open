@@ -112,10 +112,8 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
     if (checkForKeywords(m_description, params.description))
         return true;
 
-    nx::analytics::db::TextMatcher textMatcher;
-    textMatcher.parse(params.description);
-    textMatcher.matchAttributes(m_attributes);
-    return textMatcher.matched();
+    nx::analytics::db::TextMatcher textMatcher(params.description);
+    return textMatcher.matchAttributes(m_attributes);
 }
 
 const nx::common::metadata::Attributes& AnalyticsSdkEvent::attributes() const
