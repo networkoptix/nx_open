@@ -136,6 +136,7 @@ public:
     void setQuery(const QString &query, QUrl::ParsingMode mode = QUrl::TolerantMode);
     void setQuery(const QUrlQuery &query);
     Q_INVOKABLE QString query(QUrl::ComponentFormattingOptions = QUrl::PrettyDecoded) const;
+    Q_INVOKABLE bool hasQueryItem(const QString& key) const;
     Q_INVOKABLE QString queryItem(const QString& key) const;
 
     void setPathAndQuery(const QString& pathAndQuery, QUrl::ParsingMode mode = QUrl::DecodedMode);
