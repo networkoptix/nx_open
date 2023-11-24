@@ -143,8 +143,7 @@ bool ObjectLookupField::match(const QVariant& eventValue) const
     if (m_checkType == ObjectLookupCheckType::hasAttributes)
     {
         auto matcher = std::any_cast<analytics::db::TextMatcher&>(m_listOrMatcher);
-        matcher.matchAttributes(attributes);
-        return matcher.matched();
+        return matcher.matchAttributes(attributes);
     }
 
     const auto& lookupListData = std::any_cast<api::LookupListData&>(m_listOrMatcher);

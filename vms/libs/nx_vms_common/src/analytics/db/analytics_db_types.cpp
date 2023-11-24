@@ -17,7 +17,6 @@
 
 #include "analytics_db_utils.h"
 #include "config.h"
-#include "text_search_utils.h"
 
 using namespace nx::common::metadata;
 
@@ -210,11 +209,14 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track,
     if (!analyticsEngineId.isNull() && track.analyticsEngineId != analyticsEngineId)
         return false;
 
-    if (!options.testFlag(Option::ignoreTextFilter))
+    if (!freeText.isEmpty() && !options.testFlag(Option::ignoreTextFilter))
     {
-        TextMatcher textMatcher;
-        textMatcher.parse(freeText);
-        if (!matchText(&textMatcher, track, objectTypeDictionary))
+        TextMatcher tempTextMatcher;
+        const TextMatcher* textMatcher = context ? &context->textMatcher : &tempTextMatcher;
+        if (!context)
+            tempTextMatcher.parse(freeText);
+
+        if (!matchText(textMatcher, track, objectTypeDictionary))
         {
             if constexpr (std::is_same<decltype(track), const ObjectTrackEx&>::value)
             {
@@ -222,8 +224,7 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track,
                 if (!std::any_of(track.objectPositionSequence.cbegin(),
                         track.objectPositionSequence.cend(),
                         [this, &textMatcher](const ObjectPosition& position) {
-                            textMatcher.matchAttributes(position.attributes);
-                            return textMatcher.matched();
+                            return textMatcher->matchAttributes(position.attributes);
                         }))
                 {
                     return false;
@@ -246,17 +247,15 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track,
     return true;
 }
 
-bool Filter::matchText(TextMatcher* textMatcher,
+bool Filter::matchText(const TextMatcher* textMatcher,
     const ObjectTrack& track,
     const AbstractObjectTypeDictionary& objectTypeDictionary) const
 {
     const auto objectTypeName = objectTypeDictionary.idToName(track.objectTypeId);
-    if (objectTypeName)
-        textMatcher->matchText(*objectTypeName);
+    if (objectTypeName && textMatcher->matchText(*objectTypeName))
+        return true;
 
-    textMatcher->matchAttributes(track.attributes);
-
-    return textMatcher->matched();
+    return textMatcher->matchAttributes(track.attributes);
 }
 
 bool Filter::operator==(const Filter& right) const
