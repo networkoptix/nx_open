@@ -85,14 +85,22 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
 
     if (connection->userType() == nx::vms::api::UserType::cloud)
     {
-        token = OauthLoginDialog::login(
+        const auto cloudAuthData = OauthLoginDialog::login(
             m_parent,
             m_title,
             info(m_actionType).clientType,
             /*sessionAware*/ true,
             connection->moduleInformation().cloudSystemId,
             Qt::WindowStaysOnTopHint
-        ).credentials.authToken;
+        );
+
+        if (cloudAuthData.needValidateToken
+            && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData.credentials))
+        {
+            return {};
+        }
+
+        token = cloudAuthData.credentials.authToken;
     }
     else
     {

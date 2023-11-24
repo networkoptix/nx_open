@@ -19,6 +19,7 @@ struct CloudAuthData
     std::string authorizationCode;
     // Unix timestamp of access token expiration.
     std::chrono::milliseconds expiresAt = std::chrono::milliseconds::zero();
+    bool needValidateToken = false;
 
     bool empty() const
     {
