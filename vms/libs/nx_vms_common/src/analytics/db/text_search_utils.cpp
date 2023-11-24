@@ -2,8 +2,10 @@
 
 #include "text_search_utils.h"
 
-#include <nx/utils/string.h>
 #include <regex>
+
+#include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 
 namespace nx::analytics::db {
 
@@ -17,6 +19,7 @@ std::vector<TextSearchCondition> UserTextSearchExpressionParser::parse(const QSt
     parse(
         text,
         [&result](auto expr) { result.push_back(std::move(expr)); });
+
     return result;
 }
 
@@ -67,12 +70,20 @@ QString UserTextSearchExpressionParser::unescapeName(const QStringView& str)
 //-------------------------------------------------------------------------------------------------
 // TextMatcher.
 
+TextMatcher::TextMatcher(const QString& text)
+{
+    parse(text);
+}
+
 void TextMatcher::parse(const QString& text)
 {
     UserTextSearchExpressionParser parser;
     m_conditions = parser.parse(text);
-    m_conditionsMatched.clear();
-    m_conditionsMatched.resize(m_conditions.size(), false);
+    if (m_conditions.size() > 64)
+    {
+        NX_WARNING(this, "Text matcher supports up to 64 condittions. %1 provided", m_conditions.size());
+        m_conditions.erase(m_conditions.begin() + 64, m_conditions.end());
+    }
 }
 
 bool TextMatcher::hasShortTokens() const
@@ -102,39 +113,41 @@ bool TextMatcher::empty() const
     return m_conditions.empty();
 }
 
-void TextMatcher::matchAttributes(const nx::common::metadata::Attributes& attributes)
+bool TextMatcher::matchAttributes(const nx::common::metadata::Attributes& attributes) const
 {
     if (attributes.empty())
-        return;
+        return false;
 
-    matchExactAttributes(attributes);
-    checkAttributesPresence(attributes);
-    matchAttributeValues(attributes);
+    const uint64_t mask = matchExactAttributes(attributes)
+        | checkAttributesPresence(attributes)
+        | matchAttributeValues(attributes);
+    return allConditionMatched(mask);
 }
 
-void TextMatcher::matchText(const QString& text)
+bool TextMatcher::matchText(const QString& text) const
 {
+    uint64_t result = 0;
     for (std::size_t i = 0; i < m_conditions.size(); ++i)
     {
         const auto& condition = m_conditions[i];
         if (condition.type != ConditionType::textMatch)
             continue;
-
-        m_conditionsMatched[i] =
-            m_conditionsMatched[i] || text.startsWith(condition.text, Qt::CaseInsensitive);
+        if (text.startsWith(condition.text, Qt::CaseInsensitive))
+            result |= (1 << i);
     }
+    return allConditionMatched(result);
 }
 
-bool TextMatcher::matched() const
+bool TextMatcher::allConditionMatched(uint64_t result) const
 {
-    return std::all_of(
-        m_conditionsMatched.begin(), m_conditionsMatched.end(),
-        [](auto matched) { return matched; });
+    const uint64_t mask = (1ULL << m_conditions.size()) - 1;
+    return result == mask;
 }
 
-void TextMatcher::matchExactAttributes(
-    const nx::common::metadata::Attributes& attributes)
+uint64_t TextMatcher::matchExactAttributes(
+    const nx::common::metadata::Attributes& attributes) const
 {
+    uint64_t result = 0;
     for (std::size_t i = 0; i < m_conditions.size(); ++i)
     {
         const auto& condition = m_conditions[i];
@@ -143,21 +156,24 @@ void TextMatcher::matchExactAttributes(
 
         auto comparator =
             [&condition](const auto& attr)
-            {
-                return attr.name.compare(condition.name, Qt::CaseInsensitive) == 0
-                    && attr.value.contains(condition.value, Qt::CaseInsensitive);
-            };
-        bool matched = condition.isNegative
+        {
+            return attr.name.compare(condition.name, Qt::CaseInsensitive) == 0
+                && attr.value.contains(condition.value, Qt::CaseInsensitive);
+        };
+
+        const bool isMatched = condition.isNegative
             ? std::none_of(attributes.begin(), attributes.end(), comparator)
             : std::any_of(attributes.begin(), attributes.end(), comparator);
-
-        m_conditionsMatched[i] = m_conditionsMatched[i] || matched;
+        if (isMatched)
+            result |= (1 << i);
     }
+    return result;
 }
 
-void TextMatcher::checkAttributesPresence(
-    const nx::common::metadata::Attributes& attributes)
+uint64_t TextMatcher::checkAttributesPresence(
+    const nx::common::metadata::Attributes& attributes) const
 {
+    uint64_t result = 0;
     for (std::size_t i = 0; i < m_conditions.size(); ++i)
     {
         const auto& condition = m_conditions[i];
@@ -170,22 +186,19 @@ void TextMatcher::checkAttributesPresence(
                 return attr.name.compare(condition.name, Qt::CaseInsensitive) == 0
                     || attr.name.startsWith(condition.name + ".", Qt::CaseInsensitive);
             };
-        if (condition.isNegative)
-        {
-            m_conditionsMatched[i] = m_conditionsMatched[i] ||
-                std::none_of(attributes.begin(), attributes.end(), comparator);
-        }
-        else
-        {
-            m_conditionsMatched[i] = m_conditionsMatched[i] ||
-                std::any_of(attributes.begin(), attributes.end(), comparator);
-        }
+        const bool isMatched = condition.isNegative
+            ? std::none_of(attributes.begin(), attributes.end(), comparator)
+            : std::any_of(attributes.begin(), attributes.end(), comparator);
+        if (isMatched)
+            result |= (1 << i);
     }
+    return result;
 }
 
-void TextMatcher::matchAttributeValues(
-    const nx::common::metadata::Attributes& attributes)
+uint64_t TextMatcher::matchAttributeValues(
+    const nx::common::metadata::Attributes& attributes) const
 {
+    uint64_t result = 0;
     for (std::size_t i = 0; i < m_conditions.size(); ++i)
     {
         const auto& condition = m_conditions[i];
@@ -196,20 +209,21 @@ void TextMatcher::matchAttributeValues(
                 // Match the text in the same way as the SQL trigram matcher. It can match >= 3 symbols only.
                 continue;
             }
-            m_conditionsMatched[i] =
-            m_conditionsMatched[i] || wordMatchAnyOfAttributes(condition.text, attributes);
+            if (wordMatchAnyOfAttributes(condition.text, attributes))
+                result |= (1 << i);
         }
         else if (condition.type == ConditionType::numericRangeMatch)
         {
-            m_conditionsMatched[i] =
-            m_conditionsMatched[i] || rangeMatchAttributes(condition.range, condition.name, attributes);
+            if (rangeMatchAttributes(condition.range, condition.name, attributes))
+                result |= (1 << i);
         }
     }
+    return result;
 }
 
 bool TextMatcher::wordMatchAnyOfAttributes(
     const QString& token,
-    const nx::common::metadata::Attributes& attributes)
+    const nx::common::metadata::Attributes& attributes) const
 {
     return std::any_of(
         attributes.cbegin(), attributes.cend(),
@@ -225,7 +239,7 @@ bool TextMatcher::wordMatchAnyOfAttributes(
 bool TextMatcher::rangeMatchAttributes(
     const nx::common::metadata::NumericRange& range,
     const QString& paramName,
-    const nx::common::metadata::Attributes& attributes)
+    const nx::common::metadata::Attributes& attributes) const
 {
     return std::any_of(
         attributes.cbegin(), attributes.cend(),

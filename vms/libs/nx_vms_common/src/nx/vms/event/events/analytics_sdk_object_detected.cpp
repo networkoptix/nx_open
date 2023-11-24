@@ -79,10 +79,8 @@ bool AnalyticsSdkObjectDetected::checkEventParams(const EventParameters& params)
     if (!isObjectTypeMatched)
         return false;
 
-    nx::analytics::db::TextMatcher textMatcher;
-    textMatcher.parse(params.description);
-    textMatcher.matchAttributes(m_metadata.attributes);
-    return textMatcher.matched();
+    nx::analytics::db::TextMatcher textMatcher(params.description);
+    return textMatcher.matchAttributes(m_metadata.attributes);
 }
 
 const nx::common::metadata::Attributes& AnalyticsSdkObjectDetected::attributes() const
