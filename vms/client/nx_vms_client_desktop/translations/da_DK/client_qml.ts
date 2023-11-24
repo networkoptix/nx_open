@@ -154,19 +154,19 @@
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Tjek kameraindstillinger for at konfigurere dette plugin.</translation>
     </message>
     <message>
       <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
+      <translation>Tjek systemadministrationsindstillingerne for at konfigurere dette plugin.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>Dette plugin har ingen indstillinger på systemniveau.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Dette plugin har ingen indstillinger for dette kamera.</translation>
     </message>
   </context>
   <context>
@@ -198,7 +198,7 @@
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Tryk på hver knap flere gange, og skriv navnene på disse knapper i tabellen nedenfor.</translation>
     </message>
   </context>
   <context>
@@ -551,11 +551,11 @@
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Vælg joystick.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Ingen enheder tilsluttet.</translation>
     </message>
   </context>
   <context>
@@ -589,11 +589,11 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Gem</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Forrige</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1068,15 +1068,15 @@ for at aktivere PTZ</translation>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Vælg fil, der skal gemmes</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>JSON filer (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>Fil for at gemme resultaterne:</translation>
     </message>
   </context>
   <context>
@@ -1130,7 +1130,7 @@ for at aktivere PTZ</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>Denne handling kræver, at nogle parametre skal udfyldes.</translation>
     </message>
   </context>
   <context>
@@ -1378,28 +1378,28 @@ for at aktivere PTZ</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Du har ikke adgang til %1. Tjek venligst din internetforbindelse.</translation>
     </message>
   </context>
   <context>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Bevæg joysticket til venstre og højre flere gange.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Bevæg joysticket op og ned flere gange.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Roter joysticket med uret og mod uret flere gange.</translation>
     </message>
   </context>
 </TS>
