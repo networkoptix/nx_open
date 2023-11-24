@@ -35,20 +35,8 @@
       <translation>メンバーシップ</translation>
     </message>
     <message>
-      <source>Misc</source>
-      <translation>その他</translation>
-    </message>
-    <message>
-      <source>Synchronization&lt;br&gt;Interval</source>
-      <translation>同期&lt;br&gt;間隔</translation>
-    </message>
-    <message>
       <source>Search Timeout</source>
       <translation>検索タイムアウト</translation>
-    </message>
-    <message>
-      <source>Proxy LDAP requests&lt;br&gt;via server</source>
-      <translation>サーバー経由で LDAP リクエストをプロキシする</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
@@ -63,8 +51,25 @@
       <translation>インポートされるユーザーに対して、安全でない (Digest) 認証を許可する</translation>
     </message>
     <message>
-      <source>Group Members Attribute</source>
-      <translation>グループメンバー属性</translation>
+      <source>General</source>
+      <translation>一般</translation>
+    </message>
+    <message>
+      <source>Synchronize Users</source>
+      <translation>ユーザーを同期</translation>
+    </message>
+    <message>
+      <source>Sync Interval</source>
+      <translation>同期間隔</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests %1 via server</source>
+      <comment>%1 is a line break</comment>
+      <translation>サーバー経由で %1LDAP リクエストをプロキシする</translation>
+    </message>
+    <message>
+      <source>Group Attribute</source>
+      <translation>グループ属性</translation>
     </message>
   </context>
   <context>
@@ -1230,14 +1235,6 @@
       <translation>切断</translation>
     </message>
     <message>
-      <source>Continuous User Import</source>
-      <translation>連続ユーザーインポート</translation>
-    </message>
-    <message>
-      <source>LDAP users that have never logged in to the system are not displayed in the list of users. Use groups to configure permissions for such users.</source>
-      <translation>システムにログインしたことがない LDAP ユーザーは、ユーザーのリストには表示されません。グループを使用して、そのようなユーザーの権限を構成します。</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation>フィルター</translation>
     </message>
@@ -1252,14 +1249,6 @@
     <message>
       <source>No filters</source>
       <translation>フィルターなし</translation>
-    </message>
-    <message>
-      <source>VMS imports and synchronizes users and groups with LDAP server in real time</source>
-      <translation>VMSはリアルタイムで LDAP サーバーと同期して、ユーザーとグループをインポートします</translation>
-    </message>
-    <message>
-      <source>VMS synchronizes users with LDAP server as they log in to the system. Groups are synchronized in real time.</source>
-      <translation>ユーザーがシステムにログインするときに、VMS はユーザー情報をLDAP サーバーと同期します。グループはリアルタイムで同期されます。</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
@@ -1606,9 +1595,9 @@
       <translation>依存する権限を自動的に追加する</translation>
     </message>
     <message>
-      <source>Use %1 or %2 to select multiple lines, or %3 to clear the selection</source>
+      <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation>%1 または %2 を使用して複数行を選択、 %3 を使用して選択をクリア</translation>
+      <translation>%1 または %2 を使用して複数リソースを選択、 %3 を使用して選択をクリア</translation>
     </message>
   </context>
   <context>
@@ -1801,6 +1790,52 @@ PTZを行います</translation>
     <message>
       <source>Delete</source>
       <translation>削除</translation>
+    </message>
+  </context>
+  <context>
+    <name>ResourceAccessDelegate</name>
+    <message>
+      <source>Has %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>%1 の権限があります</translation>
+    </message>
+    <message>
+      <source>Also inherits it from:</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>また、以下からも継承します:</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from:</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>以下から %1 権限を継承します:</translation>
+    </message>
+    <message>
+      <source>Add %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Add %1 and dependent permissions</translation>
+    </message>
+    <message>
+      <source>Add %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Add %1 permission</translation>
+    </message>
+    <message>
+      <source>Already inherited from:</source>
+      <translation type="unfinished">Already inherited from:</translation>
+    </message>
+    <message>
+      <source>Remove %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+    </message>
+    <message>
+      <source>Remove %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Remove %1 permission</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from:</source>
+      <translation type="unfinished">Will stay inherited from:</translation>
     </message>
   </context>
   <context>
@@ -2169,6 +2204,21 @@ PTZを行います</translation>
     <message>
       <source>Logical ID</source>
       <translation>自定義ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>SyncComboBox</name>
+    <message>
+      <source>Never</source>
+      <translation>なし</translation>
+    </message>
+    <message>
+      <source>Always</source>
+      <translation type="unfinished">Always</translation>
+    </message>
+    <message>
+      <source>On Log In</source>
+      <translation type="unfinished">On Log In</translation>
     </message>
   </context>
   <context>
