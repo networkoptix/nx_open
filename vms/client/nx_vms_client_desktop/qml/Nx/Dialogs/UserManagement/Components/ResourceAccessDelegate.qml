@@ -127,26 +127,36 @@ Item
                     function readonlyTooltipText()
                     {
                         const name = "<b>" + root.accessRightDescriptors[index].name + "</b>"
+                        let inheritance = model.inheritanceInfoText
+
+                        if (inheritance)
+                        {
+                            const inheritanceMultiline = !!inheritance.match(/<br>/i)
+
+                            inheritance = inheritanceMultiline
+                                ? (":<br>" + inheritance)
+                                : (" " + inheritance)
+                        }
 
                         if (toggledOn)
                         {
                             const ownPermissionText = qsTr("Has %1 permission",
                                 "%1 will be substituted with a permission name").arg(name)
 
-                            if (!model.inheritanceInfoText)
+                            if (!inheritance)
                                 return ownPermissionText
 
                             return ownPermissionText + "<br><br>"
-                                + qsTr("Also inherits it from:", "'it' refers to a permission")
-                                + "<br>" + model.inheritanceInfoText
+                                + qsTr("Also inherits it from", "'it' refers to a permission")
+                                + inheritance
                         }
 
-                        if (!model.inheritanceInfoText)
+                        if (!inheritance)
                             return ""
 
-                        return qsTr("Inherits %1 permission from:",
+                        return qsTr("Inherits %1 permission from",
                             "%1 will be substituted with a permission name").arg(name)
-                                + "<br>" + model.inheritanceInfoText
+                                + inheritance
                     }
 
                     function normalTooltipText()
@@ -154,6 +164,15 @@ Item
                         const name = "<b>" + root.accessRightDescriptors[index].name + "</b>"
                         let inheritance = (root.selectionSize > 1) ? "" : model.inheritanceInfoText
                         let operation = ""
+
+                        if (inheritance)
+                        {
+                            const inheritanceMultiline = !!inheritance.match(/<br>/i)
+
+                            inheritance = inheritanceMultiline
+                                ? (":<br>" + inheritance)
+                                : (" " + inheritance)
+                        }
 
                         const nextCheckState = root.hoveredColumnAccessRight
                             ? root.externalNextCheckState
@@ -174,7 +193,7 @@ Item
 
                             if (inheritance)
                             {
-                                inheritance = "<br><br>" + qsTr("Already inherited from:") + "<br>"
+                                inheritance = "<br><br>" + qsTr("Already inherited from")
                                     + inheritance
                             }
                         }
@@ -193,8 +212,8 @@ Item
 
                             if (inheritance)
                             {
-                                inheritance = "<br><br>" + qsTr("Will stay inherited from:")
-                                    + "<br>" + inheritance
+                                inheritance = "<br><br>" + qsTr("Will stay inherited from")
+                                    + inheritance
                             }
                         }
 
