@@ -1164,7 +1164,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>アクティベートライセンス</translation>
+      <translation>ライセンスを有効化</translation>
     </message>
     <message>
       <source>Camera Settings</source>
