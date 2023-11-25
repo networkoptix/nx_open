@@ -1327,7 +1327,7 @@
     <name>Groups</name>
     <message>
       <source>Delete group?</source>
-      <translation type="unfinished">Delete group?</translation>
+      <translation>Slet gruppe?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups?</source>
@@ -5265,7 +5265,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>cloud</source>
-      <translation type="unfinished">cloud</translation>
+      <translation>sky</translation>
     </message>
     <message>
       <source>Path</source>
@@ -6385,7 +6385,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Slet layout?</translation>
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
@@ -6405,7 +6405,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Delete user?</source>
-      <translation type="unfinished">Delete user?</translation>
+      <translation>Slet bruger?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>

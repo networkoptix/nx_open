@@ -1429,11 +1429,6 @@
       <translation>サムネイルの自動更新</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>SMTPクライアントの代わりに %1 サービスを使用してメールを送信する</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>シーンの最大アイテム数 (0でデフォルト値を使用)</translation>
     </message>

@@ -1429,11 +1429,6 @@
       <translation>Tự động cập nhật hình thu nhỏ</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Sử dụng dịch vụ %1 để gửi email thay vì ứng dụng khách SMTP</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>Các mục cảnh tối đa (0 có nghĩa là mặc định)</translation>
     </message>

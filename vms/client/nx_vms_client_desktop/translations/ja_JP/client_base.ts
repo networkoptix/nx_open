@@ -5922,7 +5922,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>ライセンスの有効化...</translation>
+      <translation>ライセンスを有効化...</translation>
     </message>
     <message>
       <source>To add Video Wall, SaaS should be in active state. %1</source>
@@ -10370,32 +10370,32 @@ You can force it, but it may significantly increase CPU load.</source>
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
+      <translation>
+        <numerusform>%1 ほか %n レイアウト</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">%1 video wall</translation>
+      <translation>%1 ビデオウォール</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
+      <translation>
+        <numerusform>%1 ほか %n ビデオウォール</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 グループ</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 ほか %n グループ</numerusform>
       </translation>
     </message>
   </context>

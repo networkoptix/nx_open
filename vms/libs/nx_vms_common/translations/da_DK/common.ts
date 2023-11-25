@@ -1485,11 +1485,6 @@
       <translation type="unfinished">Thumbnails auto-update</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation type="unfinished">Max scene items (0 means default)</translation>
     </message>

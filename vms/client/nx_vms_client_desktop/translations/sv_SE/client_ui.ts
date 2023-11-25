@@ -661,15 +661,15 @@
     </message>
     <message>
       <source>Disable import</source>
-      <translation type="unfinished">Disable import</translation>
+      <translation>Inaktivera import</translation>
     </message>
     <message>
       <source>Import Video from Device</source>
-      <translation type="unfinished">Import Video from Device</translation>
+      <translation>Importera video från enheten</translation>
     </message>
     <message>
       <source>Import camera or server offline periods</source>
-      <translation type="unfinished">Import camera or server offline periods</translation>
+      <translation>Importera kamera eller server offline perioder</translation>
     </message>
   </context>
   <context>
@@ -1720,15 +1720,15 @@
     </message>
     <message>
       <source>Use Credentials</source>
-      <translation type="unfinished">Use Credentials</translation>
+      <translation>Använd inloggningsuppgifter</translation>
     </message>
     <message>
       <source>Use Link</source>
-      <translation type="unfinished">Use Link</translation>
+      <translation>Använd länk</translation>
     </message>
     <message>
       <source>Link</source>
-      <translation type="unfinished">Link</translation>
+      <translation>Länk</translation>
     </message>
   </context>
   <context>
@@ -1853,7 +1853,7 @@
     </message>
     <message>
       <source>warn icon</source>
-      <translation type="unfinished">warn icon</translation>
+      <translation>varningsikon</translation>
     </message>
     <message>
       <source>&lt;Warning label&gt;</source>
@@ -1861,7 +1861,7 @@
     </message>
     <message>
       <source>&lt;We recommend that you consult with support before proceeding.&gt;</source>
-      <translation type="unfinished">&lt;We recommend that you consult with support before proceeding.&gt;</translation>
+      <translation>&lt;Vi rekommenderar att du rådgör med | support | innan du fortsätter.&gt;</translation>
     </message>
   </context>
   <context>
@@ -1995,7 +1995,7 @@
     </message>
     <message>
       <source>Mail from</source>
-      <translation type="unfinished">Mail from</translation>
+      <translation>E-post från</translation>
     </message>
   </context>
   <context>
@@ -2010,7 +2010,7 @@
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>Logga in på webbsida</translation>
     </message>
   </context>
   <context>
@@ -2447,19 +2447,19 @@
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
-      <translation type="unfinished">No services found</translation>
+      <translation>Inga tjänster hittades</translation>
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+      <translation>Kontakta din kanalpartner för att lägga till tjänster</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation type="unfinished">Channel Partner Contact</translation>
+      <translation>Kanalpartnerkontakt</translation>
     </message>
     <message>
       <source>Services Usage</source>
-      <translation type="unfinished">Services Usage</translation>
+      <translation>Användning av tjänster</translation>
     </message>
   </context>
   <context>
@@ -2592,7 +2592,7 @@
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation type="unfinished">Display servers in tree for non-power users</translation>
+      <translation>Visa servrar i träd för användare som inte är administratörer</translation>
     </message>
   </context>
   <context>
@@ -2922,11 +2922,11 @@
     </message>
     <message>
       <source>Ctrl+F</source>
-      <translation type="unfinished">Ctrl+F</translation>
+      <translation>Ctrl+F</translation>
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>Del</translation>
     </message>
   </context>
   <context>
@@ -2941,11 +2941,11 @@
     </message>
     <message>
       <source>Ctrl+F</source>
-      <translation type="unfinished">Ctrl+F</translation>
+      <translation>Ctrl+F</translation>
     </message>
     <message>
       <source>Del</source>
-      <translation type="unfinished">Del</translation>
+      <translation>Del</translation>
     </message>
   </context>
   <context>

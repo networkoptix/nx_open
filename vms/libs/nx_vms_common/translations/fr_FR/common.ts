@@ -1486,11 +1486,6 @@
       <translation>Mise à jour automatique des vignettes</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Utiliser le service %1 pour envoyer des courriels au lieu du client SMTP</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>Nombre maximum d'éléments de scène (0 signifie par défaut)</translation>
     </message>
