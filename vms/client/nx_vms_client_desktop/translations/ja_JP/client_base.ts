@@ -6255,7 +6255,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>ライセンスの有効化...</translation>
+      <translation>ライセンスを有効化...</translation>
     </message>
   </context>
   <context>
