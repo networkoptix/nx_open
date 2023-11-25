@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Tillåt osäker (digest) autentisering för importerade användare</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,16 +56,16 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Synkronisera användare</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Synkintervall</translation>
     </message>
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+      <translation>Proxy LDAP begär %1 via server</translation>
     </message>
     <message>
       <source>Group Attribute</source>
@@ -286,23 +286,23 @@
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Integrationen kommer att kunna:
+ • ändra inställningar för kameror
+ • få tillgång till arkiv
+ • bearbeta videoströmmar
+ • utbyta metadata över nätverket</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Aktivera integration</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Ta bort %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Detta tar bort integrationsbegäran</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -310,7 +310,7 @@
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Ta bort förfrågan</translation>
     </message>
   </context>
   <context>
@@ -328,9 +328,9 @@
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Batch-redigering - %n användare</numerusform>
+        <numerusform>Batch-redigering - %n användare</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -343,7 +343,7 @@
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Användarstatus</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -355,11 +355,11 @@
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Osäker (digest) autentisering</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>behåll aktuellt värde</translation>
     </message>
   </context>
   <context>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Stäng av</translation>
     </message>
   </context>
   <context>
@@ -500,7 +500,7 @@
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - Anslutningsinställningar</translation>
     </message>
     <message>
       <source>Host</source>
@@ -508,7 +508,7 @@
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Logga in DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -516,7 +516,7 @@
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Ignorera LDAP-serverfel</translation>
     </message>
     <message>
       <source>Test</source>
@@ -528,15 +528,15 @@
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Använd StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>Värdnamn kan inte vara tom</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Inloggnings-DN kan inte vara tomt</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -544,7 +544,7 @@
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>För att tillåta LDAP-användare att logga in på %1är det nödvändigt att upprätta en anslutning mellan %1 och en LDAP-server för företag.</translation>
     </message>
   </context>
   <context>
@@ -604,11 +604,11 @@
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Listinställningar</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Ny lista</translation>
     </message>
     <message>
       <source>Name</source>
@@ -616,7 +616,7 @@
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Kolumnnamn</translation>
     </message>
     <message>
       <source>OK</source>
@@ -707,7 +707,7 @@
     <name>FilterDialog</name>
     <message>
       <source>Edit Filter</source>
-      <translation type="unfinished">Edit Filter</translation>
+      <translation>Redigera filter</translation>
     </message>
     <message>
       <source>Name</source>
@@ -715,11 +715,11 @@
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>Bas DN</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>Bas-DN får inte vara tom</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -727,11 +727,11 @@
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>Bas-DN anger startpunkten för LDAP-sökningar och synkronisering.</translation>
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filter hjälper till att kontrollera åtkomst till systemet och synkronisering genom att ange vilka användare och/eller grupper från Base DN som är tillåtna.</translation>
     </message>
   </context>
   <context>
@@ -828,7 +828,7 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>On system level user has permissions to:</source>
-      <translation type="unfinished">On system level user has permissions to:</translation>
+      <translation>På systemnivå har användaren behörigheter att:</translation>
     </message>
   </context>
   <context>
@@ -851,11 +851,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globala rättigheter</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Medlemmar</translation>
     </message>
     <message>
       <source>Add Group</source>
@@ -885,7 +885,7 @@
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Grupp - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -901,11 +901,11 @@
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globala rättigheter</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Medlemmar</translation>
     </message>
   </context>
   <context>
@@ -928,7 +928,7 @@
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Medlemmar</translation>
     </message>
     <message>
       <source>Users</source>
@@ -940,15 +940,15 @@
     </message>
     <message>
       <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</translation>
+      <translation>När kontinuerlig synkronisering är inaktiverad synkroniseras grupper inte automatiskt. För att uppdatera denna grupp, initiera en manuell synkronisering.</translation>
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+      <translation>En annan grupp med samma namn finns i systemet. Det rekommenderas att tilldela unika namn till grupperna.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Gruppen har en annan grupp som både förälder, och som barnmedlem, eller är en del av en sådan cirkulär referenskedja. Lös denna kedja för att förhindra felaktig beräkning av behörigheter.</translation>
     </message>
   </context>
   <context>
@@ -963,19 +963,19 @@
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Inga medlemmar</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Använd kontrollerna till vänster för att lägga till medlemmar</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Sammanfattning av medlemmar</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Ärv medlemskap i nuvarande grupp</translation>
     </message>
   </context>
   <context>
@@ -994,7 +994,7 @@
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Inga grupper</translation>
     </message>
   </context>
   <context>
@@ -1034,7 +1034,7 @@
     <name>InsecureWarning</name>
     <message>
       <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation type="unfinished">Account security is important. Do not enable this setting unless you have good reasons to do so.</translation>
+      <translation>Kontosäkerhet är viktigt. Aktivera inte den här inställningen om du inte har goda skäl att göra det.</translation>
     </message>
   </context>
   <context>
@@ -1058,9 +1058,9 @@
     <message numerus="yes">
       <source>%n suitable integration service is required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration service is required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>%n lämplig integrationstjänst krävs för att aktivera integrationen</numerusform>
+        <numerusform>%n lämplig integrationstjänst krävs för att aktivera integrationen</numerusform>
       </translation>
     </message>
     <message>
@@ -1068,17 +1068,17 @@
                 services. Please disable integration for some cameras or add more suitable services.
                 Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available
-                services. Please disable integration for some cameras or add more suitable services.
-                Otherwise, it will be done automatically on %1</translation>
+      <translation>Det finns fler kameror som använder denna integration än tillgängliga
+                tjänster. Vänligen inaktivera integration för vissa kameror eller lägga till mer lämpliga tjänster.
+                Annars, det kommer att göras automatiskt på %1</translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 lämpliga tjänster tillgängliga</translation>
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Tjänster krävs</translation>
     </message>
   </context>
   <context>
@@ -1203,7 +1203,7 @@
     <name>LdapSettings</name>
     <message>
       <source>LDAP is not configured yet</source>
-      <translation type="unfinished">LDAP is not configured yet</translation>
+      <translation>LDAP har inte konfigurerats ännu</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -1211,7 +1211,7 @@
     </message>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>ONLINE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1227,7 +1227,7 @@
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Senaste synk</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1235,7 +1235,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Avancerade inställningar</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>Filters</source>
-      <translation type="unfinished">Filters</translation>
+      <translation>Filter</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1251,7 +1251,7 @@
     </message>
     <message>
       <source>Add Filter</source>
-      <translation type="unfinished">Add Filter</translation>
+      <translation>Lägg till filter</translation>
     </message>
     <message>
       <source>No filters</source>
@@ -1259,19 +1259,19 @@
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Inga användare eller grupper matchar synkroniseringsinställningarna och läggs till i systemet DB. Se till att LDAP-serverns parametrar och filter är konfigurerade korrekt.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>Vänligen använd försiktighet när du ändrar LDAP-inställningar. Felaktig konfiguration kan störa systemtillgänglighet för ett stort antal användare samtidigt.</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>Anslut ditt system till en LDAP-server för enklare användarhantering</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Kontinuerlig import från LDAP-servern är inaktiverad för detta system. Uppdateringar till grupper och användare och grupper medlemskap kommer att ske enbart genom manuell synkronisering.</translation>
     </message>
   </context>
   <context>
@@ -1366,7 +1366,7 @@
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Någon %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1381,7 +1381,7 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>NÅGON</translation>
     </message>
   </context>
   <context>
@@ -1404,7 +1404,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Skapa ny...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1426,11 +1426,11 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Ny länk - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Den tidigare länken kommer att ogiltigförklaras när en ny har utfärdats</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1441,15 +1441,15 @@
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Inga listor</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Du har inte skapat några listor ännu. Med listor kan du lagra flera värden för att använda dem i Event Rules. Skapa en ny lista för att börja lägga till poster.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Skapa ny...</translation>
     </message>
   </context>
   <context>
@@ -1501,7 +1501,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Godkänn</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1520,7 +1520,7 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Inga anpassade grupper än</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1528,15 +1528,15 @@
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Ändra sökkriterier eller skapa en ny grupp</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Inga grupper</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Använd kontroller till vänster för att lägga till i en grupp</translation>
     </message>
     <message>
       <source>Member of</source>
@@ -1551,7 +1551,7 @@
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Inbyggt</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1563,7 +1563,7 @@
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Ändra lösenord - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1590,23 +1590,23 @@
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Inga anpassade behörigheter</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Inga resurser hittades</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Lägg automatiskt till beroende behörigheter</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Använd %1 eller %2 för att välja flera resurser, eller %3 för att rensa urvalet</translation>
     </message>
   </context>
   <context>
@@ -1617,7 +1617,7 @@
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Plugins är program som körs på %1 Server för att möjliggöra sömlösa videoanalysintegrationer.</translation>
     </message>
   </context>
   <context>
@@ -1726,50 +1726,50 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Tryck på piltangenterna för att flytta runt. Använd plus och minus tangenter för att zooma.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Använd mushjulet för att zooma</translation>
     </message>
     <message>
       <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</translation>
+      <translation>Klicka, dubbelklicka eller dra muspekaren medan du trycker på Skift-tangenten för att använda avancerad PTZ</translation>
     </message>
     <message>
       <source>Target Lock Tracking</source>
-      <translation type="unfinished">Target Lock Tracking</translation>
+      <translation>Spårning av mållås</translation>
     </message>
     <message>
       <source>Alt + Click to follow object</source>
-      <translation type="unfinished">Alt + Click to follow object</translation>
+      <translation>Alt + Klicka för att följa objekt</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Du kan aktivera den här guiden igen genom att gå till lokala inställningar &gt; Avancerat &gt; Återställ alla varningar</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>idag</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 timme</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 timmar</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 dagar</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 dagar</translation>
     </message>
   </context>
   <context>
@@ -1810,45 +1810,45 @@ att aktivera PTZ</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Har %1 behörighet</translation>
     </message>
     <message>
       <source>Also inherits it from:</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from:</translation>
+      <translation>Ärver även från:</translation>
     </message>
     <message>
       <source>Inherits %1 permission from:</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from:</translation>
+      <translation>Ärv %1 behörighet från:</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Lägg till %1 och beroende behörigheter</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Lägg till %1 behörighet</translation>
     </message>
     <message>
       <source>Already inherited from:</source>
-      <translation type="unfinished">Already inherited from:</translation>
+      <translation>Redan ärvd från:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Ta bort %1 och beroende behörigheter</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Ta bort %1 behörighet</translation>
     </message>
     <message>
       <source>Will stay inherited from:</source>
-      <translation type="unfinished">Will stay inherited from:</translation>
+      <translation>Kommer att förbli ärvt från:</translation>
     </message>
   </context>
   <context>
@@ -1874,7 +1874,7 @@ att aktivera PTZ</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Tillgänglig med behörigheter</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2003,19 +2003,19 @@ att aktivera PTZ</translation>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet har stängts av. För att aktivera/inaktivera integrationsanvändningen för den aktuella enheten måste systemet vara i aktivt skick. Kontakta din kanalpartner för mer information</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet har stängts av. För att aktivera/inaktivera integrationsanvändning för vissa enheter måste systemet vara i aktivt tillstånd. Kontakta din kanalpartner för mer information</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet har stängts av. För att möjliggöra denna integrationsanvändning för aktuell enhet måste systemet vara i aktivt tillstånd. Kontakta din kanalpartner för mer information</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet har stängts av. För att aktivera denna integrationsanvändning för någon enhet måste systemet vara i aktivt tillstånd. Kontakta din kanalpartner för mer information</translation>
     </message>
   </context>
   <context>
@@ -2229,35 +2229,35 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Alltid</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Vid inloggning</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Länken gäller t.o.m</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Länken kommer att vara tillgänglig fram till det angivna datumet (inklusive, baserat på servertid)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Återkalla åtkomst efter inloggning</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Åtkomsten kan återkallas tidigare om länkens giltighetstid löper ut</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>I</translation>
     </message>
   </context>
   <context>
@@ -2347,7 +2347,7 @@ att aktivera PTZ</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Ny användare</translation>
     </message>
     <message>
       <source>General</source>
@@ -2363,7 +2363,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globala rättigheter</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2374,7 +2374,7 @@ att aktivera PTZ</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Ny användare</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2410,15 +2410,15 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Tillåt osäker (digest) autentisering</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Du måste ange endast användare&apos;s e-postadress.</translation>
     </message>
     <message>
       <source>If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</source>
-      <translation type="unfinished">If user already has an account, he will see this system and will be able to log in to it. If not, we&apos;ll send an invitation to this address and user will see this system right after he creates an account.</translation>
+      <translation>Om användaren redan har ett konto kommer han att se detta system och kommer att kunna logga in på det. Om inte, kommer vi&apos;skicka en inbjudan till denna adress och användaren kommer att se detta system direkt efter att han skapar ett konto.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2426,15 +2426,15 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Tillgång</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Vanlig användare med autentiseringsuppgifter</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Tillfälligt med länk</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2445,7 +2445,7 @@ att aktivera PTZ</translation>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Användare - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2461,7 +2461,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globala rättigheter</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
@@ -2473,11 +2473,11 @@ att aktivera PTZ</translation>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Aktiverad användare</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Inaktiverad användare</translation>
     </message>
   </context>
   <context>
@@ -2512,15 +2512,15 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Ange lösenord för att aktivera osäker autentisering</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Tillåt osäker (digest) autentisering</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Denna användare finns inte i LDAP-databasen och kan inte logga in.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2528,7 +2528,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Åtkomst upphör</translation>
     </message>
     <message>
       <source>Access Link</source>
@@ -2536,19 +2536,19 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Kopiera länk</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Avsluta</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Ny länk...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Ingen giltig länk för denna användare</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -2557,24 +2557,24 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Hämtar länk...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Se till att denna dator kan ansluta till %1</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>LDAP-servern är offline. Användaren kan inte logga in.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Denna användares inloggning dubblerar inloggningen för en annan användare. Ingen av dem kan logga in. För att lösa det här problemet kan du ändra användarens inloggning eller inaktivera eller ta bort användare med duplicerade inloggningar.</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>När kontinuerlig synkronisering är inaktiverad synkroniseras grupper inte automatiskt. För att uppdatera denna grupp, initiera en manuell synkronisering.</translation>
     </message>
   </context>
   <context>
@@ -2596,11 +2596,11 @@ att aktivera PTZ</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Vms Rules</source>
-      <translation type="unfinished">Vms Rules</translation>
+      <translation>Vms regler</translation>
     </message>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Lägg till regel</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -2612,7 +2612,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Inga poster</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2620,7 +2620,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Återställ till standard...</translation>
     </message>
   </context>
   <context>

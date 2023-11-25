@@ -1485,11 +1485,6 @@
       <translation>Küçük resimler otomatik güncelleme</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>E-posta göndermek için SMTP istemcisi yerine %1 hizmetini kullanın</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>Maksimum sahne öğeleri (0 varsayılan değerdir)</translation>
     </message>

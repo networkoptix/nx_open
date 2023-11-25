@@ -1597,11 +1597,6 @@
       <translation>Automatyczna aktualizacja miniatur</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Użyj usługi %1 do wysyłania wiadomości e-mail zamiast klienta SMTP</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>Max liczba elementów sceny (0 oznacza domyślną)</translation>
     </message>

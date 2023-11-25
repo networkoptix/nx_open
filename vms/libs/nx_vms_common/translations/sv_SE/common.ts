@@ -208,23 +208,23 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
+      <translation>Medlemmar i denna grupp har obegränsade systembehörigheter. Administratörer kan skapa och ändra Power Users, slå samman system och ansluta eller koppla från System till  %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Medlemmar i den här gruppen kan, utöver de behörigheter som beviljas av gruppen Advanced Viewers, kontrollera det mesta av systemkonfigurationen, men de får inte ändra några administratörsrelaterade inställningar, som att ta bort eller ändra sina egna grupper och behörigheter, och kan inte skapa eller redigera andra avancerade användare.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Medlemmar i denna grupp kan, förutom de behörigheter som beviljats av Viewers-gruppen, se och aktivera PTZ-positioner och PTZ-turer, använd 2-vägs ljud, kör I/O-modulknappar, skapa och redigera bokmärken och visa händelseloggen.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Medlemmar i denna grupp kan, utöver de behörigheter som beviljats av Live-läsargruppen, visa och exportera arkiv och bokmärken.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Medlemmar i denna grupp kan se information och serverprocessorbelastning i realtid (Server Monitoring).</translation>
     </message>
   </context>
   <context>
@@ -1485,11 +1485,6 @@
       <translation>Miniatyrer automatisk uppdatering</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Använd tjänsten %1 för att skicka e-post istället för SMTP-klient</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>Max scenobjekt (0 betyder standard)</translation>
     </message>
@@ -1799,16 +1794,16 @@
     </message>
     <message>
       <source>Channel partners service</source>
-      <translation type="unfinished">Channel partners service</translation>
+      <translation>Kanal partners service</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>Aktivera föråldrade API-funktioner som för närvarande används av %1 programvara (osäker)</translation>
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>Organisationens Id</translation>
     </message>
   </context>
   <context>
@@ -2547,24 +2542,24 @@
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>Det gick inte att ansluta till LDAP-servern.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>Det gick inte att slutföra synkroniseringen inom en timeout på %1.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a given timeout.</source>
-      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+      <translation>Det gick inte att slutföra synkroniseringen inom en given timeout.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>Inga användarkonton på LDAP-servern matchar synkroniseringsinställningarna.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>Vissa LDAP-användare eller grupper hittades inte i LDAP-databasen.</translation>
     </message>
   </context>
 </TS>

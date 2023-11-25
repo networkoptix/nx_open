@@ -1812,30 +1812,30 @@ PTZを行います</translation>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>%1 および依存する権限を追加</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>%1 権限を追加</translation>
     </message>
     <message>
       <source>Already inherited from:</source>
-      <translation type="unfinished">Already inherited from:</translation>
+      <translation>すでに以下から継承しています:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>%1 および依存する権限を削除</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>%1 権限を削除</translation>
     </message>
     <message>
       <source>Will stay inherited from:</source>
-      <translation type="unfinished">Will stay inherited from:</translation>
+      <translation>引き続き以下から継承します:</translation>
     </message>
   </context>
   <context>
@@ -2122,7 +2122,7 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>アクティベートライセンス</translation>
+      <translation>ライセンスを有効化</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -2214,11 +2214,11 @@ PTZを行います</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>常時</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>ログイン時</translation>
     </message>
   </context>
   <context>

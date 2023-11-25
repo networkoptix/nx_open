@@ -351,7 +351,7 @@
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Deaktiveret</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
@@ -1579,7 +1579,7 @@
     </message>
     <message>
       <source>Confirm password</source>
-      <translation type="unfinished">Confirm password</translation>
+      <translation>Bekræft adgangskode</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2386,7 +2386,7 @@ for at aktivere PTZ</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Sky</translation>
     </message>
     <message>
       <source>Login</source>

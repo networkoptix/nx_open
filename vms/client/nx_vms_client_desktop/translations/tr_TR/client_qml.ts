@@ -1809,7 +1809,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>%1 yetki var</translation>
     </message>
     <message>
       <source>Also inherits it from:</source>
@@ -1819,7 +1819,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>Inherits %1 permission from:</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from:</translation>
+      <translation>%1 yetkileri şuradan devralır:</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
@@ -1829,21 +1829,21 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>%1 yetki ekle</translation>
     </message>
     <message>
       <source>Already inherited from:</source>
-      <translation type="unfinished">Already inherited from:</translation>
+      <translation>Zaten şu kaynaktan devralındı:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>%1 ve bağımlı izinleri kaldırın</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>%1 izni kaldır</translation>
     </message>
     <message>
       <source>Will stay inherited from:</source>
@@ -2232,7 +2232,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Oturum Açıldığında</translation>
     </message>
   </context>
   <context>

@@ -1485,11 +1485,6 @@
       <translation>Automatisk oppdatering av miniatyrbilder</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Bruk %1 -tjenesten for å sende e-poster i stedet for SMTP-klienten</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>Maks sceneelementer (0 betyr standard)</translation>
     </message>

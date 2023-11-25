@@ -10522,7 +10522,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">%1 video wall</translation>
+      <translation>%1 video duvarı</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
@@ -10535,7 +10535,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 grup</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
