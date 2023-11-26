@@ -617,7 +617,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
           Qn::ReadPermission
         | Qn::WritePermission
         | Qn::SavePermission
-        | Qn::WriteNamePermission;
+        | Qn::WriteNamePermission
+        | Qn::ViewContentPermission;
 
     if (hasPowerUserPermissions(subject))
         result |= Qn::RemovePermission;
@@ -677,7 +678,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         if (const auto& resource = resourcePool()->getResourceByDescriptor(item.resource))
         {
             if (resource->hasFlags(Qn::desktop_camera))
-                return Qn::ReadPermission | Qn::RemovePermission;
+                return Qn::ReadPermission | Qn::RemovePermission | Qn::ViewContentPermission;
         }
     }
 

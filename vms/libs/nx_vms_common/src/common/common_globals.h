@@ -484,6 +484,7 @@ namespace Qn {
 
         // Full set of permissions which can be available for the layout resource.
         FullLayoutPermissions = FullGenericPermissions
+            | ViewContentPermission
             | AddRemoveItemsPermission
             | EditLayoutSettingsPermission,
 

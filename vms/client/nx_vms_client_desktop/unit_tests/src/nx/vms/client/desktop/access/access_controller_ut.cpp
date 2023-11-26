@@ -126,7 +126,8 @@ TEST_F(AccessControllerTest, checkEncryptedExportedLayouts)
     // Encrypted layouts cannot be edited, only (theoretically) removed or (theoretically) renamed.
     const Qn::Permissions expected = Qn::ReadPermission
         | Qn::RemovePermission
-        | Qn::WriteNamePermission;
+        | Qn::WriteNamePermission
+        | Qn::ViewContentPermission;
 
     CHECK_EXACT_PERMISSIONS(layout, expected);
 
