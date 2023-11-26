@@ -65,7 +65,7 @@
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+      <translation>Proxy LDAP, sunucu aracılığıyla %1 isteğinde bulunur</translation>
     </message>
     <message>
       <source>Group Attribute</source>
@@ -1606,7 +1606,7 @@
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Birden fazla kaynak seçmek için %1 veya %2, seçimi temizlemek için %3 kullanın</translation>
     </message>
   </context>
   <context>
@@ -1814,7 +1814,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>Also inherits it from:</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from:</translation>
+      <translation>Ayrıca onu devralır:</translation>
     </message>
     <message>
       <source>Inherits %1 permission from:</source>
@@ -1824,7 +1824,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>%1 ve bağımlı izinleri ekleyin</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
@@ -1847,7 +1847,7 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Will stay inherited from:</source>
-      <translation type="unfinished">Will stay inherited from:</translation>
+      <translation>Devralınmış olarak kalacak:</translation>
     </message>
   </context>
   <context>
