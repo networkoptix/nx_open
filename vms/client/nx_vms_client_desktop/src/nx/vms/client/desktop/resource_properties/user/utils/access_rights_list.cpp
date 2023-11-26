@@ -22,7 +22,7 @@ AccessRightsList::AccessRightsList(QObject* parent):
         AccessRightDescriptor{
             .accessRight = AccessRight::view,
             .name = tr("View Live"),
-            .description = common::html::bold(tr("View Live.")) + " " +
+            .description = common::html::bold(tr("View Live") + ".") + " " +
                 tr("Allows users to access a resource and view live footage from a camera."),
             .icon = QUrl(kIconsDir + "view_live_24x20.svg")},
         AccessRightDescriptor{
@@ -43,18 +43,18 @@ AccessRightsList::AccessRightsList(QObject* parent):
         AccessRightDescriptor{
             .accessRight = AccessRight::manageBookmarks,
             .name = tr("Manage Bookmarks"),
-            .description = common::html::bold(tr("Modify Bookmarks")),
+            .description = common::html::bold(tr("Manage Bookmarks")),
             .icon = QUrl(kIconsDir + "manage_bookmarks_24x20.svg")},
         AccessRightDescriptor{
             .accessRight = AccessRight::userInput,
             .name = tr("User Input"),
-            .description = common::html::bold("User Input.") + " " +
+            .description = common::html::bold(tr("User Input") + ".") + " " +
                 tr("Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons."),
             .icon = QUrl(kIconsDir + "user_input_24x20.svg")},
         AccessRightDescriptor{
             .accessRight = AccessRight::edit,
             .name = tr("Edit Settings"),
-            .description = common::html::bold(tr("Edit Camera Settings.")) + " " +
+            .description = common::html::bold(tr("Edit Settings") + ".") + " " +
                 tr("Depending on the resource type it either allows user to modify device settings"
                 " or to control video wall."),
             .icon = QUrl(kIconsDir + "edit_settings_24x20.svg")}})
