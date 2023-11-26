@@ -10515,7 +10515,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 ve %n ekran düzeni daha</numerusform>
         <numerusform>%1 and %n more layouts</numerusform>
       </translation>
     </message>
@@ -10528,7 +10528,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 ve %n video duvarı daha</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
       </translation>
     </message>
@@ -10541,7 +10541,7 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 ve %n grup daha</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
