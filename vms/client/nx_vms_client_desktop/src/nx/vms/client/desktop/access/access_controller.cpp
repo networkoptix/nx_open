@@ -202,9 +202,11 @@ Qn::Permissions AccessController::Private::permissionsForFileLayout(
     const QnFileLayoutResourcePtr& layout) const
 {
     if (layout->isReadOnly() || layout->requiresPassword())
-        return Qn::ReadPermission | Qn::RemovePermission | Qn::WriteNamePermission;
+        return Qn::ReadPermission | Qn::RemovePermission | Qn::WriteNamePermission
+            | Qn::ViewContentPermission;
 
     return Qn::FullGenericPermissions
+        | Qn::ViewContentPermission
         | Qn::EditLayoutSettingsPermission
         | (layout->locked() ? Qn::NoPermissions : Qn::AddRemoveItemsPermission);
 }

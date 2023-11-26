@@ -1612,7 +1612,7 @@ TEST_F(ResourceAccessManagerTest, checkVideowallAsPowerUser)
 {
     loginAs(kPowerUsersGroupId);
     const auto videowall = addVideoWall();
-    ASSERT_EQ(permissions(videowall), Qn::FullGenericPermissions);
+    ASSERT_EQ(permissions(videowall), Qn::FullGenericPermissions | Qn::ViewContentPermission);
 }
 
 // Videowall control user must have almost full permissions for videowalls.
@@ -1622,7 +1622,8 @@ TEST_F(ResourceAccessManagerTest, checkVideowallAsController)
     setOwnAccessRights(m_currentUser->getId(), {{kAllVideoWallsGroupId, AccessRight::edit}});
 
     const auto videowall = addVideoWall();
-    ASSERT_EQ(permissions(videowall), Qn::ReadPermission | Qn::GenericEditPermissions);
+    ASSERT_EQ(permissions(videowall),
+        Qn::ReadPermission | Qn::GenericEditPermissions | Qn::ViewContentPermission);
     ASSERT_FALSE(hasPermissions(videowall, Qn::RemovePermission));
 }
 
