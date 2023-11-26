@@ -793,6 +793,9 @@ ActionVisibility LayoutItemRemovalCondition::check(
             return InvisibleAction;
         }
 
+        if (!item.layout()->systemContext())
+            continue;
+
         const auto resourceId = item.layout()->getItem(item.uuid()).resource.id;
         const auto resource =
             item.layout()->resourcePool()->getResourceById<QnResource>(resourceId);
