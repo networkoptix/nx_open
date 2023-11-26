@@ -38,7 +38,7 @@ Item
 
     // Acts as a minimum width for the dialog.
     implicitWidth: Math.max(footerRow.width + control.buttonBox.implicitWidth,
-        accessRightsHeader.width + 320 /*some sensible minimum for the tree*/)
+        (kMinColumnWidth * columnCount) + 320 /*some sensible minimum for the tree*/)
 
     Item
     {
