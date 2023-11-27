@@ -61,13 +61,13 @@ public:
 
     /**
      * Resource to load thumbnails for.
+     * Make sure to clean the resource if it's removed from the pool, to release the shared pointer.
+     *
      * These accessors are to be used from C++ code.
      */
     QnResourcePtr resource() const;
     void setResource(const QnResourcePtr& value);
-
     /**
-     * Resource to load thumbnails for.
      * These accessors are to be used from QML code (via "resource" property).
      */
     QnResource* rawResource() const;
