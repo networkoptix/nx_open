@@ -2614,7 +2614,10 @@ void ActionHandler::at_removeFromServerAction_triggered()
             [this,
                 resourcesFailed = QnResourceList(),
                 resourcesSuccess = QnResourceList(),
-                n = resources.size()](bool result, const QnResourcePtr& resource) mutable
+                n = resources.size()](
+                    bool result,
+                    const QnResourcePtr& resource,
+                    nx::network::rest::Result::Error /*errorCode*/) mutable
             {
                 if (result)
                     resourcesSuccess << resource;
