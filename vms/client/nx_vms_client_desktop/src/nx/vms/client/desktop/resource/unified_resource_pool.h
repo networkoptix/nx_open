@@ -22,7 +22,7 @@ public:
 
     using ResourceFilter = std::function<bool (const QnResourcePtr& resource)>;
     QnResourceList resources(ResourceFilter filter = {}) const;
-    QnResourcePtr resource(const QnUuid& resourceId, const QnUuid& systemId) const;
+    QnResourcePtr resource(const QnUuid& resourceId, const QnUuid& localSystemId) const;
 
 signals:
     /**

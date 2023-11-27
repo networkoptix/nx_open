@@ -673,7 +673,7 @@ ItemResult TabApiBackend::item(const QUuid& itemId) const
 ItemResult TabApiBackend::addItem(const ResourceUniqueId& resourceId, const ItemParams& params)
 {
     const auto pool = appContext()->unifiedResourcePool();
-    const auto resource = pool->resource(resourceId.id, resourceId.systemId);
+    const auto resource = pool->resource(resourceId.id, resourceId.localSystemId);
     if (!resource)
     {
         return d->itemOperationResult(
