@@ -35,10 +35,10 @@ void ClientPool::Response::reset()
 //--------------------------------------------------------------------------------------------------
 // ClientPool::Context
 
-StatusCode::Value ClientPool::Context::getStatusCode() const
+StatusLine ClientPool::Context::getStatusLine() const
 {
     NX_MUTEX_LOCKER lock(&mutex);
-    return static_cast<StatusCode::Value>(response.statusLine.statusCode);
+    return response.statusLine;
 }
 
 QThread* ClientPool::Context::targetThread() const
@@ -80,7 +80,6 @@ bool ClientPool::Context::isCanceled() const
 
 bool ClientPool::Context::hasSuccessfulResponse() const
 {
-    const auto statusCode = getStatusCode();
     return hasResponse()
         && systemError == SystemError::noError
         && nx::network::http::StatusCode::isSuccessCode(response.statusLine.statusCode);

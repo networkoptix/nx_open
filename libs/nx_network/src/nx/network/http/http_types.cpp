@@ -645,9 +645,9 @@ bool StatusLine::parse(const ConstBufferRefType& data)
     const auto statusCodeEnd = data.find_first_of(" ", statusCodeStart);
     if (statusCodeEnd == ConstBufferRefType::npos)
         return false;
-    statusCode = nx::utils::stoul(data.substr(
+    statusCode = static_cast<StatusCode::Value>(nx::utils::stoul(data.substr(
         statusCodeStart,
-        statusCodeEnd - statusCodeStart));
+        statusCodeEnd - statusCodeStart)));
 
     const auto reasonPhraseStart = data.find_first_not_of(" ", statusCodeEnd);
     if (reasonPhraseStart == ConstBufferRefType::npos)
