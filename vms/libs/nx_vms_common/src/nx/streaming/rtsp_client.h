@@ -342,7 +342,7 @@ private:
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
-    Config m_config;
+    const Config m_config;
 
     // 'initialization in order' block
     unsigned int m_csec;
@@ -404,6 +404,7 @@ private:
     int m_nonceCount = 0;
     bool m_ignoreQopInDigest = false;
     nx::network::NatTraversalSupport m_natTraversal{nx::network::NatTraversalSupport::enabled};
+    bool m_keepAliveSupported = true;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
