@@ -195,7 +195,7 @@ Rectangle
         visible: !control.hasConfig
         anchors.verticalCenterOffset: -32
         imageSource: "image://svg/skin/user_settings/ldap_not_configured.svg"
-        text: qsTr("LDAP is not configured yet")
+        text: qsTr("Not configured yet")
         additionalText: qsTr("Connect your System to an LDAP server for easier user management")
 
         maxWidth: 250
@@ -204,7 +204,7 @@ Rectangle
         {
             Layout.alignment: Qt.AlignHCenter
 
-            text: qsTr("Connect")
+            text: qsTr("Configure")
 
             onClicked:
             {
