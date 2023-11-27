@@ -211,7 +211,7 @@ void OsHidDriverMac::enumerateDevices()
         const JoystickDeviceInfo deviceInfo = loadDeviceInfo(osLevelDeviceInfo);
 
         if (osLevelDeviceInfo->usage_page != kGenericDesktopPage
-            || kJoystickUsages.contains(osLevelDeviceInfo->usage))
+            || !kJoystickUsages.contains(osLevelDeviceInfo->usage))
         {
             continue;
         }
