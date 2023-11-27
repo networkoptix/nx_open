@@ -230,6 +230,8 @@ private:
 
 class UserListWidget::Private: public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(UserListWidget::Private)
+
     UserListWidget* const q;
     UserPropertyTracker m_visibleUsers;
 

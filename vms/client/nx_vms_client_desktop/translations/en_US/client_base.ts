@@ -11599,7 +11599,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
+    <name>UserGroupsWidget::Private</name>
     <message>
         <source>Delete</source>
         <translation></translation>
@@ -11707,7 +11707,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
+    <name>UserListWidget::Private</name>
     <message>
         <source>Delete</source>
         <translation></translation>
