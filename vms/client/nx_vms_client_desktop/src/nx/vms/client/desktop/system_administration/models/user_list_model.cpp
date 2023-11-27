@@ -345,7 +345,11 @@ void UserListModel::Private::resetUsers(const QnUserResourceList& value)
     for (const auto& user: value)
     {
         if (!user->attributes().testFlag(nx::vms::api::UserAttribute::hidden))
+        {
             users.insert(user);
+            if (user->isLdap())
+                ++m_ldapUserCount;
+        }
     }
 
     for (const auto& user: users)
