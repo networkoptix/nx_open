@@ -7,6 +7,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_map.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/network/rest/result.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 
 namespace nx::vms::client::desktop {
@@ -39,7 +40,8 @@ public:
     using GenericChangesFunction = std::function<void()>;
     using GenericCallbackFunction = std::function<void(bool)>;
     using GenericCallbackWithErrorFunction = std::function<void(bool, const QString&)>;
-    using DeleteResourceCallbackFunction = std::function<void(bool, const QnResourcePtr&)>;
+    using DeleteResourceCallbackFunction = std::function<void(bool, const QnResourcePtr&,
+        nx::network::rest::Result::Error)>;
 
     /** Generic function to delete resources. */
     void deleteResource(const QnResourcePtr& resource,

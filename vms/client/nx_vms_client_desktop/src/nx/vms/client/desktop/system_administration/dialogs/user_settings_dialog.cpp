@@ -653,9 +653,15 @@ void UserSettingsDialog::onDeleteRequested()
     d->isSaving = true;
 
     auto callback = nx::utils::guarded(this,
-        [this](bool success, const QnResourcePtr& /*resource*/)
+        [this](
+            bool success,
+            const QnResourcePtr& /*resource*/,
+            nx::network::rest::Result::Error errorCode)
         {
             d->isSaving = false;
+
+            if (errorCode == nx::network::rest::Result::SessionExpired)
+                return;
 
             if (success)
                 reject();
