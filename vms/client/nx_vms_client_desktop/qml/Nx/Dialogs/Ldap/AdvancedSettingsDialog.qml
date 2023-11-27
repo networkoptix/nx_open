@@ -195,7 +195,7 @@ Dialog
 
         CenteredField
         {
-            text: "Name Attribute"
+            text: "objectClass"
 
             leftSideMargin: 180
             rightSideMargin: 0
@@ -214,7 +214,7 @@ Dialog
 
         CenteredField
         {
-            text: qsTr("Group Attribute")
+            text: qsTr("Group Members Attribute")
 
             leftSideMargin: 180
             rightSideMargin: 0
