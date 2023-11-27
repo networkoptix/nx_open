@@ -734,11 +734,11 @@ CameraDiagnostics::Result QnRtspClient::sendOptions()
         NX_DEBUG(this, "OPTIONS request failed for URL %1", request.requestLine.url);
 
     QString allowedMethods = extractRtspParam(QLatin1String(response), QLatin1String("Public:"));
-    if (!allowedMethods.contains("GET_PARAMETER"))
+    m_keepAliveSupported = allowedMethods.contains("GET_PARAMETER");
+    if (!m_keepAliveSupported)
     {
         NX_DEBUG(this, "GET_PARAMETER method not allowed, disable keep alive, public methods: %1",
             allowedMethods);
-        m_config.disableKeepAlive = true;
     }
 
     return result;
@@ -1117,7 +1117,7 @@ bool QnRtspClient::sendTeardown()
 
 void QnRtspClient::sendKeepAliveIfNeeded()
 {
-    if (m_config.disableKeepAlive || m_keepAliveTimeOut == std::chrono::milliseconds::zero())
+    if (m_config.disableKeepAlive || !m_keepAliveSupported)
         return;
 
     if (milliseconds(m_keepAliveTime.elapsed()) < m_keepAliveTimeOut * kKeepAliveGuardInterval)
