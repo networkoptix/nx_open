@@ -143,14 +143,18 @@ std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<QnUuid>>, bool
         }
 
         deprecatedPermissions |= accessRightsToGlobalPermissions(resourceRight);
-        if (resourceRight.testFlag(AccessRight::view))
+        if (id == kAllDevicesGroupId)
         {
-            if (id == kAllDevicesGroupId)
+            if (resourceRight.testFlag(AccessRight::view))
                 deprecatedPermissions.setFlag(GlobalPermissionDeprecated::accessAllMedia);
-            else
-                temporaryAccessibleResources.push_back(id);
+            continue;
         }
+
+        if (!id.isNull())
+            temporaryAccessibleResources.push_back(id);
     }
+
+    utils::unique_sort(temporaryAccessibleResources);
 
     if (permissions.testFlag(GlobalPermission::viewLogs))
         deprecatedPermissions |= GlobalPermissionDeprecated::viewLogs;
