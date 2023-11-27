@@ -41,7 +41,7 @@ ResourceUniqueId::ResourceUniqueId(const QString& str)
     const bool isTwoComponentFormat = ids.size() == 2;
     if (isTwoComponentFormat)
     {
-        systemId = QUuid(ids[0]);
+        localSystemId = QUuid(ids[0]);
         id = QUuid(ids[1]);
     }
     else if (!ids.empty())
@@ -52,19 +52,19 @@ ResourceUniqueId::ResourceUniqueId(const QString& str)
 
 ResourceUniqueId::operator QString() const
 {
-    return nx::format("%1.%2", systemId, id);
+    return nx::format("%1.%2", localSystemId, id);
 }
 
 bool ResourceUniqueId::isNull() const
 {
-    return id.isNull() && systemId.isNull();
+    return id.isNull() && localSystemId.isNull();
 }
 
 ResourceUniqueId ResourceUniqueId::from(const QnResourcePtr& resource)
 {
     ResourceUniqueId result;
     result.id = resource->getId();
-    result.systemId = SystemContext::fromResource(resource)->localSystemId();
+    result.localSystemId = SystemContext::fromResource(resource)->localSystemId();
     return result;
 }
 

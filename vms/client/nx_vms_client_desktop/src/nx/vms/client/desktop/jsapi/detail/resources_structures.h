@@ -29,7 +29,7 @@ ResourceType resourceType(const QnResourcePtr& resource);
 struct ResourceUniqueId
 {
     QnUuid id;
-    QnUuid systemId;
+    QnUuid localSystemId;
 
     ResourceUniqueId() = default;
     ResourceUniqueId(const QString& id);

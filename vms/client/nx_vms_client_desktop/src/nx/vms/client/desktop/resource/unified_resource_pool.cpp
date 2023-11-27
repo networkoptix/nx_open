@@ -51,13 +51,15 @@ QnResourceList UnifiedResourcePool::resources(ResourceFilter filter) const
     return result;
 }
 
-QnResourcePtr UnifiedResourcePool::resource(const QnUuid& resourceId, const QnUuid& systemId) const
+QnResourcePtr UnifiedResourcePool::resource(
+    const QnUuid& resourceId,
+    const QnUuid& localSystemId) const
 {
     const std::vector<SystemContext*> systemContexts = appContext()->systemContexts();
     const auto systemContext = std::find_if(systemContexts.begin(), systemContexts.end(),
-        [systemId](const SystemContext* systemContext)
+        [localSystemId](const SystemContext* systemContext)
         {
-            return systemContext->localSystemId() == systemId;
+            return systemContext->localSystemId() == localSystemId;
         });
 
     return systemContext != systemContexts.end()

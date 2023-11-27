@@ -78,9 +78,9 @@ detail::ResourceResult ResourcesApiBackend::resource(const ResourceUniqueId& res
     const auto pool = appContext()->unifiedResourcePool();
     const auto resource = pool->resource(
         resourceId.id,
-        resourceId.systemId.isNull()
+        resourceId.localSystemId.isNull()
             ? appContext()->currentSystemContext()->localSystemId()
-            : resourceId.systemId);
+            : resourceId.localSystemId);
 
     if (isResourceAvailable(resource))
         return detail::ResourceResult{Error::success(), detail::Resource::from(resource)};
