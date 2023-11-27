@@ -198,11 +198,11 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
 #ifdef Q_OS_WIN
     QnDesktopResourcePtr desktopResource = resource.dynamicCast<QnDesktopResource>();
     if (desktopResource && desktopResource->isRendererSlow())
-        m_forceMtDecoding = true; // not enough speed for desktop camera with aero in single thread mode because of slow rendering
+        m_useMtDecoding = m_forceMtDecoding = true; // not enough speed for desktop camera with aero in single thread mode because of slow rendering
 #endif
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (camera && camera->getMaxFps() >= 50)
-        m_forceMtDecoding = true; // we can get render speed limit instead. MT decoding and displaying frame queue turn on simultaneously
+        m_useMtDecoding = m_forceMtDecoding = true; // we can get render speed limit instead. MT decoding and displaying frame queue turn on simultaneously
 
     if (camera && camera->hasFlags(Qn::virtual_camera))
     {
@@ -1036,8 +1036,7 @@ void QnCamDisplay::setSingleShotMode(bool single)
         m_isRealTimeSource = false;
         emit liveMode(false);
 
-        if (!m_forceMtDecoding)
-            setMTDecoding(false);
+        setMTDecoding(false);
 
         NX_MUTEX_LOCKER lock(&m_audioChangeMutex);
         m_audioDisplay->suspend();
