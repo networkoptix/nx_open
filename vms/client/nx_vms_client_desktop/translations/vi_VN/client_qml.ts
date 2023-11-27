@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Cho phép xác thực không an toàn (digest) cho người dùng đã nhập</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,16 +56,16 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Đồng bộ hóa người dùng</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Khoảng thời gian đồng bộ hóa</translation>
     </message>
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+      <translation>Proxy yêu cầu LDAP %1 qua máy chủ</translation>
     </message>
     <message>
       <source>Group Attribute</source>
@@ -934,15 +934,15 @@
     </message>
     <message>
       <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Khi Đồng bộ hóa liên tục bị tắt, các nhóm sẽ không tự động đồng bộ hóa. Để cập nhật nhóm này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+      <translation>Một nhóm khác cùng tên đã tồn tại trong hệ thống. Nên đặt tên riêng cho từng nhóm.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Nhóm có một nhóm khác vừa là nhóm mẹ, vừa là thành viên con hoặc là một phần của chuỗi tham chiếu vòng tròn. Chỉnh lại cài đặt chuỗi này để ngăn việc cấp quyền không chính xác.</translation>
     </message>
   </context>
   <context>
@@ -1260,11 +1260,11 @@
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>Kết nối Hệ thống của bạn với máy chủ LDAP để quản lý người dùng dễ dàng hơn</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Nhập liên tục từ máy chủ LDAP bị vô hiệu hóa đối với hệ thống này. Việc cập nhật các nhóm cũng như thành viên nhóm và người dùng sẽ chỉ diễn ra thông qua đồng bộ hóa thủ công.</translation>
     </message>
   </context>
   <context>
@@ -1597,7 +1597,7 @@
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Sử dụng %1 hoặc %2 để chọn nhiều tài nguyên hoặc %3 để xóa lựa chọn</translation>
     </message>
   </context>
   <context>
@@ -1715,27 +1715,27 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Nhấn phím mũi tên để di chuyển xung quanh. Sử dụng phím cộng và trừ để phóng to.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Sử dụng con lăn chuột để thu phóng</translation>
     </message>
     <message>
       <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</translation>
+      <translation>Nhấp, nhấp đúp hoặc kéo con trỏ chuột cùng với nhấn phím Shift để sử dụng trình PTZ nâng cao</translation>
     </message>
     <message>
       <source>Target Lock Tracking</source>
-      <translation type="unfinished">Target Lock Tracking</translation>
+      <translation>Theo dõi khóa mục tiêu</translation>
     </message>
     <message>
       <source>Alt + Click to follow object</source>
-      <translation type="unfinished">Alt + Click to follow object</translation>
+      <translation>Alt + Nhấp để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Bạn có thể bật lại hướng dẫn này bằng cách đi tới Cài đặt cục bộ &gt; Nâng cao &gt; Đặt lại tất cả cảnh báo</translation>
     </message>
   </context>
   <context>
@@ -1799,45 +1799,45 @@ to activate PTZ</source>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Có %1 quyền</translation>
     </message>
     <message>
       <source>Also inherits it from:</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from:</translation>
+      <translation>Cũng kế thừa nó từ:</translation>
     </message>
     <message>
       <source>Inherits %1 permission from:</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from:</translation>
+      <translation>Kế thừa %1 quyền từ:</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Thêm %1 và quyền phụ thuộc</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Thêm quyền %1</translation>
     </message>
     <message>
       <source>Already inherited from:</source>
-      <translation type="unfinished">Already inherited from:</translation>
+      <translation>Đã được kế thừa từ:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Xóa %1 và quyền phụ thuộc</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Xóa quyền %1</translation>
     </message>
     <message>
       <source>Will stay inherited from:</source>
-      <translation type="unfinished">Will stay inherited from:</translation>
+      <translation>Sẽ được kế thừa từ:</translation>
     </message>
   </context>
   <context>
@@ -1991,19 +1991,19 @@ to activate PTZ</source>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Hệ thống đã bị đình chỉ. Để bật/tắt việc sử dụng tích hợp cho thiết bị hiện tại, Hệ thống phải ở trạng thái hoạt động. Liên hệ với Đối tác đại lý để biết chi tiết</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Hệ thống đã bị đình chỉ. Để bật/tắt việc sử dụng tích hợp cho một số thiết bị, Hệ thống phải ở trạng thái hoạt động. Liên hệ với Đối tác đại lý để biết chi tiết</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Hệ thống đã bị tắt. Để kích hoạt việc sử dụng tích hợp này cho thiết bị hiện tại, Hệ thống phải ở trạng thái hoạt động. Liên hệ với Đối tác đại lý để biết chi tiết</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>Hệ thống đã bị tắt. Để kích hoạt việc sử dụng tích hợp này cho một số thiết bị, Hệ thống phải ở trạng thái hoạt động. Liên hệ với Đối tác đại lý để biết chi tiết</translation>
     </message>
   </context>
   <context>
@@ -2216,11 +2216,11 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Luôn luôn</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Khi đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -2244,7 +2244,7 @@ to activate PTZ</source>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>Trong</translation>
     </message>
   </context>
   <context>
@@ -2412,15 +2412,15 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Truy cập</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Người dùng thông thường với thông tin xác thực</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Tạm thời với liên kết</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2514,7 +2514,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Quyền truy cập hết hạn</translation>
     </message>
     <message>
       <source>Access Link</source>
@@ -2522,7 +2522,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Sao chép liên kết</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -2534,7 +2534,7 @@ to activate PTZ</source>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Không có liên kết hợp lệ cho người dùng này</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -2543,24 +2543,24 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Lấy liên kết...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Đảm bảo rằng máy tính này có thể kết nối với %1</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>Máy chủ LDAP đang ngoại tuyến. Người dùng không thể đăng nhập.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Thông tin đăng nhập của người dùng này trùng lặp với thông tin đăng nhập của người dùng khác. Không ai trong số họ có thể đăng nhập. Để giải quyết vấn đề này, bạn có thể thay đổi thông tin đăng nhập của người dùng hoặc vô hiệu hóa hoặc xóa người dùng có thông tin đăng nhập trùng lặp.</translation>
     </message>
     <message>
       <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Khi Đồng bộ hóa liên tục bị tắt, tư cách thành viên của người dùng trong nhóm sẽ không tự động đồng bộ hóa. Để cập nhật thông tin này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
     </message>
   </context>
   <context>
