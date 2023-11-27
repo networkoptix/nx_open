@@ -128,7 +128,7 @@ QnVirtualCameraResourcePtr CameraHotspotItem::Private::hotspotCamera() const
 {
     const auto resourcePool = q->resourcePool();
     const auto camera =
-        resourcePool->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId);
+        resourcePool->getResourceById<QnVirtualCameraResource>(hotspotData.targetResourceId);
     NX_ASSERT(camera, "Hotspot refers to a nonexistent camera");
     return camera;
 }
@@ -211,7 +211,7 @@ void CameraHotspotItem::Private::openItem()
     const auto workbenchItems = q->workbench()->currentLayout()->items();
     for (const auto item: workbenchItems)
     {
-        if (item->resource()->getId() == hotspotData.cameraId)
+        if (item->resource()->getId() == hotspotData.targetResourceId)
         {
             if (q->workbench()->item(Qn::ZoomedRole))
                 q->workbench()->setItem(Qn::ZoomedRole, nullptr);

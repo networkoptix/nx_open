@@ -47,7 +47,7 @@ int CameraHotspotsItemModel::columnCount(const QModelIndex& parent) const
 QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
 {
     const auto hotspotData = m_hotspots.at(index.row());
-    const auto cameraId = hotspotData.cameraId;
+    const auto cameraId = hotspotData.targetResourceId;
     const auto camera = m_resourcePool->getResourceById<QnVirtualCameraResource>(cameraId);
 
     if (role == Qt::DisplayRole)
