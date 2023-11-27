@@ -174,7 +174,7 @@ TEST_F(HttpClientPoolTest, GeneralNegativeTest)
                 // There should be some response with 404.
                 EXPECT_EQ(context->systemError, SystemError::noError);
                 EXPECT_TRUE(context->hasResponse());
-                EXPECT_EQ(context->getStatusCode(), StatusCode::notFound);
+                EXPECT_EQ(context->getStatusLine().statusCode, StatusCode::notFound);
             }
 
             NX_MUTEX_LOCKER lock(&mutex);
