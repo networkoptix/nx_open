@@ -456,20 +456,10 @@ MergeSystemsStatus MergeSystemsTool::verifyTargetCertificate(const Context& ctx)
     if (!nx::network::ini().verifyVmsSslCertificates)
         return MergeSystemsStatus::ok;
 
-    if (!checkServerCertificateEquality(ctx))
-        return MergeSystemsStatus::certificateInvalid;
-
-    const CertificateVerifier::Status status = m_certificateVerifier->verifyCertificate(
-        ctx.targetInfo.id,
-        ctx.targetHandshakeChain);
-
-    if (status == CertificateVerifier::Status::ok)
-        return MergeSystemsStatus::ok;
-
     const auto serverName = ctx.target.address.toString();
-    NX_VERBOSE(this, "Try to verify target cert from %1 by system CA certificates.", serverName);
-
     std::string errorMessage;
+
+    NX_VERBOSE(this, "Try to verify target cert from %1 by system CA certificates.", serverName);
     if (nx::network::ssl::verifyBySystemCertificates(
             ctx.targetHandshakeChain, serverName, &errorMessage))
     {
@@ -478,10 +468,23 @@ MergeSystemsStatus MergeSystemsTool::verifyTargetCertificate(const Context& ctx)
             ctx.targetInfo.id,
             ctx.targetHandshakeChain[0].publicKey());
 
+        // Trust the certificate if it passed system storage check.
         return MergeSystemsStatus::ok;
     }
 
     NX_VERBOSE(this, "System CA verification result: %1", errorMessage);
+
+    if (!checkServerCertificateEquality(ctx))
+        return MergeSystemsStatus::certificateInvalid;
+
+    // At this point target handshake chain equals user provided chain.
+
+    const CertificateVerifier::Status status = m_certificateVerifier->verifyCertificate(
+        ctx.targetInfo.id,
+        ctx.targetHandshakeChain);
+
+    if (status == CertificateVerifier::Status::ok)
+        return MergeSystemsStatus::ok;
 
     bool accepted = false;
     if (status == CertificateVerifier::Status::notFound)
