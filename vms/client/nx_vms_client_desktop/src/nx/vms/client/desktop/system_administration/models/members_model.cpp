@@ -1033,7 +1033,7 @@ public:
         {
             case Qt::ToolTipRole:
                 if (mapToSource(index).data(MembersModel::IsLdap).toBool())
-                    return tr("LDAP group membership is managed in LDAP");
+                    return tr("LDAP group membership is managed on LDAP server");
 
                 break;
 
