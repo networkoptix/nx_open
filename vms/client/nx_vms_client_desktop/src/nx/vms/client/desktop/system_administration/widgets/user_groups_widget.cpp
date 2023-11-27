@@ -204,6 +204,8 @@ protected:
 
 class UserGroupsWidget::Private: public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(UserGroupsWidget::Private)
+
     UserGroupsWidget* const q;
 
 public:
