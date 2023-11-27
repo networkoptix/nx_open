@@ -17,7 +17,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/thumbnails/generic_image_store.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <utils/common/synctime.h>
@@ -68,7 +67,7 @@ struct AbstractResourceThumbnail::Private
     GenericImageStore* const imageStore;
 
     QnResourcePtr resource;
-    nx::utils::ScopedConnections resourceConnections;
+    std::unique_ptr<QObject> receiver;
     int maximumSize = kUnlimitedSize;
     bool loadedAutomatically = true;
     bool active = true;
@@ -164,7 +163,7 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
     if (d->resource == value)
         return;
 
-    d->resourceConnections.reset();
+    d->receiver.reset();
     d->resource = value;
     reset();
 
@@ -175,27 +174,24 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
 
     if (d->resource)
     {
-        d->resourceConnections << connect(d->resource.get(), &QnResource::propertyChanged, this,
-            [this](const QnResourcePtr& resource, const QString& key)
+        // Resource signals are sent from non-GUI threads. To prevent receiving a signal metacall
+        // from the event queue from an old resource after it has been changed already, we use
+        // a dummy receiver which is replaced every time a new resource is set.
+        // Just disconnecting a saved connection in this case is not enough.
+        d->receiver.reset(new QObject());
+
+        connect(d->resource.get(), &QnResource::propertyChanged, d->receiver.get(),
+            [this](const QnResourcePtr& /*resource*/, const QString& key)
             {
                 if (key == QnMediaResource::customAspectRatioKey())
                     d->updateAspectRatio();
             });
 
-        d->resourceConnections << connect(d->resource.get(), &QnResource::rotationChanged, this,
+        connect(d->resource.get(), &QnResource::rotationChanged, d->receiver.get(),
             [this]() { d->updateRotation(); });
 
-        d->resourceConnections << connect(d->resource.get(), &QnResource::parentIdChanged, this,
+        connect(d->resource.get(), &QnResource::parentIdChanged, d->receiver.get(),
             [this]() { d->updateIsArmServer(); });
-
-        // Safety measure. Actually this shall be done by the owner class, who calls setResource.
-        // It should listen for resourcesRemoved instead.
-        d->resourceConnections << connect(d->resource.get(), &QnResource::flagsChanged, this,
-            [this]()
-            {
-                if (NX_ASSERT(d->resource) && d->resource->hasFlags(Qn::removed))
-                    setResource({});
-            });
     }
 
     emit resourceChanged();
