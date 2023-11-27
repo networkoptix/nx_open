@@ -130,8 +130,8 @@ public:
         /** Check if there is any response. */
         bool hasResponse() const;
 
-        /** Get HTTP status code of a response. */
-        StatusCode::Value getStatusCode() const;
+        /** Get HTTP status of a response. */
+        StatusLine getStatusLine() const;
 
         /** Get request URL. */
         nx::utils::Url getUrl() const;
