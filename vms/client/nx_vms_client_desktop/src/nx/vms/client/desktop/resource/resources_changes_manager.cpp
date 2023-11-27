@@ -246,21 +246,21 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
 
     if (!resource)
     {
-        safeCallback(false, resource);
+        safeCallback(false, resource, nx::network::rest::Result::InvalidParameter);
         return;
     }
 
     auto api = connectedServerApi();
     if (!api)
     {
-        safeCallback(false, resource);
+        safeCallback(false, resource, nx::network::rest::Result::ServiceUnavailable);
         return;
     }
 
     auto handler =
         [this, safeCallback, resource](bool success,
             rest::Handle /*requestId*/,
-            rest::ServerConnection::ErrorOrEmpty /*result*/)
+            rest::ServerConnection::ErrorOrEmpty result)
         {
             if (success)
             {
@@ -268,9 +268,16 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
                 resourcePool()->removeResource(resource);
             }
 
-            safeCallback(success, resource);
+            nx::network::rest::Result::Error errorCode = success
+                ? nx::network::rest::Result::NoError
+                : nx::network::rest::Result::InternalServerError;
 
-            if (!success)
+            if (auto error = std::get_if<nx::network::rest::Result>(&result))
+                errorCode = error->error;
+
+            safeCallback(success, resource, errorCode);
+
+            if (!success && errorCode != nx::network::rest::Result::SessionExpired)
                 emit resourceDeletingFailed({resource});
         };
 
