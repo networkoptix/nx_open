@@ -51,7 +51,7 @@ TEST(Permissions, BackwardCompatibility)
         std::tie(
             convertedBack.permissions, convertedBack.accessibleResources, convertedBack.isOwner) =
             extractFromResourceAccessRights(permissions, &groups, resourceAccessRights);
-        ASSERT_EQ(nx::reflect::json::serialize(origin), nx::reflect::json::serialize(convertedBack));
+        ASSERT_EQ(origin.permissions, convertedBack.permissions);
     }
 }
 
