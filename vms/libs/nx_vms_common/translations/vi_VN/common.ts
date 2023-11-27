@@ -202,23 +202,23 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
+      <translation>Thành viên của nhóm này có đặc quyền Hệ thống không giới hạn. Quản trị viên có thể tạo và sửa đổi Người dùng cấp cao, hợp nhất Hệ thống và kết nối hoặc ngắt kết nối Hệ thống với  %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Các thành viên của nhóm này, ngoài các quyền cấp cho nhóm Người xem nâng cao, có thể kiểm soát hầu hết cấu hình Hệ thống nhưng không được phép thay đổi bất kỳ cài đặt nào liên quan đến Quản trị viên, như xóa hoặc thay đổi nhóm và quyền của riêng họ, đồng thời không thể tạo hoặc chỉnh sửa Người dùng cấp cao khác.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Các thành viên của nhóm này, ngoài các quyền cấp cho nhóm Người xem, có thể xem và kích hoạt các vị trí PTZ và chuyến tham quan PTZ, sử dụng âm thanh 2 chiều, vận hành các nút mô-đun I/O, tạo và chỉnh sửa dấu trang cũng như xem Nhật ký sự kiện.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Ngoài các quyền cho nhóm Người xem trực tiếp, các thành viên của nhóm này có thể xem và xuất kho lưu trữ và Dấu trang.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Các thành viên của nhóm này có thể xem thông tin Giám sát tình trạng hệ thống và tải bộ xử lý máy chủ trong thời gian thực (Giám sát máy chủ).</translation>
     </message>
   </context>
   <context>
@@ -1738,16 +1738,16 @@
     </message>
     <message>
       <source>Channel partners service</source>
-      <translation type="unfinished">Channel partners service</translation>
+      <translation>Dịch vụ Đối tác đại lý</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>ID tổ chức</translation>
     </message>
   </context>
   <context>
@@ -2470,24 +2470,24 @@
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>Không thể kết nối với máy chủ LDAP.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>Không thể hoàn tất đồng bộ hóa trong khoảng thời gian chờ %1.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a given timeout.</source>
-      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+      <translation>Không thể hoàn tất đồng bộ hóa trong khoảng thời gian chờ nhất định.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>Không có tài khoản người dùng nào trên máy chủ LDAP khớp với cài đặt đồng bộ hóa.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>Không tìm thấy người dùng hoặc nhóm LDAP trong cơ sở dữ liệu LDAP.</translation>
     </message>
   </context>
 </TS>

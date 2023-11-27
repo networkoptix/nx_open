@@ -1327,8 +1327,8 @@
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <comment>Numerical form depends on groups count</comment>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
+      <translation>
+        <numerusform>Xóa %n nhóm?</numerusform>
       </translation>
     </message>
   </context>
@@ -1450,7 +1450,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>Giấy phép đã được kích hoạt</translation>
     </message>
   </context>
   <context>
@@ -1668,7 +1668,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>Tên người dùng không được để trống</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -1896,15 +1896,15 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Partner information</source>
-      <translation type="unfinished">Partner information</translation>
+      <translation>Thông tin đối tác</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>Số điện thoại</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>Email</translation>
     </message>
   </context>
   <context>
@@ -2008,7 +2008,7 @@ Khóa giấy phép: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>%1. To attach to Video Wall, SaaS must be in active state. %2</source>
-      <translation type="unfinished">%1. To attach to Video Wall, SaaS must be in active state. %2</translation>
+      <translation>%1. Để gắn vào Tường video, SaaS phải ở trạng thái hoạt động. %2</translation>
     </message>
   </context>
   <context>
@@ -2371,7 +2371,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>Năm</translation>
     </message>
   </context>
   <context>
@@ -3222,7 +3222,7 @@ to %1</source>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>Vui lòng đăng nhập lại bằng liên kết của bạn để tiếp tục</translation>
     </message>
   </context>
   <context>
@@ -4171,7 +4171,7 @@ to %1</source>
     <name>QnPopupSettingsWidget</name>
     <message>
       <source>These settings apply only to the system you are logged in. They will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the system you are logged in. They will be removed in future versions.</translation>
+      <translation>Các cài đặt này chỉ áp dụng cho hệ thống bạn đã đăng nhập. Chúng sẽ bị xóa trong các phiên bản sau.</translation>
     </message>
   </context>
   <context>
@@ -4948,11 +4948,11 @@ to %1</source>
     </message>
     <message>
       <source>SAAS SHUT DOWN</source>
-      <translation type="unfinished">SAAS SHUT DOWN</translation>
+      <translation>SAAS ĐÃ BỊ TẮT</translation>
     </message>
     <message>
       <source>NO CONNECTION TO THE LICENSE SERVER</source>
-      <translation type="unfinished">NO CONNECTION TO THE LICENSE SERVER</translation>
+      <translation>KHÔNG KẾT NỐI VỚI MÁY CHỦ CẤP PHÉP</translation>
     </message>
   </context>
   <context>
@@ -5096,11 +5096,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, các bộ lưu trữ sao lưu khác sẽ bị vô hiệu hóa và tùy chọn “Tất cả kho lưu trữ” cho các thiết bị đã được định cấu hình sẽ được thay đổi thành “Chuyển động, Đối tượng, Dấu trang”</translation>
     </message>
     <message>
       <source>If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</source>
-      <translation type="unfinished">If cloud storage is activated for backup, the “All archive” option for already configured devices will be changed to “Motion, Object, Bookmarks”</translation>
+      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, tùy chọn “Tất cả kho lưu trữ” cho các thiết bị đã được định cấu hình sẽ được thay đổi thành “Chuyển động, Đối tượng, Dấu trang”</translation>
     </message>
   </context>
   <context>
@@ -5199,7 +5199,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Đường dẫn</translation>
     </message>
     <message>
       <source>Type</source>
@@ -5207,7 +5207,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Purpose</source>
-      <translation type="unfinished">Purpose</translation>
+      <translation>Mục đích</translation>
     </message>
     <message>
       <source>Size</source>
@@ -6748,15 +6748,15 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
-      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+      <translation>Cho phép người dùng truy cập tài nguyên và xem cảnh quay trực tiếp từ camera.</translation>
     </message>
     <message>
       <source>Modify Bookmarks</source>
-      <translation type="unfinished">Modify Bookmarks</translation>
+      <translation>Tùy chỉnh Bookmark</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
-      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+      <translation>Cho phép người dùng điều khiển PTZ, sử dụng Âm thanh 2 chiều, Nút kích hoạt mềm và nút I/O.</translation>
     </message>
   </context>
   <context>
@@ -7090,7 +7090,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>– Applies to all servers</source>
-      <translation type="unfinished">– Applies to all servers</translation>
+      <translation>– Áp dụng cho tất cả các máy chủ</translation>
     </message>
   </context>
   <context>
@@ -8185,11 +8185,11 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your system administrator to do it.</translation>
+      <translation>Camera này yêu cầu phải thiết lập mật khẩu. Hãy yêu cầu quản trị viên hệ thống thực hiện việc đó.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your system administrator to do it.</translation>
+      <translation>Một số camera được chọn yêu cầu phải thiết lập mật khẩu. Hãy yêu cầu quản trị viên hệ thống thực hiện việc đó.</translation>
     </message>
   </context>
   <context>
@@ -9056,7 +9056,7 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>Không thể kết nối với máy chủ LDAP</translation>
     </message>
   </context>
   <context>
@@ -9406,7 +9406,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
+      <translation>Khuyến nghị tham khảo ý kiến của %1 trước khi tiếp tục.</translation>
     </message>
     <message>
       <source>support</source>
@@ -10219,7 +10219,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>To allow the use of a client API, create a web integration instead. %1</source>
-      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+      <translation>Để cho phép sử dụng API ứng dụng khách, hãy tạo tiện ích tích hợp web. %1</translation>
     </message>
     <message>
       <source>Learn more...</source>
@@ -10369,32 +10369,32 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
+      <translation>
+        <numerusform>%1 và %n bố cục khác</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">%1 video wall</translation>
+      <translation>%1 tường video</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
+      <translation>
+        <numerusform>%1 và %n tường video nữa</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 nhóm</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 và %n nhóm nữa</numerusform>
       </translation>
     </message>
   </context>
@@ -11371,7 +11371,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>You do not have permissions to modify or delete this group.</source>
-      <translation type="unfinished">You do not have permissions to modify or delete this group.</translation>
+      <translation>Bạn không có quyền sửa đổi hoặc xóa nhóm này.</translation>
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
@@ -11379,11 +11379,11 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name in the system. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Có nhiều nhóm có tên này trong hệ thống. Để duy trì cấu trúc rõ ràng và có tổ chức, khuyến nghị nên đặt tên duy nhất cho mỗi nhóm.</translation>
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+      <translation>Nhóm có một nhóm khác vừa là nhóm mẹ, vừa là thành viên con hoặc là một phần của chuỗi tham chiếu vòng tròn. Điều này có thể dẫn đến việc cấp quyền không chính xác.</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11398,15 +11398,15 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
       <source>Invalid JSON</source>
-      <translation type="unfinished">Invalid JSON</translation>
+      <translation>JSON không hợp lệ</translation>
     </message>
     <message>
       <source>Invalid request</source>
-      <translation type="unfinished">Invalid request</translation>
+      <translation>Yêu cầu không hợp lệ</translation>
     </message>
     <message>
       <source>Method not found</source>
-      <translation type="unfinished">Method not found</translation>
+      <translation>Không tìm thấy phương thức này</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -11418,39 +11418,39 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Connection failure</source>
-      <translation type="unfinished">Connection failure</translation>
+      <translation>Kết nối thất bại</translation>
     </message>
     <message>
       <source>Invalid encoding</source>
-      <translation type="unfinished">Invalid encoding</translation>
+      <translation>Mã hóa không hợp lệ</translation>
     </message>
     <message>
       <source>Invalid encoding charset</source>
-      <translation type="unfinished">Invalid encoding charset</translation>
+      <translation>Bộ ký tự mã hóa không hợp lệ</translation>
     </message>
     <message>
       <source>Application Error</source>
-      <translation type="unfinished">Application Error</translation>
+      <translation>Lỗi ứng dụng</translation>
     </message>
     <message>
       <source>System Error</source>
-      <translation type="unfinished">System Error</translation>
+      <translation>Lỗi hệ thống</translation>
     </message>
     <message>
       <source>Transport Error</source>
-      <translation type="unfinished">Transport Error</translation>
+      <translation>Lỗi vận chuyển</translation>
     </message>
     <message>
       <source>Server error code %1</source>
-      <translation type="unfinished">Server error code %1</translation>
+      <translation>Mã lỗi máy chủ %1</translation>
     </message>
     <message>
       <source>Reserved error code %1</source>
-      <translation type="unfinished">Reserved error code %1</translation>
+      <translation>Mã lỗi dành riêng %1</translation>
     </message>
     <message>
       <source>Unknown error code %1</source>
-      <translation type="unfinished">Unknown error code %1</translation>
+      <translation>Mã lỗi chưa xác định %1</translation>
     </message>
   </context>
   <context>
@@ -11469,37 +11469,37 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Nhiều nhóm có cùng tên, điều này có thể dẫn đến nhầm lẫn. Để duy trì cấu trúc rõ ràng và có tổ chức, khuyến nghị nên đặt tên duy nhất cho mỗi nhóm.</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>%n nhóm LDAP hiện có không được tìm thấy trong cơ sở dữ liệu LDAP.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
+      <translation>
+        <numerusform>Xóa %n nhóm</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+      <translation>Không xóa được nhóm %1.</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
+      <translation>Không xóa được nhóm.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
+      <translation>
+        <numerusform>Không xóa được %n nhóm.</numerusform>
       </translation>
     </message>
     <message>
       <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+      <translation>Một số nhóm vừa là nhóm mẹ vừa là thành viên con hoặc là một phần của chuỗi tham chiếu vòng tròn. Điều này có thể dẫn đến việc cấp quyền không chính xác.</translation>
     </message>
   </context>
   <context>
@@ -11535,19 +11535,19 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>You do not have permissions to modify this user.</source>
-      <translation type="unfinished">You do not have permissions to modify this user.</translation>
+      <translation>Bạn không có quyền sửa đổi người dùng này.</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>Máy chủ LDAP đang ngoại tuyến. Người dùng không thể đăng nhập.</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
-      <translation type="unfinished">User is not found in the LDAP database.</translation>
+      <translation>Không tìm thấy người dùng trong cơ sở dữ liệu LDAP.</translation>
     </message>
     <message>
       <source>Temporary user</source>
-      <translation type="unfinished">Temporary user</translation>
+      <translation>Người dùng tạm thời</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -11555,7 +11555,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Đã có một người dùng có cùng thông tin đăng nhập trong hệ thống. Để tránh sự cố, tất cả người dùng phải có thông tin đăng nhập duy nhất.</translation>
     </message>
   </context>
   <context>
@@ -11746,12 +11746,12 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Lấy liên kết...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Đảm bảo rằng máy tính này có thể kết nối với %1</translation>
     </message>
     <message>
       <source>in %1</source>
@@ -13030,11 +13030,11 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     </message>
     <message>
       <source>You do not have permissions to open this camera on the layout</source>
-      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+      <translation>Bạn không có quyền mở camera này trên bố cục</translation>
     </message>
     <message>
       <source>You do not have permissions to open some of selected cameras on the layout</source>
-      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
+      <translation>Bạn không có quyền mở một số camera đã chọn trên bố cục</translation>
     </message>
   </context>
   <context>
