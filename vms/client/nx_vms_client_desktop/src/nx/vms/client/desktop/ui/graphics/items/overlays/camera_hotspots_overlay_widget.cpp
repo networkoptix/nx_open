@@ -81,7 +81,7 @@ QnUuidSet CameraHotspotsOverlayWidget::Private::resourceWidgetCameraHotspotsIds(
     const auto hotspots = camera->cameraHotspots();
     QnUuidSet hospotsCamerasIds;
     for (const auto& hotspot: hotspots)
-        hospotsCamerasIds.insert(hotspot.cameraId);
+        hospotsCamerasIds.insert(hotspot.targetResourceId);
 
     return hospotsCamerasIds;
 }
@@ -101,7 +101,7 @@ void CameraHotspotsOverlayWidget::Private::initHotspotItems()
     for (const auto& hotspotData: hotspotsData)
     {
         if (const auto hotspotCamera =
-            resourcePool()->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId))
+            resourcePool()->getResourceById<QnVirtualCameraResource>(hotspotData.targetResourceId))
         {
             const auto accessController = ResourceAccessManager::accessController(hotspotCamera);
             if (!accessController)

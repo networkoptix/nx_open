@@ -136,8 +136,11 @@ const std::unique_ptr<CameraSelectionDialog>
     resourceSelectionWidget->setSelectionMode(ResourceSelectionMode::ExclusiveSelection);
     resourceSelectionWidget->setShowRecordingIndicator(true);
 
-    if (const auto id = ui->hotspotsEditorWidget->hotspotAt(hotspotIndex).cameraId; !id.isNull())
+    if (const auto id = ui->hotspotsEditorWidget->hotspotAt(hotspotIndex).targetResourceId;
+        !id.isNull())
+    {
         resourceSelectionWidget->setSelectedResourceId(id);
+    }
 
     return cameraSelectionDialog;
 }
@@ -152,7 +155,7 @@ CameraSelectionDialog::ResourceFilter
         if (i == hotspotIndex)
             continue;
 
-        if (const auto id = ui->hotspotsEditorWidget->hotspotAt(i).cameraId; !id.isNull())
+        if (const auto id = ui->hotspotsEditorWidget->hotspotAt(i).targetResourceId; !id.isNull())
             usedHotspotCamerasIds.insert(id);
     }
 
@@ -172,7 +175,7 @@ void CameraHotspotsSettingsWidget::Private::selectCameraForHotspot(int hotspotIn
         return;
 
     auto hotspotData = ui->hotspotsEditorWidget->hotspotAt(hotspotIndex);
-    hotspotData.cameraId =
+    hotspotData.targetResourceId =
         cameraSelectionDialog->resourceSelectionWidget()->selectedResourceId();
 
     ui->hotspotsEditorWidget->setHotspotAt(hotspotData, hotspotIndex);

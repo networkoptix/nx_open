@@ -17,7 +17,7 @@ struct NX_VMS_COMMON_API CameraHotspotData
     /**
      * The Id of the camera that the hotspot refers to.
      */
-    QnUuid cameraId;
+    QnUuid targetResourceId;
 
     /**
      * Hotspot item relative position on the camera item. (0.0, 0.0) and (1.0, 1.0) values stand
@@ -66,7 +66,7 @@ struct NX_VMS_COMMON_API CameraHotspotData
     bool operator==(const CameraHotspotData& other) const;
 };
 
-NX_REFLECTION_INSTRUMENT(CameraHotspotData, (cameraId)(pos)(direction)(name)(accentColorName))
+NX_REFLECTION_INSTRUMENT(CameraHotspotData, (targetResourceId)(pos)(direction)(name)(accentColorName))
 
 using CameraHotspotDataList = std::vector<CameraHotspotData>;
 

@@ -509,12 +509,12 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         else if (d->isHoveredHotspotIndex(i))
             option.state = CameraHotspotDisplayOption::State::hovered;
 
-        if (!hotspot.cameraId.isNull())
+        if (!hotspot.targetResourceId.isNull())
         {
             option.cameraState = CameraHotspotDisplayOption::CameraState::valid;
             const auto resourcePool = systemContext->resourcePool();
             const auto camera =
-                resourcePool->getResourceById<QnVirtualCameraResource>(hotspot.cameraId);
+                resourcePool->getResourceById<QnVirtualCameraResource>(hotspot.targetResourceId);
 
             if (!camera)
                 option.cameraState = CameraHotspotDisplayOption::CameraState::invalid;

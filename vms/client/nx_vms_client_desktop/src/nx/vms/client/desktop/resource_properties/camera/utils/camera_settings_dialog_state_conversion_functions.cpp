@@ -475,7 +475,8 @@ void setCameraHotspots(
             if (!cameraHotspot.isValid())
                 return false;
 
-            const auto hotspotCamera = resourcePool->getResourceById(cameraHotspot.cameraId);
+            const auto hotspotCamera =
+                resourcePool->getResourceById(cameraHotspot.targetResourceId);
             return nx::vms::common::camera_hotspots::hotspotCanReferToCamera(hotspotCamera);
         });
 
