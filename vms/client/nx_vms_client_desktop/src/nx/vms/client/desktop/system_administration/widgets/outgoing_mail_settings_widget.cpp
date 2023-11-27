@@ -305,6 +305,9 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
     q->connect(m_testSmtpConfigurationButton, &QPushButton::clicked, q,
         [this] { testSmtpConfiguration(); });
 
+    q->connect(q->systemSettings(), &nx::vms::common::SystemSettings::emailSettingsChanged, q,
+        [this] { updateConfigurationStatus(); });
+
     q->connect(q->systemSettings(), &nx::vms::common::SystemSettings::cloudSettingsChanged, q,
         [this]
         {
