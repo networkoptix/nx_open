@@ -429,7 +429,7 @@ bool SecuritySettingsWidget::hasChanges() const
         || (ui->forceVideoTrafficEncryptionCheckBox->isChecked()
             != systemSettings()->isVideoTrafficEncryptionForced())
         || (m_watermarkSettings != systemSettings()->watermarkSettings())
-        || (calculateSessionLimit() != systemSettings()->sessionTimeoutLimit())
+        || (calculateSessionLimit() != systemSettings()->sessionTimeoutLimit().value_or(kNoLimitSessionDuration))
         || (ui->archiveEncryptionGroupBox->isChecked() != systemSettings()->useStorageEncryption())
         || m_archivePasswordState == ArchivePasswordState::changed
         || m_archivePasswordState == ArchivePasswordState::failedToSet
