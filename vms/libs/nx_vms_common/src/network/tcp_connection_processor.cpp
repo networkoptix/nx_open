@@ -428,7 +428,8 @@ nx::String QnTCPConnectionProcessor::createResponse(
 {
     Q_D(QnTCPConnectionProcessor);
     d->response.statusLine.version = d->request.requestLine.version;
-    d->response.statusLine.statusCode = httpStatusCode;
+    d->response.statusLine.statusCode =
+        static_cast<nx::network::http::StatusCode::Value>(httpStatusCode);
     d->response.statusLine.reasonPhrase = nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)httpStatusCode);
 
     if (d->response.headers.find("Connection") == d->response.headers.end() &&  //response does not contain

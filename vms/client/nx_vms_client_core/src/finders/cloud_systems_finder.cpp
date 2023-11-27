@@ -186,7 +186,7 @@ struct CloudSystemsFinder::Private
             NX_VERBOSE(this,
                 "Cloud system <%1>: ping failure: status %2 error %3",
                 cloudSystemId,
-                context->getStatusCode(),
+                context->getStatusLine(),
                 context->systemError);
         }
 

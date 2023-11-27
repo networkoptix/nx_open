@@ -1158,7 +1158,7 @@ void QnRtspClient::processTextData(const QByteArray& textData)
     {
         nx::network::http::Response response;
         response.statusLine.version = nx::network::rtsp::rtsp_1_0;
-        response.statusLine.statusCode = 200;
+        response.statusLine.statusCode = nx::network::http::StatusCode::Value::ok;
         response.statusLine.reasonPhrase = "OK";
 
         response.headers.insert({"User-Agent", m_userAgent});

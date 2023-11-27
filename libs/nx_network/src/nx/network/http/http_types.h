@@ -438,7 +438,7 @@ class NX_NETWORK_API StatusLine
 {
 public:
     MimeProtoVersion version;
-    int statusCode;
+    StatusCode::Value statusCode;
     std::string reasonPhrase;
 
     StatusLine();

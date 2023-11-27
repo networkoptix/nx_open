@@ -77,7 +77,7 @@ rest::RestResultWithData<T> parseMessageBody(
     Type<rest::RestResultWithData<T>>,
     Qn::SerializationFormat format,
     const QByteArray& msgBody,
-    nx::network::http::StatusCode::Value statusCode,
+    const nx::network::http::StatusLine& statusLine,
     bool* success)
 {
     using Result = rest::RestResultWithData<T>;
@@ -101,7 +101,7 @@ rest::RestResultWithData<T> parseMessageBody(
             NX_DEBUG(typeid(rest::ServerConnection),
                 "Unsupported format '%1', status code: %2, message body: %3 ...",
                 nx::reflect::enumeration::toString(format),
-                statusCode,
+                statusLine,
                 msgBody.left(kMessageBodyLogSize));
 
             break;
@@ -115,12 +115,12 @@ T parseMessageBody(
     Type<T>,
     Qn::SerializationFormat format,
     const QByteArray& msgBody,
-    nx::network::http::StatusCode::Value statusCode,
+    const nx::network::http::StatusLine& statusLine,
     bool* success)
 {
-    if (statusCode != nx::network::http::StatusCode::ok)
+    if (statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
-        NX_DEBUG(typeid(rest::ServerConnection), "Unexpected HTTP status code: %1", statusCode);
+        NX_DEBUG(typeid(rest::ServerConnection), "Unexpected HTTP status code: %1", statusLine);
         *success = false;
         return T();
     }
@@ -137,7 +137,7 @@ T parseMessageBody(
             NX_DEBUG(typeid(rest::ServerConnection),
                 "Unsupported format '%1', status code: %2, message body: %3 ...",
                 nx::reflect::enumeration::toString(format),
-                statusCode,
+                statusLine,
                 msgBody.left(kMessageBodyLogSize));
 
             break;
@@ -152,10 +152,11 @@ nx::network::rest::Result parseMessageBody(
     Type<nx::network::rest::Result>,
     Qn::SerializationFormat format,
     const QByteArray& messageBody,
-    nx::network::http::StatusCode::Value httpStatusCode,
+    const nx::network::http::StatusLine& statusLine,
     bool* success)
 {
-    auto result = nx::vms::common::api::parseRestResult(httpStatusCode, format, messageBody);
+    auto result = nx::vms::common::api::parseRestResult(statusLine.statusCode, format,
+        messageBody);
     *success = (result.error == nx::network::rest::Result::NoError);
 
     return result;
@@ -167,7 +168,7 @@ rest::ErrorOrData<T> parseMessageBody(
     Type<rest::ErrorOrData<T>>,
     Qn::SerializationFormat format,
     const QByteArray& messageBody,
-    nx::network::http::StatusCode::Value httpStatusCode,
+    const nx::network::http::StatusLine& statusLine,
     bool* success)
 {
     if (format != Qn::SerializationFormat::json)
@@ -175,11 +176,11 @@ rest::ErrorOrData<T> parseMessageBody(
         NX_DEBUG(typeid(rest::ServerConnection),
             "Unsupported format '%1', status code: %2, message body: %3 ...",
             nx::reflect::enumeration::toString(format),
-            httpStatusCode,
+            statusLine,
             messageBody.left(kMessageBodyLogSize));
     }
 
-    if (httpStatusCode == nx::network::http::StatusCode::ok)
+    if (statusLine.statusCode == nx::network::http::StatusCode::ok)
     {
         T data;
         if constexpr (std::is_same_v<T, rest::Empty>)
@@ -203,19 +204,19 @@ rest::ErrorOrData<T> parseMessageBody(
         }
     }
 
-    return parseMessageBody(
-        Type<nx::network::rest::Result>{}, format, messageBody, httpStatusCode, success);
+    return parseMessageBody(Type<nx::network::rest::Result>{}, format, messageBody, statusLine,
+        success);
 }
 
 template <typename T>
 T parseMessageBody(
     Qn::SerializationFormat format,
     const QByteArray& messageBody,
-    nx::network::http::StatusCode::Value httpStatusCode,
+    const nx::network::http::StatusLine& statusLine,
     bool* success)
 {
     NX_CRITICAL(success);
-    return parseMessageBody(Type<T>{}, format, messageBody, httpStatusCode, success);
+    return parseMessageBody(Type<T>{}, format, messageBody, statusLine, success);
 }
 
 // Invokes callback in appropriate thread
@@ -2062,7 +2063,7 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
 
             QString errorString;
             if (context->systemError != SystemError::noError
-                || context->getStatusCode() != nx::network::http::StatusCode::ok)
+                || context->getStatusLine().statusCode != nx::network::http::StatusCode::ok)
             {
                 success = false;
             }
@@ -2072,9 +2073,6 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
                 nx::network::rest::JsonResult restResult;
                 if (!QJson::deserialize(context->response.messageBody, &restResult))
                     success = false;
-
-                //else
-                //    QJson::deserialize(restResult.reply, &result);
             }
 
             auto internal_callback =
@@ -3001,8 +2999,11 @@ Handle ServerConnection::executeRequest(
                 this,
                 [this, callback = std::move(callback), serverId](ContextPtr context)
                 {
-                    NX_VERBOSE(d->logTag, "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
-                        context->handle, context->systemError, context->getStatusCode());
+                    NX_VERBOSE(d->logTag,
+                        "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
+                        context->handle,
+                        context->systemError,
+                        context->getStatusLine());
                     bool success = false;
                     const auto format
                         = Qn::serializationFormatFromHttpContentType(context->response.contentType);
@@ -3012,14 +3013,14 @@ Handle ServerConnection::executeRequest(
                         parseMessageBody<ResultType>(
                             format,
                             context->response.messageBody,
-                            context->getStatusCode(),
+                            context->getStatusLine(),
                             &success));
 
                     if (!success)
                         NX_VERBOSE(d->logTag, "<%1> Could not parse message body.", context->handle);
 
                     if (context->systemError != SystemError::noError
-                        || context->getStatusCode() != nx::network::http::StatusCode::ok)
+                        || context->getStatusLine().statusCode != nx::network::http::StatusCode::ok)
                     {
                         success = false;
                     }
@@ -3070,20 +3071,20 @@ Handle ServerConnection::executeRequest(
                     "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
                     context->handle,
                     context->systemError,
-                    context->getStatusCode());
+                    context->getStatusLine());
                 bool success = false;
                 const auto format =
                     Qn::serializationFormatFromHttpContentType(context->response.contentType);
 
                 // All parsing functions can handle incorrect format.
                 auto resultPtr = std::make_shared<ResultType>(parseMessageBody<ResultType>(
-                    format, context->response.messageBody, context->getStatusCode(), &success));
+                    format, context->response.messageBody, context->getStatusLine(), &success));
 
                 if (!success)
                     NX_VERBOSE(d->logTag, "<%1> Could not parse message body.", context->handle);
 
                 if (context->systemError != SystemError::noError
-                    || context->getStatusCode() != nx::network::http::StatusCode::ok)
+                    || context->getStatusLine().statusCode != nx::network::http::StatusCode::ok)
                 {
                     success = false;
                 }
@@ -3123,18 +3124,18 @@ Handle ServerConnection::executeRequest(
                 this,
                 [this, callback,  targetThreadGuard, serverId](ContextPtr context)
                 {
-                    const auto statusCode = context->getStatusCode();
                     const auto osErrorCode = context->systemError;
                     const auto id = context->handle;
 
                     NX_VERBOSE(
                         d->logTag,
-                        "<%1> Got %2 byte(s) reply of content type %3. OS error: %4, HTTP status: %5",
+                        "<%1> Got %2 byte(s) reply of content type %3. OS error: %4, "
+                            "HTTP status: %5",
                         id,
                         context->response.messageBody.size(),
                         QString::fromLatin1(context->response.contentType),
                         osErrorCode,
-                        statusCode);
+                        context->getStatusLine());
 
                     const bool success = context->hasSuccessfulResponse();
                     auto internal_callback =
@@ -3173,15 +3174,15 @@ Handle ServerConnection::executeRequest(
                 this,
                 [this, callback, serverId](ContextPtr context)
                 {
-                    const auto statusCode = context->getStatusCode();
+                    const auto statusLine = context->getStatusLine();
                     const auto osErrorCode = context->systemError;
                     const auto id = context->handle;
                     bool success = (osErrorCode == SystemError::noError
-                        && statusCode >= nx::network::http::StatusCode::ok
-                        && statusCode <= nx::network::http::StatusCode::partialContent);
+                        && statusLine.statusCode >= nx::network::http::StatusCode::ok
+                        && statusLine.statusCode <= nx::network::http::StatusCode::partialContent);
 
                     NX_VERBOSE(d->logTag, "<%1> Got reply. OS error: %2, HTTP status: %3",
-                        id, osErrorCode, statusCode);
+                        id, osErrorCode, context->getStatusLine());
 
                     auto internal_callback = [callback, success, id]()
                         {
