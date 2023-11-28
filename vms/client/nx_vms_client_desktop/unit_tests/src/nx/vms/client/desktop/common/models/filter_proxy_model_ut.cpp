@@ -732,6 +732,21 @@ TEST_F(FilterProxyModelTest, layoutChanges)
     ASSERT_EQ(modelToString(), newContent2);
     ASSERT_EQ(getText(persistentIndexList), textFromIndexes); //< Must persist.
     ASSERT_EQ(getText(getAllIndexes()), newTextFromIndexes2);
+
+    // Rows moved from a filtered out parent into an accepted parent.
+    ASSERT_TRUE(sourceModel->moveRows(sourceModel->buildIndex({0}), 2, 2,
+        sourceModel->buildIndex({3, 0}), 0));
+
+    const auto newContent3 = QString(
+        "Coleoidea {Belemnoidea {Clymeniida, Ceratitida, Belemnitida, Aulacocerida, Ascocerida}}, "
+        "Ammonoidea {Ammonitida, Agoniatitida}");
+
+    const QString newTextFromIndexes3 = "Coleoidea, Belemnoidea, Clymeniida, Ceratitida, "
+        "Belemnitida, Aulacocerida, Ascocerida, Ammonoidea, Ammonitida, Agoniatitida";
+
+    ASSERT_EQ(modelToString(), newContent3);
+    ASSERT_EQ(getText(persistentIndexList), textFromIndexes); //< Must persist.
+    ASSERT_EQ(getText(getAllIndexes()), newTextFromIndexes3);
 }
 
 TEST_F(FilterProxyModelTest, invalidIndex)
