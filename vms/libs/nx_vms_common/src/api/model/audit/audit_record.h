@@ -29,7 +29,12 @@ struct NX_VMS_COMMON_API QnAuditRecord
     Qn::AuditRecordType eventType = Qn::AR_NotDefined;
 
     std::vector<QnUuid> resources;
-    QnLatin1Array params; // I didn't use map here for optimization reason
+
+    /**%apidoc
+     * JSON object serialized using the Latin-1 encoding, even though it may contain other Unicode
+     * characters.
+     */
+    QnLatin1Array params;
 
     QnAuthSession authSession;
 };
