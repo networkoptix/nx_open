@@ -87,7 +87,7 @@ struct NX_VMS_API DeviceModelGeneral
 };
 #define DeviceModelGeneral_Fields \
     (id)(name)(url)(typeId)(mac)(serverId)(physicalId)(isManuallyAdded)(vendor)(model)(group)(credentials)
-QN_FUSION_DECLARE_FUNCTIONS(DeviceModelGeneral, (json), NX_VMS_API)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(DeviceModelGeneral, (json))
 NX_REFLECTION_INSTRUMENT(DeviceModelGeneral, DeviceModelGeneral_Fields);
 
 struct NX_VMS_API DeviceModelForSearch: DeviceModelGeneral
