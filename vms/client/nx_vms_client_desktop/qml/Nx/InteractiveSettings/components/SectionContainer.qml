@@ -47,7 +47,7 @@ StackLayout
 
         verticalScrollBar: ScrollBar
         {
-            parent: scrollBarParent ? scrollBarParent : view
+            parent: scrollBarParent ? scrollBarParent : view.scrollView
             x: parent ? parent.width - width : 0
             height: parent ? parent.height : 0
             visible: view.visible
