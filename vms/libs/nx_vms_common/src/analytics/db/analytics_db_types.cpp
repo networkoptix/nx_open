@@ -187,9 +187,9 @@ bool Filter::acceptsTrackInternal(const ObjectTrackType& track,
 
     if (!options.testFlag(Option::ignoreTimePeriod))
     {
-        if (!(microseconds(track.lastAppearanceTimeUs) >= timePeriod.startTime()
-                && (timePeriod.isInfinite()
-                    || microseconds(track.firstAppearanceTimeUs) < timePeriod.endTime())))
+        if (microseconds(track.firstAppearanceTimeUs) < timePeriod.startTime()
+            || (!timePeriod.isInfinite()
+                && microseconds(track.firstAppearanceTimeUs) > timePeriod.endTime()))
         {
             return false;
         }
