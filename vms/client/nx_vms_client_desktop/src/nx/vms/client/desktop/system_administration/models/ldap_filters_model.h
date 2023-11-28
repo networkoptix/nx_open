@@ -61,7 +61,7 @@ public:
     bool ignoreCertErrors = false;
     QList<LdapFilter> filters;
     bool continuousSyncEnabled = true;
-    int continuousSync = (int) nx::vms::api::LdapSettings::Sync::usersAndGroups;
+    int continuousSync = (int) nx::vms::api::LdapSyncMode::usersAndGroups;
     int syncIntervalS = 3600; //< 1 hour.
     int searchTimeoutS = 60; //< 1 minute.
 

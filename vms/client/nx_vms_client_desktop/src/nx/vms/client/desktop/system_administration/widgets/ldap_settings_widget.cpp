@@ -211,7 +211,7 @@ struct LdapSettingsWidget::Private
         }
 
         state.continuousSyncEnabled =
-            settings.continuousSync != nx::vms::api::LdapSettings::Sync::disabled;
+            settings.continuousSync != nx::vms::api::LdapSyncMode::disabled;
         state.continuousSync = (int) settings.continuousSync;
 
         state.loginAttribute = settings.loginAttribute;
@@ -256,7 +256,7 @@ struct LdapSettingsWidget::Private
             });
         }
 
-        settings.continuousSync = (nx::vms::api::LdapSettings::Sync) state.continuousSync;
+        settings.continuousSync = (nx::vms::api::LdapSyncMode) state.continuousSync;
 
         settings.loginAttribute = state.loginAttribute;
         settings.groupObjectClass = state.groupObjectClass;
