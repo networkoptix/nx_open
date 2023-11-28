@@ -430,11 +430,14 @@ bool QnResource::setProperty(const QString& key, const QString& value, bool mark
             if (itr == m_locallySavedProperties.end())
             {
                 m_locallySavedProperties.emplace(key, value);
+                emitPropertyChanged(key, QString(), value);
                 return true;
             }
             if (value == itr->second)
                 return false;
+            QString prev = itr->second;
             itr->second = value;
+            emitPropertyChanged(key, prev, value);
             return true;
         }
     }
