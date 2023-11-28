@@ -6,6 +6,7 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/branding.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/saveable_system_settings.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -154,18 +155,29 @@ void QnSystemAdministrationDialog::applyChanges()
 
     base_type::applyChanges();
 
-    const auto callback =
-        [this](bool /*success*/, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty)
+    auto callback = nx::utils::guarded(this,
+        [this](
+            bool /*success*/,
+            rest::Handle requestId,
+            rest::ServerConnection::ErrorOrEmpty response)
         {
             NX_ASSERT(requestId == d->currentRequest || d->currentRequest == 0);
             d->currentRequest = 0;
             updateButtonBox();
-        };
+
+            if (const auto error = std::get_if<nx::network::rest::Result>(&response))
+            {
+                NX_DEBUG(this, "Can't save system settings, code: %1, error: %2",
+                    error->error, error->errorString);
+                QnSessionAwareMessageBox::critical(
+                    this, tr("Failed to save system settings"), error->errorString);
+            }
+        });
 
     d->currentRequest = connectedServerApi()->patchSystemSettings(
         systemContext()->getSessionTokenHelper(),
         d->editableSystemSettings,
-        callback,
+        std::move(callback),
         this);
 
     updateButtonBox();
