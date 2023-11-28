@@ -193,8 +193,8 @@ struct UserSettingsDialog::Private
         continuousSync = q->globalSettings()->ldap().continuousSync
             == nx::vms::api::LdapSettings::Sync::usersAndGroups;
 
-        connect(q->systemContext()->traffiRelayUrlWatcher(),
-            &TraffiRelayUrlWatcher::trafficRelayUrlReady,
+        connect(q->systemContext()->trafficRelayUrlWatcher(),
+            &TrafficRelayUrlWatcher::trafficRelayUrlReady,
             q,
             [this] { linkReady = true; });
 
@@ -216,7 +216,7 @@ struct UserSettingsDialog::Private
 
     QString getTrafficRelayUrl() const
     {
-        return q->systemContext()->traffiRelayUrlWatcher()->trafficRelayUrl();
+        return q->systemContext()->trafficRelayUrlWatcher()->trafficRelayUrl();
     }
 
     void updateStateLinkReady()

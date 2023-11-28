@@ -31,7 +31,7 @@ class ServerRuntimeEventConnector;
 class SystemInternetAccessWatcher;
 class SystemHealthState;
 class SystemSpecificLocalSettings;
-class TraffiRelayUrlWatcher;
+class TrafficRelayUrlWatcher;
 class VideoCache;
 class VideoWallOnlineScreensWatcher;
 class VirtualCameraManager;
@@ -102,7 +102,7 @@ public:
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;
     DefaultPasswordCamerasWatcher* defaultPasswordCamerasWatcher() const;
     SystemHealthState* systemHealthState() const;
-    TraffiRelayUrlWatcher* traffiRelayUrlWatcher() const;
+    TrafficRelayUrlWatcher* trafficRelayUrlWatcher() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

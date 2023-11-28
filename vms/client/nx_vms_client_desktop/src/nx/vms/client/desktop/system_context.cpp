@@ -83,7 +83,7 @@ struct SystemContext::Private
     std::unique_ptr<IntercomManager> intercomManager;
     std::unique_ptr<AnalyticsEventsSearchTreeBuilder> analyticsEventsSearchTreeBuilder;
     std::unique_ptr<SystemHealthState> systemHealthState;
-    std::unique_ptr<TraffiRelayUrlWatcher> traffiRelayUrlWatcher;
+    std::unique_ptr<TrafficRelayUrlWatcher> trafficRelayUrlWatcher;
 
     void initLocalRuntimeInfo()
     {
@@ -144,7 +144,7 @@ SystemContext::SystemContext(
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             d->defaultPasswordCamerasWatcher = std::make_unique<DefaultPasswordCamerasWatcher>(
                 this);
-            d->traffiRelayUrlWatcher = std::make_unique<TraffiRelayUrlWatcher>(this);
+            d->trafficRelayUrlWatcher = std::make_unique<TrafficRelayUrlWatcher>(this);
             break;
 
         case Mode::crossSystem:
@@ -312,9 +312,9 @@ SystemHealthState* SystemContext::systemHealthState() const
     return d->systemHealthState.get();
 }
 
-TraffiRelayUrlWatcher* SystemContext::traffiRelayUrlWatcher() const
+TrafficRelayUrlWatcher* SystemContext::trafficRelayUrlWatcher() const
 {
-    return d->traffiRelayUrlWatcher.get();
+    return d->trafficRelayUrlWatcher.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
