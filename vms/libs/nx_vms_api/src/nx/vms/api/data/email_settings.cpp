@@ -8,4 +8,8 @@ namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EmailSettings, (json), EmailSettings_Fields)
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EmailSettingsRequest, (json), EmailSettingsRequest_Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EmailSettingsReply, (json), EmailSettingsReply_Fields)
+
 } // namespace nx::vms::api
