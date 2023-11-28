@@ -651,6 +651,8 @@ AccessSubjectEditingContext::IsIndexAccepted
 
 void AccessSubjectEditingContext::resetAccessibleByPermissionsFilter()
 {
+    NX_VERBOSE(this, "Resetting 'Accessible by permissions' filter");
+
     d->currentlyAccessibleIdsCache.clear();
     emit accessibleByPermissionsFilterChanged();
 }

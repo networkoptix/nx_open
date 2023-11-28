@@ -45,18 +45,18 @@ Item
 
     property int selectionSize: 0
 
-    property var externallyHoveredGroups // {indexes[], accessRight, toggledOn, fromSelection}
+    property var externalHoverData //< {indexes[], accessRight, toggledOn, fromSelection}
 
     property bool parentNodeSelected: false
 
     readonly property bool parentNodeHovered:
     {
-        if (!externallyHoveredGroups)
+        if (!externalHoverData)
             return false
 
-        for (let parent of externallyHoveredGroups.indexes)
+        for (let parent of externalHoverData.indexes)
         {
-            if (NxGlobals.isRecursiveChildOf(root.resourceTreeIndex, parent))
+            if (parent.valid && NxGlobals.isRecursiveChildOf(root.resourceTreeIndex, parent))
                 return true
         }
 
@@ -273,23 +273,23 @@ Item
                         if (root.editingEnabled && cellsRow.hoveredCell === cell)
                             return true
 
-                        const hg = root.externallyHoveredGroups
+                        const hd = root.externalHoverData
 
-                        if (hg
+                        if (hd
                             && root.parentNodeHovered
-                            && hg.toggledOn === toggledOn
-                            && (hg.fromSelection || root.editingEnabled)
-                            && (accessRightsModel.relevantAccessRights & hg.accessRight))
+                            && hd.toggledOn === toggledOn
+                            && (hd.fromSelection || root.editingEnabled)
+                            && (accessRightsModel.relevantAccessRights & hd.accessRight))
                         {
                             // Highlight a child of a hovered resource group cell.
-                            if (hg.accessRight === accessRight)
+                            if (hd.accessRight === accessRight)
                                 return true
 
                             if (root.automaticDependencies)
                             {
-                                if (toggledOn && context.isDependingOn(accessRight, hg.accessRight)
+                                if (toggledOn && context.isDependingOn(accessRight, hd.accessRight)
                                     || !toggledOn && context.isRequiredFor(accessRight,
-                                        hg.accessRight))
+                                        hd.accessRight))
                                 {
                                     return true
                                 }
