@@ -251,5 +251,31 @@ TEST_F(VideowallLayoutWatcherTest, videowallMatrices)
     ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)), QnUuidSet({layout1->getId()}));
 }
 
+TEST_F(VideowallLayoutWatcherTest, videowallAddedWithItemAndMatrix)
+{
+    const auto videowall = createVideoWall();
+
+    const auto layout1 = addLayout();
+    const auto layout2 = addLayout();
+    const auto item = addVideoWallItem(videowall, layout1);
+
+    QnVideoWallMatrix matrix;
+    matrix.uuid = QnUuid::createUuid();
+    matrix.layoutByItem[item] = layout2->getId();
+    layout2->setParentId(videowall->getId());
+    videowall->matrices()->addItem(matrix);
+
+    ASSERT_EQ(popNextSignal(), QString());
+
+    resourcePool()->addResource(videowall);
+
+    ASSERT_EQ(popNextSignal(), QString("videowallAdded"));
+    ASSERT_EQ(popNextVideowall(), videowall);
+    ASSERT_EQ(watcher->layoutVideowall(layout1), videowall);
+    ASSERT_EQ(watcher->layoutVideowall(layout2), videowall);
+    ASSERT_EQ(toSet(watcher->videowallLayouts(videowall)),
+        QnUuidSet({layout1->getId(), layout2->getId()}));
+}
+
 } // namespace test
 } // namespace nx::vms::common
