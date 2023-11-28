@@ -1690,6 +1690,8 @@ void initialize(Manager* manager, Action* root)
         .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
             && !condition::tourIsRunning());
 
+    vx::registerMonitoringLayoutSettingsAction(factory);
+
     factory(VideowallSettingsAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Video Wall Settings..."))
