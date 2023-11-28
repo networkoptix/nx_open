@@ -960,10 +960,13 @@ void FilterProxyModel::Private::sourceLayoutAboutToBeChanged(
     m_changingIndexes.clear();
     m_layoutChangingParents.clear();
 
-    for (const auto& sourceParent: sourceParents)
+    if (!sourceParents.empty())
     {
-        if (const std::optional<QModelIndex> parent = mapFromSource(sourceParent))
-            m_layoutChangingParents.push_back(*parent);
+        for (const auto& sourceParent: sourceParents)
+        {
+            if (const std::optional<QModelIndex> parent = mapFromSource(sourceParent))
+                m_layoutChangingParents.push_back(*parent);
+        }
 
         if (m_layoutChangingParents.empty())
             return;
