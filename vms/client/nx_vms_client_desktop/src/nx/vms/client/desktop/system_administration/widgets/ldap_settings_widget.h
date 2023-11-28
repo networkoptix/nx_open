@@ -28,9 +28,9 @@ public:
 
     enum class Sync
     {
-        disabled = (int) nx::vms::api::LdapSettings::Sync::disabled,
-        groupsOnly = (int) nx::vms::api::LdapSettings::Sync::groupsOnly,
-        usersAndGroups = (int) nx::vms::api::LdapSettings::Sync::usersAndGroups,
+        disabled = (int) nx::vms::api::LdapSyncMode::disabled,
+        groupsOnly = (int) nx::vms::api::LdapSyncMode::groupsOnly,
+        usersAndGroups = (int) nx::vms::api::LdapSyncMode::usersAndGroups,
     };
     Q_ENUM(Sync)
 

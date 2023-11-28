@@ -141,7 +141,7 @@ struct UserSettingsDialog::Private
     QmlProperty<bool> isSaving;
     QmlProperty<bool> ldapError;
     QmlProperty<bool> ldapOffline;
-    QmlProperty<api::LdapSettings::Sync> continuousSync;
+    QmlProperty<api::LdapSyncMode> continuousSync;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
     QmlProperty<int> displayOffsetMs;
