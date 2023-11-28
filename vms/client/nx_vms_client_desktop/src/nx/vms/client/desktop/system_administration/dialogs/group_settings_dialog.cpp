@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/ui/messages/user_groups_messages.h>
+#include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -66,6 +67,7 @@ DifferencesResult differences(
 struct GroupSettingsDialog::Private
 {
     GroupSettingsDialog* q;
+    QString syncId;
     QWidget* parentWidget = nullptr;
     QPointer<SessionNotifier> sessionNotifier;
     DialogType dialogType;
@@ -75,19 +77,22 @@ struct GroupSettingsDialog::Private
     QmlProperty<GroupSettingsDialog*> self; //< Used to call validate functions from QML.
     QmlProperty<api::LdapSyncMode> continuousSync;
     QmlProperty<bool> deleteAvailable;
+    QmlProperty<bool> ldapError;
 
     QnUuid groupId;
     GroupSettingsDialogState originalState;
 
     Private(GroupSettingsDialog* parent, DialogType dialogType):
         q(parent),
+        syncId(parent->globalSettings()->ldap().syncId()),
         dialogType(dialogType),
         tabIndex(q->rootObjectHolder(), "tabIndex"),
         isSaving(q->rootObjectHolder(), "isSaving"),
         editingContext(q->rootObjectHolder(), "editingContext"),
         self(q->rootObjectHolder(), "self"),
         continuousSync(q->rootObjectHolder(), "continuousSync"),
-        deleteAvailable(q->rootObjectHolder(), "deleteAvailable")
+        deleteAvailable(q->rootObjectHolder(), "deleteAvailable"),
+        ldapError(q->rootObjectHolder(), "ldapError")
     {
     }
 
@@ -169,7 +174,15 @@ GroupSettingsDialog::GroupSettingsDialog(
         connect(globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
             [this]()
             {
+                d->syncId = globalSettings()->ldap().syncId();
                 d->continuousSync = globalSettings()->ldap().continuousSync;
+                updateStateFrom(d->groupId);
+            });
+
+        connect(systemContext->ldapStatusWatcher(), &LdapStatusWatcher::statusChanged, this,
+            [this]()
+            {
+                updateStateFrom(d->groupId);
             });
 
         d->continuousSync = globalSettings()->ldap().continuousSync;
@@ -427,6 +440,14 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const QnUuid& groupId)
                 break;
             }
         }
+
+        const auto status = systemContext()->ldapStatusWatcher()->status();
+        const bool ldapOffline = !status || status->state == api::LdapStatus::State::offline;
+
+        d->ldapError = groupData->type == api::UserType::ldap
+            && !groupData->externalId.dn.isEmpty()
+            && groupData->externalId.syncId != d->syncId
+            && !ldapOffline;
     }
 
     return state;
