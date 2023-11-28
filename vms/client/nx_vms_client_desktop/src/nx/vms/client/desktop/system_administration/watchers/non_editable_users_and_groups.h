@@ -49,6 +49,8 @@ public:
     const NonUniqueNameTracker& nonUniqueUsers() const { return m_nonUniqueUserTracker; }
     const NonUniqueNameTracker& nonUniqueGroups() const { return m_nonUniqueGroupTracker; }
 
+    QString tooltip(const QnUuid& id) const;
+
 signals:
     void userModified(const QnUserResourcePtr& user);
     void groupModified(const QnUuid& groupId);
