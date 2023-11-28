@@ -1804,16 +1804,6 @@ to activate PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Also inherits it from:</source>
-        <comment>&apos;it&apos; refers to a permission</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Inherits %1 permission from:</source>
-        <comment>%1 will be substituted with a permission name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Add %1 and dependent permissions</source>
         <comment>%1 will be substituted with a permission name</comment>
         <translation type="unfinished"></translation>
@@ -1821,10 +1811,6 @@ to activate PTZ</source>
     <message>
         <source>Add %1 permission</source>
         <comment>%1 will be substituted with a permission name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Already inherited from:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1838,7 +1824,21 @@ to activate PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Will stay inherited from:</source>
+        <source>Also inherits it from</source>
+        <comment>&apos;it&apos; refers to a permission</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inherits %1 permission from</source>
+        <comment>%1 will be substituted with a permission name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already inherited from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Will stay inherited from</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
