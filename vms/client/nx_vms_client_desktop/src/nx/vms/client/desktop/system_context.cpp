@@ -67,7 +67,7 @@ struct SystemContext::Private
     std::unique_ptr<DelayedDataLoader> delayedDataLoader;
     std::unique_ptr<analytics::TaxonomyManager> taxonomyManager;
     std::unique_ptr<NonEditableUsersAndGroups> nonEditableUsersAndGroups;
-    std::unique_ptr<TraffiRelayUrlWatcher> traffiRelayUrlWatcher;
+    std::unique_ptr<TrafficRelayUrlWatcher> trafficRelayUrlWatcher;
 
     void initLocalRuntimeInfo()
     {
@@ -123,7 +123,7 @@ SystemContext::SystemContext(
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->ldapStatusWatcher = std::make_unique<LdapStatusWatcher>(this);
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
-            d->traffiRelayUrlWatcher = std::make_unique<TraffiRelayUrlWatcher>(this);
+            d->trafficRelayUrlWatcher = std::make_unique<TrafficRelayUrlWatcher>(this);
             break;
 
         case Mode::crossSystem:
@@ -248,9 +248,9 @@ common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const
     return d->restApiHelper->getSessionTokenHelper();
 }
 
-TraffiRelayUrlWatcher* SystemContext::traffiRelayUrlWatcher() const
+TrafficRelayUrlWatcher* SystemContext::trafficRelayUrlWatcher() const
 {
-    return d->traffiRelayUrlWatcher.get();
+    return d->trafficRelayUrlWatcher.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

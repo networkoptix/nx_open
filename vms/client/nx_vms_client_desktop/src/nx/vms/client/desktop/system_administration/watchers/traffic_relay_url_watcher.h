@@ -9,15 +9,15 @@
 
 namespace nx::vms::client::desktop {
 
-class TraffiRelayUrlWatcher:
+class TrafficRelayUrlWatcher:
     public QObject,
     public SystemContextAware
 {
     Q_OBJECT
 
 public:
-    explicit TraffiRelayUrlWatcher(SystemContext* context, QObject* parent = nullptr);
-    virtual ~TraffiRelayUrlWatcher() override;
+    explicit TrafficRelayUrlWatcher(SystemContext* context, QObject* parent = nullptr);
+    virtual ~TrafficRelayUrlWatcher() override;
 
     QString trafficRelayUrl() const;
 
