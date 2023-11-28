@@ -4,6 +4,10 @@
 
 #include <sstream>
 
+#if defined(Q_OS_WIN)
+    #include <process.h>
+#endif
+
 #if defined(__APPLE__) && !defined(_GNU_SOURCE)
     #define _GNU_SOURCE
 #endif
