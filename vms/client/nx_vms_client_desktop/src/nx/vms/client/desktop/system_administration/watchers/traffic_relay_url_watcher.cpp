@@ -8,7 +8,7 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/guarded_callback.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/serialization/qjson.h>
 #include <nx/utils/url.h>
@@ -29,10 +29,10 @@ static const QString kTrafficRelayUrlRequest = R"json(
 static const QString kCloudPathTrafficRelayInfo = "/mediator/server/%1/sessions/";
 static const QString kTrafficRelayUrl = "trafficRelayUrl";
 
-class TraffiRelayUrlWatcher::Private
+class TrafficRelayUrlWatcher::Private
 {
 public:
-    Private(TraffiRelayUrlWatcher* owner): q(owner)
+    Private(TrafficRelayUrlWatcher* owner): q(owner)
     {
         requestTrafficRelayUrl();
     }
@@ -40,7 +40,7 @@ public:
     ~Private() {}
 
 public:
-    TraffiRelayUrlWatcher* const q;
+    TrafficRelayUrlWatcher* const q;
     QTimer reconnectTimer;
     std::unique_ptr<nx::network::http::AsyncClient> httpClient;
     nx::utils::PendingOperation delayedRequestTrafficRelayUrl{
@@ -84,60 +84,62 @@ public:
             Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
             nx::format(kTrafficRelayUrlRequest, cloudSystemId).toStdString());
 
+        auto handler = nx::utils::AsyncHandlerExecutor(q).bind(
+            [this, url]()
+            {
+                NX_MUTEX_LOCKER lock(&mutex);
+                trafficRelayUrl = {};
+                if (httpClient->failed())
+                {
+                    NX_VERBOSE(this, "POST request failed. Url: %1", url);
+                    delayedRequestTrafficRelayUrl.requestOperation();
+                    return;
+                }
+
+                const auto result = httpClient->fetchMessageBodyBuffer();
+                httpClient.reset();
+                if (result.empty())
+                {
+                    NX_VERBOSE(this, "POST body fetch failed. Url: %1", url);
+                    delayedRequestTrafficRelayUrl.requestOperation();
+                    return;
+                }
+
+                QJsonObject response;
+                if (nx::reflect::json::deserialize(result, &response))
+                {
+                    trafficRelayUrl = response[kTrafficRelayUrl].toString();
+                }
+                else
+                {
+                    NX_VERBOSE(this, "Can not deserialize POST response. Url: %1", url);
+                    delayedRequestTrafficRelayUrl.requestOperation();
+                    return;
+                }
+
+                emit q->trafficRelayUrlReady();
+            });
+
         httpClient->doPost(
             url,
             std::move(messageBody),
-            nx::utils::guarded(q,
-                [this, url]()
-                {
-                    NX_MUTEX_LOCKER lock(&mutex);
-                    trafficRelayUrl = {};
-                    if (httpClient->failed())
-                    {
-                        NX_VERBOSE(this, "POST request failed. Url: %1", url);
-                        delayedRequestTrafficRelayUrl.requestOperation();
-                        return;
-                    }
-
-                    const auto result = httpClient->fetchMessageBodyBuffer();
-                    httpClient.reset();
-                    if (result.empty())
-                    {
-                        NX_VERBOSE(this, "POST body fetch failed. Url: %1", url);
-                        delayedRequestTrafficRelayUrl.requestOperation();
-                        return;
-                    }
-
-                    QJsonObject response;
-                    if (nx::reflect::json::deserialize(result, &response))
-                    {
-                        trafficRelayUrl = response[kTrafficRelayUrl].toString();
-                    }
-                    else
-                    {
-                        NX_VERBOSE(this, "Can not deserialize POST response. Url: %1", url);
-                        delayedRequestTrafficRelayUrl.requestOperation();
-                        return;
-                    }
-
-                    emit q->trafficRelayUrlReady();
-                }));
+            std::move(handler));
     }
 };
 
-TraffiRelayUrlWatcher::TraffiRelayUrlWatcher(SystemContext* context, QObject* parent):
+TrafficRelayUrlWatcher::TrafficRelayUrlWatcher(SystemContext* context, QObject* parent):
     QObject(parent), SystemContextAware(context), d(new Private(this))
 {
     connect(globalSettings(), &common::SystemSettings::cloudSettingsChanged,
         this, [this]() { d->delayedRequestTrafficRelayUrl.requestOperation(); });
 }
 
-QString TraffiRelayUrlWatcher::trafficRelayUrl() const
+QString TrafficRelayUrlWatcher::trafficRelayUrl() const
 {
     return d->getTrafficRelayUrl();
 }
 
-TraffiRelayUrlWatcher::~TraffiRelayUrlWatcher()
+TrafficRelayUrlWatcher::~TrafficRelayUrlWatcher()
 {
 }
 
