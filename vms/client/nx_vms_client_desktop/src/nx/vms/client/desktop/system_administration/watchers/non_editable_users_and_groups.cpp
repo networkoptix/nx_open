@@ -155,6 +155,12 @@ bool NonEditableUsersAndGroups::canChangeAuthentication(const QnUserResourcePtr&
 
 bool NonEditableUsersAndGroups::canEditParents(const QnUuid& id) const
 {
+    if (const auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(id))
+    {
+        if (user->attributes().testFlag(api::UserAttribute::readonly))
+            return false;
+    }
+
     return !m_usersWithUnchangableParents.contains(id) && m_nonUniqueGroupTracker.isUnique(id);
 }
 
@@ -162,6 +168,9 @@ bool NonEditableUsersAndGroups::canMassEdit(const QnUserResourcePtr& user) const
 {
     // Do not allow mass editing to be used with Administrators.
     if (user->isAdministrator())
+        return false;
+
+    if (user->attributes().testFlag(api::UserAttribute::readonly))
         return false;
 
     return canDelete(user)
@@ -430,6 +439,32 @@ QSet<QnUuid> NonEditableUsersAndGroups::groups() const
 qsizetype NonEditableUsersAndGroups::groupCount() const
 {
     return groups().size();
+}
+
+QString NonEditableUsersAndGroups::tooltip(const QnUuid& id) const
+{
+    if (const auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(id))
+    {
+        if (user->attributes().testFlag(api::UserAttribute::readonly))
+        {
+            return tr("User management for organization users is available only at the "
+                "organization level, not the system level");
+        }
+        if (!canMassEdit(user))
+            return tr("You do not have permissions to modify this user");
+        if (!m_nonUniqueUserTracker.isUnique(id))
+            return tr("You cannot modify a user with a non-unique login");
+    }
+    else if (m_groupsWithNonEditableMembers.contains(id))
+    {
+        return tr("You may not have permissions to modify certain members of this group, or it "
+            "includes users with duplicate logins");
+    }
+    else if (m_nonEditableGroups.contains(id))
+    {
+        return tr("You do not have permissions to modify this group");
+    }
+    return {};
 }
 
 } // namespace nx::vms::client::desktop
