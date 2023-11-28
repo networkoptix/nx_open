@@ -471,7 +471,7 @@ void UserGroupsWidget::Private::setupUi()
                 ui->groupsTable->clearSelection();
         });
 
-    ui->createGroupButton->setIcon(qnSkin->icon("user_settings/plus.svg"));
+    ui->createGroupButton->setIcon(qnSkin->icon("buttons/add_20x20.svg", kTextButtonColors));
     connect(ui->createGroupButton, &QPushButton::clicked, this, &Private::createGroup);
 
     nonUniqueGroupsWarning->setText(tr(
