@@ -12,6 +12,8 @@ Item
 {
     id: control
 
+    // Parent of the scrollbar can be changed during internal initialization. Use
+    // scrollView as the initial parent to prevent breaking bindings.
     property alias verticalScrollBar: scrollView.verticalScrollBar
     property alias scrollView: scrollView
     property alias background: scrollView.background
@@ -44,13 +46,20 @@ Item
 
         anchors.fill: parent
 
+        wheelEnabled: false // Scrolling is implemented using MouseArea.
+
         onVerticalScrollBarChanged: updateScrollBar()
         Component.onCompleted: updateScrollBar()
 
         function updateScrollBar()
         {
             if (verticalScrollBar)
+            {
+                const parent = verticalScrollBar.parent
                 ScrollBar.vertical = verticalScrollBar
+                if (verticalScrollBar.parent !== parent)
+                    verticalScrollBar.parent = parent
+            }
         }
 
         Flickable
@@ -66,7 +75,7 @@ Item
             function scrollContentY(pixelDelta)
             {
                 if (!pixelDelta)
-                    return
+                    return false
 
                 const minY = flickable.originY - flickable.topMargin
                 const maxY = (flickable.originY + flickable.bottomMargin
@@ -93,7 +102,8 @@ Item
         onWheel: (wheel) =>
         {
             wheel.accepted = flickable.contentHeight > flickable.height
-                && flickable.scrollContentY(gearbox.transform(getPixelDelta(wheel)))
+                && flickable.scrollContentY(wheel.pixelDelta.y
+                    || gearbox.transform(getPixelDelta(wheel)))
         }
 
         function getPixelDelta(wheel)
@@ -103,11 +113,7 @@ Item
             const kDegreesPerStep = 15.0
 
             const degrees = wheel.angleDelta.y / kUnitsPerDegree
-
-            if (degrees)
-                return Qt.styleHints.wheelScrollLines * pixelsPerLine * (degrees / kDegreesPerStep)
-
-            return wheel.pixelDelta.y
+            return Qt.styleHints.wheelScrollLines * pixelsPerLine * (degrees / kDegreesPerStep)
         }
     }
 }
