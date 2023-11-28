@@ -160,6 +160,33 @@ Item
             return 0
         }
 
+        readonly property var hoverData: // {indexes[], accessRight, toggledOn, fromSelection}
+        {
+            if (tree.hoveredColumnAccessRight && control.editingContext)
+            {
+                const selection = tree.selection()
+                if (!selection.length)
+                    return undefined
+
+                return {
+                    "indexes": selection,
+                    "accessRight": tree.hoveredColumnAccessRight,
+                    "toggledOn": tree.nextBatchCheckState !== Qt.Checked,
+                    "fromSelection": true}
+            }
+
+            if (tree.hoveredRow)
+            {
+                return {
+                    "indexes": [tree.hoveredRow.resourceTreeIndex],
+                    "accessRight": tree.hoveredCell.accessRight,
+                    "toggledOn": tree.hoveredCell.toggledOn,
+                    "fromSelection": false}
+            }
+
+            return undefined
+        }
+
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
 
         property int nextBatchCheckState: Qt.Checked
@@ -293,33 +320,7 @@ Item
             selectionSize: tree.selectionSize
 
             externalNextCheckState: tree.nextBatchCheckState
-
-            externallyHoveredGroups:
-            {
-                if (hoveredColumnAccessRight && control.editingContext)
-                {
-                    const selection = tree.selection()
-                    if (!selection.length)
-                        return undefined
-
-                    return {
-                        "indexes": selection,
-                        "accessRight": hoveredColumnAccessRight,
-                        "toggledOn": tree.nextBatchCheckState !== Qt.Checked,
-                        "fromSelection": true}
-                }
-
-                if (tree.hoveredRow)
-                {
-                    return {
-                        "indexes": [tree.hoveredRow.resourceTreeIndex],
-                        "accessRight": tree.hoveredCell.accessRight,
-                        "toggledOn": tree.hoveredCell.toggledOn,
-                        "fromSelection": false}
-                }
-
-                return undefined
-            }
+            externalHoverData: tree.hoverData
 
             onHoveredCellChanged:
             {
