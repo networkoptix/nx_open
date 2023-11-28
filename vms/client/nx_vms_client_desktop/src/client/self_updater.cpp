@@ -164,13 +164,16 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
                 probablyPermissionError = true;
         }
 
-        // TODO: #alevenkov Remove this action in ( 5.1 + 3 releases ).
-        if (!registerNovFilesAssociation())
+        if (nx::build_info::isWindows())
         {
-            if (hasAdminRights)
-                NX_WARNING(this, "Unable to register nov files association.");
-            else
-                probablyPermissionError = true;
+            // TODO: #alevenkov Remove this action in ( 5.1 + 3 releases ).
+            if (!registerNovFilesAssociation())
+            {
+                if (hasAdminRights)
+                    NX_WARNING(this, "Unable to register nov files association.");
+                else
+                    probablyPermissionError = true;
+            }
         }
 
         updateApplauncher();
