@@ -57,6 +57,7 @@ DialogWithState
     property var self
     property int continuousSync: LdapSettings.Sync.usersAndGroups
     property bool deleteAvailable: true
+    property bool ldapError: false
 
     signal deleteRequested()
     signal addGroupRequested()
@@ -115,6 +116,7 @@ DialogWithState
                 deleteAvailable: !dialog.isSaving && dialog.deleteAvailable
                 continuousSync: dialog.continuousSync
                 cycledGroup: membersModel.cycledGroup
+                ldapError: dialog.ldapError
                 editingContext: membersModel.editingContext
                 model: membersModel
                 parentGroupsEditable: dialog.parentGroupsEditable

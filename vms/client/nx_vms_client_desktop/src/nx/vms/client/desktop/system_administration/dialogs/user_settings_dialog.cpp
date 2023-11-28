@@ -173,12 +173,25 @@ struct UserSettingsDialog::Private
         linkReady(q->rootObjectHolder(), "linkReady")
 
     {
-        connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
-            [this]()
-            {
-                syncId = q->globalSettings()->ldap().syncId();
-                continuousSync = q->globalSettings()->ldap().continuousSync;
-            });
+        if (dialogType == EditUser)
+        {
+            connect(parent->globalSettings(), &common::SystemSettings::ldapSettingsChanged, q,
+                [this]()
+                {
+                    syncId = q->globalSettings()->ldap().syncId();
+                    continuousSync = q->globalSettings()->ldap().continuousSync;
+                    q->updateStateFrom(user);
+                });
+
+            connect(
+                parent->systemContext()->ldapStatusWatcher(),
+                &LdapStatusWatcher::statusChanged,
+                q,
+                [this]()
+                {
+                    q->updateStateFrom(user);
+                });
+        }
 
         connect(
             parent->systemContext()->serverTimeWatcher(),

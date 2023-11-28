@@ -41,6 +41,8 @@ Item
 
     property var self
 
+    property bool ldapError: false
+
     function validate()
     {
         return groupNameTextField.validate()
@@ -194,6 +196,24 @@ Item
                     }
                 }
             }
+        }
+
+        DialogBanner
+        {
+            id: bannerGroupNotFound
+
+            style: DialogBanner.Style.Error
+            closeable: true
+            watchToReopen: control.groupId
+            visible: control.ldapError && !closed
+            Layout.fillWidth: true
+
+            text: qsTr("This group is not found in the LDAP database.")
+
+            buttonText: control.deleteAvailable && control.enabled ? qsTr("Delete") : ""
+            buttonIcon: "image://svg/skin/user_settings/trash.svg"
+
+            onButtonClicked: control.deleteRequested()
         }
 
         DialogBanner
