@@ -57,6 +57,7 @@ DialogWithState
     property var self
     property int continuousSync //< Not used by current dialog type.
     property bool deleteAvailable //< Not used by current dialog type.
+    property bool ldapError: false //< Not used by current dialog type.
 
     title: qsTr("New Group")
 
