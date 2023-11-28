@@ -707,14 +707,22 @@ Rectangle
                 }
             }
 
-            Text
+            RowLayout
             {
-                text: qsTr("No filters")
-                font: Qt.font({pixelSize: 14, weight: Font.Normal})
-                color: ColorTheme.colors.light16
                 visible: list.count == 0
-                height: 22
-                verticalAlignment: Text.AlignVCenter
+
+                Image
+                {
+                    Layout.alignment: Qt.AlignTop
+                    source: "image://svg/skin/user_settings/warning_icon.svg"
+                }
+
+                Text
+                {
+                    text: qsTr("Specify at least one filter to synchronize users and groups")
+                    font: Qt.font({pixelSize: 14, weight: Font.Bold})
+                    color: ColorTheme.colors.yellow_core
+                }
             }
         }
 
