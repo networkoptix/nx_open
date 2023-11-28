@@ -20,11 +20,21 @@ struct NX_VMS_API EventRuleData: IdData
 {
     EventType eventType = EventType::undefinedEvent;
     std::vector<QnUuid> eventResourceIds;
-    QnLatin1Array eventCondition;
-    EventState eventState = EventState::undefined;
 
+    /**%apidoc
+     * JSON object serialized using the Latin-1 encoding, even though it may contain other Unicode
+     * characters.
+     */
+    QnLatin1Array eventCondition;
+
+    EventState eventState = EventState::undefined;
     ActionType actionType = ActionType::undefinedAction;
     std::vector<QnUuid> actionResourceIds;
+
+    /**%apidoc
+     * JSON object serialized using the Latin-1 encoding, even though it may contain other Unicode
+     * characters.
+     */
     QnLatin1Array actionParams;
 
     qint32 aggregationPeriod = 0; //< Seconds.
