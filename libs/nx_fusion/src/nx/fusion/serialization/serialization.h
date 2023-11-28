@@ -258,7 +258,7 @@ namespace QnSerializationDetail {
          *
          * Note that we wrap a serialized type into a wrapper so that
          * ADL would find only overloads with it as the first parameter.
-         * Otherwise other overloads could also be discovered.
+         * Otherwise, other overloads could also be discovered.
          *
          * Also note that disable_user_conversions is also looked up via ADL, and thus
          * conversion wrapping for the data type can actually be disabled by
@@ -279,7 +279,7 @@ namespace QnSerializationDetail {
          *
          * Note that we wrap a serialized type into a wrapper so that
          * ADL would find only overloads with it as the first parameter.
-         * Otherwise other overloads could also be discovered. */
+         * Otherwise, other overloads could also be discovered. */
         return deserialize(ctx, disable_user_conversions(value), target);
     }
 
@@ -290,7 +290,7 @@ namespace QnSerializationDetail {
 
     template<class Context, class T, class D>
     void serialize_internal(Context *ctx, const T &value, D *target,
-        typename std::enable_if<is_metatype_defined<T>::value>::type * = NULL) {
+        std::enable_if_t<is_metatype_defined<T>::value> * = NULL) {
 
         typename Context::serializer_type *serializer = ctx->serializer(qMetaTypeId<T>());
         if(serializer) {
@@ -302,7 +302,7 @@ namespace QnSerializationDetail {
 
     template<class Context, class T, class D>
     void serialize_internal(Context *ctx, const T &value, D *target,
-        typename std::enable_if<!is_metatype_defined<T>::value>::type * = NULL) {
+        std::enable_if_t<!is_metatype_defined<T>::value> * = NULL) {
 
         serialize_direct(ctx, value, target);
     }
