@@ -1696,49 +1696,10 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
 {
-    auto itemDataAccessor =
-        [this](const QnResourcePtr& resource, int role) -> QVariant
-        {
-            switch (role)
-            {
-                case Qt::DisplayRole:
-                    return resource->getName();
-                case Qt::DecorationRole:
-                    return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
-                default:
-                    break;
-            }
-            return QVariant();
-        };
-
     const auto parameters = menu()->currentParameters(sender());
-    QnVideoWallItemIndexList items = parameters.videoWallItems();
+    const QnVideoWallItemIndexList items = parameters.videoWallItems();
 
-    QnResourceList resources;
-    for (const auto& index: items)
-    {
-        if (!index.isValid())
-            continue;
-
-        QnResourcePtr proxyResource(new QnResource());
-        proxyResource->setIdUnsafe(index.uuid());
-        proxyResource->setName(index.item().name);
-        resources.append(proxyResource);
-    }
-
-    QnMessageBox messageBox(QnMessageBoxIcon::Question,
-        tr("Delete %n items?", "", resources.size()), QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindowWidget());
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
-        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    auto resourcesListView = new QnResourceListView(resources, &messageBox);
-    resourcesListView->model()->setCustomColumnAccessor(0, itemDataAccessor);
-    messageBox.addCustomWidget(resourcesListView);
-
-    auto result = messageBox.exec();
-
-    if (result == QDialogButtonBox::Cancel)
+    if (!messages::Resources::deleteVideoWallItems(mainWindowWidget(), items))
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
@@ -2239,30 +2200,29 @@ void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
 
-    QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
+    const QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
     if (matrices.size() != 1)
         return;
 
-    QnVideoWallMatrixIndex index = matrices.first();
-    if (index.isNull())
+    const QnVideoWallMatrixIndex index = matrices.first();
+    if (!index.isValid())
         return;
 
-    QnVideoWallResourcePtr videowall = index.videowall();
-    if (!videowall->matrices()->hasItem(index.uuid()))
+    const QnWorkbenchLayoutsChangeValidator validator(context());
+    if (!validator.confirmLoadVideoWallMatrix(index))
         return;
 
-    QnVideoWallMatrix matrix = videowall->matrices()->getItem(index.uuid());
-
-    QnVideoWallItemMap items = videowall->items()->getItems();
+    const auto videowall = index.videowall();
+    const auto matrix = index.matrix();
 
     bool hasChanges = false;
-    foreach(QnVideoWallItem item, items)
+    for (auto item: videowall->items()->getItems())
     {
         if (!matrix.layoutByItem.contains(item.uuid))
             continue;
 
         QnUuid layoutUuid = matrix.layoutByItem[item.uuid];
-        if (!layoutUuid.isNull() && !resourcePool()->getResourceById(layoutUuid))
+        if (!layoutUuid.isNull() && !resourcePool()->getResourceById<QnLayoutResource>(layoutUuid))
             layoutUuid = QnUuid();
 
         if (item.layout == layoutUuid)
@@ -2281,48 +2241,14 @@ void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 {
-    auto itemDataAccessor =
-        [this](const QnResourcePtr& resource, int role) -> QVariant
-        {
-            switch (role)
-            {
-                case Qt::DisplayRole:
-                    return resource->getName();
-                case Qt::DecorationRole:
-                    return qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
-                default:
-                    break;
-            }
-            return QVariant();
-        };
-
     const auto parameters = menu()->currentParameters(sender());
-    QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
+    const QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
 
-    QnResourceList resources;
-    for (const auto& matrix: matrices)
-    {
-        if (!matrix.videowall() || !matrix.videowall()->matrices()->hasItem(matrix.uuid()))
-            continue;
+    if (!messages::Resources::deleteVideoWallMatrices(mainWindowWidget(), matrices))
+        return;
 
-        QnResourcePtr proxyResource(new QnResource());
-        proxyResource->setIdUnsafe(matrix.uuid());
-        proxyResource->setName(matrix.videowall()->matrices()->getItem(matrix.uuid()).name);
-        resources.append(proxyResource);
-    }
-
-    QnMessageBox messageBox(QnMessageBoxIcon::Question,
-        tr("Delete %n matrices?", "", resources.size()), QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindowWidget());
-
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
-        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    auto resourcesListView = new QnResourceListView(resources, &messageBox);
-    resourcesListView->model()->setCustomColumnAccessor(0, itemDataAccessor);
-    messageBox.addCustomWidget(resourcesListView);
-
-    if (messageBox.exec() == QDialogButtonBox::Cancel)
+    const QnWorkbenchLayoutsChangeValidator validator(context());
+    if (!validator.confirmDeleteVideoWallMatrices(matrices))
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
@@ -3570,7 +3496,7 @@ bool QnWorkbenchVideoWallHandler::confirmRemoveResourcesFromLayout(
     const QnLayoutResourcePtr& layout,
     const QnResourceList& resources) const
 {
-    QnWorkbenchLayoutsChangeValidator validator(context());
+    const QnWorkbenchLayoutsChangeValidator validator(context());
     return validator.confirmChangeVideoWallLayout(layout, resources);
 }
 

@@ -11,12 +11,18 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_matrix.h>
+#include <core/resource/videowall_matrix_index.h>
 #include <core/resource/webpage_resource.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/models/resource/resource_list_model.h>
 #include <ui/widgets/views/resource_list_view.h>
 
 namespace {
@@ -317,6 +323,92 @@ bool Resources::deleteResourcesFailed(QWidget* parent, const QnResourceList& res
     messageBox.setText(tr("%n items were not deleted.", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
+    messageBox.setCheckBoxEnabled(false);
+
+    const auto result = messageBox.exec();
+    return result != QDialogButtonBox::Cancel;
+}
+
+bool Resources::deleteVideoWallItems(QWidget* parent, const QnVideoWallItemIndexList& items)
+{
+    QnResourceList resources;
+    for (const auto& index: items)
+    {
+        if (!index.isValid())
+            continue;
+
+        QnResourcePtr proxyResource(new QnResource());
+        proxyResource->setIdUnsafe(index.uuid());
+        proxyResource->setName(index.item().name);
+        resources.append(proxyResource);
+    }
+
+    const auto itemDataAccessor =
+        [](const QnResourcePtr& resource, int role) -> QVariant
+        {
+            switch (role)
+            {
+                case Qt::DisplayRole:
+                    return resource->getName();
+                case Qt::DecorationRole:
+                    return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+                default:
+                    return QVariant();
+            }
+        };
+
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
+    messageBox.setText(tr("Delete %n items?", "", resources.size()));
+    messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    auto resourcesListView = new QnResourceListView(resources, &messageBox);
+    resourcesListView->model()->setCustomColumnAccessor(0, itemDataAccessor);
+    messageBox.addCustomWidget(resourcesListView);
+    messageBox.setCheckBoxEnabled(false);
+
+    const auto result = messageBox.exec();
+    return result != QDialogButtonBox::Cancel;
+}
+
+bool Resources::deleteVideoWallMatrices(QWidget* parent, const QnVideoWallMatrixIndexList& matrices)
+{
+    QnResourceList resources;
+    for (const auto& index: matrices)
+    {
+        if (!index.isValid())
+            continue;
+
+        QnResourcePtr proxyResource(new QnResource());
+        proxyResource->setIdUnsafe(index.uuid());
+        proxyResource->setName(index.matrix().name);
+        resources.append(proxyResource);
+    }
+
+    const auto itemDataAccessor =
+        [](const QnResourcePtr& resource, int role) -> QVariant
+        {
+            switch (role)
+            {
+                case Qt::DisplayRole:
+                    return resource->getName();
+                case Qt::DecorationRole:
+                    return qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
+                default:
+                    return QVariant();
+            }
+        };
+
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
+    messageBox.setText(tr("Delete %n matrices?", "", resources.size()));
+    messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    auto resourcesListView = new QnResourceListView(resources, &messageBox);
+    resourcesListView->model()->setCustomColumnAccessor(0, itemDataAccessor);
+    messageBox.addCustomWidget(resourcesListView);
     messageBox.setCheckBoxEnabled(false);
 
     const auto result = messageBox.exec();
