@@ -6,8 +6,10 @@
 #include <optional>
 
 #include <nx/branding.h>
-#include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/api/data/data_macros.h>
+#include <nx/vms/api/data/type_traits.h>
 #include <nx/vms/api/types/smtp_types.h>
 
 namespace nx::vms::api {
@@ -19,7 +21,6 @@ struct NX_VMS_API EmailSettings
     static constexpr int kTlsPort = 587;
     static constexpr int kSslPort = 465;
     static constexpr int kInsecurePort = 25;
-    static constexpr int kAutoPort = 0;
     static constexpr std::chrono::seconds kDefaultTimeoutLimit = 5min;
 
     /**%apidoc Sender email. Used as MAIL FROM. */
@@ -60,8 +61,33 @@ struct NX_VMS_API EmailSettings
 #define EmailSettings_Fields (server)(email)(user)(password)(signature)(supportAddress) \
     (connectionType)(port)(timeoutS)(smtpEhloName)(useCloudServiceToSendEmail)
 
+NX_VMS_API_DECLARE_STRUCT_EX(EmailSettings, (json))
 NX_REFLECTION_INSTRUMENT(EmailSettings, EmailSettings_Fields)
 NX_REFLECTION_TAG_TYPE(EmailSettings, jsonSerializeChronoDurationAsNumber)
-QN_FUSION_DECLARE_FUNCTIONS(EmailSettings, (json), NX_VMS_API)
+
+struct NX_VMS_API EmailSettingsRequest
+{
+    /**%apidoc:string
+     * Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers` or be "this" to
+     * refer to the current Server.
+     * %example this
+     */
+    QnUuid serverId;
+
+    std::optional<EmailSettings> settings;
+};
+#define EmailSettingsRequest_Fields (serverId)(settings)
+
+NX_VMS_API_DECLARE_STRUCT_EX(EmailSettingsRequest, (json))
+NX_REFLECTION_INSTRUMENT(EmailSettingsRequest, EmailSettingsRequest_Fields)
+NX_REFLECTION_TAG_TYPE(EmailSettingsRequest, jsonSerializeChronoDurationAsNumber)
+
+struct NX_VMS_API EmailSettingsReply
+{
+    int smtpReplyCode;
+};
+#define EmailSettingsReply_Fields (smtpReplyCode)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(EmailSettingsReply, (json))
+NX_REFLECTION_INSTRUMENT(EmailSettingsReply, EmailSettingsReply_Fields)
 
 } // namespace nx::vms::api
