@@ -281,15 +281,26 @@ TEST_F(VideowallItemAccessResolverTest, videowallAdded)
     NX_ASSERT_TEST_SUBJECT_CHANGED();
 
     auto videowall = createVideoWall();
-    auto layout = addLayoutForVideoWall(videowall);
+    auto layout1 = addLayout();
+    const auto itemId = addVideoWallItem(videowall, layout1);
+
+    QnVideoWallMatrix matrix;
+    matrix.uuid = QnUuid::createUuid();
+    auto layout2 = addLayout();
+    layout2->setParentId(videowall->getId());
+    matrix.layoutByItem[itemId] = layout2->getId();
+    videowall->matrices()->addItem(matrix);
 
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, videowall), AccessRights());
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout1), AccessRights());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout2), AccessRights());
 
     resourcePool()->addResource(videowall);
 
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, videowall), kTestAccessRights);
-    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout),
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout1),
+        videowallItemAccessRights(kTestAccessRights));
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, layout2),
         videowallItemAccessRights(kTestAccessRights));
 
     // The signal is not sent for gaining access to the videowall when it's added to the pool.

@@ -728,6 +728,40 @@ TEST_F(ResourceAccessManagerTest, cannotPushScreenWithCamerasOnExistingLayout)
     ASSERT_FALSE(resourceAccessManager()->canModifyResource(m_currentUser, layout, layoutData));
 }
 
+TEST_F(ResourceAccessManagerTest, checkCameraAccessViaVideoWall)
+{
+    loginAsCustom();
+    setOwnAccessRights(m_currentUser->getId(), {{kAllVideoWallsGroupId, AccessRight::edit}});
+
+    const auto videoWall = createVideoWall();
+    const auto camera1 = addCamera();
+    const auto camera2 = addCamera();
+
+    const auto layout1 = addLayout();
+    addToLayout(layout1, camera1);
+    const auto itemId = addVideoWallItem(videoWall, layout1);
+
+    QnVideoWallMatrix matrix;
+    matrix.uuid = QnUuid::createUuid();
+    const auto layout2 = addLayout();
+    addToLayout(layout2, camera2);
+    layout2->setParentId(videoWall->getId());
+    matrix.layoutByItem[itemId] = layout2->getId();
+    videoWall->matrices()->addItem(matrix);
+
+    EXPECT_EQ(permissions(camera1), Qn::NoPermissions);
+    EXPECT_EQ(permissions(camera2), Qn::NoPermissions);
+
+    resourcePool()->addResource(videoWall);
+
+    const Qn::Permissions expectedPermissions = Qn::ReadPermission
+        | Qn::ViewContentPermission
+        | Qn::ViewLivePermission;
+
+    EXPECT_EQ(permissions(camera1), expectedPermissions);
+    EXPECT_EQ(permissions(camera2), expectedPermissions);
+}
+
 // ------------------------------------------------------------------------------------------------
 // Checking user access rights
 

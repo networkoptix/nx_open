@@ -366,12 +366,22 @@ void VideowallLayoutWatcher::Private::addVideowallUnsafe(
     auto& data = videowallData[videowall];
     for (const auto& item: videowall->items()->getItems())
     {
-        if (item.layout.isNull())
-            continue;
-
-        data.layouts.insert(item.layout);
         data.itemIds.insert(item.uuid);
-        allVideowallLayouts.insert(item.layout);
+
+        if (!item.layout.isNull())
+        {
+            data.layouts.insert(item.layout);
+            allVideowallLayouts.insert(item.layout);
+        }
+
+        for (const auto matrix: videowall->matrices()->getItems())
+        {
+            if (const auto layoutId = matrix.layoutByItem.value(item.uuid); !layoutId.isNull())
+            {
+                data.layouts.insert(layoutId);
+                allVideowallLayouts.insert(layoutId);
+            }
+        }
     }
 
     NX_VERBOSE(q, "Videowall %1 is added to the pool, it has %2", videowall,
