@@ -73,7 +73,7 @@ struct GroupSettingsDialog::Private
     QmlProperty<bool> isSaving;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<GroupSettingsDialog*> self; //< Used to call validate functions from QML.
-    QmlProperty<api::LdapSettings::Sync> continuousSync;
+    QmlProperty<api::LdapSyncMode> continuousSync;
     QmlProperty<bool> deleteAvailable;
 
     QnUuid groupId;

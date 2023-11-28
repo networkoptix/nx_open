@@ -47,6 +47,16 @@ struct NX_VMS_API LdapSettingSearchFilter
 QN_FUSION_DECLARE_FUNCTIONS(LdapSettingSearchFilter, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(LdapSettingSearchFilter, LdapSettingSearchFilter_Fields)
 
+NX_REFLECTION_ENUM_CLASS(LdapSyncMode,
+    /**%apidoc Nothing is synchronized. */
+    disabled,
+
+    /**%apidoc Only Groups are synchronized. */
+    groupsOnly,
+
+    /**%apidoc Users and Groups are synchronized. */
+    usersAndGroups);
+
 struct NX_VMS_API LdapSettings
 {
     /**%apidoc:string
@@ -102,18 +112,8 @@ struct NX_VMS_API LdapSettings
     /**%apidoc[opt] LDAP users and groups are collected using all these filters. */
     std::vector<LdapSettingSearchFilter> filters;
 
-    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Sync,
-        /**%apidoc Nothing is synchronized. */
-        disabled,
-
-        /**%apidoc Only Groups are synchronized. */
-        groupsOnly,
-
-        /**%apidoc Users and Groups are synchronized. */
-        usersAndGroups);
-
     /**%apidoc[opt] Automatic synchronization policy. */
-    Sync continuousSync = Sync::groupsOnly;
+    LdapSyncMode continuousSync = LdapSyncMode::groupsOnly;
 
     /**%apidoc[opt] Delay between automatic synchronization cycles.
      * %example 0
@@ -193,12 +193,15 @@ struct NX_VMS_API LdapStatus
     State state = State::offline;
 
     bool isRunning = false;
+
+    /**%apidoc What's being synced right now. */
+    LdapSyncMode mode = LdapSyncMode::disabled;
     QString message;
     std::optional<std::chrono::seconds> timeSinceSyncS;
 
     bool operator==(const LdapStatus&) const = default;
 };
-#define LdapStatus_Fields (state)(isRunning)(message)(timeSinceSyncS)
+#define LdapStatus_Fields (state)(isRunning)(mode)(message)(timeSinceSyncS)
 NX_VMS_API_DECLARE_STRUCT_EX(LdapStatus, (json))
 NX_REFLECTION_INSTRUMENT(LdapStatus, LdapStatus_Fields)
 
