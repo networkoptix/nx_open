@@ -409,7 +409,7 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
             {
                 case CheckBoxColumn:
                     if (systemContext()->nonEditableUsersAndGroups()->containsGroup(group.id))
-                        return tr("You do not have permissions to modify or delete this group.");
+                        return systemContext()->nonEditableUsersAndGroups()->tooltip(group.id);
                     break;
 
                 case GroupWarningColumn:

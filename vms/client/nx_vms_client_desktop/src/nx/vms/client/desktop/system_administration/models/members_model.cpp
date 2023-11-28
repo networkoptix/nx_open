@@ -817,6 +817,11 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
         case UserType:
             return (UserSettingsGlobal::UserType) m_cache->info(id).userType;
 
+        case Qt::ToolTipRole:
+            if (!systemContext()->nonEditableUsersAndGroups()->canEditParents(id))
+                return systemContext()->nonEditableUsersAndGroups()->tooltip(id);
+            return {};
+
         default:
             return {};
     }

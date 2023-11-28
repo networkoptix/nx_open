@@ -551,9 +551,12 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
             switch (index.column())
             {
                 case CheckBoxColumn:
-                    if (d->systemContext()->nonEditableUsersAndGroups()->containsUser(user))
-                        return tr("You do not have permissions to modify this user.");
+                {
+                    const auto nonEditable = d->systemContext()->nonEditableUsersAndGroups();
+                    if (nonEditable->containsUser(user))
+                        return nonEditable->tooltip(user->getId());
                     break;
+                }
 
                 case UserWarningColumn:
                 {
