@@ -553,6 +553,13 @@ void CameraSettingsDialogStore::setPrimaryRecordingDisabled(bool value)
     d->executeAction(
         [&](State state) { return Reducer::setPrimaryRecordingDisabled(std::move(state), value); });
 }
+
+void CameraSettingsDialogStore::setRecordAudioEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setRecordAudioEnabled(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setSecondaryRecordingDisabled(bool value)
 {
     d->executeAction(

@@ -300,6 +300,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         UserEditableMultiple<nx::core::resource::UsingOnvifMedia2Type> useMedia2ToFetchProfiles;
         UserEditableMultiple<bool> primaryRecordingDisabled;
         UserEditableMultiple<bool> secondaryRecordingDisabled;
+        UserEditableMultiple<bool> recordAudioEnabled;
         UserEditableMultiple<nx::core::ptz::PresetType> preferredPtzPresetType;
         UserEditableMultiple<bool> forcedPtzPanTiltCapability;
         UserEditableMultiple<bool> forcedPtzZoomCapability;

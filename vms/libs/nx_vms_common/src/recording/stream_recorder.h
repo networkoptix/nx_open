@@ -106,6 +106,8 @@ private:
         const QnConstAbstractMediaDataPtr& mediaData,
         const QnConstResourceVideoLayoutPtr& videoLayout);
 
+    bool isAudioRecorded() const;
+
 protected:
     // nx::AbstractRecordingContextCallback implementation
     virtual int64_t startTimeUs() const override;

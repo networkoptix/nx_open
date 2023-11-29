@@ -216,6 +216,13 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     return true;
 }
 
+bool QnStreamRecorder::isAudioRecorded() const
+{
+    if (auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+        return camera->isAudioRecorded();
+    return true;
+}
+
 void QnStreamRecorder::resetPacketCount()
 {
     m_packetCount = 0;
@@ -225,10 +232,10 @@ bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaDa
 {
     m_endDateTimeUs = m_startDateTimeUs = mediaData->timestamp;
     m_interleavedStream = m_videoLayout && m_videoLayout->channelCount() > 1;
-    m_isAudioPresent = m_audioLayout && !m_audioLayout->tracks().empty();
-
+    m_isAudioPresent = m_audioLayout && !m_audioLayout->tracks().empty() && isAudioRecorded();
+    const auto audioLayout = m_isAudioPresent ? m_audioLayout : AudioLayoutConstPtr();
     auto metaData = prepareMetaData(mediaData, m_videoLayout);
-    if (!doPrepareToStart(mediaData, m_videoLayout, m_audioLayout, metaData))
+    if (!doPrepareToStart(mediaData, m_videoLayout, audioLayout, metaData))
         return false;
 
     onSuccessfulPrepare();
