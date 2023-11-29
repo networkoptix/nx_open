@@ -601,6 +601,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         hideProgress();
 
         QnMessageBox::critical(mainWindowWidget(), tr("Failed to save screenshot"));
+        emit screenshotFailed(filename);
         return;
     }
 

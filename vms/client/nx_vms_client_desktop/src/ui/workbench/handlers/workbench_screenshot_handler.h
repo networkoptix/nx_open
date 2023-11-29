@@ -94,6 +94,7 @@ private:
 
 Q_SIGNALS:
     void screenshotSaved(const QString &filename);
+    void screenshotFailed(const QString &filename);
 
 private slots:
     void at_takeScreenshotAction_triggered();
