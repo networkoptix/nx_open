@@ -30,10 +30,22 @@ namespace nx {
 namespace p2p {
 
 const QString MessageBus::kCloudPathPrefix("/cdb");
+std::chrono::milliseconds kDefaultTimerInterval(500);
 
 using namespace ec2;
 using namespace vms::api;
 using namespace nx::utils;
+
+std::chrono::milliseconds MessageBus::DelayIntervals::minInterval() const
+{
+    const auto data = {
+        sendPeersInfoInterval,
+        subscribeIntervalLow,
+        subscribeIntervalHigh,
+        outConnectionsInterval,
+        remotePeerReconnectTimeout};
+    return *std::min_element(data.begin(), data.end());
+}
 
 QString MessageBus::peerName(const QnUuid& id)
 {
@@ -106,7 +118,7 @@ MessageBus::MessageBus(
                 connect(m_timer, &QTimer::timeout, this, [this]() { doPeriodicTasks(); });
                 connect(this, &MessageBus::removeConnectionAsync, this, &MessageBus::removeConnection, Qt::QueuedConnection);
             }
-            m_timer->start(500);
+            m_timer->start(kDefaultTimerInterval);
         });
     connect(m_thread, &QThread::finished,
         [this]()
@@ -1536,6 +1548,11 @@ void MessageBus::setDelayIntervals(const DelayIntervals& intervals)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_intervals = intervals;
+    executeInThread(
+        m_thread, [this]()
+        {
+            m_timer->setInterval(std::min(m_intervals.minInterval(), kDefaultTimerInterval));
+        });
 }
 
 MessageBus::DelayIntervals MessageBus::delayIntervals() const
