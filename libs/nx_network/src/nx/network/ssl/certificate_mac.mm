@@ -67,7 +67,7 @@ bool verifyBySystemCertificatesMac(
 
     const bool success =
         SecTrustCreateWithCertificates(certificateArray, policy, &trust) == errSecSuccess
-            && SecTrustEvaluateWithError(trust, &error) == YES;
+            && SecTrustEvaluateWithError(trust, &error) == true;
 
     CFRelease(policy);
     CFRelease(trust);
