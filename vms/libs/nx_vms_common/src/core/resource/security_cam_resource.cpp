@@ -1544,6 +1544,19 @@ void QnSecurityCamResource::setPrimaryStreamRecorded(bool value)
     setProperty(ResourcePropertyKey::kDontRecordPrimaryStreamKey, valueStr);
 }
 
+bool QnSecurityCamResource::isAudioRecorded() const
+{
+    const bool forbidden =
+        getProperty(ResourcePropertyKey::kDontRecordAudio).toInt() > 0;
+    return !forbidden;
+}
+
+void QnSecurityCamResource::setRecordAudio(bool value)
+{
+    const QString valueStr = value ? "" : "1";
+    setProperty(ResourcePropertyKey::kDontRecordAudio, valueStr);
+}
+
 bool QnSecurityCamResource::isSecondaryStreamRecorded() const
 {
     if (!hasDualStreamingInternal() && isDualStreamingDisabled())
