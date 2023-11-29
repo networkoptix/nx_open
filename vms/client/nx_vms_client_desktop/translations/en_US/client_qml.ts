@@ -68,7 +68,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Group Attribute</source>
+        <source>Group Members Attribute</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1196,14 +1196,6 @@
 <context>
     <name>LdapSettings</name>
     <message>
-        <source>LDAP is not configured yet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>ONLINE</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1248,10 +1240,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No filters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1265,6 +1253,18 @@
     </message>
     <message>
         <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not configured yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specify at least one filter to synchronize users and groups</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2224,6 +2224,19 @@ to activate PTZ</source>
     </message>
     <message>
         <source>On Log In</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TemporaryLinkDates</name>
+    <message>
+        <source>Valid from %1 to %2 (by server time)</source>
+        <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+        <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
