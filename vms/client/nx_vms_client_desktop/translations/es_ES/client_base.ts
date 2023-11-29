@@ -1125,7 +1125,7 @@
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed in LDAP</source>
-      <translation type="unfinished">LDAP group membership is managed in LDAP</translation>
+      <translation>La membresía del grupo LDAP se administra en LDAP</translation>
     </message>
   </context>
   <context>
@@ -6621,6 +6621,121 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
   </context>
   <context>
+    <name>UserGroupsWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Borrar</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>Ningún grupo encontrado</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>Cambiar criterios de búsqueda o crear un nuevo grupo</translation>
+    </message>
+    <message>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation>Varios grupos comparten el mismo nombre, lo que puede generar confusión. Para mantener una estructura clara y organizada, sugerimos proporcionar nombres únicos para cada grupo.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation>
+        <numerusform>%n grupos LDAP existentes no se encuentran en la base de datos LDAP.</numerusform>
+        <numerusform>%n grupos LDAP existentes no se encuentran en la base de datos LDAP.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation>
+        <numerusform>¿Eliminar %n grupos</numerusform>
+        <numerusform>¿Eliminar %n grupos</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation>No se pudo eliminar el grupo &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation>No se pudo eliminar el grupo.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation>
+        <numerusform>Error al eliminar grupos %n.</numerusform>
+        <numerusform>Error al eliminar grupos %n.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation>Algunos grupos se tienen entre sí como miembros padres e hijos, o son parte de una cadena de referencia circular. Esto puede provocar cálculos incorrectos de permisos.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Borrar</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Todos Los Usuarios</translation>
+    </message>
+    <message>
+      <source>Users with Digest Authentication</source>
+      <translation type="unfinished">Users with Digest Authentication</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation>No se han encontrado usuarios</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation>Cambiar criterios de búsqueda o crear un nuevo usuario</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Editar</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation>Varios usuarios comparten el mismo inicio de sesión, lo que provoca errores de inicio de sesión. Para resolver este problema, actualice los inicios de sesión de los usuarios afectados o deshabilite/elimine los duplicados.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation>
+        <numerusform>¿Eliminar %n usuarios?</numerusform>
+        <numerusform>Eliminar %n usuarios</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation>
+        <numerusform>El servidor LDAP está fuera de línea. %n usuarios no pueden iniciar sesión.</numerusform>
+        <numerusform>El servidor LDAP está fuera de línea. %n usuarios no pueden iniciar sesión.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation>No se pudo eliminar el usuario &quot;%1&quot;.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation>
+        <numerusform>No se pudo eliminar %n usuarios.</numerusform>
+        <numerusform>No se pudo eliminar %n usuarios.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation>
+        <numerusform>%n usuarios LDAP existentes no se encuentran en la base de datos LDAP</numerusform>
+        <numerusform>%n usuarios LDAP existentes no se encuentran en la base de datos LDAP</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>UserPickerHelper</name>
     <message>
       <source>All Users</source>
@@ -6842,24 +6957,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation type="unfinished">View Live</translation>
     </message>
     <message>
-      <source>Edit Camera Settings.</source>
-      <translation type="unfinished">Edit Camera Settings.</translation>
-    </message>
-    <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
       <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
     </message>
     <message>
-      <source>View Live.</source>
-      <translation type="unfinished">View Live.</translation>
-    </message>
-    <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
       <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
-    </message>
-    <message>
-      <source>Modify Bookmarks</source>
-      <translation type="unfinished">Modify Bookmarks</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
@@ -10514,40 +10617,40 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     <message>
       <source>%1 layout</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">%1 layout</translation>
+      <translation>%1 diseños</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
-        <numerusform>%1 and %n more layouts</numerusform>
+      <translation>
+        <numerusform>%1 y %n diseños más</numerusform>
+        <numerusform>%1 y %n diseños más</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">%1 video wall</translation>
+      <translation>Pared de vídeo %1</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
-        <numerusform>%1 and %n more video walls</numerusform>
+      <translation>
+        <numerusform>%1 y %n videowalls más</numerusform>
+        <numerusform>%1 y %n videowalls más</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>Grupo %1</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>Grupos %1 y %n más</numerusform>
+        <numerusform>Grupos %1 y %n más</numerusform>
       </translation>
     </message>
   </context>
@@ -11621,58 +11724,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Borrar</translation>
-    </message>
-    <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
-    </message>
-    <message>
-      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
-        <numerusform>Delete %n groups</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
@@ -11726,69 +11777,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
       <translation type="unfinished">There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Borrar</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Todos Los Usuarios</translation>
-    </message>
-    <message>
-      <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new user</source>
-      <translation type="unfinished">Change search criteria or create a new user</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Editar</translation>
-    </message>
-    <message>
-      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-      </translation>
     </message>
   </context>
   <context>

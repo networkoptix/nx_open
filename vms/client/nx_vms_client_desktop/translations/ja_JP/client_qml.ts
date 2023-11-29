@@ -1800,16 +1800,6 @@ PTZを行います</translation>
       <translation>%1 の権限があります</translation>
     </message>
     <message>
-      <source>Also inherits it from:</source>
-      <comment>&apos;it&apos; refers to a permission</comment>
-      <translation>また、以下からも継承します:</translation>
-    </message>
-    <message>
-      <source>Inherits %1 permission from:</source>
-      <comment>%1 will be substituted with a permission name</comment>
-      <translation>以下から %1 権限を継承します:</translation>
-    </message>
-    <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>%1 および依存する権限を追加</translation>
@@ -1818,10 +1808,6 @@ PTZを行います</translation>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>%1 権限を追加</translation>
-    </message>
-    <message>
-      <source>Already inherited from:</source>
-      <translation>すでに以下から継承しています:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
@@ -1834,8 +1820,22 @@ PTZを行います</translation>
       <translation>%1 権限を削除</translation>
     </message>
     <message>
-      <source>Will stay inherited from:</source>
-      <translation>引き続き以下から継承します:</translation>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>また、以下からも継承します</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>以下から %1 権限を継承します</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation>すでに以下から継承しています</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation>引き続き以下から継承します</translation>
     </message>
   </context>
   <context>

@@ -6623,6 +6623,121 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
+    <name>UserGroupsWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Radera</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>Inga grupper hittades</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>Ändra sökkriterier eller skapa en ny grupp</translation>
+    </message>
+    <message>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation>Flera grupper delar samma namn, vilket kan leda till förvirring. För att upprätthålla en tydlig och organiserad struktur föreslår vi att vi tillhandahåller unika namn för varje grupp.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation>
+        <numerusform>%n befintliga LDAP-grupper finns inte i LDAP-databasen.</numerusform>
+        <numerusform>%n befintliga LDAP-grupper finns inte i LDAP-databasen.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation>
+        <numerusform>Radera %n objekt</numerusform>
+        <numerusform>Radera %n objekt</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation>Det gick inte att ta bort gruppen &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation>Det gick inte att ta bort gruppen.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation>
+        <numerusform>Det gick inte att ta bort %n grupper.</numerusform>
+        <numerusform>Det gick inte att ta bort %n grupper.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation>Vissa grupper har varandra som både förälder och barnmedlemmar, eller är en del av en sådan cirkulär referenskedja. Detta kan leda till felaktiga beräkningar av behörigheter.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Radera</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Alla användare</translation>
+    </message>
+    <message>
+      <source>Users with Digest Authentication</source>
+      <translation>Användare med Digest-autentisering</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation>Inga användare hittades</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation>Ändra sökkriterier eller skapa en ny användare</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Redigera</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation>Flera användare delar samma inloggning, orsakar inloggningsfel. För att lösa detta problem, antingen uppdatera de berörda användarinloggningar eller inaktivera/ta bort dubbletter.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation>
+        <numerusform>Ta bort %n användare</numerusform>
+        <numerusform>Ta bort %n användare</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation>
+        <numerusform>LDAP-servern är offline. %n användare kan inte logga in.</numerusform>
+        <numerusform>LDAP-servern är offline. %n användare kan inte logga in.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation>Misslyckades att ta bort användare &quot;%1&quot;.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation>
+        <numerusform>Det gick inte att ta bort %n användare.</numerusform>
+        <numerusform>Det gick inte att ta bort %n användare.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation>
+        <numerusform>%n befintliga LDAP-användare finns inte i LDAP-databasen</numerusform>
+        <numerusform>%n befintliga LDAP-användare finns inte i LDAP-databasen</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>UserPickerHelper</name>
     <message>
       <source>All Users</source>
@@ -6844,24 +6959,12 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Visa Live</translation>
     </message>
     <message>
-      <source>Edit Camera Settings.</source>
-      <translation>Redigera kamerainställningar.</translation>
-    </message>
-    <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
       <translation>Beroende på resurstyp låter den antingen användaren ändra enhetsinställningar eller kontrollera videovägg.</translation>
     </message>
     <message>
-      <source>View Live.</source>
-      <translation>Visa Live.</translation>
-    </message>
-    <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
       <translation>Tillåter användare att komma åt en resurs och se livebilder från en kamera.</translation>
-    </message>
-    <message>
-      <source>Modify Bookmarks</source>
-      <translation>Ändra bokmärken</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
@@ -11623,58 +11726,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Radera</translation>
-    </message>
-    <message>
-      <source>No groups found</source>
-      <translation>Inga grupper hittades</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new group</source>
-      <translation>Ändra sökkriterier eller skapa en ny grupp</translation>
-    </message>
-    <message>
-      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation>Flera grupper delar samma namn, vilket kan leda till förvirring. För att upprätthålla en tydlig och organiserad struktur föreslår vi att vi tillhandahåller unika namn för varje grupp.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation>
-        <numerusform>%n befintliga LDAP-grupper finns inte i LDAP-databasen.</numerusform>
-        <numerusform>%n befintliga LDAP-grupper finns inte i LDAP-databasen.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n groups</source>
-      <translation>
-        <numerusform>Radera %n objekt</numerusform>
-        <numerusform>Radera %n objekt</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation>Det gick inte att ta bort gruppen &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Failed to delete group.</source>
-      <translation>Det gick inte att ta bort gruppen.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n groups.</source>
-      <translation>
-        <numerusform>Det gick inte att ta bort %n grupper.</numerusform>
-        <numerusform>Det gick inte att ta bort %n grupper.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation>Vissa grupper har varandra som både förälder och barnmedlemmar, eller är en del av en sådan cirkulär referenskedja. Detta kan leda till felaktiga beräkningar av behörigheter.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
@@ -11728,69 +11779,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
       <translation>Det finns redan en användare med samma inloggning i systemet. För att undvika problem krävs det att alla användare har en unik inloggning.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Radera</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Alla användare</translation>
-    </message>
-    <message>
-      <source>Users with Digest Authentication</source>
-      <translation>Användare med Digest-autentisering</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>Inga användare hittades</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new user</source>
-      <translation>Ändra sökkriterier eller skapa en ny användare</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Redigera</translation>
-    </message>
-    <message>
-      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation>Flera användare delar samma inloggning, orsakar inloggningsfel. För att lösa detta problem, antingen uppdatera de berörda användarinloggningar eller inaktivera/ta bort dubbletter.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users</source>
-      <translation>
-        <numerusform>Ta bort %n användare</numerusform>
-        <numerusform>Ta bort %n användare</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation>
-        <numerusform>LDAP-servern är offline. %n användare kan inte logga in.</numerusform>
-        <numerusform>LDAP-servern är offline. %n användare kan inte logga in.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation>Misslyckades att ta bort användare &quot;%1&quot;.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n users.</source>
-      <translation>
-        <numerusform>Det gick inte att ta bort %n användare.</numerusform>
-        <numerusform>Det gick inte att ta bort %n användare.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation>
-        <numerusform>%n befintliga LDAP-användare finns inte i LDAP-databasen</numerusform>
-        <numerusform>%n befintliga LDAP-användare finns inte i LDAP-databasen</numerusform>
-      </translation>
     </message>
   </context>
   <context>

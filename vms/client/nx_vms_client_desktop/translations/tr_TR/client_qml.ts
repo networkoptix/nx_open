@@ -1812,16 +1812,6 @@ herhangi bir bölümü üzerine sürükleyin</translation>
       <translation>%1 yetki var</translation>
     </message>
     <message>
-      <source>Also inherits it from:</source>
-      <comment>&apos;it&apos; refers to a permission</comment>
-      <translation>Ayrıca onu devralır:</translation>
-    </message>
-    <message>
-      <source>Inherits %1 permission from:</source>
-      <comment>%1 will be substituted with a permission name</comment>
-      <translation>%1 yetkileri şuradan devralır:</translation>
-    </message>
-    <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>%1 ve bağımlı izinleri ekleyin</translation>
@@ -1830,10 +1820,6 @@ herhangi bir bölümü üzerine sürükleyin</translation>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>%1 yetki ekle</translation>
-    </message>
-    <message>
-      <source>Already inherited from:</source>
-      <translation>Zaten şu kaynaktan devralındı:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
@@ -1846,8 +1832,22 @@ herhangi bir bölümü üzerine sürükleyin</translation>
       <translation>%1 izni kaldır</translation>
     </message>
     <message>
-      <source>Will stay inherited from:</source>
-      <translation>Devralınmış olarak kalacak:</translation>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>Ayrıca onu devralır</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>%1 yetkileri şuradan devralır</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation>Zaten şu kaynaktan devralındı</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation>Devralınmış olarak kalacak</translation>
     </message>
   </context>
   <context>
