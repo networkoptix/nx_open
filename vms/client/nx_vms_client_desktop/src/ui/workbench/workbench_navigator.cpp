@@ -124,6 +124,24 @@ bool resourceIsVmax(const QnMediaResourcePtr& resource)
     return camera && camera->isDtsBased() && camera->licenseType() == Qn::LC_VMAX;
 }
 
+qreal cachedSpeed(const QnMediaResourceWidget* widget)
+{
+    if (!widget)
+        return 0.0;
+
+    const auto targetWidget = widget->isZoomWindow() ? widget->zoomTargetWidget() : widget;
+    return targetWidget->item()->data(Qn::ItemSpeedRole).toReal();
+}
+
+void cacheSpeed(qreal speed, QnMediaResourceWidget* widget)
+{
+    if (!widget)
+        return;
+
+    const auto targetWidget = widget->isZoomWindow() ? widget->zoomTargetWidget() : widget;
+    targetWidget->item()->setData(Qn::ItemSpeedRole, speed);
+}
+
 } //namespace
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(WindowContext* context):
@@ -615,10 +633,14 @@ bool QnWorkbenchNavigator::setPlaying(bool playing)
         camDisplay->playAudio(true);
 
         if (qFuzzyIsNull(speed()))
-            setSpeed(1.0);
+        {
+            const auto speed = cachedSpeed(m_currentMediaWidget);
+            setSpeed(qFuzzyIsNull(speed) ? 1.0 : speed);
+        }
     }
     else
     {
+        cacheSpeed(speed(), m_currentMediaWidget);
         reader->pauseMedia();
         setSpeed(0.0);
     }
