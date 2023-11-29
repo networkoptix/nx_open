@@ -55,7 +55,7 @@ DialogWithState
     property bool isSaving: false
     property alias editingContext: membersModel.editingContext
     property var self
-    property bool continuousSync: true
+    property int continuousSync: LdapSettings.Sync.usersAndGroups
     property bool deleteAvailable: true
 
     signal deleteRequested()

@@ -141,7 +141,7 @@ struct UserSettingsDialog::Private
     QmlProperty<bool> isSaving;
     QmlProperty<bool> ldapError;
     QmlProperty<bool> ldapOffline;
-    QmlProperty<bool> continuousSync;
+    QmlProperty<api::LdapSettings::Sync> continuousSync;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<UserSettingsDialog*> self; //< Used to call validate functions from QML.
     QmlProperty<int> displayOffsetMs;
@@ -180,8 +180,7 @@ struct UserSettingsDialog::Private
             [this]()
             {
                 syncId = q->globalSettings()->ldap().syncId();
-                continuousSync = q->globalSettings()->ldap().continuousSync
-                    == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+                continuousSync = q->globalSettings()->ldap().continuousSync;
             });
 
         connect(
@@ -190,8 +189,7 @@ struct UserSettingsDialog::Private
             q,
             [this]{ updateDisplayOffset(); });
 
-        continuousSync = q->globalSettings()->ldap().continuousSync
-            == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+        continuousSync = q->globalSettings()->ldap().continuousSync;
 
         connect(q->systemContext()->trafficRelayUrlWatcher(),
             &TrafficRelayUrlWatcher::trafficRelayUrlReady,
