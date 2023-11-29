@@ -7,12 +7,12 @@ namespace nx::cloud::cps::api {
 static constexpr char kSystemBindToOrganizationPath[] = "/partners/cloud_systems/";
 
 static constexpr char kInternalSystemUsersPath[] =
-    "/internal/partners/systems/{systemId}/users";
+    "/api/v2/internal/partners/systems/{systemId}/users";
 
 static constexpr char kInternalSystemUserPath[] =
-    "/internal/partners/systems/{systemId}/users/{email}";
+    "/api/v2/internal/partners/systems/{systemId}/users/{email}";
 
 static constexpr char kInternalUserSystemsPath[] =
-    "/internal/partners/users/{email}/systems";
+    "/api/v2/internal/partners/users/{email}/systems";
 
 } // namespace nx::cloud::cps::api
