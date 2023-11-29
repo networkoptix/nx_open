@@ -228,6 +228,8 @@ public:
 
         // Delay to reconnect if 2 attempts failed in a row
         std::chrono::milliseconds remotePeerReconnectTimeout = std::chrono::seconds(10);
+
+        std::chrono::milliseconds minInterval() const;
     };
 
     void setDelayIntervals(const DelayIntervals& intervals);
