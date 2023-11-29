@@ -31,7 +31,7 @@ Item
     property int userCount: 0
     property int groupCount: 0
     property bool deleteAvailable: true
-    property bool continuousSync: true
+    property int continuousSync: LdapSettings.Sync.usersAndGroups
     property bool cycledGroup: false
     property var editingContext
     property bool nameIsUnique: true
@@ -203,11 +203,13 @@ Item
             style: DialogBanner.Style.Warning
             closeable: true
             watchToReopen: control.groupId
-            visible: control.isLdap && !control.continuousSync && !closed
+            visible: control.isLdap
+                && control.continuousSync === LdapSettings.Sync.disabled
+                && !closed
             Layout.fillWidth: true
 
-            text: qsTr("When Continuous Sync is disabled, groups do not synchronize "
-                + " automatically. To update this group, initiate a manual sync.")
+            text: qsTr("When continuous sync with LDAP server is disabled, groups do not " +
+                "synchronize automatically. To update this group, initiate a manual sync.")
         }
 
         DialogBanner

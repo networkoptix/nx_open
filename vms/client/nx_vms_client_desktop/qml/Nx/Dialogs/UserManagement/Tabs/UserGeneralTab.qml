@@ -58,7 +58,7 @@ Item
     property bool ldapError: false
     property bool ldapOffline: true
     property bool linkReady: true
-    property bool continuousSync: true
+    property int continuousSync: LdapSettings.Sync.usersAndGroups
     property bool nameIsUnique: true
 
     property var self
@@ -862,11 +862,12 @@ Item
             Layout.fillWidth: true
 
             visible: control.userType === UserSettingsGlobal.LdapUser
-                && !control.continuousSync
+                && control.continuousSync === LdapSettings.Sync.disabled
                 && !closed
 
-            text: qsTr("When Continuous Sync is disabled, user membership in groups do not "
-                + "synchronize automatically. To update this information, initiate a manual sync.")
+            text: qsTr("When continuous sync with LDAP server is disabled, user membership in " +
+                "groups does not synchronize automatically. To update this information, " +
+                "initiate a manual sync.")
         }
     }
 }
