@@ -44,7 +44,7 @@ public:
 signals:
     void selectedHotspotChanged();
     void hotspotsDataChanged();
-    void selectHotspotCamera(int hotspotIndex);
+    void selectHotspotTarget(int hotspotIndex);
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;

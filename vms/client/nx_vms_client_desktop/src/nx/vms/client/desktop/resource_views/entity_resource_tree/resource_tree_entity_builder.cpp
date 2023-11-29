@@ -15,8 +15,8 @@
 #include <finders/systems_finder.h>
 #include <network/system_description.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
-#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
@@ -548,34 +548,6 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogServerCamerasEntity(
     return camerasGroupingEntity;
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createDialogShareableMediaEntity() const
-{
-    auto shareableMediaComposition = std::make_unique<CompositionEntity>();
-    shareableMediaComposition->addSubEntity(createDialogAllCamerasAndResourcesEntity());
-
-    const auto healthMonitorItemCreator =
-        [this](const QnResourcePtr& resource)
-        {
-            return std::make_unique<HealthMonitorResourceItemDecorator>(
-                m_itemFactory->createResourceItem(resource));
-        };
-    auto healthMonitorsList = makeKeyList<QnResourcePtr>(
-        healthMonitorItemCreator,
-        serversOrder());
-    healthMonitorsList->installItemSource(
-        m_itemKeySourcePool->serversSource(user(), /*reduceEdgeServers*/ false));
-    shareableMediaComposition->addSubEntity(std::move(healthMonitorsList));
-
-    auto webPagesList = makeKeyList<QnResourcePtr>(
-        simpleResourceItemCreator(m_itemFactory.get()),
-        numericOrder());
-    webPagesList->installItemSource(
-        m_itemKeySourcePool->webPagesSource(user(), /*includeProxiedWebPages*/ false));
-    shareableMediaComposition->addSubEntity(std::move(webPagesList));
-
-    return shareableMediaComposition;
-}
-
 AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllLayoutsEntity() const
 {
     auto allLayoutsList = makeKeyList<QnResourcePtr>(
@@ -586,14 +558,43 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllLayoutsEntity() cons
     return allLayoutsList;
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createDialogShareableLayoutsEntity() const
+AbstractEntityPtr ResourceTreeEntityBuilder::createDialogShareableLayoutsEntity(
+    const std::function<bool(const QnResourcePtr&)>& resourceFilter) const
 {
-    auto allLayoutsList = makeKeyList<QnResourcePtr>(
+    auto sharedLayoutsList = makeKeyList<QnResourcePtr>(
         simpleResourceItemCreator(m_itemFactory.get()), layoutsOrder());
 
-    allLayoutsList->installItemSource(m_itemKeySourcePool->shareableLayoutsSource(user()));
+    sharedLayoutsList->installItemSource(
+        m_itemKeySourcePool->shareableLayoutsSource(user(), resourceFilter));
 
-    return allLayoutsList;
+    return sharedLayoutsList;
+}
+
+AbstractEntityPtr ResourceTreeEntityBuilder::createDialogHotspotTargetsEntity(
+    bool showServers,
+    const std::function<bool(const QnResourcePtr&)>& resourceFilter) const
+{
+    auto composition = std::make_unique<CompositionEntity>();
+    if (showServers)
+    {
+        composition->addSubEntity(makeFlatteningGroup(
+            m_itemFactory->createServersItem(),
+            createDialogAllCamerasEntity(showServers, resourceFilter),
+            FlatteningGroupEntity::AutoFlatteningPolicy::singleChildPolicy));
+    }
+    else
+    {
+        composition->addSubEntity(makeFlatteningGroup(
+            m_itemFactory->createCamerasAndDevicesItem(Qt::ItemIsEnabled | Qt::ItemIsSelectable),
+            createDialogAllCamerasEntity(showServers, resourceFilter),
+            FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+    }
+    composition->addSubEntity(makeFlatteningGroup(
+        m_itemFactory->createLayoutsItem(),
+        createDialogShareableLayoutsEntity(resourceFilter),
+        FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy));
+
+    return composition;
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createAllServersEntity() const

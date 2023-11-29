@@ -13,6 +13,7 @@
 #include <QtWidgets/QMenu>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -56,25 +57,28 @@ struct CameraHotspotItem::Private
     const nx::vms::common::CameraHotspotData hotspotData;
 
     QPointer<QMenu> contextMenu;
-    QPointer<ThumbnailTooltip> tooltip;
+    QPointer<BubbleToolTip> tooltip;
 
     Private(
         CameraHotspotItem* const q,
         nx::vms::common::CameraHotspotData hotspotData);
 
     QnMediaResourceWidget* mediaResourceWidget() const;
+
+    QnResourcePtr hotspotResource() const;
     QnVirtualCameraResourcePtr hotspotCamera() const;
+    QnLayoutResourcePtr hotspotLayout() const;
 
     // Preview tooltip.
     nx::api::CameraImageRequest tooltipImageRequest() const;
     QString tooltipText() const;
     QPoint tooltipGlobalPos() const;
-    ThumbnailTooltip* createTooltip() const;
+    BubbleToolTip* createTooltip() const;
 
     // Interactive actions.
     menu::Parameters::ArgumentHash itemPlaybackParameters() const;
     void openItem();
-    void opemItemInNewLayout();
+    void openInNewTab();
     void openItemInPlace();
 
     // Optimized hotspot painting routines.
@@ -124,13 +128,22 @@ QnMediaResourceWidget* CameraHotspotItem::Private::mediaResourceWidget() const
     return dynamic_cast<QnMediaResourceWidget*>(hotspotsOverlayWidget->parentItem());
 }
 
-QnVirtualCameraResourcePtr CameraHotspotItem::Private::hotspotCamera() const
+QnResourcePtr CameraHotspotItem::Private::hotspotResource() const
 {
     const auto resourcePool = q->resourcePool();
-    const auto camera =
-        resourcePool->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId);
-    NX_ASSERT(camera, "Hotspot refers to a nonexistent camera");
-    return camera;
+    const auto resource = resourcePool->getResourceById(hotspotData.targetResourceId);
+    NX_ASSERT(resource, "Hotspot refers to a nonexistent resource");
+    return resource;
+}
+
+QnVirtualCameraResourcePtr CameraHotspotItem::Private::hotspotCamera() const
+{
+    return hotspotResource().dynamicCast<QnVirtualCameraResource>();
+}
+
+QnLayoutResourcePtr CameraHotspotItem::Private::hotspotLayout() const
+{
+    return hotspotResource().dynamicCast<QnLayoutResource>();
 }
 
 nx::api::CameraImageRequest CameraHotspotItem::Private::tooltipImageRequest() const
@@ -154,8 +167,8 @@ nx::api::CameraImageRequest CameraHotspotItem::Private::tooltipImageRequest() co
 
 QString CameraHotspotItem::Private::tooltipText() const
 {
-    const auto camera = hotspotCamera();
-    return camera ? camera->getName() : QString();
+    const auto resource = hotspotResource();
+    return resource ? resource->getName() : QString();
 }
 
 QPoint CameraHotspotItem::Private::tooltipGlobalPos() const
@@ -167,8 +180,18 @@ QPoint CameraHotspotItem::Private::tooltipGlobalPos() const
     return tooltipGlobalPos;
 }
 
-ThumbnailTooltip* CameraHotspotItem::Private::createTooltip() const
+BubbleToolTip* CameraHotspotItem::Private::createTooltip() const
 {
+    if (auto layout = hotspotLayout())
+    {
+        const auto tooltip = new BubbleToolTip(q->windowContext());
+        tooltip->setTooltipOffset(kTooltipOffset);
+        tooltip->setEnclosingRect(q->scene()->views().first()->window()->geometry());
+        tooltip->setText(tooltipText());
+        tooltip->setTarget(tooltipGlobalPos());
+        return tooltip;
+    };
+
     const auto imageRequest = tooltipImageRequest();
     if (!imageRequest.camera)
         return nullptr;
@@ -211,7 +234,7 @@ void CameraHotspotItem::Private::openItem()
     const auto workbenchItems = q->workbench()->currentLayout()->items();
     for (const auto item: workbenchItems)
     {
-        if (item->resource()->getId() == hotspotData.cameraId)
+        if (item->resource()->getId() == hotspotData.targetResourceId)
         {
             if (q->workbench()->item(Qn::ZoomedRole))
                 q->workbench()->setItem(Qn::ZoomedRole, nullptr);
@@ -248,9 +271,9 @@ void CameraHotspotItem::Private::openItem()
     actionManager->trigger(menu::OpenInCurrentLayoutAction, parameters);
 }
 
-void CameraHotspotItem::Private::opemItemInNewLayout()
+void CameraHotspotItem::Private::openInNewTab()
 {
-    auto parameters = menu::Parameters(hotspotCamera());
+    auto parameters = menu::Parameters(hotspotResource());
     if (!q->navigator()->syncEnabled())
         parameters.setArguments(itemPlaybackParameters());
 
@@ -310,7 +333,7 @@ CameraHotspotDisplayOption CameraHotspotItem::Private::hotspotDisplayOption() co
 {
     CameraHotspotDisplayOption hotspotOption;
 
-    hotspotOption.cameraState = CameraHotspotDisplayOption::CameraState::valid;
+    hotspotOption.targetState = CameraHotspotDisplayOption::TargetState::valid;
     hotspotOption.state = q->isUnderMouse()
         ? CameraHotspotDisplayOption::State::hovered
         : CameraHotspotDisplayOption::State::none;
@@ -394,7 +417,7 @@ void CameraHotspotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
 {
     d->setDevicePixelRatio(painter->device()->devicePixelRatioF());
     d->setHovered(isUnderMouse());
-    d->setDecorationIconKey(qnResIconCache->key(d->hotspotCamera()));
+    d->setDecorationIconKey(qnResIconCache->key(d->hotspotResource()));
 
     d->updateHotspotPixmapIfNeeded();
     d->updateHotspotDecorationPixmapIfNeeded();
@@ -437,17 +460,27 @@ void CameraHotspotItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
         event->accept();
 
         d->contextMenu = new QMenu();
-        QObject::connect(d->contextMenu, &QMenu::aboutToHide, d->contextMenu, &QMenu::deleteLater);
+        connect(d->contextMenu, &QMenu::aboutToHide, d->contextMenu, &QMenu::deleteLater);
 
-        const auto openAction = d->contextMenu->addAction(tr("Open Camera"));
-        QObject::connect(openAction, &QAction::triggered, [this] { d->openItem(); });
+        if (d->hotspotCamera())
+        {
+            const auto openAction = d->contextMenu->addAction(tr("Open Camera"));
+            connect(openAction, &QAction::triggered, this, [this] { d->openItem(); });
 
-        const auto openInNewTabAction = d->contextMenu->addAction(tr("Open Camera in new Tab"));
-        QObject::connect(
-            openInNewTabAction, &QAction::triggered, [this] { d->opemItemInNewLayout(); });
+            const auto openInNewTabAction =
+                d->contextMenu->addAction(tr("Open Camera in new Tab"));
+            connect(openInNewTabAction, &QAction::triggered, this, [this] { d->openInNewTab(); });
 
-        const auto openInPlaceAction = d->contextMenu->addAction(tr("Open Camera in place"));
-        QObject::connect(openInPlaceAction, &QAction::triggered, [this] { d->openItemInPlace(); });
+            const auto openInPlaceAction = d->contextMenu->addAction(tr("Open Camera in place"));
+            connect(openInPlaceAction, &QAction::triggered,
+                this, [this] { d->openItemInPlace(); });
+        }
+        else if (d->hotspotLayout())
+        {
+            const auto openInNewTabAction =
+                d->contextMenu->addAction(tr("Open Layout in new Tab"));
+            connect(openInNewTabAction, &QAction::triggered, this, [this] { d->openInNewTab(); });
+        }
 
         QnHiDpiWorkarounds::showMenu(d->contextMenu, QCursor::pos());
         return;
@@ -463,22 +496,37 @@ void CameraHotspotItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
     if (event->button() == Qt::LeftButton)
     {
-        switch (event->modifiers())
+        if (d->hotspotCamera())
         {
-            case Qt::KeyboardModifier::ControlModifier:
-                d->opemItemInNewLayout();
-                event->accept();
-                return;
+            switch (event->modifiers())
+            {
+                case Qt::KeyboardModifier::ControlModifier:
+                    d->openInNewTab();
+                    event->accept();
+                    return;
 
-            case Qt::KeyboardModifier::ShiftModifier:
-                d->openItemInPlace();
-                event->accept();
-                return;
+                case Qt::KeyboardModifier::ShiftModifier:
+                    d->openItemInPlace();
+                    event->accept();
+                    return;
 
-            case Qt::KeyboardModifier::NoModifier:
-                d->openItem();
+                case Qt::KeyboardModifier::NoModifier:
+                    d->openItem();
+                    event->accept();
+                    return;
+
+                default:
+                    break;
+            }
+        }
+        else if (d->hotspotLayout())
+        {
+            if (event->modifiers() == Qt::KeyboardModifier::NoModifier)
+            {
+                d->openInNewTab();
                 event->accept();
                 return;
+            }
         }
     }
 

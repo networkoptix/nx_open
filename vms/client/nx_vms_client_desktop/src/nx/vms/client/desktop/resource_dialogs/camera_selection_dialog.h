@@ -61,6 +61,12 @@ public:
      */
     void setAllowInvalidSelection(bool value);
 
+    /**
+     * @return Considering current user, system settings and resource tree settings, whether
+     *     servers should be displayed in the resource tree or not.
+     */
+    bool showServersInTree() const;
+
 public:
     struct DummyPolicy
     {

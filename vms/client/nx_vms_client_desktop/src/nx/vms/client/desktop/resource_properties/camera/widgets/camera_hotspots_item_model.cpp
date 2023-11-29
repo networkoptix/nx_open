@@ -47,8 +47,8 @@ int CameraHotspotsItemModel::columnCount(const QModelIndex& parent) const
 QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
 {
     const auto hotspotData = m_hotspots.at(index.row());
-    const auto cameraId = hotspotData.cameraId;
-    const auto camera = m_resourcePool->getResourceById<QnVirtualCameraResource>(cameraId);
+    const auto resourceId = hotspotData.targetResourceId;
+    const auto resource = m_resourcePool->getResourceById(resourceId);
 
     if (role == Qt::DisplayRole)
     {
@@ -57,13 +57,13 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
             case IndexColumn:
                 return index.row() + 1;
 
-            case CameraColumn:
-                if (camera)
-                    return camera->getUserDefinedName();
-                else if (!cameraId.isNull())
-                    return tr("Camera does not exist");
+            case TargetColumn:
+                if (resource)
+                    return resource->getName();
+                else if (!resourceId.isNull())
+                    return tr("Target resource does not exist");
                 else
-                    return tr("Select Camera");
+                    return tr("Select camera or layout");
 
             case DeleteButtonColumn:
                 return tr("Delete");
@@ -74,10 +74,10 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
     {
         switch (index.column())
         {
-            case CameraColumn:
-                if (camera)
-                    return qnResIconCache->icon(camera);
-                else if (!cameraId.isNull())
+            case TargetColumn:
+                if (resource)
+                    return qnResIconCache->icon(resource);
+                else if (!resourceId.isNull())
                     return qnResIconCache->icon(QnResourceIconCache::Camera);
                 else
                     return qnResIconCache->icon(QnResourceIconCache::Cameras);
@@ -87,19 +87,19 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
         }
     }
 
-    if (role == Qn::ResourceRole && index.column() == CameraColumn && camera)
-        return QVariant::fromValue(camera);
+    if (role == Qn::ResourceRole && index.column() == TargetColumn && resource)
+        return QVariant::fromValue(resource);
 
     if (role == Qt::CheckStateRole && index.column() == PointedCheckBoxColumn)
         return hotspotData.hasDirection() ? Qt::Checked : Qt::Unchecked;
 
-    if (role == HotspotCameraIdRole && index.column() == CameraColumn && !cameraId.isNull())
-        return QVariant::fromValue(cameraId);
+    if (role == HotspotCameraIdRole && index.column() == TargetColumn && !resourceId.isNull())
+        return QVariant::fromValue(resourceId);
 
     if (role == HotspotColorRole && index.column() == ColorPaletteColumn)
         return QColor(hotspotData.accentColorName);
 
-    if (role == Qn::ItemMouseCursorRole && index.column() == CameraColumn)
+    if (role == Qn::ItemMouseCursorRole && index.column() == TargetColumn)
         return static_cast<int>(Qt::PointingHandCursor);
 
     return {};
@@ -109,7 +109,7 @@ Qt::ItemFlags CameraHotspotsItemModel::flags(const QModelIndex& index) const
 {
     auto result = base_type::flags(index);
 
-    if (index.column() == CameraColumn)
+    if (index.column() == TargetColumn)
         result.setFlag(Qt::ItemIsEditable);
 
     return result;
@@ -133,8 +133,8 @@ QVariant CameraHotspotsItemModel::headerData(
             case IndexColumn:
                 return tr("#");
 
-            case Column::CameraColumn:
-                return tr("Camera");
+            case Column::TargetColumn:
+                return tr("Target");
 
             case ColorPaletteColumn:
                 return tr("Color");

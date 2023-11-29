@@ -175,7 +175,7 @@ QWidget* CameraHotspotsItemDelegate::createEditor(
     QStyleOptionViewItem& option,
     const QModelIndex& index) const
 {
-    if (index.column() == CameraHotspotsItemModel::CameraColumn)
+    if (index.column() == CameraHotspotsItemModel::TargetColumn)
     {
         auto editorButton = new QPushButton(parent);
         editorButton->setText(index.data(Qt::DisplayRole).toString());
@@ -237,7 +237,7 @@ void CameraHotspotsItemDelegate::initStyleOption(
         option->fontMetrics = QFontMetrics(option->font);
     }
 
-    if (index.column() == CameraHotspotsItemModel::CameraColumn)
+    if (index.column() == CameraHotspotsItemModel::TargetColumn)
     {
         const auto cameraIdData = index.data(CameraHotspotsItemModel::HotspotCameraIdRole);
         const auto cameraResourceData = index.data(Qn::ResourceRole);

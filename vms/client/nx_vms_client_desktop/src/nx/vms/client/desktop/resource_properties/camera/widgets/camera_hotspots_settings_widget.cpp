@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/camera_hotspots_item_delegate.h>
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/camera_hotspots_item_model.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -64,13 +65,13 @@ struct CameraHotspotsSettingsWidget::Private
 
     void setupUi() const;
 
-    const std::unique_ptr<CameraSelectionDialog> createHotspotCameraSelectionDialog(
+    const std::unique_ptr<CameraSelectionDialog> createHotspotTargetSelectionDialog(
         int hotspotIndex) const;
 
-    CameraSelectionDialog::ResourceFilter hotspotCameraSelectionResourceFilter(
+    CameraSelectionDialog::ResourceFilter hotspotTargetSelectionResourceFilter(
         int hotspotIndex) const;
 
-    void selectCameraForHotspot(int index) const;
+    void selectTargetForHotspot(int index) const;
 
     void selectHotspotsViewRow(std::optional<int> row);
 };
@@ -104,13 +105,13 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
     ui->hotspotsItemView->setEditTriggers(QAbstractItemView::SelectedClicked);
 
     q->connect(ui->hotspotsItemView, &QAbstractItemView::doubleClicked,
-        [this](const QModelIndex& index) { selectCameraForHotspot(index.row()); });
+        [this](const QModelIndex& index) { selectTargetForHotspot(index.row()); });
 
     auto header = ui->hotspotsItemView->header();
     header->setSectionResizeMode(
         CameraHotspotsItemModel::IndexColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
-        CameraHotspotsItemModel::CameraColumn, QHeaderView::Stretch);
+        CameraHotspotsItemModel::TargetColumn, QHeaderView::Stretch);
     header->setSectionResizeMode(
         CameraHotspotsItemModel::ColorPaletteColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
@@ -120,59 +121,72 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
 }
 
 const std::unique_ptr<CameraSelectionDialog>
-    CameraHotspotsSettingsWidget::Private::createHotspotCameraSelectionDialog(
+    CameraHotspotsSettingsWidget::Private::createHotspotTargetSelectionDialog(
         int hotspotIndex) const
 {
-    auto cameraSelectionDialog = std::make_unique<CameraSelectionDialog>(
-        hotspotCameraSelectionResourceFilter(hotspotIndex),
+    auto targetSelectionDialog = std::make_unique<CameraSelectionDialog>(
+        hotspotTargetSelectionResourceFilter(hotspotIndex),
         CameraSelectionDialog::ResourceValidator(),
         CameraSelectionDialog::AlertTextProvider(),
         q);
 
-    cameraSelectionDialog->setAllCamerasSwitchVisible(false);
-    cameraSelectionDialog->setAllowInvalidSelection(false);
+    ResourceSelectionWidget::EntityFactoryFunction createTreeEntity =
+        [showServers = targetSelectionDialog->showServersInTree(),
+            resourceFilter = hotspotTargetSelectionResourceFilter(hotspotIndex)]
+        (const entity_resource_tree::ResourceTreeEntityBuilder* builder)
+        {
+            return builder->createDialogHotspotTargetsEntity(showServers, resourceFilter);
+        };
 
-    const auto resourceSelectionWidget = cameraSelectionDialog->resourceSelectionWidget();
+    targetSelectionDialog->setAllCamerasSwitchVisible(false);
+    targetSelectionDialog->setAllowInvalidSelection(false);
+    targetSelectionDialog->setWindowTitle(tr("Select Hotspot Target"));
+
+    const auto resourceSelectionWidget = targetSelectionDialog->resourceSelectionWidget();
     resourceSelectionWidget->setSelectionMode(ResourceSelectionMode::ExclusiveSelection);
     resourceSelectionWidget->setShowRecordingIndicator(true);
+    resourceSelectionWidget->setTreeEntityFactoryFunction(createTreeEntity);
 
-    if (const auto id = ui->hotspotsEditorWidget->hotspotAt(hotspotIndex).cameraId; !id.isNull())
+    if (const auto id = ui->hotspotsEditorWidget->hotspotAt(hotspotIndex).targetResourceId;
+        !id.isNull())
+    {
         resourceSelectionWidget->setSelectedResourceId(id);
+    }
 
-    return cameraSelectionDialog;
+    return targetSelectionDialog;
 }
 
 CameraSelectionDialog::ResourceFilter
-    CameraHotspotsSettingsWidget::Private::hotspotCameraSelectionResourceFilter(
+    CameraHotspotsSettingsWidget::Private::hotspotTargetSelectionResourceFilter(
         int hotspotIndex) const
 {
-    QnUuidSet usedHotspotCamerasIds;
+    QnUuidSet usedHotspotTargetsIds;
     for (int i = 0; i < ui->hotspotsEditorWidget->hotspotsCount(); ++i)
     {
         if (i == hotspotIndex)
             continue;
 
-        if (const auto id = ui->hotspotsEditorWidget->hotspotAt(i).cameraId; !id.isNull())
-            usedHotspotCamerasIds.insert(id);
+        if (const auto id = ui->hotspotsEditorWidget->hotspotAt(i).targetResourceId; !id.isNull())
+            usedHotspotTargetsIds.insert(id);
     }
 
     return
-        [usedHotspotCamerasIds, this](const QnResourcePtr& resource)
+        [usedHotspotTargetsIds, this](const QnResourcePtr& resource)
         {
-            return nx::vms::common::camera_hotspots::hotspotCanReferToCamera(resource)
-                && !usedHotspotCamerasIds.contains(resource->getId())
+            return nx::vms::common::camera_hotspots::hotspotCanReferToResource(resource)
+                && !usedHotspotTargetsIds.contains(resource->getId())
                 && resource->getId() != cameraId;
         };
 }
 
-void CameraHotspotsSettingsWidget::Private::selectCameraForHotspot(int hotspotIndex) const
+void CameraHotspotsSettingsWidget::Private::selectTargetForHotspot(int hotspotIndex) const
 {
-    const auto cameraSelectionDialog = createHotspotCameraSelectionDialog(hotspotIndex);
+    const auto cameraSelectionDialog = createHotspotTargetSelectionDialog(hotspotIndex);
     if (cameraSelectionDialog->exec() != QDialog::Accepted)
         return;
 
     auto hotspotData = ui->hotspotsEditorWidget->hotspotAt(hotspotIndex);
-    hotspotData.cameraId =
+    hotspotData.targetResourceId =
         cameraSelectionDialog->resourceSelectionWidget()->selectedResourceId();
 
     ui->hotspotsEditorWidget->setHotspotAt(hotspotData, hotspotIndex);
@@ -264,11 +278,11 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
             d->selectHotspotsViewRow(d->ui->hotspotsEditorWidget->selectedHotspotIndex());
         });
 
-    connect(d->ui->hotspotsEditorWidget, &CameraHotspotsEditorWidget::selectHotspotCamera, this,
+    connect(d->ui->hotspotsEditorWidget, &CameraHotspotsEditorWidget::selectHotspotTarget, this,
         [this](int index)
         {
             d->ui->hotspotsEditorWidget->setSelectedHotspotIndex(index);
-            d->selectCameraForHotspot(index);
+            d->selectTargetForHotspot(index);
         });
 
     connect(d->ui->enableHotspotsCheckBox, &QCheckBox::clicked, store,
@@ -332,7 +346,7 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
     connect(d->hotspotsDelegate.get(), &CameraHotspotsItemDelegate::cameraEditorRequested, this,
         [this](const QModelIndex& index)
         {
-            d->selectCameraForHotspot(index.row());
+            d->selectTargetForHotspot(index.row());
         });
 }
 

@@ -40,7 +40,7 @@ namespace nx::vms::common {
 
 bool CameraHotspotData::isValid() const
 {
-    return !cameraId.isNull() && QRectF(0, 0, 1, 1).contains(pos);
+    return !targetResourceId.isNull() && QRectF(0, 0, 1, 1).contains(pos);
 }
 
 bool CameraHotspotData::hasDirection() const
@@ -56,7 +56,7 @@ void CameraHotspotData::fixupData()
 
 bool CameraHotspotData::operator==(const CameraHotspotData& other) const
 {
-    return cameraId == other.cameraId
+    return targetResourceId == other.targetResourceId
         && qFuzzyEquals(pos, other.pos)
         && qFuzzyEquals(fixupDirection(direction), fixupDirection(other.direction))
         && name == other.name

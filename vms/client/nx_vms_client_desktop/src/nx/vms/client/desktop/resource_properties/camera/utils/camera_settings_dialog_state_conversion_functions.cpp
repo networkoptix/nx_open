@@ -9,8 +9,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/resource_display_info.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_media_layout.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/range_adapters.h>
@@ -481,8 +481,10 @@ void setCameraHotspots(
             if (!cameraHotspot.isValid())
                 return false;
 
-            const auto hotspotCamera = resourcePool->getResourceById(cameraHotspot.cameraId);
-            return nx::vms::common::camera_hotspots::hotspotCanReferToCamera(hotspotCamera);
+            const auto hotspotResource =
+                resourcePool->getResourceById(cameraHotspot.targetResourceId);
+
+            return nx::vms::common::camera_hotspots::hotspotCanReferToResource(hotspotResource);
         });
 
     camera->setCameraHotspots(validHotspots);

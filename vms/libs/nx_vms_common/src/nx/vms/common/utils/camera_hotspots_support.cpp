@@ -3,6 +3,7 @@
 #include "camera_hotspots_support.h"
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 
 namespace nx::vms::common {
 namespace camera_hotspots {
@@ -32,18 +33,22 @@ bool supportsCameraHotspots(const QnResourcePtr& cameraResource)
         && camera->hasVideo();
 }
 
-bool hotspotCanReferToCamera(const QnResourcePtr& cameraResource)
+bool hotspotCanReferToResource(const QnResourcePtr& targetResource)
 {
-    const auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return false;
+    if (const auto layout = targetResource.dynamicCast<QnLayoutResource>())
+    {
+        return !layout->isServiceLayout() && layout->isShared();
+    }
+    else if (const auto camera = targetResource.dynamicCast<QnVirtualCameraResource>())
+    {
+        const auto cameraFlags = camera->flags();
 
-    const auto cameraFlags = camera->flags();
-
-    return !cameraFlags.testFlag(Qn::desktop_camera)
-        && !cameraFlags.testFlag(Qn::virtual_camera)
-        && cameraFlags.testFlag(Qn::server_live_cam)
-        && camera->hasVideo();
+        return !cameraFlags.testFlag(Qn::desktop_camera)
+            && !cameraFlags.testFlag(Qn::virtual_camera)
+            && cameraFlags.testFlag(Qn::server_live_cam)
+            && camera->hasVideo();
+    }
+    return false;
 }
 
 } // namespace camera_hotspots

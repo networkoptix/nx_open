@@ -79,11 +79,11 @@ QnUuidSet CameraHotspotsOverlayWidget::Private::resourceWidgetCameraHotspotsIds(
         return {};
 
     const auto hotspots = camera->cameraHotspots();
-    QnUuidSet hospotsCamerasIds;
+    QnUuidSet hospotsTargetsIds;
     for (const auto& hotspot: hotspots)
-        hospotsCamerasIds.insert(hotspot.cameraId);
+        hospotsTargetsIds.insert(hotspot.targetResourceId);
 
-    return hospotsCamerasIds;
+    return hospotsTargetsIds;
 }
 
 void CameraHotspotsOverlayWidget::Private::initHotspotItems()
@@ -100,23 +100,24 @@ void CameraHotspotsOverlayWidget::Private::initHotspotItems()
     const auto hotspotsData = resourceWidgetCamera()->cameraHotspots();
     for (const auto& hotspotData: hotspotsData)
     {
-        if (const auto hotspotCamera =
-            resourcePool()->getResourceById<QnVirtualCameraResource>(hotspotData.cameraId))
+        if (const auto hotspotTargetResource =
+            resourcePool()->getResourceById(hotspotData.targetResourceId))
         {
-            const auto accessController = ResourceAccessManager::accessController(hotspotCamera);
+            const auto accessController =
+                ResourceAccessManager::accessController(hotspotTargetResource);
             if (!accessController)
                 continue;
 
-            if (!notifiers.contains(hotspotCamera))
+            if (!notifiers.contains(hotspotTargetResource))
             {
-                const auto notifier = accessController->createNotifier(hotspotCamera);
-                notifiers.insert(hotspotCamera, notifier);
+                const auto notifier = accessController->createNotifier(hotspotTargetResource);
+                notifiers.insert(hotspotTargetResource, notifier);
 
                 connect(notifier.get(), &AccessController::Notifier::permissionsChanged, q,
                     [this]() { initHotspotItems(); });
             }
 
-            if (!accessController->hasPermissions(hotspotCamera, Qn::ReadPermission))
+            if (!accessController->hasPermissions(hotspotTargetResource, Qn::ReadPermission))
                 continue;
 
             CameraHotspotItem* item(new CameraHotspotItem(

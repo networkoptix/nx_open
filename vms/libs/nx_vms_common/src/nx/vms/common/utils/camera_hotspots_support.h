@@ -14,9 +14,10 @@ namespace camera_hotspots {
 NX_VMS_COMMON_API bool supportsCameraHotspots(const QnResourcePtr& cameraResource);
 
 /**
- * Predicate that determines whether some hotspot can refer to the given camera resource or not.
+ * Predicate that determines whether some hotspot can refer to the given camera or layout resource
+ * or not.
  */
-NX_VMS_COMMON_API bool hotspotCanReferToCamera(const QnResourcePtr& cameraResource);
+NX_VMS_COMMON_API bool hotspotCanReferToResource(const QnResourcePtr& targetResource);
 
 } // namespace camera_hotspots
 } // namespace nx::vms::common

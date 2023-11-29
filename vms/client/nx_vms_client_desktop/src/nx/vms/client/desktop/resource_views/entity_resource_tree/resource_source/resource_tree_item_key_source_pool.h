@@ -61,20 +61,13 @@ public:
         const QnMediaServerResourcePtr& parentServer,
         const QnResourceAccessSubject& accessSubject);
 
-    /**
-     * @todo Remove.
-     */
     UniqueResourceSourcePtr layoutsSource(const QnUserResourcePtr& user);
 
-    /**
-     * @todo Remove.
-     */
     UniqueResourceSourcePtr allLayoutsSource(const QnUserResourcePtr& user);
 
-    /**
-     * @todo Remove.
-     */
-    UniqueResourceSourcePtr shareableLayoutsSource(const QnUserResourcePtr& user);
+    UniqueResourceSourcePtr shareableLayoutsSource(
+        const QnUserResourcePtr& user,
+        const ResourceFilter& resourceFilter = ResourceFilter());
 
     /**
      * Provides integration resources stored in the resource pool.

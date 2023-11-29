@@ -70,8 +70,12 @@ public:
         const std::function<bool(const QnResourcePtr&)>& resourceFilter) const;
 
     AbstractEntityPtr createDialogAllLayoutsEntity() const;
-    AbstractEntityPtr createDialogShareableMediaEntity() const;
-    AbstractEntityPtr createDialogShareableLayoutsEntity() const;
+    AbstractEntityPtr createDialogShareableLayoutsEntity(
+        const std::function<bool(const QnResourcePtr&)>& resourceFilter) const;
+
+    AbstractEntityPtr createDialogHotspotTargetsEntity(
+        bool showServers,
+        const std::function<bool(const QnResourcePtr&)>& resourceFilter) const;
 
     AbstractEntityPtr createAllServersEntity() const;
     AbstractEntityPtr createAllCamerasEntity() const;

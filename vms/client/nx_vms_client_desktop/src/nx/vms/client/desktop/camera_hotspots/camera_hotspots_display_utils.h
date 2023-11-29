@@ -45,13 +45,13 @@ struct CameraHotspotDisplayOption
     };
     State state = State::none;
 
-    enum class CameraState
+    enum class TargetState
     {
         noCamera,
         valid,
         invalid,
     };
-    CameraState cameraState = CameraState::noCamera;
+    TargetState targetState = TargetState::noCamera;
 
     enum class Component
     {
