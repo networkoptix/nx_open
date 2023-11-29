@@ -109,6 +109,7 @@ void Timer::cancelSync()
 void Timer::stopWhileInAioThread()
 {
     m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut);
+    m_timerStartClock.reset();
     m_handler = nullptr;
 }
 
