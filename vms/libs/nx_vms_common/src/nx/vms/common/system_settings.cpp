@@ -695,10 +695,6 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_showMouseTimelinePreviewAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "showMouseTimelinePreview", true, this, [] { return tr("Show mouse timeline preview"); });
 
-    m_cloudStorageUpdatePeriodAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        "cloudStorageUpdatePeriod", 180, this,
-        [] { return tr("Cloud storage update period in seconds"); });
-
     m_ldapAdaptor = new QnJsonResourcePropertyAdaptor<nx::vms::api::LdapSettings>(
         Names::ldap, nx::vms::api::LdapSettings(), this,
         [] { return tr("LDAP settings"); });
@@ -992,13 +988,6 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
-        m_cloudStorageUpdatePeriodAdaptor,
-        &QnAbstractResourcePropertyAdaptor::valueChanged,
-        this,
-        &SystemSettings::cloudStorageUpdatePeriodChanged,
-        Qt::QueuedConnection);
-
-    connect(
         m_ldapAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
@@ -1102,7 +1091,6 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << m_showMouseTimelinePreviewAdaptor
         << m_ldapAdaptor
         << m_exposeServerEndpointsAdaptor
-        << m_cloudStorageUpdatePeriodAdaptor
         << m_cloudPollingIntervalAdaptor
     ;
 
@@ -2128,16 +2116,6 @@ bool SystemSettings::showMouseTimelinePreview() const
 void SystemSettings::setShowMouseTimelinePreview(bool value)
 {
     m_showMouseTimelinePreviewAdaptor->setValue(value);
-}
-
-std::chrono::seconds SystemSettings::cloudStorageUpdatePeriod() const
-{
-    return std::chrono::seconds(m_cloudStorageUpdatePeriodAdaptor->value());
-}
-
-void SystemSettings::setCloudStorageUpdatePeriod(std::chrono::seconds period)
-{
-    m_cloudStorageUpdatePeriodAdaptor->setValue(period.count());
 }
 
 bool SystemSettings::system2faEnabled() const
