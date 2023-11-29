@@ -244,6 +244,7 @@ void CrossNatConnector::onConnectResponse(
     m_mediatorAddress->stunUdpEndpoint =
         m_connectionMediationInitiator->mediatorLocation().stunUdpEndpoint;
 
+    const auto effectiveConnectTimeout = calculateTimeLeftForConnect();
     m_timer->cancelSync();
 
     auto mediatorClientSocket = m_connectionMediationInitiator->takeUdpSocket();
@@ -256,7 +257,6 @@ void CrossNatConnector::onConnectResponse(
         return;
     }
 
-    const auto effectiveConnectTimeout = calculateTimeLeftForConnect();
     m_connectionParameters = response.params;
     m_remotePeerFullName = response.destinationHostFullName;
 
@@ -277,8 +277,8 @@ std::chrono::milliseconds CrossNatConnector::calculateTimeLeftForConnect()
     milliseconds effectiveConnectTimeout = nx::network::kNoTimeout;
     if (m_connectTimeout && m_connectTimeout != nx::network::kNoTimeout)
     {
-        if (const auto timeToEvent = m_timer->timeToEvent())
-            effectiveConnectTimeout = duration_cast<milliseconds>(*timeToEvent);
+        effectiveConnectTimeout =
+            duration_cast<milliseconds>(m_timer->timeToEvent().value_or(nanoseconds::zero()));
 
         if (effectiveConnectTimeout == milliseconds::zero())
             effectiveConnectTimeout = milliseconds(1);   //< Zero timeout is infinity.
