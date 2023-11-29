@@ -185,6 +185,9 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     connect(action(action::SaveCurrentLayoutAsAction), &QAction::triggered, this,
         [=]() { saveLayoutAs(getCurrentLayout()); });
 
+    connect(action(action::ConvertLayoutToSharedAction), &QAction::triggered, this,
+        [=]() { convertLayoutToShared(getLayoutFromParameters()); });
+
     connect(action(action::CloseLayoutAction), &QAction::triggered, this,
         &LayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(action::CloseAllButThisLayoutAction), &QAction::triggered, this,
@@ -663,6 +666,19 @@ void LayoutsHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
     appContext()->cloudLayoutsSystemContext()->resourcePool()->addResource(cloudLayout);
     saveLayout(cloudLayout);
     workbench()->replaceLayout(layout, cloudLayout);
+}
+
+void LayoutsHandler::convertLayoutToShared(const LayoutResourcePtr& layout)
+{
+    const auto user = systemContext()->accessController()->user();
+    if (!NX_ASSERT(layout && user && layout->getParentId() == user->getId()))
+        return;
+
+    layout->setParentId({});
+    systemContext()->layoutSnapshotManager()->save(layout);
+
+    // Re-select the layout in Resource Tree.
+    menu()->trigger(action::SelectNewItemAction, layout);
 }
 
 void LayoutsHandler::removeLayoutItems(const LayoutItemIndexList& items, bool autoSave)

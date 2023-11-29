@@ -2474,6 +2474,24 @@ ConditionWrapper canSaveLayoutAs()
     );
 }
 
+ConditionWrapper isOwnLayout()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            const auto user = context->systemContext()->accessController()->user();
+            if (!user)
+                return false;
+
+            const auto resources = parameters.resources();
+            if (resources.size() != 1)
+                return false;
+
+            const auto layout = resources[0].objectCast<LayoutResource>();
+            return layout && layout->getParentId() == user->getId();
+        });
+}
+
 ConditionWrapper userHasCamerasWithEditableSettings()
 {
     return new CustomBoolCondition(
