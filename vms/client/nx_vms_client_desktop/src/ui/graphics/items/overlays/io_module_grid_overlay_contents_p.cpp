@@ -22,8 +22,8 @@ namespace {
 
 constexpr int kIdFontPixelSize = 12;
 constexpr auto kIdFontWeight = QFont::Normal;
-constexpr auto kActiveIdFontWeight = QFont::Bold;
-constexpr auto kLabelFontWeight = QFont::DemiBold;
+constexpr auto kActiveIdFontWeight = QFont::DemiBold;
+constexpr auto kLabelFontWeight = QFont::Medium;
 
 constexpr int kIndicatorWidth = 28;
 constexpr int kIndicatorPadding = 2;

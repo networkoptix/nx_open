@@ -60,6 +60,7 @@
 #include <nx/vms/client/desktop/common/widgets/slide_switch.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
@@ -109,8 +110,6 @@ const char* kContentsMarginsBackupId = "contentsMargins";
 const char* kHoveredWidgetProperty = "_qn_hoveredWidget"; // QPointer<QWidget>
 
 const QSize kSwitchFocusFrameMargins = QSize(4, 4); // 2 at left, 2 at right, 2 at top, 2 at bottom
-
-const char* kPopupShadowCompanion = "popupShadow";
 
 const char* kLinkHoverProcessorCompanion = "linkHoverProcessor";
 
@@ -1812,9 +1811,7 @@ void Style::drawComplexControl(ComplexControl control,
                         QRect rect = labelRect;
                         if (!text.isEmpty())
                         {
-                            QFont font = painter->font();
-                            font.setPixelSize(font.pixelSize() + 2);
-                            font.setWeight(QFont::DemiBold);
+                            const QFont font = fontConfig()->font("groupBoxLabel");
 
                             QnScopedPainterFontRollback fontRollback(painter, font);
 
@@ -2650,11 +2647,8 @@ void Style::drawControl(ControlElement element,
 
                 QRect rect = progressBar->rect;
 
-                QFont font = painter->font();
-                font.setWeight(QFont::DemiBold);
-                font.setPixelSize(font.pixelSize() - 2);
-
-                QnScopedPainterFontRollback fontRollback(painter, font);
+                QnScopedPainterFontRollback fontRollback(
+                    painter, fontConfig()->font("progressBar"));
                 QnScopedPainterPenRollback penRollback(painter);
 
                 if (!title.isEmpty())
@@ -3052,10 +3046,7 @@ QRect Style::subControlRect(ComplexControl control,
                                 text = text.left(splitPos);
                             }
 
-                            QFont font = widget ? widget->font() : QApplication::font();
-                            font.setPixelSize(font.pixelSize() + 2);
-                            font.setWeight(QFont::DemiBold);
-
+                            const QFont font = fontConfig()->font("groupBoxLabel");
                             int textWidth = QFontMetrics(font).size(kTextFlags, text).width();
 
                             if (!detailText.isEmpty())
@@ -4123,22 +4114,13 @@ void Style::polish(QWidget* widget)
     if (nonFlatPushButton(widget) || qobject_cast<QToolButton*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
-        {
-            QFont font = widget->font();
-            font.setWeight(QFont::DemiBold);
-            widget->setFont(font);
-        }
+            widget->setFont(fontConfig()->font("button"));
     }
 
     if (qobject_cast<QHeaderView*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
-        {
-            QFont font = widget->font();
-            font.setWeight(QFont::DemiBold);
-            font.setPixelSize(Metrics::kHeaderViewFontPixelSize);
-            widget->setFont(font);
-        }
+            widget->setFont(fontConfig()->font("headerView"));
         widget->setAttribute(Qt::WA_Hover);
 
         // TODO: #vkutin Check if this workaround is required in current Qt version.
@@ -4155,7 +4137,7 @@ void Style::polish(QWidget* widget)
         if (!lineEdit->property(Properties::kDontPolishFontProperty).toBool()
             && !isItemViewEdit(lineEdit))
         {
-            QFont font = lineEdit->font();
+            QFont font = fontConfig()->font("textEdit");
 
             if (isWidgetOwnedBy<QCalendarWidget>(lineEdit))
             {
@@ -4164,10 +4146,6 @@ void Style::polish(QWidget* widget)
                 palette.setBrush(QPalette::HighlightedText, qApp->palette().highlightedText());
                 lineEdit->setPalette(palette);
                 font.setBold(true);
-            }
-            else
-            {
-                font.setPixelSize(Metrics::kTextEditFontPixelSize);
             }
 
             lineEdit->setFont(font);
@@ -4202,11 +4180,7 @@ void Style::polish(QWidget* widget)
         }
 
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
-        {
-            QFont font = widget->font();
-            font.setPixelSize(Metrics::kTextEditFontPixelSize);
-            widget->setFont(font);
-        }
+            widget->setFont(fontConfig()->font("textEdit"));
     }
 
     /* Polish tooltips: */
@@ -4279,13 +4253,7 @@ void Style::polish(QWidget* widget)
     if (qobject_cast<QTabBar*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
-        {
-            QFont font = widget->font();
-            font.setPixelSize(Metrics::kTabBarFontPixelSize);
-            if (tabShape(widget) == TabShape::Rectangular)
-                font.setWeight(QFont::DemiBold);
-            widget->setFont(font);
-        }
+            widget->setFont(fontConfig()->font("tabBar"));
 
         /* Install hover events tracking: */
         widget->installEventFilter(this);

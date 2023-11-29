@@ -69,7 +69,7 @@ const auto kLongInstallWarningTimeout = std::chrono::minutes(2);
 const int kTooLateDayOfWeek = Qt::Thursday;
 const int kAutoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
 const int kVersionLabelFontSizePixels = 24;
-const auto kVersionLabelFontWeight = QFont::DemiBold;
+const auto kVersionLabelFontWeight = QFont::Medium;
 
 // Height limit for servers list in dialog box with update report
 static constexpr int kSectionHeight = 150;

@@ -22,9 +22,9 @@ namespace {
 const int kMinColumnWidth = 160;
 const int kTotalLineOffset = 4;
 
-const auto kTotalCamerasFontWeight = QFont::Bold;
+const auto kTotalCamerasFontWeight = QFont::DemiBold;
 const auto kForeignCamerasFontWeight = QFont::Normal;
-const auto kFontWeight = QFont::DemiBold;
+const auto kFontWeight = QFont::Medium;
 
 QnRecordingStatsModel::RowType rowType(const QModelIndex& index)
 {

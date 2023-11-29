@@ -120,7 +120,7 @@ FocusScope
 
             text: (model && model.display) || ""
             textFormat: Text.PlainText
-            font.weight: Font.DemiBold
+            font: FontConfig.resourceTree
             height: parent.height
             verticalAlignment: Text.AlignVCenter
             visible: !delegateItem.isEditing && text.length !== 0
@@ -137,6 +137,7 @@ FocusScope
                || (model && model.nodeType == ResourceTree.NodeType.cloudSystem))
                     && model && model.extraInfo) || ""
             textFormat: Text.PlainText
+            font.pixelSize: FontConfig.resourceTree.pixelSize
             font.weight: Font.Normal
             height: parent.height
             width: parent.extraInfoWidth
@@ -163,7 +164,7 @@ FocusScope
         {
             id: nameEditor
 
-            font.weight: Font.DemiBold
+            font: FontConfig.resourceTree
             height: parent.height
             width: delegateItem.width - x - 1
             verticalAlignment: Text.AlignVCenter

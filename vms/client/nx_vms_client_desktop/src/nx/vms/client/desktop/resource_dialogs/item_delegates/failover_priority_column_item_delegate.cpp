@@ -8,8 +8,7 @@
 
 namespace {
 
-static constexpr auto kFailoverPriorityFontWeight =
-    static_cast<QFont::Weight>((QFont::DemiBold + QFont::Bold) / 2);
+static constexpr auto kFailoverPriorityFontWeight = QFont::DemiBold;
 
 } // namespace
 

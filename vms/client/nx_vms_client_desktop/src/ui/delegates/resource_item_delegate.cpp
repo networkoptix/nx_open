@@ -315,7 +315,7 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
 void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
 {
     /* Init font options: */
-    option->font.setWeight(QFont::DemiBold);
+    option->font.setWeight(QFont::Medium);
     option->fontMetrics = QFontMetrics(option->font);
 
     /* Save default decoration size: */
@@ -375,7 +375,7 @@ QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptio
 
     /* Change editor font: */
     QFont font(editor->font());
-    font.setWeight(QFont::DemiBold);
+    font.setWeight(QFont::Medium);
     editor->setFont(font);
 
     /* Set text and selected text editor colors by item state: */

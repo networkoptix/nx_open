@@ -24,7 +24,9 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -105,6 +107,8 @@ QnLayoutTabBar::QnLayoutTabBar(
     setProperty(nx::style::Properties::kSideIndentation, QVariant::fromValue(kTabIndents));
     setDoubleLevelContentMargins();
     setDoubleLevelPalette();
+    setFont(fontConfig()->font("systemTabBar"));
+    setProperty(nx::style::Properties::kDontPolishFontProperty, true);
 
     connect(this, &QTabBar::currentChanged, this, &QnLayoutTabBar::at_currentChanged);
     connect(this, &QTabBar::tabMoved, this, &QnLayoutTabBar::at_tabMoved);

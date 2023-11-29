@@ -9,6 +9,7 @@
 #include <ui/common/palette.h>
 #include <nx/vms/time/formatter.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 
 namespace {
 
@@ -22,11 +23,7 @@ namespace nx::vms::client::desktop::workbench::timeline {
 ClockLabel::ClockLabel(QWidget* parent):
     QLabel(parent)
 {
-    QFont font;
-    font.setPixelSize(18);
-    font.setWeight(QFont::DemiBold);
-    setFont(font);
-
+    setFont(fontConfig()->font("clock"));
     setPaletteColor(this, foregroundRole(), core::colorTheme()->color("timeline.clockText"));
 
     m_timerId = startTimer(kClockUpdatePeriod);
