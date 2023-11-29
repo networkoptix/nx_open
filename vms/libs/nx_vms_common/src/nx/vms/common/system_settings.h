@@ -497,9 +497,6 @@ public:
     std::vector<QnUuid> masterCloudSyncList() const;
     void setMasterCloudSyncList(const std::vector<QnUuid>& idList) const;
 
-    std::chrono::seconds cloudStorageUpdatePeriod() const;
-    void setCloudStorageUpdatePeriod(std::chrono::seconds period);
-
     std::chrono::seconds cloudPollingInterval() const;
     void setCloudPollingInterval(std::chrono::seconds value);
 
@@ -702,7 +699,6 @@ private:
     QnResourcePropertyAdaptor<bool>* m_insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_exposeServerEndpointsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_showMouseTimelinePreviewAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int>* m_cloudStorageUpdatePeriodAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_cloudPollingIntervalAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
