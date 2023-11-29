@@ -216,7 +216,7 @@ protected:
         opt.sortIndicator = QStyleOptionHeader::None;
         if (logicalIndexAt(mapFromGlobal(QCursor::pos())) == logicalIndex)
             opt.state |= QStyle::State_MouseOver;
-        opt.textAlignment = Qt::AlignRight | Qt::AlignVCenter;
+        opt.textAlignment = Qt::AlignVCenter;
         opt.text = model()->headerData(logicalIndex, orientation()).toString();
         style()->drawControl(QStyle::CE_Header, &opt, painter, this);
     }
