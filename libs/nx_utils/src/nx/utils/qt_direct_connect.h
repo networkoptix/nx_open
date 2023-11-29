@@ -4,6 +4,8 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/thread/mutex.h>
+
 #include "scope_guard.h"
 
 namespace nx {
@@ -30,7 +32,7 @@ template<typename Object, typename Signal, typename Handler>
     const auto scope = std::make_shared<detail::QtDirectConnectScope>();
     const auto connection = QObject::connect(
         object, signal,
-        [scope, handler = std::move(handler)](auto... args)
+        [scope, handler = std::move(handler)](auto... args) mutable
         {
             NX_MUTEX_LOCKER lock(&scope->mutex);
             if (scope->isConnected)
