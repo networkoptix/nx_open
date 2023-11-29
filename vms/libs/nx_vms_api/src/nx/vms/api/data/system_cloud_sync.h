@@ -14,7 +14,7 @@ namespace nx::vms::api {
 NX_REFLECTION_ENUM_CLASS(SystemCloudService,
 
     /**%apidoc[unused] */
-    both,
+    all,
 
     /**%apidoc
      * Fetch information about Cloud users, System name, 2FA enabled.
@@ -24,12 +24,17 @@ NX_REFLECTION_ENUM_CLASS(SystemCloudService,
     /**%apidoc
      * Fetch information about Channel Partner, Organization, available services, send SaaS reports.
      */
-    cps
+    cps,
+
+    /**%apidoc
+     * Fetch information about the Cloud Storage services available.
+     */
+    css
 );
 
 struct NX_VMS_API SystemCloudSyncRequest
 {
-    SystemCloudService service = SystemCloudService::both;
+    SystemCloudService service = SystemCloudService::all;
 
     /**%apidoc[opt] Wait until the data is processed. */
     bool waitForDone = false;
