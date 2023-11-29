@@ -724,6 +724,9 @@ ConditionWrapper videowallIsRunning();
 /** Checks if "Save Layout As..." action is applicable. */
 ConditionWrapper canSaveLayoutAs();
 
+/** Checks if the layout is owned by the current user. */
+ConditionWrapper isOwnLayout();
+
 /** Checks if the user has cameras with editable settings. */
 ConditionWrapper userHasCamerasWithEditableSettings();
 

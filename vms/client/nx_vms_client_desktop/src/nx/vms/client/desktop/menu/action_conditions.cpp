@@ -2435,6 +2435,24 @@ ConditionWrapper canSaveLayoutAs()
     );
 }
 
+ConditionWrapper isOwnLayout()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, WindowContext* context)
+        {
+            const auto user = context->system()->accessController()->user();
+            if (!user)
+                return false;
+
+            const auto resources = parameters.resources();
+            if (resources.size() != 1)
+                return false;
+
+            const auto layout = resources[0].objectCast<LayoutResource>();
+            return layout && layout->getParentId() == user->getId();
+        });
+}
+
 ConditionWrapper userHasCamerasWithEditableSettings()
 {
     return new CustomBoolCondition(

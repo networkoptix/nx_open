@@ -1223,6 +1223,12 @@ void initialize(Manager* manager, Action* root)
             && condition::hasFlags(Qn::cross_system, MatchMode::none)
         );
 
+    factory(ConvertLayoutToSharedAction)
+        .flags(Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Convert to Shared Layout"))
+        .condition(condition::isOwnLayout())
+        .requiredPowerUserPermissions();
+
     factory()
         .flags(Tree)
         .separator();

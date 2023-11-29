@@ -63,6 +63,8 @@ private:
     /** Save existing cloud layout under another name. */
     void saveCloudLayoutAs(const LayoutResourcePtr& layout);
 
+    void convertLayoutToShared(const LayoutResourcePtr& layout);
+
     void removeLayoutItems(const LayoutItemIndexList& items, bool autoSave);
 
     struct LayoutChange
