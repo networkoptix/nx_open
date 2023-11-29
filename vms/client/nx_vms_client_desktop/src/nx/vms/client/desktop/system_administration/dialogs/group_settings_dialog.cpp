@@ -73,7 +73,7 @@ struct GroupSettingsDialog::Private
     QmlProperty<bool> isSaving;
     QmlProperty<AccessSubjectEditingContext*> editingContext;
     QmlProperty<GroupSettingsDialog*> self; //< Used to call validate functions from QML.
-    QmlProperty<bool> continuousSync;
+    QmlProperty<api::LdapSettings::Sync> continuousSync;
     QmlProperty<bool> deleteAvailable;
 
     QnUuid groupId;
@@ -169,12 +169,10 @@ GroupSettingsDialog::GroupSettingsDialog(
         connect(globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
             [this]()
             {
-                d->continuousSync = globalSettings()->ldap().continuousSync
-                    == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+                d->continuousSync = globalSettings()->ldap().continuousSync;
             });
 
-        d->continuousSync = globalSettings()->ldap().continuousSync
-            == nx::vms::api::LdapSettings::Sync::usersAndGroups;
+        d->continuousSync = globalSettings()->ldap().continuousSync;
 
         connect(systemContext->accessSubjectHierarchy(),
             &nx::core::access::SubjectHierarchy::changed,

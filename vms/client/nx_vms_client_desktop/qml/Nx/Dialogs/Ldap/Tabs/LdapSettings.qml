@@ -738,9 +738,9 @@ Rectangle
 
                 style: DialogBanner.Style.Info
 
-                text: qsTr("Continuous import from LDAP server is disabled for this system. Updates "
-                    + "to groups and user and groups membership will occur solely through manual "
-                    + "synchronization.")
+                text: qsTr("Continuous sync with LDAP server is disabled for this system. " +
+                    "Updates to groups and users and groups membership will occur solely " +
+                    "through manual synchronization.")
 
                 Layout.fillWidth: true
             }

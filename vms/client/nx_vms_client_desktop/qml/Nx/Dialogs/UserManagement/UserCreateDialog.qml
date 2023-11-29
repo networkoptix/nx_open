@@ -70,7 +70,7 @@ DialogWithState
     property bool ldapError: false
     property bool ldapOffline: true
     property bool linkReady: true
-    property bool continuousSync //< Not used by current dialog type.
+    property int continuousSync //< Not used by current dialog type.
     property alias editingContext: membersModel.editingContext
     property var self
     property date firstLoginTime //< Not used by current dialog type.
