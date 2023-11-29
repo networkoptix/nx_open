@@ -67,6 +67,7 @@ struct LdapSettingsWidget::Private
     QmlProperty<bool> checkingOnlineStatus;
     QmlProperty<bool> online;
     QmlProperty<bool> syncIsRunning;
+    QmlProperty<int> syncMode;
     QmlProperty<bool> syncRequested;
     QmlProperty<bool> hideEmptyLdapWarning;
     QmlProperty<bool> hideEditingWarning;
@@ -93,6 +94,7 @@ struct LdapSettingsWidget::Private
         checkingOnlineStatus(quickWidget, "checkingOnlineStatus"),
         online(quickWidget, "online"),
         syncIsRunning(quickWidget, "syncIsRunning"),
+        syncMode(quickWidget, "syncMode"),
         syncRequested(quickWidget, "syncRequested"),
         hideEmptyLdapWarning(quickWidget, "hideEmptyLdapWarning"),
         hideEditingWarning(quickWidget, "hideEditingWarning"),
@@ -290,6 +292,8 @@ struct LdapSettingsWidget::Private
             ? time::fromNow(*status->timeSinceSyncS)
             : QString();
         syncIsRunning = status->isRunning;
+        syncMode = (int) status->mode;
+
         updateUserAndGroupCount();
     }
 
