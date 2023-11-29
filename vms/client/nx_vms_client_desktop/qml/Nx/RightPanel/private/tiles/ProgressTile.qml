@@ -35,7 +35,7 @@ TileBase
                 value: (model && model.progressValue) || 0
                 title: (model && model.display) || ""
 
-                font { pixelSize: FontConfig.normal.pixelSize; weight: Font.DemiBold }
+                font { pixelSize: FontConfig.normal.pixelSize; weight: Font.Medium }
                 percentageFont.pixelSize: FontConfig.small.pixelSize
             }
 

@@ -32,7 +32,7 @@ using StreamQuality = nx::vms::api::StreamQuality;
 namespace {
 
 static constexpr int kRecordingTypeLabelFontSize = 12;
-static constexpr auto kRecordingTypeLabelFontWeight = QFont::DemiBold;
+static constexpr auto kRecordingTypeLabelFontWeight = QFont::Medium;
 static constexpr int kCustomQualityOffset = 7;
 
 static const QColor kLight10Color = "#A5B7C0";

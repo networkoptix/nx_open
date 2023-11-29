@@ -225,7 +225,7 @@ void QnAboutDialog::initSaasSupportInfo()
 {
     static constexpr auto kContentsColumn = 1;
     static constexpr auto kSpacerHeight = 2;
-    static constexpr auto kCaptionFontWeight = QFont::DemiBold;
+    static constexpr auto kCaptionFontWeight = QFont::Medium;
 
     const auto addLabelAtPosition =
         [this](const QString& text, int row, int column) -> QLabel*

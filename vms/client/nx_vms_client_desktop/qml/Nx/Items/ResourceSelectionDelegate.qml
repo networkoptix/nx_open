@@ -128,7 +128,7 @@ Item
 
             text: (model && highlightMatchingText(model.display)) || ""
             textFormat: Text.StyledText
-            font.weight: Font.DemiBold
+            font: FontConfig.resourceTree
             height: parent.height
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight

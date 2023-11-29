@@ -233,7 +233,7 @@ void CameraHotspotsItemDelegate::initStyleOption(
 
     if (index.column() != CameraHotspotsItemModel::DeleteButtonColumn)
     {
-        option->font.setWeight(QFont::DemiBold);
+        option->font.setWeight(QFont::Medium);
         option->fontMetrics = QFontMetrics(option->font);
     }
 

@@ -436,7 +436,7 @@ EventTile::EventTile(QWidget* parent):
     ui->secondaryTimestampHolder->hide();
 
     QFont progressLabelFont;
-    progressLabelFont.setWeight(QFont::DemiBold);
+    progressLabelFont.setWeight(QFont::Medium);
 
     d->progressLabel->setParent(ui->progressBar);
     d->progressLabel->setProperty(style::Properties::kDontPolishFontProperty, true);

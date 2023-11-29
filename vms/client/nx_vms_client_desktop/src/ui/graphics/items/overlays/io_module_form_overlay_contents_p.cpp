@@ -24,14 +24,13 @@ namespace {
 
 constexpr int kIdFontPixelSize = 12;
 constexpr auto kIdFontWeight = QFont::Normal;
-constexpr auto kLabelFontWeight = QFont::DemiBold;
+constexpr auto kLabelFontWeight = QFont::Medium;
 
 constexpr int kIndicatorWidth = 28;
 constexpr int kIndicatorPadding = 2;
 
 constexpr int kButtonMargin = 12;
 constexpr qreal kRoundingRadius = 2.0;
-constexpr int kShadowColorShift = 2;
 constexpr qreal kShadowThickness = 1.0;
 
 constexpr int kMinimumItemWidth = 128; //< without side margins
