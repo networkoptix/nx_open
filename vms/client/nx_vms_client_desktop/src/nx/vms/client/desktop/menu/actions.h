@@ -145,8 +145,7 @@ enum IDType
     SelectionChangeAction,
 
     /**
-     * Select newly created item (webpage, showreel, user, videowall) in the resource tree. Open
-     * on the scene if possible.
+     * Select newly created item (webpage, showreel, user, videowall) in the resource tree.
      */
     SelectNewItemAction,
 
@@ -623,6 +622,11 @@ enum IDType
      * Saves provided layout under another name.
      */
     SaveLayoutAsAction,
+
+    /**
+     * Converts selected layout to shared.
+     */
+    ConvertLayoutToSharedAction,
 
     /**
      * Performs a fit in view operation.
