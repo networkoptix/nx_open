@@ -99,7 +99,7 @@ void ResourceDialogItemDelegate::initStyleOption(
 
     if (index.column() == 0)
     {
-        option->font.setWeight(QFont::DemiBold);
+        option->font = fontConfig()->font("resourceTree");
         option->fontMetrics = QFontMetrics(option->font);
 
         const auto itemIsSelected = option->state.testFlag(QStyle::State_Selected);
@@ -109,8 +109,8 @@ void ResourceDialogItemDelegate::initStyleOption(
     }
 
     static const auto kInvalidTextColor = core::colorTheme()->color("red_core");
-    static const auto kUncheckedCheckboxColor = core::colorTheme()->color("dark7");
-    static const auto kCheckedItemTextColor = core::colorTheme()->color("resourceTree.mainTextSelected");
+    static const auto kCheckedItemTextColor =
+        core::colorTheme()->color("resourceTree.mainTextSelected");
     static const auto kCheckedItemExtraTextColor =
         core::colorTheme()->color("resourceTree.extraTextSelected");
 

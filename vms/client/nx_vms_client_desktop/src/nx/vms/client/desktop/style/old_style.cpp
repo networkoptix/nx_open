@@ -164,12 +164,6 @@ int OldStyle::styleHint(StyleHint hint,
 void OldStyle::polish(QApplication* application)
 {
     base_type::polish(application);
-
-    QFont font = fontConfig()->normal();
-    font.setStyle(QFont::StyleNormal);
-    font.setFamily("Roboto");
-    application->setFont(font);
-
     application->setEffectEnabled(Qt::UI_AnimateCombo, false);
 }
 

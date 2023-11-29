@@ -192,6 +192,10 @@ void initializeExternalResources()
 
     nx::vms::client::core::FontLoader::loadFonts(
         externalResourcesDirectory().absoluteFilePath("fonts"));
+
+    QFont font("Roboto", /*pointSize*/ -1, QFont::Normal);
+    font.setPixelSize(13);
+    qApp->setFont(font);
 }
 
 QString calculateLogNameSuffix(

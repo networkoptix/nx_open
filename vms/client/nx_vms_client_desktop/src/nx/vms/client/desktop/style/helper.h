@@ -133,9 +133,6 @@ struct Metrics
     /** Space between a widget and its hint button. */
     static constexpr int kHintButtonMargin = 6;
 
-    static constexpr int kTabBarFontPixelSize = 12;
-    static constexpr int kTextEditFontPixelSize = 14;
-    static constexpr int kHeaderViewFontPixelSize = 14;
     static constexpr int kCalendarItemFontPixelSize = 12;
     static constexpr int kCalendarHeaderFontPixelSize = 12;
     static constexpr int kBannerLabelFontPixelSize = 14;

@@ -60,7 +60,7 @@ BackupSettingsPickerWidget::BackupSettingsPickerWidget(
     setPaletteColor(ui->horizontalLine, QPalette::Shadow, core::colorTheme()->color("dark6"));
 
     QFont selectionDescriptionLabelFont = ui->selectionDescriptionLabel->font();
-    selectionDescriptionLabelFont.setWeight(QFont::DemiBold);
+    selectionDescriptionLabelFont.setWeight(QFont::Medium);
     ui->selectionDescriptionLabel->setFont(selectionDescriptionLabelFont);
 
     connect(ui->enableSwitch, &QCheckBox::stateChanged, this,

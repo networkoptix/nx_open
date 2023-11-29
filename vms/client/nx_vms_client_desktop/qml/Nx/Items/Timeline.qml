@@ -118,7 +118,7 @@ Item
                 height: 28
                 color: ColorTheme.colors.brand_d2
                 font.pixelSize: 18
-                font.weight: Font.DemiBold
+                font.weight: Font.Medium
                 verticalAlignment: Text.AlignVCenter
 
                 Timer

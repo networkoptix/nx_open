@@ -115,7 +115,7 @@ const qreal kTickmarkOpacityAnimationMs = 500.0;
 /* Dates bar. */
 
 const qreal kDateTextFontHeight = 12;
-const auto kDateTextFontWeight = QFont::DemiBold;
+const auto kDateTextFontWeight = QFont::Medium;
 
 const qreal kMinDateSpanFraction = 0.15;
 const qreal kMinDateSpanPixels = 160;
@@ -152,7 +152,7 @@ const int kMaxLines = 2;
 const int kLastMinuteStripeWidth = 9;
 
 const int kLineLabelFontHeight = 14;
-const auto kLineLabelFontWeight = QFont::DemiBold;
+const auto kLineLabelFontWeight = QFont::Medium;
 
 /** Padding at the left of line labels. */
 const int kLineLabelPaddingPixels = 6;
@@ -181,7 +181,7 @@ const qreal kHoverEffectDistance = 5.0;
 
 const int kStartDragDistance = 5;
 
-const auto kBookmarkFontWeight = QFont::DemiBold;
+const auto kBookmarkFontWeight = QFont::Medium;
 const int kBookmarkTextPadding = 6;
 const int kMinBookmarkTextCharsVisible = 6;
 

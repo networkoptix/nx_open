@@ -11,14 +11,12 @@
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <ui/widgets/common/elided_label.h>
 #include <utils/common/event_processors.h>
 
 namespace {
-
-static constexpr int kDefaultFontSizePixels = 24;
-static constexpr auto kDefaultFontWeight = QFont::DemiBold;
 
 static const QColor kLight4Color = "#E1E7EA";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
@@ -306,10 +304,7 @@ EditableLabel::EditableLabel(QWidget* parent):
     base_type(parent),
     d(new Private(this))
 {
-    QFont font;
-    font.setPixelSize(kDefaultFontSizePixels);
-    font.setWeight(kDefaultFontWeight);
-    setFont(font);
+    setFont(fontConfig()->font("editableLabel"));
     setButtonIcon(qnSkin->icon("system_settings/edit_28.svg", kIconSubstitutions));
     setValidator([](const QString& text) { return !text.isEmpty(); });
 }
