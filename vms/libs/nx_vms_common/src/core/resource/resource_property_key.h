@@ -118,6 +118,11 @@ NX_VMS_COMMON_API extern const QString kDontRecordPrimaryStreamKey;
 NX_VMS_COMMON_API extern const QString kDontRecordSecondaryStreamKey;
 
 /**
+ * Whether to record audio track for the primary and secondary streams.
+ */
+NX_VMS_COMMON_API extern const QString kDontRecordAudio;
+
+/**
  * Remote archive before this time will not be synchronized.
  */
 NX_VMS_COMMON_API extern const QString kLastSyncronizedRemoteArchiveTimestampMs;

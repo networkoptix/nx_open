@@ -187,6 +187,13 @@
                   </property>
                  </widget>
                 </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBoxRecordAudio">
+                  <property name="text">
+                   <string>Record audio</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
