@@ -72,7 +72,7 @@ DialogWithState
     property bool ldapError: false
     property bool ldapOffline: true
     property alias linkReady: generalSettings.linkReady
-    property bool continuousSync: true
+    property int continuousSync: LdapSettings.Sync.usersAndGroups
     property alias editingContext: membersModel.editingContext
     property var self
 
