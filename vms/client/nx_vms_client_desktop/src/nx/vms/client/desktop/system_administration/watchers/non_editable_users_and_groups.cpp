@@ -159,6 +159,8 @@ bool NonEditableUsersAndGroups::canEditParents(const QnUuid& id) const
     {
         if (user->attributes().testFlag(api::UserAttribute::readonly))
             return false;
+        if (!accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
+            return false;
     }
 
     return !m_usersWithUnchangableParents.contains(id) && m_nonUniqueGroupTracker.isUnique(id);
@@ -450,7 +452,7 @@ QString NonEditableUsersAndGroups::tooltip(const QnUuid& id) const
             return tr("User management for organization users is available only at the "
                 "organization level, not the system level");
         }
-        if (!canMassEdit(user))
+        if (!canEnableDisable(user))
             return tr("You do not have permissions to modify this user");
         if (!m_nonUniqueUserTracker.isUnique(id))
             return tr("You cannot modify a user with a non-unique login");
