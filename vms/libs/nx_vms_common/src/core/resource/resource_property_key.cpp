@@ -75,8 +75,8 @@ const QString kAudioInputDeviceId("audioInputDeviceId");
 const QString kAudioOutputDeviceId("audioOutputDeviceId");
 
 const QString kDontRecordPrimaryStreamKey("dontRecordPrimaryStream");
-
 const QString kDontRecordSecondaryStreamKey("dontRecordSecondaryStream");
+const QString kDontRecordAudio("dontRecordAudio");
 
 const QString kLastSyncronizedRemoteArchiveTimestampMs(
 "lastSyncronizedRemoteArchiveTimestampMs");

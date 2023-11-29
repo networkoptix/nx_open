@@ -380,6 +380,16 @@ public:
     void setPrimaryStreamRecorded(bool value);
 
     /**
+     * @return Whether primary and secondary streams should record audio track.
+     */
+    bool isAudioRecorded() const;
+
+    /**
+     * Enable or disable audio track recording for the primary and secondary streams.
+     */
+    void setRecordAudio(bool value);
+
+    /**
      * @return Whether secondary stream is not recorded by the server. Even if recording is
      * disabled, the stream still can be used for motion or objects detection.
      */
