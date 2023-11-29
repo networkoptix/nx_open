@@ -6622,6 +6622,121 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     </message>
   </context>
   <context>
+    <name>UserGroupsWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>Ingen grupper funnet</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation type="unfinished">Change search criteria or create a new group</translation>
+    </message>
+    <message>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation>Flere grupper deler samme navn, noe som kan føre til forvirring. For å opprettholde en klar og organisert struktur, foreslår vi å gi unike navn for hver gruppe.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation>
+        <numerusform>%n eksisterende LDAP-grupper finnes ikke i LDAP-databasen.</numerusform>
+        <numerusform>%n eksisterende LDAP-grupper finnes ikke i LDAP-databasen.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation>
+        <numerusform>Slett %n grupper</numerusform>
+        <numerusform>Slett %n grupper</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation>Kunne ikke slette gruppe &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation>Kunne ikke slette gruppen.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation>
+        <numerusform>Kunne ikke slette %n grupper.</numerusform>
+        <numerusform>Kunne ikke slette %n grupper.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Alle brukere</translation>
+    </message>
+    <message>
+      <source>Users with Digest Authentication</source>
+      <translation>Brukere med Digest Authentication</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation>Ingen brukere funnet</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation type="unfinished">Change search criteria or create a new user</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Rediger</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation>Flere brukere deler samme pålogging, noe som forårsaker påloggingsfeil. For å løse dette problemet må du enten oppdatere de berørte brukerpåloggingene eller deaktivere/slette duplikater.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation>
+        <numerusform>Slett %n brukere</numerusform>
+        <numerusform>Slett %n brukere</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation>
+        <numerusform>LDAP-serveren er frakoblet. %n brukere kan ikke logge på.</numerusform>
+        <numerusform>LDAP-serveren er frakoblet. %n brukere kan ikke logge på.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation>Kunne ikke slette bruker &quot;%1&quot;.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation>
+        <numerusform>Kunne ikke slette %n brukere.</numerusform>
+        <numerusform>Kunne ikke slette %n brukere.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation>
+        <numerusform>%n eksisterende LDAP-brukere finnes ikke i LDAP-databasen</numerusform>
+        <numerusform>%n eksisterende LDAP-brukere finnes ikke i LDAP-databasen</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>UserPickerHelper</name>
     <message>
       <source>All Users</source>
@@ -6843,24 +6958,12 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
       <translation>Se live</translation>
     </message>
     <message>
-      <source>Edit Camera Settings.</source>
-      <translation type="unfinished">Edit Camera Settings.</translation>
-    </message>
-    <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
       <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
     </message>
     <message>
-      <source>View Live.</source>
-      <translation>Se live.</translation>
-    </message>
-    <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
       <translation>Lar brukere få tilgang til en ressurs og se live-opptak fra et kamera.</translation>
-    </message>
-    <message>
-      <source>Modify Bookmarks</source>
-      <translation>Endre bokmerker</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
@@ -11620,58 +11723,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Slett</translation>
-    </message>
-    <message>
-      <source>No groups found</source>
-      <translation>Ingen grupper funnet</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
-    </message>
-    <message>
-      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation>Flere grupper deler samme navn, noe som kan føre til forvirring. For å opprettholde en klar og organisert struktur, foreslår vi å gi unike navn for hver gruppe.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation>
-        <numerusform>%n eksisterende LDAP-grupper finnes ikke i LDAP-databasen.</numerusform>
-        <numerusform>%n eksisterende LDAP-grupper finnes ikke i LDAP-databasen.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n groups</source>
-      <translation>
-        <numerusform>Slett %n grupper</numerusform>
-        <numerusform>Slett %n grupper</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation>Kunne ikke slette gruppe &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Failed to delete group.</source>
-      <translation>Kunne ikke slette gruppen.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n groups.</source>
-      <translation>
-        <numerusform>Kunne ikke slette %n grupper.</numerusform>
-        <numerusform>Kunne ikke slette %n grupper.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
@@ -11725,69 +11776,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
       <translation>Det er allerede en bruker med samme innlogging i systemet. For å unngå problemer kreves det at alle brukere har en unik pålogging.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Slett</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Alle brukere</translation>
-    </message>
-    <message>
-      <source>Users with Digest Authentication</source>
-      <translation>Brukere med Digest Authentication</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>Ingen brukere funnet</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new user</source>
-      <translation type="unfinished">Change search criteria or create a new user</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Rediger</translation>
-    </message>
-    <message>
-      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation>Flere brukere deler samme pålogging, noe som forårsaker påloggingsfeil. For å løse dette problemet må du enten oppdatere de berørte brukerpåloggingene eller deaktivere/slette duplikater.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users</source>
-      <translation>
-        <numerusform>Slett %n brukere</numerusform>
-        <numerusform>Slett %n brukere</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation>
-        <numerusform>LDAP-serveren er frakoblet. %n brukere kan ikke logge på.</numerusform>
-        <numerusform>LDAP-serveren er frakoblet. %n brukere kan ikke logge på.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation>Kunne ikke slette bruker &quot;%1&quot;.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n users.</source>
-      <translation>
-        <numerusform>Kunne ikke slette %n brukere.</numerusform>
-        <numerusform>Kunne ikke slette %n brukere.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation>
-        <numerusform>%n eksisterende LDAP-brukere finnes ikke i LDAP-databasen</numerusform>
-        <numerusform>%n eksisterende LDAP-brukere finnes ikke i LDAP-databasen</numerusform>
-      </translation>
     </message>
   </context>
   <context>

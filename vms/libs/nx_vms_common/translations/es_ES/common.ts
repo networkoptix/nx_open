@@ -208,23 +208,23 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</translation>
+      <translation>Los miembros de este grupo tienen privilegios ilimitados del Sistema. Los administradores pueden crear y modificar usuarios potenciales, y fusionar sistemas y vincular o desvincular cuentas de %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Los miembros de este grupo tienen control de la mayor parte de la configuración del sistema, pero no pueden cambiar ninguna configuración del administrador, eliminar o cambiar sus propios grupos y permisos, y no pueden crear ni editar otros usuarios avanzados.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Los miembros de este grupo pueden, además de los permisos otorgados por el grupo Visores, ver y activar posiciones PTZ y recorridos PTZ, usar audio bidireccional, operar botones del módulo de E/S, crear y editar marcadores y ver el Registro de eventos.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Los miembros de este grupo pueden, además de los permisos otorgados por el grupo Live Viewers, ver y exportar archivos y marcadores.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Los miembros de este grupo pueden ver la información de Monitoreo del estado del sistema y la carga del procesador del servidor en tiempo real (Monitoreo del servidor).</translation>
     </message>
   </context>
   <context>
@@ -1794,16 +1794,16 @@
     </message>
     <message>
       <source>Channel partners service</source>
-      <translation type="unfinished">Channel partners service</translation>
+      <translation>Servicio de socios de canal</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>Habilitar funciones API obsoletas actualmente utilizadas por el software %1 (inseguro)</translation>
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>ID de Organización</translation>
     </message>
   </context>
   <context>
@@ -2542,24 +2542,24 @@
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>No se pudo conectar al servidor LDAP.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>No se pudo completar la sincronización dentro de un tiempo de espera %1.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a given timeout.</source>
-      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+      <translation>No se pudo completar la sincronización dentro de un tiempo de espera determinado.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>Ninguna cuenta de usuario en el servidor LDAP coincide con la configuración de sincronización.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>Algunos usuarios o grupos de LDAP no se encontraron en la base de datos de LDAP.</translation>
     </message>
   </context>
 </TS>

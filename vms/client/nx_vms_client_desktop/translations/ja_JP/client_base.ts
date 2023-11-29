@@ -6519,6 +6519,114 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
   </context>
   <context>
+    <name>UserGroupsWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>グループが見つかりません</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>検索条件を変更するか、新しいグループを作成してください</translation>
+    </message>
+    <message>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation>複数のグループが同じ名前を共有しているため、混乱が生じる可能性があります。明確で組織的な構造を維持するために、各グループに一意の名前を付けることをお勧めします。</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation>
+        <numerusform>%n つの既存 LDAP グループが LDAP データベース内に見つかりません。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation>
+        <numerusform>%n グループを削除</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation>グループ &quot;%1&quot; の削除に失敗しました。</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation> グループの削除に失敗しました。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation>
+        <numerusform>%n グループの削除に失敗しました。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation>一部のグループは、互いに親かつ子メンバーである、あるいはそういった循環参照の一部となっています。これにより、権限が正しく計算されない可能性があります。</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>すべてのユーザー</translation>
+    </message>
+    <message>
+      <source>Users with Digest Authentication</source>
+      <translation>ダイジェスト認証を使用するユーザー</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation>ユーザーが見つかりません</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation>検索条件を変更するか、新しいユーザーを作成してください</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>編集</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation>複数のユーザーが同じログイン名を共有すると、ログインに失敗します。この問題を解決するには、影響を受けるユーザーのログイン名を更新するか、重複ユーザーを無効化または削除します。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation>
+        <numerusform>%n ユーザーを削除</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation>
+        <numerusform>LDAPサーバーがオフラインです。%n ユーザーはログインできません。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation>ユーザー &quot;%1&quot; の削除に失敗しました。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation>
+        <numerusform>%n ユーザーの削除に失敗しました。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation>
+        <numerusform>%n 名の既存 LDAP ユーザーが LDAP データベース内に見つかりません</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>UserPickerHelper</name>
     <message>
       <source>All Users</source>
@@ -6735,24 +6843,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>ライブの表示</translation>
     </message>
     <message>
-      <source>Edit Camera Settings.</source>
-      <translation>カメラ設定を編集します。</translation>
-    </message>
-    <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
       <translation>リソースの種類に応じて、ユーザーはデバイス設定を変更することも、ビデオ ウォールを制御することもできます。</translation>
     </message>
     <message>
-      <source>View Live.</source>
-      <translation>ライブの表示。</translation>
-    </message>
-    <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
       <translation>ユーザーは、リソースにアクセスし、カメラからのライブ映像を表示することができます。</translation>
-    </message>
-    <message>
-      <source>Modify Bookmarks</source>
-      <translation>ブックマークの変更</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
@@ -11454,55 +11550,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>削除</translation>
-    </message>
-    <message>
-      <source>No groups found</source>
-      <translation>グループが見つかりません</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new group</source>
-      <translation>検索条件を変更するか、新しいグループを作成してください</translation>
-    </message>
-    <message>
-      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation>複数のグループが同じ名前を共有しているため、混乱が生じる可能性があります。明確で組織的な構造を維持するために、各グループに一意の名前を付けることをお勧めします。</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation>
-        <numerusform>%n つの既存 LDAP グループが LDAP データベース内に見つかりません。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n groups</source>
-      <translation>
-        <numerusform>%n グループを削除</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation>グループ &quot;%1&quot; の削除に失敗しました。</translation>
-    </message>
-    <message>
-      <source>Failed to delete group.</source>
-      <translation> グループの削除に失敗しました。</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n groups.</source>
-      <translation>
-        <numerusform>%n グループの削除に失敗しました。</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation>一部のグループは、互いに親かつ子メンバーである、あるいはそういった循環参照の一部となっています。これにより、権限が正しく計算されない可能性があります。</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
@@ -11556,65 +11603,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
       <translation>システム内に同じログイン名を持つユーザーがすでに存在します。問題を回避するには、すべてのユーザーに一意のログイン名を持たせる必要があります。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>削除</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>すべてのユーザー</translation>
-    </message>
-    <message>
-      <source>Users with Digest Authentication</source>
-      <translation>ダイジェスト認証を使用するユーザー</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>ユーザーが見つかりません</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new user</source>
-      <translation>検索条件を変更するか、新しいユーザーを作成してください</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>編集</translation>
-    </message>
-    <message>
-      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation>複数のユーザーが同じログイン名を共有すると、ログインに失敗します。この問題を解決するには、影響を受けるユーザーのログイン名を更新するか、重複ユーザーを無効化または削除します。</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users</source>
-      <translation>
-        <numerusform>%n ユーザーを削除</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation>
-        <numerusform>LDAPサーバーがオフラインです。%n ユーザーはログインできません。</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation>ユーザー &quot;%1&quot; の削除に失敗しました。</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n users.</source>
-      <translation>
-        <numerusform>%n ユーザーの削除に失敗しました。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation>
-        <numerusform>%n 名の既存 LDAP ユーザーが LDAP データベース内に見つかりません</numerusform>
-      </translation>
     </message>
   </context>
   <context>

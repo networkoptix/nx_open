@@ -6814,6 +6814,135 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     </message>
   </context>
   <context>
+    <name>UserGroupsWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Usuń</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>Nie znaleziono grup</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation type="unfinished">Change search criteria or create a new group</translation>
+    </message>
+    <message>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation type="unfinished">
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation>
+        <numerusform>Usunąć %n grup</numerusform>
+        <numerusform>Usunąć %n grup</numerusform>
+        <numerusform>Usunąć %n grup</numerusform>
+        <numerusform>Usunąć %n grup</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation type="unfinished">Failed to delete group.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Usuń</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Wszyscy użytkownicy</translation>
+    </message>
+    <message>
+      <source>Users with Digest Authentication</source>
+      <translation>Użytkownicy z uwierzytelnianiem Digest</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation>Nie znaleziono żadnych użytkowników</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation type="unfinished">Change search criteria or create a new user</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Edytuj</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation>
+        <numerusform>Usunąć %n użytkownika</numerusform>
+        <numerusform>Usunąć %n użytkownika</numerusform>
+        <numerusform>Usunąć %n użytkownika</numerusform>
+        <numerusform>Usunąć %n użytkownika</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation type="unfinished">
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>Failed to delete %n users.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation type="unfinished">
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>UserPickerHelper</name>
     <message>
       <source>All Users</source>
@@ -7045,24 +7174,12 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
       <translation type="unfinished">View Live</translation>
     </message>
     <message>
-      <source>Edit Camera Settings.</source>
-      <translation type="unfinished">Edit Camera Settings.</translation>
-    </message>
-    <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
       <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
     </message>
     <message>
-      <source>View Live.</source>
-      <translation type="unfinished">View Live.</translation>
-    </message>
-    <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
       <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
-    </message>
-    <message>
-      <source>Modify Bookmarks</source>
-      <translation type="unfinished">Modify Bookmarks</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
@@ -11946,64 +12063,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Usuń</translation>
-    </message>
-    <message>
-      <source>No groups found</source>
-      <translation>Nie znaleziono grup</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
-    </message>
-    <message>
-      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n groups</source>
-      <translation>
-        <numerusform>Usunąć %n grup</numerusform>
-        <numerusform>Usunąć %n grup</numerusform>
-        <numerusform>Usunąć %n grup</numerusform>
-        <numerusform>Usunąć %n grup</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Failed to delete group.</source>
-      <translation type="unfinished">Failed to delete group.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
@@ -12057,77 +12116,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
       <translation type="unfinished">There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Usuń</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Wszyscy użytkownicy</translation>
-    </message>
-    <message>
-      <source>Users with Digest Authentication</source>
-      <translation>Użytkownicy z uwierzytelnianiem Digest</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>Nie znaleziono żadnych użytkowników</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new user</source>
-      <translation type="unfinished">Change search criteria or create a new user</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Edytuj</translation>
-    </message>
-    <message>
-      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users</source>
-      <translation>
-        <numerusform>Usunąć %n użytkownika</numerusform>
-        <numerusform>Usunąć %n użytkownika</numerusform>
-        <numerusform>Usunąć %n użytkownika</numerusform>
-        <numerusform>Usunąć %n użytkownika</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-      </translation>
     </message>
   </context>
   <context>

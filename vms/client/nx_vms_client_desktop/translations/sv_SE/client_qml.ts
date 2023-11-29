@@ -1813,16 +1813,6 @@ att aktivera PTZ</translation>
       <translation>Har %1 behörighet</translation>
     </message>
     <message>
-      <source>Also inherits it from:</source>
-      <comment>&apos;it&apos; refers to a permission</comment>
-      <translation>Ärver även från:</translation>
-    </message>
-    <message>
-      <source>Inherits %1 permission from:</source>
-      <comment>%1 will be substituted with a permission name</comment>
-      <translation>Ärv %1 behörighet från:</translation>
-    </message>
-    <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>Lägg till %1 och beroende behörigheter</translation>
@@ -1831,10 +1821,6 @@ att aktivera PTZ</translation>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>Lägg till %1 behörighet</translation>
-    </message>
-    <message>
-      <source>Already inherited from:</source>
-      <translation>Redan ärvd från:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
@@ -1847,8 +1833,22 @@ att aktivera PTZ</translation>
       <translation>Ta bort %1 behörighet</translation>
     </message>
     <message>
-      <source>Will stay inherited from:</source>
-      <translation>Kommer att förbli ärvt från:</translation>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>Ärver det också från</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Ärv %1 behörighet från</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation>Redan ärvd från</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation>Kommer att förbli ärvt från</translation>
     </message>
   </context>
   <context>

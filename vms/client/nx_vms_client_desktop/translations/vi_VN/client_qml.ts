@@ -1802,16 +1802,6 @@ to activate PTZ</source>
       <translation>Có %1 quyền</translation>
     </message>
     <message>
-      <source>Also inherits it from:</source>
-      <comment>&apos;it&apos; refers to a permission</comment>
-      <translation>Cũng kế thừa nó từ:</translation>
-    </message>
-    <message>
-      <source>Inherits %1 permission from:</source>
-      <comment>%1 will be substituted with a permission name</comment>
-      <translation>Kế thừa %1 quyền từ:</translation>
-    </message>
-    <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>Thêm %1 và quyền phụ thuộc</translation>
@@ -1820,10 +1810,6 @@ to activate PTZ</source>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>Thêm quyền %1</translation>
-    </message>
-    <message>
-      <source>Already inherited from:</source>
-      <translation>Đã được kế thừa từ:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
@@ -1836,8 +1822,22 @@ to activate PTZ</source>
       <translation>Xóa quyền %1</translation>
     </message>
     <message>
-      <source>Will stay inherited from:</source>
-      <translation>Sẽ được kế thừa từ:</translation>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>Cũng kế thừa nó từ</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Kế thừa %1 quyền từ</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation>Đã được kế thừa từ</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation>Sẽ được kế thừa từ</translation>
     </message>
   </context>
   <context>

@@ -1801,16 +1801,6 @@ to activate PTZ</source>
       <translation type="unfinished">Has %1 permission</translation>
     </message>
     <message>
-      <source>Also inherits it from:</source>
-      <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from:</translation>
-    </message>
-    <message>
-      <source>Inherits %1 permission from:</source>
-      <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from:</translation>
-    </message>
-    <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation type="unfinished">Add %1 and dependent permissions</translation>
@@ -1819,10 +1809,6 @@ to activate PTZ</source>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation type="unfinished">Add %1 permission</translation>
-    </message>
-    <message>
-      <source>Already inherited from:</source>
-      <translation type="unfinished">Already inherited from:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
@@ -1835,8 +1821,22 @@ to activate PTZ</source>
       <translation type="unfinished">Remove %1 permission</translation>
     </message>
     <message>
-      <source>Will stay inherited from:</source>
-      <translation type="unfinished">Will stay inherited from:</translation>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation type="unfinished">Also inherits it from</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Inherits %1 permission from</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation type="unfinished">Already inherited from</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation type="unfinished">Will stay inherited from</translation>
     </message>
   </context>
   <context>

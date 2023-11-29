@@ -1835,16 +1835,6 @@ to activate PTZ</source>
       <translation>Имеет разрешение %1</translation>
     </message>
     <message>
-      <source>Also inherits it from:</source>
-      <comment>&apos;it&apos; refers to a permission</comment>
-      <translation>Также наследует его от:</translation>
-    </message>
-    <message>
-      <source>Inherits %1 permission from:</source>
-      <comment>%1 will be substituted with a permission name</comment>
-      <translation>Наследует разрешение %1 от:</translation>
-    </message>
-    <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>Добавить %1 и зависимые разрешения</translation>
@@ -1853,10 +1843,6 @@ to activate PTZ</source>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
       <translation>Добавить разрешение %1</translation>
-    </message>
-    <message>
-      <source>Already inherited from:</source>
-      <translation>Уже унаследовано от:</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
@@ -1869,8 +1855,22 @@ to activate PTZ</source>
       <translation>Удалить разрешение %1</translation>
     </message>
     <message>
-      <source>Will stay inherited from:</source>
-      <translation>Останется унаследованным от:</translation>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>Также наследует его от</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Наследует разрешение %1 от</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation>Уже унаследовано от</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation>Останется унаследованным от</translation>
     </message>
   </context>
   <context>

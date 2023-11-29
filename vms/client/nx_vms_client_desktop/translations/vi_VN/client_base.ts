@@ -6519,6 +6519,114 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     </message>
   </context>
   <context>
+    <name>UserGroupsWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>Không tìm thấy nhóm nào</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>Thay đổi tiêu chí tìm kiếm hoặc tạo nhóm mới</translation>
+    </message>
+    <message>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation>Nhiều nhóm có cùng tên, điều này có thể dẫn đến nhầm lẫn. Để duy trì cấu trúc rõ ràng và có tổ chức, khuyến nghị nên đặt tên duy nhất cho mỗi nhóm.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation>
+        <numerusform>%n nhóm LDAP hiện có không được tìm thấy trong cơ sở dữ liệu LDAP.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation>
+        <numerusform>Xóa %n nhóm</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation>Không xóa được nhóm %1.</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation>Không xóa được nhóm.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation>
+        <numerusform>Không xóa được %n nhóm.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation>Một số nhóm vừa là nhóm mẹ vừa là thành viên con hoặc là một phần của chuỗi tham chiếu vòng tròn. Điều này có thể dẫn đến việc cấp quyền không chính xác.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Tất cả người dùng</translation>
+    </message>
+    <message>
+      <source>Users with Digest Authentication</source>
+      <translation>Người dùng có xác thực Digest</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation>Không tìm thấy người dùng</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation>Thay đổi tiêu chí tìm kiếm hoặc tạo người dùng mới</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Chỉnh sửa</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation>Nhiều người dùng sử dụng cùng một thông tin đăng nhập, gây ra lỗi đăng nhập. Để giải quyết vấn đề này, hãy cập nhật thông tin đăng nhập của người dùng bị ảnh hưởng hoặc tắt/xóa các thông tin đăng nhập trùng lặp.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation>
+        <numerusform>Xóa %n người dùng</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation>
+        <numerusform>Máy chủ LDAP đang ngoại tuyến. Người dùng %n không thể đăng nhập.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation>Không xóa được người dùng %1.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation>
+        <numerusform>Không thể xóa người dùng %n.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation>
+        <numerusform>Không tìm thấy %n người dùng LDAP hiện tại trong cơ sở dữ liệu LDAP</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>UserPickerHelper</name>
     <message>
       <source>All Users</source>
@@ -6735,24 +6843,12 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <translation>Xem trực tiếp</translation>
     </message>
     <message>
-      <source>Edit Camera Settings.</source>
-      <translation>Điều chỉnh cài đặt camera.</translation>
-    </message>
-    <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
       <translation>Tùy thuộc vào loại tài nguyên, sẽ cho phép người dùng sửa đổi cài đặt thiết bị hoặc điều khiển tường video.</translation>
     </message>
     <message>
-      <source>View Live.</source>
-      <translation>Xem trực tiếp.</translation>
-    </message>
-    <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
       <translation>Cho phép người dùng truy cập tài nguyên và xem cảnh quay trực tiếp từ camera.</translation>
-    </message>
-    <message>
-      <source>Modify Bookmarks</source>
-      <translation>Tùy chỉnh Bookmark</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
@@ -11454,55 +11550,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Xóa bỏ</translation>
-    </message>
-    <message>
-      <source>No groups found</source>
-      <translation>Không tìm thấy nhóm nào</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new group</source>
-      <translation>Thay đổi tiêu chí tìm kiếm hoặc tạo nhóm mới</translation>
-    </message>
-    <message>
-      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation>Nhiều nhóm có cùng tên, điều này có thể dẫn đến nhầm lẫn. Để duy trì cấu trúc rõ ràng và có tổ chức, khuyến nghị nên đặt tên duy nhất cho mỗi nhóm.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation>
-        <numerusform>%n nhóm LDAP hiện có không được tìm thấy trong cơ sở dữ liệu LDAP.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n groups</source>
-      <translation>
-        <numerusform>Xóa %n nhóm</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation>Không xóa được nhóm %1.</translation>
-    </message>
-    <message>
-      <source>Failed to delete group.</source>
-      <translation>Không xóa được nhóm.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n groups.</source>
-      <translation>
-        <numerusform>Không xóa được %n nhóm.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation>Một số nhóm vừa là nhóm mẹ vừa là thành viên con hoặc là một phần của chuỗi tham chiếu vòng tròn. Điều này có thể dẫn đến việc cấp quyền không chính xác.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
@@ -11556,65 +11603,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
       <translation>Đã có một người dùng có cùng thông tin đăng nhập trong hệ thống. Để tránh sự cố, tất cả người dùng phải có thông tin đăng nhập duy nhất.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Xóa bỏ</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Tất cả người dùng</translation>
-    </message>
-    <message>
-      <source>Users with Digest Authentication</source>
-      <translation>Người dùng có xác thực Digest</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>Không tìm thấy người dùng</translation>
-    </message>
-    <message>
-      <source>Change search criteria or create a new user</source>
-      <translation>Thay đổi tiêu chí tìm kiếm hoặc tạo người dùng mới</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Chỉnh sửa</translation>
-    </message>
-    <message>
-      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation>Nhiều người dùng sử dụng cùng một thông tin đăng nhập, gây ra lỗi đăng nhập. Để giải quyết vấn đề này, hãy cập nhật thông tin đăng nhập của người dùng bị ảnh hưởng hoặc tắt/xóa các thông tin đăng nhập trùng lặp.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users</source>
-      <translation>
-        <numerusform>Xóa %n người dùng</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation>
-        <numerusform>Máy chủ LDAP đang ngoại tuyến. Người dùng %n không thể đăng nhập.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation>Không xóa được người dùng %1.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to delete %n users.</source>
-      <translation>
-        <numerusform>Không thể xóa người dùng %n.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation>
-        <numerusform>Không tìm thấy %n người dùng LDAP hiện tại trong cơ sở dữ liệu LDAP</numerusform>
-      </translation>
     </message>
   </context>
   <context>

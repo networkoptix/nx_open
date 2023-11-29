@@ -56,20 +56,20 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Sincronizar usuarios</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Intervalo de sincronización</translation>
     </message>
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+      <translation>Solicitudes LDAP proxy %1 vía servidor</translation>
     </message>
     <message>
       <source>Group Attribute</source>
-      <translation type="unfinished">Group Attribute</translation>
+      <translation>Atributo de grupo</translation>
     </message>
   </context>
   <context>
@@ -1606,7 +1606,7 @@
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Utilice %1 o %2 para seleccionar varios recursos, o %3 para limpiar la selección</translation>
     </message>
   </context>
   <context>
@@ -1810,45 +1810,45 @@ para activar PTZ</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
-    </message>
-    <message>
-      <source>Also inherits it from:</source>
-      <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from:</translation>
-    </message>
-    <message>
-      <source>Inherits %1 permission from:</source>
-      <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from:</translation>
+      <translation>Tiene %1 permiso</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Añadir %1 y permisos dependientes</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
-    </message>
-    <message>
-      <source>Already inherited from:</source>
-      <translation type="unfinished">Already inherited from:</translation>
+      <translation>Agregar %1 permiso</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Eliminar %1 y permisos dependientes</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Eliminar permiso %1</translation>
     </message>
     <message>
-      <source>Will stay inherited from:</source>
-      <translation type="unfinished">Will stay inherited from:</translation>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>También lo hereda de</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Hereda %1 permiso de</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation>Ya heredado de</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation>Seguirá siendo heredado de</translation>
     </message>
   </context>
   <context>
@@ -2229,11 +2229,11 @@ para activar PTZ</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Siempre</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Al iniciar sesión</translation>
     </message>
   </context>
   <context>
