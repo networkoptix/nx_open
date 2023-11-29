@@ -78,8 +78,8 @@ const QString kCameraHotspotsEnabled("cameraHotspotsEnabled");
 const QString kCameraHotspotsData("cameraHotspotsData");
 
 const QString kDontRecordPrimaryStreamKey("dontRecordPrimaryStream");
-
 const QString kDontRecordSecondaryStreamKey("dontRecordSecondaryStream");
+const QString kDontRecordAudio("dontRecordAudio");
 
 const QString kLastSyncronizedRemoteArchiveTimestampMs("lastSyncronizedRemoteArchiveTimestampMs");
 const QString kRemoteArchiveSynchronizationMode("remoteArchiveSynchronizationMode");

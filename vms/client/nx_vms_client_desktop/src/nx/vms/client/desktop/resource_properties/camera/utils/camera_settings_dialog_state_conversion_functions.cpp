@@ -235,6 +235,12 @@ void setSecondaryRecordingDisabled(bool value, const Cameras& cameras)
         camera->setSecondaryStreamRecorded(!value);
 }
 
+void setRecordAudioEnabled(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setRecordAudio(value);
+}
+
 void setPreferredPtzPresetType(nx::core::ptz::PresetType value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
@@ -738,6 +744,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.expert.secondaryRecordingDisabled.hasValue())
         setSecondaryRecordingDisabled(state.expert.secondaryRecordingDisabled(), cameras);
+
+    if (state.expert.recordAudioEnabled.hasValue())
+        setRecordAudioEnabled(state.expert.recordAudioEnabled(), cameras);
 
     if (state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All
         && state.expert.remoteMotionDetectionEnabled.hasValue())

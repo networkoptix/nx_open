@@ -147,6 +147,7 @@ public:
     static State setUseBitratePerGOP(State state, bool value);
     static State setUseMedia2ToFetchProfiles(State state, nx::core::resource::UsingOnvifMedia2Type value);
     static State setPrimaryRecordingDisabled(State state, bool value);
+    static State setRecordAudioEnabled(State state, bool value);
     static State setSecondaryRecordingDisabled(State state, bool value);
     static State setPreferredPtzPresetType(State state, nx::core::ptz::PresetType value);
     static State setForcedPtzPanTiltCapability(State state, bool value);
