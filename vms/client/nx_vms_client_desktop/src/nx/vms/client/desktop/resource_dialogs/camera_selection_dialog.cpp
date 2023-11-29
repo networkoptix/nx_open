@@ -21,25 +21,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 
-namespace {
-
-bool shouldDisplayServersInTree(QnWorkbenchContext* context)
-{
-    auto systemContext = context->systemContext();
-    const auto isPowerUser =
-        systemContext->accessController()->hasPowerUserPermissions();
-
-    const bool currentUserAllowedToShowServers =
-        isPowerUser || systemContext->globalSettings()->showServersInTreeForNonAdmins();
-
-    const bool showServersInTree = currentUserAllowedToShowServers
-        && context->resourceTreeSettings()->showServersInTree();
-
-    return showServersInTree;
-}
-
-} // namespace
-
 namespace nx::vms::client::desktop {
 
 CameraSelectionDialog::CameraSelectionDialog(
@@ -56,8 +37,7 @@ CameraSelectionDialog::CameraSelectionDialog(
     ResourceSelectionWidget::EntityFactoryFunction createTreeEntity =
         [this, resourceFilter](const entity_resource_tree::ResourceTreeEntityBuilder* builder)
         {
-            return builder->createDialogAllCamerasEntity(
-                shouldDisplayServersInTree(workbenchContext()), resourceFilter);
+            return builder->createDialogAllCamerasEntity(showServersInTree(), resourceFilter);
         };
 
     m_resourceSelectionWidget = new ResourceSelectionWidget(
@@ -131,6 +111,17 @@ void CameraSelectionDialog::setAllowInvalidSelection(bool value)
     m_allowInvalidSelection = value;
 
     updateDialogControls();
+}
+
+bool CameraSelectionDialog::showServersInTree() const
+{
+    const auto isPowerUser = systemContext()->accessController()->hasPowerUserPermissions();
+
+    const bool currentUserAllowedToShowServers =
+        isPowerUser || systemContext()->globalSettings()->showServersInTreeForNonAdmins();
+
+    return currentUserAllowedToShowServers
+        && workbenchContext()->resourceTreeSettings()->showServersInTree();
 }
 
 void CameraSelectionDialog::showEvent(QShowEvent* event)

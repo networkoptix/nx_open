@@ -156,13 +156,27 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::allLayoutsSource(
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::shareableLayoutsSource(
-    const QnUserResourcePtr& user)
+    const QnUserResourcePtr& user,
+    const ResourceFilter& resourceFilter)
 {
-    return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<AccessibleResourceProxySource>(
-            systemContext(),
-            user,
-            std::make_unique<LayoutResourceSource>(resourcePool(), user, true)));
+    if (resourceFilter)
+    {
+        return std::make_shared<ResourceSourceAdapter>(
+            std::make_unique<AccessibleResourceProxySource>(
+                systemContext(),
+                user,
+                std::make_unique<FilteredResourceProxySource>(
+                    resourceFilter,
+                    std::make_unique<LayoutResourceSource>(resourcePool(), user, true))));
+    }
+    else
+    {
+        return std::make_shared<ResourceSourceAdapter>(
+            std::make_unique<AccessibleResourceProxySource>(
+                systemContext(),
+                user,
+                std::make_unique<LayoutResourceSource>(resourcePool(), user, true)));
+    }
 }
 
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::integrationsSource(

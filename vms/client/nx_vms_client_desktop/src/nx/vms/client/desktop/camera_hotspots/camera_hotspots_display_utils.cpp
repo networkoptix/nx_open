@@ -132,7 +132,7 @@ void paintHotspot(
         const auto hotspotOutline = makeHotspotOutline(origin, hotspot.direction);
 
         const QBrush brush(
-            option.cameraState == CameraHotspotDisplayOption::CameraState::invalid
+            option.targetState == CameraHotspotDisplayOption::TargetState::invalid
                 ? kInvalidColor
                 : QColor(hotspot.accentColorName));
 
@@ -199,7 +199,7 @@ void paintHotspot(
         else if (option.decoration.typeId() == QMetaType::QIcon)
         {
             double iconOpacity = 1.0;
-            if (option.cameraState == CameraHotspotDisplayOption::CameraState::noCamera)
+            if (option.targetState == CameraHotspotDisplayOption::TargetState::noCamera)
                 iconOpacity = kNoCameraIconOpacity;
 
             if (option.state == CameraHotspotDisplayOption::State::disabled)
@@ -210,7 +210,7 @@ void paintHotspot(
             const auto icon = option.decoration.value<QIcon>();
             QPixmap pixmap = icon.pixmap(nx::style::Metrics::kDefaultIconSize, QIcon::Selected);
 
-            if (option.cameraState == CameraHotspotDisplayOption::CameraState::invalid)
+            if (option.targetState == CameraHotspotDisplayOption::TargetState::invalid)
                 pixmap = qnSkin->colorize(pixmap, kInvalidColor);
 
             const auto iconOffset = -Geometry::toPoint(kHotspotItemIconSize) / 2.0 - QPoint(0, -1);

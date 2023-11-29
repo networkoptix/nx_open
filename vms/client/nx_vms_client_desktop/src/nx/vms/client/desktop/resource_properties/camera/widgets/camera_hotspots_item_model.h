@@ -20,7 +20,7 @@ public:
     enum Column
     {
         IndexColumn,
-        CameraColumn,
+        TargetColumn,
         ColorPaletteColumn,
         PointedCheckBoxColumn,
         DeleteButtonColumn,

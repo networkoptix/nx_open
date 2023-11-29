@@ -8,7 +8,7 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QMenu>
 
-#include <core/resource/camera_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/access/access_controller.h>
@@ -217,9 +217,9 @@ void CameraHotspotsEditorWidget::Private::processContextMenuRequest(const QPoint
             [this, index = hotspotIndex.value()] { q->removeHotstpotAt(index); });
 
         // Select camera action.
-        const auto editAction = menu->addAction(tr("Select Camera..."));
+        const auto editAction = menu->addAction(tr("Select Target..."));
         QObject::connect(editAction, &QAction::triggered, q,
-            [this, index = hotspotIndex.value()] { emit q->selectHotspotCamera(index); });
+            [this, index = hotspotIndex.value()] { emit q->selectHotspotTarget(index); });
 
         // Toggle pointed hotspot shape action.
         const auto pointedShapeToggleAction = menu->addAction(tr("Pointed"));
@@ -509,15 +509,14 @@ void CameraHotspotsEditorWidget::paintEvent(QPaintEvent* event)
         else if (d->isHoveredHotspotIndex(i))
             option.state = CameraHotspotDisplayOption::State::hovered;
 
-        if (!hotspot.cameraId.isNull())
+        if (!hotspot.targetResourceId.isNull())
         {
-            option.cameraState = CameraHotspotDisplayOption::CameraState::valid;
+            option.targetState = CameraHotspotDisplayOption::TargetState::valid;
             const auto resourcePool = systemContext->resourcePool();
-            const auto camera =
-                resourcePool->getResourceById<QnVirtualCameraResource>(hotspot.cameraId);
+            const auto targetResource = resourcePool->getResourceById(hotspot.targetResourceId);
 
-            if (!camera)
-                option.cameraState = CameraHotspotDisplayOption::CameraState::invalid;
+            if (!targetResource)
+                option.targetState = CameraHotspotDisplayOption::TargetState::invalid;
         }
 
         if (!isEnabled())
