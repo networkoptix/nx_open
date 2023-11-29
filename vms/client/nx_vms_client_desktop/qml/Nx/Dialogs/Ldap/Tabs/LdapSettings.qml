@@ -34,6 +34,7 @@ Rectangle
     property int syncIntervalS: kDefaultSyncIntervalS
     property int searchTimeoutS: kDefaultSearchTimeoutS
     property bool syncIsRunning
+    property int syncMode: LdapSettings.Sync.usersAndGroups
     property bool syncRequested
     property var preferredSyncServer
     property bool isHttpDigestEnabledOnImport
@@ -351,7 +352,7 @@ Rectangle
                         Spinner
                         {
                             running: control.showSpinners
-                                && control.continuousSync == LdapSettings.Sync.usersAndGroups
+                                && control.syncMode == LdapSettings.Sync.usersAndGroups
                         }
                     }
 
@@ -386,6 +387,8 @@ Rectangle
                         Spinner
                         {
                             running: control.showSpinners
+                                && (control.syncMode == LdapSettings.Sync.groupsOnly
+                                    || control.syncMode == LdapSettings.Sync.usersAndGroups)
                         }
                     }
 
