@@ -154,6 +154,7 @@ public:
     void setUseBitratePerGOP(bool value);
     void setUseMedia2ToFetchProfiles(nx::core::resource::UsingOnvifMedia2Type value);
     void setPrimaryRecordingDisabled(bool value);
+    void setRecordAudioEnabled(bool value);
     void setSecondaryRecordingDisabled(bool value);
     void setPreferredPtzPresetType(nx::core::ptz::PresetType value);
     void setForcedPtzPanTiltCapability(bool value);
