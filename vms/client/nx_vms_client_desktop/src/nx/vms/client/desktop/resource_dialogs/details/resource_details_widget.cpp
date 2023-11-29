@@ -20,7 +20,7 @@ namespace {
 static constexpr int kThumbnailPlaceholderFontPixelSize = 24;
 static constexpr auto kThumbnailPlaceholderFontWeight = QFont::Light;
 
-static constexpr auto kCaptionFontWeight = QFont::DemiBold;
+static constexpr auto kCaptionFontWeight = QFont::Medium;
 
 static constexpr int kCameraThumbnailWidth = 160;
 

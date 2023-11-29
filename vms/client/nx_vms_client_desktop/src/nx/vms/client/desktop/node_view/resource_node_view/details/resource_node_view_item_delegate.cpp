@@ -70,7 +70,7 @@ void ResourceNodeViewItemDelegate::initStyleOption(
     base_type::initStyleOption(option, index);
 
     // Font options initialization.
-    option->font.setWeight(QFont::DemiBold);
+    option->font.setWeight(QFont::Medium);
     option->fontMetrics = QFontMetrics(option->font);
 
     if (!option->state.testFlag(QStyle::State_Enabled))

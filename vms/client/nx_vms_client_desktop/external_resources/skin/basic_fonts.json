@@ -2,5 +2,17 @@
     "small": {"size": 11},
     "normal": {"size": 13},
     "large": {"size": 15},
-    "xLarge": {"size": 17}
+    "xLarge": {"size": 17},
+
+    "button": {"size": 13, "weight": "medium"},
+    "textEdit": {"size": 14},
+    "tabBar": {"size": 12},
+    "groupBoxLabel": {"size": 15, "weight": "medium"},
+    "headerView": {"size": 14, "weight": "medium"},
+    "progressBar": {"size": 11, "weight": "medium"},
+
+    "editableLabel": {"size": 24, "weight": "medium"},
+    "resourceTree": {"size": 13, "weight": "medium"},
+    "systemTabBar": {"size": 12, "weight": "medium"},
+    "clock": {"size": 18, "weight": "medium"}
 }

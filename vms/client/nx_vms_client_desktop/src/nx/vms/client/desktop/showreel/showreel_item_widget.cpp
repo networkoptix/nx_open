@@ -144,7 +144,7 @@ void ShowreelItemWidget::initOverlay()
     setFont(font);
 
     auto titleFont(font);
-    titleFont.setWeight(QFont::DemiBold);
+    titleFont.setWeight(QFont::Medium);
 
     auto orderFont(font);
     orderFont.setPixelSize(18);

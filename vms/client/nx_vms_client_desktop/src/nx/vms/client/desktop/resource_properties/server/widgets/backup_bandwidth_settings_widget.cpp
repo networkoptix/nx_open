@@ -139,7 +139,7 @@ BackupBandwidthSettingsWidget::BackupBandwidthSettingsWidget(QWidget* parent):
     ui->messageBar->init({.level = BarDescription::BarLevel::Info, .isClosable = false});
 
     for (const auto brushlabel: {ui->unlimitedLabel, ui->scheduledLimitLabel, ui->noBackupLabel})
-        setFontWeight(brushlabel, QFont::DemiBold);
+        setFontWeight(brushlabel, QFont::Medium);
 
     ui->unlimitedButton->setCellPainter(m_scheduleCellPainter.get());
     ui->limitedButton->setCellPainter(m_scheduleCellPainter.get());
