@@ -1805,6 +1805,10 @@
       <source>Organization Id</source>
       <translation>Organisationens Id</translation>
     </message>
+    <message>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data, if zero then the transaction message bus is used</source>
+      <translation>Intervall mellan Cloud polling HTTP-begäranden för att synkronisera data, om noll används transaktionsmeddelandebussen</translation>
+    </message>
   </context>
   <context>
     <name>TimeFormat</name>

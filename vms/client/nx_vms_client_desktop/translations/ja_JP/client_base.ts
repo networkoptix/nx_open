@@ -1121,8 +1121,8 @@
   <context>
     <name>DirectParentsModel</name>
     <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation>LDAP グループのメンバーシップは LDAP で管理されます</translation>
+      <source>LDAP group membership is managed on LDAP server</source>
+      <translation>LDAP グループのメンバーシップは LDAP サーバーで管理されます</translation>
     </message>
   </context>
   <context>
@@ -5928,6 +5928,30 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>To add Video Wall, SaaS should be in active state. %1</source>
       <translation>ビデオウォールを追加するには、SaaS がアクティブな状態である必要があります。 %1</translation>
     </message>
+    <message numerus="yes">
+      <source>Failed to open %n devices on the video wall:</source>
+      <translation>
+        <numerusform>%n 台のデバイスをビデオウォールで開けませんでした:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to open %n cameras on the video wall:</source>
+      <translation>
+        <numerusform>%n 台のカメラをビデオウォールで開けませんでした:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <translation>
+        <numerusform>ライブ表示権限を持っていないデバイスをビデオウォールに追加することはできません。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <translation>
+        <numerusform>ライブ表示権限を持っていないカメラをビデオウォールに追加することはできません。</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
@@ -9931,6 +9955,29 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
+    <message>
+      <source>User management for organization users is available only at the organization level, not the system level</source>
+      <translation>組織ユーザーに対するユーザー管理は組織レベルでのみ利用でき、システムレベルでは利用できません。</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this user</source>
+      <translation>このユーザーを変更する権限がありません。</translation>
+    </message>
+    <message>
+      <source>You cannot modify a user with a non-unique login</source>
+      <translation>一意でないログイン名を持つユーザーを変更することはできません</translation>
+    </message>
+    <message>
+      <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
+      <translation>このグループの特定のメンバーを変更する権限がないか、重複したログイン名を持つユーザーがグループに含まれている可能性があります。</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this group</source>
+      <translation>このグループを変更する権限がありません</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -11466,10 +11513,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>説明</translation>
     </message>
     <message>
-      <source>You do not have permissions to modify or delete this group.</source>
-      <translation>このグループを変更または削除する権限がありません。</translation>
-    </message>
-    <message>
       <source>Group is not found in the LDAP database.</source>
       <translation>グループが LDAP データベース内に見つかりません。</translation>
     </message>
@@ -11579,10 +11622,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Custom</source>
       <translation>カスタム</translation>
-    </message>
-    <message>
-      <source>You do not have permissions to modify this user.</source>
-      <translation>このユーザーを変更する権限がありません。</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>

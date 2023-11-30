@@ -68,8 +68,8 @@
       <translation>Proxy LDAP begär %1 via server</translation>
     </message>
     <message>
-      <source>Group Attribute</source>
-      <translation>Gruppattribut</translation>
+      <source>Group Members Attribute</source>
+      <translation>Attribut för gruppmedlemmar</translation>
     </message>
   </context>
   <context>
@@ -1202,14 +1202,6 @@
   <context>
     <name>LdapSettings</name>
     <message>
-      <source>LDAP is not configured yet</source>
-      <translation>LDAP har inte konfigurerats ännu</translation>
-    </message>
-    <message>
-      <source>Connect</source>
-      <translation>Anslut</translation>
-    </message>
-    <message>
       <source>ONLINE</source>
       <translation>ONLINE</translation>
     </message>
@@ -1254,10 +1246,6 @@
       <translation>Lägg till filter</translation>
     </message>
     <message>
-      <source>No filters</source>
-      <translation>Inga filter</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation>Inga användare eller grupper matchar synkroniseringsinställningarna och läggs till i systemet DB. Se till att LDAP-serverns parametrar och filter är konfigurerade korrekt.</translation>
     </message>
@@ -1272,6 +1260,18 @@
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
       <translation>Kontinuerlig import från LDAP-servern är inaktiverad för detta system. Uppdateringar till grupper och användare och grupper medlemskap kommer att ske enbart genom manuell synkronisering.</translation>
+    </message>
+    <message>
+      <source>Not configured yet</source>
+      <translation>Inte konfigurerad ännu</translation>
+    </message>
+    <message>
+      <source>Configure</source>
+      <translation>Konfigurera</translation>
+    </message>
+    <message>
+      <source>Specify at least one filter to synchronize users and groups</source>
+      <translation>Ange minst ett filter för att synkronisera användare och grupper</translation>
     </message>
   </context>
   <context>
@@ -2234,6 +2234,19 @@ att aktivera PTZ</translation>
     <message>
       <source>On Log In</source>
       <translation>Vid inloggning</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation>Giltig från %1 till %2 (av servertid)</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation>Giltig från %1 till %2 (av servertid) eller för %3 efter inloggning</translation>
     </message>
   </context>
   <context>

@@ -1121,8 +1121,8 @@
   <context>
     <name>DirectParentsModel</name>
     <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation>Thành viên nhóm LDAP được quản lý trong LDAP</translation>
+      <source>LDAP group membership is managed on LDAP server</source>
+      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
     </message>
   </context>
   <context>
@@ -5928,6 +5928,30 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <source>To add Video Wall, SaaS should be in active state. %1</source>
       <translation>Để thêm Tường Video, SaaS phải ở trạng thái hoạt động. %1</translation>
     </message>
+    <message numerus="yes">
+      <source>Failed to open %n devices on the video wall:</source>
+      <translation type="unfinished">
+        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to open %n cameras on the video wall:</source>
+      <translation type="unfinished">
+        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <translation type="unfinished">
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <translation type="unfinished">
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
@@ -9930,6 +9954,29 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
+    <message>
+      <source>User management for organization users is available only at the organization level, not the system level</source>
+      <translation type="unfinished">User management for organization users is available only at the organization level, not the system level</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this user</source>
+      <translation>Bạn không có quyền sửa đổi người dùng này</translation>
+    </message>
+    <message>
+      <source>You cannot modify a user with a non-unique login</source>
+      <translation type="unfinished">You cannot modify a user with a non-unique login</translation>
+    </message>
+    <message>
+      <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
+      <translation type="unfinished">You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this group</source>
+      <translation type="unfinished">You do not have permissions to modify this group</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -11466,10 +11513,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Mô tả</translation>
     </message>
     <message>
-      <source>You do not have permissions to modify or delete this group.</source>
-      <translation>Bạn không có quyền sửa đổi hoặc xóa nhóm này.</translation>
-    </message>
-    <message>
       <source>Group is not found in the LDAP database.</source>
       <translation>Nhóm không được tìm thấy trong cơ sở dữ liệu LDAP.</translation>
     </message>
@@ -11579,10 +11622,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>Custom</source>
       <translation>Tùy chỉnh</translation>
-    </message>
-    <message>
-      <source>You do not have permissions to modify this user.</source>
-      <translation>Bạn không có quyền sửa đổi người dùng này.</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>

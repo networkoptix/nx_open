@@ -68,8 +68,8 @@
       <translation>Proxy yêu cầu LDAP %1 qua máy chủ</translation>
     </message>
     <message>
-      <source>Group Attribute</source>
-      <translation>Thuộc tính nhóm</translation>
+      <source>Group Members Attribute</source>
+      <translation type="unfinished">Group Members Attribute</translation>
     </message>
   </context>
   <context>
@@ -1195,14 +1195,6 @@
   <context>
     <name>LdapSettings</name>
     <message>
-      <source>LDAP is not configured yet</source>
-      <translation>LDAP chưa được định cấu hình</translation>
-    </message>
-    <message>
-      <source>Connect</source>
-      <translation>Kết nối</translation>
-    </message>
-    <message>
       <source>ONLINE</source>
       <translation>TRỰC TUYẾN</translation>
     </message>
@@ -1247,10 +1239,6 @@
       <translation>Thêm bộ lọc</translation>
     </message>
     <message>
-      <source>No filters</source>
-      <translation>Không lọc</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation>Không có người dùng hoặc nhóm nào phù hợp với cài đặt đồng bộ hóa và được thêm vào cơ sở dữ liệu hệ thống. Đảm bảo các tham số và bộ lọc của máy chủ LDAP được định cấu hình chính xác.</translation>
     </message>
@@ -1265,6 +1253,18 @@
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
       <translation>Nhập liên tục từ máy chủ LDAP bị vô hiệu hóa đối với hệ thống này. Việc cập nhật các nhóm cũng như thành viên nhóm và người dùng sẽ chỉ diễn ra thông qua đồng bộ hóa thủ công.</translation>
+    </message>
+    <message>
+      <source>Not configured yet</source>
+      <translation type="unfinished">Not configured yet</translation>
+    </message>
+    <message>
+      <source>Configure</source>
+      <translation type="unfinished">Configure</translation>
+    </message>
+    <message>
+      <source>Specify at least one filter to synchronize users and groups</source>
+      <translation type="unfinished">Specify at least one filter to synchronize users and groups</translation>
     </message>
   </context>
   <context>
@@ -2221,6 +2221,19 @@ to activate PTZ</source>
     <message>
       <source>On Log In</source>
       <translation>Khi đăng nhập</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
     </message>
   </context>
   <context>

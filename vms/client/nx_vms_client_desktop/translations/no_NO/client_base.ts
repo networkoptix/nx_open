@@ -1124,8 +1124,8 @@
   <context>
     <name>DirectParentsModel</name>
     <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation>LDAP-gruppemedlemskap administreres i LDAP</translation>
+      <source>LDAP group membership is managed on LDAP server</source>
+      <translation>LDAP-gruppemedlemskap administreres på LDAP-server</translation>
     </message>
   </context>
   <context>
@@ -6003,6 +6003,34 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
       <source>To add Video Wall, SaaS should be in active state. %1</source>
       <translation type="unfinished">To add Video Wall, SaaS should be in active state. %1</translation>
     </message>
+    <message numerus="yes">
+      <source>Failed to open %n devices on the video wall:</source>
+      <translation>
+        <numerusform>Kunne ikke åpne %n enheter på videoveggen:</numerusform>
+        <numerusform>Kunne ikke åpne %n enheter på videoveggen:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to open %n cameras on the video wall:</source>
+      <translation>
+        <numerusform>Kunne ikke åpne %n kameraer på videoveggen:</numerusform>
+        <numerusform>Kunne ikke åpne %n kameraer på videoveggen:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <translation>
+        <numerusform>Du kan ikke legge til enheter som du ikke har View Live-tillatelse for, til videoveggen.</numerusform>
+        <numerusform>Du kan ikke legge til enheter som du ikke har View Live-tillatelse for, til videoveggen.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <translation>
+        <numerusform>Du kan ikke legge til kameraer på videoveggen du ikke har View Live-tillatelse til.</numerusform>
+        <numerusform>Du kan ikke legge til kameraer på videoveggen du ikke har View Live-tillatelse til.</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
@@ -6633,7 +6661,7 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Endre søkekriterier eller opprett en ny gruppe</translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
@@ -6670,7 +6698,7 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     </message>
     <message>
       <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+      <translation>Noen grupper har hverandre som både foreldre- og barnemedlemmer, eller er en del av en slik sirkulær referansekjede. Dette kan føre til feilberegninger av tillatelser.</translation>
     </message>
   </context>
   <context>
@@ -6693,7 +6721,7 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     </message>
     <message>
       <source>Change search criteria or create a new user</source>
-      <translation type="unfinished">Change search criteria or create a new user</translation>
+      <translation>Endre søkekriterier eller opprett en ny bruker</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -10084,6 +10112,29 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
+    <message>
+      <source>User management for organization users is available only at the organization level, not the system level</source>
+      <translation>Brukeradministrasjon for organisasjonsbrukere er kun tilgjengelig på organisasjonsnivå, ikke systemnivå</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this user</source>
+      <translation>Du har ikke tillatelse til å endre denne brukeren</translation>
+    </message>
+    <message>
+      <source>You cannot modify a user with a non-unique login</source>
+      <translation>Du kan ikke endre en bruker med en ikke-unik pålogging</translation>
+    </message>
+    <message>
+      <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
+      <translation>Du har kanskje ikke tillatelser til å endre enkelte medlemmer av denne gruppen, eller den inkluderer brukere med dupliserte pålogginger</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this group</source>
+      <translation>Du har ikke tillatelse til å endre denne gruppen</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -10623,34 +10674,34 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
-        <numerusform>%1 and %n more layouts</numerusform>
+      <translation>
+        <numerusform>%1 og %n oppsett til</numerusform>
+        <numerusform>%1 og %n oppsett til</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">%1 video wall</translation>
+      <translation>%1 videovegg</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
-        <numerusform>%1 and %n more video walls</numerusform>
+      <translation>
+        <numerusform>%1 og %n videovegger til</numerusform>
+        <numerusform>%1 og %n videovegger til</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 gruppe</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 og %n grupper til</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
       </translation>
     </message>
@@ -11639,10 +11690,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Beskrivelse</translation>
     </message>
     <message>
-      <source>You do not have permissions to modify or delete this group.</source>
-      <translation>Du har ikke tillatelse til å endre eller slette denne gruppen.</translation>
-    </message>
-    <message>
       <source>Group is not found in the LDAP database.</source>
       <translation>Finner ikke gruppen i LDAP-databasen.</translation>
     </message>
@@ -11752,10 +11799,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>Custom</source>
       <translation>Tilpasset</translation>
-    </message>
-    <message>
-      <source>You do not have permissions to modify this user.</source>
-      <translation>Du har ikke tillatelse til å endre denne brukeren.</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>

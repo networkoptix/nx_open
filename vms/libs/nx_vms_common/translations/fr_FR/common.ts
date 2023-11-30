@@ -1807,6 +1807,10 @@
       <source>Organization Id</source>
       <translation type="unfinished">Organization Id</translation>
     </message>
+    <message>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data, if zero then the transaction message bus is used</source>
+      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data, if zero then the transaction message bus is used</translation>
+    </message>
   </context>
   <context>
     <name>TimeFormat</name>

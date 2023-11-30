@@ -1124,8 +1124,8 @@
   <context>
     <name>DirectParentsModel</name>
     <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation>LDAP grup üyeliği LDAP içinde yönetilir</translation>
+      <source>LDAP group membership is managed on LDAP server</source>
+      <translation>LDAP grup üyeliği LDAP sunucusunda yönetilir</translation>
     </message>
   </context>
   <context>
@@ -5997,6 +5997,34 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>To add Video Wall, SaaS should be in active state. %1</source>
       <translation type="unfinished">To add Video Wall, SaaS should be in active state. %1</translation>
     </message>
+    <message numerus="yes">
+      <source>Failed to open %n devices on the video wall:</source>
+      <translation type="unfinished">
+        <numerusform>%n cihaz(lar) Video duvarında açılamadı:</numerusform>
+        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to open %n cameras on the video wall:</source>
+      <translation type="unfinished">
+        <numerusform>%n kamera(lar) Video duvarında açılamadı:</numerusform>
+        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <translation type="unfinished">
+        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı cihazlarına ekleme yapamazsınız.</numerusform>
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <translation type="unfinished">
+        <numerusform>Canlı Görüntüleme iznine sahip olmadığınız video duvarı kameralarına ekleme yapamazsınız.</numerusform>
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
@@ -6627,16 +6655,16 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Arama kriterlerini değiştirin veya yeni bir grup oluşturun</translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Birden fazla grubun aynı adı paylaşması karışıklığa neden olabilir. Açık ve düzenli bir yapıyı sürdürmek için her gruba benzersiz adlar vermenizi öneririz.</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
       <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>LDAP veritabanında mevcut %n LDAP grubu bulunamadı.</numerusform>
         <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
       </translation>
     </message>
@@ -6649,7 +6677,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+      <translation>&quot;%1&quot; grubu silinemedi.</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
@@ -6658,7 +6686,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
       <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>%n grup(lar) silinemedi.</numerusform>
         <numerusform>Failed to delete %n groups.</numerusform>
       </translation>
     </message>
@@ -6687,7 +6715,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Change search criteria or create a new user</source>
-      <translation type="unfinished">Change search criteria or create a new user</translation>
+      <translation>Arama kriterlerini değiştirin veya yeni bir kullanıcı oluşturun</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -6695,7 +6723,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+      <translation>Birden fazla kullanıcının aynı giriş bilgilerini paylaşması, oturum açma hatalarına neden olur. Bu sorunu çözmek için, etkilenen kullanıcı oturum açma bilgilerini güncelleyin veya kopyaları devre dışı bırakın/silin.</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
@@ -6707,18 +6735,18 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
       <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP sunucusu çevrimdışı. %n kullanıcı giriş yapamıyor.</numerusform>
         <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+      <translation>&quot;%1&quot; kullanıcısı silinemedi.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
       <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>%n kullanıcı(lar) silinemedi.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
       </translation>
     </message>
@@ -10078,6 +10106,29 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
+    <message>
+      <source>User management for organization users is available only at the organization level, not the system level</source>
+      <translation>Kuruluş kullanıcıları için kullanıcı yönetimi, sistem düzeyinde değil, yalnızca kuruluş düzeyinde kullanılabilir</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this user</source>
+      <translation>Bu kullanıcıyı değiştirme izniniz yok</translation>
+    </message>
+    <message>
+      <source>You cannot modify a user with a non-unique login</source>
+      <translation>Benzersiz olmayan oturum açma bilgilerine sahip bir kullanıcıyı değiştiremezsiniz</translation>
+    </message>
+    <message>
+      <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
+      <translation>Bu grubun belirli üyelerini değiştirme izniniz olmayabilir veya grup, yinelenen oturum açma bilgilerine sahip kullanıcılar içeriyor olabilir</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this group</source>
+      <translation>Bu grubu değiştirme izniniz yok</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -11633,10 +11684,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>Açıklama</translation>
     </message>
     <message>
-      <source>You do not have permissions to modify or delete this group.</source>
-      <translation type="unfinished">You do not have permissions to modify or delete this group.</translation>
-    </message>
-    <message>
       <source>Group is not found in the LDAP database.</source>
       <translation type="unfinished">Group is not found in the LDAP database.</translation>
     </message>
@@ -11746,10 +11793,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Custom</source>
       <translation>Özel Ayarlar</translation>
-    </message>
-    <message>
-      <source>You do not have permissions to modify this user.</source>
-      <translation>Bu kullanıcıyı değiştirme izniniz yok.</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>

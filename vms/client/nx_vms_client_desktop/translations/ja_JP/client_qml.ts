@@ -68,8 +68,8 @@
       <translation>サーバー経由で %1LDAP リクエストをプロキシする</translation>
     </message>
     <message>
-      <source>Group Attribute</source>
-      <translation>グループ属性</translation>
+      <source>Group Members Attribute</source>
+      <translation>グループメンバー属性</translation>
     </message>
   </context>
   <context>
@@ -1195,14 +1195,6 @@
   <context>
     <name>LdapSettings</name>
     <message>
-      <source>LDAP is not configured yet</source>
-      <translation>LDAP はまだ設定されていません</translation>
-    </message>
-    <message>
-      <source>Connect</source>
-      <translation>接続</translation>
-    </message>
-    <message>
       <source>ONLINE</source>
       <translation>オンライン</translation>
     </message>
@@ -1247,10 +1239,6 @@
       <translation>フィルターを追加</translation>
     </message>
     <message>
-      <source>No filters</source>
-      <translation>フィルターなし</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation>同期設定に一致するユーザーまたはグループが存在しないため、システムの DB には追加されません。 LDAP サーバーのパラメーターとフィルターが正しく構成されていることを確認してください。</translation>
     </message>
@@ -1265,6 +1253,18 @@
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
       <translation>このシステムでは、LDAP サーバーからの継続的なインポートが無効になっています。グループ、ユーザーおよびグループのメンバーシップの更新は、手動同期によってのみ反映されます。</translation>
+    </message>
+    <message>
+      <source>Not configured yet</source>
+      <translation>まだ設定されていません</translation>
+    </message>
+    <message>
+      <source>Configure</source>
+      <translation>設定</translation>
+    </message>
+    <message>
+      <source>Specify at least one filter to synchronize users and groups</source>
+      <translation>ユーザーとグループを同期するには、1 つ以上のフィルターを指定してください</translation>
     </message>
   </context>
   <context>
@@ -2219,6 +2219,19 @@ PTZを行います</translation>
     <message>
       <source>On Log In</source>
       <translation>ログイン時</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation>サーバー時刻の %1 から %2 まで有効</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation>サーバー時刻の %1 から %2 まで、もしくはログイン後 %3 の間有効</translation>
     </message>
   </context>
   <context>

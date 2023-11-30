@@ -68,8 +68,8 @@
       <translation>Proxy LDAP, sunucu aracılığıyla %1 isteğinde bulunur</translation>
     </message>
     <message>
-      <source>Group Attribute</source>
-      <translation>Grup Özelliği</translation>
+      <source>Group Members Attribute</source>
+      <translation>Grup Üyeleri Niteliği</translation>
     </message>
   </context>
   <context>
@@ -1202,14 +1202,6 @@
   <context>
     <name>LdapSettings</name>
     <message>
-      <source>LDAP is not configured yet</source>
-      <translation>LDAP henüz yapılandırılmadı</translation>
-    </message>
-    <message>
-      <source>Connect</source>
-      <translation>Bağlan</translation>
-    </message>
-    <message>
       <source>ONLINE</source>
       <translation>ÇEVRİMİÇİ</translation>
     </message>
@@ -1254,10 +1246,6 @@
       <translation>Filtre Ekle</translation>
     </message>
     <message>
-      <source>No filters</source>
-      <translation>Filtre yok</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
     </message>
@@ -1272,6 +1260,18 @@
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
       <translation>Bu sistem için LDAP sunucusundan sürekli içe aktarma devre dışı bırakıldı. Gruplara ve kullanıcı ve grup üyeliğine ilişkin güncellemeler yalnızca el ile senkronizasyon yoluyla gerçekleştirilecektir.</translation>
+    </message>
+    <message>
+      <source>Not configured yet</source>
+      <translation>Henüz yapılandırılmadı</translation>
+    </message>
+    <message>
+      <source>Configure</source>
+      <translation>Yapılandır</translation>
+    </message>
+    <message>
+      <source>Specify at least one filter to synchronize users and groups</source>
+      <translation>Kullanıcıları ve grupları senkronize etmek için en az bir filtre belirtin</translation>
     </message>
   </context>
   <context>
@@ -2233,6 +2233,19 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>On Log In</source>
       <translation>Oturum Açıldığında</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation>%1 ile %2 arasında geçerlidir (sunucu zamanına göre)</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation>%1 ile %2 arasında geçerlidir (sunucu zamanına göre) veya oturum açtıktan sonra %3 süreyle geçerlidir</translation>
     </message>
   </context>
   <context>

@@ -56,20 +56,20 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Synkroniser brukere</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Synkroniseringsintervall</translation>
     </message>
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+      <translation>Proxy LDAP ber om %1 via server</translation>
     </message>
     <message>
-      <source>Group Attribute</source>
-      <translation>Gruppeattributt</translation>
+      <source>Group Members Attribute</source>
+      <translation>Gruppemedlemmer-attributt</translation>
     </message>
   </context>
   <context>
@@ -1202,14 +1202,6 @@
   <context>
     <name>LdapSettings</name>
     <message>
-      <source>LDAP is not configured yet</source>
-      <translation>LDAP er ikke konfigurert ennå</translation>
-    </message>
-    <message>
-      <source>Connect</source>
-      <translation>Koble til</translation>
-    </message>
-    <message>
       <source>ONLINE</source>
       <translation>ONLINE</translation>
     </message>
@@ -1254,10 +1246,6 @@
       <translation>Legg til filter</translation>
     </message>
     <message>
-      <source>No filters</source>
-      <translation>Ingen filtre</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation>Ingen brukere eller grupper samsvarer med synkroniseringsinnstillinger og legges til i systemdatabasen. Sørg for at LDAP-serverparametere og -filtre er riktig konfigurert.</translation>
     </message>
@@ -1272,6 +1260,18 @@
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
       <translation>Kontinuerlig import fra LDAP-server er deaktivert for dette systemet. Oppdateringer av grupper og bruker- og gruppemedlemskap skjer kun gjennom manuell synkronisering.</translation>
+    </message>
+    <message>
+      <source>Not configured yet</source>
+      <translation>Ikke konfigurert ennå</translation>
+    </message>
+    <message>
+      <source>Configure</source>
+      <translation>Konfigurer</translation>
+    </message>
+    <message>
+      <source>Specify at least one filter to synchronize users and groups</source>
+      <translation>Angi minst ett filter for å synkronisere brukere og grupper</translation>
     </message>
   </context>
   <context>
@@ -1606,7 +1606,7 @@
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Bruk %1 eller %2 for å velge flere ressurser, eller %3 for å fjerne valget</translation>
     </message>
   </context>
   <context>
@@ -1810,45 +1810,45 @@ for å aktivere PTZ</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Har %1 tillatelse</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Legg til %1 og avhengige tillatelser</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Legg til %1 tillatelse</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Fjern %1 og avhengige tillatelser</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Fjern %1 tillatelse</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>Arver det også fra</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Arver %1 tillatelse fra</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>Allerede arvet fra</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>Vil forbli arvet fra</translation>
     </message>
   </context>
   <context>
@@ -2229,11 +2229,24 @@ for å aktivere PTZ</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Alltid</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>På Logg inn</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation>Gyldig fra %1 til %2 (etter servertid)</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation>Gyldig fra %1 til %2 (etter servertid) eller for %3 etter pålogging</translation>
     </message>
   </context>
   <context>

@@ -1124,8 +1124,8 @@
   <context>
     <name>DirectParentsModel</name>
     <message>
-      <source>LDAP group membership is managed in LDAP</source>
-      <translation>Medlemskap i LDAP-gruppen hanteras i LDAP</translation>
+      <source>LDAP group membership is managed on LDAP server</source>
+      <translation>Medlemskap i LDAP-gruppen hanteras på LDAP-servern</translation>
     </message>
   </context>
   <context>
@@ -6004,6 +6004,34 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>To add Video Wall, SaaS should be in active state. %1</source>
       <translation>För att lägga till videovägg bör SaaS vara i aktivt tillstånd. %1</translation>
     </message>
+    <message numerus="yes">
+      <source>Failed to open %n devices on the video wall:</source>
+      <translation>
+        <numerusform>Det gick inte att öppna %n enheter på videoväggen:</numerusform>
+        <numerusform>Det gick inte att öppna %n enheter på videoväggen:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to open %n cameras on the video wall:</source>
+      <translation>
+        <numerusform>Det gick inte att öppna %n kameror på videoväggen:</numerusform>
+        <numerusform>Det gick inte att öppna %n kameror på videoväggen:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <translation>
+        <numerusform>Du kan inte lägga till videoväggsenheter för vilka du inte har behörigheten Visa Live.</numerusform>
+        <numerusform>Du kan inte lägga till videoväggsenheter för vilka du inte har behörigheten Visa Live.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <translation>
+        <numerusform>Du kan inte lägga till kameror på videoväggen som du inte har View Live-behörighet för.</numerusform>
+        <numerusform>Du kan inte lägga till kameror på videoväggen som du inte har View Live-behörighet för.</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
@@ -10085,6 +10113,29 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
+    <message>
+      <source>User management for organization users is available only at the organization level, not the system level</source>
+      <translation>Användarhantering för organisationsanvändare är endast tillgänglig på organisationsnivå, inte systemnivån</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this user</source>
+      <translation>Du har inte behörighet att ändra denna användare</translation>
+    </message>
+    <message>
+      <source>You cannot modify a user with a non-unique login</source>
+      <translation>Du kan inte ändra en användare med en icke-unik inloggning</translation>
+    </message>
+    <message>
+      <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
+      <translation>Du kanske inte har behörighet att ändra vissa medlemmar i denna grupp, eller innehåller användare med dubbla inloggningar</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this group</source>
+      <translation>Du har inte behörighet att ändra den här gruppen</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -11642,10 +11693,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <translation>Beskrivning</translation>
     </message>
     <message>
-      <source>You do not have permissions to modify or delete this group.</source>
-      <translation>Du har inte behörighet att ändra eller ta bort denna grupp.</translation>
-    </message>
-    <message>
       <source>Group is not found in the LDAP database.</source>
       <translation>Gruppen finns inte i LDAP-databasen.</translation>
     </message>
@@ -11755,10 +11802,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Custom</source>
       <translation>Anpassad</translation>
-    </message>
-    <message>
-      <source>You do not have permissions to modify this user.</source>
-      <translation>Du har inte behörighet att ändra denna användare.</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
