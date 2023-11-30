@@ -37,6 +37,7 @@ protected:
 
     QList<BaseProperty*> properties() const;
 
+public:
     void loadProperty(BaseProperty* property);
     void saveProperty(BaseProperty* property);
 
