@@ -50,8 +50,6 @@ private:
 private:
     /** We should not check for updates if this option is disabled in global settings. */
     bool m_autoChecksEnabled = false;
-    /** We should not run update checks if we are logged out. */
-    bool m_userLoggedIn = false;
     /** Timer for checking state of current update check. Spins once per second. */
     QTimer m_updateStateTimer;
     /** Long timer for checking another update. Spins once per hour*/
