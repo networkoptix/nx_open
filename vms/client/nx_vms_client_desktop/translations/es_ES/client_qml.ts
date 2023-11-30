@@ -68,8 +68,8 @@
       <translation>Solicitudes LDAP proxy %1 vía servidor</translation>
     </message>
     <message>
-      <source>Group Attribute</source>
-      <translation>Atributo de grupo</translation>
+      <source>Group Members Attribute</source>
+      <translation type="unfinished">Group Members Attribute</translation>
     </message>
   </context>
   <context>
@@ -1202,14 +1202,6 @@
   <context>
     <name>LdapSettings</name>
     <message>
-      <source>LDAP is not configured yet</source>
-      <translation type="unfinished">LDAP is not configured yet</translation>
-    </message>
-    <message>
-      <source>Connect</source>
-      <translation>Conexión</translation>
-    </message>
-    <message>
       <source>ONLINE</source>
       <translation type="unfinished">ONLINE</translation>
     </message>
@@ -1254,10 +1246,6 @@
       <translation type="unfinished">Add Filter</translation>
     </message>
     <message>
-      <source>No filters</source>
-      <translation>Sin filtros</translation>
-    </message>
-    <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and filters are configured correctly.</source>
       <translation>Ningún usuario o grupo coincide con la configuración de sincronización y se agrega a la base de datos del sistema. Asegúrese de que los parámetros y filtros del servidor LDAP estén configurados correctamente.</translation>
     </message>
@@ -1272,6 +1260,18 @@
     <message>
       <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
       <translation type="unfinished">Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+    </message>
+    <message>
+      <source>Not configured yet</source>
+      <translation type="unfinished">Not configured yet</translation>
+    </message>
+    <message>
+      <source>Configure</source>
+      <translation type="unfinished">Configure</translation>
+    </message>
+    <message>
+      <source>Specify at least one filter to synchronize users and groups</source>
+      <translation type="unfinished">Specify at least one filter to synchronize users and groups</translation>
     </message>
   </context>
   <context>
@@ -1524,11 +1524,11 @@
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Ningún grupo encontrado</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Cambiar criterios de búsqueda o crear un nuevo grupo</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -2234,6 +2234,19 @@ para activar PTZ</translation>
     <message>
       <source>On Log In</source>
       <translation>Al iniciar sesión</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
     </message>
   </context>
   <context>
