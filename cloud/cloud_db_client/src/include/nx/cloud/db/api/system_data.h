@@ -352,6 +352,12 @@ struct ShareSystemRequest
 
 NX_REFLECTION_INSTRUMENT(ShareSystemRequest, (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId))
 
+NX_REFLECTION_ENUM_CLASS(UserType,
+    system,
+    organization,
+    channel_partner
+)
+
 /**
  * Describes an account to system relation.
  */
@@ -374,6 +380,18 @@ struct SystemSharing: ShareSystemRequest
     /**%apidoc UTC time of the last login of user to the system. */
     std::chrono::system_clock::time_point lastLoginTime;
 
+    /**%apidoc User type. User may come from different sources: organization, channel partner,
+     * the system itself. This field provides lets to find out how the user gained access
+     * to the system.
+     */
+    api::UserType type = api::UserType::system;
+
+    /**%apidoc Indicates that the user record is readonly and cannot be affected via API. */
+    std::optional<bool> readonly;
+
+    // Internal attribute. Gives a hint to the UI whether to show the user in the list or not.
+    std::optional<bool> hidden;
+
     bool operator==(const SystemSharing& rhs) const
     {
         return std::tie(static_cast<const base_type&>(*this), systemId, accountId, accountFullName)
@@ -390,10 +408,10 @@ struct SystemSharing: ShareSystemRequest
 };
 
 #define SystemSharing_Fields (systemId)(accountId)(accountFullName)(usageFrequency)(lastLoginTime) \
-    (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)
+    (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)(type)(readonly)(hidden)
 
 NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(usageFrequency) \
-    (lastLoginTime))
+    (lastLoginTime)(type)(readonly)(hidden))
 
 using SystemSharingList = std::vector<SystemSharing>;
 

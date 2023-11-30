@@ -9,6 +9,11 @@
 
 namespace nx::cloud::cps::api {
 
+NX_REFLECTION_ENUM_CLASS(UserType,
+    organization,
+    channel_partner
+);
+
 // Describes organization's system user.
 struct User
 {
@@ -19,9 +24,11 @@ struct User
 
     // Roles understandable by VMS.
     std::vector<std::string> vmsRoles;
+
+    UserType type = UserType::organization;
 };
 
-NX_REFLECTION_INSTRUMENT(User, (email)(roles)(vmsRoles))
+NX_REFLECTION_INSTRUMENT(User, (email)(roles)(vmsRoles)(type))
 
 // Describes user's access to a system.
 struct SystemAllowance
