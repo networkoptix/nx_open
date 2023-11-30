@@ -5385,6 +5385,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Services</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to save system settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5937,13 +5941,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>Failed to apply changes</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>Delete %n items?</source>
-        <translation>
-            <numerusform>Delete item?</numerusform>
-            <numerusform>Delete %n items?</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Stop Video Wall?</source>
         <translation></translation>
@@ -5955,13 +5952,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
         <source>Stop</source>
         <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n matrices?</source>
-        <translation>
-            <numerusform>Delete matrix?</numerusform>
-            <numerusform>Delete %n matrices?</numerusform>
-        </translation>
     </message>
     <message>
         <source>More Video Wall licenses required</source>
@@ -6429,6 +6419,13 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation type="unfinished">
             <numerusform>Delete %n user?</numerusform>
             <numerusform>Delete %n users?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n matrices?</source>
+        <translation type="unfinished">
+            <numerusform>Delete matrix?</numerusform>
+            <numerusform>Delete %n matrices?</numerusform>
         </translation>
     </message>
 </context>
