@@ -935,15 +935,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1252,10 +1252,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Not configured yet</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1265,6 +1261,10 @@
     </message>
     <message>
         <source>Specify at least one filter to synchronize users and groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2206,6 +2206,13 @@ to activate PTZ</source>
     </message>
 </context>
 <context>
+    <name>StringEditor</name>
+    <message>
+        <source>Min 3 characters</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StyledRadioButton</name>
     <message>
         <source>Logical ID</source>
@@ -2577,7 +2584,7 @@ to activate PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
+        <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
