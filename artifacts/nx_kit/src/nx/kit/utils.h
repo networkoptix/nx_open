@@ -128,6 +128,12 @@ NX_KIT_API std::string getProcessName();
  */
 NX_KIT_API const std::vector<std::string>& getProcessCmdLineArgs();
 
+/**
+ * @return Absolute path to the executable file, cached after the first call. If the path cannot be
+ *     determined, returns an empty string.
+ */
+NX_KIT_API std::string getPathToExecutable();
+
 NX_KIT_API bool fileExists(const char* filename);
 
 //-------------------------------------------------------------------------------------------------
@@ -279,8 +285,18 @@ NX_KIT_API bool parseNameValueFile(
     std::ostream* out,
     bool* isFileEmpty);
 
+//-------------------------------------------------------------------------------------------------
+// String conversions.
+
 /** Converts ASCII characters from the input string to the upper case. */
 NX_KIT_API std::string toUpper(const std::string& str);
+
+#if defined(_WIN32)
+
+/** Converts a UTF-16 string via WinAPI to a UTF-8 std::string. */
+NX_KIT_API std::string wideCharToStdString(const wchar_t* str);
+
+#endif // defined(_WIN32)
 
 } // namespace utils
 } // namespace kit

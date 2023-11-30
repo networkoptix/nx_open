@@ -8,6 +8,7 @@ namespace kit {
 namespace apple_utils {
 
 std::vector<std::string> getProcessCmdLineArgs();
+const std::string getPathToExecutable();
 
 } // namespace apple_utils
 } // namespace kit

@@ -544,6 +544,55 @@ TEST(utils, toUpper)
     ASSERT_EQ("ABC \xB1", toUpper("abc \xB1"));
 }
 
+#if defined(_WIN32)
+
+TEST(utils, wideCharToStdString)
+{
+    ASSERT_EQ(u8"", wideCharToStdString((const wchar_t*) u""));
+    ASSERT_EQ(u8"abcdef", wideCharToStdString((const wchar_t*) u"abcdef"));
+
+    // "test" in Russian.
+    ASSERT_EQ(
+        u8"\u0442\u0435\u0441\u0442",
+        wideCharToStdString((const wchar_t*) u"\u0442\u0435\u0441\u0442"));
+
+    // "truth" in Old Persian.
+    ASSERT_EQ(
+        u8"\U000103A0\U000103AB", wideCharToStdString((const wchar_t*) u"\U000103A0\U000103AB"));
+
+    // Incorrect string ("truth" in Old Persian, low surrogate in the end is missed).
+    const wchar_t lowSurrogateMissedInTheEnd[] = {0xD800, 0xDFA0, 0xD800};
+    ASSERT_EQ(u8"\U000103A0\uFFFD", wideCharToStdString(lowSurrogateMissedInTheEnd));
+
+    // Incorrect string ("truth" in Old Persian, high surrogate in the end is missed).
+    const wchar_t highSurrogateMissedInTheEnd[] = {0xD800, 0xDFA0, 0xDFAB};
+    ASSERT_EQ(u8"\U000103A0\uFFFD", wideCharToStdString(highSurrogateMissedInTheEnd));
+
+    // Incorrect string ("truth" in Old Persian, low surrogate in the beginning is missed).
+    const wchar_t lowSurrogateMissedInTheBeginning[] = {0xD800, 0xD800, 0xDFA0};
+    ASSERT_EQ(u8"\uFFFD\U000103A0", wideCharToStdString(lowSurrogateMissedInTheBeginning));
+
+    // Incorrect string ("truth" in Old Persian, high surrogate in the middle is missed).
+    const wchar_t highSurrogateMissedInTheMiddle[] = {0xDFAB, 0xD800, 0xDFA0};
+    ASSERT_EQ(u8"\uFFFD\U000103A0", wideCharToStdString(highSurrogateMissedInTheMiddle));
+
+}
+
+#endif
+
+TEST(utils, getPathToExecutable)
+{
+    std::string selfExecutablePath = getPathToExecutable();
+
+    #if defined(_WIN32)
+        const char* const kFileName = "nx_kit_ut.exe";
+    #else
+        const char* const kFileName = "nx_kit_ut";
+    #endif
+    const int fileNamePosition = (int) selfExecutablePath.find(kFileName);
+    ASSERT_EQ((int) (selfExecutablePath.length() - strlen(kFileName)), fileNamePosition);
+}
+
 } // namespace test
 } // namespace utils
 } // namespace kit
