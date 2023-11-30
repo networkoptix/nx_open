@@ -3,7 +3,7 @@
 #pragma once
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 
-class QnDesktopAudioOnlyResource : public QnDesktopResource
+class NX_VMS_CLIENT_CORE_API QnDesktopAudioOnlyResource : public QnDesktopResource
 {
     Q_OBJECT
 public:
