@@ -101,8 +101,8 @@ void QnResourceTitleItem::setSimpleMode(bool isSimpleMode, bool animate)
             connect(
                 animator,
                 &AbstractAnimator::finished,
-                this,
-                &QnResourceTitleItem::updateNameLabelElideConstraint);
+                m_rightButtonsPanel,
+                [this] { updateNameLabelElideConstraint(); });
         }
         else
         {
