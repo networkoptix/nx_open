@@ -23,11 +23,11 @@
 #include <nx/vms/client/desktop/common/widgets/scalable_image_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_background_image_provider.h>
 #include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
-#include <nx/vms/client/desktop/image_providers/watermark_proxy_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/watermark/watermark_painter.h>
 #include <ui/common/palette.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
@@ -333,6 +333,14 @@ struct LayoutThumbnailLoader::Private
 
             // Hint: the rect from QnGeometry:: encloseRotatedGeometry is not
             // pixel-accurate bounding box. It will be cropped for rotations around 90degrees
+        }
+
+        if (watermark.visible())
+        {
+            WatermarkPainter painter;
+            painter.setWatermark(watermark);
+            QPainter qtPainter(&outputImage);
+            painter.drawWatermark(&qtPainter, item->outRect);
         }
 
         finalizeOutputImage();
@@ -696,18 +704,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         request.roundMethod = d->roundMethod;
         request.tolerant = d->tolerant;
 
-        ImageProvider* provider = nullptr;
-        if (d->watermark.visible())
-        {
-            auto baseProvider = new ResourceThumbnailProvider(request, this);
-            auto finalProvider = new WatermarkProxyProvider(baseProvider, baseProvider);
-            finalProvider->setWatermark(d->watermark);
-            provider = finalProvider;
-        }
-        else
-            provider = new ResourceThumbnailProvider(request);
-
-        thumbnailItem->provider.reset(provider);
+        thumbnailItem->provider.reset(new ResourceThumbnailProvider(request));
 
         const auto handleStatusChange =
             [this, thumbnailItem, zoomRect](Qn::ThumbnailStatus status)
