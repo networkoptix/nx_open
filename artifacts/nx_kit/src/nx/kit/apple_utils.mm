@@ -20,6 +20,11 @@ std::vector<std::string> getProcessCmdLineArgs()
     return argumentsVector;
 }
 
+const std::string getPathToExecutable()
+{
+    return [[[[NSProcessInfo processInfo] arguments] objectAtIndex:0] fileSystemRepresentation];
+}
+
 } // namespace apple_utils
 } // namespace kit
 } // namespace nx

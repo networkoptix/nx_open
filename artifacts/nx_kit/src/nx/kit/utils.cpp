@@ -11,6 +11,9 @@
 #include <type_traits>
 #include <vector>
 #include <map>
+#include <mutex>
+
+#include <nx/kit/debug.h>
 
 #if defined(_WIN32)
     #define NOMINMAX //< Needed to prevent windows.h define macros min() and max().
@@ -21,6 +24,7 @@
     #include <nx/kit/apple_utils.h>
 #else
     #include <fstream>
+    #include <unistd.h>
 #endif
 
 namespace nx {
@@ -139,19 +143,8 @@ const std::vector<std::string>& getProcessCmdLineArgs()
         }
 
         for (int i = 0; i < argc; ++i)
-        {
-            int utf8Length = WideCharToMultiByte(
-                CP_UTF8, 0, argv[i], -1, nullptr, 0, nullptr, nullptr);
-            if (utf8Length > 0)
-            {
-                std::string utf8Arg;
-                // Exclued null-terminator
-                utf8Arg.resize(utf8Length - 1);
-                WideCharToMultiByte(
-                    CP_UTF8, 0, argv[i], -1, &utf8Arg[0], utf8Length, nullptr, nullptr);
-                args.push_back(utf8Arg);
-            }
-        }
+            args.push_back(wideCharToStdString(argv[i]));
+
         LocalFree(argv);
     #elif defined(__APPLE__)
         args = nx::kit::apple_utils::getProcessCmdLineArgs();
@@ -168,6 +161,33 @@ const std::vector<std::string>& getProcessCmdLineArgs()
         args.push_back("");
 
     return args;
+}
+
+std::string getPathToExecutable()
+{
+    static std::string pathToExecutable;
+
+    static std::mutex mutex;
+    const std::lock_guard<std::mutex> lock(mutex);
+
+    if (!pathToExecutable.empty())
+        return pathToExecutable;
+
+    #if defined(_WIN32)
+        WCHAR filenameBuffer[MAX_PATH + /* terminating NUL */ 1] = {0};
+        if (GetModuleFileNameW(nullptr, filenameBuffer, MAX_PATH) == 0)
+            return pathToExecutable;
+        pathToExecutable = wideCharToStdString(filenameBuffer);
+    #elif defined(__APPLE__)
+        pathToExecutable = nx::kit::apple_utils::getPathToExecutable();
+    #else
+        char path[PATH_MAX + /* terminating NUL */ 1] = {0};
+        const ssize_t count = readlink("/proc/self/exe", path, PATH_MAX);
+        if (count != -1)
+            pathToExecutable = path;
+    #endif
+
+    return pathToExecutable;
 }
 
 bool fileExists(const char* filename)
@@ -702,6 +722,44 @@ std::string toUpper(const std::string& str)
         c = (c >= 'a' && c <= 'z') ? (c - 'a' + 'A') : c;
     return result;
 }
+
+#if defined(_WIN32)
+
+std::string wideCharToStdString(const wchar_t* str)
+{
+    // Get the length of the resulting string.
+    const int utf8Length = WideCharToMultiByte(
+        CP_UTF8,
+        /* Conversion flags */ 0,
+        str,
+        /* Autodetect string length */ -1,
+        /* Pointer to converted string*/ nullptr,
+        /* Size, in bytes, of the converted string. 0 to detect the needed size */ 0,
+        /* Pointer to the default character */ nullptr,
+        /* Pointer to a flag indicating if the default character was used */ nullptr);
+    if (utf8Length == 0)
+    {
+        NX_KIT_ASSERT(GetLastError() == 0, "WideCharToMultiByte failed");
+        return "";
+    }
+
+    std::string utf8String;
+    utf8String.resize(utf8Length - 1);
+    const int convertedLength = WideCharToMultiByte(
+        CP_UTF8,
+        /* Conversion flags */ 0,
+        str,
+        /* Autodetect string length */ -1,
+        &utf8String[0],
+        utf8Length,
+        /* Pointer to the default character */ nullptr,
+        /* Pointer to a flag indicating if the default character was used */ nullptr);
+    NX_KIT_ASSERT(convertedLength == utf8Length);
+
+    return utf8String;
+}
+
+#endif // defined(_WIN32)
 
 } // namespace utils
 } // namespace kit
