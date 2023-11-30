@@ -212,6 +212,8 @@ void TimeSynchronizationWidget::applyChanges()
     const auto& state = m_store->state();
     editableSystemSettings->timeSynchronizationEnabled = state.enabled;
     editableSystemSettings->primaryTimeServer = state.primaryServer;
+
+    m_store->applyChanges();
 }
 
 bool TimeSynchronizationWidget::hasChanges() const
