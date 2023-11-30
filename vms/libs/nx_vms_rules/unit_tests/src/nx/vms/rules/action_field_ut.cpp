@@ -73,11 +73,78 @@ public:
         engine->registerEvent(TestEvent::manifest(), []{ return new TestEvent(); });
     }
 
-    EventPtr makeEvent()
+    EventPtr makeEvent(State state = State::instant)
     {
-        return engine->buildEvent(kEventData);
+        auto event = engine->buildEvent(kEventData);
+        auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now().time_since_epoch());
+        event->setTimestamp(timestamp);
+        event->setState(state);
+        return event;
     }
 };
+
+TEST_F(ActionFieldTest, EventTimeInstantEvent)
+{
+    TextWithFields field(systemContext());
+    field.setText("{event.time}");
+    auto event = AggregatedEventPtr::create(makeEvent());
+    EXPECT_EQ(nx::utils::timestampToISO8601(event->timestamp()), field.build(event).toString());
+}
+
+TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
+{
+    TextWithFields fieldStartTime(systemContext());
+    fieldStartTime.setText("{event.time.start}");
+    // There is no start time for Instant event.
+    EXPECT_TRUE(
+        fieldStartTime.build(AggregatedEventPtr::create(makeEvent())).toString().isEmpty());
+}
+
+TEST_F(ActionFieldTest, EventTimeProlongedEvent)
+{
+    TextWithFields fieldActiveStartTime(systemContext());
+    fieldActiveStartTime.setText("{event.time.start}");
+
+    TextWithFields fieldActiveTime(systemContext());
+    fieldActiveTime.setText("{event.time}");
+
+    TextWithFields fieldActiveEndTime(systemContext());
+    fieldActiveEndTime.setText("{event.time.end}");
+
+    auto eventStart = makeEvent(State::started);
+    engine->processEvent(eventStart);
+
+    auto aggregatedEvent = AggregatedEventPtr::create(eventStart);
+    auto activeEventTime = fieldActiveTime.build(aggregatedEvent).toString();
+
+    // Event start time and timestamp are equal.
+    EXPECT_EQ(activeEventTime, fieldActiveStartTime.build(aggregatedEvent).toString());
+
+    // Event doesn't have end time yet.
+    EXPECT_TRUE(fieldActiveEndTime.build(aggregatedEvent).toString().isEmpty());
+
+    auto eventEnd = makeEvent(State::stopped);
+    engine->processEvent(eventEnd);
+
+    TextWithFields fieldInactiveStartTime(systemContext());
+    fieldInactiveStartTime.setText("{event.time.start}");
+
+    TextWithFields fieldInactiveTime(systemContext());
+    fieldInactiveTime.setText("{event.time}");
+
+    TextWithFields fieldInactiveEndTime(systemContext());
+    fieldInactiveEndTime.setText("{event.time.end}");
+
+    aggregatedEvent = AggregatedEventPtr::create(eventEnd);
+
+    // Start time is start of previous event.
+    EXPECT_EQ(activeEventTime, fieldInactiveStartTime.build(aggregatedEvent).toString());
+
+    // End time is time of current event.
+    EXPECT_EQ(fieldInactiveTime.build(aggregatedEvent).toString(),
+        fieldInactiveEndTime.build(aggregatedEvent).toString());
+}
 
 TEST_F(ActionFieldTest, CreateGuid)
 {

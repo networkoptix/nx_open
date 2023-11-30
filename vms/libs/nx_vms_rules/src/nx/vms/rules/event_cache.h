@@ -26,11 +26,14 @@ public:
     /** Check prolonged event on-off consistency.*/
     bool checkEventState(const EventPtr& event);
 
+    std::chrono::microseconds runningEventStartTimestamp(const EventPtr& event) const;
+    void stopRunningEvent(const EventPtr& event);
+
 private:
     std::unordered_map<QString, nx::utils::ElapsedTimer> m_cachedEvents;
     nx::utils::ElapsedTimer m_cacheTimer;
 
-    std::unordered_set<QString> m_runningEvents;
+    std::unordered_map<QString, std::chrono::microseconds> m_runningEvents;
 };
 
 } // namespace nx::vms::rules

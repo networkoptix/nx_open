@@ -19,6 +19,15 @@ QString timestampToRfc2822(qint64 timestampMs)
     return QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
 }
 
+QString timestampToISO8601(std::chrono::microseconds timestamp)
+{
+    if (timestamp == std::chrono::microseconds::zero())
+        return {};
+    return QDateTime::fromMSecsSinceEpoch(
+        std::chrono::duration_cast<milliseconds>(timestamp).count())
+        .toString(Qt::DateFormat::ISODate);
+}
+
 QString timestampToRfc2822(milliseconds timestamp)
 {
     return timestampToRfc2822(timestamp.count());
