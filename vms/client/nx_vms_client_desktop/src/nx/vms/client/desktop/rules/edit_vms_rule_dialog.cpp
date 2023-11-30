@@ -11,6 +11,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/widgets/panel.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
@@ -65,6 +66,9 @@ EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
 
         m_editableLabel = new EditableLabel;
         m_editableLabel->setButtonIcon(qnSkin->pixmap("text_buttons/edit.png"));
+        m_editableLabel->setPlaceholderText(tr("Add Title or Comment"));
+        m_editableLabel->setFont(fontConfig()->xLarge());
+        m_editableLabel->setValidator({});
         connect(
             m_editableLabel,
             &EditableLabel::textChanged,
