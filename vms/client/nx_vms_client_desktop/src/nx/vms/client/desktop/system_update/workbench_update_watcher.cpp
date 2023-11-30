@@ -42,12 +42,14 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::common;
 
 namespace {
-    constexpr int kUpdatePeriodMSec = 1000; //< 1 second.
-    constexpr int kTooLateDayOfWeek = Qt::Thursday;
 
-    const auto kCheckUpdatePeriod = std::chrono::minutes(60);
-    const auto kWaitForUpdateCheckFuture = std::chrono::milliseconds(1);
-} // anonymous namespace
+constexpr int kTooLateDayOfWeek = Qt::Thursday;
+
+constexpr milliseconds kUpdatePeriod = 1s;
+constexpr milliseconds kCheckUpdatePeriod = 60min;
+constexpr milliseconds kWaitForUpdateCheckFuture = 1ms;
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -57,6 +59,7 @@ struct WorkbenchUpdateWatcher::Private
     UpdateContents updateContents;
     std::future<UpdateContents> updateCheck;
     QPointer<ServerUpdateTool> serverUpdateTool;
+    bool connected = false;
 };
 
 WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(WindowContext* windowContext, QObject* parent):
@@ -104,6 +107,7 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(WindowContext* windowContext, QOb
         : kCheckUpdatePeriod;
 
     m_checkLatestUpdateTimer.setInterval(checkInterval);
+    m_updateStateTimer.setInterval(kUpdatePeriod);
 
     connect(m_private->notificationsManager,
         &workbench::LocalNotificationsManager::cancelRequested,
@@ -144,8 +148,12 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(WindowContext* windowContext, QOb
             if (systemId.isNull())
                 systemId = system()->localSystemId();
 
-            if (!systemId.isNull())
+            m_private->connected = !systemId.isNull();
+
+            if (m_private->connected)
                 m_private->serverUpdateTool->onConnectToSystem(systemId);
+
+            syncState();
         });
 }
 
@@ -153,17 +161,16 @@ WorkbenchUpdateWatcher::~WorkbenchUpdateWatcher() {}
 
 void WorkbenchUpdateWatcher::syncState()
 {
-    if (m_userLoggedIn && m_autoChecksEnabled && !m_updateStateTimer.isActive())
+    if (m_private->connected && m_autoChecksEnabled && !m_updateStateTimer.isActive())
     {
-        NX_VERBOSE(this, "syncState() - starting automatic checks for updates");
+        NX_VERBOSE(this, "Starting automatic checks for updates...");
         atStartCheckUpdate();
-        m_updateStateTimer.start(kUpdatePeriodMSec);
+        m_updateStateTimer.start();
         m_checkLatestUpdateTimer.start();
     }
-
-    if ((!m_userLoggedIn || !m_autoChecksEnabled) && m_updateStateTimer.isActive())
+    else
     {
-        NX_VERBOSE(this, "syncState() - stopping automatic checks for updates");
+        NX_VERBOSE(this, "Stopping automatic checks for updates...");
         m_private->updateCheck = {};
         m_updateStateTimer.stop();
         m_checkLatestUpdateTimer.stop();
