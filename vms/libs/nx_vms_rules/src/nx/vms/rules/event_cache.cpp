@@ -2,10 +2,10 @@
 
 #include "event_cache.h"
 
+#include <nx/utils/log/log.h>
+
 #include "basic_event.h"
 #include "utils/event.h"
-
-#include <nx/utils/log/log.h>
 
 namespace nx::vms::rules {
 
@@ -49,6 +49,21 @@ void EventCache::cacheEvent(const QString& eventKey)
     m_cachedEvents.emplace(eventKey, ElapsedTimer(ElapsedTimerState::started));
 }
 
+std::chrono::microseconds EventCache::runningEventStartTimestamp(const EventPtr& event) const
+{
+    if (!event)
+        std::chrono::microseconds::zero();
+
+    const auto it = m_runningEvents.find(event->resourceKey());
+    return it != m_runningEvents.end() ? it->second : std::chrono::microseconds::zero();
+}
+
+void EventCache::stopRunningEvent(const EventPtr& event)
+{
+    if (event && event->state() == State::stopped)
+        m_runningEvents.erase(event->resourceKey());
+}
+
 bool EventCache::checkEventState(const EventPtr& event)
 {
     if (!isProlonged(event))
@@ -70,7 +85,7 @@ bool EventCache::checkEventState(const EventPtr& event)
             return false;
         }
 
-        m_runningEvents.insert(resourceKey);
+        m_runningEvents.insert({resourceKey, event->timestamp()});
     }
     else
     {
@@ -80,8 +95,6 @@ bool EventCache::checkEventState(const EventPtr& event)
                 event->type(), resourceKey);
             return false;
         }
-
-        m_runningEvents.erase(resourceKey);
     }
 
     return true;

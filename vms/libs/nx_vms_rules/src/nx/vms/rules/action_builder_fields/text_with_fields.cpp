@@ -2,10 +2,12 @@
 
 #include "text_with_fields.h"
 
+#include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/rules/engine.h>
 
 #include "../aggregated_event.h"
 #include "../utils/event_details.h"
@@ -135,13 +137,44 @@ QString extendedEventDescription(
     return toStringList(extendedDescription).join(common::html::kLineBreak);
 }
 
+QString eventTime(const AggregatedEventPtr& eventAggregator, common::SystemContext* /*context*/)
+{
+    return nx::utils::timestampToISO8601(eventAggregator->timestamp());
+}
+
+QString eventTimeStart(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+{
+    switch (eventAggregator->state())
+    {
+        case State::started:
+            return eventTime(eventAggregator, context);
+        case State::stopped:
+            return nx::utils::timestampToISO8601(
+                context->vmsRulesEngine()->eventCache()->runningEventStartTimestamp(
+                    eventAggregator->initialEvent()));
+        default:
+            return {};
+    }
+}
+
+QString eventTimeEnd(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+{
+    if (eventAggregator->state() != State::stopped)
+        return {};
+
+    return eventTime(eventAggregator, context);
+}
+
 const QMap<QString, FormatFunction> kFormatFunctions = {
     { "@CreateGuid", &createGuid },
     { "@EventType", &eventType },
     { "@EventName", &eventName },
     { "@EventCaption", &eventCaption },
     { "@EventDescription", &eventDescription },
-    { "@ExtendedEventDescription", &extendedEventDescription }
+    { "@ExtendedEventDescription", &extendedEventDescription },
+    { "event.time", &eventTime },
+    { "event.time.start", &eventTimeStart },
+    { "event.time.end", &eventTimeEnd }
 };
 
 FormatFunction formatFunction(const QString& name)
@@ -165,13 +198,10 @@ QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
         if (m_types[i] == FieldType::Substitution)
         {
             const auto& name = m_values[i];
-            if (name.startsWith(kFunctionPrefix))
+            if (const auto function = formatFunction(name))
             {
-                if (const auto function = formatFunction(name))
-                {
-                    result += function(eventAggregator, systemContext());
-                    continue;
-                }
+                result += function(eventAggregator, systemContext());
+                continue;
             }
 
             const auto propertyValue = eventAggregator->property(name.toUtf8().data());

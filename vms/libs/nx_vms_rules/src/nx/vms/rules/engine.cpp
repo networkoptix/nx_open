@@ -848,6 +848,8 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
             builder->process(event);
         }
     }
+
+    m_eventCache->stopRunningEvent(event);
 }
 
 void Engine::processAction(const ActionPtr& action)
