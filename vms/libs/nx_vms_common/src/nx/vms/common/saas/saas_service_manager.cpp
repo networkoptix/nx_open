@@ -6,6 +6,8 @@
 
 #include <core/resource_management/resource_properties.h>
 #include <licensing/license.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_resource_manager.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/reflect/string_conversion.h>
@@ -127,11 +129,20 @@ api::SaasState ServiceManager::saasState() const
 void ServiceManager::setSaasState(api::SaasState saasState)
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    auto updatedSaasData = m_data;
-    updatedSaasData.state = saasState;
-    mutexLocker.unlock();
+    m_data.state = saasState;
 
-    loadSaasData(nx::reflect::json::serialize(updatedSaasData));
+    if (ec2::AbstractECConnectionPtr connection = systemContext()->messageBusConnection())
+    {
+        nx::vms::api::ResourceParamWithRefData data(
+            QnUuid(),
+            kSaasDataPropertyKey,
+            QString::fromStdString(nx::reflect::json::serialize(m_data)));
+        nx::vms::api::ResourceParamWithRefDataList dataList;
+        dataList.push_back(data);
+        connection->getResourceManager(Qn::kSystemAccess)->save(
+            dataList,
+            [](int, ec2::ErrorCode) {});
+    }
 }
 
 std::map<QnUuid, nx::vms::api::SaasAnalyticsParameters> ServiceManager::analyticsIntegrations() const
