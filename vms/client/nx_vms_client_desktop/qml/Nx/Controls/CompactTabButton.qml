@@ -150,12 +150,12 @@ TabButton
         {
             id: underline
 
-            x: content.x
+            x: content.x - 2
             anchors.bottom: parent.bottom
             // There are some visual bugs with tabButton positioning.
             // Underline is only 1 pixel height instead of 2, without this shift.
             anchors.bottomMargin: (tabButton.secondaryStyle ? 0 : 1) - tabButton.underlineOffset
-            width: content.implicitWidth
+            width: content.implicitWidth + 4
             height: tabButton.secondaryStyle ? 1 : 2
             visible: !tabButton.compact || tabButton.isCurrent || tabButton.hovered
 
