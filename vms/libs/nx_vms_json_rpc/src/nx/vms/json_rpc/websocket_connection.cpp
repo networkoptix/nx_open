@@ -227,18 +227,23 @@ void WebSocketConnection::addGuard(const QString& id, nx::utils::Guard guard)
     if (!NX_ASSERT(guard))
         return;
 
-    NX_VERBOSE(this, "Add guard for %1", id);
     dispatch(
         [this, id, g = std::move(guard)]() mutable
         {
-            NX_ASSERT(m_guards.emplace(id, std::move(g)).second);
+            auto& guard = m_guards[id];
+            NX_VERBOSE(this, "%1 guard for %2", guard ? "Adding" : "Replacing", id);
+            guard = std::move(g);
         });
 }
 
 void WebSocketConnection::removeGuard(const QString& id)
 {
-    NX_VERBOSE(this, "Remove guard for %1", id);
-    dispatch([this, id]() mutable { m_guards.erase(id); });
+    dispatch(
+        [this, id]() mutable
+        {
+            NX_VERBOSE(this, "Removing guard for %1", id);
+            m_guards.erase(id);
+        });
 }
 
 } // namespace nx::vms::json_rpc
