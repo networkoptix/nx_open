@@ -813,8 +813,8 @@ void QnStorageConfigWidget::updateWarnings()
         messages.push_back(
             {
                 .text = tr("If cloud storage is activated for backup, other backup storages will "
-                    "be deactivated and the “All archive” option for already configured devices "
-                    "will be changed to “Motion, Object, Bookmarks”"),
+                    "be deactivated and the \"All archive\" option for already configured devices "
+                    "will be changed to \"Motion, Object, Bookmarks\""),
                 .level = BarDescription::BarLevel::Warning,
                 .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
             });
@@ -823,8 +823,8 @@ void QnStorageConfigWidget::updateWarnings()
     {
         messages.push_back(
             {
-                .text = tr("If cloud storage is activated for backup, the “All archive” option "
-                    "for already configured devices will be changed to “Motion, Object, Bookmarks”"),
+                .text = tr("If cloud storage is activated for backup, the \"All archive\" option "
+                    "for already configured devices will be changed to \"Motion, Object, Bookmarks\""),
                 .level = BarDescription::BarLevel::Warning,
                 .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
             });
