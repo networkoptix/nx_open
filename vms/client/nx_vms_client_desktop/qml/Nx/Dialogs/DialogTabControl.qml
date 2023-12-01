@@ -48,4 +48,22 @@ TabControl
         inactiveUnderlineColor: "transparent"
         font: Qt.font({pixelSize: 12, weight: Font.Normal})
     }
+
+    function switchTab(tabIndex, callbackAfterSwitching)
+    {
+        if (dialog.tabIndex === tabIndex)
+        {
+            callbackAfterSwitching()
+        }
+        else
+        {
+            function tabSwitchHandler()
+            {
+                callbackAfterSwitching()
+                tabControl.tabSwitched.disconnect(tabSwitchHandler)
+            }
+            tabControl.tabSwitched.connect(tabSwitchHandler)
+            dialog.tabIndex = tabIndex
+        }
+    }
 }
