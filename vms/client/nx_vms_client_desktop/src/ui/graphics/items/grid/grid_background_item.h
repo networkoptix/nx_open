@@ -32,7 +32,7 @@ class QnGridBackgroundItem: public QGraphicsObject, public QnWorkbenchContextAwa
 
 public:
     explicit QnGridBackgroundItem(
-        QGraphicsItem* parent = nullptr,
+        QGraphicsScene* scene,
         QnWorkbenchContext* context = nullptr);
 
     virtual ~QnGridBackgroundItem();
