@@ -67,7 +67,6 @@ Item
 
     signal deleteRequested()
     signal auditTrailRequested()
-
     signal moreGroupsClicked()
 
     function validate()
@@ -77,7 +76,7 @@ Item
         if (userLoginText.enabled)
             result = userLoginText.validate()
 
-        if (userEmailTextField.visible)
+        if (control.userType != UserSettingsGlobal.CloudUser)
             return userEmailTextField.validate() && result
 
         return result

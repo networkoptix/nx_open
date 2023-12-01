@@ -13,6 +13,8 @@ Control
     property alias tabBar: tabBar
     property alias currentTabIndex: tabBar.currentIndex
 
+    signal tabSwitched()
+
     spacing: 0 //< Spacing between tabbar and content.
 
     default property list<Tab> tabs
@@ -143,6 +145,11 @@ Control
 
                     readonly property Tab tab: tabControl.tabs[index]
 
+                    onAnimationFinished:
+                    {
+                        if (opaque)
+                            tabControl.tabSwitched()
+                    }
                     anchors.fill: parent
                     opaque: tab.visible && tab === tabPages.currentTab
                     contentItem: tab.page

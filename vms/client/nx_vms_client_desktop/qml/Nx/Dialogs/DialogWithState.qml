@@ -4,6 +4,8 @@ import QtQuick 2.15
 
 import Nx.Dialogs 1.0
 
+import "../Controls"
+
 Dialog
 {
     id: dialog
@@ -26,5 +28,31 @@ Dialog
     {
         if (validateFunc())
             stateApplied()
+    }
+
+    function findAndFocusTextWithWarning(item)
+    {
+        if (!item.visible)
+            return false
+
+        if (item instanceof TextFieldWithWarning)
+        {
+            if (!item.warningState)
+                return false
+
+            recursiveForceActiveFocus(item)
+            return true
+        }
+        return Array.prototype.find.call(item.children,
+            child => findAndFocusTextWithWarning(child))
+    }
+
+    function recursiveForceActiveFocus(item)
+    {
+        if (item)
+        {
+            recursiveForceActiveFocus(item.parent)
+            item.forceActiveFocus()
+        }
     }
 }

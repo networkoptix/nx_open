@@ -6,8 +6,11 @@ import QtQuick.Controls 2.4
 
 Control
 {
+    id: control
     property bool opaque: true
     property int fadeDuration: 200
+
+    signal animationFinished()
 
     opacity: opaque ? 1.0 : 0.0
     visible: opacity > 0
@@ -18,6 +21,12 @@ Control
         {
             easing.type: Easing.InOutQuad
             duration: fadeDuration
+
+            onRunningChanged:
+            {
+                if (!running)
+                    control.animationFinished()
+            }
         }
     }
 }
