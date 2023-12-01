@@ -26,6 +26,23 @@ public:
         const std::string& organizationId,
         SystemRegistrationData registrationData,
         std::function<void(ResultCode, SystemData)> completionHandler) = 0;
+
+    /**
+     * Get the list of system offers either for the organization or by the organization.
+     */
+    virtual void getSystemOffers(
+        const std::string& organizationId,
+        std::function<void(ResultCode, std::vector<api::SystemOffer>)> completionHandler) = 0;
+
+    virtual void acceptOffer(
+        const std::string& organizationId,
+        const std::string& systemId,
+        std::function<void(ResultCode)> completionHandler) = 0;
+
+    virtual void rejectOffer(
+        const std::string& organizationId,
+        const std::string& systemId,
+        std::function<void(ResultCode)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

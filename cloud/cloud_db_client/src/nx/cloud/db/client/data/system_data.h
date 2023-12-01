@@ -169,11 +169,11 @@ NX_REFLECTION_INSTRUMENT(GetSystemUsersRequest, (systemId)(localOnly))
 
 //-------------------------------------------------------------------------------------------------
 
-NX_REFLECTION_INSTRUMENT(CreateSystemOfferRequest, (toAccount)(systemId)(comment))
+NX_REFLECTION_INSTRUMENT(CreateSystemOfferRequest, (toAccount)(organizationId)(systemId)(comment))
 
 NX_REFLECTION_INSTRUMENT_ENUM(OfferStatus, offered, accepted, rejected)
 
-NX_REFLECTION_INSTRUMENT(SystemOffer, (fromAccount)(toAccount)(systemId)(systemName)(comment)(status))
+NX_REFLECTION_INSTRUMENT(SystemOffer, (fromAccount)(toAccount)(organizationId)(systemId)(systemName)(comment)(status))
 
 NX_REFLECTION_INSTRUMENT(SystemOfferPatch, (comment)(status))
 

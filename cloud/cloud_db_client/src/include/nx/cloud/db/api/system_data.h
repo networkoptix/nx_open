@@ -637,10 +637,16 @@ NX_REFLECTION_INSTRUMENT(DataSyncSettings, (onlineStatusExpirationPeriodMs) \
 
 struct CreateSystemOfferRequest
 {
-    /**%apidoc The account the system is offered to. */
-    std::string toAccount;
+    /**%apidoc The account email to offer the system to. Cannot be present simultaneously with
+     * organizationId.
+     */
+    std::optional<std::string> toAccount;
 
-    /**%apidoc ID of offered system. */
+    /**%apidoc The organization to offer the system to. Cannot be present simultaneously with
+     * toAccount.
+     */
+    std::optional<std::string> organizationId;
+
     std::string systemId;
 
     /**%apidoc Any text. */
@@ -661,8 +667,15 @@ struct SystemOffer
      */
     std::string fromAccount;
 
-    /**%apidoc The account the system has been offered to. */
-    std::string toAccount;
+    /**%apidoc The account the system has been offered to. Cannot be present simultaneously
+     * with organizationId.
+     */
+    std::optional<std::string> toAccount;
+
+    /**%apidoc The organization the system has been offered to. Cannot be present simultaneously
+     * with toAccount.
+     */
+    std::optional<std::string> organizationId;
 
     /**%apidoc Guess what. */
     std::string systemId;
