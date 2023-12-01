@@ -5390,6 +5390,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>Services</source>
       <translation>Szolgáltatások</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5948,13 +5952,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>A változások érvényesítése sikertelen</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Töröl %n elemet?</numerusform>
-        <numerusform>Töröl %n elemet?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Leállítja a videófalat?</translation>
@@ -5966,13 +5963,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Állj</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Töröl %n mátrixot?</numerusform>
-        <numerusform>Töröl %n mátrixot?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6440,6 +6430,13 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>
         <numerusform>Töröl %n felhasználót?</numerusform>
         <numerusform>Töröl %n felhasználót?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Töröl %n mátrixot?</numerusform>
+        <numerusform>Töröl %n mátrixot?</numerusform>
       </translation>
     </message>
   </context>

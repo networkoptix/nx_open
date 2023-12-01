@@ -2651,19 +2651,19 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Pokazuj również na kamerze źródłowej</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Wyzwalaj również na kamerze źródłowej</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Nagrywaj również kamerę źródłową</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Odtwarzaj również na kamerze źródłowej</translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>

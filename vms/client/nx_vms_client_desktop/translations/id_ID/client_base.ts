@@ -5327,6 +5327,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Services</source>
       <translation type="unfinished">Services</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation>Gagal menyimpan pengaturan sistem</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5881,12 +5885,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>Failed to apply changes</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Delete %n items?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Stop Video Wall?</translation>
@@ -5898,12 +5896,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Stop</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Delete %n matrices?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6341,6 +6333,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <comment>Numerical form depends on users count</comment>
       <translation>
         <numerusform>Delete %n users?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Delete %n matrices?</numerusform>
       </translation>
     </message>
   </context>

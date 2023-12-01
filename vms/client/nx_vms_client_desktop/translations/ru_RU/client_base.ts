@@ -5522,6 +5522,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Services</source>
       <translation>Службы</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -6088,15 +6092,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>Не удалось применить изменения</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Удалить %n элемента?</numerusform>
-        <numerusform>Удалить %n элементов?</numerusform>
-        <numerusform>Удалить %n элементов?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Остановить видеостену?</translation>
@@ -6108,15 +6103,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Остановить</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Удалить %n матрицу?</numerusform>
-        <numerusform>Удалить %n матрицы?</numerusform>
-        <numerusform>Удалить %n матриц?</numerusform>
-        <numerusform>Удалить %n матриц?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6644,6 +6630,15 @@ We recommend you not to open this integration. If you understand the risks, you 
         <numerusform>Delete %n user?</numerusform>
         <numerusform>Delete %n user?</numerusform>
         <numerusform>Delete %n user?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Удалить %n матрицу?</numerusform>
+        <numerusform>Удалить %n матрицы?</numerusform>
+        <numerusform>Удалить %n матриц?</numerusform>
+        <numerusform>Удалить %n матриц?</numerusform>
       </translation>
     </message>
   </context>
@@ -8265,11 +8260,11 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 требуется</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 требуется</numerusform>
+        <numerusform>%1 требуется</numerusform>
+        <numerusform>%1 требуется</numerusform>
       </translation>
     </message>
   </context>
@@ -10966,7 +10961,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Движение, Объекты</translation>
     </message>
     <message>
       <source>Objects only</source>
@@ -10978,7 +10973,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Объекты + низкое разрешение</translation>
     </message>
   </context>
   <context>
@@ -12058,7 +12053,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Группы</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -12149,7 +12144,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Группы</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -12184,7 +12179,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Группы</translation>
     </message>
     <message>
       <source>LDAP</source>

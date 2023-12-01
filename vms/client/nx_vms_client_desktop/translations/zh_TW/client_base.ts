@@ -1676,7 +1676,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>使用者正在接收電子郵件</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
@@ -5327,6 +5327,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Services</source>
       <translation>服務</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5879,12 +5883,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>套用變更時失敗</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>刪除 %n 項目?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>停止電視牆?</translation>
@@ -5896,12 +5894,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>停止</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>刪除 %n 矩陣?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6339,6 +6331,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <comment>Numerical form depends on users count</comment>
       <translation>
         <numerusform>刪除 %n 使用者?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>刪除 %n 矩陣?</numerusform>
       </translation>
     </message>
   </context>

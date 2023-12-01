@@ -5392,6 +5392,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Services</source>
       <translation>Tjänster</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation>Det gick inte att spara systeminställningar</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5950,13 +5954,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>Failed to apply changes</source>
       <translation>Misslyckades med att spara ändringar</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Radera %n objekt?</numerusform>
-        <numerusform>Radera %n objekt?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Stoppa videovägg?</translation>
@@ -5968,13 +5965,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Stop</source>
       <translation>Stoppa</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Radera %n matriser?</numerusform>
-        <numerusform>Radera %n matriser?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6442,6 +6432,13 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>
         <numerusform>Ta bort %n användare?</numerusform>
         <numerusform>Ta bort %n användare?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Radera %n matriser?</numerusform>
+        <numerusform>Radera %n matriser?</numerusform>
       </translation>
     </message>
   </context>

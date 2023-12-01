@@ -5322,6 +5322,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Services</source>
       <translation>Dịch vụ</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5876,12 +5880,6 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <source>Failed to apply changes</source>
       <translation>Không thể lưu các thay đổi</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Xóa %n mục?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Dừng Video Wall?</translation>
@@ -5893,12 +5891,6 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <message>
       <source>Stop</source>
       <translation>Dừng lại</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Xóa %n ma trận?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6336,6 +6328,12 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <comment>Numerical form depends on users count</comment>
       <translation>
         <numerusform>Xóa %n người dùng?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Xóa %n ma trận?</numerusform>
       </translation>
     </message>
   </context>

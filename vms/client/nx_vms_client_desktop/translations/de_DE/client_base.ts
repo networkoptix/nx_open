@@ -5388,6 +5388,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Services</source>
       <translation>Dienste</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5946,13 +5950,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>Änderungen konnten nicht gespeichert werden</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>%n Item löschen?</numerusform>
-        <numerusform>%n Items löschen?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Videowand anhalten?</translation>
@@ -5964,13 +5961,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Anhalten</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>%n Matrix löschen?</numerusform>
-        <numerusform>%n Matrizen löschen?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6438,6 +6428,13 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>
         <numerusform>%n Benutzer löschen?</numerusform>
         <numerusform>%n Benutzer löschen?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>%n Matrix löschen?</numerusform>
+        <numerusform>%n Matrizen löschen?</numerusform>
       </translation>
     </message>
   </context>

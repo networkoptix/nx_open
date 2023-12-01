@@ -939,16 +939,16 @@
       <translation>İzin Grupları</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-      <translation>Sürekli Senkronizasyon devre dışı bırakıldığında gruplar otomatik olarak senkronize edilmez. Bu grubu güncellemek için manuel senkronizasyon başlatın.</translation>
-    </message>
-    <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
       <translation>Sistemde aynı isimde başka bir grup daha bulunmaktadır. Gruplara benzersiz adlar atamanız önerilir.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
       <translation>Grubun hem ebeveyni hem de alt üyesi olarak başka bir grubu vardır veya böyle bir döngüsel referans zincirinin parçasıdır. İzinlerin yanlış hesaplanmasını önlemek için bu zinciri çözün.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation>LDAP sunucusuyla sürekli senkronizasyon devre dışı bırakıldığında gruplar otomatik olarak senkronize edilmez. Bu grubu güncellemek için manuel senkronizasyon başlatın.</translation>
     </message>
   </context>
   <context>
@@ -1258,10 +1258,6 @@
       <translation>Daha kolay kullanıcı yönetimi için Sisteminizi bir LDAP sunucusuna bağlayın</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation>Bu sistem için LDAP sunucusundan sürekli içe aktarma devre dışı bırakıldı. Gruplara ve kullanıcı ve grup üyeliğine ilişkin güncellemeler yalnızca el ile senkronizasyon yoluyla gerçekleştirilecektir.</translation>
-    </message>
-    <message>
       <source>Not configured yet</source>
       <translation>Henüz yapılandırılmadı</translation>
     </message>
@@ -1272,6 +1268,10 @@
     <message>
       <source>Specify at least one filter to synchronize users and groups</source>
       <translation>Kullanıcıları ve grupları senkronize etmek için en az bir filtre belirtin</translation>
+    </message>
+    <message>
+      <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
+      <translation>Bu sistem için LDAP sunucusuyla sürekli senkronizasyon devre dışı bırakıldı. Gruplara, kullanıcılara ve grup üyeliğine ilişkin güncellemeler yalnızca manuel senkronizasyon yoluyla gerçekleştirilecektir.</translation>
     </message>
   </context>
   <context>
@@ -1528,7 +1528,7 @@
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Arama kriterlerini değiştirin veya yeni bir grup oluşturun</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -2214,6 +2214,13 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
   </context>
   <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation>En az 3 karakter</translation>
+    </message>
+  </context>
+  <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
@@ -2585,8 +2592,8 @@ herhangi bir bölümü üzerine sürükleyin</translation>
       <translation>Bu kullanıcının oturum açma bilgileri başka bir kullanıcının oturum açma bilgileri ile aynı. Hiçbiri giriş yapamıyor. Bu sorunu çözmek için kullanıcının oturum açma bilgilerini değiştirebilir veya oturum açma bilgileri kopyalanan kullanıcıları devre dışı bırakabilir veya silebilirsiniz.</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation>Sürekli Senkronizasyon devre dışı bırakıldığında gruplardaki kullanıcı üyelikleri otomatik olarak senkronize edilmez. Bu bilgileri güncellemek için senkronizasyon el ile başlatın.</translation>
+      <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation>LDAP sunucusuyla sürekli senkronizasyon devre dışı bırakıldığında, gruplardaki kullanıcı üyeliği otomatik olarak senkronize edilmez. Bu bilgileri güncellemek için manuel senkronizasyon başlatın.</translation>
     </message>
   </context>
   <context>

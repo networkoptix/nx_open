@@ -5520,6 +5520,10 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <source>Services</source>
       <translation>Služby</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -6086,15 +6090,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>Použití změn se nezdařilo</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Smazat %n položek?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Zastavit videostěnu?</translation>
@@ -6106,15 +6101,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Zastavit</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Odstranit %n matice?</numerusform>
-        <numerusform>Odstranit %n matice?</numerusform>
-        <numerusform>Odstranit %n matice?</numerusform>
-        <numerusform>Odstranit %n matice?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6642,6 +6628,15 @@ We recommend you not to open this integration. If you understand the risks, you 
         <numerusform>Smazat %n uživatelů?</numerusform>
         <numerusform>Smazat %n uživatelů?</numerusform>
         <numerusform>Smazat %n uživatelů?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Odstranit %n matice?</numerusform>
+        <numerusform>Odstranit %n matice?</numerusform>
+        <numerusform>Odstranit %n matice?</numerusform>
+        <numerusform>Odstranit %n matice?</numerusform>
       </translation>
     </message>
   </context>

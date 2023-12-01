@@ -5324,6 +5324,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Services</source>
       <translation>サービス</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation>システム設定の保存に失敗しました</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5876,12 +5880,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>変更を保存できませんでした</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>%n アイテムを削除しますか？</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>ビデオウォールを停止しますか？</translation>
@@ -5893,12 +5891,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>停止</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>%n マトリックスを削除しますか？</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6336,6 +6328,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <comment>Numerical form depends on users count</comment>
       <translation>
         <numerusform>%n ユーザーを削除しますか？</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>%n マトリックスを削除しますか？</numerusform>
       </translation>
     </message>
   </context>

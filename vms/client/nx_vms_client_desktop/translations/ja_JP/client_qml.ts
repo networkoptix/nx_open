@@ -933,16 +933,16 @@
       <translation>権限グループ</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-      <translation>継続的同期が無効になっている場合、グループは自動的に同期しません。このグループを更新するには、手動同期を開始してください。</translation>
-    </message>
-    <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
       <translation>同じ名前の別のグループがシステム内に存在します。グループには一意の名前を割り当てることをお勧めします。</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
       <translation>このグループは、他のグループの親かつ子メンバーである、あるいはそういった循環参照の一部となっています。これにより、権限が正しく計算されない可能性があります。</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation>LDAP サーバーとの継続的同期が無効になっている場合、グループは自動的に同期されません。このグループを更新するには、手動同期を開始してください。</translation>
     </message>
   </context>
   <context>
@@ -1251,10 +1251,6 @@
       <translation>システムを LDAP サーバーに接続すると、ユーザー管理が容易になります</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation>このシステムでは、LDAP サーバーからの継続的なインポートが無効になっています。グループ、ユーザーおよびグループのメンバーシップの更新は、手動同期によってのみ反映されます。</translation>
-    </message>
-    <message>
       <source>Not configured yet</source>
       <translation>まだ設定されていません</translation>
     </message>
@@ -1265,6 +1261,10 @@
     <message>
       <source>Specify at least one filter to synchronize users and groups</source>
       <translation>ユーザーとグループを同期するには、1 つ以上のフィルターを指定してください</translation>
+    </message>
+    <message>
+      <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
+      <translation>このシステムでは、LDAP サーバーとの継続的同期が無効になっています。グループ、ユーザー、およびグループメンバーシップの更新は、手動同期によってのみ行われます。</translation>
     </message>
   </context>
   <context>
@@ -2200,6 +2200,13 @@ PTZを行います</translation>
     </message>
   </context>
   <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation>最短3文字</translation>
+    </message>
+  </context>
+  <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
@@ -2570,8 +2577,8 @@ PTZを行います</translation>
       <translation>このユーザーのログイン名は、別のユーザーのログイン名と重複しています。どちらのユーザーもログインできません。この問題を解決するには、ユーザーのログイン名を変更するか、ログイン名が重複しているユーザーを無効化または削除してください。</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation>継続的同期が無効になっている場合、グループ内のユーザーメンバーシップは自動的に同期されません。この情報を更新するには、手動同期を開始してください。</translation>
+      <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation>LDAPサーバーとの継続的同期が無効になっている場合、グループのユーザーメンバーシップは自動的に同期されません。この情報を更新するには、手動同期を開始してください。</translation>
     </message>
   </context>
   <context>

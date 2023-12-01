@@ -939,16 +939,16 @@
       <translation>Behörighetsgrupper</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-      <translation>När kontinuerlig synkronisering är inaktiverad synkroniseras grupper inte automatiskt. För att uppdatera denna grupp, initiera en manuell synkronisering.</translation>
-    </message>
-    <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
       <translation>En annan grupp med samma namn finns i systemet. Det rekommenderas att tilldela unika namn till grupperna.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
       <translation>Gruppen har en annan grupp som både förälder, och som barnmedlem, eller är en del av en sådan cirkulär referenskedja. Lös denna kedja för att förhindra felaktig beräkning av behörigheter.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation>När kontinuerlig synkronisering med LDAP-server är inaktiverad synkroniseras inte grupper automatiskt. För att uppdatera den här gruppen, starta en manuell synkronisering.</translation>
     </message>
   </context>
   <context>
@@ -1258,10 +1258,6 @@
       <translation>Anslut ditt system till en LDAP-server för enklare användarhantering</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation>Kontinuerlig import från LDAP-servern är inaktiverad för detta system. Uppdateringar till grupper och användare och grupper medlemskap kommer att ske enbart genom manuell synkronisering.</translation>
-    </message>
-    <message>
       <source>Not configured yet</source>
       <translation>Inte konfigurerad ännu</translation>
     </message>
@@ -1272,6 +1268,10 @@
     <message>
       <source>Specify at least one filter to synchronize users and groups</source>
       <translation>Ange minst ett filter för att synkronisera användare och grupper</translation>
+    </message>
+    <message>
+      <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
+      <translation>Kontinuerlig synkronisering med LDAP-server är inaktiverad för det här systemet. Uppdateringar av grupper och användare och gruppmedlemskap sker enbart genom manuell synkronisering.</translation>
     </message>
   </context>
   <context>
@@ -2215,6 +2215,13 @@ att aktivera PTZ</translation>
     </message>
   </context>
   <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation>Minst 3 tecken</translation>
+    </message>
+  </context>
+  <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
@@ -2586,8 +2593,8 @@ att aktivera PTZ</translation>
       <translation>Denna användares inloggning dubblerar inloggningen för en annan användare. Ingen av dem kan logga in. För att lösa det här problemet kan du ändra användarens inloggning eller inaktivera eller ta bort användare med duplicerade inloggningar.</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation>När kontinuerlig synkronisering är inaktiverad synkroniseras grupper inte automatiskt. För att uppdatera denna grupp, initiera en manuell synkronisering.</translation>
+      <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation>När kontinuerlig synkronisering med LDAP-servern är inaktiverad synkroniseras inte användarmedlemskap i grupper automatiskt. För att uppdatera denna information, initiera en manuell synkronisering.</translation>
     </message>
   </context>
   <context>

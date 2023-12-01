@@ -5391,6 +5391,10 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
       <source>Services</source>
       <translation>Serveis</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5949,13 +5953,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>No s'han pogut aplicar els canvis</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Voleu eliminar %n elements?</numerusform>
-        <numerusform>Voleu eliminar %n elements?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Voleu aturar el Video Wall?</translation>
@@ -5967,13 +5964,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Atura</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Voleu eliminar %n matrius?</numerusform>
-        <numerusform>Voleu eliminar %n matrius?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6441,6 +6431,13 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>
         <numerusform>Voleu eliminar %n usuaris?</numerusform>
         <numerusform>Voleu eliminar %n usuaris?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Voleu eliminar %n matrius?</numerusform>
+        <numerusform>Voleu eliminar %n matrius?</numerusform>
       </translation>
     </message>
   </context>

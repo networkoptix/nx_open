@@ -5388,6 +5388,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Services</source>
       <translation>Services</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5946,13 +5950,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>Wijzigingen opslaan mislukt</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Verwijder %n items?</numerusform>
-        <numerusform>Verwijder %n items?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Stop videowall?</translation>
@@ -5964,13 +5961,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Stop</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Verwijder %n matrixen?</numerusform>
-        <numerusform>Verwijder %n matrixen?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6438,6 +6428,13 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>
         <numerusform>Verwijder %n gebruikers?</numerusform>
         <numerusform>Verwijder %n gebruikers?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Verwijder %n matrixen?</numerusform>
+        <numerusform>Verwijder %n matrixen?</numerusform>
       </translation>
     </message>
   </context>
