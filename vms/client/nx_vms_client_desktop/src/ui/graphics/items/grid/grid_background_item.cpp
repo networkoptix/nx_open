@@ -28,18 +28,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <utils/color_space/yuvconvert.h>
 
-#if defined(_WIN32)
-/**
- * if defined, background is drawn with native API (as gl texture),
- * else - QPainter::drawImage is used
- */
-#define NATIVE_PAINT_BACKGROUND
-#if defined(NATIVE_PAINT_BACKGROUND)
-// Use YUV 420 with alpha plane
-#define USE_YUVA420
-#endif
-#endif
-
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
 
@@ -179,23 +167,30 @@ public:
     QRect sceneBoundingRect;
     QHash<QString, QImage> imagesMemCache;  // TODO: #sivanov Replace with QCache.
 
-    #if defined(NATIVE_PAINT_BACKGROUND)
-        bool imgUploaded = false;
-    #else
-        QImage image;
-    #endif
+    /**
+     * If set, background is drawn with native API (as gl texture),
+     * else - QPainter::drawPixmap is used. Use QPixmap to enable caching in QPaintEngine.
+     */
+    bool nativePaintBackground = false;
+    bool imgUploaded = false;
+    QPixmap image;
+
     bool connected;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchContext* context):
-    base_type(parent),
+QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsScene* scene, QnWorkbenchContext* context):
+    base_type(),
     QnWorkbenchContextAware(context),
     d_ptr(new QnGridBackgroundItemPrivate()),
     m_panelColor(nx::vms::client::core::colorTheme()->color("scene.customLayoutBackground"))
 {
     setAcceptedMouseButtons(Qt::NoButton);
+
+    auto views = scene->views();
+    const bool isOpenGL = !views.empty() && qobject_cast<QOpenGLWidget*>(views.first());
+    d_ptr->nativePaintBackground = nx::build_info::isWindows() && isOpenGL;
 
     const auto imageLoaded =
         [this](const QString& filename, ServerFileCache::OperationResult status)
@@ -230,10 +225,11 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchCon
 
 QnGridBackgroundItem::~QnGridBackgroundItem()
 {
-    #ifdef NATIVE_PAINT_BACKGROUND
+    if (d_ptr->nativePaintBackground)
+    {
         m_renderer.reset();
         m_imgUploader.reset();
-    #endif
+    }
 }
 
 QRectF QnGridBackgroundItem::boundingRect() const
@@ -255,11 +251,11 @@ void QnGridBackgroundItem::updateDefaultBackground()
     {
         d->imageData.fileName = background.name;
         d->imageStatus = ImageStatus::None;
-        #ifdef NATIVE_PAINT_BACKGROUND
+        if (d->nativePaintBackground)
             m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
-        #else
-            d->image = QImage();
-        #endif
+        else
+            d->image = {};
+
         hasChanges = true;
     }
 
@@ -381,11 +377,10 @@ void QnGridBackgroundItem::update(const LayoutResourcePtr& layout)
     d->imageData = data;
     d->imageStatus = ImageStatus::None;
 
-    #ifdef NATIVE_PAINT_BACKGROUND
+    if (d->nativePaintBackground)
         m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
-    #else
-        d->image = QImage();
-    #endif
+    else
+        d->image = {};
 
     updateConnectedState();
 }
@@ -477,78 +472,66 @@ void QnGridBackgroundItem::setImage(const QImage& image, const QString& filename
 
     d->imageAspectRatio = Geometry::aspectRatio(image.size(), 0.0);
 
-#ifdef NATIVE_PAINT_BACKGROUND
-    //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
-    const QImage* imgToLoad = nullptr;
-    std::unique_ptr<QImage> tempImgAp;
-    if( image.format() != QImage::Format_ARGB32 )
+    if (d->nativePaintBackground)
     {
-        tempImgAp.reset( new QImage() );
-        *tempImgAp = image.convertToFormat( QImage::Format_ARGB32 );
-        imgToLoad = tempImgAp.get();
+        //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
+        const QImage* imgToLoad = nullptr;
+        std::unique_ptr<QImage> tempImgAp;
+        if( image.format() != QImage::Format_ARGB32 )
+        {
+            tempImgAp.reset( new QImage() );
+            *tempImgAp = image.convertToFormat( QImage::Format_ARGB32 );
+            imgToLoad = tempImgAp.get();
+        }
+        else
+        {
+            imgToLoad = &image;
+        }
+
+        //converting image to YUV format
+
+        //adding stride to source data
+        // TODO: #akolesnikov it is possible to remove this copying and optimize loading by using ffmpeg to load picture files
+        const unsigned int requiredImgXStride = qPower2Ceil( (unsigned int)imgToLoad->width()*4, X_STRIDE_FOR_SSE_CONVERT_UTILS );
+        quint8* alignedImgBuffer = (quint8*)qMallocAligned( requiredImgXStride*imgToLoad->height(), X_STRIDE_FOR_SSE_CONVERT_UTILS );
+
+        // Check if there is enough memory to preprocess the image.
+        if (!alignedImgBuffer)
+            return;
+
+        //copying image data to aligned buffer
+        for( int y = 0; y < imgToLoad->height(); ++y )
+            memcpy( alignedImgBuffer + requiredImgXStride*y, imgToLoad->constScanLine(y), imgToLoad->width()*imgToLoad->depth()/8 );
+
+        m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
+
+        m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), AV_PIX_FMT_YUVA420P );
+        bgra_to_yva12_simd_intr(
+            alignedImgBuffer,
+            requiredImgXStride,
+            m_imgAsFrame->data[0],
+            m_imgAsFrame->data[1],
+            m_imgAsFrame->data[2],
+            m_imgAsFrame->data[3],
+            m_imgAsFrame->linesize[0],
+            m_imgAsFrame->linesize[1],
+            m_imgAsFrame->linesize[3],
+            imgToLoad->width(),
+            imgToLoad->height(),
+            false);
+
+        qFreeAligned( alignedImgBuffer );
+
+        //image has to be uploaded before next paint
+        d->imgUploaded = false;
+
+        m_renderer.reset();
+        m_imgUploader.reset();
     }
     else
     {
-        imgToLoad = &image;
+        d->image = QPixmap::fromImage(image);
     }
-
-    //converting image to YUV format
-
-    //adding stride to source data
-    // TODO: #akolesnikov it is possible to remove this copying and optimize loading by using ffmpeg to load picture files
-    const unsigned int requiredImgXStride = qPower2Ceil( (unsigned int)imgToLoad->width()*4, X_STRIDE_FOR_SSE_CONVERT_UTILS );
-    quint8* alignedImgBuffer = (quint8*)qMallocAligned( requiredImgXStride*imgToLoad->height(), X_STRIDE_FOR_SSE_CONVERT_UTILS );
-
-    // Check if there is enough memory to preprocess the image.
-    if (!alignedImgBuffer)
-        return;
-
-    //copying image data to aligned buffer
-    for( int y = 0; y < imgToLoad->height(); ++y )
-        memcpy( alignedImgBuffer + requiredImgXStride*y, imgToLoad->constScanLine(y), imgToLoad->width()*imgToLoad->depth()/8 );
-
-    m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
-
-#ifdef USE_YUVA420
-    m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), AV_PIX_FMT_YUVA420P );
-    bgra_to_yva12_simd_intr(
-        alignedImgBuffer,
-        requiredImgXStride,
-        m_imgAsFrame->data[0],
-        m_imgAsFrame->data[1],
-        m_imgAsFrame->data[2],
-        m_imgAsFrame->data[3],
-        m_imgAsFrame->linesize[0],
-        m_imgAsFrame->linesize[1],
-        m_imgAsFrame->linesize[3],
-        imgToLoad->width(),
-        imgToLoad->height(),
-        false );
-#else
-    m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), AV_PIX_FMT_YUV420P );
-    bgra_to_yv12_sse2_intr(
-        alignedImgBuffer,
-        requiredImgXStride,
-        m_imgAsFrame->data[0],
-        m_imgAsFrame->data[1],
-        m_imgAsFrame->data[2],
-        m_imgAsFrame->linesize[0],
-        m_imgAsFrame->linesize[1],
-        imgToLoad->width(),
-        imgToLoad->height(),
-        false );
-#endif
-
-    qFreeAligned( alignedImgBuffer );
-
-    //image has to be uploaded before next paint
-    d->imgUploaded = false;
-
-    m_renderer.reset();
-    m_imgUploader.reset();
-#else
-    d->image = image;
-#endif
 }
 
 void QnGridBackgroundItem::paint(
@@ -584,50 +567,51 @@ void QnGridBackgroundItem::paint(
         }
     }
 
-#ifdef NATIVE_PAINT_BACKGROUND
-
-    const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
-    if (!glWidget)
-        return;
-
-    if (!m_imgAsFrame)
-        return;
-
-    if (!m_imgUploader)
+    if (d->nativePaintBackground)
     {
-        m_imgUploader.reset(new DecodedPictureToOpenGLUploader(glWidget, nullptr));
-        m_renderer.reset(new QnGLRenderer(glWidget, *m_imgUploader));
-        m_imgUploader->setYV12ToRgbShaderUsed(m_renderer->isYV12ToRgbShaderUsed());
-        m_imgUploader->setNV12ToRgbShaderUsed(m_renderer->isNV12ToRgbShaderUsed());
-    }
+        const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
+        if (!glWidget)
+            return;
 
-    if (!d->imgUploaded)
+        if (!m_imgAsFrame)
+            return;
+
+        if (!m_imgUploader)
+        {
+            m_imgUploader.reset(new DecodedPictureToOpenGLUploader(glWidget, nullptr));
+            m_renderer.reset(new QnGLRenderer(glWidget, *m_imgUploader));
+            m_imgUploader->setYV12ToRgbShaderUsed(m_renderer->isYV12ToRgbShaderUsed());
+            m_imgUploader->setNV12ToRgbShaderUsed(m_renderer->isNV12ToRgbShaderUsed());
+        }
+
+        if (!d->imgUploaded)
+        {
+            //uploading image to opengl texture
+            m_imgUploader->uploadDecodedPicture( m_imgAsFrame );
+            d->imgUploaded = true;
+        }
+
+        QnGlNativePainting::begin(glWidget, painter);
+        const auto functions = glWidget->context()->functions();
+
+        if (m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA)
+        {
+            functions->glEnable(GL_BLEND);
+            functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+
+        m_imgUploader->setOpacity(painter->opacity());
+
+        m_renderer->paint(nullptr, QRectF(0, 0, 1, 1), targetRect);
+
+        if (m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA)
+            functions->glDisable(GL_BLEND);
+
+        QnGlNativePainting::end(painter);
+    }
+    else
     {
-        //uploading image to opengl texture
-        m_imgUploader->uploadDecodedPicture( m_imgAsFrame );
-        d->imgUploaded = true;
+        if (!d->image.isNull())
+            painter->drawPixmap(targetRect.toRect(), d->image);
     }
-
-    QnGlNativePainting::begin(glWidget, painter);
-    const auto functions = glWidget->context()->functions();
-
-    if (m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA)
-    {
-        functions->glEnable(GL_BLEND);
-        functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    m_imgUploader->setOpacity(painter->opacity());
-
-    m_renderer->paint(nullptr, QRectF(0, 0, 1, 1), targetRect);
-
-    if (m_imgAsFrame->format == AV_PIX_FMT_YUVA420P || m_imgAsFrame->format == AV_PIX_FMT_RGBA)
-        functions->glDisable(GL_BLEND);
-
-    QnGlNativePainting::end(painter);
-
-#else
-    if (!d->image.isNull())
-        painter->drawImage(targetRect, d->image);
-#endif
 }
