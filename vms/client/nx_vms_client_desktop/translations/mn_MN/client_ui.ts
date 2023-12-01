@@ -681,6 +681,10 @@
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
     </message>
+    <message>
+      <source>Record audio</source>
+      <translation>Аудио бичих</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

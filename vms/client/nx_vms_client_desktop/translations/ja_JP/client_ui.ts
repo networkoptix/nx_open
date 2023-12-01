@@ -681,6 +681,10 @@
       <source>Web Page Port</source>
       <translation>Webページポート</translation>
     </message>
+    <message>
+      <source>Record audio</source>
+      <translation>音声を録音する</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

@@ -585,7 +585,7 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>저장</translation>
     </message>
     <message>
       <source>Previous</source>
@@ -1244,6 +1244,13 @@ to activate PTZ</source>
     <message>
       <source>Access denied</source>
       <translation>접근이 거부됨</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation type="unfinished">Min 3 characters</translation>
     </message>
   </context>
   <context>

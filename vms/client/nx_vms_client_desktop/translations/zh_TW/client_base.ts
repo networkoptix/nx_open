@@ -1547,7 +1547,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>使用者正在接收電子郵件</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>

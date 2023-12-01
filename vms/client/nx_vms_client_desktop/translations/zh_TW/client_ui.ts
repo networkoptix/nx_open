@@ -681,6 +681,10 @@
       <source>Web Page Port</source>
       <translation>網頁埠號</translation>
     </message>
+    <message>
+      <source>Record audio</source>
+      <translation type="unfinished">Record audio</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

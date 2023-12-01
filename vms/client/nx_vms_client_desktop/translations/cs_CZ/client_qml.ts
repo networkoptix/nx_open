@@ -597,7 +597,7 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Uložit</translation>
     </message>
     <message>
       <source>Previous</source>
@@ -1275,6 +1275,13 @@ to activate PTZ</translation>
     <message>
       <source>Access denied</source>
       <translation>Přístup byl odepřen</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation type="unfinished">Min 3 characters</translation>
     </message>
   </context>
   <context>

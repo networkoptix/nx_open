@@ -681,6 +681,10 @@
       <source>Web Page Port</source>
       <translation>Web Sayfası Bağlantı Noktası</translation>
     </message>
+    <message>
+      <source>Record audio</source>
+      <translation>Ses kaydı</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

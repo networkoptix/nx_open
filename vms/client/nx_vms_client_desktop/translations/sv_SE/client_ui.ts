@@ -681,6 +681,10 @@
       <source>Web Page Port</source>
       <translation>Porten för webbsida</translation>
     </message>
+    <message>
+      <source>Record audio</source>
+      <translation>Spela in ljud</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

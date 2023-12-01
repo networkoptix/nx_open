@@ -131,7 +131,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>ปลั๊กอินใด ๆ</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -585,7 +585,7 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>บันทึก</translation>
     </message>
     <message>
       <source>Previous</source>
@@ -1245,6 +1245,13 @@ to activate PTZ</translation>
     <message>
       <source>Access denied</source>
       <translation type="unfinished">Access denied</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation type="unfinished">Min 3 characters</translation>
     </message>
   </context>
   <context>
