@@ -25,9 +25,9 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 med %n attributter</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 med %n attributter</numerusform>
       </translation>
     </message>
   </context>
@@ -5392,6 +5392,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>Services</source>
       <translation>Tjenester</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation>Kunne ikke lagre systeminnstillingene</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5949,13 +5953,6 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
       <source>Failed to apply changes</source>
       <translation>Kunne ikke bruke endringene</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Vil du slette %n element?</numerusform>
-        <numerusform>Vil du slette %n elementer?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Stopp videovegg?</translation>
@@ -5967,13 +5964,6 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     <message>
       <source>Stop</source>
       <translation>Stopp</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Vil du slette %n matriser?</numerusform>
-        <numerusform>Vil du slette %n matriser?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6441,6 +6431,13 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
       <translation>
         <numerusform>Vil du slette %n brukere?</numerusform>
         <numerusform>Vil du slette %n brukere?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Vil du slette %n matriser?</numerusform>
+        <numerusform>Vil du slette %n matriser?</numerusform>
       </translation>
     </message>
   </context>
@@ -7940,9 +7937,9 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kunne ikke aktivere lyd på %n enheter</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Kunne ikke aktivere lyd på %n enheter</numerusform>
       </translation>
     </message>
     <message numerus="yes">

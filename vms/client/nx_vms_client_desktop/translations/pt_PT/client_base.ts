@@ -5392,6 +5392,10 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <source>Services</source>
       <translation>Serviços</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5950,13 +5954,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>Falha ao aplicar as alterações</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Excluir %n itens?</numerusform>
-        <numerusform>Excluir %n itens?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Parar Video Wall?</translation>
@@ -5968,13 +5965,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Pausa</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Excluir %n matrizes?</numerusform>
-        <numerusform>Excluir %n matrizes?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6442,6 +6432,13 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>
         <numerusform>Excluir %n usuários?</numerusform>
         <numerusform>Excluir %n usuários?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Excluir %n matrizes?</numerusform>
+        <numerusform>Excluir %n matrizes?</numerusform>
       </translation>
     </message>
   </context>

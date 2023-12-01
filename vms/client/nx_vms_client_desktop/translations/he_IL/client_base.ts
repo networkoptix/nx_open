@@ -5519,6 +5519,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Services</source>
       <translation>שירותים</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -6085,15 +6089,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>החלת השינויים נכשלה</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>למחוק %n פריטים?</numerusform>
-        <numerusform>למחוק %n פריטים?</numerusform>
-        <numerusform>למחוק %n פריטים?</numerusform>
-        <numerusform>למחוק %n פריטים?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>הם לעצור את קיר וידאו?</translation>
@@ -6105,15 +6100,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>עצור</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>האם למחוק %n מטריצות?</numerusform>
-        <numerusform>האם למחוק %n מטריצות?</numerusform>
-        <numerusform>האם למחוק %n מטריצות?</numerusform>
-        <numerusform>האם למחוק %n מטריצות?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6641,6 +6627,15 @@ We recommend you not to open this integration. If you understand the risks, you 
         <numerusform>מחק %n משתמשים?</numerusform>
         <numerusform>מחק %n משתמשים?</numerusform>
         <numerusform>מחק %n משתמשים?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>האם למחוק %n מטריצות?</numerusform>
+        <numerusform>האם למחוק %n מטריצות?</numerusform>
+        <numerusform>האם למחוק %n מטריצות?</numerusform>
+        <numerusform>האם למחוק %n מטריצות?</numerusform>
       </translation>
     </message>
   </context>

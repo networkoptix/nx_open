@@ -1689,11 +1689,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>Utilisateurs reçoivent des courriels</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation> Utilisateurs recevront des courriels dès que vous appliquez les paramètres</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
@@ -5392,6 +5392,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Services</source>
       <translation>Services</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5950,13 +5954,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>Impossible d’appliquer les changements</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Supprimer %n objet?</numerusform>
-        <numerusform>Supprimer %n objets?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Arrêter le mur vidéo?</translation>
@@ -5968,13 +5965,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Arrêt</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Supprimer %n matrice?</numerusform>
-        <numerusform>Supprimer %n matrices?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6442,6 +6432,13 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>
         <numerusform>Supprimer %n utilisateur ?</numerusform>
         <numerusform>Supprimer %n utilisateurs?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Supprimer %n matrice?</numerusform>
+        <numerusform>Supprimer %n matrices?</numerusform>
       </translation>
     </message>
   </context>

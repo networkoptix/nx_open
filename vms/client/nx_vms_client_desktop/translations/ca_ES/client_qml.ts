@@ -939,16 +939,16 @@
       <translation type="unfinished">Permission Groups</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</translation>
-    </message>
-    <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
       <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
       <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
     </message>
   </context>
   <context>
@@ -1135,7 +1135,7 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Desa</translation>
     </message>
     <message>
       <source>Previous</source>
@@ -1258,10 +1258,6 @@
       <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
-    </message>
-    <message>
       <source>Not configured yet</source>
       <translation type="unfinished">Not configured yet</translation>
     </message>
@@ -1272,6 +1268,10 @@
     <message>
       <source>Specify at least one filter to synchronize users and groups</source>
       <translation type="unfinished">Specify at least one filter to synchronize users and groups</translation>
+    </message>
+    <message>
+      <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
     </message>
   </context>
   <context>
@@ -2215,6 +2215,13 @@ to activate PTZ</translation>
     </message>
   </context>
   <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation type="unfinished">Min 3 characters</translation>
+    </message>
+  </context>
+  <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
@@ -2586,8 +2593,8 @@ to activate PTZ</translation>
       <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to login. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
     </message>
   </context>
   <context>

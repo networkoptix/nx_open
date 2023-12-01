@@ -933,16 +933,16 @@
       <translation>Nhóm quyền</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, groups do not synchronize  automatically. To update this group, initiate a manual sync.</source>
-      <translation>Khi Đồng bộ hóa liên tục bị tắt, các nhóm sẽ không tự động đồng bộ hóa. Để cập nhật nhóm này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
-    </message>
-    <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
       <translation>Một nhóm khác cùng tên đã tồn tại trong hệ thống. Nên đặt tên riêng cho từng nhóm.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
       <translation>Nhóm có một nhóm khác vừa là nhóm mẹ, vừa là thành viên con hoặc là một phần của chuỗi tham chiếu vòng tròn. Chỉnh lại cài đặt chuỗi này để ngăn việc cấp quyền không chính xác.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
     </message>
   </context>
   <context>
@@ -1251,10 +1251,6 @@
       <translation>Kết nối Hệ thống của bạn với máy chủ LDAP để quản lý người dùng dễ dàng hơn</translation>
     </message>
     <message>
-      <source>Continuous import from LDAP server is disabled for this system. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation>Nhập liên tục từ máy chủ LDAP bị vô hiệu hóa đối với hệ thống này. Việc cập nhật các nhóm cũng như thành viên nhóm và người dùng sẽ chỉ diễn ra thông qua đồng bộ hóa thủ công.</translation>
-    </message>
-    <message>
       <source>Not configured yet</source>
       <translation type="unfinished">Not configured yet</translation>
     </message>
@@ -1265,6 +1261,10 @@
     <message>
       <source>Specify at least one filter to synchronize users and groups</source>
       <translation type="unfinished">Specify at least one filter to synchronize users and groups</translation>
+    </message>
+    <message>
+      <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
     </message>
   </context>
   <context>
@@ -2202,6 +2202,13 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation type="unfinished">Min 3 characters</translation>
+    </message>
+  </context>
+  <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
@@ -2572,8 +2579,8 @@ to activate PTZ</source>
       <translation>Thông tin đăng nhập của người dùng này trùng lặp với thông tin đăng nhập của người dùng khác. Không ai trong số họ có thể đăng nhập. Để giải quyết vấn đề này, bạn có thể thay đổi thông tin đăng nhập của người dùng hoặc vô hiệu hóa hoặc xóa người dùng có thông tin đăng nhập trùng lặp.</translation>
     </message>
     <message>
-      <source>When Continuous Sync is disabled, user membership in groups do not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation>Khi Đồng bộ hóa liên tục bị tắt, tư cách thành viên của người dùng trong nhóm sẽ không tự động đồng bộ hóa. Để cập nhật thông tin này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
+      <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
     </message>
   </context>
   <context>

@@ -5322,6 +5322,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Services</source>
       <translation>บริการ</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -5876,12 +5880,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>ไม่สามารถใช้การเปลี่ยนแปลงได้</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>ลบ %n รายการหรือไม่?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>หยุดกำแพงวิดีโอหรือไม่?</translation>
@@ -5893,12 +5891,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>หยุด</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>ลบเมทริกซ์ %n หรือไม่?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6336,6 +6328,12 @@ We recommend you not to open this integration. If you understand the risks, you 
       <comment>Numerical form depends on users count</comment>
       <translation>
         <numerusform>ลบ %n ผู้ใช้หรือไม่?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>ลบเมทริกซ์ %n หรือไม่?</numerusform>
       </translation>
     </message>
   </context>
@@ -7564,7 +7562,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>ไม่สามารถเปลี่ยนกล้องได้</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>

@@ -25,10 +25,10 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 cu %n atribute</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 cu %n atribute</numerusform>
+        <numerusform>%1 cu %n atribute</numerusform>
       </translation>
     </message>
   </context>
@@ -5457,6 +5457,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Services</source>
       <translation type="unfinished">Services</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -6019,14 +6023,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation type="unfinished">Failed to apply changes</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation type="unfinished">Stop Video Wall?</translation>
@@ -6038,14 +6034,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation type="unfinished">Stop</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6543,6 +6531,14 @@ We recommend you not to open this integration. If you understand the risks, you 
         <numerusform>Delete %n users?</numerusform>
         <numerusform>Delete %n users?</numerusform>
         <numerusform>Delete %n users?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>Delete %n matrices?</numerusform>
       </translation>
     </message>
   </context>

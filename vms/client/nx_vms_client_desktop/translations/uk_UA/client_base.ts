@@ -5522,6 +5522,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Services</source>
       <translation>Сервіси</translation>
     </message>
+    <message>
+      <source>Failed to save system settings</source>
+      <translation type="unfinished">Failed to save system settings</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
@@ -6088,15 +6092,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes</source>
       <translation>Не вдалося зберегти зміни</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Видалити %n елемент?</numerusform>
-        <numerusform>Видалити %n елементів?</numerusform>
-        <numerusform>Видалити %n елементів?</numerusform>
-        <numerusform>Видалити %n елементів?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Зупинити відео Стіну?</translation>
@@ -6108,15 +6103,6 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Stop</source>
       <translation>Зупинити</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Видалити %n матрицю?</numerusform>
-        <numerusform>Видалити %n матриць?</numerusform>
-        <numerusform>Видалити %n матриць?</numerusform>
-        <numerusform>Видалити %n матриць?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6644,6 +6630,15 @@ We recommend you not to open this integration. If you understand the risks, you 
         <numerusform>Видалити %n користувачів?</numerusform>
         <numerusform>Видалити %n користувачів?</numerusform>
         <numerusform>Видалити %n користувачів?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Видалити %n матрицю?</numerusform>
+        <numerusform>Видалити %n матриць?</numerusform>
+        <numerusform>Видалити %n матриць?</numerusform>
+        <numerusform>Видалити %n матриць?</numerusform>
       </translation>
     </message>
   </context>
