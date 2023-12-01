@@ -237,7 +237,7 @@ DialogWithState
         if (generalSettings.validate())
             return true
 
-        dialog.tabIndex = 0
+        tabControl.switchTab(0, () => findAndFocusTextWithWarning(generalSettings))
         return false
     }
 
