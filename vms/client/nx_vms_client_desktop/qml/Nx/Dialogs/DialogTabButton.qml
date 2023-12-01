@@ -12,7 +12,6 @@ CompactTabButton
 {
     height: parent ? parent.height : 0
 
-    underlineOffset: -1
     topPadding: 14
     focusFrameEnabled: false
     secondaryStyle: false
