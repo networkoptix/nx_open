@@ -671,6 +671,10 @@
         <source>Import camera or server offline periods</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Record audio</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraHotspotsSettingsWidget</name>
