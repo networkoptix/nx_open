@@ -18,6 +18,20 @@ public:
         api::SystemRegistrationData registrationData,
         std::function<void(api::ResultCode, api::SystemData)> completionHandler) override;
 
+    virtual void getSystemOffers(
+        const std::string& organizationId,
+        std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler) override;
+
+    virtual void acceptOffer(
+        const std::string& organizationId,
+        const std::string& systemId,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
+    virtual void rejectOffer(
+        const std::string& organizationId,
+        const std::string& systemId,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
 private:
     AsyncRequestsExecutor* m_requestsExecutor = nullptr;
 };

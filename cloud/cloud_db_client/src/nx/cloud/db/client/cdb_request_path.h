@@ -67,8 +67,11 @@ static constexpr char kCodeParam[] = "code";
 
 //-------------------------------------------------------------------------------------------------
 
-static constexpr char kSystemOwnershipOffers[] = "/cdb/offered-systems";
-static constexpr char kSystemOwnershipOffer[] = "/cdb/offered-systems/{systemId}";
+static constexpr char kOfferSystemOwnership[] = "/cdb/v0/systems/{systemId}/offer";
+static constexpr char kSystemOwnershipOffers[] = "/cdb/v0/system-offers";
+static constexpr char kSystemOwnershipOffer[] = "/cdb/v0/system-offers/{systemId}";
+static constexpr char kSystemOwnershipOfferAccept[] = "/cdb/v0/system-offers/{systemId}/accept";
+static constexpr char kSystemOwnershipOfferReject[] = "/cdb/v0/system-offers/{systemId}/reject";
 
 //-------------------------------------------------------------------------------------------------
 
@@ -82,11 +85,17 @@ static constexpr char kBatchIdParam[] = "batchId";
 
 static constexpr char kOrganizationSystemsPath[] = "/cdb/organizations/{organizationId}/systems";
 
-static constexpr char kOrganizationSystemPath[] =
-    "/cdb/organizations/{organizationId}/systems/{systemId}";
+static constexpr char kOrganizationSystemOwnershipOffers[] =
+    "/cdb/v0/organizations/{organizationId}/system-offers";
 
-static constexpr char kOrganizationSystemUsersPath[] =
-    "/cdb/organizations/{organizationId}/systems/{systemId}/users";
+static constexpr char kOrganizationSystemOwnershipOffer[] =
+    "/cdb/v0/organizations/{organizationId}/system-offers/{systemId}";
+
+static constexpr char kOrganizationSystemOwnershipOfferAccept[] =
+    "/cdb/v0/organizations/{organizationId}/system-offers/{systemId}/accept";
+
+static constexpr char kOrganizationSystemOwnershipOfferReject[] =
+    "/cdb/v0/organizations/{organizationId}/system-offers/{systemId}/reject";
 
 static constexpr char kOrganizationIdParam[] = "organizationId";
 
@@ -141,6 +150,9 @@ static constexpr char kSystemGetAccessRoleListPath[] = "/cdb/systems/getAccessRo
 static constexpr char kSystemSharePath[] = "/cdb/systems/share";
 static constexpr char kSystemUsersPath[] = "/cdb/systems/{systemId}/users";
 static constexpr char kSystemUserPath[] = "/cdb/systems/{systemId}/users/{accountEmail}";
+
+static constexpr char kSystemOwnershipOffers[] = "/cdb/offered-systems";
+static constexpr char kSystemOwnershipOffer[] = "/cdb/offered-systems/{systemId}";
 
 } // namespace deprecated
 
