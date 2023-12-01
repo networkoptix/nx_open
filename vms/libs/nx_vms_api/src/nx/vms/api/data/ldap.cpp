@@ -3,12 +3,13 @@
 #include "ldap.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::api {
 
 bool LdapSettings::isValid(bool checkPassword) const
 {
-    return !uri.isEmpty()
+    return uri.isValid()
         && (!checkPassword || !(adminDn.isEmpty() ^ adminPassword.value_or(QString()).isEmpty()));
 }
 
@@ -26,15 +27,18 @@ int LdapSettings::defaultPort(bool useSsl)
 
 QString LdapSettings::syncId() const
 {
+    const auto cmpFilters =
+        [](const api::LdapSettingSearchFilter& lhs, const api::LdapSettingSearchFilter& rhs)
+        {
+            return std::tie(lhs.base, lhs.filter) < std::tie(rhs.base, rhs.filter);
+        };
+
     if (!isValid(/*checkPassword*/ false))
-        return QString();
+        return {};
 
     QString data = uri.toString() + adminDn + loginAttribute + groupObjectClass + memberAttribute;
-    std::set<QString> uniqueFilters;
-    for (auto filter: filters)
-        uniqueFilters.insert(filter.base + filter.filter);
-    for (auto filter: uniqueFilters)
-        data += filter;
+    for (const auto& filter: nx::utils::unique_sorted(filters, cmpFilters))
+        data += filter.base + filter.filter;
     return QnUuid::fromArbitraryData(data.toUtf8()).toSimpleString();
 }
 
