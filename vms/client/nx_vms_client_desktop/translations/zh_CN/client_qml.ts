@@ -585,11 +585,11 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>保存</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>上一页</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1245,6 +1245,13 @@ to activate PTZ</source>
     <message>
       <source>Access denied</source>
       <translation>访问被拒绝</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation type="unfinished">Min 3 characters</translation>
     </message>
   </context>
   <context>

@@ -1258,6 +1258,13 @@ for å aktivere PTZ</translation>
     </message>
   </context>
   <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation>Minst 3 tegn</translation>
+    </message>
+  </context>
+  <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>

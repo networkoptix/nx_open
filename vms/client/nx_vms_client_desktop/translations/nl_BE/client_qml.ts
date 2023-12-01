@@ -589,11 +589,11 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Opslaan</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Vorige</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1255,6 +1255,13 @@ om PTZ te activeren</translation>
     <message>
       <source>Access denied</source>
       <translation>Toegang geweigerd</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation type="unfinished">Min 3 characters</translation>
     </message>
   </context>
   <context>

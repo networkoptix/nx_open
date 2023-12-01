@@ -1558,11 +1558,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>Utilisateurs reçoivent des courriels</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation> Utilisateurs recevront des courriels dès que vous appliquez les paramètres</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>

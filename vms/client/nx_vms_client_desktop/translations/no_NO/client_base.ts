@@ -25,9 +25,9 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 med %n attributter</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 med %n attributter</numerusform>
       </translation>
     </message>
   </context>
@@ -7863,9 +7863,9 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kunne ikke aktivere lyd på %n enheter</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Kunne ikke aktivere lyd på %n enheter</numerusform>
       </translation>
     </message>
     <message numerus="yes">

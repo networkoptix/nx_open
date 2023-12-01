@@ -1278,6 +1278,13 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation>Минимум 3 символа</translation>
+    </message>
+  </context>
+  <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>

@@ -1246,6 +1246,13 @@ PTZを行います</translation>
     </message>
   </context>
   <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation>最短3文字</translation>
+    </message>
+  </context>
+  <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>

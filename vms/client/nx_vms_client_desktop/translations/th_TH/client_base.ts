@@ -7507,7 +7507,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>ไม่สามารถเปลี่ยนกล้องได้</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>

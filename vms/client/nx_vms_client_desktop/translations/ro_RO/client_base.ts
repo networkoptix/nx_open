@@ -25,10 +25,10 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 cu %n atribute</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 cu %n atribute</numerusform>
+        <numerusform>%1 cu %n atribute</numerusform>
       </translation>
     </message>
   </context>

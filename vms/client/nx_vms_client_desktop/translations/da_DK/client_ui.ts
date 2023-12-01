@@ -681,6 +681,10 @@
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
     </message>
+    <message>
+      <source>Record audio</source>
+      <translation type="unfinished">Record audio</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>
@@ -702,11 +706,11 @@
     </message>
     <message>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>Kamera ID</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -1114,7 +1118,7 @@
     </message>
     <message>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Standard</translation>
     </message>
   </context>
   <context>
@@ -1485,7 +1489,7 @@
     </message>
     <message>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Standard</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1764,7 +1768,7 @@
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Aktiver gratis licens</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -2172,7 +2176,7 @@
     </message>
     <message>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>ADVARSEL</translation>
     </message>
     <message>
       <source>INFO</source>
@@ -3012,7 +3016,7 @@
     </message>
     <message>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>Genindeksér Arkiv</translation>
     </message>
     <message>
       <source>Reindex Backup</source>

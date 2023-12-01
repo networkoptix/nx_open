@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Billedtekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -231,7 +231,7 @@
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Generisk Begivenhed</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -239,7 +239,7 @@
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Nøgleord adskilt af mellemrum</translation>
     </message>
     <message>
       <source>State</source>
@@ -251,7 +251,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Billedtekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -301,7 +301,7 @@
     </message>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Licens problem</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
@@ -343,7 +343,7 @@
     </message>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Netværksproblem</translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
@@ -354,11 +354,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>RTP-fejl i primær stream (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>RTP-fejl i sekundær strøm (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -366,7 +366,7 @@
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>Kameratid er tilbage til normal.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
@@ -388,7 +388,7 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>Netværksadresse %1 er ikke en multicast adresse.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -427,7 +427,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Billedtekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -454,7 +454,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Billedtekst</translation>
     </message>
     <message>
       <source>Description</source>
@@ -549,7 +549,7 @@
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>Server Konflikt</translation>
     </message>
   </context>
   <context>
@@ -560,7 +560,7 @@
     </message>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Serverfejl</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -579,7 +579,7 @@
     </message>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Server Startet</translation>
     </message>
   </context>
   <context>
@@ -703,7 +703,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show text overlay</source>
-      <translation type="unfinished">Show text overlay</translation>
+      <translation>Vis tekstoverlejring</translation>
     </message>
     <message>
       <source>Cameras</source>

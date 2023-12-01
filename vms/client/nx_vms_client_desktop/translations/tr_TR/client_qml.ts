@@ -1257,6 +1257,13 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
   </context>
   <context>
+    <name>StringEditor</name>
+    <message>
+      <source>Min 3 characters</source>
+      <translation>En az 3 karakter</translation>
+    </message>
+  </context>
+  <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>

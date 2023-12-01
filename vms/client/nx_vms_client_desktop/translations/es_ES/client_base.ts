@@ -25,9 +25,9 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 con %n atributos</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 con %n atributos</numerusform>
       </translation>
     </message>
   </context>
@@ -8840,7 +8840,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 Diseños</translation>
     </message>
   </context>
   <context>
@@ -8950,9 +8950,9 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n minutos restantes</numerusform>
-        <numerusform>%n minutes left</numerusform>
+        <numerusform>%n minutos restantes</numerusform>
       </translation>
     </message>
   </context>
@@ -10397,9 +10397,9 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n de %1 usuarios tienen permitido usar autenticación digest (no seguro).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n de %1 usuarios tienen permitido usar autenticación digest (no seguro).</numerusform>
       </translation>
     </message>
     <message>
@@ -10983,7 +10983,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
+      <translation>Miembro de</translation>
     </message>
     <message>
       <source>Permissions</source>

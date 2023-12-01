@@ -25,11 +25,11 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 z %n atrybutami</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 z %n atrybutami</numerusform>
+        <numerusform>%1 z %n atrybutami</numerusform>
+        <numerusform>%1 z %n atrybutami</numerusform>
       </translation>
     </message>
   </context>
@@ -1580,7 +1580,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>Użytkowników otrzymuje e-maile</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
@@ -6961,11 +6961,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
+        <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
+        <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
       </translation>
     </message>
   </context>
@@ -8098,11 +8098,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Te urządzenia nie mają wejścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>Te urządzenia nie mają wejścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
+        <numerusform>Te urządzenia nie mają wejścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
+        <numerusform>Te urządzenia nie mają wejścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8116,11 +8116,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Te urządzenia nie mają wyjścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>Te urządzenia nie mają wyjścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
+        <numerusform>Te urządzenia nie mają wyjścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
+        <numerusform>Te urządzenia nie mają wyjścia audio lub nie są one poprawnie skonfigurowane.</numerusform>
       </translation>
     </message>
     <message>
@@ -9337,11 +9337,11 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Rejestrowanie debugowania jest włączone na %n serwerach</numerusform>
         <numerusform>Logowanie debugowania jest włączone na %n serwerach</numerusform>
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+        <numerusform>Logowanie debugowania jest włączone na %n serwerach</numerusform>
+        <numerusform>Logowanie debugowania jest włączone na %n serwerach</numerusform>
       </translation>
     </message>
     <message>
@@ -9927,11 +9927,11 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message numerus="yes">
       <source>%n notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n powiadomień</numerusform>
-        <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
+        <numerusform>%n powiadomień</numerusform>
+        <numerusform>%n powiadomień</numerusform>
+        <numerusform>%n powiadomień</numerusform>
       </translation>
     </message>
     <message>
@@ -10681,11 +10681,11 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n z %1 użytkowników może korzystać z niebezpieczniego uwierzytelniania.</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n z %1 użytkowników może korzystać z niebezpieczniego uwierzytelniania.</numerusform>
+        <numerusform>%n z %1 użytkowników może korzystać z niebezpieczniego uwierzytelniania.</numerusform>
+        <numerusform>%n z %1 użytkowników może korzystać z niebezpieczniego uwierzytelniania.</numerusform>
       </translation>
     </message>
     <message>
@@ -10991,11 +10991,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Harmonogram nagrywania jest nieprawidłowy dla %n kamer</numerusform>
         <numerusform>Harmonogram nagrywania jest nieprawidłowy dla %n kamer</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+        <numerusform>Harmonogram nagrywania jest nieprawidłowy dla %n kamer</numerusform>
+        <numerusform>Harmonogram nagrywania jest nieprawidłowy dla %n kamer</numerusform>
       </translation>
     </message>
     <message>
@@ -11048,29 +11048,29 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Magazyn kopii zapasowych nie jest skonfigurowany na %n serwerach</numerusform>
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
+        <numerusform>Magazyn kopii zapasowych nie jest skonfigurowany na %n serwerach</numerusform>
+        <numerusform>Magazyn kopii zapasowych nie jest skonfigurowany na %n serwerach</numerusform>
+        <numerusform>Magazyn kopii zapasowych nie jest skonfigurowany na %n serwerach</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Przechowywanie danych analitycznych nie jest ustawione na %n serwerach</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+        <numerusform>Przechowywanie danych analitycznych nie jest ustawione na %n serwerach</numerusform>
+        <numerusform>Przechowywanie danych analitycznych nie jest ustawione na %n serwerach</numerusform>
+        <numerusform>Przechowywanie danych analitycznych nie jest ustawione na %n serwerach</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Pamięć systemowa jest używana do przechowywania danych analitycznych na %n serwerach</numerusform>
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
+        <numerusform>Pamięć systemowa jest używana do przechowywania danych analitycznych na %n serwerach</numerusform>
+        <numerusform>Pamięć systemowa jest używana do przechowywania danych analitycznych na %n serwerach</numerusform>
+        <numerusform>Pamięć systemowa jest używana do przechowywania danych analitycznych na %n serwerach</numerusform>
       </translation>
     </message>
     <message>

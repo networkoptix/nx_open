@@ -1537,7 +1537,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Succes</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -1847,7 +1847,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Deaktiveret</translation>
     </message>
     <message>
       <source>Recommended</source>
@@ -3271,7 +3271,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Deaktiveret</translation>
     </message>
     <message>
       <source>Login</source>
@@ -3356,7 +3356,7 @@ to %1</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Kunne ikke initialisere lydkoder.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3606,7 +3606,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Vælg mappe...</translation>
     </message>
   </context>
   <context>
@@ -3689,7 +3689,7 @@ to %1</translation>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Deaktiveret</translation>
     </message>
     <message>
       <source>Input</source>
@@ -4231,7 +4231,7 @@ to %1</translation>
     <name>QnMessageBox</name>
     <message>
       <source>Overwrite</source>
-      <translation type="unfinished">Overwrite</translation>
+      <translation>Overskriv</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -4602,7 +4602,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Vælg mappe...</translation>
     </message>
   </context>
   <context>
@@ -5173,7 +5173,7 @@ to %1</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>ADGANGSKODE PÅKRÆVET</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
@@ -7125,7 +7125,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>DEAKTIVERET</translation>
     </message>
   </context>
   <context>
@@ -7523,7 +7523,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>standard</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -8251,7 +8251,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Succes</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -8712,7 +8712,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Vælg mappe...</translation>
     </message>
   </context>
   <context>
@@ -8738,7 +8738,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
-      <translation type="unfinished">Brand</translation>
+      <translation>Mærke</translation>
     </message>
     <message>
       <source>Model</source>
@@ -8928,7 +8928,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>DEAKTIVERET</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -9102,7 +9102,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Vælg mappe...</translation>
     </message>
   </context>
   <context>
@@ -9851,7 +9851,7 @@ Du kan tvinge det, men det kan øge CPU-belastningen betydeligt.</translation>
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Tilsuttet</translation>
     </message>
     <message>
       <source>Powered</source>
@@ -10339,7 +10339,7 @@ Du kan stadig ændre kvalitet og FPS direkte på kameraet.</translation>
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>Sporer og logger alle brugerhandlinger.</translation>
     </message>
     <message>
       <source>minutes</source>
@@ -11994,7 +11994,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Vælg mappe...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
@@ -12057,7 +12057,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>New Layout</source>
-      <translation type="unfinished">New Layout</translation>
+      <translation>Nyt layout</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
