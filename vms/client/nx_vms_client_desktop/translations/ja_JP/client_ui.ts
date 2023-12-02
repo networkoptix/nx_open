@@ -671,6 +671,10 @@
       <source>Import camera or server offline periods</source>
       <translation>カメラまたはサーバーのオフライン期間をインポートする</translation>
     </message>
+    <message>
+      <source>Record audio</source>
+      <translation>音声を録音する</translation>
+    </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>
