@@ -671,6 +671,10 @@
       <source>Import camera or server offline periods</source>
       <translation>Kamera veya sunucu çevrimdışı dönemlerini içe aktarın</translation>
     </message>
+    <message>
+      <source>Record audio</source>
+      <translation>Ses kaydı</translation>
+    </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>

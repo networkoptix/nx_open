@@ -671,6 +671,10 @@
       <source>Import camera or server offline periods</source>
       <translation>Nhập thời gian ngoại tuyến của camera hoặc máy chủ</translation>
     </message>
+    <message>
+      <source>Record audio</source>
+      <translation type="unfinished">Record audio</translation>
+    </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>
