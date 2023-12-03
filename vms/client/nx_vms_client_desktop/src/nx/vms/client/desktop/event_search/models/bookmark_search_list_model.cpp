@@ -2,38 +2,50 @@
 
 #include "bookmark_search_list_model.h"
 
-#include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/desktop/system_context.h>
-
-#include "private/bookmark_search_list_model_p.h"
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 
 namespace nx::vms::client::desktop {
 
-BookmarkSearchListModel::BookmarkSearchListModel(WindowContext* context, QObject* parent):
-    base_type(context, [this]() { return new Private(this); }, parent),
-    d(qobject_cast<Private*>(base_type::d.data()))
+namespace {
+
+QString iconPath()
 {
+    return "soft_triggers/user_selectable/bookmark.png";
 }
 
-TextFilterSetup* BookmarkSearchListModel::textFilter() const
+QColor color()
 {
-    return d->textFilter.get();
+    return QPalette().color(QPalette::Light);
 }
 
-bool BookmarkSearchListModel::isConstrained() const
+QPixmap pixmap()
 {
-    return !d->textFilter->text().isEmpty() || base_type::isConstrained();
+    return core::Skin::colorize(qnSkin->pixmap(iconPath()), color());
 }
 
-bool BookmarkSearchListModel::hasAccessRights() const
-{
-    return system()->accessController()->isDeviceAccessRelevant(
-        nx::vms::api::AccessRight::viewBookmarks);
-}
+} // namespace
 
-void BookmarkSearchListModel::dynamicUpdate(const QnTimePeriod& period)
+QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
 {
-    d->dynamicUpdate(period);
+    switch (role)
+    {
+        case core::DecorationPathRole:
+            return "soft_triggers/user_selectable/bookmark.png";
+
+        case Qt::DecorationRole:
+            return QVariant::fromValue(pixmap());
+
+        case Qt::ForegroundRole:
+            return QVariant::fromValue(color());
+
+        case Qn::HelpTopicIdRole:
+            return HelpTopic::Id::Bookmarks_Usage;
+
+        default:
+            return base_type::data(index, role);
+    }
 }
 
 } // namespace nx::vms::client::desktop
+

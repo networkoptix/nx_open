@@ -11,48 +11,27 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/system_context.h>
-
-namespace {
-
-struct BookmarkUtilStrings
-{
-    Q_DECLARE_TR_FUNCTIONS(BookmarkUtilStrings)
-public:
-    static QString systemEvent()
-    {
-        return tr("System Event", "Shows that the bookmark was created by a system event");
-    }
-};
-
-} // namespace
+#include <nx/vms/common/bookmark/bookmark_facade.h>
 
 namespace nx::vms::client::desktop {
 
-QString getBookmarkCreatorName(const QnUuid& creatorId, SystemContext* systemContext)
+QString getVisibleBookmarkCreatorName(
+    const QnCameraBookmark& bookmark,
+    SystemContext* systemContext)
 {
     const auto currentUser = systemContext->userWatcher()->user();
 
     if (!NX_ASSERT(currentUser))
         return {};
 
-    if (creatorId.isNull())
-        return {};
-
-    if (creatorId == QnCameraBookmark::systemUserId())
+    if (bookmark.creatorId == QnCameraBookmark::systemUserId()
+        || systemContext->resourceAccessManager()->hasPowerUserPermissions(currentUser)
+        || currentUser->getId() == bookmark. creatorId)
     {
-        return BookmarkUtilStrings::systemEvent();
+        return common::QnBookmarkFacade::creatorName(bookmark, systemContext->resourcePool());
     }
 
-    if (!systemContext->resourceAccessManager()->hasPowerUserPermissions(currentUser)
-        && currentUser->getId() != creatorId)
-    {
-        // Only power users can see name of other users.
-        return {};
-    }
-
-    const auto userResource =
-        systemContext->resourcePool()->getResourceById<QnUserResource>(creatorId);
-
-    return userResource ? userResource->getName() : QString();
+    return {}; //< Only power users can see name of other users.
 }
+
 } // namespace nx::vms::client::desktop

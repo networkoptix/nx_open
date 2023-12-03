@@ -10,18 +10,18 @@
 #include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
 
-namespace nx::vms::client::desktop { class SystemContext; }
+namespace nx::vms::client::core { class SystemContext; }
 
 class QnCameraBookmarksManagerPrivate;
 
 /** Creates, updates, deletes, fetches and caches bookmarks. */
-class QnCameraBookmarksManager: public QObject
+class NX_VMS_CLIENT_CORE_API QnCameraBookmarksManager: public QObject
 {
     Q_OBJECT
 
 public:
     QnCameraBookmarksManager(
-        nx::vms::client::desktop::SystemContext* systemContext,
+        nx::vms::client::core::SystemContext* systemContext,
         QObject* parent = nullptr);
 
     virtual ~QnCameraBookmarksManager();
@@ -33,6 +33,21 @@ public:
     /// @param callback         Callback for receiving bookmarks data.
     /// @returns                Internal id of the request.
     int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter, BookmarksCallbackType callback);
+
+    /**
+     * @brief Requests bookmarks around specified central point. Calculates tail (new bookmarks
+     * over/under specified central point) and body (all other bookmarks).
+     * range).
+     * Note that the only reasonable sort column is startTime.
+     * @param filter Filter parameters (with specified central point)
+     * @param source Currently known bookmarks. Used to calculate tail/body values.
+     * @param callback Callback for receiving bookmarks data.
+     * @return Internal id of the request.
+     */
+    int getBookmarksAroundPointAsync(
+        const QnCameraBookmarkSearchFilter& filter,
+        const QnCameraBookmarkList& source,
+        BookmarksAroundPointCallbackType&& callback);
 
     /// @brief                  Add the bookmark to the camera.
     /// @param bookmark         Target bookmark.

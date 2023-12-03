@@ -5,12 +5,12 @@
 #include <QtCore/QMap>
 #include <QtCore5Compat/QLinkedList>
 
-#include <core/resource/bookmark_sort.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/algorithm/merge_sorted_lists.h>
+#include <nx/vms/common/bookmark/bookmark_helpers.h>
+#include <nx/vms/common/bookmark/bookmark_sort.h>
 #include <nx/vms/common/resource/bookmark_filter.h>
 #include <nx/vms/common/system_context.h>
-#include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
 
 using namespace std::chrono;
@@ -42,7 +42,7 @@ QnCameraBookmarkList createListFromIters(const ItersLinkedList& iters)
     for (auto it: iters)
         result.push_back(*it);
     return result;
-};
+}
 
 QnCameraBookmarkList getSparseByIters(ItersLinkedList& bookmarkIters, int limit)
 {
@@ -392,7 +392,7 @@ QnCameraBookmarkList variantListToBookmarkList(const QVariantList& list)
 {
     QnCameraBookmarkList result;
     for  (const auto& v : list)
-        result << v.value<QnCameraBookmark>();
+        result.push_back(v.value<QnCameraBookmark>());
     return result;
 }
 
