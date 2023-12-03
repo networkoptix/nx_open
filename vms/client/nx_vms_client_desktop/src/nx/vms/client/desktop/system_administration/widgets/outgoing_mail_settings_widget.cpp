@@ -327,6 +327,9 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
 
             if (!ui->passwordInput->hasRemotePassword() && !getUseCloudServiceFromDialog())
             {
+                if (!smtpSettingsPasswordChanged() && !smtpSettingsChanged())
+                    return;
+
                 setConfigurationStatus(NotConfigured);
                 setConfigurationStatusHint({});
             }
@@ -723,8 +726,10 @@ bool OutgoingMailSettingsWidget::Private::validate() const
 
 void OutgoingMailSettingsWidget::Private::applyChanges()
 {
-    // Notify user about incorrect filling but allow him to apply changes when "Apply" button is pressed.
-    validate();
+    // Notify user about incorrect filling but allow him to apply changes when "Apply" button is
+    // pressed.
+    if (smtpSettingsChanged() || smtpSettingsPasswordChanged())
+        validate();
 
     if (q->isReadOnly())
         return;
