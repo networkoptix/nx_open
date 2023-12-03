@@ -12,21 +12,21 @@
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <nx/network/http/http_types.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/client/core/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 
 struct QnMultiserverRequestData;
 
 class QnCameraBookmarksManagerPrivate:
     public QObject,
-    public nx::vms::client::desktop::SystemContextAware
+    public nx::vms::client::core::SystemContextAware
 {
     Q_OBJECT
     typedef QObject base_type;
 
 public:
     QnCameraBookmarksManagerPrivate(
-        nx::vms::client::desktop::SystemContext* systemContext,
+        nx::vms::client::core::SystemContext* systemContext,
         QObject* parent = nullptr);
 
     virtual ~QnCameraBookmarksManagerPrivate() override;
@@ -42,7 +42,19 @@ public:
     /// @returns                Internal id of the request.
     int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter, BookmarksCallbackType callback);
 
+    /**
+     *  Gathers bookmarks around specified time point using usual bookmarks request. Heuristicly
+     *  extends (or shrinks) request time period to find appropriate data. Tries it maxTriesCount
+     *  times maximum.
+     */
+    int getBookmarkstAroundPointHeuristic(
+        const QnCameraBookmarkSearchFilter& filter,
+        const QnCameraBookmarkList& source,
+        int maxTriesCount,
+        BookmarksAroundPointCallbackType callback);
+
     int getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback);
+
     /// @brief                  Add the bookmark to the camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.

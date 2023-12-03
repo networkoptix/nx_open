@@ -4,11 +4,12 @@
 
 #include <camera/camera_bookmarks_query.h>
 #include <camera/private/camera_bookmarks_manager_p.h>
-
-using namespace nx::vms::client::desktop;
+#include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/common/bookmark/bookmark_facade.h>
 
 QnCameraBookmarksManager::QnCameraBookmarksManager(
-    SystemContext* systemContext,
+    nx::vms::client::core::SystemContext* systemContext,
     QObject* parent)
     :
     QObject(parent),
@@ -24,6 +25,37 @@ int QnCameraBookmarksManager::getBookmarksAsync(const QnCameraBookmarkSearchFilt
     BookmarksCallbackType callback)
 {
     return d->getBookmarksAsync(filter, callback);
+}
+
+int QnCameraBookmarksManager::getBookmarksAroundPointAsync(
+    const QnCameraBookmarkSearchFilter& filter,
+    const QnCameraBookmarkList& source,
+    BookmarksAroundPointCallbackType&& bookmarkCallback)
+{
+    if (!NX_ASSERT(filter.centralTimePointMs))
+        return 0;
+
+    NX_ASSERT(filter.orderBy.column == nx::vms::api::BookmarkSortField::startTime);
+
+    static const auto kCentralPointSupportApiVersion = nx::utils::SoftwareVersion(6, 0);
+    if (d->systemContext()->moduleInformation().version < kCentralPointSupportApiVersion)
+    {
+        // Emulate request around the point using a usual bookmarks request.
+        return d->getBookmarkstAroundPointHeuristic(filter, source, /*triesCount*/ 10, bookmarkCallback);
+    }
+
+    auto bookmarksCallback = BookmarksCallbackType(
+        [callback = std::move(bookmarkCallback), source, filter]
+            (bool success, int id, QnCameraBookmarkList bookmarks)
+        {
+            using namespace nx::vms::client::core;
+            const auto direction =  EventSearch::directionFromSortOrder(filter.orderBy.order);
+            auto fetched = makeFetchedData<nx::vms::common::QnBookmarkFacade>(
+                source, bookmarks, FetchRequest{direction, *filter.centralTimePointMs});
+            callback(success, id, std::move(fetched));
+        });
+
+    return getBookmarksAsync(filter, std::move(bookmarksCallback));
 }
 
 int QnCameraBookmarksManager::getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback)

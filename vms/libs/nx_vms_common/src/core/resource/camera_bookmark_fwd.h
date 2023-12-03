@@ -9,7 +9,7 @@
 #include <QtCore/QVector>
 
 struct QnCameraBookmark;
-typedef QVector<QnCameraBookmark> QnCameraBookmarkList;
+typedef std::vector<QnCameraBookmark> QnCameraBookmarkList;
 typedef std::vector<QnCameraBookmarkList> QnMultiServerCameraBookmarkList;
 
 struct QnCameraBookmarkSearchFilter;

@@ -4,7 +4,8 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
-#include <core/resource/resource_fwd.h>
+#include <nx/vms/client/core/event_search/models/fetched_data.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 
 class QnCameraBookmarksQuery;
 class QnCameraBookmarksManager;
@@ -16,3 +17,9 @@ using BookmarkTagsCallbackType = std::function<void (bool, rest::Handle, QnCamer
 
 typedef QSharedPointer<QnCameraBookmarksQuery> QnCameraBookmarksQueryPtr;
 typedef QWeakPointer<QnCameraBookmarksQuery> QnCameraBookmarksQueryWeakPtr;
+
+using BookmarkFetchedData = nx::vms::client::core::FetchedData<QnCameraBookmarkList>;
+using BookmarksAroundPointCallbackType = std::function<void (
+    bool success,
+    int requestId,
+    BookmarkFetchedData&& data)>;

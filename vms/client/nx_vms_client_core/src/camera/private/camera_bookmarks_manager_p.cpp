@@ -16,12 +16,15 @@
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/guarded_callback.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/core/event_search/event_search_globals.h>
+#include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/common/bookmark/bookmark_facade.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_timer.h>
 #include <utils/common/synctime.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 namespace {
 
@@ -92,8 +95,74 @@ QString debugBookmarksRange(const QnCameraBookmarkList& bookmarks)
         return "empty";
 
     return nx::format("%1 - %2",
-        nx::utils::timestampToDebugString(bookmarks.first().startTimeMs),
-        nx::utils::timestampToDebugString(bookmarks.last().endTime()));
+        nx::utils::timestampToDebugString(bookmarks.front().startTimeMs),
+        nx::utils::timestampToDebugString(bookmarks.back().endTime()));
+}
+
+enum class CheckResult
+{
+    dataFound,
+    tryMore
+};
+
+/**
+ *  Result structure for fetched data check. Contains successful mark of operation and new central
+ *  point to fetch in case of check fail.
+ */
+struct CheckResultData
+{
+    CheckResult result = CheckResult::tryMore;
+    std::chrono::milliseconds nextCentralPoinMs;
+};
+
+/**
+ * Checks if fetched data contains enouth tail. Used in bookmarks requests to old servers (with
+ * version less than 6.0) where we don't have central point parameter. Thus we have to request data
+ * sequentially and check if results have enough tail and body.
+ */
+CheckResultData checkFetchedData(
+    const FetchedData<QnCameraBookmarkList>& fetched,
+    int length,
+    EventSearch::FetchDirection direction)
+{
+    const int maxBodyLength = length / 2;
+    const int maxTailLength = length - maxBodyLength;
+
+    if (fetched.data.empty())
+        return CheckResultData{CheckResult::dataFound, {}};
+
+    const bool fetchedAllNeeded =
+        fetched.ranges.tail.length + fetched.ranges.body.length < maxBodyLength + maxTailLength;
+
+    // If data size is less than maximum we expect that we found all existing records.
+    // Also, as our request uses central point (start time or end time) of currently existing data
+    // (at least at the moment of last request) we suppose that maxTailLength/2 data size is enough
+    // to be represented to user.
+    if (fetchedAllNeeded || fetched.ranges.tail.length > maxTailLength / 2)
+        return CheckResultData{CheckResult::dataFound, {}};
+
+    if (fetched.data.begin()->startTimeMs >= fetched.data.rbegin()->startTimeMs)
+        return CheckResultData{CheckResult::tryMore, {}};
+
+    // Looking for the new period to be fetched to get an appropriate tail data.
+    const int shift = std::min(maxTailLength / 2, fetched.ranges.body.length / 2);
+
+    if (direction == EventSearch::FetchDirection::older)
+    {
+        auto newBodyStartTime = fetched.data.at(shift).startTimeMs;
+        const auto bodyStartTime = fetched.data.begin()->startTimeMs;
+        if (newBodyStartTime >= bodyStartTime && bodyStartTime.count())
+            newBodyStartTime = bodyStartTime - 1ms;
+
+        return CheckResultData{CheckResult::tryMore, newBodyStartTime};
+    }
+
+    auto newBodyStartTime = fetched.data.at(int(fetched.data.size()) - shift).startTimeMs;
+    const auto bodyStartTime = fetched.data.rbegin()->startTimeMs;
+    if (newBodyStartTime <= bodyStartTime && bodyStartTime.count() != QnTimePeriod::kMaxTimeValue)
+        newBodyStartTime = bodyStartTime + 1ms;
+
+    return CheckResultData{CheckResult::tryMore, newBodyStartTime};
 }
 
 } // namespace
@@ -182,7 +251,12 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(
     connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
     connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnCameraBookmarksManagerPrivate::removeCameraFromQueries);
+    connect(resourcePool(), &QnResourcePool::resourcesRemoved, this,
+        [this](const QnResourceList& resources)
+        {
+            for (const auto& resource: resources)
+                removeCameraFromQueries(resource);
+        });
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
@@ -277,6 +351,56 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
         "/ec2/bookmarks",
         requestData,
         makeUbjsonResponseWrapper(this, callback));
+}
+
+int QnCameraBookmarksManagerPrivate::getBookmarkstAroundPointHeuristic(
+    const QnCameraBookmarkSearchFilter& filter,
+    const QnCameraBookmarkList& source,
+    int maxTriesCount,
+    BookmarksAroundPointCallbackType callback)
+{
+    using namespace nx::vms::client::core;
+
+    QnGetBookmarksRequestData requestData;
+    requestData.format = Qn::SerializationFormat::ubjson;
+    requestData.filter = filter;
+
+    const auto handler = makeUbjsonResponseWrapper(this, BookmarksCallbackType(
+        [this, source, callback, filter, maxTriesCount]
+            (bool success, rest::Handle requestId, QnCameraBookmarkList bookmarks)
+        {
+            if (!requestId)
+                return;
+
+            if (!success)
+            {
+                callback(/*success*/ false, requestId, {});
+                return;
+            }
+
+            const auto direction = EventSearch::directionFromSortOrder(filter.orderBy.order);
+            auto fetched = makeFetchedData<nx::vms::common::QnBookmarkFacade>(
+                source, bookmarks, FetchRequest{direction, *filter.centralTimePointMs});
+            const auto checkResult = checkFetchedData(fetched, filter.limit, direction);
+
+            if (checkResult.result == CheckResult::dataFound)
+            {
+                truncateFetchedData(fetched, direction, filter.limit);
+                callback(/*success*/ true, requestId, std::move(fetched));
+            }
+            else if (checkResult.nextCentralPoinMs.count() && maxTriesCount > 0)
+            {
+                QnCameraBookmarkSearchFilter updatedFilter = filter;
+                updatedFilter.startTimeMs = checkResult.nextCentralPoinMs;
+                getBookmarkstAroundPointHeuristic(updatedFilter, source, maxTriesCount - 1, callback);
+            }
+            else
+            {
+                callback(/*success*/ false, requestId,  BookmarkFetchedData{});
+            }
+        }));
+
+    return sendGetRequest("/ec2/bookmarks", requestData, handler);
 }
 
 int QnCameraBookmarksManagerPrivate::getBookmarkTagsAsync(
@@ -594,7 +718,7 @@ void QnCameraBookmarksManagerPrivate::handleQueryReply(
 
     if (isPartialData && !limitExceeded)
     {
-        sendQueryTailRequest(query, bookmarks.last().startTimeMs, std::move(callback));
+        sendQueryTailRequest(query, bookmarks.back().startTimeMs, std::move(callback));
     }
     else
     {

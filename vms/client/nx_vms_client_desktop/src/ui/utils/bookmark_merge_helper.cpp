@@ -92,6 +92,19 @@ bool bookmarkItemLess(const BookmarkItemPtr &left, const BookmarkItemPtr &right)
     return false;
 }
 
+template<typename Container, typename D>
+void setBookmarksInternal(const Container& bookmarks, D* d)
+{
+    d->clear();
+
+    DetailLevel &zeroLevel = d->detailLevels.first();
+    for (const QnCameraBookmark &bookmark: bookmarks)
+        zeroLevel.items.append(BookmarkItemPtr(new BookmarkItem(bookmark)));
+
+    for (int i = 1; i < d->detailLevels.size(); ++i)
+        d->mergeBookmarkItems(i);
+}
+
 } // anonymous namespace
 
 class QnBookmarkMergeHelperPrivate
@@ -217,10 +230,10 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
                     NX_ASSERT(bookmarkItem->bookmark,
                         "Zero level item should contain real bookmarks");
                     if (bookmarkItem->bookmark)
-                        result.append(*bookmarkItem->bookmark);
+                        result.push_back(*bookmarkItem->bookmark);
                 }
 
-                if (!result.isEmpty())
+                if (!result.empty())
                     break;
             }
         }
@@ -237,7 +250,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
             {
                 NX_ASSERT(bookmarkItem->bookmark, "Zero level item should contain real bookmarks");
                 if (bookmarkItem->bookmark)
-                    result.append(*bookmarkItem->bookmark);
+                    result.push_back(*bookmarkItem->bookmark);
             }
         }
     }
@@ -255,7 +268,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
                 NX_ASSERT(bookmarkItem->bookmark,
                     "Zero level item should contain real bookmarks");
                 if (bookmarkItem->bookmark)
-                    result.append(*bookmarkItem->bookmark);
+                    result.push_back(*bookmarkItem->bookmark);
             }
         }
     }
@@ -263,17 +276,16 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(milliseconds tim
     return result;
 }
 
+void QnBookmarkMergeHelper::setBookmarks(const QList<QnCameraBookmark> &bookmarks)
+{
+    Q_D(QnBookmarkMergeHelper);
+    setBookmarksInternal(bookmarks, d);
+}
+
 void QnBookmarkMergeHelper::setBookmarks(const QnCameraBookmarkList &bookmarks)
 {
     Q_D(QnBookmarkMergeHelper);
-    d->clear();
-
-    DetailLevel &zeroLevel = d->detailLevels.first();
-    for (const QnCameraBookmark &bookmark: bookmarks)
-        zeroLevel.items.append(BookmarkItemPtr(new BookmarkItem(bookmark)));
-
-    for (int i = 1; i < d->detailLevels.size(); ++i)
-        d->mergeBookmarkItems(i);
+    setBookmarksInternal(bookmarks, d);
 }
 
 void QnBookmarkMergeHelper::addBookmark(const QnCameraBookmark &bookmark)

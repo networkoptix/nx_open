@@ -55,7 +55,7 @@ struct NX_VMS_API BookmarkFilter
      * In case of ascending sorting (whatever the sorting column is) the split point is right after
      * the specified time point. In case of descending order the split point is right before the
      * specified time point.
-     * In addition to the sort filed all returned bookmarks are sorted by the guid field.
+     * In addition to the sort field all returned bookmarks are sorted by the guid field.
      */
     std::optional<std::chrono::milliseconds> centralTimePointMs;
 
@@ -133,6 +133,8 @@ struct NX_VMS_API Bookmark
 
     QnUuid getId() const { return id; }
     void setId(QnUuid id_) { id = std::move(id_); }
+
+    bool operator==(const Bookmark& other) const = default;
 };
 #define Bookmark_Fields \
     (id) \
