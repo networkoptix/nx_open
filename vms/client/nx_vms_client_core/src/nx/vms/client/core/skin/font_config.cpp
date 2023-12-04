@@ -47,7 +47,7 @@ NX_REFLECTION_INSTRUMENT(FontRecord, (size)(weight));
 
 using FontMap = QHash<QString, QFont>;
 
-FontMap readFontMap(const QString& fileName)
+FontMap readFontMap(const QString& fileName, const QFont& baseFont)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
@@ -68,7 +68,7 @@ FontMap readFontMap(const QString& fileName)
         if (!NX_ASSERT(rec.size > 0, "Invalid font %1 size %2", name, rec.size))
             continue;
 
-        QFont font;
+        auto font = baseFont;
         font.setPixelSize(rec.size);
 
         if (NX_ASSERT(rec.weight > 0 && rec.weight <= 1000,
@@ -90,15 +90,14 @@ struct FontConfig::Private
     FontMap fontMap;
 };
 
-FontConfig::FontConfig(const QString& basicFontsFileName, QObject* parent):
+FontConfig::FontConfig(const QFont& baseFont, const QString& basicFontsFileName, QObject* parent):
     base_type(this, parent),
     d(new Private())
 {
-    const auto appFont = QGuiApplication::font();
-    NX_INFO(this, "Loading font config, default app font family: %1, weight: %2, size %3px",
-        appFont.family(), appFont.weight(), appFont.pixelSize());
+    NX_INFO(this, "Loading font config, base font family: %1, weight: %2, size %3px",
+        baseFont.family(), baseFont.weight(), baseFont.pixelSize());
 
-    d->fontMap = readFontMap(basicFontsFileName);
+    d->fontMap = readFontMap(basicFontsFileName, baseFont);
     const auto normalFont = font("normal");
     NX_INFO(this, "Loaded %1 fonts, default config font family: %2, weight: %3, size %4px",
         d->fontMap.size(), normalFont.family(), normalFont.weight(), normalFont.pixelSize());
