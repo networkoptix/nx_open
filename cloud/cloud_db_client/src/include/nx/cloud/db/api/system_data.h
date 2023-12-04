@@ -60,6 +60,9 @@ struct SystemRegistrationData
 
     /**%apidoc Vms-specific data. Transparently stored and returned. */
     std::string opaque;
+
+    /**%apidoc Non-empty if system must be bound to an organization. */
+    std::optional<std::string> organizationId;
 };
 
 /**
