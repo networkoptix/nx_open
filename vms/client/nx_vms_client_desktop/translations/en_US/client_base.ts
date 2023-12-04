@@ -5987,16 +5987,16 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message numerus="yes">
         <source>Failed to open %n devices on the video wall:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Failed to open %n device on the video wall:</numerusform>
+            <numerusform>Failed to open %n devices on the video wall:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Failed to open %n cameras on the video wall:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Failed to open %n camera on the video wall:</numerusform>
+            <numerusform>Failed to open %n cameras on the video wall:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
