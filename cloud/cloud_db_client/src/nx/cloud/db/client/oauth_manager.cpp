@@ -36,7 +36,7 @@ void OauthManager::issueAuthorizationCode(
         std::move(completionHandler));
 }
 
-void OauthManager::validateToken(
+void OauthManager::legacyValidateToken(
     const std::string& token,
     nx::utils::MoveOnlyFunc<void(api::ResultCode, api::ValidateTokenResponse)> completionHandler)
 {
@@ -47,6 +47,17 @@ void OauthManager::validateToken(
         nx::network::http::Method::get,
         requestPath,
         std::move(completionHandler));
+}
+
+void OauthManager::introspectToken(
+    const api::TokenIntrospectionRequest request,
+    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::TokenIntrospectionResponse)> handler)
+{
+    m_requestsExecutor->executeRequest<api::TokenIntrospectionResponse>(
+        nx::network::http::Method::post,
+        kOauthIntrospectPath,
+        request,
+        std::move(handler));
 }
 
 void OauthManager::deleteToken(
