@@ -1100,8 +1100,8 @@ void QnTimeSlider::setWindow(milliseconds start, milliseconds end, bool animate,
             m_kineticZoomHandler->kineticProcessor()->reset();
             m_kineticScrollHandler->kineticProcessor()->reset();
             m_animatingSliderWindow = true;
-            setTargetStart(start);
-            setTargetEnd(end);
+            setWindowTargetStart(start);
+            setWindowTargetEnd(end);
         }
         else
         {
@@ -1369,7 +1369,7 @@ void QnTimeSlider::finishAnimations()
 
     if (m_animatingSliderWindow)
     {
-        setWindow(targetStart(), targetEnd());
+        setWindow(windowTargetStart(), windowTargetEnd());
         m_animatingSliderWindow = false;
     }
 
@@ -1383,22 +1383,22 @@ void QnTimeSlider::hurryKineticAnimations()
     m_kineticScrollHandler->hurry();
 }
 
-void QnTimeSlider::setTargetStart(milliseconds start)
+void QnTimeSlider::setWindowTargetStart(milliseconds start)
 {
     m_targetStart = (start == minimum()) ? milliseconds(std::numeric_limits<qint64>::min()) : start;
 }
 
-void QnTimeSlider::setTargetEnd(milliseconds end)
+void QnTimeSlider::setWindowTargetEnd(milliseconds end)
 {
     m_targetEnd = (end == maximum()) ? milliseconds(std::numeric_limits<qint64>::max()) : end;
 }
 
-milliseconds QnTimeSlider::targetStart()
+milliseconds QnTimeSlider::windowTargetStart()
 {
     return (m_targetStart == milliseconds(std::numeric_limits<qint64>::min())) ? minimum() : m_targetStart;
 }
 
-milliseconds QnTimeSlider::targetEnd()
+milliseconds QnTimeSlider::windowTargetEnd()
 {
     return (m_targetEnd == milliseconds(std::numeric_limits<qint64>::max())) ? maximum() : m_targetEnd;
 }
@@ -3276,10 +3276,10 @@ void QnTimeSlider::tick(int deltaMs)
         /* 0.5^t convergence: */
         static const qreal kHalfwayTimeMs = 15.0;
         qreal timeFactor = pow(0.5, deltaMs / kHalfwayTimeMs);
-        milliseconds untilStart = milliseconds(qint64((targetStart() - m_windowStart).count() * timeFactor));
-        milliseconds untilEnd = milliseconds(qint64((targetEnd() - m_windowEnd).count() * timeFactor));
+        milliseconds untilStart = milliseconds(qint64((windowTargetStart() - m_windowStart).count() * timeFactor));
+        milliseconds untilEnd = milliseconds(qint64((windowTargetEnd() - m_windowEnd).count() * timeFactor));
 
-        milliseconds desiredWindowSize = targetEnd() - targetStart();
+        milliseconds desiredWindowSize = windowTargetEnd() - windowTargetStart();
         milliseconds maxRemainder =
             milliseconds(qMax(qAbs(untilStart.count()), qAbs(untilEnd.count())));
 
@@ -3289,7 +3289,7 @@ void QnTimeSlider::tick(int deltaMs)
             untilStart = untilEnd = 0ms;
         }
 
-        setWindow(targetStart() - untilStart, targetEnd() - untilEnd);
+        setWindow(windowTargetStart() - untilStart, windowTargetEnd() - untilEnd);
     }
 
     animateStepValues(deltaMs);
