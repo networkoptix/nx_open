@@ -992,7 +992,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.passwordEditable = permissions.testFlag(Qn::WritePasswordPermission);
     state.userEnabled = user->isEnabled();
     state.userEnabledEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
-    state.allowInsecure = user->digestAuthorizationEnabled();
+    state.allowInsecure = user->shouldDigestAuthBeUsed();
     state.allowInsecureEditable = permissions.testFlag(Qn::WriteDigestPermission);
 
     state.auditAvailable = accessController()->hasPowerUserPermissions();
@@ -1097,7 +1097,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
             actualPassword = userData.password;
         }
         // Disabling digest authentication.
-        else if (d->user->digestAuthorizationEnabled() && !userData.isHttpDigestEnabled)
+        else if (d->user->shouldDigestAuthBeUsed() && !userData.isHttpDigestEnabled)
         {
             const auto credentials = systemContext()->connectionCredentials();
             if (NX_ASSERT(credentials.authToken.isPassword()))
