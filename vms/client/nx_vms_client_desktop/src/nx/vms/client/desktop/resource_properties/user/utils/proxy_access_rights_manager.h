@@ -37,6 +37,10 @@ public:
     /** Returns whether current subject access rights were changed (overridden). */
     bool hasChanges() const;
 
+signals:
+    void proxyAccessRightsAboutToBeChanged();
+    void proxyAccessRightsChanged();
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
