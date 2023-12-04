@@ -8,7 +8,6 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QResource>
 #include <QtCore/QStandardPaths>
-#include <QtGui/QPalette>
 #include <QtGui/QSurfaceFormat>
 #include <QtQml/QQmlEngine>
 #include <QtWebEngineCore/QWebEngineProfile>

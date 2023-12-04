@@ -7,6 +7,7 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
+#include <QtGui/QPalette>
 #include <QtQml/QQmlEngine>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QToolTip>
@@ -211,10 +212,18 @@ void initializeExternalResources()
 
     nx::vms::client::core::FontLoader::loadFonts(
         externalResourcesDirectory().absoluteFilePath("fonts"));
+}
 
+QFont initializeBaseFont()
+{
     QFont font("Roboto", /*pointSize*/ -1, QFont::Normal);
     font.setPixelSize(13);
-    qApp->setFont(font);
+    return font;
+}
+
+void initializeDefaultApplicationFont()
+{
+    qApp->setFont(fontConfig()->normal());
 }
 
 QString calculateLogNameSuffix(
@@ -356,6 +365,7 @@ struct ApplicationContext::Private
     // UI Skin parts.
     std::unique_ptr<core::Skin> skin;
     std::unique_ptr<CustomCursors> customCursors;
+    std::unique_ptr<nx::vms::client::core::ColorTheme> colorTheme;
 
     // Miscelaneous modules.
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
@@ -606,6 +616,23 @@ struct ApplicationContext::Private
         }
     }
 
+    void initSkin()
+    {
+        QStringList paths;
+        paths << ":/skin";
+
+        skin = std::make_unique<nx::vms::client::core::Skin>(paths);
+
+        QApplication::setWindowIcon(skin->icon(":/logo.png"));
+        QApplication::setStyle([]() { return new OldStyle(new Style()); }());
+
+        colorTheme = std::make_unique<nx::vms::client::core::ColorTheme>();
+        customCursors = std::make_unique<nx::vms::client::desktop::CustomCursors>(skin.get());
+
+        QApplication::setPalette(makeApplicationPalette());
+        QToolTip::setPalette(QApplication::palette());
+    }
+
     void initializeQml()
     {
         static const QString kQmlRoot = QStringLiteral("qrc:///qml");
@@ -662,21 +689,6 @@ struct ApplicationContext::Private
         timer->start(kReinstallExceptionHandlerPeriod);
 #endif
     }
-
-    void initializeSkin()
-    {
-        QStringList paths;
-        paths << ":/skin";
-
-        skin = std::make_unique<core::Skin>(paths);
-        customCursors = std::make_unique<CustomCursors>(skin.get());
-
-        QApplication::setWindowIcon(skin->icon(":/logo.png"));
-        QApplication::setStyle([]() { return new OldStyle(new Style()); }());
-
-        QApplication::setPalette(makeApplicationPalette());
-        QToolTip::setPalette(QApplication::palette());
-    }
 };
 
 ApplicationContext::ApplicationContext(
@@ -703,7 +715,9 @@ ApplicationContext::ApplicationContext(
     initializeResources();
     initializeExternalResources();
     QnClientMetaTypes::initialize();
-    storeFontConfig(new FontConfig(baseFontConfigPath()));
+    d->initSkin();
+    storeFontConfig(new FontConfig(initializeBaseFont(), baseFontConfigPath()));
+    initializeDefaultApplicationFont();
     d->initializeSettings();
     d->initializeExceptionHandlerGuard();
 
@@ -745,7 +759,6 @@ ApplicationContext::ApplicationContext(
             d->initializeClientCoreModule();
             d->initializeQml();
             d->initializeLocalResourcesSearch();
-            d->initializeSkin();
             d->applauncherGuard = std::make_unique<ApplauncherGuard>();
             d->autoRunWatcher = std::make_unique<QnClientAutoRunWatcher>();
             d->radassController = std::make_unique<RadassController>();
