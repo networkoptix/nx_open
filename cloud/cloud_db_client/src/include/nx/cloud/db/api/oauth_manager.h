@@ -28,9 +28,14 @@ public:
         const IssueTokenRequest& request,
         nx::utils::MoveOnlyFunc<void(ResultCode, IssueCodeResponse)> completionHandler) = 0;
 
-    virtual void validateToken(
+    virtual void legacyValidateToken(
         const std::string& token,
         nx::utils::MoveOnlyFunc<void(ResultCode, ValidateTokenResponse)> completionHandler) = 0;
+
+    // Get attributes and claims associated with the token.
+    virtual void introspectToken(
+        const TokenIntrospectionRequest request,
+        nx::utils::MoveOnlyFunc<void(ResultCode, TokenIntrospectionResponse)> completionHandler) = 0;
 
     virtual void deleteToken(
         const std::string& token, nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
