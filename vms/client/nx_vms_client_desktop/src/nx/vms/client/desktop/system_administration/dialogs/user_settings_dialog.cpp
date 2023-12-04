@@ -80,9 +80,6 @@ using namespace std::chrono;
 
 namespace {
 
-// TODO: #akolesnikov #move to cdb api section
-static const QString cloudAuthInfoPropertyName("cloudUserAuthenticationInfo");
-
 static constexpr auto kAuditTrailDays = 7;
 static constexpr int kDefaultTempUserExpiresAfterLoginS = 60 * 60 * 8; //< 8 hours.
 
@@ -1006,8 +1003,10 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     state.parentGroupsEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
 
+    // Cloud user full name is controlled by the Cloud and is required to be non-empty when user
+    // registers in the Cloud.
     state.userIsNotRegisteredInCloud = user->userType() == nx::vms::api::UserType::cloud
-        && user->getProperty(cloudAuthInfoPropertyName).isEmpty();
+        && user->fullName().isEmpty();
 
     // List of groups.
     for (const QnUuid& groupId: user->groupIds())
