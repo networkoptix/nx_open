@@ -49,6 +49,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/color_transformations.h>
 
@@ -279,11 +280,18 @@ public:
     void setMassEditInProgress(bool inProgress);
 
 private:
+    struct BatchEditSettings
+    {
+        Qt::CheckState enableUsers = Qt::PartiallyChecked;
+        Qt::CheckState disableDigest = Qt::PartiallyChecked;
+    };
+
+private:
     void createUser();
     void editUser(const QnUserResourcePtr& user, bool raiseDialog = true);
     void deleteUsers(const QnUserResourceList& usersToDelete);
     void deleteSelected();
-    void editSelected();
+    void editSelected(BatchEditSettings initialSettings);
     void deleteNotFoundLdapUsers();
 
     void modelUpdated();
@@ -510,7 +518,7 @@ void UserListWidget::Private::setupUi()
     QWidget::setTabOrder(editButton, deleteNotFoundUsersButton);
 
     connect(deleteButton, &QPushButton::clicked, this, &Private::deleteSelected);
-    connect(editButton, &QPushButton::clicked, this, &Private::editSelected);
+    connect(editButton, &QPushButton::clicked, this, [this]() { Private::editSelected({}); });
 
     connect(ui->filterLineEdit, &SearchLineEdit::textChanged, this,
         [this](const QString& text)
@@ -804,17 +812,20 @@ void UserListWidget::Private::deleteNotFoundLdapUsers()
     deleteUsers(q->resourcePool()->getResourcesByIds<QnUserResource>(usersModel->notFoundUsers()));
 }
 
-void UserListWidget::Private::editSelected()
+void UserListWidget::Private::editSelected(BatchEditSettings initialSettings)
 {
-    const auto getSelectedUsers = [this]() -> std::tuple<QSet<QnUserResourcePtr>, QVariantMap>
-    {
-        const auto usersToEdit = m_visibleUsers.selectedEditable();
+    const auto getSelectedUsers =
+        [this, initialSettings]() -> std::tuple<QSet<QnUserResourcePtr>, QVariantMap>
+        {
+            const auto usersToEdit = m_visibleUsers.selectedEditable();
 
-        return {usersToEdit, QVariantMap{
-            {"usersCount", usersToEdit.size()},
-            {"enableUsersEditable", canEnableDisable(usersToEdit)},
-            {"digestEditable", canChangeAuthentication(usersToEdit)}}};
-    };
+            return {usersToEdit, QVariantMap{
+                {"usersCount", usersToEdit.size()},
+                {"enableUsersEditable", canEnableDisable(usersToEdit)},
+                {"digestEditable", canChangeAuthentication(usersToEdit)},
+                {"enableUsers", initialSettings.enableUsers},
+                {"disableDigest", initialSettings.disableDigest}}};
+        };
 
     QSet<QnUserResourcePtr> usersToEdit;
     QVariantMap dialogParameters;
@@ -858,14 +869,18 @@ void UserListWidget::Private::editSelected()
     if (usersToEdit.empty())
         return;
 
-    const auto enableUsers = batchUserEditDialog.window()->property("enableUsers")
-        .value<Qt::CheckState>();
+    const BatchEditSettings settings = {
+        .enableUsers = batchUserEditDialog.window()->property("enableUsers")
+            .value<Qt::CheckState>(),
+        .disableDigest = batchUserEditDialog.window()->property("disableDigest")
+            .value<Qt::CheckState>()
+    };
 
-    const auto disableDigest = batchUserEditDialog.window()->property("disableDigest")
-        .value<Qt::CheckState>();
-
-    if (enableUsers == Qt::PartiallyChecked && disableDigest == Qt::PartiallyChecked)
+    if (settings.enableUsers == Qt::PartiallyChecked
+        && settings.disableDigest == Qt::PartiallyChecked)
+    {
         return; //< No changes.
+    }
 
     requestChain.reset(new UserGroupRequestChain(q->systemContext()));
     for (auto user: usersToEdit)
@@ -875,12 +890,12 @@ void UserListWidget::Private::editSelected()
 
         // TODO: #vkutin #ikulaychuk These fields should be optional in the API request.
         // Refactor the client side.
-        updateUser.enabled = enableUsers != Qt::PartiallyChecked
-            ? (enableUsers == Qt::Checked)
+        updateUser.enabled = settings.enableUsers != Qt::PartiallyChecked
+            ? (settings.enableUsers == Qt::Checked)
             : user->isEnabled();
 
-        updateUser.enableDigest = disableDigest != Qt::PartiallyChecked
-            ? (disableDigest == Qt::Checked)
+        updateUser.enableDigest = settings.disableDigest != Qt::PartiallyChecked
+            ? (settings.disableDigest == Qt::Checked)
             : user->shouldDigestAuthBeUsed();
 
         requestChain->append(updateUser);
@@ -890,11 +905,18 @@ void UserListWidget::Private::editSelected()
     auto rollback = nx::utils::makeScopeGuard([this]{ setMassEditInProgress(false); });
 
     requestChain->start(
-        [this, rollback = std::move(rollback)](
+        [this, rollback = std::move(rollback), settings](
             bool success,  nx::network::rest::Result::Error errorCode, const QString& errorString)
         {
-            if (success || errorCode == nx::network::rest::Result::Error::SessionExpired)
+            if (success)
                 return;
+
+            if (errorCode == nx::network::rest::Result::Error::SessionExpired)
+            {
+                // Reopen the dialog with the last settings.
+                executeLater([this, settings](){ editSelected(settings); }, this);
+                return;
+            }
 
             QnMessageBox messageBox(
                 QnMessageBoxIcon::Critical,
