@@ -4,7 +4,10 @@
 
 #include <chrono>
 #include <optional>
+#include <map>
 #include <string>
+
+#include <nx/reflect/instrument.h>
 
 namespace nx::cloud::db::api {
 
@@ -119,6 +122,56 @@ struct ValidateTokenResponse : public TokenInfo
      */
     std::chrono::seconds time_since_password;
 };
+
+struct TokenIntrospectionRequest
+{
+    /**%apidoc The token to introspect.*/
+    std::string token;
+
+    /**%apidoc The token type hint. It may be used to speed up the introspection process. */
+    std::optional<std::string> token_type_hint;
+};
+
+NX_REFLECTION_INSTRUMENT(TokenIntrospectionRequest, (token)(token_type_hint))
+
+struct TokenIntrospectionResponse
+{
+    /**%apidoc true if token is valid. false if token is unknown, expired or revoked. */
+    bool active = false;
+
+    /**%apidoc The id of the client which requested the token. */
+    std::string client_id;
+
+    /**%apidoc The username associated with the token. */
+    std::string username;
+
+    /**%apidoc The token's scope. */
+    std::string scope;
+
+    /**%apidoc Seconds since epoch (1970-01-01 UTC) to token expiration time.*/
+    std::chrono::seconds exp;
+
+    /**%apidoc Seconds to token expiration.*/
+    std::chrono::seconds expires_in;
+
+    /**%apidoc Seconds. Time that passed since this token was confirmed with a password entry
+    * (explicitly or implicitly).<br/>
+    * E.g., if an access token was issued with <pre>grant_type=refresh_token</pre>, then
+    * its time_since_password will be the time passed since corresponding refresh token was issued
+    * with `grant_type=password`. If, in turn the refresh token was issued with `grant_type=code`,
+    * then the time passed since issuing the authorization code with `grant_type=password` will be here.
+    * And so on.
+    */
+    std::chrono::seconds time_since_password;
+
+    TokenType token_type = TokenType::bearer;
+
+    /**%apidoc The VMS user id. Present only if defined for specific account and specific system.*/
+    std::optional<std::string> vms_user_id;
+};
+
+NX_REFLECTION_INSTRUMENT(TokenIntrospectionResponse, (active)(client_id)(username)(scope)(exp) \
+    (expires_in)(time_since_password)(token_type)(vms_user_id))
 
 struct IssueStunTokenRequest
 {
