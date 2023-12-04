@@ -16,9 +16,9 @@ Dialog
 
     color: ColorTheme.colors.dark7
 
-    readonly property int enableUsers: enableUsersComboBox.currentValue
+    property int enableUsers: Qt.PartiallyChecked
     property bool enableUsersEditable: true
-    readonly property int disableDigest: disableDigestComboBox.currentValue
+    property int disableDigest: Qt.PartiallyChecked
     property bool digestEditable: true
     property int usersCount: 0
 
@@ -82,6 +82,9 @@ Dialog
                     visible: dialog.enableUsersEditable
                     Layout.alignment: Qt.AlignLeft | Qt.AlignBaseline
 
+                    Component.onCompleted: currentIndex = indexOfValue(dialog.enableUsers)
+                    onActivated: dialog.enableUsers = currentValue
+
                     model:
                     [
                         {"text": "<" + qsTr("keep current value") + ">",
@@ -106,6 +109,9 @@ Dialog
                     valueRole: "value"
                     visible: dialog.digestEditable
                     Layout.alignment: Qt.AlignLeft | Qt.AlignBaseline
+
+                    Component.onCompleted: currentIndex = indexOfValue(dialog.disableDigest)
+                    onActivated: dialog.disableDigest = currentValue
 
                     model:
                     [
