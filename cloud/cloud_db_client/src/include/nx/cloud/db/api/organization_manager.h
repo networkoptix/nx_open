@@ -19,15 +19,6 @@ public:
     virtual ~OrganizationManager() = default;
 
     /**
-     * Create new system and bind it to organization.
-     * The calling user must the corresponding rights on the organization.
-     */
-    virtual void bindSystem(
-        const std::string& organizationId,
-        SystemRegistrationData registrationData,
-        std::function<void(ResultCode, SystemData)> completionHandler) = 0;
-
-    /**
      * Get the list of system offers either for the organization or by the organization.
      */
     virtual void getSystemOffers(

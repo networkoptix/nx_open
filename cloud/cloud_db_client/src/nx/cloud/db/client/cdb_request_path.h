@@ -31,8 +31,8 @@ static constexpr char kSystemHealthHistoryPath[] = "/cdb/systems/{systemId}/heal
 static constexpr char kSystemDataSyncSettingsPath[] = "/cdb/systems/{systemId}/data-sync-settings";
 static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/systems/{systemId}/merged_systems/";
 static constexpr char kSystemsValidateMSSignature[] = "/cdb/systems/{systemId}/signature/validate";
-static constexpr char kSystemUsersPath[] = "/cdb/v2/systems/{systemId}/users";
-static constexpr char kSystemUserPath[] = "/cdb/v2/systems/{systemId}/users/{accountEmail}";
+static constexpr char kSystemUsersPath[] = "/cdb/v0/systems/{systemId}/users";
+static constexpr char kSystemUserPath[] = "/cdb/v0/systems/{systemId}/users/{accountEmail}";
 
 static constexpr char kSystemAttributesPath[] = "/cdb/systems/{systemId}/attributes";
 static constexpr char kSystemAttributePath[] = "/cdb/systems/{systemId}/attributes/{attributeName}";
@@ -82,8 +82,6 @@ static constexpr char kBatchIdParam[] = "batchId";
 
 //-------------------------------------------------------------------------------------------------
 // Organizations.
-
-static constexpr char kOrganizationSystemsPath[] = "/cdb/organizations/{organizationId}/systems";
 
 static constexpr char kOrganizationSystemOwnershipOffers[] =
     "/cdb/v0/organizations/{organizationId}/system-offers";

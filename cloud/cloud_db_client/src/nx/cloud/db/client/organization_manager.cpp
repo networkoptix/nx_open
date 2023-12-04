@@ -16,21 +16,6 @@ OrganizationManager::OrganizationManager(AsyncRequestsExecutor* requestsExecutor
 {
 }
 
-void OrganizationManager::bindSystem(
-    const std::string& organizationId,
-    api::SystemRegistrationData registrationData,
-    std::function<void(api::ResultCode, api::SystemData)> completionHandler)
-{
-    if (registrationData.customization.empty())
-        registrationData.customization = nx::branding::customization().toStdString();
-
-    m_requestsExecutor->executeRequest<api::SystemData>(
-        Method::post,
-        rest::substituteParameters(kOrganizationSystemsPath, {organizationId}),
-        std::move(registrationData),
-        std::move(completionHandler));
-}
-
 void OrganizationManager::getSystemOffers(
     const std::string& organizationId,
     std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler)

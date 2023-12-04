@@ -13,11 +13,6 @@ class OrganizationManager:
 public:
     OrganizationManager(AsyncRequestsExecutor* requestsExecutor);
 
-    virtual void bindSystem(
-        const std::string& organizationId,
-        api::SystemRegistrationData registrationData,
-        std::function<void(api::ResultCode, api::SystemData)> completionHandler) override;
-
     virtual void getSystemOffers(
         const std::string& organizationId,
         std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler) override;

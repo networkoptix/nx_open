@@ -14,8 +14,7 @@
 
 namespace nx::cloud::db::api {
 
-#define SystemRegistrationData_Fields (id)(name)(customization)(opaque)
-NX_REFLECTION_INSTRUMENT(SystemRegistrationData, SystemRegistrationData_Fields)
+NX_REFLECTION_INSTRUMENT(SystemRegistrationData, (id)(name)(customization)(opaque)(organizationId))
 
 // TODO: #akolesnikov Replace this and similar functions with nx::reflect::urlencoded.
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
