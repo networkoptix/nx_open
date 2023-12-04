@@ -157,6 +157,7 @@ void DesktopCameraConnectionProcessor::processRequest()
     const auto method = d->request.requestLine.method;
     if (method == "PLAY")
     {
+        NX_DEBUG(this, "Start streaming data to the VMS server");
         if (!d->dataProvider)
         {
             d->dataProvider = qnClientCoreModule->dataProviderFactory()->createDataProvider(

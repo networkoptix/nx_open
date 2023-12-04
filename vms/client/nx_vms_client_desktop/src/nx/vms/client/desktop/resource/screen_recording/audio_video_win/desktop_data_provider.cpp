@@ -204,10 +204,18 @@ bool EncodedAudioInfo::addBuffer()
     m_buffers << buffer;
 
     hr = waveInPrepareHeader(hWaveIn, buffer, sizeof(WAVEHDR));
-    if (hr != S_OK) return false;
+    if (hr != S_OK)
+    {
+        NX_WARNING(this, "waveInPrepareHeader call failed. Error: %1", hr);
+        return false;
+    }
 
     hr = waveInAddBuffer(hWaveIn, buffer, sizeof(WAVEHDR));
-    if (hr != S_OK) return false;
+    if (hr != S_OK)
+    {
+        NX_WARNING(this, "waveInAddBuffer call failed. Error: %1", hr);
+        return false;
+    }
 
     return true;
 }
@@ -249,6 +257,8 @@ bool EncodedAudioInfo::setupFormat(QString& errMessage)
 
     if (!m_audioDevice.isFormatSupported(m_audioFormat))
     {
+        NX_DEBUG(this, "Input audio device doesn't support audio format %1. Try another one", m_audioFormat);
+
         if (!m_audioDevice.supportedSampleFormats().contains(m_audioFormat.sampleFormat()))
             m_audioFormat.setSampleFormat(m_audioDevice.preferredFormat().sampleFormat());
 
@@ -266,6 +276,8 @@ bool EncodedAudioInfo::setupFormat(QString& errMessage)
 
         if (!m_audioDevice.isFormatSupported(m_audioFormat))
         {
+            NX_DEBUG(this, "Input audio device doesn't support alternative audio format %1.", m_audioFormat);
+
             m_audioFormat = {};
             errMessage = DesktopDataProvider::tr(
                 "The audio capturing device supports no suitable audio formats."
@@ -276,6 +288,7 @@ bool EncodedAudioInfo::setupFormat(QString& errMessage)
     }
 
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
+    NX_DEBUG(this, "Selected audio format for audio device: %1.", m_audioFormat);
     return true;
 }
 
@@ -300,11 +313,15 @@ bool EncodedAudioInfo::setupPostProcess(
     wfx.nBlockAlign = (wfx.wBitsPerSample >> 3) * wfx.nChannels;
     wfx.nAvgBytesPerSec = wfx.nBlockAlign * wfx.nSamplesPerSec;
 
-    if(waveInOpen(&hWaveIn, devId, &wfx,
+    auto result = waveInOpen(&hWaveIn, devId, &wfx,
         (DWORD_PTR)&waveInProc,
-        (DWORD_PTR) this,
-        CALLBACK_FUNCTION) != MMSYSERR_NOERROR != S_OK)
+        (DWORD_PTR)this,
+        CALLBACK_FUNCTION) != MMSYSERR_NOERROR;
+    if(result != S_OK)
+    {
+        NX_WARNING(this, "waveInOpen call failed. Error: %1", result);
         return false;
+    }
     m_waveInOpened = true;
     for (int i = 0; i < AUDIO_BUFFERS_COUNT; ++i)
     {
@@ -598,6 +615,11 @@ bool DesktopDataProvider::initAudioCapturing()
             }
         }
     }
+    else
+    {
+        NX_DEBUG(this, "Input audio device is not selected.");
+    }
+
     // 50 ms as max jitter.
     // Qt uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
     d->maxAudioJitter = 1000 / 20; //< Keep in ms.
