@@ -104,10 +104,14 @@ void ProxyAccessRightsManager::setOwnResourceAccessMap(const ResourceAccessMap& 
     if (value == ownResourceAccessMap(d->currentSubjectId))
         return;
 
+    emit proxyAccessRightsAboutToBeChanged();
+
     NX_VERBOSE(this, "Access rights changed locally for %1", d->currentSubjectId);
 
     d->accessMapOverride = value;
+
     emit ownAccessRightsChanged({d->currentSubjectId});
+    emit proxyAccessRightsChanged();
 }
 
 void ProxyAccessRightsManager::resetOwnResourceAccessMap()
