@@ -1607,8 +1607,9 @@ void QnWorkbenchNavigator::timelineCatchUp(qint64 toMs)
 
 bool QnWorkbenchNavigator::isTimelineCatchingUp() const
 {
-    return m_positionAnimator->isRunning() &&
-        m_positionAnimator->targetValue() == m_previousMediaPosition;
+    return m_positionAnimator
+        && m_positionAnimator->isRunning()
+        && m_positionAnimator->targetValue() == m_previousMediaPosition;
 }
 
 bool QnWorkbenchNavigator::isCurrentWidgetSynced() const
@@ -2135,13 +2136,23 @@ void QnWorkbenchNavigator::updateCalendarFromSlider()
     if (!isValid())
         return;
 
-    QScopedValueRollback<bool> guard(m_updatingCalendarFromSlider, true);
+    const auto targetStart = QDateTime::fromMSecsSinceEpoch(
+        m_timeSlider->windowTargetStart().count() + m_calendar->displayOffset);
+    const auto targetEnd = QDateTime::fromMSecsSinceEpoch(
+        m_timeSlider->windowTargetEnd().count() + m_calendar->displayOffset);
 
-    m_calendar->selection = {
-        QDateTime::fromMSecsSinceEpoch(
-            m_timeSlider->windowStart().count() + m_calendar->displayOffset),
-        QDateTime::fromMSecsSinceEpoch(
-            m_timeSlider->windowEnd().count() + m_calendar->displayOffset)};
+    if (!m_timeSlider->isAnimatingWindow()
+        || m_calendar->selection().start != targetStart
+        || m_calendar->selection().end != targetEnd)
+    {
+        QScopedValueRollback<bool> guard(m_updatingCalendarFromSlider, true);
+
+        m_calendar->selection = {
+            QDateTime::fromMSecsSinceEpoch(
+                m_timeSlider->windowStart().count() + m_calendar->displayOffset),
+            QDateTime::fromMSecsSinceEpoch(
+                m_timeSlider->windowEnd().count() + m_calendar->displayOffset)};
+    }
 }
 
 void QnWorkbenchNavigator::updateTimeSliderWindowFromCalendar()

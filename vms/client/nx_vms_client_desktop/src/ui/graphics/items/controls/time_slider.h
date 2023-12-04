@@ -190,6 +190,10 @@ public:
     void setWindow(milliseconds start, milliseconds end, bool animate = false, bool forceResize = false);
     void shiftWindow(milliseconds delta, bool animate = false);
 
+    bool isAnimatingWindow() const;
+    milliseconds windowTargetStart();
+    milliseconds windowTargetEnd();
+
     bool windowContains(milliseconds position);
     void ensureWindowContains(milliseconds position);
 
@@ -454,8 +458,6 @@ private:
 
     void extendSelection(milliseconds position);
 
-    bool isAnimatingWindow() const;
-
     bool scaleWindow(qreal factor, milliseconds anchor);
 
     void drawPeriodsBar(QPainter* painter, const QnTimePeriodList& recorded, const QnTimePeriodList& extra, const QRectF& rect);
@@ -514,10 +516,8 @@ private:
 
     void setThumbnailSelecting(milliseconds time, bool selecting);
 
-    void setTargetStart(milliseconds start);
-    void setTargetEnd(milliseconds end);
-    milliseconds targetStart();
-    milliseconds targetEnd();
+    void setWindowTargetStart(milliseconds start);
+    void setWindowTargetEnd(milliseconds end);
 
     // Similar to ensureWindowContains, but honors side paddings.
     void scrollIntoWindow(milliseconds position, bool animated);
