@@ -182,6 +182,7 @@ public:
     const std::unique_ptr<AccessRightsResolver> accessRightsResolver;
     const std::unique_ptr<AccessRightsResolver::Notifier> notifier;
     bool hierarchyChanged = false;
+    bool updatingAccessRights = false;
     mutable QSet<QnUuid> currentlyAccessibleIdsCache; //< For filter by permissions.
 
 public:
@@ -206,7 +207,9 @@ public:
             [this]()
             {
                 emit this->q->resourceAccessChanged();
-                emit this->q->accessibleByPermissionsFilterChanged();
+
+                if (!updatingAccessRights)
+                    emit this->q->accessibleByPermissionsFilterChanged();
             });
 
         connect(accessRightsResolver.get(), &AccessRightsResolver::resourceAccessReset,
@@ -219,8 +222,12 @@ public:
         connect(systemSubjectHierarchy, &SubjectHierarchy::reset,
             q, &AccessSubjectEditingContext::resetRelations);
 
-        connect(accessRightsManager.get(), &ProxyAccessRightsManager::ownAccessRightsChanged,
-            q, &AccessSubjectEditingContext::resourceAccessChanged);
+        connect(
+            accessRightsManager.get(), &ProxyAccessRightsManager::proxyAccessRightsAboutToBeChanged,
+            this, [this]() { updatingAccessRights = true; });
+
+        connect(accessRightsManager.get(), &ProxyAccessRightsManager::proxyAccessRightsChanged,
+            this, [this]() { updatingAccessRights = false; });
 
         connect(systemSubjectHierarchy, &SubjectHierarchy::changed,
             this, &Private::handleSystemHierarchyChanged);
