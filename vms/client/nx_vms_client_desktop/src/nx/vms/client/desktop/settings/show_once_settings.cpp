@@ -28,7 +28,10 @@ void ShowOnceSettings::reload()
 void ShowOnceSettings::reset()
 {
     for (BaseProperty* property: properties())
-        property->setVariantValue(false);
+    {
+        if (property != &migrationDone)
+            property->setVariantValue(false);
+    }
 }
 
 void ShowOnceSettings::migrate()
