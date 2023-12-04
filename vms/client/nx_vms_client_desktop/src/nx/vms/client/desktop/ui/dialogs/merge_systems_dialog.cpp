@@ -73,7 +73,7 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
 
     CustomerSupport customerSupport(systemContext());
     const QUrl url(customerSupport.systemContact.address.rawData);
-    ui->contactSupportLabel->setText(tr("We recommend that you consult with %1 before proceeding.")
+    ui->contactSupportLabel->setText(tr("It is recommended to contact %1 before proceeding.")
         .arg(nx::vms::common::html::link(tr("support"), url)));
     ui->contactSupportLabel->setOpenExternalLinks(url.isValid());
 
