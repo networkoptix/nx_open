@@ -5886,6 +5886,34 @@ We recommend you not to open this integration. If you understand the risks, you 
         <source>To add Video Wall, SaaS should be in active state. %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>Failed to open %n devices on the video wall:</source>
+        <translation>
+            <numerusform>Failed to open %n device on the video wall:</numerusform>
+            <numerusform>Failed to open %n devices on the video wall:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Failed to open %n cameras on the video wall:</source>
+        <translation>
+            <numerusform>Failed to open %n camera on the video wall:</numerusform>
+            <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchVirtualCameraHandler</name>
