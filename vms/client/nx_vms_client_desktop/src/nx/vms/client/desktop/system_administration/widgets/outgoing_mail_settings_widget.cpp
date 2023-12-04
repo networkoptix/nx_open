@@ -395,7 +395,7 @@ void OutgoingMailSettingsWidget::Private::updateSmtpConfigurationStatus()
 
 void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
 {
-    if (!q->currentServer() || !validate())
+    if (!q->currentServer())
         return;
 
     std::optional<QnUuid> proxyServerId;
