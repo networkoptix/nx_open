@@ -67,8 +67,6 @@ public:
 
     static void initWebEngine();
 
-    void initSkin();
-
 private:
     static void initSurfaceFormat();
     void initNetwork();

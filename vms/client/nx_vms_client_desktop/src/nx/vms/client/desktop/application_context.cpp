@@ -7,8 +7,10 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
+#include <QtGui/QPalette>
 #include <QtQml/QQmlEngine>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QToolTip>
 
 #include <api/server_rest_connection.h>
 #include <client/client_autorun_watcher.h>
@@ -39,7 +41,9 @@
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
+#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
@@ -66,7 +70,10 @@
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
+#include <nx/vms/client/desktop/style/old_style.h>
+#include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
@@ -76,6 +83,7 @@
 #include <nx/vms/utils/external_resources.h>
 #include <nx/vms/utils/translation/translation_manager.h>
 #include <platform/platform_abstraction.h>
+#include <utils/math/color_transformations.h>
 
 #if defined(Q_OS_MACOS)
     #include <ui/workaround/mac_utils.h>
@@ -192,10 +200,18 @@ void initializeExternalResources()
 
     nx::vms::client::core::FontLoader::loadFonts(
         externalResourcesDirectory().absoluteFilePath("fonts"));
+}
 
+QFont initializeBaseFont()
+{
     QFont font("Roboto", /*pointSize*/ -1, QFont::Normal);
     font.setPixelSize(13);
-    qApp->setFont(font);
+    return font;
+}
+
+void initializeDefaultApplicationFont()
+{
+    qApp->setFont(fontConfig()->normal());
 }
 
 QString calculateLogNameSuffix(
@@ -255,6 +271,44 @@ QString baseFontConfigPath()
         return result;
 
     return ":/skin/basic_fonts.json";
+}
+
+QPalette makeApplicationPalette()
+{
+    QPalette result(QApplication::palette());
+    result.setColor(QPalette::WindowText, core::colorTheme()->color("light16"));
+    result.setColor(QPalette::Button, core::colorTheme()->color("dark11"));
+    result.setColor(QPalette::Light, core::colorTheme()->color("light10"));
+    result.setColor(QPalette::Midlight, core::colorTheme()->color("dark13"));
+    result.setColor(QPalette::Dark, core::colorTheme()->color("dark9"));
+    result.setColor(QPalette::Mid, core::colorTheme()->color("dark10"));
+    result.setColor(QPalette::Text, core::colorTheme()->color("light4"));
+    result.setColor(QPalette::BrightText, core::colorTheme()->color("light1"));
+    result.setColor(QPalette::ButtonText, core::colorTheme()->color("light4"));
+    result.setColor(QPalette::Base, core::colorTheme()->color("dark7"));
+    result.setColor(QPalette::Window, core::colorTheme()->color("dark7"));
+    result.setColor(QPalette::Shadow, core::colorTheme()->color("dark5"));
+    result.setColor(QPalette::Highlight, core::colorTheme()->color("brand_core"));
+    result.setColor(QPalette::HighlightedText, core::colorTheme()->color("brand_contrast"));
+    result.setColor(QPalette::Link, core::colorTheme()->color("brand_d2"));
+    result.setColor(QPalette::LinkVisited, core::colorTheme()->color("brand_core"));
+    result.setColor(QPalette::AlternateBase, core::colorTheme()->color("dark7"));
+    result.setColor(QPalette::ToolTipBase, core::colorTheme()->color("light4"));
+    result.setColor(QPalette::ToolTipText, core::colorTheme()->color("dark4"));
+    result.setColor(QPalette::PlaceholderText, core::colorTheme()->color("light16"));
+
+    static const auto kDisabledAlpha = 77;
+    static const QList<QPalette::ColorRole> kDimmerRoles{{
+        QPalette::WindowText, QPalette::Button, QPalette::Light,
+        QPalette::Midlight, QPalette::Dark, QPalette::Mid,
+        QPalette::Text, QPalette::BrightText, QPalette::ButtonText,
+        QPalette::Base, QPalette::Shadow, QPalette::HighlightedText,
+        QPalette::Link, QPalette::LinkVisited, QPalette::AlternateBase}};
+
+    for (const QPalette::ColorRole role: kDimmerRoles)
+        result.setColor(QPalette::Disabled, role, withAlpha(result.color(role), kDisabledAlpha));
+
+    return result;
 }
 
 } // namespace
@@ -487,6 +541,23 @@ struct ApplicationContext::Private
         }
     }
 
+    void initSkin()
+    {
+        QStringList paths;
+        paths << ":/skin";
+
+        skin = std::make_unique<nx::vms::client::core::Skin>(paths);
+
+        QApplication::setWindowIcon(skin->icon(":/logo.png"));
+        QApplication::setStyle([]() { return new OldStyle(new Style()); }());
+
+        colorTheme = std::make_unique<nx::vms::client::core::ColorTheme>();
+        customCursors = std::make_unique<nx::vms::client::desktop::CustomCursors>(skin.get());
+
+        QApplication::setPalette(makeApplicationPalette());
+        QToolTip::setPalette(QApplication::palette());
+    }
+
     void initializeQml()
     {
         static const QString kQmlRoot = QStringLiteral("qrc:///qml");
@@ -595,6 +666,10 @@ struct ApplicationContext::Private
     std::unique_ptr<CloudLayoutsManager> cloudLayoutsManager;
     std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
     std::unique_ptr<nx::cloud::gateway::VmsGatewayEmbeddable> cloudGateway;
+
+    std::unique_ptr<nx::vms::client::core::Skin> skin;
+    std::unique_ptr<nx::vms::client::core::ColorTheme> colorTheme;
+    std::unique_ptr<nx::vms::client::desktop::CustomCursors> customCursors;
 };
 
 ApplicationContext::ApplicationContext(
@@ -621,7 +696,9 @@ ApplicationContext::ApplicationContext(
     initializeResources();
     initializeExternalResources();
     QnClientMetaTypes::initialize();
-    storeFontConfig(new FontConfig(baseFontConfigPath()));
+    d->initSkin();
+    storeFontConfig(new FontConfig(initializeBaseFont(), baseFontConfigPath()));
+    initializeDefaultApplicationFont();
     d->initializeSettings();
     d->initializeExceptionHandlerGuard();
 
