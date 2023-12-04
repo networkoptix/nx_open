@@ -489,9 +489,6 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
             return;
 
         data.promoOverlay = new PtzPromoOverlay();
-        data.promoOverlay->setPagesVisibility(
-            !showOnceSettings()->newPtzMechanicPromo(),
-            !showOnceSettings()->autoTrackingPromo());
 
         connect(data.promoOverlay.data(), &PtzPromoOverlay::closeRequested, this,
             [this, widget, overlay = data.promoOverlay.data()]()
@@ -508,6 +505,10 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
             QnResourceWidget::OverlayFlag::bindToViewport | QnResourceWidget::OverlayFlag::autoRotate,
             QnResourceWidget::TopControlsLayer});
     }
+
+    data.promoOverlay->setPagesVisibility(
+        !showOnceSettings()->newPtzMechanicPromo(),
+        !showOnceSettings()->autoTrackingPromo());
 
     const bool showPromo = widget->options().testFlag(QnResourceWidget::ControlPtz)
         && !appContext()->localSettings()->ptzAimOverlayEnabled()
