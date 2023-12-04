@@ -37,7 +37,10 @@ public:
         requestTrafficRelayUrl();
     }
 
-    ~Private() {}
+    ~Private()
+    {
+        stopHttpClient();
+    }
 
 public:
     TrafficRelayUrlWatcher* const q;
@@ -54,10 +57,18 @@ public:
         return trafficRelayUrl;
     }
 
+    void stopHttpClient()
+    {
+        if (!httpClient)
+            return;
+
+        httpClient->pleaseStopSync();
+        httpClient.reset();
+    }
+
     void requestTrafficRelayUrl()
     {
-        if (httpClient)
-            httpClient->pleaseStopSync();
+        stopHttpClient();
 
         const auto cloudSystemId = q->systemSettings()->cloudSystemId();
         if (cloudSystemId.isEmpty())
@@ -97,7 +108,7 @@ public:
                 }
 
                 const auto result = httpClient->fetchMessageBodyBuffer();
-                httpClient.reset();
+                stopHttpClient();
                 if (result.empty())
                 {
                     NX_VERBOSE(this, "POST body fetch failed. Url: %1", url);
