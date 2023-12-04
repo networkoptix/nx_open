@@ -624,7 +624,7 @@ void CloudStatusWatcher::Private::validateAccessToken()
                 emit q->cloudLoginChanged();
         });
 
-    cloudConnection->oauthManager()->validateToken(
+    cloudConnection->oauthManager()->legacyValidateToken(
         m_authData.credentials.authToken.value, std::move(callback));
 }
 

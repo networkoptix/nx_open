@@ -22,11 +22,16 @@ public:
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueCodeResponse)> completionHandler)
         override;
 
-    virtual void validateToken(
+    virtual void legacyValidateToken(
         const std::string& token,
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::ValidateTokenResponse)>
             completionHandler)
         override;
+
+    virtual void introspectToken(
+        const api::TokenIntrospectionRequest request,
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::TokenIntrospectionResponse)>
+            completionHandler) override;
 
     virtual void deleteToken(
         const std::string& token,
