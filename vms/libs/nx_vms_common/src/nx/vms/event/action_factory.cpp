@@ -78,8 +78,6 @@ AbstractActionPtr ActionFactory::createAction(
             return AbstractActionPtr(new SendMailAction(runtimeParams));
         case ActionType::bookmarkAction:
             return AbstractActionPtr(new BookmarkAction(runtimeParams));
-        case ActionType::showIntercomInformer:
-            return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
 
         case ActionType::undefinedAction:
         case ActionType::diagnosticsAction:

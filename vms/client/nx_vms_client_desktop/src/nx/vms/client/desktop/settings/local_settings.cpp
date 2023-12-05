@@ -101,6 +101,9 @@ void migratePopupSystemHealthFrom5_1(LocalSettings* settings, QSettings* oldSett
         healthFlag <<= 1;
     }
 
+    result.insert(MessageType::showIntercomInformer);
+    result.insert(MessageType::showMissedCallInformer);
+
     settings->popupSystemHealth = result;
 }
 

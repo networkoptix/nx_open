@@ -149,7 +149,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
         creationCallback(true);
 
         // Hiding notification instantly to keep UX smooth.
-        emit notificationRemoved(businessAction);
+        removeNotification(businessAction);
         return;
     }
 
@@ -179,7 +179,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
         creationCallback);
 
     // Hiding notification instantly to keep UX smooth.
-    emit notificationRemoved(businessAction);
+    removeNotification(businessAction);
 }
 
 void QnWorkbenchNotificationsHandler::handleFullscreenCameraAction(
@@ -260,7 +260,6 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     switch (action->actionType())
     {
         case vms::api::ActionType::showOnAlarmLayoutAction:
-        case vms::api::ActionType::showIntercomInformer:
         case vms::api::ActionType::playSoundAction:
             //case vms::event::playSoundOnceAction: -- handled outside without notification
             alwaysNotify = true;
@@ -280,6 +279,25 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(
     MessageType message, const vms::event::AbstractActionPtr& action)
 {
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(action), true);
+}
+
+void QnWorkbenchNotificationsHandler::removeNotification(
+    const vms::event::AbstractActionPtr& action)
+{
+    const vms::api::EventType eventType = action->getRuntimeParams().eventType;
+
+    if (eventType >= vms::api::EventType::systemHealthEvent
+        && eventType <= vms::api::EventType::maxSystemHealthEvent)
+    {
+        const int healthMessage = eventType - vms::api::EventType::systemHealthEvent;
+
+        setSystemHealthEventVisibleInternal(
+            MessageType(healthMessage), QVariant::fromValue(action), false);
+    }
+    else
+    {
+        emit notificationRemoved(action);
+    }
 }
 
 bool QnWorkbenchNotificationsHandler::tryClose(bool /*force*/)
@@ -400,7 +418,6 @@ void QnWorkbenchNotificationsHandler::at_businessActionReceived(
 
         case vms::api::ActionType::showPopupAction: //< Fallthrough
         case vms::api::ActionType::playSoundAction:
-        case vms::api::ActionType::showIntercomInformer:
         {
             switch (action->getToggleState())
             {
@@ -410,7 +427,7 @@ void QnWorkbenchNotificationsHandler::at_businessActionReceived(
                     break;
 
                 case vms::api::EventState::inactive:
-                    emit notificationRemoved(action);
+                    removeNotification(action);
                     break;
 
                 default:

@@ -2498,8 +2498,7 @@ void QnWorkbenchDisplay::at_notificationAdded(const vms::event::AbstractActionPt
     else
     {
         NX_ASSERT(actionType == vms::api::ActionType::showPopupAction
-            || actionType == vms::api::ActionType::playSoundAction
-            || actionType == vms::api::ActionType::showIntercomInformer);
+            || actionType == vms::api::ActionType::playSoundAction);
         vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);

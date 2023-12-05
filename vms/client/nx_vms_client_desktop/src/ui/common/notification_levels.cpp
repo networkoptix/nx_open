@@ -40,6 +40,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         // Green notifications.
         case MessageType::archiveRebuildFinished:
         case MessageType::archiveFastScanFinished: //< This one is never displayed though.
+        case MessageType::showIntercomInformer:
             return QnNotificationLevel::Value::SuccessNotification;
 
         // Yellow notifications.
@@ -65,6 +66,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         case MessageType::backupStoragesNotConfigured:
         case MessageType::storagesNotConfigured:
         case MessageType::remoteArchiveSyncError:
+        case MessageType::showMissedCallInformer:
             return QnNotificationLevel::Value::CriticalNotification;
 
         default:
