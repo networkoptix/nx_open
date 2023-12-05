@@ -214,7 +214,7 @@ void NotificationListWidget::Private::changeFilterVisibilityIfNeeded()
 
     if (auto user = system()->user();
         user && user->isCloud() && qnCloudStatusWatcher->cloudSystems().size() > 1
-        && (saas::saasServicesOperational(system()) || rules::ini().enableCSNwithoutSaaS))
+        && saas::saasServicesOperational(system()))
     {
         m_headerWidget->show();
         m_separatorLine->show();
