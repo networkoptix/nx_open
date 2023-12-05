@@ -548,27 +548,24 @@ int ServerUpdateTool::uploadPackageToRecipients(
 {
     NX_ASSERT(!package.file.isEmpty());
 
-    QString localFile = m_packageProperties[package.file].localFile;
-    NX_ASSERT(!localFile.isEmpty());
-
     auto targets = getTargetsForPackage(package);
 
     if (targets.empty())
     {
-        NX_DEBUG(this, "uploadPackage(%1) - no server wants this package", localFile);
+        NX_DEBUG(this, "%1(%2): No servers want this package", __func__, package.file);
         return 0;
     }
 
     int toUpload = 0;
 
-    NX_INFO(this, "uploadPackage(%1) - going to upload package to servers", localFile);
+    NX_INFO(this, "%1(%2): Going to upload package to servers", __func__, package.file);
 
     for (const auto& serverId: targets)
     {
         auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
         if (!server)
         {
-            NX_ERROR(this, "uploadPackage(%1) - lost server %2 for upload", localFile, serverId);
+            NX_ERROR(this, "%1(%2): Lost server %3 for upload", __func__, package.file, serverId);
             continue;
         }
 
@@ -582,7 +579,11 @@ int ServerUpdateTool::uploadPackageToRecipients(
 bool ServerUpdateTool::uploadPackageToServer(const QnUuid& serverId,
     const nx::vms::update::Package& package, QDir storageDir)
 {
-    QString localFile = m_packageProperties[package.file].localFile;
+    NX_VERBOSE(this, "%1(%2): Starting...", __func__, package.file);
+
+    const QString localFile = m_packageProperties[package.file].localFile;
+    NX_ASSERT(!localFile.isEmpty());
+
     UploadState config;
     config.source = storageDir.absoluteFilePath(localFile);
     // Updates should land to updates/version/file_name.
@@ -592,10 +593,10 @@ bool ServerUpdateTool::uploadPackageToServer(const QnUuid& serverId,
     // Server should create file by itself.
     config.allowFileCreation = false;
 
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
+    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
     if (!server)
     {
-        NX_ERROR(this, "uploadPackageToServer(%1) - lost server %2 for upload", localFile, serverId);
+        NX_ERROR(this, "%1(%2): Lost server %3 for upload", __func__, localFile, serverId);
         return false;
     }
 
@@ -606,19 +607,22 @@ bool ServerUpdateTool::uploadPackageToServer(const QnUuid& serverId,
                 tool->atUploadWorkerState(serverId, state);
         };
 
-    auto id = m_uploadManager->addUpload(server, config, this, callback);
+    const QString uploadId = m_uploadManager->addUpload(server, config, this, callback);
 
-    if (!id.isEmpty())
+    if (!uploadId.isEmpty())
     {
-        NX_INFO(this, "uploadPackageToServer(%1) - started uploading file to server %2",
-            package.file, serverId);
-        m_uploadStateById[id] = config;
-        m_activeUploads.insert(id);
+        NX_INFO(this, "%1(%2): Started uploading file to server %3",
+            __func__, package.file, serverId);
+        m_uploadStateById[uploadId] = config;
+        m_activeUploads.insert(uploadId);
         return true;
     }
-    NX_WARNING(this, "uploadPackageToServer(%1) - failed to start uploading file=%2 reason=%3",
-        package.file, localFile, config.errorMessage);
-    m_completedUploads.insert(id);
+
+    NX_WARNING(this, "%1(%2): Failed to start uploading: file=%3 reason=%4",
+        __func__, package.file, localFile, config.errorMessage);
+
+    m_completedUploads.insert(uploadId);
+
     return false;
 }
 
