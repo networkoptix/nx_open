@@ -528,6 +528,7 @@ distrib_copyQtLibs() # additional_libs_to_copy...
         Sql
         WebSockets
         Qml
+        SerialPort
 
         "${additional_qt_libs[@]}"
     )
