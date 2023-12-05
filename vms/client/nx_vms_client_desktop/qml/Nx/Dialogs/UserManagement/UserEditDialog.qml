@@ -188,6 +188,12 @@ DialogWithState
                 }
             }
         }
+
+        onTabSwitched:
+        {
+            if (tabIndex === 0)
+                validateFunc()
+        }
     }
 
     Column

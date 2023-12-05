@@ -180,6 +180,12 @@ DialogWithState
                 }
             }
         }
+
+        onTabSwitched:
+        {
+            if (tabIndex === 0)
+                validateFunc()
+        }
     }
 
     DialogBanner
