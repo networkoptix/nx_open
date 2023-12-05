@@ -2,7 +2,6 @@ module Nx.Items
 
 AnalyticsSettingsMenu 1.0 AnalyticsSettingsMenu.qml
 IntegrationsMenu 1.0 IntegrationsMenu.qml
-CameraDisplay 1.0 CameraDisplay.qml
 DewarpingSettings 1.0 DewarpingSettings.qml
 FigureEditor 1.0 FigureEditor.qml
 FigurePreview 1.0 FigurePreview.qml
@@ -17,6 +16,4 @@ SelectionMouseArea 1.0 SelectionMouseArea.qml
 Timeline 1.0 Timeline.qml
 TimelineCalendar 1.0 TimelineCalendar.qml
 InteractiveGrid 1.0 InteractiveGrid.qml
-IntervalPreview 1.0 IntervalPreview.qml
 IntervalPreviewControls 1.0 IntervalPreviewControls.qml
-NameValueTable 1.0 NameValueTable.qml

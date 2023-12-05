@@ -5,7 +5,6 @@ import QtQuick.Controls 2.14
 import QtQuick.Window 2.14
 import QtQml 2.14
 
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
 
@@ -36,7 +35,7 @@ GridView
     cellWidth: columnWidth + columnSpacing
     cellHeight: rowHeight + rowSpacing
 
-    topMargin: 4
+    topMargin: 14
     leftMargin: 8
     rightMargin: 8 + scrollBar.width - columnSpacing
     bottomMargin: 8 - rowSpacing
@@ -44,6 +43,38 @@ GridView
     boundsBehavior: Flickable.StopAtBounds
     interactive: false
     clip: true
+
+    function currentCentralPointUs()
+    {
+        if (!count)
+            return d.currentTimeUs()
+
+        // Calculate the currently visible rows
+        const firstVisibleRow = Math.floor((contentY + topMargin - originY ) / cellHeight);
+        const lastVisibleRow = Math.ceil((contentY + topMargin - originY + height) / cellHeight) - 1;
+
+        // Looks for the avarage time of first items in the rows.
+        const columnCount = Math.floor(width / (columnWidth + columnSpacing))
+        const firstItem = itemAtIndex(firstVisibleRow * columnCount)
+        const lastItem = itemAtIndex(lastVisibleRow * columnCount)
+
+        const items = [firstItem, lastItem]
+        let validCount = 0
+        let timestampSum = 0
+        items.forEach(
+            (item) =>
+            {
+                if (!item || !item.videoPreviewTimestampMs)
+                    return
+
+                timestampSum += item.videoPreviewTimestampMs
+                validCount++
+            })
+
+        return validCount
+            ? timestampSum / count * 1000
+            : d.currentTimeUs()
+    }
 
     ScrollBar.vertical: ScrollBar
     {
@@ -130,6 +161,11 @@ GridView
 
         property real automaticRowHeight: 0
         property real maxImplicitRowHeight: 0
+
+        function currentTimeUs()
+        {
+            return new Date().getTime() * 1000
+        }
 
         function resetAutomaticRowHeight()
         {

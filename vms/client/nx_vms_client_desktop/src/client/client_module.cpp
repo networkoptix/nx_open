@@ -28,13 +28,12 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/analytics/analytics_metadata_provider_factory.h>
+#include <nx/vms/client/core/analytics/analytics_settings_manager.h>
+#include <nx/vms/client/core/analytics/analytics_settings_manager_factory.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
-#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
-#include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
-#include <nx/vms/client/desktop/analytics/analytics_settings_manager_factory.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
 #include <nx/vms/client/desktop/director/director.h>
@@ -76,8 +75,10 @@ struct QnClientModule::Private
     }
 
     const QnStartupParameters startupParameters;
-    std::unique_ptr<AnalyticsSettingsManager> analyticsSettingsManager;
-    std::unique_ptr<analytics::AttributeHelper> analyticsAttributeHelper;
+    std::unique_ptr<core::AnalyticsSettingsManager> analyticsSettingsManager;
+    std::unique_ptr<core::analytics::AnalyticsMetadataProviderFactory> analyticsMetadataProviderFactory;
+    std::unique_ptr<LicenseHealthWatcher> licenseHealthWatcher;
+    std::unique_ptr<core::analytics::AttributeHelper> analyticsAttributeHelper;
     std::unique_ptr<nx::vms::license::VideoWallLicenseUsageHelper> videoWallLicenseUsageHelper;
     std::unique_ptr<DebugInfoStorage> debugInfoStorage;
 };
@@ -102,19 +103,16 @@ QnClientModule::QnClientModule(
 
     core::appContext()->knownServerConnectionsWatcher()->start();
 
-    d->analyticsSettingsManager = AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
+    d->analyticsSettingsManager = core::AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
         systemContext);
 
-    d->analyticsAttributeHelper = std::make_unique<analytics::AttributeHelper>(
-        systemContext->analyticsTaxonomyStateWatcher());
-
-    m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
-    m_analyticsMetadataProviderFactory->registerMetadataProviders();
+    d->analyticsMetadataProviderFactory.reset(new core::analytics::AnalyticsMetadataProviderFactory());
+    d->analyticsMetadataProviderFactory->registerMetadataProviders();
 
     registerResourceDataProviders();
     integrations::initialize(this);
 
-    m_licenseHealthWatcher.reset(new LicenseHealthWatcher(
+    d->licenseHealthWatcher.reset(new LicenseHealthWatcher(
         systemContext->licensePool()));
 
     d->debugInfoStorage = std::make_unique<DebugInfoStorage>();
@@ -233,18 +231,7 @@ nx::vms::license::VideoWallLicenseUsageHelper* QnClientModule::videoWallLicenseU
     return d->videoWallLicenseUsageHelper.get();
 }
 
-analytics::TaxonomyManager* QnClientModule::taxonomyManager() const
-{
-    return systemContext()->taxonomyManager();
-}
-
-analytics::AttributeHelper*
-    QnClientModule::analyticsAttributeHelper() const
-{
-    return d->analyticsAttributeHelper.get();
-}
-
-AnalyticsSettingsManager* QnClientModule::analyticsSettingsManager() const
+core::AnalyticsSettingsManager* QnClientModule::analyticsSettingsManager() const
 {
     return d->analyticsSettingsManager.get();
 }

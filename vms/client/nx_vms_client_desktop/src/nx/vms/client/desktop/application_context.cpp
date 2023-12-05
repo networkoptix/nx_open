@@ -42,13 +42,14 @@
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/font_loader.h>
-#include <nx/vms/client/desktop/analytics/object_display_settings.h>
+#include <nx/vms/client/core/analytics/object_display_settings.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
@@ -59,7 +60,6 @@
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
-#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/session_manager/default_process_interface.h>
 #include <nx/vms/client/desktop/session_manager/session_manager.h>
 #include <nx/vms/client/desktop/settings/ipc_settings_synchronizer.h>
@@ -77,6 +77,7 @@
 #include <nx/vms/client/desktop/style/old_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/ui/image_providers/web_page_icon_cache.h>
@@ -331,12 +332,12 @@ struct ApplicationContext::Private
     std::vector<QPointer<WindowContext>> windowContexts;
     std::unique_ptr<SystemContext> mainSystemContext; //< Main System Context;
     std::unique_ptr<QnClientCoreModule> clientCoreModule;
-    std::unique_ptr<UnifiedResourcePool> unifiedResourcePool;
+    std::unique_ptr<core::UnifiedResourcePool> unifiedResourcePool;
 
     // Settings modules.
     std::unique_ptr<LocalSettings> localSettings;
     std::unique_ptr<QnClientRuntimeSettings> runtimeSettings;
-    std::unique_ptr<ObjectDisplaySettings> objectDisplaySettings;
+    std::unique_ptr<core::ObjectDisplaySettings> objectDisplaySettings;
     std::unique_ptr<ScreenRecordingSettings> screenRecordingSettings;
     std::unique_ptr<ShowOnceSettings> showOnceSettings;
     std::unique_ptr<MessageBarSettings> messageBarSettings;
@@ -413,7 +414,7 @@ struct ApplicationContext::Private
             }
         #endif
 
-        objectDisplaySettings = std::make_unique<ObjectDisplaySettings>();
+        objectDisplaySettings = std::make_unique<core::ObjectDisplaySettings>();
         screenRecordingSettings = std::make_unique<ScreenRecordingSettings>();
         showOnceSettings = std::make_unique<ShowOnceSettings>();
         messageBarSettings = std::make_unique<MessageBarSettings>();
@@ -577,7 +578,8 @@ struct ApplicationContext::Private
                 ? SystemContext::Mode::unitTests
                 : SystemContext::Mode::client,
             peerId);
-        systemContexts.push_back(mainSystemContext.get());
+
+        q->addSystemContext(mainSystemContext.get());
 
         if (mode == Mode::desktopClient)
         {
@@ -747,7 +749,6 @@ ApplicationContext::ApplicationContext(
             d->initializeNetworkModules();
             d->initializeSystemContext();
             d->initializeCrossSystemModules();
-            d->unifiedResourcePool = std::make_unique<UnifiedResourcePool>();
             d->mainSystemContext->enableRouting(moduleDiscoveryManager());
             d->initializeClientCoreModule();
             d->initializeQml();
@@ -815,39 +816,6 @@ nx::utils::SoftwareVersion ApplicationContext::version() const
         : nx::utils::SoftwareVersion(nx::build_info::vmsVersion());
 }
 
-SystemContext* ApplicationContext::currentSystemContext() const
-{
-    if (NX_ASSERT(!d->systemContexts.empty()))
-        return d->systemContexts.front();
-
-    return nullptr;
-}
-
-std::vector<SystemContext*> ApplicationContext::systemContexts() const
-{
-    std::vector<SystemContext*> result;
-    for (auto context: d->systemContexts)
-    {
-        if (NX_ASSERT(context))
-            result.push_back(context.data());
-    }
-    return result;
-}
-
-void ApplicationContext::addSystemContext(SystemContext* systemContext)
-{
-    d->systemContexts.push_back(systemContext);
-    emit systemContextAdded(systemContext);
-}
-
-void ApplicationContext::removeSystemContext(SystemContext* systemContext)
-{
-    auto iter = std::find(d->systemContexts.begin(), d->systemContexts.end(), systemContext);
-    if (NX_ASSERT(iter != d->systemContexts.end()))
-        d->systemContexts.erase(iter);
-    emit systemContextRemoved(systemContext);
-}
-
 SystemContext* ApplicationContext::systemContextByCloudSystemId(const QString& cloudSystemId) const
 {
     if (const auto cloudContext = d->cloudCrossSystemManager->systemContext(cloudSystemId))
@@ -905,14 +873,14 @@ QnClientCoreModule* ApplicationContext::clientCoreModule() const
     return d->clientCoreModule.get();
 }
 
+SystemContext* ApplicationContext::currentSystemContext() const
+{
+    return base_type::currentSystemContext()->as<SystemContext>();
+}
+
 ContextStatisticsModule* ApplicationContext::statisticsModule() const
 {
     return d->statisticsModule.get();
-}
-
-UnifiedResourcePool* ApplicationContext::unifiedResourcePool() const
-{
-    return d->unifiedResourcePool.get();
 }
 
 LocalSettings* ApplicationContext::localSettings() const
@@ -940,7 +908,7 @@ MessageBarSettings* ApplicationContext::messageBarSettings() const
     return d->messageBarSettings.get();
 }
 
-ObjectDisplaySettings* ApplicationContext::objectDisplaySettings() const
+core::ObjectDisplaySettings* ApplicationContext::objectDisplaySettings() const
 {
     return d->objectDisplaySettings.get();
 }

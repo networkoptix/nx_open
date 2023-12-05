@@ -21,6 +21,8 @@ class ColorTheme;
 class CloudStatusWatcher;
 class FontConfig;
 class Settings;
+class SystemContext;
+class UnifiedResourcePool;
 
 namespace watchers { class KnownServerConnections; }
 
@@ -70,13 +72,47 @@ public:
 
     Settings* coreSettings() const;
 
+    watchers::KnownServerConnections* knownServerConnectionsWatcher() const;
+
     ColorTheme* colorTheme() const;
 
-    watchers::KnownServerConnections* knownServerConnectionsWatcher() const;
+    /**
+     * Unified interface to access all available Resource Pools.
+     */
+    UnifiedResourcePool* unifiedResourcePool() const;
+
+    /**
+     * Context of the System we are currently connected to. Also contains local files.
+     */
+    SystemContext* currentSystemContext() const;
+
+    /**
+     * Contexts of the all Systems for which we have established connection.
+     */
+    std::vector<SystemContext*> systemContexts() const;
+
+    /**
+     * Register existing System Context. First registered is considered to be the Current Context.
+     * Ownership is not passed, but Context is to be unregistered before being destroyed.
+     * TODO: #sivanov Pass ownership here and emit signals on adding / deleting Contexts.
+     * TODO: @sivanov Allow to change Current Context later.
+     */
+    void addSystemContext(SystemContext* systemContext);
+
+    /**
+     * Unregister existing system context before destroying.
+     */
+    void removeSystemContext(SystemContext* systemContext);
 
     FontConfig* fontConfig() const;
 
+signals:
+    void systemContextAdded(SystemContext* systemContext);
+    void systemContextRemoved(SystemContext* systemContext);
+
 protected:
+    void addMainContext(SystemContext* mainContext);
+
     void storeFontConfig(FontConfig* config);
 
 private:

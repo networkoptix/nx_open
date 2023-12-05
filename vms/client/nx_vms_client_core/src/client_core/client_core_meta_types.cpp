@@ -20,7 +20,10 @@
 #include <nx/vms/api/types/dewarping_types.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/camera/buttons/abstract_camera_button_controller.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/common/helpers/texture_size_helper.h>
@@ -31,16 +34,21 @@
 #include <nx/vms/client/core/common/utils/property_update_filter.h>
 #include <nx/vms/client/core/common/utils/validators.h>
 #include <nx/vms/client/core/common/utils/velocity_meter.h>
+#include <nx/vms/client/core/event_search/event_search_globals.h>
+#include <nx/vms/client/core/event_search/models/abstract_search_list_model.h>
+#include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
+#include <nx/vms/client/core/event_search/utils/common_object_search_setup.h>
+#include <nx/vms/client/core/event_search/utils/event_search_utils.h>
+#include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 #include <nx/vms/client/core/items/grid_viewport.h>
 #include <nx/vms/client/core/media/abstract_time_period_storage.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
-#include <nx/vms/client/core/media/media_player.h>
 #include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/vms/client/core/motion/helpers/media_player_motion_provider.h>
 #include <nx/vms/client/core/motion/items/motion_mask_item.h>
 #include <nx/vms/client/core/network/oauth_client.h>
-#include <nx/vms/client/core/network/server_certificate_validation_level_metatype.h>
+#include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/qml/nx_globals_object.h>
 #include <nx/vms/client/core/qml/positioners/grid_positioner.h>
 #include <nx/vms/client/core/qml/qml_test_helper.h>
@@ -48,11 +56,13 @@
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/core/resource/media_resource_helper.h>
 #include <nx/vms/client/core/resource/resource_helper.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/global_temporaries.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/thumbnails/abstract_resource_thumbnail.h>
+#include <nx/vms/client/core/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/core/time/calendar_model.h>
 #include <nx/vms/client/core/time/date_range.h>
 #include <nx/vms/client/core/time/day_hours_model.h>
@@ -72,21 +82,14 @@
 
 namespace nx::vms::client::core {
 
-namespace {
-
-static QObject* createNxGlobals(QQmlEngine*, QJSEngine*)
-{
-    return new NxGlobalsObject();
-}
-
-} // namespace
-
 void initializeMetaTypes()
 {
     static std::atomic_bool initialized = false;
 
     if (initialized.exchange(true))
         return;
+
+    ColorTheme::registerQmlType();
 
     QnCommonMetaTypes::initialize();
     nx::vms::rules::Metatypes::initialize();
@@ -99,7 +102,7 @@ void initializeMetaTypes()
 
     // To create properties of type QAbstractItemModel* in QML and to assign C++ object properties
     // of that type from QML.
-    qmlRegisterUncreatableType<QAbstractItemModel>("Nx", 1, 0, "AbstractItemModel",
+    qmlRegisterUncreatableType<QAbstractItemModel>("Nx.Core", 1, 0, "AbstractItemModel",
         "Cannot create instance of AbstractItemModel.");
 
     qmlRegisterType<QmlTestHelper>("Nx.Test", 1, 0, "QmlTestHelper");
@@ -117,13 +120,24 @@ void initializeMetaTypes()
 
     qmlRegisterType<Collator>("Nx.Core", 1, 0, "Collator");
 
-    qmlRegisterSingletonType<NxGlobalsObject>("Nx", 1, 0, "NxGlobals", &createNxGlobals);
+    qmlRegisterSingletonType<NxGlobalsObject>("Nx.Core", 1, 0, "NxGlobals",
+        [](QQmlEngine*, QJSEngine*) { return new NxGlobalsObject(); });
+    qmlRegisterSingletonType<EventSearchUtils>("nx.vms.client.core", 1, 0, "EventSearchUtils",
+        [](QQmlEngine*, QJSEngine*) { return new EventSearchUtils(); });
+
+    qmlRegisterSingletonType<Settings>("Nx.Core", 1, 0, "CoreSettings",
+        [](QQmlEngine* qmlEngine, QJSEngine* /*jsEngine*/) -> QObject*
+        {
+            qmlEngine->setObjectOwnership(appContext()->coreSettings(), QQmlEngine::CppOwnership);
+            return appContext()->coreSettings();
+        });
+
     qmlRegisterUncreatableType<QnUuid>(
         "Nx.Utils", 1, 0, "Uuid", "Cannot create an instance of Uuid.");
     qmlRegisterUncreatableType<utils::Url>(
         "Nx.Utils", 1, 0, "Url", "Cannot create an instance of Url.");
     qmlRegisterUncreatableType<nx::utils::SoftwareVersion>(
-        "Nx", 1, 0, "SoftwareVersion", "Cannot create an instance of SoftwareVersion.");
+        "Nx.Core", 1, 0, "SoftwareVersion", "Cannot create an instance of SoftwareVersion.");
     qRegisterMetaType<DateRange>();
     qmlRegisterUncreatableType<DateRange>(
         "nx.vms.client.core", 1, 0, "DateRange", "Cannot create an instance of DateRange.");
@@ -161,7 +175,17 @@ void initializeMetaTypes()
     CameraButton::registerQmlType();
     AccessHelper::registerQmlType();
 
+    EventSearch::registerQmlTypes();
+    ResourceIdentificationThumbnail::registerQmlType();
+    AnalyticsSearchSetup::registerQmlType();
+    TextFilterSetup::registerQmlType();
     MediaPlayer::registerQmlTypes();
+    AbstractSearchListModel::registerQmlType();
+    CommonObjectSearchSetup::registerQmlType();
+    analytics::TaxonomyManager::registerQmlTypes();
+    analytics::IconManager::registerQmlType();
+    FetchRequest::registerQmlType();
+    ColorTheme::registerQmlType();
 
     qRegisterMetaType<MediaDewarpingParams>();
     qmlRegisterUncreatableType<MediaDewarpingParams>("nx.vms.client.core", 1, 0,

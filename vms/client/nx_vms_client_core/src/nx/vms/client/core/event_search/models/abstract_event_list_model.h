@@ -7,32 +7,34 @@
 #include <QtCore/QAbstractListModel>
 
 #include <nx/utils/scoped_model_operations.h>
-#include <nx/vms/client/desktop/window_context_aware.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 /**
- * Base model for all Right Panel data models. Provides action activation via setData.
+ * Base model for all Event Search data models. Provides action activation via setData.
  */
-class AbstractEventListModel:
+class NX_VMS_CLIENT_CORE_API AbstractEventListModel:
     public ScopedModelOperations<QAbstractListModel>,
-    public WindowContextAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractListModel>;
 
 public:
-    explicit AbstractEventListModel(WindowContext* context, QObject* parent = nullptr);
+    explicit AbstractEventListModel(
+        SystemContext* context,
+        QObject* parent = nullptr);
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+    virtual QHash<int, QByteArray> roleNames() const override;
 
 protected:
     bool isValid(const QModelIndex& index) const;
-    virtual QString timestampText(std::chrono::microseconds timestamp) const;
 
     virtual bool defaultAction(const QModelIndex& index);
     virtual bool activateLink(const QModelIndex& index, const QString& link);
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

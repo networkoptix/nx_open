@@ -6,24 +6,22 @@
 
 #include <api/media_server_statistics_manager.h>
 #include <api/runtime_info_manager.h>
-#include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_data_manager.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <nx/branding.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
-#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
@@ -39,8 +37,7 @@
 #include <nx/vms/client/desktop/videowall/desktop_camera_initializer.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
-#include <nx/vms/common/system_settings.h>
-#include <server/server_storage_manager.h>
+#include <storage/server_storage_manager.h>
 
 #include "application_context.h"
 
@@ -61,9 +58,6 @@ struct SystemContext::Private
     std::unique_ptr<VideoWallOnlineScreensWatcher> videoWallOnlineScreensWatcher;
     std::unique_ptr<LdapStatusWatcher> ldapStatusWatcher;
     std::unique_ptr<OtherServersManager> otherServersManager;
-    std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;
-    std::unique_ptr<QnServerStorageManager> serverStorageManager;
-    std::unique_ptr<QnCameraBookmarksManager> cameraBookmarksManager;
     std::unique_ptr<QnCameraDataManager> cameraDataManager;
     std::unique_ptr<StatisticsSender> statisticsSender;
     std::unique_ptr<VirtualCameraManager> virtualCameraManager;
@@ -76,12 +70,11 @@ struct SystemContext::Private
     std::unique_ptr<SystemSpecificLocalSettings> localSettings;
     std::unique_ptr<RestApiHelper> restApiHelper;
     std::unique_ptr<DelayedDataLoader> delayedDataLoader;
-    std::unique_ptr<analytics::TaxonomyManager> taxonomyManager;
     std::unique_ptr<NonEditableUsersAndGroups> nonEditableUsersAndGroups;
     std::unique_ptr<DefaultPasswordCamerasWatcher> defaultPasswordCamerasWatcher;
     std::unique_ptr<DesktopCameraInitializer> desktopCameraInitializer;
     std::unique_ptr<IntercomManager> intercomManager;
-    std::unique_ptr<AnalyticsEventsSearchTreeBuilder> analyticsEventsSearchTreeBuilder;
+    std::unique_ptr<core::AnalyticsEventsSearchTreeBuilder> analyticsEventsSearchTreeBuilder;
     std::unique_ptr<SystemHealthState> systemHealthState;
     std::unique_ptr<TrafficRelayUrlWatcher> trafficRelayUrlWatcher;
 
@@ -120,10 +113,8 @@ SystemContext::SystemContext(
             d->initLocalRuntimeInfo();
             d->videoWallOnlineScreensWatcher = std::make_unique<VideoWallOnlineScreensWatcher>(
                 this);
-            d->serverRuntimeEventConnector = std::make_unique<ServerRuntimeEventConnector>();
+
             // Depends on ServerRuntimeEventConnector.
-            d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
-            d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->statisticsSender = std::make_unique<StatisticsSender>(this);
             d->virtualCameraManager = std::make_unique<VirtualCameraManager>(this);
@@ -139,7 +130,6 @@ SystemContext::SystemContext(
             d->localSettings = std::make_unique<SystemSpecificLocalSettings>(this);
             d->restApiHelper = std::make_unique<RestApiHelper>(this);
             d->delayedDataLoader = std::make_unique<DelayedDataLoader>(this);
-            d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->ldapStatusWatcher = std::make_unique<LdapStatusWatcher>(this);
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             d->defaultPasswordCamerasWatcher = std::make_unique<DefaultPasswordCamerasWatcher>(
@@ -148,7 +138,6 @@ SystemContext::SystemContext(
             break;
 
         case Mode::crossSystem:
-            d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
@@ -200,7 +189,7 @@ std::shared_ptr<RemoteSession> SystemContext::session() const
     return std::dynamic_pointer_cast<RemoteSession>(base_type::session());
 }
 
-AnalyticsEventsSearchTreeBuilder* SystemContext::analyticsEventsSearchTreeBuilder() const
+core::AnalyticsEventsSearchTreeBuilder* SystemContext::analyticsEventsSearchTreeBuilder() const
 {
     return d->analyticsEventsSearchTreeBuilder.get();
 }
@@ -218,21 +207,6 @@ LdapStatusWatcher* SystemContext::ldapStatusWatcher() const
 NonEditableUsersAndGroups* SystemContext::nonEditableUsersAndGroups() const
 {
     return d->nonEditableUsersAndGroups.get();
-}
-
-ServerRuntimeEventConnector* SystemContext::serverRuntimeEventConnector() const
-{
-    return d->serverRuntimeEventConnector.get();
-}
-
-QnServerStorageManager* SystemContext::serverStorageManager() const
-{
-    return d->serverStorageManager.get();
-}
-
-QnCameraBookmarksManager* SystemContext::cameraBookmarksManager() const
-{
-    return d->cameraBookmarksManager.get();
 }
 
 QnCameraDataManager* SystemContext::cameraDataManager() const
@@ -280,18 +254,6 @@ RestApiHelper* SystemContext::restApiHelper() const
     return d->restApiHelper.get();
 }
 
-QnUuid SystemContext::localSystemId() const
-{
-    const auto& currentConnection = connection();
-    return currentConnection ? currentConnection->moduleInformation().localSystemId : QnUuid();
-}
-
-analytics::TaxonomyManager* SystemContext::taxonomyManager() const
-{
-    QQmlEngine::setObjectOwnership(d->taxonomyManager.get(), QQmlEngine::CppOwnership);
-    return d->taxonomyManager.get();
-}
-
 OtherServersManager* SystemContext::otherServersManager() const
 {
     return d->otherServersManager.get();
@@ -328,10 +290,10 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
         return;
 
     d->otherServersManager->setMessageProcessor(clientMessageProcessor);
-    d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
     d->logsManagementWatcher->setMessageProcessor(clientMessageProcessor);
     d->intercomManager = std::make_unique<IntercomManager>(this);
-    d->analyticsEventsSearchTreeBuilder = std::make_unique<AnalyticsEventsSearchTreeBuilder>(this);
+    d->analyticsEventsSearchTreeBuilder =
+        std::make_unique<core::AnalyticsEventsSearchTreeBuilder>(this);
     d->systemHealthState = std::make_unique<SystemHealthState>(this);
 
     // Desktop camera must work in the normal mode only.

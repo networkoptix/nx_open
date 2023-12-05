@@ -4,16 +4,21 @@
 
 #include <QtQml/QtQml>
 
+#include <camera/camera_bookmarks_manager.h>
 #include <client/client_message_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <storage/server_storage_manager.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/network/server_primary_interface_watcher.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
+#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
@@ -62,9 +67,14 @@ struct SystemContext::Private
     std::unique_ptr<UserWatcher> userWatcher;
     std::unique_ptr<WatermarkWatcher> watermarkWatcher;
     std::unique_ptr<ServerTimeWatcher> serverTimeWatcher;
+    std::unique_ptr<QnServerStorageManager> serverStorageManager;
+    std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;
+    std::unique_ptr<QnCameraBookmarksManager> cameraBookmarksManager;
     std::unique_ptr<ServerPrimaryInterfaceWatcher> serverPrimaryInterfaceWatcher;
     std::unique_ptr<nx::vms::rules::EngineHolder> vmsRulesEngineHolder;
+    std::unique_ptr<core::analytics::AttributeHelper> analyticsAttributeHelper;
     std::unique_ptr<AccessController> accessController;
+    std::unique_ptr<analytics::TaxonomyManager> taxonomyManager;
 
     mutable nx::Mutex sessionMutex;
 
@@ -90,24 +100,32 @@ SystemContext::SystemContext(
     d(new Private())
 {
     d->serverTimeWatcher = std::make_unique<ServerTimeWatcher>(this);
+    std::unique_ptr<QnServerStorageManager> serverStorageManager;
+
+    d->analyticsAttributeHelper = std::make_unique<
+        nx::vms::client::core::analytics::AttributeHelper>(analyticsTaxonomyStateWatcher());
 
     switch (mode)
     {
         case Mode::client:
+            d->serverRuntimeEventConnector = std::make_unique<ServerRuntimeEventConnector>();
+            d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
-            d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
-                this);
+            d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(this);
+            d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
             d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
                 this,
                 std::make_unique<nx::vms::rules::Initializer>(this),
                 /*separateThread*/ false);
+            d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             break;
 
         case Mode::crossSystem:
             d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
+            d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
             d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(
                 this);
@@ -207,6 +225,12 @@ RemoteConnectionPtr SystemContext::connection() const
     return d->connection;
 }
 
+QnUuid SystemContext::localSystemId() const
+{
+    const auto& currentConnection = connection();
+    return currentConnection ? currentConnection->moduleInformation().localSystemId : QnUuid();
+}
+
 nx::network::http::Credentials SystemContext::connectionCredentials() const
 {
     if (auto connection = this->connection())
@@ -266,6 +290,32 @@ common::SessionTokenHelperPtr SystemContext::getSessionTokenHelper() const
     return nullptr;
 }
 
+QnCameraBookmarksManager* SystemContext::cameraBookmarksManager() const
+{
+    return d->cameraBookmarksManager.get();
+}
+
+analytics::TaxonomyManager* SystemContext::taxonomyManager() const
+{
+    QQmlEngine::setObjectOwnership(d->taxonomyManager.get(), QQmlEngine::CppOwnership);
+    return d->taxonomyManager.get();
+}
+
+analytics::AttributeHelper* SystemContext::analyticsAttributeHelper() const
+{
+    return d->analyticsAttributeHelper.get();
+}
+
+QnServerStorageManager* SystemContext::serverStorageManager() const
+{
+    return d->serverStorageManager.get();
+}
+
+ServerRuntimeEventConnector* SystemContext::serverRuntimeEventConnector() const
+{
+    return d->serverRuntimeEventConnector.get();
+}
+
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     base_type::setMessageProcessor(messageProcessor);
@@ -273,6 +323,8 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     auto clientMessageProcessor = qobject_cast<QnClientMessageProcessor*>(messageProcessor);
     if (!NX_ASSERT(clientMessageProcessor, "Invalid message processor type"))
         return;
+
+    d->serverRuntimeEventConnector->setMessageProcessor(clientMessageProcessor);
 
     if (!vmsRulesEngine())
         return;

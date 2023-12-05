@@ -19,6 +19,7 @@ struct QnStartupParameters;
 
 namespace nx::vms::utils { class TranslationManager; }
 namespace nx::cloud::gateway { class VmsGatewayEmbeddable; }
+namespace nx::vms::client::core { class ObjectDisplaySettings; }
 
 namespace nx::vms::client::desktop {
 
@@ -28,7 +29,6 @@ class CloudLayoutsManager;
 class ContextStatisticsModule;
 class FontConfig;
 class LocalSettings;
-class ObjectDisplaySettings;
 class PerformanceMonitor;
 class RadassController;
 class ResourceFactory;
@@ -39,7 +39,6 @@ class SharedMemoryManager;
 class ShowOnceSettings;
 class MessageBarSettings;
 class SystemContext;
-class UnifiedResourcePool;
 class UploadManager;
 class WebPageIconCache;
 class WindowContext;
@@ -58,6 +57,7 @@ class DefaultProcessInterface;
 class NX_VMS_CLIENT_DESKTOP_API ApplicationContext: public core::ApplicationContext
 {
     Q_OBJECT
+    using base_type = core::ApplicationContext;
 
 public:
     enum class Mode
@@ -92,24 +92,6 @@ public:
      * Context of the System we are currently connected to. Also contains local files.
      */
     SystemContext* currentSystemContext() const;
-
-    /**
-     * Contexts of the all Systems for which we have established connection.
-     */
-    std::vector<SystemContext*> systemContexts() const;
-
-    /**
-     * Register existing System Context. First registered is considered to be the Current Context.
-     * Ownership is not passed, but Context is to be unregistered before being destroyed.
-     * TODO: #sivanov Pass ownership here and emit signals on adding / deleting Contexts.
-     * TODO: @sivanov Allow to change Current Context later.
-     */
-    void addSystemContext(SystemContext* systemContext);
-
-    /**
-     * Unregister existing system context before destroying.
-     */
-    void removeSystemContext(SystemContext* systemContext);
 
     /**
      * Find existing System Context by it's cloud system id.
@@ -165,11 +147,6 @@ public:
     ContextStatisticsModule* statisticsModule() const;
 
     /**
-     * Unified interface to access all available Resource Pools.
-     */
-    UnifiedResourcePool* unifiedResourcePool() const;
-
-    /**
      * Local Client settings.
      */
     LocalSettings* localSettings() const;
@@ -185,7 +162,7 @@ public:
     /**
      * Map of analytics objects colors by object type. Persistently stored on a PC.
      */
-    ObjectDisplaySettings* objectDisplaySettings() const;
+    core::ObjectDisplaySettings* objectDisplaySettings() const;
 
     ClientStateHandler* clientStateHandler() const;
 

@@ -94,6 +94,12 @@ public:
         QObject* parent = nullptr);
     virtual ~SystemContext();
 
+    template<typename Target>
+    Target* as()
+    {
+        return qobject_cast<Target*>(this);
+    }
+
     /**
      * Id of the current peer in the Message Bus. It is persistent and is not changed between the
      * application runs. It is stored in the application settings. VMS Server uses it as a Server

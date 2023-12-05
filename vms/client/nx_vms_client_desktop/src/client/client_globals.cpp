@@ -9,6 +9,7 @@ namespace Qn {
 /**
  * These roles are used in the BlueBox integration and should not be changed without an agreement.
  */
+static_assert(ItemDataRole::FirstItemDataRole < ItemDataRole::ItemGeometryRole);
 static_assert(ItemGeometryRole == 288);
 static_assert(ItemImageDewarpingRole == 295);
 static_assert(ItemRotationRole == 297);
@@ -28,15 +29,10 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(ResourceTreeScopeRole),
 
         // Resource-based.
-        IDR_ITEM(ResourceRole),
         IDR_ITEM(UserResourceRole),
-        IDR_ITEM(LayoutResourceRole),
-        IDR_ITEM(MediaServerResourceRole),
         IDR_ITEM(VideoWallResourceRole),
 
-        IDR_ITEM(ResourceNameRole),
         IDR_ITEM(ResourceFlagsRole),
-        IDR_ITEM(ResourceStatusRole),
         IDR_ITEM(ResourceIconKeyRole),
 
         IDR_ITEM(ResourceExtraStatusRole),
@@ -152,10 +148,7 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         /** Role for 'forced' flag. Used in DisconnectAction. */
         IDR_ITEM(ForceRole),
 
-        IDR_ITEM(CameraBookmarkRole),
         IDR_ITEM(CameraBookmarkListRole),
-        IDR_ITEM(BookmarkTagRole),
-        IDR_ITEM(UuidRole),
         IDR_ITEM(KeyboardModifiersRole),
 
         /* Others. */
@@ -205,29 +198,16 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(ForceShowCamerasList),
         IDR_ITEM(ParentWidgetRole),
 
-        IDR_ITEM(TimestampRole),
-        IDR_ITEM(TimestampTextRole),
-        IDR_ITEM(DescriptionTextRole),
         IDR_ITEM(AdditionalTextRole),
-        IDR_ITEM(AnalyticsAttributesRole),
         IDR_ITEM(RemovableRole),
         IDR_ITEM(CommandActionRole),
-        IDR_ITEM(ResourceListRole),
-        IDR_ITEM(DisplayedResourceListRole),
-        IDR_ITEM(PreviewTimeRole),
         IDR_ITEM(TimeoutRole),
         IDR_ITEM(BusyIndicatorVisibleRole),
         IDR_ITEM(ProgressValueRole),
         IDR_ITEM(ProgressFormatRole),
-        IDR_ITEM(DurationRole),
         IDR_ITEM(NotificationLevelRole),
         IDR_ITEM(CreateContextMenuRole),
         IDR_ITEM(ForcePrecisePreviewRole),
-        IDR_ITEM(PreviewStreamSelectionRole),
-        IDR_ITEM(ObjectTrackIdRole),
-        IDR_ITEM(HasExternalBestShotRole),
-
-        IDR_ITEM(DecorationPathRole),
 
         IDR_ITEM(SelectOnOpeningRole),
 
@@ -240,11 +220,6 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         /** Enable advanced UI features (typically in settings dialogs). */
         IDR_ITEM(AdvancedModeRole),
 
-        // Model notification roles. Do not necessarily pass any data but implement
-        // item-related view-to-model notifications via setData which can be proxied.
-        IDR_ITEM(DefaultNotificationRole),
-        IDR_ITEM(ActivateLinkRole),
-
         // Additional roles for the resource tree. Placed at the end of the list for purpose
         // not to change enumeration values for BlueBox integration.
         IDR_ITEM(ParentResourceRole),
@@ -256,7 +231,6 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(TargetResourceTreeCustomGroupIdRole),
         IDR_ITEM(OnlyResourceTreeSiblingsRole),
 
-        IDR_ITEM(AnalyticsEngineNameRole),
         IDR_ITEM(RemoteConnectionRole),
 
         IDR_ITEM(ItemDataRoleCount)

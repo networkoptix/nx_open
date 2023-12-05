@@ -25,7 +25,7 @@ static bool isCamera(const QnSharedResourcePointer<QnResource>& resource)
 
 AbstractSearchWidget::AbstractSearchWidget(
     WindowContext* context,
-    AbstractSearchListModel* model,
+    core::AbstractSearchListModel* model,
     QWidget* parent)
     :
     base_type(parent),
@@ -62,7 +62,7 @@ AbstractSearchWidget::~AbstractSearchWidget()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-AbstractSearchListModel* AbstractSearchWidget::model() const
+core::AbstractSearchListModel* AbstractSearchWidget::model() const
 {
     return d->model();
 }
@@ -110,6 +110,11 @@ void AbstractSearchWidget::setFooterToggled(bool value)
 bool AbstractSearchWidget::footerToggled() const
 {
     return d->footerToggled();
+}
+
+std::chrono::milliseconds AbstractSearchWidget::currentCentralPointMs() const
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(d->currentCentralPointUs());
 }
 
 void AbstractSearchWidget::setPlaceholderPixmap(const QPixmap& value)

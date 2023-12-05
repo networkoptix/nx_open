@@ -50,9 +50,9 @@ struct NX_VMS_COMMON_API ActionData
     };
 
     ActionData(): actionType(ActionType::undefinedAction), flags(0) {}
-    ActionData(const ActionData&) = delete;
+    ActionData(const ActionData&) = default;
     ActionData(ActionData&&) = default;
-    ActionData& operator=(const ActionData&) = delete;
+    ActionData& operator=(const ActionData&) = default;
     ActionData& operator=(ActionData&&) = default;
 
     bool hasFlags(int value) const { return flags & value; }
