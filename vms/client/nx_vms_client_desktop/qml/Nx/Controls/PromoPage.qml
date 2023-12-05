@@ -40,26 +40,6 @@ Item
 
         spacing: 8
 
-        Item
-        {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.fillHeight: true
-
-            width: 200
-            Layout.maximumHeight: 75
-
-            Image
-            {
-                id: imageItem
-
-                anchors.fill: parent
-
-                fillMode: Image.PreserveAspectFit
-
-                visible: source !== ""
-            }
-        }
-
         Text
         {
             id: titleItem
@@ -74,6 +54,26 @@ Item
 
             color: ColorTheme.colors.light4
             visible: !!text
+        }
+
+        Item
+        {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.fillHeight: true
+
+            width: 240
+            Layout.maximumHeight: 67
+
+            Image
+            {
+                id: imageItem
+
+                anchors.fill: parent
+
+                fillMode: Image.PreserveAspectFit
+
+                visible: source !== ""
+            }
         }
 
         Text
