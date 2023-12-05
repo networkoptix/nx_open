@@ -124,7 +124,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, grayscaleDecoding,
         "[Dev] Use grayscale video decoding.");
 
-    NX_INI_FLAG(false, nvidiaHardwareDecoding,
+    NX_INI_FLAG(true, nvidiaHardwareDecoding,
         "[Dev] Use NVIDIA hardware video decoding.");
 
     NX_INI_FLAG(0, disableVideoRendering,
@@ -271,7 +271,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Feature] Makes Camera Replacement feature available in the client.");
 
     // VMS-32543
-    NX_INI_FLAG(false, allowConfigureCloudServiceToSendEmail,
+    NX_INI_FLAG(true, allowConfigureCloudServiceToSendEmail,
         "[Feature] Makes the option to send emails via cloud service available in the\n"
         "outgoing email settings dialog.");
 
