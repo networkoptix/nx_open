@@ -4,6 +4,8 @@
 
 #include <random>
 
+#include <QtTest/QAbstractItemModelTester>
+
 #include <client_core/client_core_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
@@ -22,6 +24,10 @@ void EntityItemModelTest::SetUp()
 {
     m_entityItemModel.reset(new EntityItemModel());
     nx::utils::ModelTransactionChecker::install(m_entityItemModel.get());
+
+    // Create QAbstractItemModelTester owned by the model.
+    new QAbstractItemModelTester(m_entityItemModel.get(),
+        QAbstractItemModelTester::FailureReportingMode::Fatal, /*parent*/ m_entityItemModel.get());
 }
 
 void EntityItemModelTest::TearDown()
