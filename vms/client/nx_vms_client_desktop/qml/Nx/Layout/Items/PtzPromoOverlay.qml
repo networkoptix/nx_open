@@ -23,8 +23,8 @@ Control
         pagesModel.clear()
 
         pagesModel.append({
-            "title": qsTr("Introducing you\nnew PTZ controls"),
-            "text": qsTr("Here is a quick presentation\nof what has changed"),
+            "title": qsTr("Introducing\nNew PTZ controls"),
+            "text": qsTr("Here is a quick guide\non what has changed"),
             "imageUrl": ""
         })
 
@@ -50,8 +50,8 @@ Control
 
             pagesModel.append({
                 "title": "",
-                "text": qsTr("Click, double-click, or drag mouse pointer while pressing Shift key "
-                    + "to use Advanced PTZ"),
+                "text": qsTr("Click, double-click, or drag\nmouse pointer while pressing\nShift "
+                    + "key to use Advanced PTZ"),
                 "imageUrl": "image://svg/skin/promo/ptz_promo_advanced.svg"
             })
 
