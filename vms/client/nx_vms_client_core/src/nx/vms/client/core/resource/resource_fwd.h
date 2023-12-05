@@ -27,3 +27,21 @@ class UserResource;
 using UserResourcePtr = QnSharedResourcePointer<UserResource>;
 
 } // namespace nx::vms::client::core
+
+class QnClientStorageResource;
+typedef QnSharedResourcePointer<QnClientStorageResource> QnClientStorageResourcePtr;
+typedef QnSharedResourcePointerList<QnClientStorageResource> QnClientStorageResourceList;
+
+class QnFakeMediaServerResource;
+using QnFakeMediaServerResourcePtr = QnSharedResourcePointer<QnFakeMediaServerResource>;
+
+class QnClientCameraResource;
+using QnClientCameraResourcePtr = QnSharedResourcePointer<QnClientCameraResource>;
+using QnClientCameraResourceList = QnSharedResourcePointerList<QnClientCameraResource>;
+
+class QnFileLayoutResource;
+using QnFileLayoutResourcePtr = QnSharedResourcePointer<QnFileLayoutResource>;
+using QnFileLayoutResourceList = QnSharedResourcePointerList<QnFileLayoutResource>;
+
+struct QnLayoutTourItem;
+using QnLayoutTourItemList = std::vector<QnLayoutTourItem>;

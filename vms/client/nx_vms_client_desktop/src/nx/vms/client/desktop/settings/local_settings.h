@@ -11,6 +11,7 @@
 #include <nx/build_info.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/property_storage/storage.h>
+#include <nx/vms/client/core/settings/types/detected_object.h>
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
@@ -19,7 +20,6 @@
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 
 #include "types/background_image.h"
-#include "types/detected_object.h"
 #include "types/export_mode.h"
 
 namespace nx::vms::client::desktop {
@@ -152,7 +152,7 @@ public:
     Property<int> maximumLiveBufferMs{this, "maximumLiveBufferMs", 500,
         "Maximum live buffer lengths, in milliseconds."};
 
-    Property<DetectedObjectSettingsMap> detectedObjectSettings{this, "detectedObjectSettings"};
+    Property<core::DetectedObjectSettingsMap> detectedObjectSettings{this, "detectedObjectSettings"};
 
     Property<AuthAllowedUrls> authAllowedUrls{this, "authAllowedUrls", {},
         "Approved URLs that have access to a session token using jsapi."};

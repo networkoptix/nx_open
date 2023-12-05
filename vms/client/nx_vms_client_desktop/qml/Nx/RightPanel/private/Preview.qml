@@ -3,12 +3,13 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.4
 
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
+import Nx.Core.Items 1.0
 import Nx.Items 1.0
 
 import nx.vms.client.desktop 1.0
+import nx.vms.client.core 1.0
 
 Control
 {
@@ -16,7 +17,7 @@ Control
 
     property string previewId
     property alias previewSource: image.source
-    property int previewState: { return RightPanel.PreviewState.initial }
+    property int previewState: { return EventSearch.PreviewState.initial }
     property real previewAspectRatio: 1
     property rect highlightRect: Qt.rect(0, 0, 0, 0)
     property bool showHighlightBorder: false
@@ -88,6 +89,11 @@ Control
             {
                 id: intervalPreview
 
+                delayMs: CoreSettings.iniConfigValue("intervalPreviewDelayMs")
+                loopDelayMs: CoreSettings.iniConfigValue("intervalPreviewLoopDelayMs")
+                durationMs: CoreSettings.iniConfigValue("intervalPreviewDurationMs")
+                speedFactor: CoreSettings.iniConfigValue("intervalPreviewSpeedFactor")
+
                 anchors.fill: parent
                 aspectRatio: preview.previewAspectRatio
 
@@ -103,7 +109,7 @@ Control
             anchors.fill: parent
             verticalAlignment: Qt.AlignVCenter
             horizontalAlignment: Qt.AlignHCenter
-            visible: previewState == RightPanel.PreviewState.missing
+            visible: previewState == EventSearch.PreviewState.missing
             color: preview.foregroundColor
             text: qsTr("NO DATA")
         }
@@ -115,8 +121,8 @@ Control
             anchors.centerIn: parent
             color: preview.foregroundColor
 
-            running: previewState == RightPanel.PreviewState.busy
-                || previewState == RightPanel.PreviewState.initial
+            running: previewState == EventSearch.PreviewState.busy
+                || previewState == EventSearch.PreviewState.initial
         }
     }
 }

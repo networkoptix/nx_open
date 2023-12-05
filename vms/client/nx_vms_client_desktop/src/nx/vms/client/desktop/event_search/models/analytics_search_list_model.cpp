@@ -147,4 +147,3 @@ void AnalyticsSearchListModel::addCreateNewListAction(QMenu* menu,
 }
 
 } // namespace nx::vms::client::desktop
-

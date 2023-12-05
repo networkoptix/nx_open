@@ -5,9 +5,9 @@
 #include <QtCore/QPointer>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/utils/managed_camera_set.h>
+#include <nx/vms/client/core/utils/managed_camera_set.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 struct AnalyticsSearchSetup::Private
 {
@@ -15,6 +15,12 @@ struct AnalyticsSearchSetup::Private
     bool areaEnabled = false;
     bool areaSelectionActive = false;
 };
+
+void AnalyticsSearchSetup::registerQmlType()
+{
+    qmlRegisterUncreatableType<core::AnalyticsSearchSetup>("nx.vms.client.core", 1, 0,
+        "AnalyticsSearchSetup", "Cannot create instance of AnalyticsSearchSetup");
+}
 
 AnalyticsSearchSetup::AnalyticsSearchSetup(
     AnalyticsSearchListModel* model,
@@ -47,11 +53,11 @@ AnalyticsSearchSetup::AnalyticsSearchSetup(
     connect(model, &AnalyticsSearchListModel::selectedEngineChanged,
         this, &AnalyticsSearchSetup::engineChanged);
 
-    connect(model, &AbstractSearchListModel::camerasChanged, this,
+    connect(model, &core::AbstractSearchListModel::camerasChanged, this,
         [this]()
         {
             const bool areaEnabled =
-                d->model->cameraSet()->type() == ManagedCameraSet::Type::single;
+                d->model->cameraSet().type() == core::ManagedCameraSet::Type::single;
 
             if (areaEnabled == d->areaEnabled)
                 return;
@@ -177,4 +183,4 @@ void AnalyticsSearchSetup::commitAvailableNewTracks()
         d->model->commitAvailableNewTracks();
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

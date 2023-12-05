@@ -5,14 +5,16 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
-class TextFilterSetup: public QObject
+class NX_VMS_CLIENT_CORE_API TextFilterSetup: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged FINAL)
 
 public:
+    static void registerQmlType();
+
     explicit TextFilterSetup(QObject* parent = nullptr);
 
     QString text() const;
@@ -25,4 +27,4 @@ private:
     QString m_text;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

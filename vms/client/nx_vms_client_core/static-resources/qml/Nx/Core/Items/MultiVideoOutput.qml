@@ -11,15 +11,28 @@ MultiVideoLayout
 {
     id: layout
 
+    readonly property size channelSize: d.sourceSize
     property MediaPlayer mediaPlayer: null
     property Component channelOverlay: null
 
     // Implementation.
 
-    property size __sourceSize
+    implicitWidth: d.sourceSize.width * layoutSize.width
+    implicitHeight: d.sourceSize.height * layoutSize.height
 
-    implicitWidth: __sourceSize.width * layoutSize.width
-    implicitHeight: __sourceSize.height * layoutSize.height
+    function pointInVideo(position)
+    {
+        for (var i = 0; i != layout.repeater.count; ++i)
+        {
+            var child = layout.repeater.itemAt(i);
+            var mapped = mapToItem(child, position.x, position.y)
+            if (mapped.x < 0 || mapped.y < 0 || mapped.x > child.width || mapped.y > child.height)
+                continue;
+
+            return true
+        }
+        return false
+    }
 
     delegate: VideoOutput
     {
@@ -37,8 +50,8 @@ MultiVideoLayout
 
         onSourceRectChanged:
         {
-            if (index === 0 && __sourceSize.width <= 0.0)
-                __sourceSize = Qt.size(sourceRect.width, sourceRect.height)
+            if (index === 0 && d.sourceSize.width <= 0.0)
+                d.sourceSize = Qt.size(sourceRect.width, sourceRect.height)
         }
 
         Loader
@@ -52,5 +65,12 @@ MultiVideoLayout
                     item.index = index
             }
         }
+    }
+
+    NxObject
+    {
+        id: d
+
+        property size sourceSize
     }
 }

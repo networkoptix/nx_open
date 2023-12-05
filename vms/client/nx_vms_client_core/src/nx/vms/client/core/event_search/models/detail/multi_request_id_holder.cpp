@@ -20,4 +20,3 @@ rest::Handle MultiRequestIdHolder::value(Mode mode)
 }
 
 } // namespace nx::vms::client::core::detail
-

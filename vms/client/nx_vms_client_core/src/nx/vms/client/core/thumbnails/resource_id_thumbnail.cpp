@@ -17,20 +17,20 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/common/utils/volatile_unique_ptr.h>
 #include <nx/vms/client/core/thumbnails/camera_async_image_request.h>
+#include <nx/vms/client/core/thumbnails/fallback_image_result.h>
 #include <nx/vms/client/core/thumbnails/immediate_image_result.h>
 #include <nx/vms/client/core/thumbnails/local_media_async_image_request.h>
+#include <nx/vms/client/core/thumbnails/ordered_camera_async_image_request.h>
 #include <nx/vms/client/core/thumbnails/proxy_image_result.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_cache.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/common/utils/volatile_unique_ptr.h>
-#include <nx/vms/client/desktop/thumbnails/fallback_image_result.h>
 #include <utils/common/delayed.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 using namespace std::chrono;
-using namespace nx::vms::client::core;
 
 // ------------------------------------------------------------------------------------------------
 // ResourceIdentificationThumbnail::Private
@@ -139,21 +139,26 @@ struct ResourceIdentificationThumbnail::Private
     // if the same request is being processed.
     class CameraRequestManager: public QObject
     {
-        using Key = QPair<QnVirtualCameraResourcePtr, int>;
-        QHash<Key, std::shared_ptr<CameraAsyncImageRequest>> m_requests;
+        using SubKey = QPair<int, qint64>;
+        using Key = QPair<QnVirtualCameraResourcePtr, SubKey>;
+        QHash<Key, std::shared_ptr<OrderedCameraAsyncImageRequest>> m_requests;
 
     public:
         std::unique_ptr<AsyncImageResult> request(
-            const QnVirtualCameraResourcePtr& camera, int maximumSize)
+            const QnVirtualCameraResourcePtr& camera,
+            std::chrono::milliseconds timestampMs,
+            int maximumSize)
         {
             if (!NX_ASSERT(camera && camera->resourcePool()))
                 return {};
 
-            const auto key = Key(camera, maximumSize);
+            const auto key = Key(camera, SubKey(maximumSize, timestampMs.count()));
             if (m_requests.contains(key))
                 return std::make_unique<ProxyImageResult>(m_requests.value(key));
 
-            const auto request = std::make_shared<CameraAsyncImageRequest>(camera, maximumSize);
+            const auto request = std::make_shared<OrderedCameraAsyncImageRequest>(
+                camera, maximumSize, CameraAsyncImageRequest::CameraStream::undefined, timestampMs);
+
             if (request->isReady())
                 return std::make_unique<ProxyImageResult>(request);
 
@@ -366,7 +371,7 @@ std::unique_ptr<AsyncImageResult> ResourceIdentificationThumbnail::getImageAsync
             d->camera, d->isLicensedCamera(), d->enforced, status(), !doRequest);
 
         return doRequest
-            ? Private::cameraRequestManager()->request(d->camera, maximumSize())
+            ? Private::cameraRequestManager()->request(d->camera, std::chrono::milliseconds(timestampMs()), maximumSize())
             : std::unique_ptr<AsyncImageResult>();
     }
 
@@ -439,8 +444,8 @@ ThumbnailCache* ResourceIdentificationThumbnail::thumbnailCache()
 
 void ResourceIdentificationThumbnail::registerQmlType()
 {
-    qmlRegisterType<ResourceIdentificationThumbnail>("nx.vms.client.desktop", 1, 0,
+    qmlRegisterType<ResourceIdentificationThumbnail>("nx.vms.client.core", 1, 0,
         "ResourceIdentificationThumbnail");
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

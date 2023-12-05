@@ -13,6 +13,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/property_storage/filesystem_backend.h>
 #include <nx/utils/property_storage/qsettings_migration_utils.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/settings/ini_helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
@@ -299,7 +302,7 @@ bool LocalSettings::hardwareDecodingEnabled()
 
 QVariant LocalSettings::iniConfigValue(const QString& name)
 {
-    return ini().get(name);
+    return core::getIniValue(ini(), name);
 }
 
 void LocalSettings::migrateOldSettings()

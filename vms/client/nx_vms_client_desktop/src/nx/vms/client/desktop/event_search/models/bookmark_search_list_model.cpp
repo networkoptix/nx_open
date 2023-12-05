@@ -48,4 +48,3 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
 }
 
 } // namespace nx::vms::client::desktop
-

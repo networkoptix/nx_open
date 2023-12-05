@@ -63,9 +63,9 @@ QString AbstractCachingResourceThumbnail::thumbnailId() const
 {
     const auto resourceId = (resource() ? resource()->getId() : QnUuid()).toSimpleString();
     if (maximumSize() <= 0)
-        return resourceId;
+        return nx::format("%1:%2").args(resourceId, timestampMs());
 
-    return nx::format("%1:%2").args(resourceId, maximumSize());
+    return nx::format("%1:%2:%3").args(resourceId, maximumSize(), timestampMs());
 }
 
 } // namespace nx::vms::client::core

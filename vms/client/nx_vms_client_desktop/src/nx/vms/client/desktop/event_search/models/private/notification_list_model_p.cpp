@@ -14,8 +14,8 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -136,7 +136,7 @@ QnResourcePtr getResource(QnUuid resourceId, const QString& cloudSystemId)
     if (resourceId.isNull())
         return {};
 
-    SystemContext* systemContext = nullptr;
+    nx::vms::client::core::SystemContext* systemContext = nullptr;
     if (!cloudSystemId.isEmpty())
         systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
 
@@ -183,6 +183,7 @@ QnVirtualCameraResourceList getActionDevices(
 }
 
 void fillEventData(
+    const nx::vms::client::core::SystemContext* systemContext,
     const nx::vms::rules::NotificationActionBase* action,
     EventListModel::EventData& eventData)
 {
@@ -196,7 +197,7 @@ void fillEventData(
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
 
     eventData.objectTrackId = action->objectTrackId();
-    eventData.attributes = qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
+    eventData.attributes = systemContext->analyticsAttributeHelper()->preprocessAttributes(
         action->objectTypeId(),
         action->attributes());
 }
@@ -374,7 +375,7 @@ void NotificationListModel::Private::onNotificationAction(
     eventData.level = QnNotificationLevel::convert(action->level());
     eventData.icon = pixmapForAction(action.get(), cloudSystemId, eventData.titleColor);
     eventData.cloudSystemId = cloudSystemId;
-    fillEventData(action.get(), eventData);
+    fillEventData(system(), action.get(), eventData);
 
     setupClientAction(action.get(), eventData);
 
@@ -397,7 +398,7 @@ void NotificationListModel::Private::onRepeatSoundAction(
         eventData.icon =
             qnSkin->icon("events/sound_20.svg", kIconSubstitutions).pixmap(QSize(20, 20));
         eventData.sourceName = action->sourceName();
-        fillEventData(action.get(), eventData);
+        fillEventData(system(), action.get(), eventData);
 
         if (!this->q->addEvent(eventData))
             return;
@@ -441,7 +442,7 @@ void NotificationListModel::Private::onAlarmLayoutAction(
     eventData.actionId = menu::OpenInAlarmLayoutAction;
     eventData.actionParameters = eventData.cameras;
 
-    fillEventData(action.get(), eventData);
+    fillEventData(system(), action.get(), eventData);
 
     if (!this->q->addEvent(eventData))
         return;
@@ -486,7 +487,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             {
                 for (const auto& id: ids)
                 {
-                    if (q->indexOf(id).data(Qn::TimestampRole).value<microseconds>() == timestamp)
+                    if (q->indexOf(id).data(core::TimestampRole).value<microseconds>() == timestamp)
                         return;
                 }
             }
@@ -510,7 +511,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.source = resource;
 
     eventData.objectTrackId = params.objectTrackId;
-    eventData.attributes = qnClientModule->analyticsAttributeHelper()->preprocessAttributes(
+    eventData.attributes = system()->analyticsAttributeHelper()->preprocessAttributes(
         params.getAnalyticsObjectTypeId(),
         params.attributes);
 

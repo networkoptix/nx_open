@@ -243,7 +243,7 @@ QnVirtualCameraResourceSet AnalyticsFilterModel::selectedDevices() const
 }
 
 void AnalyticsFilterModel::setSelectedDevices(const QnVirtualCameraResourceSet& devices)
-{    
+{
     update(m_engine, devices, m_attributeValues, m_liveTypesExcluded);
 }
 

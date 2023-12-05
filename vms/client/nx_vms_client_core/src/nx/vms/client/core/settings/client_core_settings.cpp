@@ -14,6 +14,8 @@
 #include <nx/utils/property_storage/filesystem_backend.h>
 #include <nx/utils/property_storage/qsettings_backend.h>
 #include <nx/utils/system_utils.h>
+#include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/settings/ini_helpers.h>
 
 #if defined(USE_QT_KEYCHAIN)
     #include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
@@ -66,6 +68,11 @@ NX_REFLECTION_INSTRUMENT(SystemAuthenticationData_v42, (key)(value));
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LocalConnectionData, (json), (systemName)(urls))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SystemVisibilityScopeInfo, (json), (name)(visibilityScope))
+
+QVariant Settings::iniConfigValue(const QString& name)
+{
+    return getIniValue(ini(), name);
+}
 
 Settings::Settings(const InitializationOptions& options):
     Storage(createBackend(options.useQSettingsBackend))

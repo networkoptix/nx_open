@@ -1150,7 +1150,7 @@ void AnalyticsSearchListModel::commitAvailableNewTracks()
         ?  Facade::startTime(d->data.items.front())
         : Facade::startTime(d->newTracks.items.front());
     d->applyFetchedData(std::move(d->newTracks.items),
-        FetchRequest{.centralPointUs = centralPoint, .direction = FetchDirection::newer});
+        FetchRequest{.direction = FetchDirection::newer, .centralPointUs = centralPoint});
     d->newTracks.clear();
 
     if (d->liveProcessingMode == LiveProcessingMode::manualAdd)

@@ -36,6 +36,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -43,14 +44,13 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
-#include <server/server_storage_manager.h>
+#include <storage/server_storage_manager.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
@@ -1659,10 +1659,10 @@ bool QnWorkbenchNavigator::isCurrentWidgetSynced() const
     return streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
 }
 
-void QnWorkbenchNavigator::connectToContext(SystemContext* systemContext)
+void QnWorkbenchNavigator::connectToContext(core::SystemContext* systemContext)
 {
     // Cloud layouts context does not have camera data.
-    if (auto cameraDataManager = systemContext->cameraDataManager())
+    if (auto cameraDataManager = systemContext->as<SystemContext>()->cameraDataManager())
     {
         connect(cameraDataManager,
             &QnCameraDataManager::periodsChanged,
@@ -2552,8 +2552,8 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     const auto watcher = workbenchContext()->instance<QnTimelineBookmarksWatcher>();
     QnCameraBookmarkList bookmarks = watcher->bookmarksAtPosition(position);
-    if (!bookmarks.isEmpty())
-        parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
+    if (!bookmarks.empty())
+        parameters.setArgument(core::CameraBookmarkRole, bookmarks.front()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
     QScopedPointer<QMenu> menu(manager->newMenu(
         menu::TimelineScope, mainWindowWidget(), parameters));
