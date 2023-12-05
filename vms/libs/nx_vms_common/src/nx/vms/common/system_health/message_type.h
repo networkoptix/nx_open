@@ -57,6 +57,22 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
 
     saasInSuspendedState = 32, //< Generated on the client side.
     saasInShutdownState = 33, //< Generated on the client side.
+    /**
+     * Open an intercom as an action on notification press.
+     *
+     * actionParams:
+     * - actionResourceId - intercom camera id
+     */
+    showIntercomInformer = 34,
+
+    /**
+     * Show an intercom missed call notification. It replaces the opened showIntercomInformer's
+     * notification with the same actionResourceId.
+     *
+     * actionParams:
+     * - actionResourceId - intercom camera id
+     */
+    showMissedCallInformer = 35,
 
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.

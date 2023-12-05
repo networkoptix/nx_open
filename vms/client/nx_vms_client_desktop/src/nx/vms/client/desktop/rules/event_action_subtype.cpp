@@ -53,7 +53,6 @@ ActionSubtype actionSubtype(nx::vms::api::ActionType actionType)
         case ActionType::showOnAlarmLayoutAction:
         case ActionType::fullscreenCameraAction:
         case ActionType::exitFullscreenAction:
-        case ActionType::showIntercomInformer:
             return ActionSubtype::client;
 
         case ActionType::cameraOutputAction:

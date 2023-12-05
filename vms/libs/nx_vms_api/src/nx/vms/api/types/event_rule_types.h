@@ -277,14 +277,7 @@ NX_REFLECTION_ENUM(ActionType,
     buzzerAction = 20,
 
     /** Send push notification using cloud. */
-    pushNotificationAction = 21,
-
-    /**
-     * Open intercom as an action. TODO: #dfisenko Describe the action when it is defined.
-     * actionParams:
-     * TODO: #dfisenko Add parameters when they are defined.
-     */
-    showIntercomInformer = 22
+    pushNotificationAction = 21
 )
 
 enum class EventLevel

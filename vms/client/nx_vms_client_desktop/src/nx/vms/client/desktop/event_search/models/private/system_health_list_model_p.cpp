@@ -69,6 +69,12 @@ std::optional<QString> overusedSaasServiceType(MessageType messageType)
     }
 }
 
+bool messageIsSupported(MessageType message)
+{
+    return message != MessageType::showIntercomInformer
+        && message != MessageType::showMissedCallInformer;
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -612,6 +618,9 @@ void SystemHealthListModel::Private::doAddItem(
 {
     NX_VERBOSE(this, "Adding a system health message %1", message);
 
+    if (!messageIsSupported(message))
+        return; //< Message type is processed in a separate model.
+
     if (!common::system_health::isMessageVisible(message))
     {
         NX_VERBOSE(this, "The message %1 is not visible", message);
@@ -666,6 +675,9 @@ void SystemHealthListModel::Private::removeItem(
     MessageType message,
     const QVariant& params)
 {
+    if (!messageIsSupported(message))
+        return; //< Message type is processed in a separate model.
+
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();

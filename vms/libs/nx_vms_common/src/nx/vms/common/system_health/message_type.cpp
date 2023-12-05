@@ -66,7 +66,8 @@ bool isMessageLocked(MessageType message)
         case MessageType::saasIntegrationServicesOverused:
         case MessageType::saasInSuspendedState:
         case MessageType::saasInShutdownState:
-
+        case MessageType::showIntercomInformer:
+        case MessageType::showMissedCallInformer:
             return true;
         default:
             return false;

@@ -57,6 +57,10 @@ QString QnSystemHealthStringsHelper::messageTitle(MessageType messageType)
             return tr("System suspended");
         case MessageType::saasInShutdownState:
             return tr("System shut down");
+        case MessageType::showIntercomInformer:
+            return tr("Intercom call");
+        case MessageType::showMissedCallInformer:
+            return tr("Intercom missed call");
 
         default:
             break;

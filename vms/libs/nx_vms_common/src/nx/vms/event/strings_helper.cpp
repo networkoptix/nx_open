@@ -127,7 +127,6 @@ QString StringsHelper::actionName(ActionType value) const
         case ActionType::fullscreenCameraAction:  return tr("Set to fullscreen");
         case ActionType::exitFullscreenAction:    return tr("Exit fullscreen");
         case ActionType::buzzerAction:            return tr("Buzzer");
-        case ActionType::showIntercomInformer:    return tr("Show Intercom Informer");
 
         case ActionType::cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(

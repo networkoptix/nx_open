@@ -454,17 +454,14 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 {
     using namespace std::chrono;
 
-    const auto actionType = action->actionType();
-
-    if (actionType == ActionType::showIntercomInformer)
-        return;
-
     const auto& params = action->getRuntimeParams();
     const auto ruleId = action->getRuleId();
     const auto actionId = action->getParams().actionId;
     // The actionId is set for notifications only, see RuleProcessor::executeActionInternal.
     // Used for hiding acknowledged notifications.
     const bool actionHasId = !actionId.isNull();
+
+    const auto actionType = action->actionType();
 
     NX_VERBOSE(this, "Received action: %1, id: %2", actionType, actionId);
 
@@ -717,9 +714,6 @@ void NotificationListModel::Private::setupClientAction(
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
 {
-    if (action->actionType() == ActionType::showIntercomInformer)
-        return;
-
     if (const auto actionId = action->getParams().actionId; !actionId.isNull())
     {
         q->removeEvent(actionId);

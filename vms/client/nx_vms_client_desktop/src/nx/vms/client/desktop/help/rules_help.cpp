@@ -79,8 +79,6 @@ int actionHelpId(ActionType type)
             return HelpTopic::Id::EventsActions_Diagnostics;
         case ActionType::showOnAlarmLayoutAction:
             return HelpTopic::Id::EventsActions_ShowOnAlarmLayout;
-        case ActionType::showIntercomInformer:
-            return HelpTopic::Id::EventsActions_ShowIntercomInformer;
         case ActionType::bookmarkAction:
             return HelpTopic::Id::EventsActions_Bookmark;
         case ActionType::executePtzPresetAction:

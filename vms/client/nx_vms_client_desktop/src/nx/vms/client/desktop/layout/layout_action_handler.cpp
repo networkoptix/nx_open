@@ -51,7 +51,9 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/common_action.h>
+#include <nx/vms/event/actions/system_health_action.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
@@ -71,6 +73,8 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
+
+using namespace nx::vms::common::system_health;
 
 namespace nx::vms::client::desktop {
 
@@ -1234,8 +1238,9 @@ void LayoutActionHandler::at_openIntercomLayoutAction_triggered()
     const auto businessAction =
         parameters.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
 
-    const auto broadcastAction = nx::vms::event::CommonAction::createBroadcastAction(
-        nx::vms::api::ActionType::showIntercomInformer, businessAction->getParams());
+    vms::event::SystemHealthActionPtr broadcastAction(new vms::event::SystemHealthAction(
+        MessageType::showIntercomInformer,
+        businessAction->getRuntimeParams().eventResourceId));
     broadcastAction->setToggleState(nx::vms::api::EventState::inactive);
 
     if (const auto connection = system()->messageBusConnection())
