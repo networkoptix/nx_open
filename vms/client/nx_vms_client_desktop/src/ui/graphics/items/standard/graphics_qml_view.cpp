@@ -37,11 +37,33 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
+#include <nx/vms/client/desktop/window_context.h>
+#include <ui/widgets/main_window.h>
+#include <ui/workbench/workbench_context.h>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+    #include <rhi/qrhi.h>
+#else
+    #include <QtGui/private/qrhi_p.h>
+#endif
+
 namespace {
 
 constexpr auto kQuadVertexCount = 4;
 constexpr auto kCoordPerVertex = 2; //< x, y
 constexpr auto kQuadArrayLength = kQuadVertexCount * kCoordPerVertex;
+
+QRhi* getRhi(QQuickWindow* window)
+{
+    #if QT_VERSION >= QT_VERSION_CHECK(6,6,0)
+        return window->rhi();
+    #else
+        const auto ri = window->rendererInterface();
+        return reinterpret_cast<QRhi*>(ri->getResource(window, QSGRendererInterface::RhiResource));
+    #endif
+}
 
 QWidget* findWindowWidgetOf(QWidget* widget)
 {
@@ -244,6 +266,11 @@ struct GraphicsQmlView::Private
     bool renderRequested = false;
     bool sceneChanged = false;
 
+    std::unique_ptr<QRhiTexture> rhiTexture;
+    std::unique_ptr<QRhiTextureRenderTarget> rhiRenderTarget;
+    std::unique_ptr<QRhiRenderPassDescriptor> rp;
+    QPixmap rhiImage;
+
     Private(GraphicsQmlView* view): view(view) {}
 
     void resetComponent();
@@ -253,6 +280,8 @@ struct GraphicsQmlView::Private
     bool isTextureInitializationRequired(qreal devicePixelRatio);
     void initializeTexture(qreal devicePixelRatio);
     void paintQml(qreal devicePixelRatio);
+
+    void initRenderTarget();
 
     static QSize rounded(const QSizeF& size);
 };
@@ -300,6 +329,11 @@ GraphicsQmlView::~GraphicsQmlView()
     d->renderControl->invalidate();
     if (d->renderTexture)
         d->openglContext->functions()->glDeleteTextures(1, &d->renderTexture);
+
+    // Release RHI resources before QQuickWindow is destroyed.
+    d->rp.reset();
+    d->rhiRenderTarget.reset();
+    d->rhiTexture.reset();
 
     // Delete quickWindow before rootItem to avoid a crash when Accessibility is enabled in macOS.
     d->quickWindow.reset();
@@ -470,6 +504,28 @@ void GraphicsQmlView::setData(const QByteArray& data, const QUrl& url)
     d->qmlComponent->setData(data, url);
 }
 
+void GraphicsQmlView::Private::initRenderTarget()
+{
+    auto rhi = getRhi(quickWindow.get());
+
+    const auto pixelRatio = quickWindow->effectiveDevicePixelRatio();
+    const QSize deviceSize = quickWindow->size() * pixelRatio;
+
+    rhiTexture.reset(rhi->newTexture(QRhiTexture::RGBA8, deviceSize, 1,
+        QRhiTexture::RenderTarget | QRhiTexture::UsedAsTransferSource));
+
+    if (!rhiTexture->create())
+        return;
+
+    rhiRenderTarget.reset(rhi->newTextureRenderTarget({rhiTexture.get()}));
+    rp.reset(rhiRenderTarget->newCompatibleRenderPassDescriptor());
+    rhiRenderTarget->setRenderPassDescriptor(rp.get());
+
+    auto quickRenderTarget = QQuickRenderTarget::fromRhiRenderTarget(rhiRenderTarget.get());
+    quickRenderTarget.setDevicePixelRatio(pixelRatio);
+    quickWindow->setRenderTarget(quickRenderTarget);
+}
+
 void GraphicsQmlView::Private::updateSizes()
 {
     if (!rootItem || !quickWindow)
@@ -483,12 +539,79 @@ void GraphicsQmlView::Private::updateSizes()
     const QPoint pos = w ? w->mapToGlobal(offset) : offset;
 
     quickWindow->setGeometry(pos.x(), pos.y(), size.width(), size.height());
+
+    if (quickWindow->rendererInterface()->graphicsApi() == QSGRendererInterface::Software)
+        return;
+
+    if (!view->scene())
+        return;
+
+    if (!qobject_cast<QOpenGLWidget*>(
+        appContext()->mainWindowContext()->workbenchContext()->mainWindow()->viewport()))
+    {
+        initRenderTarget();
+    }
 }
 
 void GraphicsQmlView::Private::ensureOffscreen()
 {
+    const auto api = quickWindow->rendererInterface()->graphicsApi();
+    if (api == QSGRendererInterface::Software)
+        return;
+
     if (offscreenInitialized)
         return;
+
+    if (!qobject_cast<QOpenGLWidget*>(
+        appContext()->mainWindowContext()->workbenchContext()->mainWindow()->viewport()))
+    {
+        renderControl->initialize();
+
+        auto rhi = getRhi(quickWindow.get());
+
+        initRenderTarget();
+
+        connect(quickWindow.get(), &QQuickWindow::afterRendering, view,
+            [this, rhi]()
+            {
+                QSGRendererInterface* rif = quickWindow->rendererInterface();
+                QRhiCommandBuffer* cb =
+                    static_cast<QRhiCommandBuffer*>(
+                        rif->getResource(
+                            quickWindow.get(),
+                            QSGRendererInterface::RhiRedirectCommandBuffer));
+
+                QRhiReadbackResult *rbResult = new QRhiReadbackResult();
+                rbResult->completed =
+                    [rbResult, rhi, this]
+                    {
+                        QImage nonOwningImage(
+                            reinterpret_cast<const uchar*>(rbResult->data.constData()),
+                            rbResult->pixelSize.width(),
+                            rbResult->pixelSize.height(),
+                            QImage::Format_RGBA8888_Premultiplied);
+
+                        nonOwningImage.setDevicePixelRatio(quickWindow->effectiveDevicePixelRatio());
+
+                        // Must copy here because the image does not own the data.
+                        this->rhiImage = rhi->isYUpInFramebuffer()
+                            ? QPixmap::fromImage(nonOwningImage.mirrored(false, true))
+                            : QPixmap::fromImage(nonOwningImage);
+
+                        delete rbResult;
+                    };
+
+                QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
+                QRhiReadbackDescription rb(rhiTexture.get());
+                u->readBackTexture(rb, rbResult);
+
+                cb->resourceUpdate(u);
+            },
+            Qt::DirectConnection);
+
+        offscreenInitialized = true;
+        return;
+    }
 
     openglContext.reset(new QOpenGLContext());
     openglContext->setShareContext(QOpenGLContext::globalShareContext());
@@ -733,6 +856,26 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
         return;
 
     const auto glWidget = qobject_cast<QOpenGLWidget*>(scene()->views().first()->viewport());
+    if (!glWidget)
+    {
+        if (d->quickWindow->rendererInterface()->graphicsApi() == QSGRendererInterface::Software)
+        {
+            QImage image = d->quickWindow->grabWindow();
+            painter->drawImage(0, 0, image);
+        }
+        else
+        {
+            d->renderControl->polishItems();
+
+            d->renderControl->beginFrame();
+            d->renderControl->sync();
+            d->renderControl->render();
+            d->renderControl->endFrame();
+
+            painter->drawPixmap(0, 0, d->rhiImage);
+        }
+        return;
+    }
 
     const QSizeF outputSize = QSizeF(Private::rounded(size()));
 
