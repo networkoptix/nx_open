@@ -12,15 +12,13 @@
 
 #include <nx/analytics/taxonomy/abstract_engine.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/analytics/taxonomy/state_view_builder.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view_builder.h>
 
-Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/taxonomy/object_type.h")
-
-namespace nx::vms::client::desktop::analytics {
+namespace nx::vms::client::core::analytics {
 class TaxonomyManager;
-} // namespace nx::vms::client::desktop::analytics.
+} // namespace nx::vms::client::core::analytics.
 
-namespace nx::vms::client::desktop::analytics::taxonomy {
+namespace nx::vms::client::core::analytics::taxonomy {
 
 class AbstractStateViewFilter;
 
@@ -28,14 +26,29 @@ class AbstractStateViewFilter;
  * Filter model represents the Client's structure of available analytics filters (engines, objects,
  * attributes). Supports additional options such as engine selection.
  */
-class AnalyticsFilterModel: public QObject
+class NX_VMS_CLIENT_CORE_API AnalyticsFilterModel: public QObject
 {
     Q_OBJECT
 
 public:
-    Q_PROPERTY(std::vector<nx::vms::client::desktop::analytics::taxonomy::ObjectType*> objectTypes
+    Q_PROPERTY(std::vector<nx::vms::client::core::analytics::taxonomy::ObjectType*> objectTypes
         READ objectTypes
         NOTIFY objectTypesChanged);
+
+    Q_PROPERTY(nx::analytics::taxonomy::AbstractEngine* selectedEngine
+        READ selectedEngine
+        WRITE setSelectedEngine
+        NOTIFY selectedEngineChanged)
+
+    Q_PROPERTY(QnVirtualCameraResourceSet selectedDevices
+        READ selectedDevices
+        WRITE setSelectedDevices
+        NOTIFY selectedDevicesChanged)
+
+    Q_PROPERTY(QVariantMap selectedAttributeValues
+        READ selectedAttributeValues
+        WRITE setSelectedAttributeValues
+        NOTIFY selectedAttributeValuesChanged)
 
     Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractEngine*> engines
         READ engines
@@ -44,6 +57,8 @@ public:
     Q_PROPERTY(bool active WRITE setActive READ isActive NOTIFY activeChanged);
 
 public:
+    static void registerQmlType();
+
     AnalyticsFilterModel(TaxonomyManager* taxonomyManager = nullptr, QObject* parent = nullptr);
 
     /**
@@ -59,24 +74,21 @@ public:
     /**
      * Sets selected engine.
      */
-    Q_INVOKABLE void setSelectedEngine(
-        nx::analytics::taxonomy::AbstractEngine* engine,
-        bool force = false);
+    void setSelectedEngine(nx::analytics::taxonomy::AbstractEngine* engine);
+    nx::analytics::taxonomy::AbstractEngine* selectedEngine() const;
 
     /**
      * Sets selected devices.
      */
-    Q_INVOKABLE void setSelectedDevices(const QnVirtualCameraResourceSet& devices);
-
-    /**
-     * Sets selected devices.
-     */
-    void setSelectedDevices(const std::set<QnUuid>& devices);
+    QnVirtualCameraResourceSet selectedDevices() const;
+    void setSelectedDevices(const QnVirtualCameraResourceSet& devices);
+    void setSelectedDevices(const std::set<QnUuid>& deviceIds);
 
     /**
      * Sets selected attribute values.
      */
-    Q_INVOKABLE void setSelectedAttributeValues(const QVariantMap& values);
+    void setSelectedAttributeValues(const QVariantMap& values);
+    QVariantMap selectedAttributeValues() const;
 
     /**
      * Sets whether to exclude live types.
@@ -86,7 +98,7 @@ public:
     /**
      * Finds the filter object type corresponding to analytics object type ids.
      */
-    Q_INVOKABLE nx::vms::client::desktop::analytics::taxonomy::ObjectType* findFilterObjectType(
+    Q_INVOKABLE nx::vms::client::core::analytics::taxonomy::ObjectType* findFilterObjectType(
         const QStringList& analyticsObjectTypeIds);
 
     /**
@@ -115,6 +127,9 @@ signals:
     void objectTypesChanged();
     void enginesChanged();
     void activeChanged();
+    void selectedEngineChanged();
+    void selectedDevicesChanged();
+    void selectedAttributeValuesChanged();
 
 private:
     ObjectType* objectTypeById(const QString& id) const;
@@ -123,7 +138,7 @@ private:
     void rebuild();
     void update(
         nx::analytics::taxonomy::AbstractEngine* engine,
-        const std::set<QnUuid>& devices,
+        const QnVirtualCameraResourceSet& devices,
         const QVariantMap& attributeValues,
         bool liveTypesExcluded,
         bool force = false);
@@ -135,7 +150,7 @@ private:
     std::vector<nx::analytics::taxonomy::AbstractEngine*> m_engines;
 
     QPointer<nx::analytics::taxonomy::AbstractEngine> m_engine;
-    std::set<QnUuid> m_devices;
+    QnVirtualCameraResourceSet m_devices;
     QVariantMap m_attributeValues;
     bool m_liveTypesExcluded = false;
 
@@ -144,4 +159,4 @@ private:
     bool m_isActive = true;
 };
 
-} // namespace nx::vms::client::desktop::analytics::taxonomy
+} // namespace nx::vms::client::core::analytics::taxonomy

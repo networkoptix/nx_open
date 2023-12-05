@@ -2,88 +2,32 @@
 
 #pragma once
 
-#include <functional>
-#include <set>
+#include <nx/vms/client/core/event_search/models/analytics_search_list_model.h>
 
-#include <QtCore/QRectF>
-
-#include <nx/vms/client/desktop/event_search/models/abstract_async_search_list_model.h>
-
-namespace nx::analytics::db { struct ObjectTrack; }
+class QMenu;
 
 namespace nx::vms::client::desktop {
 
-class TextFilterSetup;
-
-class AnalyticsSearchListModel: public AbstractAsyncSearchListModel
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsSearchListModel: public core::AnalyticsSearchListModel
 {
     Q_OBJECT
-    using base_type = AbstractAsyncSearchListModel;
+    using base_type = core::AnalyticsSearchListModel;
 
 public:
-    explicit AnalyticsSearchListModel(WindowContext* context, QObject* parent = nullptr);
-    virtual ~AnalyticsSearchListModel() override = default;
+    using base_type::base_type;
 
-    QRectF filterRect() const;
-    void setFilterRect(const QRectF& relativeRect);
-
-    virtual TextFilterSetup* textFilter() const override;
-
-    QnUuid selectedEngine() const;
-    void setSelectedEngine(const QnUuid& value);
-
-    QStringList selectedObjectTypes() const;
-    void setSelectedObjectTypes(const QStringList& value);
-    const std::set<QString>& relevantObjectTypes() const;
-
-    QStringList attributeFilters() const;
-    void setAttributeFilters(const QStringList& value);
-
-    QString combinedTextFilter() const; // Free text filter combined with attribute filters.
-
-    // Metadata newer than timestamp returned by this callback will be deferred.
-    using LiveTimestampGetter = std::function<
-        std::chrono::milliseconds(const QnVirtualCameraResourcePtr&)>;
-    void setLiveTimestampGetter(LiveTimestampGetter value);
-
-    virtual bool isConstrained() const override;
-    virtual bool hasAccessRights() const override;
-
-    enum class LiveProcessingMode
-    {
-        automaticAdd,
-        manualAdd
-    };
-    Q_ENUM(LiveProcessingMode)
-
-    LiveProcessingMode liveProcessingMode() const;
-    void setLiveProcessingMode(LiveProcessingMode value);
-    bool hasOnlyLiveCameras() const;
-
-    // Methods for `LiveProcessingMode::manualAdd` mode.
-    int availableNewTracks() const;
-    void commitAvailableNewTracks();
-    static constexpr int kUnknownAvailableTrackCount = -1;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
 
 signals:
-    void pluginActionRequested(const QnUuid& engineId, const QString& actionTypeId,
-        const nx::analytics::db::ObjectTrack& track, const QnVirtualCameraResourcePtr& camera,
-        QPrivateSignal);
-
-    void filterRectChanged();
-    void selectedEngineChanged();
-    void selectedObjectTypesChanged();
-    void relevantObjectTypesChanged();
-    void availableNewTracksChanged();
-    void attributeFiltersChanged();
-    void combinedTextFilterChanged();
-
-protected:
-    virtual bool isFilterDegenerate() const override;
+    void pluginActionRequested(
+        const QnUuid& engineId,
+        const QString& actionTypeId,
+        const nx::analytics::db::ObjectTrack& track,
+        const QnVirtualCameraResourcePtr& camera) const;
 
 private:
-    class Private;
-    Private* const d;
+    QSharedPointer<QMenu> contextMenu(const nx::analytics::db::ObjectTrack& track) const;
+    void addCreateNewListAction(QMenu* menu, const nx::analytics::db::ObjectTrack& track) const;
 };
 
 } // namespace nx::vms::client::desktop
