@@ -24,5 +24,3 @@ public:
 };
 
 } // namespace nx::vms::client::core::detail
-
-

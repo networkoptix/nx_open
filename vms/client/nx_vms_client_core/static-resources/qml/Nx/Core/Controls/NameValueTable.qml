@@ -2,11 +2,8 @@
 
 import QtQuick
 
-import Nx
 import Nx.Core
-import Nx.Controls
-
-import nx.vms.client.desktop
+import Nx.Core.Controls
 
 Item
 {
@@ -19,6 +16,7 @@ Item
 
     property color nameColor: "gray"
     property color valueColor: "white"
+    property int valueAlignment: Text.AlignLeft
 
     property string textRoleName: "text"
 
@@ -36,6 +34,9 @@ Item
     readonly property int kHighlightLeftPadding: 8
 
     signal searchRequested(int row)
+
+    property real tableLineHeight: CoreSettings.iniConfigValue("attributeTableLineHeightFactor")
+    property real attributeTableSpacing: CoreSettings.iniConfigValue("attributeTableSpacing")
 
     implicitWidth: 400
     implicitHeight: grid.implicitHeight
@@ -88,7 +89,9 @@ Item
                     && gridMouseArea.mouseX > gridMouseArea.width - kCopyWidth
 
                 color: pressed ? pressedColor : (hovered ? hoveredColor : mainColor)
-                source: "image://svg/skin/advanced_search_dialog/tosearch.svg"
+                 source: control.copyable
+                    ? "image://svg/skin/advanced_search_dialog/tosearch.svg"
+                    : ""
                 sourceSize: Qt.size(width, height)
             }
         }
@@ -136,14 +139,19 @@ Item
                     maximumLineCount: 2
                     wrapMode: Text.Wrap
                     elide: Text.ElideRight
+                    horizontalAlignment: isLabel
+                        ? Text.AlignLeft
+                        : control.valueAlignment
 
-                    lineHeight: LocalSettings.iniConfigValue("attributeTableLineHeightFactor")
+                    lineHeight: control.tableLineHeight
 
                     // Copy icon requires more vertical space.
-                    topPadding:
-                        copyable ? 4 : Math.round((LocalSettings.iniConfigValue("attributeTableSpacing") / 2))
-                    bottomPadding:
-                        copyable ? 4 : (LocalSettings.iniConfigValue("attributeTableSpacing") - topPadding)
+                    topPadding: copyable
+                        ? 4
+                        : Math.round(control.attributeTableSpacing / 2)
+                    bottomPadding: copyable
+                        ? 4
+                        : (control.attributeTableSpacing - topPadding)
                     leftPadding: color.visible ? color.width + 4 : 0
 
                     Rectangle
@@ -321,17 +329,5 @@ Item
             if (highlight.rowIndex >= 0)
                 control.searchRequested(highlight.rowIndex)
         }
-    }
-
-    FontMetrics
-    {
-        id: nameFontMetrics
-        font: control.nameFont
-    }
-
-    FontMetrics
-    {
-        id: valueFontMetrics
-        font: control.valueFont
     }
 }

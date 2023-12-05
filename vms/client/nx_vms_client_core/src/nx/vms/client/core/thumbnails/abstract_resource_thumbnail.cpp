@@ -66,6 +66,7 @@ struct AbstractResourceThumbnail::Private
     AbstractResourceThumbnail* const q;
     GenericImageStore* const imageStore;
 
+    qint64 timestampMs = -1;
     QnResourcePtr resource;
     std::unique_ptr<QObject> receiver;
     int maximumSize = kUnlimitedSize;
@@ -198,6 +199,23 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
 
     if (d->loadedAutomatically)
         update();
+}
+
+qint64 AbstractResourceThumbnail::timestampMs() const
+{
+    return d->timestampMs;
+}
+
+void AbstractResourceThumbnail::setTimestampMs(qint64 value)
+{
+    if (d->timestampMs == value)
+        return;
+
+    d->timestampMs = value;
+    reset();
+
+    emit timestampMsChanged();
+    update();
 }
 
 QnResource* AbstractResourceThumbnail::rawResource() const

@@ -6,7 +6,7 @@
 
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/range_adapters.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/core/system_context.h>
 
 #include "analytics_filter_model.h"
 #include "taxonomy/attribute.h"
@@ -14,7 +14,7 @@
 #include "taxonomy/object_type.h"
 #include "taxonomy/state_view.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace analytics {
 
 using namespace nx::analytics::taxonomy;
@@ -195,7 +195,7 @@ QSet<AbstractObjectType*> TaxonomyManager::relevantObjectTypes(AbstractEngine* e
 void TaxonomyManager::registerQmlTypes()
 {
     qmlRegisterUncreatableType<TaxonomyManager>(
-        "nx.vms.client.desktop.analytics", 1, 0, "TaxonomyManager",
+        "nx.vms.client.core.analytics", 1, 0, "TaxonomyManager",
         "Cannot create an instance of TaxonomyManager");
 
     qmlRegisterUncreatableType<taxonomy::StateView>(
@@ -203,40 +203,38 @@ void TaxonomyManager::registerQmlTypes()
         "Cannot create an instance of StateView");
 
     qmlRegisterUncreatableType<AbstractState>(
-        "nx.vms.client.desktop.analytics", 1, 0, "Taxonomy",
+        "nx.vms.client.core.analytics", 1, 0, "Taxonomy",
         "Cannot create an instance of Taxonomy");
 
-    qmlRegisterUncreatableType<taxonomy::AnalyticsFilterModel>(
-        "nx.vms.client.desktop.analytics", 1, 0, "AnalyticsFilterModel",
-        "Cannot create an instance of AnalyticsFilterModel");
+    taxonomy::AnalyticsFilterModel::registerQmlType();
 
     qmlRegisterUncreatableType<AbstractEngine>(
-        "nx.vms.client.desktop.analytics", 1, 0, "Engine",
+        "nx.vms.client.core.analytics", 1, 0, "Engine",
         "Cannot create an instance of Engine");
 
     qmlRegisterUncreatableType<taxonomy::ObjectType>(
-        "nx.vms.client.desktop.analytics", 1, 0, "ObjectType",
+        "nx.vms.client.core.analytics", 1, 0, "ObjectType",
         "Cannot create an instance of ObjectType");
 
     qmlRegisterUncreatableType<taxonomy::Enumeration>(
-        "nx.vms.client.desktop.analytics", 1, 0, "Enumeration",
+        "nx.vms.client.core.analytics", 1, 0, "Enumeration",
         "Cannot create an instance of Enumeration");
 
     qmlRegisterUncreatableType<taxonomy::Attribute>(
-        "nx.vms.client.desktop.analytics", 1, 0, "Attribute",
+        "nx.vms.client.core.analytics", 1, 0, "Attribute",
         "Cannot create an instance of Attribute");
 
     qmlRegisterUncreatableType<AbstractScope>(
-        "nx.vms.client.desktop.analytics", 1, 0, "Scope",
+        "nx.vms.client.core.analytics", 1, 0, "Scope",
         "Cannot create an instance of Scope");
 
     qmlRegisterUncreatableType<AbstractGroup>(
-        "nx.vms.client.desktop.analytics", 1, 0, "Group",
+        "nx.vms.client.core.analytics", 1, 0, "Group",
         "Cannot create an instance of Group");
 
     qmlRegisterType<taxonomy::AnalyticsFilterModel>(
-        "nx.vms.client.desktop.analytics", 1, 0, "FilterModel");
+        "nx.vms.client.core.analytics", 1, 0, "FilterModel");
 }
 
 } // namespace analytics
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

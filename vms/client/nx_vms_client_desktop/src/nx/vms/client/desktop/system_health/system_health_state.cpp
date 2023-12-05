@@ -35,7 +35,7 @@
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
-#include <server/server_storage_manager.h>
+#include <storage/server_storage_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/email/email.h>
 
@@ -205,10 +205,11 @@ SystemHealthState::Private::Private(SystemHealthState* q):
 
     // Metadata storage issues.
 
-    connect(qnServerStorageManager, &QnServerStorageManager::storageChanged,
+    const auto storageManager = q->systemContext()->serverStorageManager();
+    connect(storageManager, &QnServerStorageManager::storageChanged,
         [this]() { updateServersWithMetadataStorageIssues(); });
 
-    connect(qnServerStorageManager, &QnServerStorageManager::activeMetadataStorageChanged,
+    connect(storageManager, &QnServerStorageManager::activeMetadataStorageChanged,
         [this]() { updateServersWithMetadataStorageIssues(); });
 
     update(SystemHealthIndex::metadataStorageNotSet);

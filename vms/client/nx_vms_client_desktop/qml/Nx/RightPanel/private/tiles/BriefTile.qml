@@ -48,7 +48,7 @@ TileBase
                 visible: !!text
                 font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
 
-                text: (model && model.timestamp) || ""
+                text: (model && model.textTimestamp) || ""
             }
         }
 

@@ -65,14 +65,14 @@ struct NX_VMS_COMMON_API QnTimePeriod
         auto durationMs =
             startTimeMs == kMaxTimeValue ? kInfiniteDuration : startTimeMs - endTimeMs;
         return QnTimePeriod(endTimeMs, durationMs);
-    };
+    }
 
     static constexpr QnTimePeriod fromInterval(
         const std::chrono::milliseconds& startTime,
         const std::chrono::milliseconds& endTime)
     {
         return fromInterval(startTime.count(), endTime.count());
-    };
+    }
 
     nx::vms::api::ServerTimePeriod toServerPeriod() const;
 
@@ -102,7 +102,7 @@ struct NX_VMS_COMMON_API QnTimePeriod
     /**
      * Whether this is an empty period - a period of zero length.
      */
-    constexpr bool isEmpty() const { return durationMs == 0; };
+    constexpr bool isEmpty() const { return durationMs == 0; }
 
     qint64 endTimeMs() const;
     void setEndTimeMs(qint64 value);
@@ -112,14 +112,14 @@ struct NX_VMS_COMMON_API QnTimePeriod
     /**
      * Whether this is a null time period.
      */
-    constexpr bool isNull() const { return startTimeMs == 0 && durationMs == 0; };
+    constexpr bool isNull() const { return startTimeMs == 0 && durationMs == 0; }
 
     /**
      * Whether this is a infinite time period.
      */
     constexpr bool isInfinite() const { return durationMs == kInfiniteDuration; }
 
-    constexpr bool isValid() const { return durationMs == kInfiniteDuration || durationMs > 0; };
+    constexpr bool isValid() const { return durationMs == kInfiniteDuration || durationMs > 0; }
 
     /**
      * Returns infinite period starting from zero.
@@ -127,7 +127,7 @@ struct NX_VMS_COMMON_API QnTimePeriod
     static constexpr QnTimePeriod anytime()
     {
         return QnTimePeriod(kMinTimeValue, kInfiniteDuration);
-    };
+    }
 
     /**
      * \returns distance from the nearest period edge to the time in ms. Returns zero if timeMs inside period
@@ -163,22 +163,22 @@ struct NX_VMS_COMMON_API QnTimePeriod
     constexpr bool operator==(const QnTimePeriod& other) const
     {
         return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
-    };
+    }
 
     constexpr bool operator!=(const QnTimePeriod& other) const
     {
         return !(*this == other);
-    };
+    }
 
     constexpr bool operator<(const QnTimePeriod& other) const
     {
         return startTimeMs < other.startTimeMs;
-    };
+    }
 
     constexpr bool operator<(qint64 timeMs) const
     {
         return this->startTimeMs < timeMs;
-    };
+    }
 
     /** Start time in milliseconds. */
     qint64 startTimeMs = 0;
@@ -195,6 +195,8 @@ constexpr bool operator<(qint64 timeMs, const QnTimePeriod& other)
 {
     return timeMs < other.startTimeMs;
 };
+
+using OptionalTimePeriod = std::optional<QnTimePeriod>;
 
 NX_VMS_COMMON_API QnTimePeriod variantMapToTimePeriod(const QVariantMap& map);
 NX_VMS_COMMON_API void PrintTo(const QnTimePeriod& period, ::std::ostream* os);

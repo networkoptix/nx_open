@@ -2,9 +2,17 @@
 
 #include "text_filter_setup.h"
 
+#include <QtQml/QtQml>
+
 #include <nx/utils/log/log.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
+
+void TextFilterSetup::registerQmlType()
+{
+    qmlRegisterUncreatableType<core::TextFilterSetup>("nx.vms.client.core", 1, 0,
+        "TextFilterSetup", "Cannot create instance of TextFilterSetup");
+}
 
 TextFilterSetup::TextFilterSetup(QObject* parent):
     QObject(parent)
@@ -27,4 +35,4 @@ void TextFilterSetup::setText(const QString& value)
     emit textChanged();
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

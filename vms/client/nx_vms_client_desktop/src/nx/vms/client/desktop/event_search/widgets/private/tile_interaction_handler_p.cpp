@@ -498,7 +498,7 @@ void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
 
                         case HeaderItem::creator:
                             cellValue =
-                                getBookmarkCreatorName(bookmark.creatorId, system());
+                                getVisibleBookmarkCreatorName(bookmark, system());
                             break;
 
                         case HeaderItem::tags:

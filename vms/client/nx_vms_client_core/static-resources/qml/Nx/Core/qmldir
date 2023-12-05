@@ -1,3 +1,10 @@
 module Nx.Core
 
 singleton ColorTheme 1.0 ColorTheme.qml
+
+NxObject 1.0 NxObject.qml
+ViewUpdateWatcher 1.0 ViewUpdateWatcher.qml
+
+CoreUtils 1.0 utils.js
+MathUtils 1.0 math_utils.js
+Utils3D 1.0 utils_3d.js

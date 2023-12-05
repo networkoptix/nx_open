@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "structures.h"
 
 namespace nx::vms::client::core::event_search {
@@ -25,4 +27,3 @@ Accessor::TimeType Accessor::startTime(const Type& item)
 }
 
 } // namespace nx::vms::client::core::event_search
-

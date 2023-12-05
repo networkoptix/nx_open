@@ -2,12 +2,13 @@
 
 import QtQuick 2.11
 
-import Nx 1.0
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Items 1.0
+import Nx.Core
+import Nx.Controls
+import Nx.Core.Controls
+import Nx.Core.Items
+import Nx.Items
 
-import nx.vms.client.core
+import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
 
 import "../../../RightPanel/private"
@@ -83,6 +84,9 @@ Rectangle
         {
             id: intervalPreview
 
+            delayMs: CoreSettings.iniConfigValue("intervalPreviewDelayMs")
+            durationMs: CoreSettings.iniConfigValue("intervalPreviewDurationMs")
+
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
@@ -146,10 +150,10 @@ Rectangle
                 function updateState()
                 {
                     const loadingOrMissing = previewPanel.selectedItem
-                        && intervalPreview.previewState !== RightPanel.PreviewState.ready
+                        && intervalPreview.previewState !== EventSearch.PreviewState.ready
 
                     preloader.running = loadingOrMissing
-                        && intervalPreview.previewState !== RightPanel.PreviewState.missing
+                        && intervalPreview.previewState !== EventSearch.PreviewState.missing
 
                     visible = loadingOrMissing
                 }
@@ -236,7 +240,9 @@ Rectangle
                 color: ColorTheme.colors.light16
                 anchors.right: parent.right
                 font.pixelSize: FontConfig.xLarge.pixelSize
-                text: previewPanel.selectedItem ? previewPanel.selectedItem.timestamp.split(" ", 2).pop() : ""
+                text: previewPanel.selectedItem
+                    ? previewPanel.selectedItem.timestamp.split(" ", 2).pop()
+					: ""
             }
 
             Text

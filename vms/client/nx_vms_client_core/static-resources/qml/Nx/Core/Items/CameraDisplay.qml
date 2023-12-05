@@ -3,7 +3,6 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 
-import Nx 1.0
 import Nx.Core 1.0
 import Nx.Core.Items 1.0
 import Nx.Items 1.0
@@ -25,6 +24,8 @@ Rectangle
     property alias videoQuality: player.videoQuality
 
     readonly property alias mediaPlayer: player
+
+    readonly property alias videoOutput: multiVideoOutput
 
     property alias tag: player.tag
 
@@ -93,6 +94,7 @@ Rectangle
         MultiVideoOutput
         {
             id: multiVideoOutput
+
             resourceHelper: mediaResourceHelper
             mediaPlayer: cameraDisplay.mediaPlayer
 

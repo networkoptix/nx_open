@@ -60,13 +60,15 @@ nx::api::ImageRequest::StreamSelectionMode streamSelectionMode(
 nx::api::CameraImageRequest makeRequestParams(
     const QnVirtualCameraResourcePtr& camera,
     int maximumSize,
-    CameraAsyncImageRequest::CameraStream stream)
+    CameraAsyncImageRequest::CameraStream stream,
+    std::chrono::milliseconds timestamp)
 {
     nx::api::CameraImageRequest requestParams;
     requestParams.camera = camera;
     requestParams.rotation = 0;
     requestParams.streamSelectionMode = streamSelectionMode(stream);
     requestParams.size = calculateSizeLimit(camera, maximumSize);
+    requestParams.timestampMs = timestamp;
     return requestParams;
 }
 
@@ -163,9 +165,10 @@ CameraAsyncImageRequest::CameraAsyncImageRequest(
     const QnVirtualCameraResourcePtr& camera,
     int maximumSize,
     CameraStream stream,
+    std::chrono::milliseconds timestamp,
     QObject* parent)
     :
-    CameraAsyncImageRequest(makeRequestParams(camera, maximumSize, stream), parent)
+    CameraAsyncImageRequest(makeRequestParams(camera, maximumSize, stream, timestamp), parent)
 {
 }
 

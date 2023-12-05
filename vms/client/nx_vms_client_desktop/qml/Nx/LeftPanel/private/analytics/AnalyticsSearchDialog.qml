@@ -11,8 +11,8 @@ import Nx.RightPanel
 
 import nx.client.desktop
 import nx.vms.client.core
+import nx.vms.client.core.analytics as Analytics
 import nx.vms.client.desktop
-import nx.vms.client.desktop.analytics as Analytics
 
 import ".."
 
@@ -214,7 +214,7 @@ Window
                     onFiltersReset:
                     {
                         analyticsFilters.clear()
-                        eventModel.commonSetup.cameraSelection = RightPanel.CameraSelection.layout
+                        eventModel.commonSetup.cameraSelection = EventSearch.CameraSelection.layout
                     }
                 }
             }
@@ -449,12 +449,12 @@ Window
                     id: eventModel
 
                     context: windowContext
-                    type: { return RightPanelModel.Type.analytics }
+                    type: { return EventSearch.SearchType.analytics }
                     previewsEnabled: counterBlock.showThumbnails
                     active: true
 
                     Component.onCompleted:
-                        commonSetup.cameraSelection = RightPanel.CameraSelection.layout
+                        commonSetup.cameraSelection = EventSearch.CameraSelection.layout
 
                     onAnalyticsSetupChanged:
                     {
@@ -677,7 +677,7 @@ Window
         property var analyticsFiltersByEngine: ({})
 
         property var filterModel: windowContext
-            ? windowContext.systemContext.taxonomyManager().createFilterModel(dialog)
+            ? windowContext.systemContext.taxonomyManager.createFilterModel(dialog)
             : emptyFilterModel
 
         readonly property Analytics.Engine selectedAnalyticsEngine:
@@ -709,6 +709,9 @@ Window
 
             storeCurrentEngineFilterState()
 
+            if (!eventModel.analyticsSetup)
+                return
+
             eventModel.analyticsSetup.engine = selectedAnalyticsEngine
                 ? NxGlobals.uuid(selectedAnalyticsEngine.id)
                 : NxGlobals.uuid("")
@@ -729,8 +732,7 @@ Window
             target: eventModel.commonSetup
             function onSelectedCamerasChanged()
             {
-                d.filterModel.setSelectedDevices(
-                    eventModel.commonSetup.selectedCameras)
+                d.filterModel.selectedDevices = eventModel.commonSetup.selectedCameras
             }
         }
 

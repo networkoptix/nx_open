@@ -2,17 +2,18 @@
 
 #pragma once
 
+#include <set>
+
 #include <QtCore/QObject>
 #include <QtCore/QStringList>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/client/core/event_search/models/analytics_search_list_model.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
-class AnalyticsSearchListModel;
-
-class AnalyticsSearchSetup: public QObject
+class NX_VMS_CLIENT_CORE_API AnalyticsSearchSetup: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QnUuid engine READ engine WRITE setEngine NOTIFY engineChanged)
@@ -32,6 +33,8 @@ class AnalyticsSearchSetup: public QObject
     Q_PROPERTY(int availableNewTracks READ availableNewTracks NOTIFY availableNewTracksChanged)
 
 public:
+    static void registerQmlType();
+
     explicit AnalyticsSearchSetup(AnalyticsSearchListModel* model, QObject* parent = nullptr);
     virtual ~AnalyticsSearchSetup() override;
 
@@ -82,4 +85,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

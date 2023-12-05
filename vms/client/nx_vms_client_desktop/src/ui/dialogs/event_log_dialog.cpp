@@ -25,9 +25,9 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/skin/color_substitutions.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/item_view_auto_hider.h>
@@ -57,6 +57,7 @@
 
 using namespace nx;
 using namespace nx::vms::event;
+using namespace nx::vms::client::core;
 using namespace nx::vms::client::desktop;
 using namespace std::chrono;
 
@@ -224,7 +225,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->cameraButton,       &QAbstractButton::clicked,          this,   &QnEventLogDialog::at_cameraButton_clicked);
     connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnEventLogDialog::at_eventsGrid_customContextMenuRequested);
-    connect(&appContext()->localSettings()->resourceInfoLevel,
+    connect(&nx::vms::client::desktop::appContext()->localSettings()->resourceInfoLevel,
         &nx::utils::property_storage::BaseProperty::changed,
         ui->gridEvents,
         &QAbstractItemView::reset);
@@ -764,7 +765,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
-        QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr resource = m_model->data(idx, ResourceRole).value<QnResourcePtr>();
         auto manager = this->menu();
         if (resource && system()->accessController()->hasPermissions(resource,
             Qn::ViewContentPermission))

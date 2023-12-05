@@ -15,6 +15,7 @@
 #include <core/resource/resource.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -589,12 +590,12 @@ void EventTile::setFooterText(const QString& value)
     ui->footerLabel->setHidden(!d->footerEnabled || value.isEmpty());
 }
 
-analytics::AttributeList EventTile::attributeList() const
+core::analytics::AttributeList EventTile::attributeList() const
 {
     return ui->attributeTable->content();
 }
 
-void EventTile::setAttributeList(const analytics::AttributeList& value)
+void EventTile::setAttributeList(const core::analytics::AttributeList& value)
 {
     ui->attributeTable->setContent(value);
     ui->attributeTable->setHidden(!d->footerEnabled || value.empty());
@@ -647,7 +648,7 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
     d->forceNextPreviewUpdate = forceUpdate;
     d->updatePreview();
 
-    if (ini().showDebugTimeInformationInRibbon)
+    if (core::ini().showDebugTimeInformationInEventSearchData)
         d->showDebugPreviewTimestamp();
 
     if (!preview())
@@ -662,7 +663,7 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
             if (status == Qn::ThumbnailStatus::NoData && kPreviewReloadDelay > 0s)
                 d->updatePreview(kPreviewReloadDelay);
 
-            if (ini().showDebugTimeInformationInRibbon)
+            if (core::ini().showDebugTimeInformationInEventSearchData)
                 d->showDebugPreviewTimestamp();
         });
 }

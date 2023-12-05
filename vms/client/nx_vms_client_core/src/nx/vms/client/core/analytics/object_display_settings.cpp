@@ -8,11 +8,11 @@
 #include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/settings/local_settings.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 const std::map<std::string, std::string> ObjectDisplaySettings::kBoundingBoxPalette{
     {"Magenta", "#E040FB"},
@@ -29,13 +29,13 @@ const std::map<std::string, std::string> ObjectDisplaySettings::kBoundingBoxPale
 QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
 {
     DetectedObjectSettingsMap settingsMap =
-        appContext()->localSettings()->detectedObjectSettings();
+        appContext()->coreSettings()->detectedObjectSettings();
     auto& settings = settingsMap[objectTypeId];
 
     if (!settings.color.isValid())
     {
-        settings.color = nx::utils::random::choice(core::colorTheme()->colors("detectedObject"));
-        appContext()->localSettings()->detectedObjectSettings = settingsMap;
+        settings.color = nx::utils::random::choice(colorTheme()->colors("detectedObject"));
+        appContext()->coreSettings()->detectedObjectSettings = settingsMap;
     }
     return settings.color;
 }
@@ -84,4 +84,4 @@ std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::visibleAttri
     return result;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

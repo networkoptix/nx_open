@@ -22,6 +22,8 @@
 #include <nx/vms/client/core/system_logon/connection_data.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 
+#include "types/detected_object.h"
+
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API Settings: public nx::utils::property_storage::Storage
@@ -40,6 +42,8 @@ public:
         /** An optional predefined securty key. Used for settings migration. */
         QByteArray securityKey;
     };
+
+    Q_INVOKABLE static QVariant iniConfigValue(const QString& name);
 
     Settings(const InitializationOptions& options);
     virtual ~Settings() override;
@@ -64,6 +68,8 @@ public:
         this, "PreferredCloudServers"};
 
     SecureProperty<ConnectionData> lastConnection{this, "lastConnection"};
+
+    Property<DetectedObjectSettingsMap> detectedObjectSettings{this, "detectedObjectSettings"};
 
     // Password for cloud connections to the old systems. Needed for the compatibility.
     SecureProperty<std::string> digestCloudPassword{this, "digestCloudPassword"};
