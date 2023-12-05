@@ -9665,11 +9665,11 @@ Remember to return the Logging Level to its default setting after you have colle
         <translation></translation>
     </message>
     <message>
-        <source>We recommend that you consult with %1 before proceeding.</source>
+        <source>support</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>support</source>
+        <source>It is recommended to contact %1 before proceeding.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
