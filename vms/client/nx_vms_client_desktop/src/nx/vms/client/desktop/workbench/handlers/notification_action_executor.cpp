@@ -45,9 +45,7 @@ void NotificationActionExecutor::onContextUserChanged()
 
     const auto user = context()->user();
 
-    if (user && user->isCloud()
-        && (common::saas::saasServicesOperational(systemContext())
-            || rules::ini().enableCSNwithoutSaaS))
+    if (user && user->isCloud() && common::saas::saasServicesOperational(systemContext()))
     {
         m_listener = std::make_unique<CrossSystemNotificationsListener>();
         connect(m_listener.get(),
