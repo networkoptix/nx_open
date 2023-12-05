@@ -5,10 +5,11 @@
 #include <QtCore/QPointer>
 #include <QtWidgets/QAbstractButton>
 
-#include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/skin.h>
 
 class QGroupBox;
+class QHeaderView;
 
 namespace nx::vms::client::desktop {
 
@@ -32,6 +33,12 @@ public:
      * is transferred to the group box.
      */
     static HintButton* createGroupBoxHint(QGroupBox* groupBox);
+
+    /**
+     * Creates hint button attached to the given section of horizontal header view, ownership of
+     * the created hint button is transferred to the header view.
+     */
+    static HintButton* createHeaderViewHint(QHeaderView* headerView, int section);
 
     /**
      * @returns Text displayed in the tooltip.
@@ -60,6 +67,7 @@ protected:
 private:
     void showTooltip(bool show);
     void updateGeometry(QGroupBox* parent); //< Updates position of hint attached to a group box.
+    void updateGeometry(QHeaderView* parent); //< Updates position of hint attached to a group box.
     int getHelpTopicId() const;
     bool hasHelpTopic() const;
 
@@ -68,6 +76,7 @@ private:
     QPixmap m_highlightedPixmap;
     QString m_hintText;
     QPointer<QGroupBox> m_groupBox; //< Pointer to the group box to which the hint is attached.
+    std::optional<int> m_headerViewSection;
 
     bool m_isHovered = false;
     bool m_tooltipVisible = false;

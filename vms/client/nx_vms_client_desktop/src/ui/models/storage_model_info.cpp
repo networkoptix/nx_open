@@ -33,9 +33,13 @@ QnStorageModelInfo::QnStorageModelInfo(const nx::vms::api::StorageSpaceDataV1& r
     , isExternal(reply.isExternal)
     , isOnline(reply.isOnline)
     , isDbReady(reply.storageStatus.testFlag(nx::vms::api::StorageStatus::dbReady))
-{}
+{
+    archiveMode = isExternal
+        ? nx::vms::api::StorageArchiveMode::isolated
+        : nx::vms::api::StorageArchiveMode::exclusive;
+}
 
-QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr &storage )
+QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr& storage)
     : id(storage->getId())
     , isUsed(storage->isUsedForWriting())
     , url(storage->getUrl())
@@ -45,5 +49,7 @@ QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr &storage )
     , isBackup(storage->isBackup())
     , isExternal(storage->isExternal())
     , isOnline(storage->getStatus() == nx::vms::api::ResourceStatus::online)
-    , isDbReady(storage->persistentStatusFlags().testFlag(nx::vms::api::StoragePersistentFlag::dbReady))
+    , isDbReady(storage->persistentStatusFlags().testFlag(
+        nx::vms::api::StoragePersistentFlag::dbReady))
+    , archiveMode(storage->storageArchiveMode())
 {}

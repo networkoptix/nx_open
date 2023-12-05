@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -207,12 +208,15 @@ public:
         QStyleOptionViewItem opt(option);
         initStyleOption(&opt, index);
 
-        bool editableColumn = opt.state.testFlag(QStyle::State_Enabled)
-            && index.column() == QnStorageListModel::StoragePoolColumn
+        bool isDropdownColumn = index.column() == QnStorageListModel::StoragePoolColumn
+            || index.column() == QnStorageListModel::StorageArchiveModeColumn;
+
+        bool isEditableDropdownItem = opt.state.testFlag(QStyle::State_Enabled)
+            && isDropdownColumn
             && index.flags().testFlag(Qt::ItemIsEditable);
 
         bool hovered = m_hoverTracker && m_hoverTracker->hoveredIndex() == index;
-        bool beingEdited = m_editedRow == index.row();
+        bool beingEdited = m_editedIndex == index;
 
         bool hoveredRow = m_hoverTracker && m_hoverTracker->hoveredIndex().row() == index.row();
         bool hasHoverableText = index.data(QnStorageListModel::ShowTextOnHoverRole).toBool();
@@ -242,18 +246,18 @@ public:
         if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
             opt.palette.setColor(QPalette::Text, vms::client::core::colorTheme()->color("red_l2"));
 
-        // Set proper color for hovered storage type column.
+        // Set proper color for hovered editable dropdown item.
         if (!opt.state.testFlag(QStyle::State_Enabled))
             opt.palette.setCurrentColorGroup(QPalette::Disabled);
-        if (editableColumn && hovered)
+        if (isEditableDropdownItem && hovered)
             opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::ButtonText));
 
         // Draw item.
         QStyle* style = option.widget ? option.widget->style() : QApplication::style();
         style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, option.widget);
 
-        // Draw arrow if editable storage type column.
-        if (editableColumn)
+        // Draw arrow for editable dropdown item.
+        if (isEditableDropdownItem)
         {
             QStyleOption arrowOption = opt;
             arrowOption.rect.setLeft(arrowOption.rect.left() +
@@ -280,14 +284,14 @@ public:
         return nullptr;
     }
 
-    void setEditedRow(int row)
+    void setEditedIndex(const QModelIndex& index)
     {
-        m_editedRow = row;
+        m_editedIndex = index;
     }
 
 private:
     QPointer<ItemViewHoverTracker> m_hoverTracker;
-    int m_editedRow = -1;
+    QPersistentModelIndex m_editedIndex;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -525,7 +529,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     m_model(new QnStorageListModel()),
     m_columnResizer(new ColumnResizer(this)),
     m_updateStatusTimer(new QTimer(this)),
-    m_storagePoolMenu(new QMenu(this))
+    m_storagePoolMenu(new QMenu(this)),
+    m_storageArchiveModeMenu(new QMenu(this))
 {
     ui->setupUi(this);
     connect(m_model.get(), &QnStorageListModel::dataChanged, [this] { updateWarnings(); });
@@ -536,6 +541,15 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
 
     mainAction->setData(static_cast<int>(StoragePoolMenuItem::main));
     backupAction->setData(static_cast<int>(StoragePoolMenuItem::backup));
+
+    m_storageArchiveModeMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+    const auto exclusiveAction = m_storageArchiveModeMenu->addAction(tr("Exclusive"));
+    const auto sharedAction = m_storageArchiveModeMenu->addAction(tr("Shared"));
+    const auto isolatedAction = m_storageArchiveModeMenu->addAction(tr("Isolated"));
+
+    exclusiveAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::exclusive));
+    sharedAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::shared));
+    isolatedAction->setData(static_cast<int>(nx::vms::api::StorageArchiveMode::isolated));
 
     setHelpTopic(this, HelpTopic::Id::ServerSettings_Storages);
 
@@ -563,6 +577,19 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     ui->storageView->header()->setSectionResizeMode(
         QnStorageListModel::SeparatorColumn, QHeaderView::Stretch);
     ui->storageView->header()->setSectionsMovable(false);
+    ui->storageView->header()->setSectionsClickable(false);
+    ui->storageView->header()->setVisible(true);
+
+    const auto archiveModeHint = HintButton::createHeaderViewHint(
+        ui->storageView->header(), QnStorageListModel::StorageArchiveModeColumn);
+    archiveModeHint->addHintLine(
+        tr("Choose a read-write policy to define how interact with storage directories."));
+    archiveModeHint->addHintLine(
+        tr("Exclusive - server reads and writes all folders."));
+    archiveModeHint->addHintLine(
+        tr("Shared - server reads all folders, but writes only its own folder."));
+    archiveModeHint->addHintLine(
+        tr("Isolated - server reads and writes only its own folder."));
 
     ui->storageView->setMouseTracking(true);
     ui->storageView->installEventFilter(m_columnResizer.data());
@@ -570,10 +597,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     auto itemClicked =
         [this, itemDelegate](const QModelIndex& index)
         {
-            itemDelegate->setEditedRow(index.row());
+            itemDelegate->setEditedIndex(index);
             ui->storageView->update(index);
             atStorageViewClicked(index);
-            itemDelegate->setEditedRow(-1);
+            itemDelegate->setEditedIndex(QModelIndex());
             ui->storageView->update(index);
         };
 
@@ -945,34 +972,34 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
 
     QnStorageModelInfo record = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
 
+    auto findMenuAction =
+        [](QMenu* menu, const QVariant& actionData) -> QAction*
+        {
+            for (auto action: menu->actions())
+            {
+                const auto data = action->data();
+                if (data.isNull())
+                    continue;
+
+                if (data == actionData)
+                    return action;
+
+                if (data == actionData)
+                    return action;
+            }
+
+            NX_ASSERT(false, "Unexpected action data passed as parameter");
+            return nullptr;
+        };
+
     if (index.column() == QnStorageListModel::StoragePoolColumn)
     {
-        if (!m_model->canChangeStoragePool(record) || !index.flags().testFlag(Qt::ItemIsEditable))
+        if (!m_model->canChangeStoragePool(record))
             return;
 
-        auto findAction =
-            [this](StoragePoolMenuItem menuItem) -> QAction*
-            {
-                for (auto action: m_storagePoolMenu->actions())
-                {
-                    const auto actionData = action->data();
-                    if (actionData.isNull())
-                        continue;
-
-                    StoragePoolMenuItem actionItem =
-                        static_cast<StoragePoolMenuItem>(actionData.toInt());
-
-                    if (menuItem == actionItem)
-                        return action;
-                }
-
-                NX_ASSERT(false, "Unexpected action type passed as parameter");
-                return nullptr;
-            };
-
-        const auto activeAction = findAction(record.isBackup
-            ? StoragePoolMenuItem::backup
-            : StoragePoolMenuItem::main);
+        const auto activeAction = findMenuAction(m_storagePoolMenu, record.isBackup
+            ? static_cast<int>(StoragePoolMenuItem::backup)
+            : static_cast<int>(StoragePoolMenuItem::main));
 
         m_storagePoolMenu->setActiveAction(activeAction);
 
@@ -980,7 +1007,11 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
         // disabled and become non-interactive.
         const auto cloudStorageInfo = m_model->cloudBackupStorage();
         const auto backupMenuActionEnabled = !cloudStorageInfo || !cloudStorageInfo->isUsed;
-        findAction(StoragePoolMenuItem::backup)->setEnabled(backupMenuActionEnabled);
+        if (auto backupMenuAction =
+            findMenuAction(m_storagePoolMenu, static_cast<int>(StoragePoolMenuItem::backup)))
+        {
+            backupMenuAction->setEnabled(backupMenuActionEnabled);
+        }
 
         QPoint point = ui->storageView->viewport()->mapToGlobal(
             ui->storageView->visualRect(index).bottomLeft()) + QPoint(0, 1);
@@ -1011,6 +1042,32 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
                 NX_ASSERT(false, "Unexpected action type picked from context menu");
                 return;
         }
+
+        m_model->updateStorage(record);
+    }
+    else if (index.column() == QnStorageListModel::StorageArchiveModeColumn)
+    {
+        if (!m_model->canChangeStorageArchiveMode(record))
+            return;
+
+        const auto activeMenuAction =
+            findMenuAction(m_storageArchiveModeMenu, static_cast<int>(record.archiveMode));
+        m_storageArchiveModeMenu->setActiveAction(activeMenuAction);
+
+        QPoint menuPoint = ui->storageView->viewport()->mapToGlobal(
+            ui->storageView->visualRect(index).bottomLeft()) + QPoint(0, 1);
+
+        const auto selectedAction = m_storageArchiveModeMenu->exec(menuPoint);
+        if (!selectedAction)
+            return;
+
+        const auto selectedArchiveMode =
+            static_cast<nx::vms::api::StorageArchiveMode>(selectedAction->data().toInt());
+
+        if (record.archiveMode == selectedArchiveMode)
+            return;
+
+        record.archiveMode = selectedArchiveMode;
 
         m_model->updateStorage(record);
     }
@@ -1097,10 +1154,12 @@ void QnStorageConfigWidget::applyStoragesChanges(
         {
             auto storage = *existingIt;
             if (storageData.isUsed != storage->isUsedForWriting()
-                || storageData.isBackup != storage->isBackup())
+                || storageData.isBackup != storage->isBackup()
+                || storageData.archiveMode != storage->storageArchiveMode())
             {
                 storage->setUsedForWriting(storageData.isUsed);
                 storage->setBackup(storageData.isBackup);
+                storage->setStorageArchiveMode(storageData.archiveMode);
                 result.push_back(storage);
             }
         }
@@ -1137,7 +1196,8 @@ bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& sto
 
         // Storage was modified.
         if (storageData.isUsed != storage->isUsedForWriting()
-            || storageData.isBackup != storage->isBackup())
+            || storageData.isBackup != storage->isBackup()
+            || storageData.archiveMode != storage->storageArchiveMode())
         {
             return true;
         }
@@ -1178,6 +1238,9 @@ void QnStorageConfigWidget::applyChanges()
             resourcePool()->removeResource(storage);
         }
     }
+
+    for (const auto& storage: storagesToUpdate)
+        storage->savePropertiesAsync();
 
     if (!storagesToUpdate.empty())
         qnServerStorageManager->saveStorages(storagesToUpdate);
