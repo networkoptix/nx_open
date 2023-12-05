@@ -6,6 +6,7 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QStyleOptionGroupBox>
 #include <QtWidgets/QToolTip>
 
@@ -19,7 +20,8 @@
 
 namespace {
 
-static constexpr int kGroupBoxExtraMargin = 2;
+// Extra margin for a hint button attached to group box or header view.
+static constexpr int kExtraMargin = 2;
 
 QString makeParagraph(const QString& text)
 {
@@ -72,6 +74,30 @@ HintButton* HintButton::createGroupBoxHint(QGroupBox* groupBox)
     return result;
 }
 
+HintButton* HintButton::createHeaderViewHint(QHeaderView* headerView, int section)
+{
+    if (!NX_ASSERT(headerView, "Valid pointer to the header view expected"))
+        return nullptr;
+
+    if (!NX_ASSERT(headerView->orientation() == Qt::Horizontal, "Horizontal header view expected"))
+        return nullptr;
+
+    const auto model = headerView->model();
+    if (!NX_ASSERT(model || (section < 0) || section >= model->columnCount()))
+        return nullptr;
+
+    const auto hintButton = new HintButton(headerView);
+    hintButton->m_headerViewSection = section;
+
+    connect(headerView, &QHeaderView::sectionResized, hintButton,
+        [hintButton, headerView]{ hintButton->updateGeometry(headerView); });
+
+    connect(headerView, &QHeaderView::sectionMoved, hintButton,
+        [hintButton, headerView]{ hintButton->updateGeometry(headerView); });
+
+    return hintButton;
+}
+
 QString HintButton::hintText() const
 {
     return m_hintText;
@@ -88,13 +114,15 @@ void HintButton::addHintLine(const QString& hintLine)
     m_hintText.append(hintLine.trimmed());
 }
 
-bool HintButton::eventFilter(QObject* obj, QEvent* event)
+bool HintButton::eventFilter(QObject* object, QEvent* event)
 {
-    // We have subscribed exactly to events of QGroupBox instance,
-    // so we are quite confident in objects we get here.
     if (event->type() == QEvent::Resize)
-        updateGeometry(static_cast<QGroupBox*>(obj));
-    return QWidget::eventFilter(obj, event);
+    {
+        if (auto groupBox = qobject_cast<QGroupBox*>(object))
+            updateGeometry(groupBox);
+    }
+
+    return QWidget::eventFilter(object, event);
 }
 
 // Get access to protected member function
@@ -123,9 +151,41 @@ void HintButton::updateGeometry(QGroupBox* parent)
 
     // We manually add some spaces to the caption of group box, to push away its border
     // and provide some space to hint button.
-    static constexpr auto kMargin = style::Metrics::kHintButtonMargin + kGroupBoxExtraMargin;
+    static constexpr auto kMargin = style::Metrics::kHintButtonMargin + kExtraMargin;
     newGeometry.moveLeft(captionRect.right() + kMargin);
     setGeometry(newGeometry);
+}
+
+void HintButton::updateGeometry(QHeaderView* headerView)
+{
+    static constexpr auto kMargin = style::Metrics::kHintButtonMargin + kExtraMargin;
+
+    const QRect sectionRect(
+        headerView->sectionViewportPosition(*m_headerViewSection), 0,
+        headerView->sectionSize(*m_headerViewSection), headerView->height());
+
+    const auto model = headerView->model();
+    const auto textData = model->headerData(*m_headerViewSection, Qt::Horizontal);
+    const auto textAlignmentData =
+        model->headerData(*m_headerViewSection, Qt::Horizontal, Qt::TextAlignmentRole);
+
+    QStyleOptionHeader sectionStyleOption;
+    sectionStyleOption.initFrom(headerView);
+    sectionStyleOption.text = textData.toString();
+    sectionStyleOption.section = *m_headerViewSection;
+    sectionStyleOption.textAlignment = textAlignmentData.isValid()
+        ? Qt::Alignment(textAlignmentData.toInt())
+        : headerView->defaultAlignment();
+    sectionStyleOption.rect = sectionRect;
+
+    const auto sectionTextRect =
+        style()->subElementRect(QStyle::SE_HeaderLabel, &sectionStyleOption, headerView);
+
+    QRect updatedGeometry({}, size());
+    updatedGeometry.moveCenter(headerView->rect().center());
+    updatedGeometry.moveLeft(sectionTextRect.right() + kMargin);
+
+    setGeometry(updatedGeometry);
 }
 
 int HintButton::getHelpTopicId() const

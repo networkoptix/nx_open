@@ -265,6 +265,30 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
             return storageData.storageType;
         }
 
+        case StorageArchiveModeColumn:
+        {
+            switch (storageData.archiveMode)
+            {
+                case nx::vms::api::StorageArchiveMode::isolated:
+                    return tr("Isolated");
+
+                case nx::vms::api::StorageArchiveMode::exclusive:
+                    return tr("Exclusive");
+
+                case nx::vms::api::StorageArchiveMode::shared:
+                    return tr("Shared");
+
+                case nx::vms::api::StorageArchiveMode::undefined:
+                    return canChangeStorageArchiveMode(storageData)
+                        ? tr("Undefined")
+                        : QString();
+
+                default:
+                    NX_ASSERT(false, "Unexpected storage archive mode");
+                    return QString();
+            }
+        }
+
         case TotalSpaceColumn:
         {
             switch (storageData.totalSpace)
@@ -484,11 +508,10 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex& index) const
         flags |= Qt::ItemIsEnabled;
 
     if (index.column() == StoragePoolColumn)
-    {
-        auto s = storage(index);
-        if (s.isWritable && canChangeStoragePool(s) && !isCloudBackupStorage(s))
-            flags |= Qt::ItemIsEditable;
-    }
+        flags.setFlag(Qt::ItemIsEditable, canChangeStoragePool(storage(index)));
+
+    if (index.column() == StorageArchiveModeColumn)
+        flags.setFlag(Qt::ItemIsEditable, canChangeStorageArchiveMode(storage(index)));
 
     if (index.column() == CheckBoxColumn)
     {
@@ -525,6 +548,9 @@ QVariant QnStorageListModel::headerData(int section, Qt::Orientation orientation
         case StoragePoolColumn:
             return tr("Purpose");
 
+        case StorageArchiveModeColumn:
+            return tr("Read-Write Policy");
+
         case TotalSpaceColumn:
             return tr("Size");
 
@@ -553,6 +579,9 @@ bool QnStorageListModel::canChangeStoragePool(const QnStorageModelInfo& data) co
         return false;
 
     if (isStorageInRebuild(data))
+        return false;
+
+    if (isCloudBackupStorage(data))
         return false;
 
     auto isFullScan = [](const nx::vms::api::StorageScanInfo& status)
@@ -593,6 +622,26 @@ bool QnStorageListModel::canChangeStoragePool(const QnStorageModelInfo& data) co
 
     /* Check that at least one writable storage left in the main pool. */
     return std::any_of(m_storages.begin(), m_storages.end(), isWritable);
+}
+
+bool QnStorageListModel::canChangeStorageArchiveMode(const QnStorageModelInfo& data) const
+{
+    if (m_readOnly)
+        return false;
+
+    if (!data.isWritable)
+        return false;
+
+    if (isStorageInRebuild(data))
+        return false;
+
+    if (isStoragePoolInRebuild(data))
+        return false;
+
+    if (isCloudBackupStorage(data))
+        return false;
+
+    return true;
 }
 
 bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const

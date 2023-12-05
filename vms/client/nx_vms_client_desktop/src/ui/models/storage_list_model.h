@@ -27,6 +27,7 @@ public:
         UrlColumn,
         TypeColumn,
         StoragePoolColumn,
+        StorageArchiveModeColumn,
         TotalSpaceColumn,
         ActionsColumn,
         SeparatorColumn,
@@ -63,8 +64,8 @@ public:
         QnServerStoragesPool pool,
         const nx::vms::api::StorageScanInfo& rebuildStatus);
 
-    /** Check if the storage can be moved from this model to another. */
     bool canChangeStoragePool(const QnStorageModelInfo& data) const;
+    bool canChangeStorageArchiveMode(const QnStorageModelInfo& data) const;
 
     /** Check if storage can be removed from the system. */
     bool canRemoveStorage(const QnStorageModelInfo& data) const;

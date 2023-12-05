@@ -5,6 +5,7 @@
 #include <api/model/api_model_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/storage_archive_mode.h>
 #include <nx/vms/api/data/storage_space_data.h>
 
 struct QnStorageModelInfo
@@ -20,6 +21,7 @@ struct QnStorageModelInfo
     bool isExternal;
     bool isOnline;
     bool isDbReady;
+    nx::vms::api::StorageArchiveMode archiveMode = nx::vms::api::StorageArchiveMode::undefined;
 
     QnStorageModelInfo();
     explicit QnStorageModelInfo(const nx::vms::api::StorageSpaceDataV1& reply);

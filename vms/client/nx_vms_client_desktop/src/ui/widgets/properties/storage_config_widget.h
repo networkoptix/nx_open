@@ -113,6 +113,7 @@ private:
     QScopedPointer<QObject> m_columnResizer;
     QTimer* m_updateStatusTimer;
     QMenu* m_storagePoolMenu;
+    QMenu* m_storageArchiveModeMenu;
 
     struct StoragePool
     {
