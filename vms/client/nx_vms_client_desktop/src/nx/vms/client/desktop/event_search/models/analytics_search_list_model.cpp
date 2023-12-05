@@ -2,139 +2,149 @@
 
 #include "analytics_search_list_model.h"
 
-#include <common/common_globals.h>
-#include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/managed_camera_set.h>
+#include <QtWidgets/QMenu>
 
-#include "private/analytics_search_list_model_p.h"
+#include <analytics/db/analytics_db_types.h>
+#include <core/resource/camera_resource.h>
+#include <nx/analytics/action_type_descriptor_manager.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/math/math.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 
 namespace nx::vms::client::desktop {
 
-AnalyticsSearchListModel::AnalyticsSearchListModel(WindowContext* context, QObject* parent):
-    base_type(context, [this]() { return new Private(this); }, parent),
-    d(qobject_cast<Private*>(base_type::d.data()))
+QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) const
 {
-    setLiveSupported(true);
+    if (!NX_ASSERT(qBetween<int>(0, index.row(), rowCount())))
+        return {};
+
+    const auto& track = trackByRow(index.row());
+    switch (role)
+    {
+        case Qn::HelpTopicIdRole:
+            return HelpTopic::Id::Empty;
+
+        case Qn::ItemZoomRectRole:
+            return QVariant::fromValue(previewParams(track).boundingBox);
+
+        case Qn::CreateContextMenuRole:
+            return QVariant::fromValue(contextMenu(track));
+
+        default:
+            return base_type::data(index, role);
+    }
 }
 
-QRectF AnalyticsSearchListModel::filterRect() const
+QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
+    const nx::analytics::db::ObjectTrack& track) const
 {
-    return d->filterRect();
+    const auto cameraResource = camera(track);
+    if (!cameraResource)
+        return {};
+
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext());
+    const auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
+        track.objectTypeId,
+        cameraResource);
+
+    QSharedPointer<QMenu> menu(new QMenu());
+    for (const auto& [engineId, actionById]: actionByEngine)
+    {
+        if (!menu->isEmpty())
+            menu->addSeparator();
+
+        for (const auto& [actionId, actionDescriptor]: actionById)
+        {
+            const auto name = actionDescriptor.name;
+            menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
+                [this, engineId = engineId, actionId = actionDescriptor.id, track, cameraResource]()
+                {
+                    emit this->pluginActionRequested(engineId, actionId, track, cameraResource);
+                }));
+        }
+    }
+
+    menu->addSeparator();
+
+    if (ResourceAccessManager::hasPermissions(cameraResource, Qn::ReadWriteSavePermission))
+    {
+        const auto listManager = systemContext()->lookupListManager();
+        auto& lists = listManager->lookupLists();
+        if (lists.empty())
+        {
+            addCreateNewListAction(menu.get(), track);
+        }
+        else
+        {
+            auto addMenu = menu->addMenu(tr("Add To List"));
+            addCreateNewListAction(addMenu, track);
+
+            addMenu->addSeparator();
+            for (const auto& list: lists)
+            {
+                addMenu->addAction<std::function<void()>>(list.name,
+                    nx::utils::guarded(this,
+                        [&]()
+                        {
+                            auto lookupList = listManager->lookupList(list.id);
+
+                            std::map<QString, QString> val;
+                            for (const auto& attribute: track.attributes)
+                            {
+                                for (const auto& name: lookupList.attributeNames)
+                                {
+                                    if (attribute.name == name)
+                                    {
+                                        val[name] = attribute.value;
+                                        continue;
+                                    }
+                                }
+                            }
+                            if (val.empty())
+                                return;
+
+                            lookupList.entries.push_back(val);
+                            listManager->addOrUpdate(lookupList);
+                        }));
+            }
+        }
+    }
+
+    if (menu->isEmpty())
+        menu.reset();
+
+    return menu;
 }
 
-void AnalyticsSearchListModel::setFilterRect(const QRectF& relativeRect)
+void AnalyticsSearchListModel::addCreateNewListAction(QMenu* menu,
+    const nx::analytics::db::ObjectTrack& track) const
 {
-    d->setFilterRect(relativeRect);
+    menu->addAction<std::function<void()>>(tr("Create New List by object"),
+        nx::utils::guarded(this,
+            [&]()
+            {
+                std::vector<QString> attributeNames;
+                std::vector<std::map<QString, QString>> entries;
+                std::map<QString, QString> val;
+
+                for (const auto& attribute: track.attributes)
+                {
+                    attributeNames.push_back(attribute.name);
+                    val[attribute.name] = attribute.value;
+                }
+                entries.push_back(val);
+
+                nx::vms::api::LookupListData list{
+                    .name = track.objectTypeId, //< TODO: #pprivalov Add check for name duplication.
+                    .objectTypeId = track.objectTypeId,
+                    .attributeNames = attributeNames,
+                    .entries = entries};
+                systemContext()->lookupListManager()->addOrUpdate(list);
+            }));
 }
-
-TextFilterSetup* AnalyticsSearchListModel::textFilter() const
-{
-    return d->textFilter.get();
-}
-
-QnUuid AnalyticsSearchListModel::selectedEngine() const
-{
-    return d->selectedEngine();
-}
-
-void AnalyticsSearchListModel::setSelectedEngine(const QnUuid& value)
-{
-    d->setSelectedEngine(value);
-}
-
-QStringList AnalyticsSearchListModel::selectedObjectTypes() const
-{
-    return d->selectedObjectTypes();
-}
-
-void AnalyticsSearchListModel::setSelectedObjectTypes(const QStringList& value)
-{
-    d->setSelectedObjectTypes(value);
-}
-
-const std::set<QString>& AnalyticsSearchListModel::relevantObjectTypes() const
-{
-    return d->relevantObjectTypes();
-}
-
-QStringList AnalyticsSearchListModel::attributeFilters() const
-{
-    return d->attributeFilters();
-}
-
-void AnalyticsSearchListModel::setAttributeFilters(const QStringList& value)
-{
-    d->setAttributeFilters(value);
-}
-
-QString AnalyticsSearchListModel::combinedTextFilter() const
-{
-    const auto freeText = NX_ASSERT(textFilter())
-        ? textFilter()->text()
-        : QString();
-
-    const auto attributesText = attributeFilters().join(" ");
-    if (attributesText.isEmpty())
-        return d->makeEnumValuesExact(freeText);
-
-    return d->makeEnumValuesExact(freeText.isEmpty()
-        ? attributesText
-        : QString("%1 %2").arg(attributesText, freeText));
-}
-
-bool AnalyticsSearchListModel::isConstrained() const
-{
-    return filterRect().isValid()
-        || !d->textFilter->text().isEmpty()
-        || !selectedEngine().isNull()
-        || !selectedObjectTypes().isEmpty()
-        || !attributeFilters().empty()
-        || base_type::isConstrained();
-}
-
-AnalyticsSearchListModel::LiveProcessingMode AnalyticsSearchListModel::liveProcessingMode() const
-{
-    return d->liveProcessingMode();
-}
-
-void AnalyticsSearchListModel::setLiveProcessingMode(LiveProcessingMode value)
-{
-    d->setLiveProcessingMode(value);
-}
-
-int AnalyticsSearchListModel::availableNewTracks() const
-{
-    return d->availableNewTracks();
-}
-
-void AnalyticsSearchListModel::commitAvailableNewTracks()
-{
-    d->commitNewTracks();
-}
-
-void AnalyticsSearchListModel::setLiveTimestampGetter(LiveTimestampGetter value)
-{
-    d->setLiveTimestampGetter(value);
-}
-
-bool AnalyticsSearchListModel::hasAccessRights() const
-{
-    return system()->accessController()->isDeviceAccessRelevant(
-        nx::vms::api::AccessRight::viewArchive);
-}
-
-bool AnalyticsSearchListModel::isFilterDegenerate() const
-{
-    return AbstractAsyncSearchListModel::isFilterDegenerate() || hasOnlyLiveCameras();
-}
-
-bool AnalyticsSearchListModel::hasOnlyLiveCameras() const
-{
-    const QnVirtualCameraResourceSet cameras = cameraSet()->cameras();
-    return !cameras.empty() && std::none_of(cameras.begin(), cameras.end(),
-        [this](const QnVirtualCameraResourcePtr& camera) { return d->canViewArchive(camera); });
-}
-
 
 } // namespace nx::vms::client::desktop
+
