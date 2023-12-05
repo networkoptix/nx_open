@@ -36,9 +36,9 @@ namespace nx::network::http {
 //-------------------------------------------------------------------------------------------------
 
 static ClientOptions::Timeouts kDefaultTimeouts{
-    /*sendTimeout*/ std::chrono::milliseconds(3001),
-    /*responseReadTimeout*/ std::chrono::milliseconds(3002),
-    /*messageBodyReadTimeout*/ std::chrono::milliseconds(10003),
+    /*sendTimeout*/ std::chrono::seconds(61),
+    /*responseReadTimeout*/ std::chrono::seconds(62),
+    /*messageBodyReadTimeout*/ std::chrono::seconds(103),
 };
 
 const ClientOptions::Timeouts& ClientOptions::Timeouts::defaults()
