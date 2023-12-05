@@ -3,6 +3,7 @@
 #include "resource_tree_model_test_fixture.h"
 
 #include <QtCore/QFileInfo>
+#include <QtTest/QAbstractItemModelTester>
 
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
@@ -51,6 +52,11 @@ void ResourceTreeModelTest::SetUp()
 
     m_newResourceTreeModel.reset(new entity_item_model::EntityItemModel());
     nx::utils::ModelTransactionChecker::install(m_newResourceTreeModel.get());
+
+    // Create QAbstractItemModelTester owned by the model.
+    new QAbstractItemModelTester(m_newResourceTreeModel.get(),
+        QAbstractItemModelTester::FailureReportingMode::Fatal,
+        /*parent*/ m_newResourceTreeModel.get());
 
     m_resourceTreeComposer.reset(new entity_resource_tree::ResourceTreeComposer(
         systemContext(),

@@ -148,7 +148,11 @@ int FlatteningGroupEntity::childEntityRow(const AbstractEntity* entity) const
         return -1;
 
     if (isFlattened())
-        return m_nestedEntity->childEntityRow(entity);
+    {
+        const int row = m_nestedEntity->childEntityRow(entity);
+        const int offset = (m_headIsHidden || row < 0) ? 0 : 1;
+        return row + offset;
+    }
 
     if (m_nestedEntity.get() == entity)
         return 0;
