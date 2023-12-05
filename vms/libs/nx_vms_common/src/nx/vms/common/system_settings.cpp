@@ -700,11 +700,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("LDAP settings"); });
 
     m_cloudPollingIntervalAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::cloudPollingIntervalS, 60, [](const int& value) { return value >= 0; }, this,
+        Names::cloudPollingIntervalS, 60, [](const int& value) { return value >= 1; }, this,
         []
         {
-            return tr("Interval between the Cloud polling HTTP requests to synchronize the data, "
-                "if zero then the transaction message bus is used");
+            return tr("Interval between the Cloud polling HTTP requests to synchronize the data.");
         });
 
     connect(
