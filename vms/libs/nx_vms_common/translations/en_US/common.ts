@@ -1761,10 +1761,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Cloud storage update period in seconds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>LDAP settings</source>
         <translation type="unfinished"></translation>
     </message>
