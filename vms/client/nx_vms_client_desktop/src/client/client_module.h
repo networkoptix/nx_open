@@ -13,27 +13,25 @@
 class QnClientCoreModule;
 
 namespace nx::vms::api { enum class PeerType; }
+namespace nx::vms::license { class VideoWallLicenseUsageHelper; }
 
-namespace nx::vms::license {
+namespace nx::vms::client::core::analytics {
+class AnalyticsMetadataProviderFactory;
+class AttributeHelper;
+class TaxonomyManager;
+} // namespace nx::vms::client::core::analytics
 
-class VideoWallLicenseUsageHelper;
-
-} // namespace nx::vms::license
+namespace nx::vms::client::core {
+class AnalyticsSettingsManager;
+class AnalyticsAttributeHelper;
+} // namespace nx::vms::client::core
 
 namespace nx::vms::client::desktop {
 
-class AnalyticsAttributeHelper;
-class AnalyticsMetadataProviderFactory;
-class AnalyticsSettingsManager;
 class ClientStateHandler;
 class LicenseHealthWatcher;
 class RunningInstancesManager;
 class SharedMemoryManager;
-
-namespace analytics {
-class TaxonomyManager;
-class AttributeHelper;
-} // namespace analytics
 
 class NX_VMS_CLIENT_DESKTOP_API QnClientModule: public QObject, public SystemContextAware
 {
@@ -54,11 +52,9 @@ public:
 
     QnStartupParameters startupParameters() const;
 
-    AnalyticsSettingsManager* analyticsSettingsManager() const;
+    core::AnalyticsSettingsManager* analyticsSettingsManager() const;
 
-    nx::vms::license::VideoWallLicenseUsageHelper* videoWallLicenseUsageHelper() const;
-    analytics::TaxonomyManager* taxonomyManager() const;
-    analytics::AttributeHelper* analyticsAttributeHelper() const;
+    license::VideoWallLicenseUsageHelper* videoWallLicenseUsageHelper() const;
 
     static void initWebEngine();
 
@@ -69,11 +65,6 @@ private:
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
-
-    QScopedPointer<AnalyticsMetadataProviderFactory>
-        m_analyticsMetadataProviderFactory;
-
-    QScopedPointer<LicenseHealthWatcher> m_licenseHealthWatcher;
 };
 
 } // namespace nx::vms::client::desktop

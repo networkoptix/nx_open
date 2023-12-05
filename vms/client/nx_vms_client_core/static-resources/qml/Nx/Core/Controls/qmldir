@@ -1,0 +1,7 @@
+module Nx.Core.Controls
+
+ScalableContentHolder 1.0 ScalableContentHolder.qml
+RefreshIndicator 1.0 RefreshIndicator.qml
+SpinnerBusyIndicator 1.0 SpinnerBusyIndicator.qml
+NameValueTable 1.0 NameValueTable.qml
+IconImage 1.0 IconImage.qml

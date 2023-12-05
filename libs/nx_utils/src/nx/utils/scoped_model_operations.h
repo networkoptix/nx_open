@@ -18,7 +18,6 @@ class ScopedModelOperations: public BaseModel
 public:
     using BaseModel::BaseModel;
 
-protected:
     class ScopedReset: public nx::utils::SharedGuard
     {
         using base_type = nx::utils::SharedGuard;

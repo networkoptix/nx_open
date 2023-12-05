@@ -19,8 +19,10 @@
 #include <nx/cloud/db/api/result_code.h>
 #include <nx/cloud/db/api/system_data.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/desktop/access/screen_recording_watcher.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/index_list_model.h>
 #include <nx/vms/client/desktop/common/models/linearization_list_model.h>
@@ -69,7 +71,6 @@
 #include <nx/vms/client/desktop/system_logon/data/systems_visibility_sort_filter_model.h>
 #include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <nx/vms/client/desktop/thumbnails/live_camera_thumbnail.h>
-#include <nx/vms/client/desktop/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/desktop/thumbnails/roi_camera_thumbnail.h>
 #include <nx/vms/client/desktop/ui/common/context_help.h>
 #include <nx/vms/client/desktop/ui/common/cursor_override.h>
@@ -259,7 +260,6 @@ void QnClientMetaTypes::registerQmlTypes()
     ResourceAccessRightsModel::registerQmlTypes();
     LimitedModel::registerQmlType();
     GlobalPermissionsModel::registerQmlTypes();
-    ResourceIdentificationThumbnail::registerQmlType();
     LiveCameraThumbnail::registerQmlType();
     RoiCameraThumbnail::registerQmlType();
     QuickMessageBox::registerQmlType();
@@ -345,7 +345,6 @@ void QnClientMetaTypes::registerQmlTypes()
     CursorOverride::registerQmlType();
     ScreenRecordingWatcher::registerQmlType();
     utils::WebEngineProfileManager::registerQmlType();
-    analytics::TaxonomyManager::registerQmlTypes();
     workbench::timeline::registerQmlType();
     rules::RulesTableModel::registerQmlType();
     rules::RulesSortFilterProxyModel::registerQmlType();

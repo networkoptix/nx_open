@@ -10,6 +10,7 @@
 #include <nx/vms/common/system_context_aware.h>
 
 class QnClientMessageProcessor;
+class QnCameraBookmarksManager;
 
 namespace rest {
 
@@ -24,6 +25,7 @@ class AccessController;
 class RemoteSession;
 class ServerTimeWatcher;
 class SystemContext;
+class UserWatcher;
 
 class NX_VMS_CLIENT_CORE_API SystemContextAware: public nx::vms::common::SystemContextAware
 {
@@ -51,7 +53,11 @@ public:
     /** API interface of the currently connected server. */
     rest::ServerConnectionPtr connectedServerApi() const;
 
+    UserWatcher* userWatcher() const;
+
     ServerTimeWatcher* serverTimeWatcher() const;
+
+    QnCameraBookmarksManager* cameraBookmarksManager() const;
 };
 
 } // namespace nx::vms::client::desktop

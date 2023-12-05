@@ -16,9 +16,6 @@ void registerQmlType()
         "EventCategory", "Cannot create EventCategory");
 
     qRegisterMetaType<Tab>();
-    qRegisterMetaType<FetchDirection>();
-    qRegisterMetaType<FetchResult>();
-    qRegisterMetaType<PreviewState>();
     qRegisterMetaType<EventCategory>();
     qRegisterMetaType<nx::vms::api::EventType>();
 }

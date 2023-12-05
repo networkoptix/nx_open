@@ -44,9 +44,19 @@ rest::ServerConnectionPtr SystemContextAware::connectedServerApi() const
     return systemContext()->connectedServerApi();
 }
 
+UserWatcher* SystemContextAware::userWatcher() const
+{
+    return systemContext()->userWatcher();
+}
+
 ServerTimeWatcher* SystemContextAware::serverTimeWatcher() const
 {
     return systemContext()->serverTimeWatcher();
+}
+
+QnCameraBookmarksManager* SystemContextAware::cameraBookmarksManager() const
+{
+    return systemContext()->cameraBookmarksManager();
 }
 
 } // namespace nx::vms::client::desktop

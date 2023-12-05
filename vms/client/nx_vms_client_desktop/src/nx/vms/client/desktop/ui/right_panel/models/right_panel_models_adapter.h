@@ -6,21 +6,27 @@
 #include <QtCore/QVector>
 #include <QtQuick/QQuickImageProvider>
 
-#include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
+#include <nx/vms/client/core/event_search/models/fetch_request.h>
 
-Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/analytics_search_setup.h")
+Q_MOC_INCLUDE("nx/vms/client/core/event_search/utils/analytics_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/common_object_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/window_context.h")
 
 namespace nx::analytics::db { struct ObjectTrack; }
 
+namespace nx::vms::client::core
+{
+    class AnalyticsSearchSetup;
+//    struct FetchRequest;
+} // namespace nx::vms::client::core
+
 namespace nx::vms::client::desktop {
 
-class AnalyticsSearchSetup;
 class CommonObjectSearchSetup;
 class WindowContext;
 
@@ -35,13 +41,15 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
 
     Q_PROPERTY(bool isAllowed READ isAllowed NOTIFY allowanceChanged)
 
-    Q_PROPERTY(nx::vms::client::desktop::RightPanelModelsAdapter::Type type
-        READ type WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(nx::vms::client::core::EventSearch::SearchType type
+        READ type
+        WRITE setType
+        NOTIFY typeChanged)
 
     Q_PROPERTY(nx::vms::client::desktop::CommonObjectSearchSetup* commonSetup READ commonSetup
         CONSTANT)
 
-    Q_PROPERTY(nx::vms::client::desktop::AnalyticsSearchSetup* analyticsSetup READ analyticsSetup
+    Q_PROPERTY(nx::vms::client::core::AnalyticsSearchSetup* analyticsSetup READ analyticsSetup
         NOTIFY analyticsSetupChanged)
 
     Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
@@ -76,19 +84,8 @@ public:
     WindowContext* context() const;
     void setContext(WindowContext* value);
 
-    enum class Type
-    {
-        invalid = -1,
-        notifications,
-        motion,
-        bookmarks,
-        events,
-        analytics
-    };
-    Q_ENUM(Type)
-
-    Type type() const;
-    void setType(Type value);
+    core::EventSearch::SearchType type() const;
+    void setType(core::EventSearch::SearchType value);
 
     bool isOnline() const;
     bool isAllowed() const;
@@ -97,7 +94,7 @@ public:
     void setActive(bool value);
 
     CommonObjectSearchSetup* commonSetup() const;
-    AnalyticsSearchSetup* analyticsSetup() const;
+    core::AnalyticsSearchSetup* analyticsSetup() const;
 
     int itemCount() const;
     QString itemCountText() const;
@@ -115,9 +112,10 @@ public:
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
-    Q_INVOKABLE void setFetchDirection(nx::vms::client::desktop::RightPanel::FetchDirection value);
-    Q_INVOKABLE void requestFetch(bool immediately = false);
-    Q_INVOKABLE bool canFetch() const;
+    Q_INVOKABLE void fetchData(
+        const core::FetchRequest& request,
+        bool immediately = false);
+
     Q_INVOKABLE bool fetchInProgress() const;
 
     Q_INVOKABLE void setLivePaused(bool value);
@@ -141,7 +139,8 @@ public:
     void setHighlightedTimestamp(std::chrono::microseconds value);
     void setHighlightedResources(const QSet<QnResourcePtr>& value);
 
-    static QVariantList flattenAttributeList(const analytics::AttributeList& source);
+    Q_INVOKABLE core::FetchRequest requestForDirection(
+        core::EventSearch::FetchDirection direction);
 
     static void registerQmlTypes();
 
@@ -149,9 +148,8 @@ signals:
     void contextChanged();
     void typeChanged();
     void dataNeeded();
-    void liveAboutToBeCommitted();
-    void asyncFetchStarted(nx::vms::client::desktop::RightPanel::FetchDirection direction);
-    void fetchCommitStarted(nx::vms::client::desktop::RightPanel::FetchDirection direction);
+    void asyncFetchStarted(const nx::vms::client::core::FetchRequest& request);
+    void fetchCommitStarted(const nx::vms::client::core::FetchRequest& request);
     void fetchFinished();
     void analyticsSetupChanged();
     void itemCountChanged();

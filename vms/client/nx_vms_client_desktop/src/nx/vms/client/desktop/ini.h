@@ -12,8 +12,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
 {
     Ini(): IniConfig("desktop_client.ini") { reload(); }
 
-    QVariant get(const QString& name) const;
-
     bool isAutoCloudHostDeductionMode() const;
 
     // ---------------------------------------------------------------------------------------------
@@ -115,7 +113,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_STRING("", currentOsVariantVersionOverride,
         "[Dev] Override detected OS variant version value (e.g. \"16.04\").");
 
-    NX_INI_FLAG(false, forceJsonConnection,
+    NX_INI_FLAG(true, forceJsonConnection,
         "[Dev] Force desktop client use json data encoding");
 
     NX_INI_FLAG(false, overrideDialogFramesWIN,
@@ -188,28 +186,8 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Design] The delay time in milliseconds before items in a tree view are opened\n"
         "during a drag and drop operation.");
 
-    NX_INI_INT(1000, intervalPreviewDelayMs,
-        "[Design] The delay time in milliseconds before interval video playback is initiated\n"
-        "after a Search Panel thumbnail is hovered.");
-
-    NX_INI_INT(500, intervalPreviewLoopDelayMs,
-        "[Design] The delay time in milliseconds before interval video playback is restarted.");
-
-    NX_INI_INT(8000, intervalPreviewDurationMs,
-        "[Design] The duration of interval video playback in milliseconds.\n"
-        "Half of it is before exact preview timestamp and another half is after.");
-
-    NX_INI_INT(4, intervalPreviewSpeedFactor,
-        "[Design] Interval preview video playback speed multiplier.");
-
     NX_INI_FLAG(false, compactSearchFilterEditors,
         "[Design] Tag and combo box attribute filter editors instead of radio button groups.");
-
-    NX_INI_FLOAT(1.0f, attributeTableLineHeightFactor,
-        "[Design] Line height multiplier for analytics attribute tables.");
-
-    NX_INI_INT(4, attributeTableSpacing,
-        "[Design] Spacing between attributes in analytics attribute tables.");
 
     NX_INI_FLAG(false, roundDpiScaling,
         "[Design] Whether a DPI scaling factor should be rounded to an integer value.");
@@ -338,10 +316,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Support] Timeout for waiting for the initial resource message from the Server.\n"
         "If exceeded, then the connection is dropped to avoid infinite UI \"Loading...\" state.\n"
         "Value in milliseconds, 0 means infinite timeout.");
-
-    NX_INI_FLAG(false, delayRightPanelLiveAnalytics,
-        "[Support] Prohibits showing right panel live analytics before the corresponding frame\n"
-        "appears on the camera if the camera is playing live");
 
     NX_INI_FLAG(false, debugDisableCameraThumbnails,
         "[Support] Disable camera thumbnail server requests for debugging and profiling purposes.\n"

@@ -10,3 +10,7 @@ RoundedMask 1.0 RoundedMask.qml
 Circle 1.0 Circle.qml
 ShadedCircle 1.0 ShadedCircle.qml
 RoiSelectionPreloader 1.0 RoiSelectionPreloader.qml
+IntervalPreview 1.0 IntervalPreview.qml
+CameraDisplay 1.0 CameraDisplay.qml
+CameraThumbnail 1.0 CameraThumbnail.qml
+ThreeDotBusyIndicator 1.0 ThreeDotBusyIndicator.qml

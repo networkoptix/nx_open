@@ -14,9 +14,11 @@
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
@@ -122,6 +124,8 @@ struct ApplicationContext::Private
     std::unique_ptr<nx::vms::discovery::Manager> moduleDiscoveryManager;
     std::unique_ptr<QnVoiceSpectrumAnalyzer> voiceSpectrumAnalyzer;
     std::unique_ptr<ColorTheme> colorTheme;
+    std::vector<QPointer<SystemContext>> systemContexts;
+    std::unique_ptr<UnifiedResourcePool> unifiedResourcePool;
     std::unique_ptr<FontConfig> fontConfig;
     std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
     std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
@@ -158,6 +162,7 @@ ApplicationContext::ApplicationContext(
         case Mode::mobileClient:
             d->voiceSpectrumAnalyzer = std::make_unique<QnVoiceSpectrumAnalyzer>();
             d->colorTheme = std::make_unique<ColorTheme>();
+            d->unifiedResourcePool = std::make_unique<UnifiedResourcePool>();
             d->localNetworkInterfacesManager = std::make_unique<LocalNetworkInterfacesManager>();
             d->knownServerConnectionsWatcher =
                 std::make_unique<watchers::KnownServerConnections>();
@@ -252,6 +257,55 @@ FontConfig* ApplicationContext::fontConfig() const
 watchers::KnownServerConnections* ApplicationContext::knownServerConnectionsWatcher() const
 {
     return d->knownServerConnectionsWatcher.get();
+}
+
+ColorTheme* ApplicationContext::colorTheme() const
+{
+    return d->colorTheme.get();
+}
+
+UnifiedResourcePool* ApplicationContext::unifiedResourcePool() const
+{
+    return d->unifiedResourcePool.get();
+}
+
+SystemContext* ApplicationContext::currentSystemContext() const
+{
+    if (NX_ASSERT(!d->systemContexts.empty()))
+        return d->systemContexts.front();
+
+    return nullptr;
+}
+
+std::vector<SystemContext*> ApplicationContext::systemContexts() const
+{
+    std::vector<SystemContext*> result;
+    for (auto context: d->systemContexts)
+    {
+        if (NX_ASSERT(context))
+            result.push_back(context.data());
+    }
+    return result;
+}
+
+void ApplicationContext::addSystemContext(SystemContext* systemContext)
+{
+    d->systemContexts.push_back(systemContext);
+    emit systemContextAdded(systemContext);
+}
+
+void ApplicationContext::removeSystemContext(SystemContext* systemContext)
+{
+    auto iter = std::find(d->systemContexts.begin(), d->systemContexts.end(), systemContext);
+    if (NX_ASSERT(iter != d->systemContexts.end()))
+        d->systemContexts.erase(iter);
+    emit systemContextRemoved(systemContext);
+}
+
+void ApplicationContext::addMainContext(SystemContext* mainContext)
+{
+    NX_ASSERT(d->systemContexts.empty()); //< Main context should be first.
+    d->systemContexts.push_back(mainContext);
 }
 
 } // namespace nx::vms::client::core

@@ -11,12 +11,10 @@
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
-#include <nx/vms/client/desktop/event_search/models/abstract_search_list_model.h>
+#include <nx/vms/client/core/event_search/models/abstract_search_list_model.h>
+#include <nx/vms/client/desktop/event_search/widgets/abstract_search_widget.h>
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-#include "../abstract_search_widget.h"
-#include "../placeholder_widget.h"
 
 class QMenu;
 class QLabel;
@@ -26,12 +24,14 @@ class QTimer;
 namespace Ui { class AbstractSearchWidget; }
 namespace nx::utils { class PendingOperation; }
 
+namespace nx::vms::client::core { class ConcatenationListModel; }
+
 namespace nx::vms::client::desktop {
 
 class SearchLineEdit;
 class BusyIndicatorModel;
-class ConcatenationListModel;
 class CommonObjectSearchSetup;
+class PlaceholderWidget;
 
 class AbstractSearchWidget::Private:
     public QObject,
@@ -44,10 +44,10 @@ class AbstractSearchWidget::Private:
     nx::utils::ImplPtr<Ui::AbstractSearchWidget> ui;
 
 public:
-    Private(AbstractSearchWidget* q, AbstractSearchListModel* model);
+    Private(AbstractSearchWidget* q, core::AbstractSearchListModel* model);
     virtual ~Private() override;
 
-    AbstractSearchListModel* model() const;
+    core::AbstractSearchListModel* model() const;
     EventRibbon* view() const;
 
     bool isAllowed() const;
@@ -65,7 +65,8 @@ public:
 
     void addFilterWidget(QWidget* widget, Qt::Alignment alignment); //< Ownership is taken.
 
-    bool updateFetchDirection(); //< Returns true if new data fetch is required.
+    /** Returns fetch direction for the update or nothing if there is no need to do it. */
+    std::optional<core::EventSearch::FetchDirection> getFetchDirection();
     void requestFetchIfNeeded();
     void resetFilters();
 
@@ -80,6 +81,8 @@ public:
 
     void addSearchAction(QAction* action);
 
+    std::chrono::microseconds currentCentralPointUs() const;
+
 private:
     void setupModels();
     void setupRibbon();
@@ -88,10 +91,9 @@ private:
     void setupTimeSelection();
     void setupCameraSelection();
 
-    void setFetchDirection(AbstractSearchListModel::FetchDirection value);
     void tryFetchData();
 
-    BusyIndicatorModel* relevantIndicatorModel() const;
+    BusyIndicatorModel* relevantIndicatorModel(core::EventSearch::FetchDirection direction) const;
     void handleItemCountChanged();
     void handleFetchFinished();
 
@@ -101,15 +103,15 @@ private:
     QString currentDeviceText() const;
     QString singleDeviceText(
         const QString& baseText, const QnVirtualCameraResourcePtr& device) const;
-    QString deviceButtonText(RightPanel::CameraSelection selection) const;
+    QString deviceButtonText(core::EventSearch::CameraSelection selection) const;
 
     void setCurrentDate(const QDateTime& value);
 
 private:
-    const QScopedPointer<AbstractSearchListModel> m_mainModel;
+    const QScopedPointer<core::AbstractSearchListModel> m_mainModel;
     const QScopedPointer<BusyIndicatorModel> m_headIndicatorModel;
     const QScopedPointer<BusyIndicatorModel> m_tailIndicatorModel;
-    const QScopedPointer<ConcatenationListModel> m_visualModel;
+    const QScopedPointer<core::ConcatenationListModel> m_visualModel;
 
     PlaceholderWidget* m_placeholderWidget;
     QToolButton* const m_togglePreviewsButton;
@@ -122,10 +124,10 @@ private:
 
     const QScopedPointer<nx::utils::PendingOperation> m_fetchDataOperation;
 
-    QHash<RightPanel::TimeSelection, QAction*> m_timeSelectionActions;
+    QHash<core::EventSearch::TimeSelection, QAction*> m_timeSelectionActions;
 
     QMetaObject::Connection m_currentCameraConnection;
-    QHash<RightPanel::CameraSelection, QAction*> m_cameraSelectionActions;
+    QHash<core::EventSearch::CameraSelection, QAction*> m_cameraSelectionActions;
 
     bool m_placeholderVisible = false;
     QPointer<QPropertyAnimation> m_placeholderOpacityAnimation;

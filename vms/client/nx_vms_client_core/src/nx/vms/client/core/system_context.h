@@ -6,6 +6,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 
@@ -13,6 +14,8 @@
 
 class QnPtzControllerPool;
 class QQmlContext;
+class QnCameraBookmarksManager;
+class QnServerStorageManager;
 
 namespace ec2 {
 
@@ -30,11 +33,20 @@ namespace nx::vms::client::core {
 class AccessController;
 class UserWatcher;
 class WatermarkWatcher;
+class ServerRuntimeEventConnector;
+
+namespace analytics {
+class AttributeHelper;
+} // namespace analytics
 
 class NX_VMS_CLIENT_CORE_API SystemContext: public common::SystemContext
 {
     Q_OBJECT
     using base_type = common::SystemContext;
+
+    Q_PROPERTY(analytics::TaxonomyManager* taxonomyManager
+        READ taxonomyManager
+        CONSTANT)
 
 public:
     /**
@@ -103,6 +115,11 @@ public:
     RemoteConnectionPtr connection() const;
 
     /**
+     * Local id of the system to which we are currently connected.
+     */
+    QnUuid localSystemId() const;
+
+    /**
      * Credentials we are using to authorize the connection.
      */
     nx::network::http::Credentials connectionCredentials() const;
@@ -127,7 +144,19 @@ public:
 
     ServerTimeWatcher* serverTimeWatcher() const;
 
+    QnCameraBookmarksManager* cameraBookmarksManager() const;
+
+    nx::vms::api::SystemSettings* systemSettings() const;
+
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const;
+
+    analytics::TaxonomyManager* taxonomyManager() const;
+
+    analytics::AttributeHelper* analyticsAttributeHelper() const;
+
+    QnServerStorageManager* serverStorageManager() const;
+
+    ServerRuntimeEventConnector* serverRuntimeEventConnector() const;
 
     AccessController* accessController() const;
 
