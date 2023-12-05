@@ -140,7 +140,8 @@ Item
                                 : (" " + inheritance)
                         }
 
-                        if (toggledOn)
+                        if (model.providedVia === ResourceAccessInfo.ProvidedVia.ownResourceGroup
+                            || model.providedVia === ResourceAccessInfo.ProvidedVia.own)
                         {
                             const ownPermissionText = qsTr("Has %1 permission",
                                 "%1 will be substituted with a permission name").arg(name)
