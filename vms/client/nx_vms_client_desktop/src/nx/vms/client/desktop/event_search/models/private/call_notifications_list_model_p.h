@@ -4,6 +4,8 @@
 
 #include <QtCore/QScopedPointer>
 
+#include <nx/vms/common/system_health/message_type.h>
+
 #include "../call_notifications_list_model.h"
 
 namespace nx::vms::client::desktop {
@@ -20,8 +22,12 @@ public:
     virtual ~Private() override;
 
 private:
-    void addNotification(const vms::event::AbstractActionPtr& action);
-    void removeNotification(const vms::event::AbstractActionPtr& action);
+    void addNotification(
+        nx::vms::common::system_health::MessageType message,
+        const QVariant& params);
+    void removeNotification(
+        nx::vms::common::system_health::MessageType message,
+        const QVariant& params);
 
     QString tooltip(const vms::event::AbstractActionPtr& action) const;
 

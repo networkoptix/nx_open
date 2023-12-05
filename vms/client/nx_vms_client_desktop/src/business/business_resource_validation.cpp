@@ -490,21 +490,6 @@ bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
         case nx::vms::event::ActionType::fullscreenCameraAction:
         case nx::vms::event::ActionType::exitFullscreenAction:
             return true;
-        case nx::vms::event::ActionType::showIntercomInformer:
-        {
-            const auto context = SystemContext::fromResource(user);
-            const auto accessController = context->accessController();
-            if (!NX_ASSERT(accessController))
-                return false;
-
-            const auto resource =
-                context->resourcePool()->getResourceById(action->getParams().actionResourceId);
-            if (!NX_ASSERT(resource))
-                return false;
-
-            return accessController->hasPermissions(
-                resource, Qn::Permission::UserInputPermissions);
-        }
         default:
             break;
     }
