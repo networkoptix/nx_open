@@ -44,6 +44,7 @@ private:
     void at_businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
 
     void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
+    void removeNotification(const nx::vms::event::AbstractActionPtr& action);
 
     void addSystemHealthEvent(
         MessageType message,

@@ -161,7 +161,7 @@ void NotificationActionHandler::handleAcknowledgeEventAction()
         creationCallback(true);
 
         // Hiding notification instantly to keep UX smooth.
-        emit notificationRemoved(businessAction);
+        removeNotification(businessAction);
         return;
     }
 
@@ -191,7 +191,7 @@ void NotificationActionHandler::handleAcknowledgeEventAction()
         creationCallback);
 
     // Hiding notification instantly to keep UX smooth.
-    emit notificationRemoved(businessAction);
+    removeNotification(businessAction);
 }
 
 void NotificationActionHandler::handleFullscreenCameraAction(
@@ -272,7 +272,6 @@ void NotificationActionHandler::addNotification(const vms::event::AbstractAction
     switch (action->actionType())
     {
         case vms::api::ActionType::showOnAlarmLayoutAction:
-        case vms::api::ActionType::showIntercomInformer:
         case vms::api::ActionType::playSoundAction:
             //case vms::event::playSoundOnceAction: -- handled outside without notification
             alwaysNotify = true;
@@ -288,6 +287,25 @@ void NotificationActionHandler::addNotification(const vms::event::AbstractAction
     emit notificationAdded(action);
 
     showSplash(action);
+}
+
+void NotificationActionHandler::removeNotification(
+    const vms::event::AbstractActionPtr& action)
+{
+    const vms::api::EventType eventType = action->getRuntimeParams().eventType;
+
+    if (eventType >= vms::api::EventType::systemHealthEvent
+        && eventType <= vms::api::EventType::maxSystemHealthEvent)
+    {
+        const int healthMessage = eventType - vms::api::EventType::systemHealthEvent;
+
+        setSystemHealthEventVisibleInternal(
+            MessageType(healthMessage), QVariant::fromValue(action), false);
+    }
+    else
+    {
+        emit notificationRemoved(action);
+    }
 }
 
 void NotificationActionHandler::addSystemHealthEvent(
@@ -405,7 +423,6 @@ void NotificationActionHandler::at_businessActionReceived(
 
         case vms::api::ActionType::showPopupAction: //< Fallthrough
         case vms::api::ActionType::playSoundAction:
-        case vms::api::ActionType::showIntercomInformer:
         {
             switch (action->getToggleState())
             {
@@ -415,7 +432,7 @@ void NotificationActionHandler::at_businessActionReceived(
                     break;
 
                 case vms::api::EventState::inactive:
-                    emit notificationRemoved(action);
+                    removeNotification(action);
                     break;
 
                 default:
@@ -452,8 +469,9 @@ void NotificationActionHandler::showSplash(
 {
     /*
     * We are displaying notifications in the two use cases:
-    * on ShowOnAlarmLayoutAction and on ShowPopupAction (including prolonged PlaySoundAction
-    * as its subtype) / ShowIntercomInformer.
+    * on ShowOnAlarmLayoutAction
+    * and on ShowPopupAction (including prolonged PlaySoundAction as its subtype)
+    * / showIntercomInformer / showMissedCallInformer.
     * In first case we got at_notificationsHandler_businessActionAdded called once for each camera, that
     * should be displayed on the alarm layout (including source cameras and custom cameras if required).
     * In second case we should manually collect resources from event sources.
@@ -471,8 +489,7 @@ void NotificationActionHandler::showSplash(
     else
     {
         NX_ASSERT(actionType == vms::api::ActionType::showPopupAction
-            || actionType == vms::api::ActionType::playSoundAction
-            || actionType == vms::api::ActionType::showIntercomInformer);
+            || actionType == vms::api::ActionType::playSoundAction);
         vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
 
         if (const auto resource = system()->resourcePool()->getResourceById(
