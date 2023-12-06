@@ -416,9 +416,14 @@ bool LdapSettingsWidget::requestLdapReset()
             globalSettings()->setLdap(settingsBackup);
 
             if (auto error = std::get_if<nx::network::rest::Result>(&result))
-                showError(error->errorString);
+            {
+                if (error->error != nx::network::rest::Result::SessionExpired)
+                    showError(error->errorString);
+            }
             else
+            {
                 showError(tr("Connection failed"));
+            }
         });
 
     cancelCurrentRequest();
@@ -556,11 +561,18 @@ void LdapSettingsWidget::requestSync()
             d->syncRequested = false;
 
             if (success)
+            {
                 checkOnlineAndSyncStatus();
+            }
             else if (auto error = std::get_if<nx::network::rest::Result>(&result))
-                showError(error->errorString);
+            {
+                if (error->error != nx::network::rest::Result::SessionExpired)
+                    showError(error->errorString);
+            }
             else
+            {
                 showError(tr("Connection failed"));
+            }
         });
 
     if (auto api = connectedServerApi())
