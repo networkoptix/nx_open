@@ -60,7 +60,7 @@ Item
 
             Rectangle
             {
-                id: filtersCounter
+                id: indicatorCircle
 
                 x: image.x + 9
                 y: image.y - 4
@@ -69,16 +69,6 @@ Item
                 radius: 5
                 color: ColorTheme.colors.attention.red
                 visible: button.selection !== undefined
-
-                Text
-                {
-                    anchors.centerIn: filtersCounter
-                    anchors.verticalCenterOffset: -1
-                    color: ColorTheme.colors.light1
-                    font.pixelSize: 8
-                    font.bold: true
-                    text: "1"
-                }
             }
         }
 
