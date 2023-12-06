@@ -817,7 +817,7 @@
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>新虛擬攝影機...</translation>
+      <translation>新增虛擬攝影機...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -865,7 +865,7 @@
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation>解鎖月曆</translation>
+      <translation>取消固定月曆</translation>
     </message>
     <message>
       <source>Page...</source>
@@ -1551,15 +1551,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>在套用這些設定後， 使用者將開始收到電子郵件。</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>無法測試 SMTP 伺服器</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>需輸入更多資訊</translation>
     </message>
   </context>
   <context>
