@@ -194,10 +194,16 @@ private:
     void checkCycles();
 
 private:
+    struct DeleteLater
+    {
+        void operator()(QObject* o) { o->deleteLater(); }
+    };
+
+private:
     nx::utils::ScopedConnections m_connections;
     std::unordered_map<QnUuid, nx::utils::ScopedConnections> m_userConnections;
 
-    QScopedPointer<AccessSubjectEditingContext> m_subjectContext;
+    std::unique_ptr<AccessSubjectEditingContext, DeleteLater> m_subjectContext;
 
     QnUuid m_subjectId;
     bool m_subjectIsUser = false;
