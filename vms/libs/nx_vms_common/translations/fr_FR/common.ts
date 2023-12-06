@@ -1763,10 +1763,6 @@
       <translation>Mettre à jour l'URL du fichier releases.json</translation>
     </message>
     <message>
-      <source>Cloud storage update period in seconds</source>
-      <translation>Période de mise à jour du stockage cloud en secondes</translation>
-    </message>
-    <message>
       <source>LDAP settings</source>
       <translation>Paramètres LDAP</translation>
     </message>

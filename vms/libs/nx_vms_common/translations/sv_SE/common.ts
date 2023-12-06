@@ -1761,10 +1761,6 @@
       <translation>Uppdatera releases.json filens URL</translation>
     </message>
     <message>
-      <source>Cloud storage update period in seconds</source>
-      <translation>Uppdateringsperiod för molnlagring i sekunder</translation>
-    </message>
-    <message>
       <source>LDAP settings</source>
       <translation>LDAP-inställningar</translation>
     </message>

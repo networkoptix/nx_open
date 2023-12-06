@@ -9522,12 +9522,12 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation>无法联网系统</translation>
     </message>
     <message>
-      <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
-    </message>
-    <message>
       <source>support</source>
       <translation>技术支持</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
     </message>
   </context>
   <context>

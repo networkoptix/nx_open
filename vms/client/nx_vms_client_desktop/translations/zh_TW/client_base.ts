@@ -1680,15 +1680,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>在套用這些設定後， 使用者將開始收到電子郵件。</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>無法測試 SMTP 伺服器</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>需輸入更多資訊</translation>
     </message>
   </context>
   <context>
@@ -9526,12 +9526,12 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation>無法合併系統</translation>
     </message>
     <message>
-      <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
-    </message>
-    <message>
       <source>support</source>
       <translation>支援</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
     </message>
   </context>
   <context>

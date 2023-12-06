@@ -9673,12 +9673,12 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
       <translation>Sistem birleştirme başarısız oldu</translation>
     </message>
     <message>
-      <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation>Devam etmeden önce %1 danışmanızı öneririz.</translation>
-    </message>
-    <message>
       <source>support</source>
       <translation>destek</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
     </message>
   </context>
   <context>

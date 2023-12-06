@@ -9679,12 +9679,12 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <translation>Kunne ikke slå sammen systemer</translation>
     </message>
     <message>
-      <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation>Vi anbefaler at du rådfører deg med %1 før du fortsetter.</translation>
-    </message>
-    <message>
       <source>support</source>
       <translation>brukerstøtte</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
     </message>
   </context>
   <context>

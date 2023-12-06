@@ -1705,10 +1705,6 @@
       <translation>releases.json ファイルの URL を更新</translation>
     </message>
     <message>
-      <source>Cloud storage update period in seconds</source>
-      <translation>クラウドストレージの更新期間 (秒)</translation>
-    </message>
-    <message>
       <source>LDAP settings</source>
       <translation>LDAP設定</translation>
     </message>

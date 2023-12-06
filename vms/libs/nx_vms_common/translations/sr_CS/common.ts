@@ -1817,10 +1817,6 @@
       <translation type="unfinished">Update releases.json file URL</translation>
     </message>
     <message>
-      <source>Cloud storage update period in seconds</source>
-      <translation type="unfinished">Cloud storage update period in seconds</translation>
-    </message>
-    <message>
       <source>LDAP settings</source>
       <translation type="unfinished">LDAP settings</translation>
     </message>
