@@ -6,10 +6,9 @@
 
 namespace nx::vms::api {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OverlappedIdResponse, (json),
-    nx_vms_api_OverlappedIdResponse_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OverlappedIdsRequest, (json), OverlappedIdsRequest_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OverlappedIdResponse, (json), OverlappedIdResponse_Fields);
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SetOverlappedIdRequest, (json),
-    nx_vms_api_SetOverlappedIdRequest_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SetOverlappedIdRequest, (json), SetOverlappedIdRequest_Fields);
 
 } // namespace nx::vms::api
