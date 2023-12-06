@@ -789,6 +789,16 @@ AccessRights AccessSubjectEditingContext::relevantAccessRights(const ResourceAcc
     return {};
 }
 
+AccessRights AccessSubjectEditingContext::combinedRelevantAccessRights(
+    const QModelIndexList& indexes) const
+{
+    return std::accumulate(indexes.cbegin(), indexes.cend(), AccessRights{},
+        [this](AccessRights sum, const QModelIndex& index)
+        {
+            return sum | resourceAccessTreeItemInfo(index).relevantAccessRights;
+        });
+}
+
 void AccessSubjectEditingContext::modifyAccessRightMap(
     ResourceAccessMap& accessRightMap,
     const QnUuid& resourceOrGroupId,
