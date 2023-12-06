@@ -332,6 +332,14 @@ void UserGroupRequestChain::Private::runRequests(
     const std::vector<api::JsonRpcRequest>& requests,
     std::function<void(const Result&)> onSuccess)
 {
+    if (!q->connectedServerApi())
+    {
+        // Use SessionExpired to suppress showing error message box - this is the same error as if
+        // user cancels session refresh dialog.
+        q->requestComplete(/*success*/ false, nx::network::rest::Result::SessionExpired, {});
+        return;
+    }
+
     currentRequest = q->connectedServerApi()->jsonRpcBatchCall(
         q->tokenHelper(),
         requests,
