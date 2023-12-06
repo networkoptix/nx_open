@@ -163,6 +163,7 @@ public:
     void setForcedPtzPanTiltCapability(bool value);
     void setForcedPtzZoomCapability(bool value);
     void setDifferentPtzPanTiltSensitivities(bool value);
+    void setDoNotSendStopPtzCommand(bool value);
 
     /**
      * Enable or disable motion detection in the remote archive. Actual for the Edge Cameras (with

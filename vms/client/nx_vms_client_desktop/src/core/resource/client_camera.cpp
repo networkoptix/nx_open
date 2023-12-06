@@ -13,6 +13,12 @@
 #include <nx/vms/common/intercom/utils.h>
 #include <nx_ec/abstract_ec_connection.h>
 
+namespace {
+
+const QString kAutoSendPtzStopCommandProperty("autoSendPtzStopCommand");
+
+} // namespace
+
 QnClientCameraResource::QnClientCameraResource(const QnUuid& resourceTypeId):
     base_type(resourceTypeId),
     m_isIntercom(
@@ -103,6 +109,16 @@ QString QnClientCameraResource::idForToStringFromPtr() const
 bool QnClientCameraResource::isIntercom() const
 {
     return m_isIntercom.get();
+}
+
+bool QnClientCameraResource::autoSendPtzStopCommand() const
+{
+    return getProperty(kAutoSendPtzStopCommandProperty).isEmpty();
+}
+
+void QnClientCameraResource::setAutoSendPtzStopCommand(bool value)
+{
+    setProperty(kAutoSendPtzStopCommandProperty, value ? QString() : QString("0"));
 }
 
 QnConstResourceVideoLayoutPtr QnClientCameraResource::getVideoLayout(

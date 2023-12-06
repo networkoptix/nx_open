@@ -594,6 +594,12 @@ void CameraSettingsDialogStore::setForcedPtzZoomCapability(bool value)
         [&](State state) { return Reducer::setForcedPtzZoomCapability(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setDoNotSendStopPtzCommand(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setDoNotSendStopPtzCommand(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setDifferentPtzPanTiltSensitivities(bool value)
 {
     d->executeAction(
