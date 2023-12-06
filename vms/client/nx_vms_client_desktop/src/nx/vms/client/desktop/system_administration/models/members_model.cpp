@@ -185,7 +185,7 @@ void MembersModel::readUsersAndGroups()
 {
     const auto userGroupManager = systemContext()->userGroupManager();
 
-    if (m_subjectContext.isNull() && !m_subjectId.isNull())
+    if (!m_subjectContext && !m_subjectId.isNull())
     {
         m_subjectContext.reset(new AccessSubjectEditingContext(systemContext()));
 
@@ -482,7 +482,7 @@ void MembersModel::readUsersAndGroups()
 
 void MembersModel::setOwnSharedResources(const nx::core::access::ResourceAccessMap& resources)
 {
-    if (m_subjectContext.isNull())
+    if (!m_subjectContext)
         return;
 
     m_subjectContext->setOwnResourceAccessMap(resources);
@@ -490,7 +490,7 @@ void MembersModel::setOwnSharedResources(const nx::core::access::ResourceAccessM
 
 nx::core::access::ResourceAccessMap MembersModel::ownSharedResources() const
 {
-    if (m_subjectContext.isNull())
+    if (!m_subjectContext)
         return {};
 
     return m_subjectContext->ownResourceAccessMap();
@@ -498,7 +498,7 @@ nx::core::access::ResourceAccessMap MembersModel::ownSharedResources() const
 
 MembersListWrapper MembersModel::users() const
 {
-    if (m_subjectContext.isNull())
+    if (!m_subjectContext)
         return {};
 
     return m_subjectMembers.users;
@@ -506,7 +506,7 @@ MembersListWrapper MembersModel::users() const
 
 void MembersModel::setUsers(const MembersListWrapper& users)
 {
-    if (m_subjectContext.isNull())
+    if (!m_subjectContext)
         return;
 
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
@@ -530,7 +530,7 @@ void MembersModel::setUsers(const MembersListWrapper& users)
 
 QList<QnUuid> MembersModel::groups() const
 {
-    if (m_subjectContext.isNull())
+    if (!m_subjectContext)
         return {};
 
     return m_subjectMembers.groups;
@@ -538,7 +538,7 @@ QList<QnUuid> MembersModel::groups() const
 
 void MembersModel::setGroups(const QList<QnUuid>& groups)
 {
-    if (m_subjectContext.isNull())
+    if (!m_subjectContext)
         return;
 
     auto parents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId);
@@ -736,7 +736,7 @@ void MembersModel::setTemporary(bool value)
 
 QVariant MembersModel::data(const QModelIndex& index, int role) const
 {
-    if (index.row() < 0 || index.row() >= rowCount() || m_subjectContext.isNull())
+    if (index.row() < 0 || index.row() >= rowCount() || !m_subjectContext)
         return {};
 
     const bool isUser = index.row() < m_cache->sorted().users.size();
@@ -901,7 +901,7 @@ int MembersModel::rowCount(const QModelIndex&) const
 
 QList<MembersModelGroup> MembersModel::parentGroups() const
 {
-    if (m_subjectContext.isNull() || m_cache.isNull())
+    if (!m_subjectContext || m_cache.isNull())
         return {};
 
     auto directParents = m_subjectContext->subjectHierarchy()->directParents(m_subjectId).values();
@@ -916,7 +916,7 @@ QList<MembersModelGroup> MembersModel::parentGroups() const
 
 void MembersModel::setParentGroups(const QList<MembersModelGroup>& groups)
 {
-    if (m_subjectContext.isNull())
+    if (!m_subjectContext)
         return;
 
     const auto members = m_subjectContext->subjectHierarchy()->directMembers(m_subjectId);
