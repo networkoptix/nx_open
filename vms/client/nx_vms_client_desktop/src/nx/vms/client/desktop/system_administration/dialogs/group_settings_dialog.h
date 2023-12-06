@@ -117,7 +117,7 @@ public:
     Q_PROPERTY(QString kToolTipText MEMBER kToolTipText CONSTANT)
 
     static void removeGroups(
-        SystemContext* context,
+        WindowContext* windowContext,
         const QSet<QnUuid>& idsToRemove,
         nx::utils::MoveOnlyFunc<void(bool, const QString&)> callback = {});
 

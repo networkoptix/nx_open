@@ -11,6 +11,7 @@
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -194,8 +195,36 @@ bool ContextCurrentUserWatcher::isReconnectRequired(const QnUserResourcePtr &use
     return false;
 }
 
+nx::utils::Guard ContextCurrentUserWatcher::reconnectGuard()
+{
+    blockReconnect();
+    return nx::utils::Guard(nx::utils::guarded(this, [this]() { unblockReconnect(); }));
+}
+
+void ContextCurrentUserWatcher::blockReconnect()
+{
+    ++m_blockReconnectCounter;
+}
+
+void ContextCurrentUserWatcher::unblockReconnect()
+{
+    m_blockReconnectCounter = std::max(m_blockReconnectCounter - 1, 0);
+    if (m_blockReconnectCounter == 0 && m_reconnectPending)
+    {
+        m_reconnectPending = false;
+        menu()->trigger(menu::ReconnectAction);
+    }
+}
+
 void ContextCurrentUserWatcher::reconnect()
 {
+    if (m_blockReconnectCounter > 0)
+    {
+        m_reconnectPending = true;
+        return;
+    }
+
+    m_reconnectPending = false;
     menu()->trigger(menu::ReconnectAction);
 }
 
