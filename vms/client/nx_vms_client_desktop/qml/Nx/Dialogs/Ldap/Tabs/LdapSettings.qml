@@ -50,7 +50,8 @@ Rectangle
 
     readonly property bool showSpinners: (syncIsRunning || syncRequested) && !modified
     readonly property bool showEmptyLdapWarning: userCount <= 0 && groupCount <= 0 && lastSync
-    readonly property bool showEditingWarning: modified && !showEmptyLdapWarning && lastSync
+    readonly property bool showEditingWarning: modified && !showEmptyLdapWarning &&
+        (lastSync || continuousSync === LdapSettings.Sync.disabled)
     readonly property int kDefaultSyncIntervalS: 3600 //< 1 hour.
     readonly property int kDefaultSearchTimeoutS: 60 //< 1 minute.
     readonly property int kShortSyncIntervalS: 60 //< 1 minute.
