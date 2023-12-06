@@ -487,6 +487,12 @@ struct SystemDataEx: SystemData
     /**%apidoc Access role of the entity (usually, an account) that requested the system information. */
     SystemAccessRole accessRole = SystemAccessRole::none;
 
+    /**%apidoc List of roles assigned to the user who requested this system info. */
+    std::vector<std::string> roleIds;
+
+    /**%apidoc List of permissions assigned to the user who requested this system info. */
+    std::vector<std::string> permissions;
+
     SystemHealth stateOfHealth = SystemHealth::offline;
 
     /**%apidoc
@@ -520,7 +526,8 @@ struct SystemDataEx: SystemData
 // will not been seen anywhere SystemDataEx type is used.
 // TODO: #akolesnikov Move NX_REFLECTION_INSTRUMENT for other types here as well.
 NX_REFLECTION_INSTRUMENT(SystemDataEx,
-    (accessRole)(stateOfHealth)(usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)(version))
+    (accessRole)(roleIds)(permissions)(stateOfHealth)(usageFrequency)(lastLoginTime)(mergeInfo) \
+    (capabilities)(version))
 
 // Providing custom JSON serialization functions so that SystemDataEx::attributes are added on the
 // same level with other fields in the resulting JSON document.
