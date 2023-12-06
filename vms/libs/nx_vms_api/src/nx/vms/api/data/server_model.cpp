@@ -85,11 +85,9 @@ std::vector<ServerModel> ServerModel::fromDbTypes(DbListTypes all)
                 model.locationId = attrs->locationId;
             }
 
-            if (const auto status = nx::utils::find_if(
-                allStatuses, [id = model.getId()](const auto& s) { return s.id == id; }))
-            {
-                model.status = status->status;
-            }
+            const auto status = nx::utils::find_if(
+                allStatuses, [id = model.getId()](const auto& s) { return s.id == id; });
+            model.status = status ? status->status : ResourceStatus::offline;
 
             nx::utils::erase_if(
                 allStorages,
