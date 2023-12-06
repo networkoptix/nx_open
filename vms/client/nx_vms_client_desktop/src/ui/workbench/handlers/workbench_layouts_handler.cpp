@@ -231,10 +231,22 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
         connect(cachingController, &CachingAccessController::permissionsChanged, this,
             [this](const QnResourcePtr& resource)
             {
-                // Remove layouts if current user has lost access to them.
                 const auto layoutResource = resource.dynamicCast<LayoutResource>();
-                if (layoutResource && !accessController()->hasPermissions(
-                    layoutResource, Qn::ReadPermission))
+                if (!layoutResource)
+                    return;
+
+                const auto accessController = systemContext()->accessController();
+
+                if (layoutResource->layoutType() == LayoutResource::LayoutType::videoWall
+                    && accessController->hasPermissions(
+                        layoutResource->getParentResource(), Qn::ReadPermission))
+                {
+                    // Videowall handler shall handle this.
+                    return;
+                }
+
+                // Remove layout if current user lost access to it.
+                if (!accessController->hasPermissions(layoutResource, Qn::ReadPermission))
                 {
                     workbench()->removeLayout(layoutResource);
 

@@ -14,6 +14,7 @@
 #include <core/resource/videowall_pc_data.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/license/license_usage_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -30,7 +31,9 @@ class QnWorkbenchVideoWallHandler: public QObject, public QnWorkbenchContextAwar
 {
     Q_OBJECT
 
-    typedef QObject base_type;
+    using base_type = QObject;
+    using VideoWallCallbackFunction =
+        nx::vms::client::desktop::ResourcesChangesManager::VideoWallCallbackFunction;
 
 public:
     explicit QnWorkbenchVideoWallHandler(QObject* parent = 0);
@@ -105,7 +108,7 @@ private:
 
     nx::vms::client::desktop::LayoutResourcePtr constructLayout(
         const QnResourceList& resources) const;
-    void cleanupUnusedLayouts();
+    void cleanupUnusedLayouts(const QnVideoWallResourceList& videowalls = {});
 
     void setItemOnline(const QnUuid& instanceGuid, bool online);
     void setItemControlledBy(const QnUuid& layoutId, const QnUuid& controllerId, bool on);
@@ -228,11 +231,14 @@ private:
      */
     void syncTimelinePosition(bool silent);
 
-    void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
-    void saveVideowalls(const QSet<QnVideoWallResourcePtr>& videowalls, bool saveLayout = false);
+    void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false,
+        VideoWallCallbackFunction callback = {});
+    void saveVideowalls(const QSet<QnVideoWallResourcePtr>& videowalls, bool saveLayout = false,
+        std::function<void(const QnVideoWallResourceList& successfullySaved)> callback = {});
     void saveVideowallAndReviewLayout(
         const QnVideoWallResourcePtr& videowall,
-        nx::vms::client::desktop::LayoutResourcePtr reviewLayout = {});
+        nx::vms::client::desktop::LayoutResourcePtr reviewLayout = {},
+        VideoWallCallbackFunction callback = {});
 
 private:
     void showControlledByAnotherUserMessage() const;
