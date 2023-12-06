@@ -482,6 +482,12 @@ Rectangle
                             connectionSettingsDialog.startTls = control.startTls
                             connectionSettingsDialog.ignoreCertErrors = control.ignoreCertErrors
                             connectionSettingsDialog.hasConfig = control.hasConfig
+
+                            connectionSettingsDialog.initUri = control.uri
+                            connectionSettingsDialog.initAdminDn = control.adminDn
+                            connectionSettingsDialog.initPassword = control.password
+                            connectionSettingsDialog.initStartTls = control.startTls
+                            connectionSettingsDialog.initIgnoreCertErrors = control.ignoreCertErrors
                             connectionSettingsDialog.show()
                         }
                     }
