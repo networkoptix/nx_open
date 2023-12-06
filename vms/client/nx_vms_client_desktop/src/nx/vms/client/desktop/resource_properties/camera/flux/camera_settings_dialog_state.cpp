@@ -111,6 +111,11 @@ bool CameraSettingsDialogState::canForceZoomCapability() const
     return devicesDescription.canForceZoomCapability == CombinedValue::All;
 }
 
+bool CameraSettingsDialogState::hasPanTiltCapabilities() const
+{
+    return devicesDescription.hasPanTiltCapabilities == CombinedValue::All;
+}
+
 bool CameraSettingsDialogState::canShowWebPage() const
 {
     return isSingleCamera() && devicesDescription.supportsWebPage == CombinedValue::All;
