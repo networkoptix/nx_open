@@ -189,6 +189,8 @@ Item
             return undefined
         }
 
+        property int selectionRelevantAccessRights: 0
+
         readonly property real scrollBarWidth: scrollBarVisible ? scrollBar.width : 0
 
         property int nextBatchCheckState: Qt.Checked
@@ -274,7 +276,10 @@ Item
 
             nextBatchCheckState = currentCheckState === Qt.Checked
                 ? Qt.Unchecked
-                : Qt.Checked;
+                : Qt.Checked
+
+            selectionRelevantAccessRights =
+                control.editingContext.combinedRelevantAccessRights(selection)
         }
 
         onSelectionChanged:
@@ -320,6 +325,7 @@ Item
 
             externalNextCheckState: tree.nextBatchCheckState
             externalHoverData: tree.hoverData
+            externalRelevantAccessRights: tree.selectionRelevantAccessRights
 
             onHoveredCellChanged:
             {
