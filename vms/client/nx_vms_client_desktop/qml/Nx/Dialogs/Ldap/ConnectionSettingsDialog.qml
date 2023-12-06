@@ -89,10 +89,7 @@ Dialog
 
                     readonly property bool supportsStarTls: LdapHelper.supportsStarTls(currentText)
 
-                    onCurrentIndexChanged:
-                    {
-                        testStatus.visible = false
-                    }
+                    onCurrentIndexChanged: testStatus.visible = false
                 }
 
                 TextFieldWithValidator
