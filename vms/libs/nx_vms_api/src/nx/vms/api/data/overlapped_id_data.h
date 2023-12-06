@@ -5,6 +5,12 @@
 #include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
+#include <nx/utils/uuid.h>
+
+#include "id_data.h"
+#include "data_macros.h"
 
 namespace nx::vms::api {
 
@@ -20,9 +26,9 @@ struct NX_VMS_API OverlappedIdResponse
      */
     std::vector<int> availableOverlappedIds;
 };
-#define nx_vms_api_OverlappedIdResponse_Fields (currentOverlappedId)(availableOverlappedIds)
-
-QN_FUSION_DECLARE_FUNCTIONS(OverlappedIdResponse, (json), NX_VMS_API);
+#define OverlappedIdResponse_Fields (currentOverlappedId)(availableOverlappedIds)
+NX_VMS_API_DECLARE_STRUCT_EX(OverlappedIdResponse, (json))
+NX_REFLECTION_INSTRUMENT(OverlappedIdResponse, OverlappedIdResponse_Fields)
 
 struct NX_VMS_API SetOverlappedIdRequest
 {
@@ -36,8 +42,29 @@ struct NX_VMS_API SetOverlappedIdRequest
      */
     int overlappedId = -1;
 };
-#define nx_vms_api_SetOverlappedIdRequest_Fields (groupId)(overlappedId)
+#define SetOverlappedIdRequest_Fields (groupId)(overlappedId)
 
-QN_FUSION_DECLARE_FUNCTIONS(SetOverlappedIdRequest, (json), NX_VMS_API);
+NX_VMS_API_DECLARE_STRUCT_EX(SetOverlappedIdRequest, (json))
+NX_REFLECTION_INSTRUMENT(SetOverlappedIdRequest, SetOverlappedIdRequest_Fields)
+
+struct NX_VMS_API OverlappedIdsRequest: IdData
+{
+    /**%apidoc
+     * Group id of the NVR.
+     */
+    QString groupId;
+
+    /**%apidoc
+     * Desired overlapped id to be used on the NVR.
+     */
+    std::optional<int> overlappedId;
+
+    OverlappedIdsRequest getId() const { return *this; }
+    operator QString() const { return id.toString() + '.' + groupId; }
+};
+#define OverlappedIdsRequest_Fields (id)(groupId)(overlappedId)
+
+NX_VMS_API_DECLARE_STRUCT_EX(OverlappedIdsRequest, (json))
+NX_REFLECTION_INSTRUMENT(OverlappedIdsRequest, OverlappedIdsRequest_Fields)
 
 } // namespace nx::vms::api

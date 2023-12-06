@@ -7,6 +7,9 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/uuid.h>
+
+#include "data_macros.h"
 
 namespace nx::vms::api {
 
@@ -31,6 +34,7 @@ struct NX_VMS_API NetworkPortWithPoweringMode
 
     /**%apidoc
      * Number of the port, starting from 1.
+     * %example 6000
      */
     int portNumber = 0;
 
@@ -46,7 +50,7 @@ struct NX_VMS_API NetworkPortWithPoweringMode
     (portNumber) \
     (poweringMode)
 
-QN_FUSION_DECLARE_FUNCTIONS(NetworkPortWithPoweringMode, (json), NX_VMS_API);
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(NetworkPortWithPoweringMode, (json))
 
 struct NX_VMS_API NetworkPortState: public NetworkPortWithPoweringMode
 {
@@ -72,12 +76,12 @@ struct NX_VMS_API NetworkPortState: public NetworkPortWithPoweringMode
      */
     QString macAddress;
 
-    /**%apidoc
+    /**%apidoc:float
      * Current real device power consumption in watts.
      */
     double devicePowerConsumptionWatts = 0.0;
 
-    /**%apidoc
+    /**%apidoc:float
      * Device power consumption limit depending on its PoE class.
      */
     double devicePowerConsumptionLimitWatts = 0.0;
@@ -103,8 +107,7 @@ struct NX_VMS_API NetworkPortState: public NetworkPortWithPoweringMode
     (devicePowerConsumptionLimitWatts) \
     (linkSpeedMbps) \
     (poweringStatus)
-
-QN_FUSION_DECLARE_FUNCTIONS(NetworkPortState, (json), NX_VMS_API);
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(NetworkPortState, (json))
 NX_REFLECTION_INSTRUMENT(NetworkPortState, NetworkPortState_Fields)
 
 /**%apidoc
@@ -114,15 +117,15 @@ NX_REFLECTION_INSTRUMENT(NetworkPortState, NetworkPortState_Fields)
 struct NX_VMS_API NetworkBlockData
 {
     /**%apidoc Current network port states. */
-    std::vector<NetworkPortState> portStates;
+    NetworkPortStateList portStates;
 
-    /**%apidoc
+    /**%apidoc:float
      * Upper power limit for the NVR in watts. When this limit is exceeded NVR goes to the "PoE
      *     over budget" state.
      */
     double upperPowerLimitWatts = 0.0;
 
-    /**%apidoc
+    /**%apidoc:float
      * Lower power limit for the NVR in watts. If the NVR is in the "PoE over budget" state and
      *     power consumption goes below this limit then the NVR goes to the normal state.
      */
@@ -141,7 +144,26 @@ struct NX_VMS_API NetworkBlockData
     (isInPoeOverBudgetMode) \
     (portStates)
 
-QN_FUSION_DECLARE_FUNCTIONS(NetworkBlockData, (json), NX_VMS_API);
+NX_VMS_API_DECLARE_STRUCT_EX(NetworkBlockData, (json))
 NX_REFLECTION_INSTRUMENT(NetworkBlockData, NetworkBlockData_Fields)
+
+struct NX_VMS_API NvrNetworkRequest
+{
+    QnUuid getId() { return id; }
+
+    /**%apidoc:string
+     * Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers` or be "this" to
+     * refer to the current Server.
+     * %example this
+     */
+    QnUuid id;
+
+    NetworkPortWithPoweringModeList portPowerList;
+};
+
+#define NvrNetworkRequest_Fields (id)(portPowerList)
+
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(NvrNetworkRequest, (json))
+NX_REFLECTION_INSTRUMENT(NvrNetworkRequest, NvrNetworkRequest_Fields)
 
 } // namespace nx::vms::api

@@ -12,6 +12,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkPortWithPoweringMode, (json),
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkPortState, (json), NetworkPortState_Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NetworkBlockData, (json), NetworkBlockData_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(NvrNetworkRequest, (json), NvrNetworkRequest_Fields);
 
 bool NetworkPortState::operator==(const NetworkPortState& other) const
 {
