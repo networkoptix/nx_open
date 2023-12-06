@@ -183,12 +183,8 @@ std::vector<DeviceModel> DeviceModel::fromDbTypes(DbListTypes all)
             }
 
             const auto status = nx::utils::find_if(
-                allStatuses,
-                [id = model.getId()](const auto& status) { return status.id == id; });
-            if (status)
-                model.status = status->status;
-            else
-                model.status = ResourceStatus::undefined;
+                allStatuses, [id = model.getId()](const auto& s) { return s.id == id; });
+            model.status = status ? status->status : ResourceStatus::offline;
 
             return model;
         });
