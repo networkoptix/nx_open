@@ -1602,6 +1602,10 @@
         <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Plugins</name>
