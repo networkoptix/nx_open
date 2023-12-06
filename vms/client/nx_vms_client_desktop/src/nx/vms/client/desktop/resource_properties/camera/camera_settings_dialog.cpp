@@ -2,6 +2,7 @@
 
 #include "camera_settings_dialog.h"
 #include "ui_camera_settings_dialog.h"
+#include "widgets/private/no_permissions_overlay_widget.h"
 
 #include <chrono>
 #include <memory>
@@ -20,6 +21,7 @@
 #include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/vms/client/core/ptz/remote_ptz_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -102,6 +104,8 @@ struct CameraSettingsDialog::Private: public QObject
     const QSharedPointer<LiveCameraThumbnail> cameraPreview{new LiveCameraThumbnail()};
     bool isPreviewRefreshRequired = true;
     bool isNetworkRequestRunning = false;
+    NoPermissionsOverlayWidget* overlayWidget = nullptr;
+    WidgetAnchor* anchor = nullptr;
 
     Private(CameraSettingsDialog* q): q(q)
     {
@@ -288,6 +292,11 @@ struct CameraSettingsDialog::Private: public QObject
             isPreviewRefreshRequired = true;
         }
     }
+
+    void setOverlayVisible(bool visible)
+    {
+        overlayWidget->setVisible(visible);
+    }
 };
 
 CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
@@ -296,6 +305,11 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d(new Private(this))
 {
     ui->setupUi(this);
+
+    d->overlayWidget = new NoPermissionsOverlayWidget(ui->tabWidget);
+    d->anchor = new WidgetAnchor(d->overlayWidget);
+    d->anchor->setEdges(Qt::TopEdge | Qt::BottomEdge | Qt::LeftEdge | Qt::RightEdge);
+
     d->store = new CameraSettingsDialogStore(this);
 
     d->licenseWatcher = new CameraSettingsLicenseWatcher(d->store, this);
@@ -537,6 +551,13 @@ void CameraSettingsDialog::done(int result)
     setCameras({}, /*force*/ true);
 }
 
+bool CameraSettingsDialog::event(QEvent* event)
+{
+    if (event->type() == QEvent::Show)
+        d->anchor->setMargins(0, ui->tabWidget->tabBar()->height(), 0, 0);
+    return base_type::event(event);
+}
+
 void CameraSettingsDialog::showEvent(QShowEvent* event)
 {
     base_type::showEvent(event);
@@ -669,8 +690,8 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     updateScheduleAlert(state);
 
+    d->setOverlayVisible(!state.singleCameraProperties.permissions.testFlag(Qn::WritePermission));
     static const int kLastTabKey = (int)CameraSettingsTab::expert;
-
     for (int key = 0; key <= kLastTabKey; ++key)
         setPageVisible(key, state.isPageVisible((CameraSettingsTab)key));
 
