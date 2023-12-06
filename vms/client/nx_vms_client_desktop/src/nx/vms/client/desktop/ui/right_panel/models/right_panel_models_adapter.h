@@ -141,7 +141,7 @@ public:
     void setHighlightedTimestamp(std::chrono::microseconds value);
     void setHighlightedResources(const QSet<QnResourcePtr>& value);
 
-    static QStringList flattenAttributeList(const analytics::AttributeList& source);
+    static QVariantList flattenAttributeList(const analytics::AttributeList& source);
 
     static void registerQmlTypes();
 

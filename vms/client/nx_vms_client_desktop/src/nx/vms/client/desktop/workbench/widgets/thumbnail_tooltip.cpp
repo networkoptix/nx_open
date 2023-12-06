@@ -35,7 +35,7 @@ struct ThumbnailTooltip::Private
     const QmlProperty<qreal> previewAspectRatio{q->widget(), "previewAspectRatio"};
     const QmlProperty<QUrl> previewSource{q->widget(), "previewSource"};
     const QmlProperty<int> previewState{q->widget(), "previewState"};
-    const QmlProperty<QStringList> attributes{q->widget(), "attributes"};
+    const QmlProperty<QVariantList> attributes{q->widget(), "attributes"};
 
     QString previewImageId;
     analytics::AttributeList sourceAttributes;

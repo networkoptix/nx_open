@@ -85,6 +85,15 @@ public:
         return result;
     };
 
+    static QColor findColor(AbstractColorType* colorType, const QString& color)
+    {
+        const std::vector<QString> items = colorType->items();
+        const auto item = std::find_if(items.begin(), items.end(),
+            [color](const QString& item){ return item.toLower() == color; });
+
+        return item != items.end() ? QColor(colorType->color(*item)) : QColor::fromString(color);
+    }
+
     QVector<QString> objectTypeIds() const
     {
         const std::shared_ptr<AbstractState> taxonomy =
@@ -183,6 +192,15 @@ AttributeList AttributeHelper::preprocessAttributes(
                 known.push_back({attr.name, attr.values, name, Private::processBooleanValues(
                     attr.values, "Present", "Absent")});
                 break;
+
+            case AbstractAttribute::Type::color:
+            {
+                const QColor color =
+                    Private::findColor(path.last()->colorType(), attr.values.last());
+
+                known.push_back({attr.name, attr.values, name, attr.values, color});
+                break;
+            }
 
             default:
                 known.push_back({attr.name, attr.values, name, attr.values});
