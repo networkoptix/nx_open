@@ -16,10 +16,10 @@ Item
 
     property int textMargin: 4
 
-    property alias enabled: mouseArea.enabled
     property bool interactive: false
 
     readonly property alias hovered: mouseArea.hovered
+    readonly property bool interactiveHovered: interactive && hovered
 
     signal clicked()
 
@@ -29,14 +29,14 @@ Item
 
         anchors.fill: item
 
-        hoverEnabled: item.interactive
-        acceptedButtons: Qt.LeftButton
+        hoverEnabled: true
+        acceptedButtons: item.interactive ? Qt.LeftButton : Qt.NoButton
 
         property bool hovered: false
 
         onClicked:
         {
-            if (!hovered)
+            if (!item.interactiveHovered)
                 return
 
             item.clicked()
@@ -45,10 +45,7 @@ Item
 
         // Clicks temporarily disable hover.
         // This binding will restore it when the mouse re-enters the area.
-        Binding on hovered
-        {
-            value: item.interactive && mouseArea.containsMouse
-        }
+        Binding on hovered { value: mouseArea.containsMouse }
 
         Rectangle
         {
@@ -61,12 +58,12 @@ Item
 
             color:
             {
-                if (mouseArea.hovered)
-                    return ColorTheme.colors.dark12
+                if (!item.interactive)
+                    return ColorTheme.colors.dark7
 
-                return item.interactive && item.enabled
-                    ? ColorTheme.colors.dark11
-                    : ColorTheme.colors.dark7
+                return mouseArea.hovered
+                    ? ColorTheme.colors.dark12
+                    : ColorTheme.colors.dark11
             }
 
             border.color: ColorTheme.colors.dark7

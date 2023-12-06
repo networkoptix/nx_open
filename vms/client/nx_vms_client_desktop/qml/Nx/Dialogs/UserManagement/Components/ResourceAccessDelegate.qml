@@ -80,7 +80,7 @@ Item
         width: root.width - cellsRow.width - 1
         height: root.height
 
-        highlighted: !!cellsRow.hoveredCell
+        highlighted: !!cellsRow.hoveredCell || isHovered //< TreeView delegate's context property.
 
         customSelectionIndicator: true
         wholeRowToggleable: false

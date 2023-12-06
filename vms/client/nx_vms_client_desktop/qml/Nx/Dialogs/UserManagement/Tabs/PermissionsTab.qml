@@ -77,20 +77,22 @@ Item
 
                     icon: modelData.icon
 
-                    color: tree.hoveredCell && tree.hoveredCell.accessRight == accessRight
-                        ? ColorTheme.colors.light4
-                        : ColorTheme.colors.light10
+                    color:
+                    {
+                        const highlighted = hovered
+                            || (tree.hoveredCell && tree.hoveredCell.accessRight == accessRight)
+
+                        return highlighted ? ColorTheme.colors.light4 : ColorTheme.colors.light10
+                    }
 
                     text: modelData.name
-
-                    enabled: control.editingEnabled
-                    interactive: tree.hasSelection
+                    interactive: control.editingEnabled && tree.hasSelection
 
                     GlobalToolTip.text: modelData.description
 
-                    onHoveredChanged:
+                    onInteractiveHoveredChanged:
                     {
-                        if (hovered)
+                        if (interactiveHovered)
                             accessRightsHeader.hoveredAccessRight = accessRight
                         else if (accessRightsHeader.hoveredAccessRight == accessRight)
                             accessRightsHeader.hoveredAccessRight = 0
@@ -226,9 +228,6 @@ Item
 
         hoverHighlightColor:
         {
-            if (!control.editingEnabled)
-                return "transparent"
-
             if (!hoveredItem)
                 return ColorTheme.colors.dark8
 

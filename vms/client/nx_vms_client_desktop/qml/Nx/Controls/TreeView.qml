@@ -730,6 +730,7 @@ FocusScope
 
                     readonly property bool isCurrent: listItem.isCurrent
                     readonly property bool isSelected: listItem.isSelected
+                    readonly property bool isHovered: listView.hoveredItem === listItem
 
                     readonly property Item rowItem: listItem
                     readonly property Item selectionItem: selectionHighlight
