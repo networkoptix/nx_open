@@ -21,12 +21,14 @@ struct Attribute
     QStringList values;
     QString displayedName;
     QStringList displayedValues;
+    QVariant colorValue;
 
     Q_GADGET
     Q_PROPERTY(QString id MEMBER id CONSTANT)
     Q_PROPERTY(QStringList values MEMBER values CONSTANT)
     Q_PROPERTY(QString displayedName MEMBER displayedName CONSTANT)
     Q_PROPERTY(QStringList displayedValues MEMBER displayedValues CONSTANT)
+    Q_PROPERTY(QVariant colorValue MEMBER colorValue CONSTANT)
 
 public:
     bool operator==(const Attribute& other) const
@@ -34,7 +36,8 @@ public:
         return id == other.id
             && displayedName == other.displayedName
             && values == other.values
-            && displayedValues == other.displayedValues;
+            && displayedValues == other.displayedValues
+            && colorValue == other.colorValue;
     };
 
     bool operator!=(const Attribute& other) const

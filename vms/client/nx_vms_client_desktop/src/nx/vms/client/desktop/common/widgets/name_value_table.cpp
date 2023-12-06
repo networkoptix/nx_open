@@ -106,7 +106,7 @@ public:
     }
 
     void render(
-        NameValueTable* widget, const QStringList& items, QSize& outSize, QPixmap& outPixmap)
+        NameValueTable* widget, const QVariantList& items, QSize& outSize, QPixmap& outPixmap)
     {
         const QFont nameFont(widget->font());
         QFont valueFont(nameFont);
@@ -253,7 +253,7 @@ struct NameValueTable::Private
     analytics::AttributeList content;
     QSize size;
 
-    QStringList flatItems;
+    QVariantList flatItems;
 
     QPixmap pixmap;
     nx::utils::PendingOperation updateOp;
@@ -278,7 +278,7 @@ struct NameValueTable::Private
 
     void updateImage()
     {
-        if (flatItems.empty() || !renderer)
+        if (flatItems.isEmpty() || !renderer)
         {
             size = QSize();
             pixmap = QPixmap();

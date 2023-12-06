@@ -735,13 +735,18 @@ QAbstractItemModel* RightPanelModelsAdapter::analyticsEvents() const
     return d->analyticsEvents();
 }
 
-QStringList RightPanelModelsAdapter::flattenAttributeList(const analytics::AttributeList& source)
+QVariantList RightPanelModelsAdapter::flattenAttributeList(const analytics::AttributeList& source)
 {
-    QStringList result;
-    result.reserve(source.size() * 2);
+    QVariantList result;
 
     for (const auto& attribute: source)
-        result << attribute.displayedName << Private::valuesText(attribute.displayedValues);
+    {
+        result.append(QJsonObject{{"text", attribute.displayedName}});
+        result.append(QJsonObject{
+            {"text", Private::valuesText(attribute.displayedValues)},
+            {"color", QJsonValue::fromVariant(attribute.colorValue)},
+        });
+    }
 
     return result;
 }

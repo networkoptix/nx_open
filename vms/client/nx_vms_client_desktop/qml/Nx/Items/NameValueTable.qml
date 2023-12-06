@@ -20,6 +20,11 @@ Item
     property color nameColor: "gray"
     property color valueColor: "white"
 
+    property string textRoleName: "text"
+
+    // If color is specified, a color rectangle icon is added to the line.
+    property string colorRoleName: "color"
+
     property font font
     property font nameFont: control.font
     property font valueFont: control.font
@@ -125,7 +130,7 @@ Item
                     color: isLabel ? control.nameColor : control.valueColor
                     font: isLabel ? control.nameFont : control.valueFont
 
-                    text: modelData
+                    text: modelData[textRoleName] ?? modelData
                     textFormat: Text.StyledText
 
                     maximumLineCount: 2
@@ -139,6 +144,23 @@ Item
                         copyable ? 4 : Math.round((LocalSettings.iniConfigValue("attributeTableSpacing") / 2))
                     bottomPadding:
                         copyable ? 4 : (LocalSettings.iniConfigValue("attributeTableSpacing") - topPadding)
+                    leftPadding: color.visible ? color.width + 4 : 0
+
+                    Rectangle
+                    {
+                        id: color
+
+                        property var modelColor: modelData[colorRoleName] || null
+
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        width: 16
+                        height: 16
+                        visible: !!modelColor
+                        color: modelColor ?? "transparent"
+                        border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+                        radius: 1
+                    }
                 }
             }
         }
