@@ -40,6 +40,13 @@ public:
 
     bool isIntercom() const;
 
+    /**
+    * Whether client should automatically send PTZ Stop command when camera loses focus.
+    * Enabled by default, can be disabled by setting a special resource property.
+    */
+    bool autoSendPtzStopCommand() const;
+    void setAutoSendPtzStopCommand(bool value);
+
 signals:
     void dataDropped();
 

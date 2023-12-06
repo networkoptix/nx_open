@@ -14,6 +14,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/resource_display_info.h>
 #include <nx/analytics/utils.h>
 #include <nx/network/http/http_types.h>
@@ -490,6 +491,9 @@ bool isDefaultExpertSettings(const State& state)
     if (state.canForcePanTiltCapabilities() && state.expert.forcedPtzZoomCapability.valueOr(true))
         return false;
 
+    if (state.hasPanTiltCapabilities() && state.expert.doNotSendStopPtzCommand.valueOr(true))
+        return false;
+
     if (!state.expert.customWebPagePort.equals(0))
         return false;
 
@@ -693,6 +697,13 @@ bool canForceZoomCapability(const Camera& camera)
     return camera->ptzCapabilitiesUserIsAllowedToModify()
         .testFlag(Ptz::Capability::ContinuousZoomCapability);
 };
+
+bool hasPanTiltCapabilities(const Camera& camera)
+{
+    return camera->getPtzCapabilities() && Ptz::Capabilities({
+        Ptz::Capability::AbsolutePanTiltCapabilities,
+        Ptz::Capability::ContinuousPanTiltCapabilities});
+}
 
 bool canSwitchPtzPresetTypes(const Camera& camera)
 {
@@ -998,6 +1009,9 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
     state.devicesDescription.canForceZoomCapability =
         combinedValue(cameras, canForceZoomCapability);
 
+    state.devicesDescription.hasPanTiltCapabilities =
+        combinedValue(cameras, hasPanTiltCapabilities);
+
     if (state.canSwitchPtzPresetTypes())
     {
         fetchFromCameras<nx::core::ptz::PresetType>(state.expert.preferredPtzPresetType,
@@ -1022,6 +1036,16 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
             {
                 return camera->ptzCapabilitiesAddedByUser().testFlag(
                     Ptz::ContinuousZoomCapability);
+            });
+    }
+
+    if (state.hasPanTiltCapabilities())
+    {
+        fetchFromCameras<bool>(state.expert.doNotSendStopPtzCommand, cameras,
+            [](const Camera& camera)
+            {
+                const auto clientCamera = camera.dynamicCast<QnClientCameraResource>();
+                return !(clientCamera && clientCamera->autoSendPtzStopCommand());
             });
     }
 
@@ -2358,6 +2382,19 @@ State CameraSettingsDialogStateReducer::setForcedPtzZoomCapability(State state, 
     return state;
 }
 
+State CameraSettingsDialogStateReducer::setDoNotSendStopPtzCommand(State state, bool value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    if (state.devicesDescription.hasPanTiltCapabilities != CombinedValue::All)
+        return state;
+
+    state.expert.doNotSendStopPtzCommand.setUser(value);
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setRtpTransportType(
     State state, vms::api::RtpTransportType value)
 {
@@ -2531,6 +2568,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setPreferredPtzPresetType(std::move(state), nx::core::ptz::PresetType::undefined);
     state = setForcedPtzPanTiltCapability(std::move(state), false);
     state = setForcedPtzZoomCapability(std::move(state), false);
+    state = setDoNotSendStopPtzCommand(std::move(state), false);
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
     state = setForcedPrimaryProfile(std::move(state), QString());
     state = setForcedSecondaryProfile(std::move(state), QString());

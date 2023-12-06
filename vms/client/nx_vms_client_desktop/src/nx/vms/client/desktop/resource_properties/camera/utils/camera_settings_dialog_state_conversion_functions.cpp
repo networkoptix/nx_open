@@ -244,6 +244,12 @@ void setPreferredPtzPresetType(nx::core::ptz::PresetType value, const Cameras& c
     }
 }
 
+void setDoNotSendStopPtzCommand(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras.filtered<QnClientCameraResource>())
+        camera->setAutoSendPtzStopCommand(!value);
+}
+
 void setForcedPtzCapabilities(std::optional<bool> panTilt, std::optional<bool> zoom,
     const Cameras& cameras)
 {
@@ -717,6 +723,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.canSwitchPtzPresetTypes() && state.expert.preferredPtzPresetType.hasValue())
         setPreferredPtzPresetType(state.expert.preferredPtzPresetType(), cameras);
+
+    if (state.hasPanTiltCapabilities() && state.expert.doNotSendStopPtzCommand.hasValue())
+        setDoNotSendStopPtzCommand(state.expert.doNotSendStopPtzCommand.get(), cameras);
 
     if (state.canForcePanTiltCapabilities() || state.canForceZoomCapability())
     {
