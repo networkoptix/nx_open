@@ -136,11 +136,6 @@ QString tagged(const QString& text, const QString& tag, const QString& attribute
         : nx::format("<%1 %2>%3</%1>", tag, attributes, text).toQString();
 }
 
-QString taggedIfNotEmpty(const QString& text, const QString& tag, const QString& attributes)
-{
-    return text.isEmpty() ? QString() : tagged(text, tag, attributes);
-}
-
 QString document(const QString& text)
 {
     return tagged(text, "html");
@@ -272,7 +267,7 @@ QString link(const QString& text, const nx::utils::Url& url)
     return makeLink(text, url.toString());
 }
 
-QString toHtmlEscaped(const QString& text)
+QString toHtmlEscaped(const QString& text, EscapeMethod escapeMethod)
 {
     static const QString kLt("&lt;");
     static const QString kGt("&gt;");
@@ -280,8 +275,8 @@ QString toHtmlEscaped(const QString& text)
     static const QString kQuot("&quot;");
     static const QString kNbsp("&nbsp;");
 
-    static auto indexOfAny =
-        [](const QStringView& s, int pos, const QString** replacement)
+    auto indexOfAny =
+        [escapeMethod](const QStringView& s, int pos, const QString** replacement)
         {
             const auto view = s.mid(pos);
             for (const QChar& c: view)
@@ -301,8 +296,11 @@ QString toHtmlEscaped(const QString& text)
                         *replacement = &kQuot;
                         return pos;
                     case ' ':
-                        *replacement = &kNbsp;
-                        return pos;
+                        if (escapeMethod == EscapeMethod::nbsps)
+                        {
+                            *replacement = &kNbsp;
+                            return pos;
+                        }
                 }
                 ++pos;
             }
@@ -311,15 +309,28 @@ QString toHtmlEscaped(const QString& text)
             return -1;
         };
 
+    auto wrapper = [escapeMethod](const QString& text)
+    {
+        if (text.isEmpty())
+            return QString();
+
+        if (escapeMethod == EscapeMethod::preWrap)
+            return tagged(text, "div", "style=\"white-space: pre-wrap\"");
+
+        if (escapeMethod == EscapeMethod::noWrap)
+            return tagged(text, "div", "style=\"white-space: nowrap\"");
+
+        return text;
+    };
+
     const QString* replacement = nullptr;
 
     int pos = 0;
     int nextPos = indexOfAny(text, pos, &replacement);
     if (nextPos == -1)
-        return text;
+        return wrapper(text);
 
     QString result;
-
     result.reserve(static_cast<qsizetype>(text.length() * 1.1));
 
     do
@@ -334,7 +345,7 @@ QString toHtmlEscaped(const QString& text)
         result.append(QStringView(text).mid(pos));
 
     result.squeeze();
-    return result;
+    return wrapper(result);
 }
 
 QString highlightMatch(const QString& text, const QRegularExpression& rx, const QColor& color)
@@ -365,13 +376,6 @@ QString highlightMatch(const QString& text, const QRegularExpression& rx, const 
     }
 
     return result;
-}
-
-QString noWrap(const QString& text)
-{
-    // It would be better to use <span> here, but Qt 6.5 does not support attributes
-    // `style="white-space:nowrap"` for this tag. So, using <div> instead.
-    return taggedIfNotEmpty(text, "div", "style=\"white-space:nowrap\"");
 }
 
 } // namespace html
