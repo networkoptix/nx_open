@@ -600,10 +600,9 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 }
 
                 case LoginColumn:
-                    return noWrap(toHtmlEscaped(user->getName()));
-
                 case FullNameColumn:
-                    return noWrap(toHtmlEscaped(user->fullName()));
+                    return toHtmlEscaped(data(index, Qt::DisplayRole).toString(),
+                        common::html::EscapeMethod::preWrap);
 
                 case EmailColumn:
                     return user->getEmail();
@@ -620,8 +619,8 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
                     QStringList groupNames;
                     for (const auto& group: groups)
-                        groupNames << toHtmlEscaped(group.name);
-                    return noWrap(groupNames.join(kLineBreak));
+                        groupNames << toHtmlEscaped(group.name, common::html::EscapeMethod::noWrap);
+                    return groupNames.join("");
                 }
 
                 default:

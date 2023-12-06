@@ -18,6 +18,13 @@ namespace html {
 static constexpr auto kLineBreak("<br/>");
 static constexpr auto kHorizontalLine("<hr/>");
 
+enum class EscapeMethod
+{
+    nbsps,
+    preWrap,
+    noWrap
+};
+
 /** RAII helper to consistently open/close html tags on the given string. */
 class NX_VMS_COMMON_API Tag
 {
@@ -41,10 +48,6 @@ private:
 
 /** Enclose given text in a given tag. */
 NX_VMS_COMMON_API QString tagged(
-    const QString& text, const QString& tag, const QString& attributes = "");
-
-/** Enclose given text in a given tag if text is not empty. */
-NX_VMS_COMMON_API QString taggedIfNotEmpty(
     const QString& text, const QString& tag, const QString& attributes = "");
 
 /** <html>text</html> */
@@ -128,14 +131,10 @@ NX_VMS_COMMON_API QString link(const QString& text, const QUrl& url);
 NX_VMS_COMMON_API QString link(const QString& text, const nx::utils::Url& url);
 
 /**
- * Return text tagged as no-wrap.
- */
-NX_VMS_COMMON_API QString noWrap(const QString& text);
-
-/**
  * Extended analog of QString::toHtmlEscaped() which also affect spaces.
  */
-NX_VMS_COMMON_API QString toHtmlEscaped(const QString& text);
+NX_VMS_COMMON_API QString toHtmlEscaped(const QString& text,
+    EscapeMethod escapeMethod = EscapeMethod::nbsps);
 
 /**
  * Marks all matches substrings from regular expression \a rx in \a text with \a color

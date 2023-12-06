@@ -16,14 +16,6 @@ TEST(Html, tagged)
         R"(<div style="width: 100%">source</div>)");
 }
 
-TEST(Html, taggedIfNotEmpty)
-{
-    ASSERT_EQ(taggedIfNotEmpty("source", "span"), "<span>source</span>");
-    ASSERT_EQ(taggedIfNotEmpty("source", "td", "nowrap"), "<td nowrap>source</td>");
-    ASSERT_EQ(taggedIfNotEmpty("", "span"), "");
-    ASSERT_EQ(taggedIfNotEmpty("", "td", "nowrap"), "");
-}
-
 TEST(Html, mightBeHtml)
 {
     ASSERT_FALSE(mightBeHtml("Tom&Jerry"));
