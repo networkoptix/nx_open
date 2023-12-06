@@ -202,6 +202,9 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->forcedZoomCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setForcedPtzZoomCapability);
 
+    connect(ui->doNotSendStopPtzCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setDoNotSendStopPtzCommand);
+
     connect(ui->autoMediaPortCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setAutoMediaPortUsed);
 
@@ -605,7 +608,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // PTZ control block.
     ui->groupBoxPtzControl->setVisible(state.canSwitchPtzPresetTypes()
         || state.canForcePanTiltCapabilities()
-        || state.canForceZoomCapability());
+        || state.canForceZoomCapability()
+        || state.hasPanTiltCapabilities());
 
     { // PTZ Preset type selector.
         ui->preferredPtzPresetTypeWidget->setVisible(state.canSwitchPtzPresetTypes());
@@ -627,6 +631,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     ui->forcedPanTiltCheckBox->setVisible(state.canForcePanTiltCapabilities());
     ui->forcedZoomCheckBox->setVisible(state.canForceZoomCapability());
+    ui->doNotSendStopPtzCheckBox->setVisible(state.hasPanTiltCapabilities());
 
     if (state.canForcePanTiltCapabilities())
     {
@@ -640,8 +645,15 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
             state.expert.forcedPtzZoomCapability);
     }
 
+    if (state.hasPanTiltCapabilities())
+    {
+        check_box_utils::setupTristateCheckbox(ui->doNotSendStopPtzCheckBox,
+            state.expert.doNotSendStopPtzCommand);
+    }
+
     ::setReadOnly(ui->forcedPanTiltCheckBox, state.readOnly);
     ::setReadOnly(ui->forcedZoomCheckBox, state.readOnly);
+    ::setReadOnly(ui->doNotSendStopPtzCheckBox, state.readOnly);
 
     // PTZ Sensitivity.
 

@@ -105,7 +105,7 @@
            <x>0</x>
            <y>0</y>
            <width>1343</width>
-           <height>1153</height>
+           <height>1162</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1">
@@ -662,6 +662,13 @@
                     </widget>
                    </item>
                   </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="doNotSendStopPtzCheckBox">
+                  <property name="text">
+                   <string>Do not send Stop PTZ command</string>
+                  </property>
                  </widget>
                 </item>
                </layout>

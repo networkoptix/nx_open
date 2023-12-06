@@ -140,6 +140,7 @@ public:
     static State setPreferredPtzPresetType(State state, nx::core::ptz::PresetType value);
     static State setForcedPtzPanTiltCapability(State state, bool value);
     static State setForcedPtzZoomCapability(State state, bool value);
+    static State setDoNotSendStopPtzCommand(State state, bool value);
     static State setRtpTransportType(State state, vms::api::RtpTransportType value);
     static State setForcedPrimaryProfile(State state, const QString& value);
     static State setForcedSecondaryProfile(State state, const QString& value);
