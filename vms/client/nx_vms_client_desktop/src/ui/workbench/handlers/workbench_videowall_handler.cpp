@@ -450,7 +450,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
     const auto clientMessageProcessor = qnClientMessageProcessor;
     connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
-        &QnWorkbenchVideoWallHandler::cleanupUnusedLayouts);
+        [this]() { cleanupUnusedLayouts(); });
 
     if (m_videoWallMode.active)
     {
@@ -693,8 +693,11 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(
         videoWalls << index.videowall();
     }
 
-    saveVideowalls(videoWalls);
-    cleanupUnusedLayouts();
+    saveVideowalls(videoWalls, /*saveLayout*/ false,
+        [this](const QnVideoWallResourceList& successfullySaved)
+        {
+            cleanupUnusedLayouts(successfullySaved);
+        });
 }
 
 bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr &videowall) const
@@ -1479,11 +1482,15 @@ LayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
     return layout;
 }
 
-void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
+void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts(const QnVideoWallResourceList& videowalls)
 {
     LayoutResourceList layoutsToDelete;
 
-    for (const auto& videowall: resourcePool()->getResources<QnVideoWallResource>())
+    const auto videowallList = videowalls.empty()
+        ? resourcePool()->getResources<QnVideoWallResource>()
+        : videowalls;
+
+    for (const auto& videowall: videowallList)
     {
         QSet<QnUuid> used;
         for (const QnVideoWallItem& item: videowall->items()->getItems())
@@ -1690,8 +1697,11 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
         videoWalls << index.videowall();
     }
 
-    saveVideowalls(videoWalls);
-    cleanupUnusedLayouts();
+    saveVideowalls(videoWalls, /*saveLayout*/ false,
+        [this](const QnVideoWallResourceList& successfullySaved)
+        {
+            cleanupUnusedLayouts(successfullySaved);
+        });
 }
 
 void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
@@ -1712,8 +1722,11 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         videoWalls << index.videowall();
     }
 
-    saveVideowalls(videoWalls, true);
-    cleanupUnusedLayouts();
+    saveVideowalls(videoWalls, /*saveLayout*/ true,
+        [this](const QnVideoWallResourceList& successfullySaved)
+        {
+            cleanupUnusedLayouts(successfullySaved);
+        });
 }
 
 void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered()
@@ -2119,7 +2132,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         case Action::SetAction:
             if (checkLocalFiles(targetIndex, targetLayout))
                 resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
-            break;
+            return; //< No need to call cleanupUnusedLayouts() as `resetLayout()` does it.
         case Action::SwapAction:
             if (checkLocalFiles(targetIndex, targetLayout) && checkLocalFiles(sourceIndex, currentLayout))
                 swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
@@ -3050,20 +3063,29 @@ void QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout()
 
 void QnWorkbenchVideoWallHandler::saveVideowall(
     const QnVideoWallResourcePtr& videowall,
-    bool saveLayout)
+    bool saveLayout,
+    VideoWallCallbackFunction callback)
 {
     if (!ResourceAccessManager::hasPermissions(videowall, Qn::ReadWriteSavePermission))
+    {
+        if (callback)
+        {
+            // Call the callback asynchronously, for uniformity with other places.
+            executeLater([=]() { callback(/*success*/ false, videowall); }, this);
+        }
         return;
+    }
 
     if (saveLayout && QnWorkbenchLayout::instance(videowall))
-        saveVideowallAndReviewLayout(videowall);
+        saveVideowallAndReviewLayout(videowall, {}, callback);
     else
-        qnResourcesChangesManager->saveVideoWall(videowall);
+        qnResourcesChangesManager->saveVideoWall(videowall, callback);
 }
 
 void QnWorkbenchVideoWallHandler::saveVideowalls(
     const QSet<QnVideoWallResourcePtr>& videowalls,
-    bool saveLayout)
+    bool saveLayout,
+    std::function<void(const QnVideoWallResourceList& successfullySaved)> callback)
 {
     for (const QnVideoWallResourcePtr& videowall: videowalls)
         saveVideowall(videowall, saveLayout);
@@ -3502,7 +3524,8 @@ bool QnWorkbenchVideoWallHandler::confirmRemoveResourcesFromLayout(
 
 void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(
     const QnVideoWallResourcePtr& videowall,
-    LayoutResourcePtr reviewLayout)
+    LayoutResourcePtr reviewLayout,
+    VideoWallCallbackFunction callback)
 {
     if (!ResourceAccessManager::hasPermissions(videowall, Qn::ReadWriteSavePermission))
         return;
@@ -3515,7 +3538,7 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(
 
     if (reviewLayout)
     {
-        auto callback =
+        const auto saveLayoutCallback =
             [id = reviewLayout->getId()](int /*reqId*/, ec2::ErrorCode errorCode)
             {
                 snapshotManager()->markBeingSaved(id, false);
@@ -3525,9 +3548,9 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(
                 snapshotManager()->markChanged(id, false);
             };
 
-        if (saveReviewLayout(reviewLayout, callback))
+        if (saveReviewLayout(reviewLayout, saveLayoutCallback))
             return;
     }
 
-    qnResourcesChangesManager->saveVideoWall(videowall);
+    qnResourcesChangesManager->saveVideoWall(videowall, callback);
 }
