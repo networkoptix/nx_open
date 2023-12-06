@@ -689,7 +689,7 @@ void UserGroupsWidget::Private::deleteGroups(const QSet<QnUuid>& groupsToDelete)
     setMassDeleteInProgress(true);
     auto rollback = nx::utils::makeScopeGuard([this]{ setMassDeleteInProgress(false); });
 
-    GroupSettingsDialog::removeGroups(q->systemContext(), groupsToDelete, nx::utils::guarded(q,
+    GroupSettingsDialog::removeGroups(q->context(), groupsToDelete, nx::utils::guarded(q,
         [this, groupsToDelete, rollback = std::move(rollback)](
             bool success, const QString& errorString)
         {

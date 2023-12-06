@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/scope_guard.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
 
@@ -35,6 +36,9 @@ public:
 
     void setReconnectOnPasswordChange(bool reconnect);
 
+    /** Allows to delay reconnect until the returned guard is destroyed. */
+    nx::utils::Guard reconnectGuard();
+
 private:
     void at_user_resourceChanged(const QnResourcePtr &resource);
 
@@ -42,6 +46,8 @@ private:
     void setCurrentUser(const QnUserResourcePtr &currentUser);
     bool isReconnectRequired(const QnUserResourcePtr &user);
     void reconnect();
+    void blockReconnect();
+    void unblockReconnect();
 
     QSet<QnUuid> allParentGroups() const;
     bool updateParentGroups();
@@ -53,6 +59,9 @@ private:
     QnUserResourcePtr m_user;
     bool m_reconnectOnPasswordChange = true;
     QSet<QnUuid> m_allParentGroups;
+
+    int m_blockReconnectCounter = 0;
+    bool m_reconnectPending = false;
 };
 
 } // namespace nx::vms::client::desktop

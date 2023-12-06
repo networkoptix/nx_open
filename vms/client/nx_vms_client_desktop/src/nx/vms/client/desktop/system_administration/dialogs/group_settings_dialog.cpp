@@ -27,6 +27,7 @@
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
 
 #include "../globals/session_notifier.h"
 #include "../globals/user_group_request_chain.h"
@@ -119,7 +120,7 @@ GroupSettingsDialog::GroupSettingsDialog(
         dialogType == editGroup
             ? "Nx/Dialogs/UserManagement/GroupEditDialog.qml"
             : "Nx/Dialogs/UserManagement/GroupCreateDialog.qml"),
-    SystemContextAware(systemContext),
+    QnWorkbenchContextAware(parent),
     d(new Private(this, dialogType))
 {
     d->self = this;
@@ -288,7 +289,7 @@ void GroupSettingsDialog::onDeleteRequested()
             messageBox.exec();
         });
 
-    removeGroups(systemContext(), {d->groupId}, std::move(handleRemove));
+    removeGroups(context(), {d->groupId}, std::move(handleRemove));
 }
 
 bool GroupSettingsDialog::setGroup(const QnUuid& groupId)
@@ -560,10 +561,11 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
     d->isSaving = true;
 
     chain->start(nx::utils::guarded(this,
-        [chain, state, this](
-            bool success,
-            nx::network::rest::Result::Error errorCode,
-            const QString& errorString)
+        [chain, state, this,
+            guard = context()->instance<ContextCurrentUserWatcher>()->reconnectGuard()](
+                bool success,
+                nx::network::rest::Result::Error errorCode,
+                const QString& errorString)
         {
             d->isSaving = false;
 
@@ -589,10 +591,12 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 }
 
 void GroupSettingsDialog::removeGroups(
-    nx::vms::client::desktop::SystemContext* systemContext,
+    QnWorkbenchContext* workbenchContext,
     const QSet<QnUuid>& idsToRemove,
     nx::utils::MoveOnlyFunc<void(bool, const QString&)> callback)
 {
+    auto systemContext = workbenchContext->systemContext();
+
     auto chain = new UserGroupRequestChain(systemContext);
 
     // LDAP groups will not be removed from `parentIds` or `parentGroupIds` leaving existing
@@ -662,10 +666,11 @@ void GroupSettingsDialog::removeGroups(
         FreshSessionTokenHelper::ActionType::updateSettings));
 
     chain->start(nx::utils::guarded(chain,
-        [chain, callback = std::move(callback)](
-            bool success,
-            nx::network::rest::Result::Error errorCode,
-            const QString& errorString)
+        [chain, callback = std::move(callback),
+            guard = workbenchContext->instance<ContextCurrentUserWatcher>()->reconnectGuard()](
+                bool success,
+                nx::network::rest::Result::Error errorCode,
+                const QString& errorString)
         {
             if (callback && errorCode != nx::network::rest::Result::Error::SessionExpired)
                 callback(success, errorString);
