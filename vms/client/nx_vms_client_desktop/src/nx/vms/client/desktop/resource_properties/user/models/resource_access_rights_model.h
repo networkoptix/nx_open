@@ -87,8 +87,8 @@ public:
         AccessRightRole,
         InheritanceInfoTextRole,
         EditableRole,
-        DependentAccessRightsRole,
-        RequiredAccessRightsRole
+        DependentAccessRightsRole, //< Not intersected with relevantAccessRights yet.
+        RequiredAccessRightsRole //< Not intersected with relevantAccessRights yet.
     };
 
 public:

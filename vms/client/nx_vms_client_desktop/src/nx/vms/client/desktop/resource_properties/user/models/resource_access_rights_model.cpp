@@ -246,11 +246,11 @@ QVariant ResourceAccessRightsModel::data(const QModelIndex& index, int role) con
 
         case DependentAccessRightsRole:
             return QVariant::fromValue(AccessSubjectEditingContext::dependentAccessRights(
-                d->accessRightList[index.row()]) & d->item.relevantAccessRights);
+                d->accessRightList[index.row()]));
 
         case RequiredAccessRightsRole:
             return QVariant::fromValue(AccessSubjectEditingContext::requiredAccessRights(
-                d->accessRightList[index.row()]) & d->item.relevantAccessRights);
+                d->accessRightList[index.row()]));
 
         default:
             return {};

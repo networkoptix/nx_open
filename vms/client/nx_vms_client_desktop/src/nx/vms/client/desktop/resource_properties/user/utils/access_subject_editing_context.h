@@ -170,6 +170,9 @@ public:
     static Q_INVOKABLE nx::vms::api::AccessRights relevantAccessRights(
         const ResourceAccessTarget& target);
 
+    Q_INVOKABLE nx::vms::api::AccessRights combinedRelevantAccessRights(
+        const QModelIndexList& indexes) const;
+
     static void modifyAccessRightMap(nx::core::access::ResourceAccessMap& accessRightMap,
         const QnUuid& resourceOrGroupId,
         nx::vms::api::AccessRights modifiedRightsMask,
