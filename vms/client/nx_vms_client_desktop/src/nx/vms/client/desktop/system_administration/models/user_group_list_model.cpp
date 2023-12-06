@@ -450,12 +450,13 @@ QVariant UserGroupListModel::data(const QModelIndex& index, int role) const
                 {
                     QStringList groupNames = d->getParentGroupNames(group);
                     for (auto& line: groupNames)
-                        line = toHtmlEscaped(line);
-                    return noWrap(groupNames.join(kLineBreak));
+                        line = toHtmlEscaped(line, common::html::EscapeMethod::noWrap);
+                    return groupNames.join("");
                 }
 
                 default:
-                    return noWrap(toHtmlEscaped(data(index, Qt::DisplayRole).toString()));
+                    return toHtmlEscaped(data(index, Qt::DisplayRole).toString(),
+                        common::html::EscapeMethod::preWrap);
             }
         }
 
