@@ -29,6 +29,8 @@ public:
 
     virtual void done(int result) override;
 
+    virtual bool event(QEvent* event) override;
+
 protected:
     virtual void showEvent(QShowEvent* event) override;
 
