@@ -1761,10 +1761,6 @@
       <translation>Oppdater nettadressen til releases.json-filen</translation>
     </message>
     <message>
-      <source>Cloud storage update period in seconds</source>
-      <translation>Oppdateringsperiode for skylagring i sekunder</translation>
-    </message>
-    <message>
       <source>LDAP settings</source>
       <translation>LDAP-innstillinger</translation>
     </message>

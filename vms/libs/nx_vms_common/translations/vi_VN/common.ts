@@ -1705,10 +1705,6 @@
       <translation>URL cập nhật tệp phát hành .json</translation>
     </message>
     <message>
-      <source>Cloud storage update period in seconds</source>
-      <translation>Thời gian cập nhật bộ nhớ đám mây tính bằng giây</translation>
-    </message>
-    <message>
       <source>LDAP settings</source>
       <translation>Cài đặt LDAP</translation>
     </message>

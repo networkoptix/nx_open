@@ -1761,10 +1761,6 @@
       <translation>Releases.json dosya URL'sini güncelleyin</translation>
     </message>
     <message>
-      <source>Cloud storage update period in seconds</source>
-      <translation>Saniye cinsinden bulut depolama güncelleme süresi</translation>
-    </message>
-    <message>
       <source>LDAP settings</source>
       <translation>LDAP ayarları</translation>
     </message>

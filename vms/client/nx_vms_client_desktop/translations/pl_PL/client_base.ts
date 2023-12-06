@@ -9977,12 +9977,12 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
       <translation>Nie udało się złączyć systemów</translation>
     </message>
     <message>
-      <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
-    </message>
-    <message>
       <source>support</source>
       <translation>wsparcie</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
     </message>
   </context>
   <context>

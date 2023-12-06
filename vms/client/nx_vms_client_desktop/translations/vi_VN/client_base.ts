@@ -9523,12 +9523,12 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
       <translation>Không kết hợp được Hệ thống</translation>
     </message>
     <message>
-      <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation>Khuyến nghị tham khảo ý kiến của %1 trước khi tiếp tục.</translation>
-    </message>
-    <message>
       <source>support</source>
       <translation>hỗ trợ</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
     </message>
   </context>
   <context>

@@ -10288,12 +10288,12 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation>Failed to merge Systems</translation>
     </message>
     <message>
-      <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation type="unfinished">We recommend that you consult with %1 before proceeding.</translation>
-    </message>
-    <message>
       <source>support</source>
       <translation>الدعم</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
     </message>
   </context>
   <context>

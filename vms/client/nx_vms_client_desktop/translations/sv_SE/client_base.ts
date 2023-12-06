@@ -9680,12 +9680,12 @@ Kom ihåg att återställa loggningsnivån till standardinställningen efter att
       <translation>Misslyckades med att slå samman system</translation>
     </message>
     <message>
-      <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation>Vi rekommenderar att du rådgör med %1 innan du fortsätter.</translation>
-    </message>
-    <message>
       <source>support</source>
       <translation>support</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation>Det rekommenderas att kontakta %1 innan du fortsätter.</translation>
     </message>
   </context>
   <context>

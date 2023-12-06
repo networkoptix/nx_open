@@ -9524,12 +9524,12 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation>システム統合に失敗しました</translation>
     </message>
     <message>
-      <source>We recommend that you consult with %1 before proceeding.</source>
-      <translation>次に進む前に、%1 までご相談いただくことをお勧めします。</translation>
-    </message>
-    <message>
       <source>support</source>
       <translation>サポート</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation>続行する前に %1 に連絡することをお勧めします。</translation>
     </message>
   </context>
   <context>
