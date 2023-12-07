@@ -63,6 +63,9 @@ public:
     /** Returns subject global permissions. */
     nx::vms::api::GlobalPermissions globalPermissions(const QnUuid& subjectId) const;
 
+    /** Returns subject's resolved access rights map. */
+    ResourceAccessMap resourceAccessMap(const QnUuid& subjectId) const;
+
     /**
      * A combination of all access rights of the specified subject.
      * Currently this method is not usable because due to the server implementation when a resource
