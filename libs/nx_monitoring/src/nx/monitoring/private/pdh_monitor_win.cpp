@@ -58,16 +58,6 @@ bool parseDiskDescription(LPCWSTR description, int* id, LPCWSTR* partitions)
 
 PdhMonitor::PdhMonitor()
 {
-    m_pdhLibrary = LoadLibraryW(L"pdh.dll");
-    if (!m_pdhLibrary)
-        checkError("LoadLibrary", GetLastError());
-
-    if (INVOKE(PdhOpenQuery(/*szDataSource*/ nullptr, /*dwUserData*/ 0, &m_query)) != ERROR_SUCCESS)
-        m_query = INVALID_HANDLE_VALUE;
-
-    addTotalCpuLoadCounter();
-    addGpuTimeCounter();
-    addDiskTimeCounter();
 }
 
 PdhMonitor::~PdhMonitor()
@@ -81,6 +71,21 @@ PdhMonitor::~PdhMonitor()
 
 bool PdhMonitor::collectMonitoringData()
 {
+    if (!m_initialized)
+    {
+        m_initialized = true;
+        m_pdhLibrary = LoadLibraryW(L"pdh.dll");
+        if (!m_pdhLibrary)
+            checkError("LoadLibrary", GetLastError());
+
+        if (INVOKE(PdhOpenQuery(/*szDataSource*/ nullptr, /*dwUserData*/ 0, &m_query)) != ERROR_SUCCESS)
+            m_query = INVALID_HANDLE_VALUE;
+
+        addTotalCpuLoadCounter();
+        addGpuTimeCounter();
+        addDiskTimeCounter();
+    }
+
     if (m_query == INVALID_HANDLE_VALUE)
         return false;
 

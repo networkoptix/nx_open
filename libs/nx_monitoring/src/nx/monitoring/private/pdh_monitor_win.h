@@ -95,6 +95,7 @@ private:
     qreal m_totalCpuLoad = 0;
     qreal m_thisProcessGpuUsage = 0;
     QList<ActivityMonitor::HddLoad> m_totalHddLoad;
+    bool m_initialized = false;
 };
 
 } // namespace nx::monitoring
