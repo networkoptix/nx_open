@@ -51,7 +51,12 @@ FontMap readFontMap(const QString& fileName, const QFont& baseFont)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
+    {
+        NX_ERROR(NX_SCOPE_TAG, "Can't open font config file, path %1, code: %2, error: %3",
+            fileName, file.error(), file.errorString());
+
         return {};
+    }
 
     auto [data, error] = nx::reflect::json::deserialize<std::map<QString, FontRecord>>(
         nx::toBufferView(file.readAll()));
@@ -90,14 +95,21 @@ struct FontConfig::Private
     FontMap fontMap;
 };
 
-FontConfig::FontConfig(const QFont& baseFont, const QString& basicFontsFileName, QObject* parent):
+FontConfig::FontConfig(
+    const QFont& baseFont,
+    const QString& basicFontsFileName,
+    const QString& overrideFontsFileName,
+    QObject* parent):
     base_type(this, parent),
     d(new Private())
 {
     NX_INFO(this, "Loading font config, base font family: %1, weight: %2, size %3px",
         baseFont.family(), baseFont.weight(), baseFont.pixelSize());
+    NX_DEBUG(this, "Base file: %1, override file: %2", basicFontsFileName, overrideFontsFileName);
 
     d->fontMap = readFontMap(basicFontsFileName, baseFont);
+    d->fontMap.insert(readFontMap(overrideFontsFileName, baseFont));
+
     const auto normalFont = font("normal");
     NX_INFO(this, "Loaded %1 fonts, default config font family: %2, weight: %3, size %4px",
         d->fontMap.size(), normalFont.family(), normalFont.weight(), normalFont.pixelSize());
@@ -115,7 +127,7 @@ FontConfig::~FontConfig()
 QFont FontConfig::font(const QString& name) const
 {
     const auto it = d->fontMap.find(name);
-    if (NX_ASSERT(it != d->fontMap.end()))
+    if (NX_ASSERT(it != d->fontMap.end(), "Font absent: %1", name))
         return *it;
 
     return {}; //< default font from QGuiApplication.

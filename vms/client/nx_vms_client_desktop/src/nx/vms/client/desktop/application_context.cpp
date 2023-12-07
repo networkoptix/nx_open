@@ -277,14 +277,6 @@ bool initializeLogFromFile(const QString& filename, const QString& suffix)
         suffix);
 }
 
-QString baseFontConfigPath()
-{
-    if (QString result = ini().fontConfigPath; !result.isEmpty())
-        return result;
-
-    return ":/skin/basic_fonts.json";
-}
-
 QPalette makeApplicationPalette()
 {
     auto colorTheme = core::colorTheme();
@@ -716,7 +708,8 @@ ApplicationContext::ApplicationContext(
     initializeExternalResources();
     QnClientMetaTypes::initialize();
     d->initSkin();
-    storeFontConfig(new FontConfig(initializeBaseFont(), baseFontConfigPath()));
+    storeFontConfig(
+        new FontConfig(initializeBaseFont(), ":/skin/basic_fonts.json", ini().fontConfigPath));
     initializeDefaultApplicationFont();
     d->initializeSettings();
     d->initializeExceptionHandlerGuard();
