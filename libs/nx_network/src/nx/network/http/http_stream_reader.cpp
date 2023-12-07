@@ -263,12 +263,14 @@ bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
                 if (data[pos] == ' ')  //< Considering message to be request (first token does not contain /, so it looks like METHOD).
                 {
                     m_httpMessage = Message(MessageType::request);
-                    m_httpMessage.request->requestLine.parse(data);
+                    if (!m_httpMessage.request->requestLine.parse(data))
+                        NX_DEBUG(this, "Error parsing '%1' as request line", data);
                 }
                 else    //< Response.
                 {
                     m_httpMessage = Message(MessageType::response);
-                    m_httpMessage.response->statusLine.parse(data);
+                    if (!m_httpMessage.response->statusLine.parse(data))
+                        NX_DEBUG(this, "Error parsing '%1' as status line", data);
                 }
                 m_state = ReadState::readingMessageHeaders;
                 return true;
