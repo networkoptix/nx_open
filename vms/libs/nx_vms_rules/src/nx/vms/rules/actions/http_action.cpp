@@ -3,10 +3,10 @@
 #include "http_action.h"
 
 #include "../action_builder_fields/content_type_field.h"
+#include "../action_builder_fields/http_auth_field.h"
 #include "../action_builder_fields/http_auth_type_field.h"
 #include "../action_builder_fields/http_method_field.h"
 #include "../action_builder_fields/optional_time_field.h"
-#include "../action_builder_fields/password_field.h"
 #include "../action_builder_fields/text_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../utils/event_details.h"
@@ -28,9 +28,7 @@ const ItemDescriptor& HttpAction::manifest()
             makeFieldDescriptor<TextWithFields>("content", tr("Content")),
             makeFieldDescriptor<ContentTypeField>("contentType", tr("Content type")),
             makeFieldDescriptor<HttpMethodField>("method", tr("Method")),
-            makeFieldDescriptor<HttpAuthTypeField>("authType", tr("Authentication Type")),
-            makeFieldDescriptor<ActionTextField>("login", tr("Login")),
-            makeFieldDescriptor<PasswordField>("password", tr("Password")),
+            makeFieldDescriptor<HttpAuthField>("auth", tr("HTTP authentication")),
             utils::makeTimeFieldDescriptor<OptionalTimeField>(
                 utils::kIntervalFieldName,
                 tr("Interval of Action"),
@@ -61,24 +59,34 @@ void HttpAction::setContent(const QString& content)
     m_content = content;
 }
 
-QString HttpAction::login() const
+std::string HttpAction::login() const
 {
-    return m_login;
+    return m_auth.credentials.user;
 }
 
-void HttpAction::setLogin(const QString& login)
+std::string HttpAction::password() const
 {
-    m_login = login;
+    return m_auth.credentials.password ? m_auth.credentials.password.value() : "";
 }
 
-QString HttpAction::password() const
+AuthenticationInfo HttpAction::auth() const
 {
-    return m_password;
+    return m_auth;
 }
 
-void HttpAction::setPassword(const QString& password)
+void HttpAction::setAuth(const AuthenticationInfo& auth)
 {
-    m_password = password;
+    m_auth = auth;
+}
+
+nx::network::http::AuthType HttpAction::authType() const
+{
+    return m_auth.authType;
+}
+
+std::string HttpAction::token() const
+{
+    return m_auth.credentials.token ? m_auth.credentials.token.value() : "";
 }
 
 QVariantMap HttpAction::details(common::SystemContext* context) const

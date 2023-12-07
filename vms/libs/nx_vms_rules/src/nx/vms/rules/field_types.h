@@ -6,6 +6,8 @@
 
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/serialization/json_fwd.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::rules {
@@ -38,4 +40,21 @@ NX_REFLECTION_ENUM_CLASS(ObjectLookupCheckType,
     inList,
     notInList);
 
+/** Type for storing authentication info. */
+struct AuthenticationInfo
+{
+    nx::network::http::SerializableCredentials credentials;
+    nx::network::http::AuthType authType;
+    bool operator==(const AuthenticationInfo&) const = default;
+};
+
+#define AuthenticationInfo_Fields (credentials)(authType)
+QN_FUSION_DECLARE_FUNCTIONS(AuthenticationInfo, (json), NX_VMS_RULES_API);
 } // namespace nx::vms::rules
+
+
+// Adding declaration of fusion functions to avoid adding dependency on nx_vms_rules library to
+// nx_network.
+namespace nx::network::http {
+QN_FUSION_DECLARE_FUNCTIONS(nx::network::http::SerializableCredentials, (json), NX_VMS_RULES_API);
+} // namespace nx::network::http

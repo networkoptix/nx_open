@@ -17,6 +17,7 @@
 #include "flag_picker_widget.h"
 #include "flags_picker_widget.h"
 #include "fps_picker_widget.h"
+#include "http_auth_picker_widget.h"
 #include "http_parameters_picker_widget.h"
 #include "input_port_picker_widget.h"
 #include "keywords_picker_widget.h"
@@ -182,6 +183,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new FpsPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::HttpMethodField>())
         pickerWidget = new HttpMethodPicker(context, parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::HttpAuthField>())
+        pickerWidget = new HttpAuthPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::LayoutField>())
         pickerWidget = new SingleTargetLayoutPicker(context, parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::OptionalTimeField>())

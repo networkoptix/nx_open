@@ -127,7 +127,8 @@ struct NX_NETWORK_API SerializableCredentials
     operator Credentials() const;
     bool operator==(const SerializableCredentials& other) const = default;
 };
-NX_REFLECTION_INSTRUMENT(SerializableCredentials, (user)(password)(ha1)(token));
+#define SerializableCredentials_Fields (user)(password)(ha1)(token)
+NX_REFLECTION_INSTRUMENT(SerializableCredentials, SerializableCredentials_Fields);
 
 //-------------------------------------------------------------------------------------------------
 

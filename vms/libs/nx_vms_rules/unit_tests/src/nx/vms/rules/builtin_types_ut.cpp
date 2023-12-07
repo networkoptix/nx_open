@@ -291,6 +291,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<TargetLayoutField>();
     testActionFieldRegistration<TargetSingleDeviceField>();
     testActionFieldRegistration<VolumeField>();
+    testActionFieldRegistration<HttpAuthField>();
 
     testActionRegistration<BookmarkAction>();
     testActionRegistration<BuzzerAction>();
