@@ -191,6 +191,7 @@ public:
     void shiftWindow(milliseconds delta, bool animate = false);
 
     bool isAnimatingWindow() const;
+    bool isAnimatingWindowToCertainPosition() const;
     milliseconds windowTargetStart();
     milliseconds windowTargetEnd();
 

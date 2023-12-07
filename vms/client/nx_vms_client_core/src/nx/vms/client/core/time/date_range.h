@@ -15,6 +15,8 @@ struct NX_VMS_CLIENT_CORE_API DateRange
 public:
     QDateTime start;
     QDateTime end;
+
+    bool operator==(const DateRange&) const = default;
 };
 
 } // namespace nx::vms::client::core
