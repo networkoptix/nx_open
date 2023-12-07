@@ -140,7 +140,8 @@ public:
     void stepForward();
 
     void fastForward();
-    void rewind(bool jumpToPreviousChunk = false);
+    void rewind(bool canJumpToPrevious = false);
+    void rewindOnDoubleClick();
 
     virtual nx::vms::client::desktop::menu::ActionScope currentScope() const override;
     virtual nx::vms::client::desktop::menu::Parameters currentParameters(

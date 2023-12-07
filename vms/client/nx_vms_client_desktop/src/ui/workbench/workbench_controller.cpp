@@ -112,7 +112,8 @@ using nx::vms::client::core::Geometry;
 
 namespace {
 
-static auto kDoubleClickPeriodMs = 1000;
+static auto kDoubleClickPeriodMs = 250;
+static auto kSingleClickPeriodMs = 200;
 static auto kAnimationRestartPeriodMs = 500;
 
 QPoint invalidDragDelta()
@@ -161,8 +162,10 @@ QnWorkbenchController::QnWorkbenchController(
     m_resizedWidget(nullptr),
     m_dragDelta(invalidDragDelta()),
     m_menuEnabled(true),
-    m_rewindTimer(new QTimer(this))
+    m_rewindTimer(new QTimer(this)),
+    m_rewindShortPressTimer(new QTimer(this))
 {
+    m_rewindDoubleClickTimer.invalidate();
     QEvent::Type mouseEventTypeArray[] = {
         QEvent::GraphicsSceneMousePress,
         QEvent::GraphicsSceneMouseMove,
@@ -511,6 +514,29 @@ QnWorkbenchController::QnWorkbenchController(
     connect(action(menu::ToggleCurrentItemMaximizationStateAction), &QAction::triggered, this,
         &QnWorkbenchController::toggleCurrentItemMaximizationState);
 
+    connect(m_rewindShortPressTimer, &QTimer::timeout,
+        [this]()
+        {
+            m_rewindShortPressTimer->stop();
+            m_rewindTimer->start(kAnimationRestartPeriodMs);
+
+            if (m_rewindDirection == ShiftDirection::fastForward)
+            {
+                if (navigator()->isLive())
+                {
+                    m_rewindTimer->stop();
+                    return;
+                }
+                menu()->trigger(menu::FastForwardAction);
+                navigator()->fastForward();
+            }
+            else if (m_rewindDirection == ShiftDirection::rewind)
+            {
+                menu()->trigger(menu::RewindAction);
+                navigator()->rewind(false);
+            }
+        });
+
     connect(m_rewindTimer, &QTimer::timeout,
         [this]()
         {
@@ -522,10 +548,12 @@ QnWorkbenchController::QnWorkbenchController(
                     return;
                 }
                 menu()->trigger(menu::FastForwardAction);
+                navigator()->fastForward();
             }
             else if (m_rewindDirection == ShiftDirection::rewind)
             {
                 menu()->trigger(menu::RewindAction);
+                navigator()->rewind(true);
             }
         });
 
@@ -748,6 +776,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
     const auto shift =
         [this](ShiftDirection direction) -> bool
         {
+            // Check that it can be rewinded or fast forwarded in general.
             if (!navigator()->canJump() ||
                 (navigator()->isLive() && direction == ShiftDirection::fastForward))
             {
@@ -763,7 +792,8 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
             if (direction == ShiftDirection::rewind)
                 menu()->trigger(menu::RewindAction);
 
-            m_rewindTimer->start(kAnimationRestartPeriodMs);
+            // Start timer to define which action should be executed.
+            m_rewindShortPressTimer->start(kSingleClickPeriodMs);
             m_rewindDirection = direction;
             return true;
         };
@@ -923,20 +953,52 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
             m_ptzInstrument->toggleContinuousPtz(widget, direction, false);
         };
 
-    const auto stopShift =
-        [this]()
+    const auto doubleClick =
+        [this]() -> bool
         {
-            if (m_rewindDirection == ShiftDirection::rewind)
+            if (!m_rewindDoubleClickTimer.isValid())
             {
-                if (!m_rewindButtonPressedTimer.isValid())
-                    m_rewindButtonPressedTimer.start();
-
-                // This part should be triggered on double click on rewind only.
-                if (m_rewindButtonPressedTimer.restart() < kDoubleClickPeriodMs)
-                    navigator()->rewind(/*jumpToPreviousChunk*/ true);
+                m_rewindDoubleClickTimer.start();
+                return false;
             }
 
+            // This part should be triggered on double click on rewind only.
+            if (m_rewindDoubleClickTimer.restart() < kDoubleClickPeriodMs)
+            {
+                m_rewindTimer->stop();
+                m_rewindShortPressTimer->stop();
+                if (m_rewindDirection == ShiftDirection::rewind)
+                {
+                    menu()->trigger(menu::RewindAction);
+                    navigator()->rewindOnDoubleClick();
+                    return true;
+                }
+            }
+            return false;
+        };
+
+    const auto stopShift =
+        [&]()
+        {
             m_rewindTimer->stop();
+            m_rewindShortPressTimer->stop();
+            if (!doubleClick())
+            {
+                // Single click.
+                if (m_rewindDirection == ShiftDirection::fastForward)
+                {
+                    if (navigator()->isLive())
+                        return;
+
+                    menu()->trigger(menu::FastForwardAction);
+                    navigator()->fastForward();
+                }
+                else if (m_rewindDirection == ShiftDirection::rewind)
+                {
+                    menu()->trigger(menu::RewindAction);
+                    navigator()->rewind();
+                }
+            }
         };
 
     switch (e->key())
