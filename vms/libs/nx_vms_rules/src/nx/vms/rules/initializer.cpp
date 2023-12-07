@@ -141,6 +141,7 @@ void Initializer::registerFields() const
     registerActionField<TargetSingleDeviceField>();
     registerActionField<TimeField>();
     registerActionField<VolumeField>();
+    registerActionField<HttpAuthField>();
 }
 
 } // namespace nx::vms::rules

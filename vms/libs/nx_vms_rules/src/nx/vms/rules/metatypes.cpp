@@ -2,6 +2,8 @@
 
 #include "metatypes.h"
 
+#include <string>
+
 #include <analytics/common/object_metadata.h>
 #include <common/common_meta_types.h>
 #include <nx/fusion/serialization/json_functions.h>
@@ -90,6 +92,12 @@ void Metatypes::initialize()
 
     qRegisterMetaType<ObjectLookupCheckType>();
     QnJsonSerializer::registerSerializer<ObjectLookupCheckType>();
+
+    qRegisterMetaType<nx::vms::rules::AuthenticationInfo>();
+    QnJsonSerializer::registerSerializer<nx::vms::rules::AuthenticationInfo>();
+
+    QnJsonSerializer::registerSerializer<std::string>();
+    QnJsonSerializer::registerSerializer<nx::network::http::SerializableCredentials>();
 };
 
 } // namespace nx::vms::rules

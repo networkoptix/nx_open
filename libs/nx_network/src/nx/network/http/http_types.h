@@ -625,7 +625,8 @@ public:
 NX_REFLECTION_ENUM_CLASS(AuthType,
     authBasicAndDigest,
     authDigest,
-    authBasic
+    authBasic,
+    authBearer
 )
 
 /** Contains HTTP header structures. */
