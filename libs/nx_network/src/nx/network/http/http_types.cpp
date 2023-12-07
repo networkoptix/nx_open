@@ -261,6 +261,8 @@ std::string toString(Value val)
             return "No Content";
         case partialContent:
             return "Partial Content";
+        case multiStatus:
+            return "Multi-Status";
         case multipleChoices:
             return "Multiple Choices";
         case movedPermanently:
