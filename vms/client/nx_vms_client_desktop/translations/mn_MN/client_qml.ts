@@ -306,7 +306,7 @@
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Арилгах</translation>
     </message>
     <message>
       <source>Remove Request</source>
@@ -612,7 +612,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Column Name</source>
@@ -636,7 +636,7 @@
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Төрөл</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -711,7 +711,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Base DN</source>
@@ -870,7 +870,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Description</source>
@@ -1607,6 +1607,10 @@
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
       <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+    </message>
+    <message>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
     </message>
   </context>
   <context>
@@ -2398,7 +2402,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Төрөл</translation>
     </message>
     <message>
       <source>Local</source>

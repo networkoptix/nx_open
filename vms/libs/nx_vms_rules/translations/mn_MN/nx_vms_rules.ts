@@ -231,7 +231,7 @@
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Төхөөрөмж</translation>
     </message>
   </context>
   <context>

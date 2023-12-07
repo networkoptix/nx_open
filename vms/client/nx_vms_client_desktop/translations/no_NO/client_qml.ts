@@ -1608,6 +1608,10 @@
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
       <translation>Bruk %1 eller %2 for å velge flere ressurser, eller %3 for å fjerne valget</translation>
     </message>
+    <message>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+    </message>
   </context>
   <context>
     <name>Plugins</name>

@@ -79,7 +79,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Нууц үг буруу</translation>
     </message>
   </context>
   <context>
@@ -990,17 +990,17 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>с</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>м</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>ц</translation>
     </message>
     <message>
       <source>d</source>
@@ -1020,7 +1020,7 @@
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>ж</translation>
     </message>
     <message>
       <source>msec</source>
@@ -1376,7 +1376,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Шинэ систем</translation>
     </message>
   </context>
   <context>
@@ -1883,7 +1883,7 @@
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation type="unfinished">File write error. Not enough free space.</translation>
+      <translation>Бичлэгт алдаа гарлаа. Таны багтаамж дүүрсэн байна.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
@@ -1906,7 +1906,7 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Тэмдэглэл</translation>
     </message>
     <message>
       <source>Panic recording</source>
@@ -1922,7 +1922,7 @@
     </message>
     <message>
       <source>Play sound</source>
-      <translation type="unfinished">Play sound</translation>
+      <translation>Дуу тоглуулах</translation>
     </message>
     <message>
       <source>Speak</source>
@@ -1930,7 +1930,7 @@
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation type="unfinished">Execute PTZ preset</translation>
+      <translation>PTZ тохируулгыг ажиллуулах</translation>
     </message>
     <message>
       <source>Show text overlay</source>
@@ -1969,11 +1969,11 @@
     </message>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Сүлжээний алдаа</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Серверийн алдаа</translation>
     </message>
     <message>
       <source>Server Conflict</source>
@@ -1981,11 +1981,11 @@
     </message>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Сервер ажиллаа</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Лицензийн алдаа</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
@@ -2051,15 +2051,15 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation type="unfinished">Device %1 was disconnected</translation>
+      <translation>%1 төхөөрөмж салсан байна</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation type="unfinished">Camera %1 was disconnected</translation>
+      <translation>%1 камер салсан байна</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation type="unfinished">I/O Module %1 was disconnected</translation>
+      <translation>%1 I/O модуль салсан байна</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -2067,41 +2067,41 @@
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>%1 дээр хөдөлгөөн илэрлээ</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>%1 дээр сүлжээний алдаа гарлаа</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>&quot;%1&quot; серверийн алдаа</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>%1 төхөөрөмжийн IP холбогдсонгүй</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>%1 камерын IP холбогдсонгүй</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>&quot;%1&quot; сервер холбогдсонгүй</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>&quot;%1&quot; сервер ажиллалаа</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>&quot;%1&quot; сервер лицензийн асуудалтай байна</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>&quot;%1&quot; сервер сервер архивын нөөцлөлт хийж дууслаа</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -2192,39 +2192,39 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Төхөөрөмж сүлжээнд хариу өгөхгүй байна.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Серверийн холболт саллаа.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Сервер ажиллагаагүй боллоо.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>%1 дээр I/O-н алдаа заалаа.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>%1 дээр бичилт хийхэд HDD/SSD-н хурд хүрэлцэхгүй байна.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>&quot;%1&quot; HDD/SSD диск дүүрсэн байна. Уг диск дээр VMS-тэй хамааралгүй хэт их дата хадгалагдсан байна.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>&quot;%1&quot; дискийн багтаамж дүүрч байна.</translation>
     </message>
     <message>
       <source>start</source>
-      <translation type="unfinished">start</translation>
+      <translation>эхлэх</translation>
     </message>
     <message>
       <source>stop</source>
-      <translation type="unfinished">stop</translation>
+      <translation>зогсоох</translation>
     </message>
     <message>
       <source>While %1</source>
@@ -2232,7 +2232,7 @@
     </message>
     <message>
       <source>On %1 %2</source>
-      <translation type="unfinished">On %1 %2</translation>
+      <translation>%1 %2 дээр</translation>
     </message>
     <message>
       <source>Trigger Name</source>
@@ -2271,7 +2271,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Мэдэгдэл</translation>
     </message>
     <message>
       <source>Analytics Event</source>
@@ -2284,15 +2284,15 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Хадгалалтын асуудал</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>%1 дээр хадгалалтын асуудал</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation type="unfinished">Set to fullscreen</translation>
+      <translation>Дэлгэцийг томруулах</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
@@ -2300,19 +2300,19 @@
     </message>
     <message>
       <source>Open layout</source>
-      <translation type="unfinished">Open layout</translation>
+      <translation>Хавтас нээх</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>%1 үйл явдлууд болсон байна</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>&quot;%1&quot; аналитикын хадгалалт унтарсан байна.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>&quot;%1&quot; аналитикын хадгалалт дүүрч байна.</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
@@ -2324,7 +2324,7 @@
     </message>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>Дуут дохио</translation>
     </message>
     <message>
       <source>Archive Backup Finished</source>
@@ -2353,11 +2353,11 @@
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation type="unfinished">Show desktop notification</translation>
+      <translation>Мэдэгдлийг харах</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>Гар утсанд мэдэгдэл илгээх</translation>
     </message>
     <message>
       <source>Consumption</source>
@@ -2382,7 +2382,7 @@
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>&apos;%2&apos; камер дээр %1</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
@@ -2394,7 +2394,7 @@
     </message>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Объект илэрсэн</translation>
     </message>
     <message>
       <source>Archive backup failed</source>
@@ -2456,15 +2456,15 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Камерын холболт (үндсэн дамжуулалт) саллаа.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Камерын холболт (хоёрдогч дамжуулалт) саллаа.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Төхөөрөмжийн холболт саллаа.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>

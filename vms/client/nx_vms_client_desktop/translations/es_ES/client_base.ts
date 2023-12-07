@@ -1081,6 +1081,10 @@
       <source>User Manual...</source>
       <translation>Manual de usuario...</translation>
     </message>
+    <message>
+      <source>Convert to Shared Layout</source>
+      <translation type="unfinished">Convert to Shared Layout</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>

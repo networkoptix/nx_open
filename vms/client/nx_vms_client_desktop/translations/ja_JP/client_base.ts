@@ -1078,6 +1078,10 @@
       <source>User Manual...</source>
       <translation>ユーザーマニュアル...</translation>
     </message>
+    <message>
+      <source>Convert to Shared Layout</source>
+      <translation>共有レイアウトに変換</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>

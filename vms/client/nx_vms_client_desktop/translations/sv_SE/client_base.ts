@@ -1081,6 +1081,10 @@
       <source>User Manual...</source>
       <translation>Användarmanual...</translation>
     </message>
+    <message>
+      <source>Convert to Shared Layout</source>
+      <translation>Konvertera till delad layout</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>

@@ -1078,6 +1078,10 @@
       <source>User Manual...</source>
       <translation>Hướng dẫn sử dụng...</translation>
     </message>
+    <message>
+      <source>Convert to Shared Layout</source>
+      <translation type="unfinished">Convert to Shared Layout</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>

@@ -5,19 +5,19 @@
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Систем</translation>
     </message>
     <message>
       <source>System (%1)</source>
       <comment>%1 is ip and port of system</comment>
-      <translation type="unfinished">System (%1)</translation>
+      <translation>Систем (%1)</translation>
     </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Шинэ сервер</translation>
     </message>
   </context>
   <context>
@@ -32,26 +32,26 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Эзэмшигч: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Таны систем</translation>
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Шинэ систем</translation>
     </message>
   </context>
   <context>
     <name>RemoteConnectionErrorStrings</name>
     <message>
       <source>Client version: %1</source>
-      <translation type="unfinished">Client version: %1</translation>
+      <translation>Хэрэглэгчийн хувилбар: %1</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
-      <translation type="unfinished">Server version: %1.</translation>
+      <translation>Серверийн хувилбар: %1.</translation>
     </message>
     <message>
       <source>Incompatible server</source>
@@ -67,7 +67,7 @@
     </message>
     <message>
       <source>Invalid certificate</source>
-      <translation type="unfinished">Invalid certificate</translation>
+      <translation>Хүчингүй сертификат</translation>
     </message>
     <message>
       <source>The server&amp;apos;s certificate was rejected.</source>
@@ -105,11 +105,11 @@
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation type="unfinished">Invalid login or password</translation>
+      <translation>Нэвтрэх нэр эсвэл нууц үг буруу байна</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>
-      <translation type="unfinished">Incorrect username or password.</translation>
+      <translation>Хэрэглэгчийн нэр эсвэл нууц үг буруу байна.</translation>
     </message>
     <message>
       <source>User is disabled</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Та түр хүлээгээд дахин оролдоно уу.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -125,34 +125,34 @@
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Алдаа гарлаа. Та түр хүлээгээд дахин оролдоно уу.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your system administrator.</translation>
+      <translation>Та системийн админтай холбогдоно уу.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>%1-т холбогдож чадсангүй. Та интернэт холболтоо шалгаад дахин оролдоно уу.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+      <translation>%1-т холбогдож чадсангүй. Та серверийн интернэт холболтоо шалгаад дахин оролдоно уу.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>Сервертэй холбогдох боломжгүй байна. Та түр хүлээгээд дахин оролдоно уу.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Таны нэвтрэх хугацаа дууссан байна</translation>
     </message>
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>%1 ээр дахин нэвтэрнэ үү.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
@@ -161,11 +161,11 @@
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+      <translation>Системийн админ хэрэглэгчийн нэвтрэх хугацааг тохируулах боломтой.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Системийн админ уг хэрэглэгчийг идэвхигүй болгосон байна.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
