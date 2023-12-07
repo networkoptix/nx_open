@@ -19,7 +19,11 @@ class NX_VMS_CLIENT_CORE_API FontConfig: public QQmlPropertyMap
     using base_type = QQmlPropertyMap;
 
 public:
-    FontConfig(const QFont& baseFont, const QString& mainFontsFile, QObject* parent = nullptr);
+    FontConfig(
+        const QFont& baseFont,
+        const QString& basicFontsFileName,
+        const QString& overrideFontsFileName,
+        QObject* parent = nullptr);
     virtual ~FontConfig() override;
 
     Q_INVOKABLE QFont font(const QString& name) const;
