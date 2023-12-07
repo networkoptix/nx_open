@@ -61,6 +61,9 @@ public:
     bool hasAccessRights(const QnResourceAccessSubject& subject, const QnUuid& resourceGroupId,
         nx::vms::api::AccessRights requiredAccessRights) const;
 
+    nx::core::access::ResourceAccessMap resourceAccessMap(
+        const QnResourceAccessSubject& subject) const;
+
     /**
      * @param subject User or role to get global permissions for.
      * @returns Global permissions of the given user, adjusted to take dependencies and
