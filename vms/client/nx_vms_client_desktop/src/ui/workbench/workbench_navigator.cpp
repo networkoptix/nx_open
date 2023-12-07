@@ -2182,17 +2182,23 @@ void QnWorkbenchNavigator::updateCalendarFromSlider()
     const auto targetEnd = QDateTime::fromMSecsSinceEpoch(
         m_timeSlider->windowTargetEnd().count() + m_calendar->displayOffset);
 
-    if (!m_timeSlider->isAnimatingWindow()
-        || m_calendar->selection().start != targetStart
-        || m_calendar->selection().end != targetEnd)
+    auto selection = m_calendar->selection();
+
+    if (!m_timeSlider->isAnimatingWindowToCertainPosition() || selection.start != targetStart)
+    {
+        selection.start = QDateTime::fromMSecsSinceEpoch(
+            m_timeSlider->windowStart().count() + m_calendar->displayOffset);
+    }
+    if (!m_timeSlider->isAnimatingWindowToCertainPosition() || selection.end != targetEnd)
+    {
+        selection.end = QDateTime::fromMSecsSinceEpoch(
+            m_timeSlider->windowEnd().count() + m_calendar->displayOffset);
+    }
+
+    if (m_calendar->selection() != selection)
     {
         QScopedValueRollback<bool> guard(m_updatingCalendarFromSlider, true);
-
-        m_calendar->selection = {
-            QDateTime::fromMSecsSinceEpoch(
-                m_timeSlider->windowStart().count() + m_calendar->displayOffset),
-            QDateTime::fromMSecsSinceEpoch(
-                m_timeSlider->windowEnd().count() + m_calendar->displayOffset)};
+        m_calendar->selection = selection;
     }
 }
 
