@@ -49,6 +49,10 @@ public:
     void createIntercomButtons();
     void removeIntercomButtons();
 
+    QnTwoWayAudioWidget * twoWayAudioWidget() const {
+        return m_twoWayAudioWidget;
+    }
+
 signals:
     void ioStateChanged(const QnIOStateData& value);
 

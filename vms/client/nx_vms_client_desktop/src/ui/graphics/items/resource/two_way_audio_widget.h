@@ -7,6 +7,8 @@
 
 #include <nx/utils/impl_ptr.h>
 
+class QnImageButtonWidget;
+
 class QnTwoWayAudioWidget: public GraphicsWidget
 {
     Q_OBJECT
@@ -20,6 +22,8 @@ public:
     virtual ~QnTwoWayAudioWidget() override;
 
     void setFixedHeight(qreal height);
+
+    QnImageButtonWidget *button() const;
 
 signals:
     void pressed();

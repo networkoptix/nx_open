@@ -48,6 +48,10 @@ void QnTwoWayAudioWidget::setFixedHeight(qreal height)
     d->setFixedHeight(height);
 }
 
+QnImageButtonWidget *QnTwoWayAudioWidget::button() const {
+    return d->button;
+}
+
 void QnTwoWayAudioWidget::paint(
     QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
