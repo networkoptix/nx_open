@@ -1701,16 +1701,6 @@
 <context>
     <name>PtzPromoOverlay</name>
     <message>
-        <source>Introducing you
-new PTZ controls</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Here is a quick presentation
-of what has changed</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Drag over any part of the video
 to activate PTZ</source>
         <translation></translation>
@@ -1728,10 +1718,6 @@ to activate PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Target Lock Tracking</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1741,6 +1727,22 @@ to activate PTZ</source>
     </message>
     <message>
         <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Introducing
+New PTZ controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Here is a quick guide
+on what has changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
