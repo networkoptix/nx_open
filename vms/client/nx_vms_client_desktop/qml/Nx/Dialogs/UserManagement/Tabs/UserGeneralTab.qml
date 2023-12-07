@@ -816,7 +816,7 @@ Item
             style: DialogBanner.Style.Error
             closeable: true
             watchToReopen: control.userId
-            visible: control.ldapError && !closed
+            visible: control.ldapError && !closed && !control.isSelf
             Layout.fillWidth: true
 
             text: qsTr("This user is not found in LDAP database and is not able to log in.")
@@ -834,7 +834,7 @@ Item
             style: DialogBanner.Style.Error
             closeable: true
             watchToReopen: control.userId
-            visible: control.ldapOffline && !closed
+            visible: control.ldapOffline && !closed && !control.isSelf
             Layout.fillWidth: true
 
             text: qsTr("LDAP server is offline. User is not able to log in.")
@@ -843,7 +843,7 @@ Item
         DialogBanner
         {
             style: DialogBanner.Style.Error
-            visible: !control.nameIsUnique && control.userEnabled && !closed
+            visible: !control.nameIsUnique && control.userEnabled && !closed && !control.isSelf
             closeable: true
             watchToReopen: control.userId
             Layout.fillWidth: true
