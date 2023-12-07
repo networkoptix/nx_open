@@ -1457,6 +1457,11 @@ bool QnTimeSlider::isAnimatingWindow() const
         || m_kineticScrollHandler->kineticProcessor()->isRunning();
 }
 
+bool QnTimeSlider::isAnimatingWindowToCertainPosition() const
+{
+    return m_animatingSliderWindow;
+}
+
 bool QnTimeSlider::scaleWindow(qreal factor, milliseconds anchor)
 {
     qreal targetMSecsPerPixel = m_msecsPerPixel * factor;
