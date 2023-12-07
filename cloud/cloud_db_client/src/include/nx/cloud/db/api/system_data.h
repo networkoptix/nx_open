@@ -9,6 +9,8 @@
 #include <vector>
 #include <map>
 
+#include <nx/reflect/instrument.h>
+
 namespace nx::cloud::db::api {
 
 /**
@@ -358,6 +360,9 @@ struct UserSessionDescriptor
     std::optional<std::string> systemId;
 };
 
+//-------------------------------------------------------------------------------------------------
+// Merge.
+
 struct MergeRequest
 {
     /**%apidoc The system to merge to another system. This is the system that disappears
@@ -376,6 +381,53 @@ struct MergeRequest
       */
     std::optional<std::string> slaveSystemAccessToken;
 };
+
+NX_REFLECTION_ENUM_CLASS(VmsServerMergeStatus,
+
+    /**%apidoc Merge success. */
+    success,
+
+    /**%apidoc Server is not merged because it was offline when merge is started. */
+    offline,
+
+    /**%apidoc Server is not merged because /api/configure returns error. */
+    networkError,
+
+    /**%apidoc Server reported unrecognized status. */
+    unknown
+)
+
+/**%apidoc VMS server merge attempt result. */
+struct VmsServerMergeResult
+{
+    /**%apidoc id of VMS server. */
+    std::string serverId;
+
+    /**%apidoc Server name. */
+    std::string serverName;
+
+    /**%apidoc Server merge status. */
+    VmsServerMergeStatus status = VmsServerMergeStatus::success;
+
+    /**%apidoc Human-readable error message. */
+    std::string errorText;
+
+    bool operator==(const VmsServerMergeResult&) const = default;
+};
+
+NX_REFLECTION_INSTRUMENT(VmsServerMergeResult, (serverId)(serverName)(status)(errorText))
+
+struct MergeReply
+{
+    /**%apidoc The list of VMS servers of the slave system that could not be merged into the
+     * target system.
+     */
+    std::vector<VmsServerMergeResult> failedServers;
+};
+
+NX_REFLECTION_INSTRUMENT(MergeReply, (failedServers))
+
+//-------------------------------------------------------------------------------------------------
 
 enum class FilterField
 {

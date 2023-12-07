@@ -57,6 +57,9 @@ nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resul
         case ResultCode::retryLater:
         case ResultCode::vmsRequestFailure:
             return nx::network::http::StatusCode::serviceUnavailable;
+
+        case ResultCode::mergeCompletedPartially:
+            return nx::network::http::StatusCode::multiStatus;
     }
 
     return nx::network::http::StatusCode::internalServerError;
@@ -94,19 +97,6 @@ nx::network::http::ApiRequestResult apiResultToFusionRequestResult(Result result
     if (result == ResultCode::ok)
         return nx::network::http::ApiRequestResult();
 
-    if (result == ResultCode::noContent)
-    {
-        nx::network::http::ApiRequestResult res(
-            nx::network::http::ApiRequestErrorClass::logicError,
-            toString(result.code),
-            static_cast<int>(result.code),
-            result.description.empty()
-                ? toString(result.code)
-                : result.description);
-        res.setHttpStatusCode(nx::network::http::StatusCode::noContent);
-        return res;
-    }
-
     nx::network::http::ApiRequestErrorClass requestResultCode =
         nx::network::http::ApiRequestErrorClass::noError;
     switch (result.code)
@@ -131,6 +121,8 @@ nx::network::http::ApiRequestResult apiResultToFusionRequestResult(Result result
 
         case ResultCode::notFound:
         case ResultCode::alreadyExists:
+        case ResultCode::noContent:
+        case ResultCode::mergeCompletedPartially:
             requestResultCode = nx::network::http::ApiRequestErrorClass::logicError;
             break;
 
@@ -145,13 +137,15 @@ nx::network::http::ApiRequestResult apiResultToFusionRequestResult(Result result
             break;
     }
 
-    return nx::network::http::ApiRequestResult(
+    nx::network::http::ApiRequestResult apiResult(
         requestResultCode,
         toString(result.code),
         static_cast<int>(result.code),
         result.description.empty()
             ? toString(result.code)
             : result.description);
+    apiResult.setHttpStatusCode(resultCodeToHttpStatusCode(result.code));
+    return apiResult;
 }
 
 ResultCode fusionRequestResultToResultCode(nx::network::http::ApiRequestResult result)

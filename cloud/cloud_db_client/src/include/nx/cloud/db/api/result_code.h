@@ -39,8 +39,15 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
     invalidNonce,
     serviceUnavailable,
     notAllowedInCurrentState,
+
+    // Merge specific codes.
+
     mergedSystemIsOffline,
     vmsRequestFailure,
+
+    /** Not all servers of the slave system have been merged into the target system. */
+    mergeCompletedPartially,
+
     invalidTotp,
     invalidBackupCode,
     userPasswordRequired,

@@ -255,10 +255,14 @@ std::string toString(Value val)
             return "OK";
         case created:
             return "Created";
+        case accepted:
+            return "Accepted";
         case noContent:
             return "No Content";
         case partialContent:
             return "Partial Content";
+        case multiStatus:
+            return "Multi-Status";
         case multipleChoices:
             return "Multiple Choices";
         case movedPermanently:
