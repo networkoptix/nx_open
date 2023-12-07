@@ -1081,6 +1081,10 @@
       <source>User Manual...</source>
       <translation>Kullanım kılavuzu...</translation>
     </message>
+    <message>
+      <source>Convert to Shared Layout</source>
+      <translation>Paylaşılan Ekran Düzenine Dönüştür</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>

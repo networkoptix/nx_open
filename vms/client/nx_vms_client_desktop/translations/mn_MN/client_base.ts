@@ -36,7 +36,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Системийн үйл явдал</translation>
     </message>
   </context>
   <context>
@@ -1080,6 +1080,10 @@
     <message>
       <source>User Manual...</source>
       <translation type="unfinished">User Manual...</translation>
+    </message>
+    <message>
+      <source>Convert to Shared Layout</source>
+      <translation type="unfinished">Convert to Shared Layout</translation>
     </message>
   </context>
   <context>
@@ -3299,7 +3303,7 @@ to %1</translation>
     <name>QnCustomFileDialog</name>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Зургууд</translation>
     </message>
     <message>
       <source>Video</source>
@@ -5281,7 +5285,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Хэмжээ</translation>
     </message>
   </context>
   <context>
@@ -5390,7 +5394,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Сервисүүд</translation>
     </message>
     <message>
       <source>Failed to save system settings</source>
@@ -9045,7 +9049,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Болих</translation>
     </message>
     <message>
       <source>New Group</source>
@@ -9065,7 +9069,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Хадгалах</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -9290,7 +9294,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Тийм</translation>
     </message>
     <message>
       <source>Apply Settings</source>
@@ -11858,7 +11862,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Хадгалах</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -11870,7 +11874,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Болих</translation>
     </message>
     <message>
       <source>Copy Access Link</source>

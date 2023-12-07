@@ -1608,6 +1608,10 @@
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
       <translation>Använd %1 eller %2 för att välja flera resurser, eller %3 för att rensa urvalet</translation>
     </message>
+    <message>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation>Resurstabellen ger dig en översikt över användar- eller gruppbehörigheter och låter dig tilldela behörigheter för specifika resurser. Om du väljer en behörighet som beror på en annan behörighet kommer båda behörigheterna att beviljas automatiskt.</translation>
+    </message>
   </context>
   <context>
     <name>Plugins</name>
