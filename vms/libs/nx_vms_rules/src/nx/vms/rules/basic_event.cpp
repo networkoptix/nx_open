@@ -4,6 +4,8 @@
 
 #include <QtCore/QMetaProperty>
 
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/common/system_context.h>
 
@@ -65,6 +67,14 @@ QString BasicEvent::aggregationKey() const
 QString BasicEvent::cacheKey() const
 {
     return {};
+}
+
+QString BasicEvent::source(common::SystemContext* context) const
+{
+    if (auto resource = context->resourcePool()->getResourceById(sourceId()))
+        return resource->getName();
+
+    return sourceId().toString();
 }
 
 QVariantMap BasicEvent::details(common::SystemContext* context) const

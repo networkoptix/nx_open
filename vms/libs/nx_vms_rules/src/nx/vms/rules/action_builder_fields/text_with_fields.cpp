@@ -2,6 +2,8 @@
 
 #include "text_with_fields.h"
 
+#include <QtCore/QDateTime>
+
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/metatypes.h>
@@ -165,6 +167,19 @@ QString eventTimeEnd(const AggregatedEventPtr& eventAggregator, common::SystemCo
     return eventTime(eventAggregator, context);
 }
 
+QString eventTimestamp(const AggregatedEventPtr& eventAggregator, common::SystemContext*)
+{
+    QDateTime time;
+    time = time.addMSecs(
+        std::chrono::duration_cast<std::chrono::milliseconds>(eventAggregator->timestamp()).count());
+    return time.toString();
+}
+
+QString eventSource(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+{
+    return eventAggregator->initialEvent()->source(context);
+}
+
 const QMap<QString, FormatFunction> kFormatFunctions = {
     { "@CreateGuid", &createGuid },
     { "@EventType", &eventType },
@@ -174,7 +189,13 @@ const QMap<QString, FormatFunction> kFormatFunctions = {
     { "@ExtendedEventDescription", &extendedEventDescription },
     { "event.time", &eventTime },
     { "event.time.start", &eventTimeStart },
-    { "event.time.end", &eventTimeEnd }
+    { "event.time.end", &eventTimeEnd },
+    { "event.timestamp", &eventTimestamp },
+    { "event.name", &eventName },
+    { "event.source", &eventSource },
+    { "event.caption", &eventCaption },
+    { "event.description", &eventDescription },
+    { "event.type", &eventType },
 };
 
 FormatFunction formatFunction(const QString& name)

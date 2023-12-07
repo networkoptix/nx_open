@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <QtCore/QObject>
+#include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
 
@@ -48,6 +49,8 @@ public:
 
     State state() const;
     void setState(State state);
+
+    QString source(common::SystemContext* context) const;
 
     /**
      * Key for more detailed event aggregation. Used in SendMailAction.
