@@ -90,6 +90,11 @@ nx::vms::api::AccessRights AccessRightsResolver::accessRights(const QnUuid& subj
     return d->inheritedResourceAccessResolver->resourceAccessMap(subjectId).value(resourceGroupId);
 }
 
+ResourceAccessMap AccessRightsResolver::resourceAccessMap(const QnUuid& subjectId) const
+{
+    return d->inheritedResourceAccessResolver->resourceAccessMap(subjectId);
+}
+
 nx::vms::api::GlobalPermissions AccessRightsResolver::globalPermissions(
     const QnUuid& subjectId) const
 {
