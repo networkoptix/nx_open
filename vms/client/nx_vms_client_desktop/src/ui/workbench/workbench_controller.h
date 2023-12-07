@@ -287,6 +287,7 @@ private:
     };
     ShiftDirection m_rewindDirection = ShiftDirection::noShift;
     QTimer* const m_rewindTimer;
+    QTimer* const m_rewindShortPressTimer;
 
-    QElapsedTimer m_rewindButtonPressedTimer;
+    QElapsedTimer m_rewindDoubleClickTimer;
 };
