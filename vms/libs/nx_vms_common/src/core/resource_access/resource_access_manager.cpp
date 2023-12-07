@@ -180,6 +180,14 @@ bool QnResourceAccessManager::hasAccessRights(const QnResourceAccessSubject& sub
         || accessRights(subject, resourceGroupId).testFlags(requiredAccessRights);
 }
 
+ResourceAccessMap QnResourceAccessManager::resourceAccessMap(
+    const QnResourceAccessSubject& subject) const
+{
+    return subject.isValid()
+        ? m_accessRightsResolver->resourceAccessMap(subject.id())
+        : ResourceAccessMap{};
+}
+
 GlobalPermissions QnResourceAccessManager::globalPermissions(
     const QnResourceAccessSubject& subject) const
 {
