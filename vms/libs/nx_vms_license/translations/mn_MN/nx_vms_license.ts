@@ -84,7 +84,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Үл мэдэгдэх алдаа</translation>
     </message>
   </context>
 </TS>
