@@ -1,6 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <chrono>
 #include <gtest/gtest.h>
+
+#include <QtCore/QString>
 
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
@@ -92,6 +95,19 @@ TEST_F(ActionFieldTest, EventTimeInstantEvent)
     EXPECT_EQ(nx::utils::timestampToISO8601(event->timestamp()), field.build(event).toString());
 }
 
+TEST_F(ActionFieldTest, EventTimestamp)
+{
+    TextWithFields field(systemContext());
+    field.setText("{event.timestamp}");
+    auto event = AggregatedEventPtr::create(makeEvent());
+
+    QDateTime time;
+    time = time.addMSecs(
+        std::chrono::duration_cast<std::chrono::milliseconds>(event->timestamp()).count());
+
+    EXPECT_EQ(time.toString(), field.build(event).toString());
+}
+
 TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
 {
     TextWithFields fieldStartTime(systemContext());
@@ -163,10 +179,28 @@ TEST_F(ActionFieldTest, EventType)
         field.build(AggregatedEventPtr::create(makeEvent())).toString());
 }
 
+TEST_F(ActionFieldTest, EventDotType)
+{
+    TextWithFields field(systemContext());
+    field.setText("{event.type}");
+    EXPECT_EQ(
+        TestEvent::manifest().id,
+        field.build(AggregatedEventPtr::create(makeEvent())).toString());
+}
+
 TEST_F(ActionFieldTest, EventName)
 {
     TextWithFields field(systemContext());
     field.setText("{@EventName}");
+    EXPECT_EQ(
+        TestEvent::manifest().displayName,
+        field.build(AggregatedEventPtr::create(makeEvent())).toString());
+}
+
+TEST_F(ActionFieldTest, EventDotName)
+{
+    TextWithFields field(systemContext());
+    field.setText("{event.name}");
     EXPECT_EQ(
         TestEvent::manifest().displayName,
         field.build(AggregatedEventPtr::create(makeEvent())).toString());
@@ -179,6 +213,21 @@ TEST_F(ActionFieldTest, EventCaption)
     auto eventAggregator = AggregatedEventPtr::create(event);
 
     field.setText("{@EventCaption}");
+    EXPECT_EQ(TestEvent::manifest().displayName, field.build(eventAggregator).toString());
+
+    constexpr auto kEventCaption = "Test caption";
+    event->setProperty("caption", kEventCaption);
+
+    EXPECT_EQ(kEventCaption, field.build(eventAggregator).toString());
+}
+
+TEST_F(ActionFieldTest, EventDotCaption)
+{
+    TextWithFields field(systemContext());
+    auto event = makeEvent();
+    auto eventAggregator = AggregatedEventPtr::create(event);
+
+    field.setText("{event.caption}");
     EXPECT_EQ(TestEvent::manifest().displayName, field.build(eventAggregator).toString());
 
     constexpr auto kEventCaption = "Test caption";
@@ -200,6 +249,33 @@ TEST_F(ActionFieldTest, EventDescription)
     event->setProperty("description", kEventDescription);
 
     EXPECT_EQ(kEventDescription, field.build(eventAggregator).toString());
+}
+
+TEST_F(ActionFieldTest, EventDotDescription)
+{
+    TextWithFields field(systemContext());
+    auto event = makeEvent();
+    auto eventAggregator = AggregatedEventPtr::create(event);
+
+    field.setText("{event.description}");
+    EXPECT_EQ(TestEvent::manifest().description, field.build(eventAggregator).toString());
+
+    constexpr auto kEventDescription = "Test description override";
+    event->setProperty("description", kEventDescription);
+
+    EXPECT_EQ(kEventDescription, field.build(eventAggregator).toString());
+}
+
+TEST_F(ActionFieldTest, EventDotSource)
+{
+    TextWithFields field(systemContext());
+    auto event = makeEvent();
+    auto eventAggregator = AggregatedEventPtr::create(event);
+
+    field.setText("{event.source}");
+    static const auto kZeroId = u"{00000000-0000-0000-0000-000000000000}";
+
+    EXPECT_EQ(kZeroId, field.build(eventAggregator).toString());
 }
 
 TEST_F(ActionFieldTest, EventTooltip)
