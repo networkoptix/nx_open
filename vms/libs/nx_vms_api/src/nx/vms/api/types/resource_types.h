@@ -291,6 +291,9 @@ enum ServerFlag
     SF_HasBuzzer = 0x10000000,
 
     SF_AdminApiForPowerUsers = 0x20000000,
+
+    /**%apidoc Server runs inside a Docker container. */
+    SF_Docker = 0x40000000,
 };
 Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
@@ -320,7 +323,8 @@ constexpr auto nxReflectVisitAllEnumItems(ServerFlag*, Visitor&& visitor)
         // For compatibility with existing APIs we should serialize this value to
         // "SF_OwnerApiForAdmins" by default.
         Item{ServerFlag::SF_AdminApiForPowerUsers, "SF_OwnerApiForAdmins"},
-        Item{ServerFlag::SF_AdminApiForPowerUsers, "SF_AdminApiForPowerUsers"}
+        Item{ServerFlag::SF_AdminApiForPowerUsers, "SF_AdminApiForPowerUsers"},
+        Item{ServerFlag::SF_Docker, "SF_Docker"}
     );
 }
 
