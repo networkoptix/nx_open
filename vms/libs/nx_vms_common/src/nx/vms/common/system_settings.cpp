@@ -366,8 +366,9 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     m_systemNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::systemName, QString(), this, [] { return tr("System name"); });
 
-    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::localSystemId, QString(), this, [] { return tr("Local System ID"); });
+    m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
+        Names::localSystemId, QnUuid(), this,
+        [] { return tr("Local System ID, null means the System is not set up yet."); });
 
     m_lastMergeMasterIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::lastMergeMasterId, QString(), this, [] { return tr("Last master System merge ID"); });
@@ -1418,13 +1419,16 @@ void SystemSettings::setUpnpPortMappingEnabled(bool value)
 QnUuid SystemSettings::localSystemId() const
 {
     NX_VERBOSE(this, "Providing local System ID %1", m_localSystemIdAdaptor->value());
-    return QnUuid(m_localSystemIdAdaptor->value());
+    return m_localSystemIdAdaptor->value();
 }
 
 void SystemSettings::setLocalSystemId(const QnUuid& value)
 {
-    NX_DEBUG(this, "Changing local System ID from %1 to %2", m_localSystemIdAdaptor->value(), value);
-    m_localSystemIdAdaptor->setValue(value.toString());
+    if (const auto oldValue = m_localSystemIdAdaptor->value(); oldValue != value)
+    {
+        NX_DEBUG(this, "Changing local System ID from %1 to %2", oldValue, value);
+        m_localSystemIdAdaptor->setValue(value);
+    }
 }
 
 QnUuid SystemSettings::lastMergeMasterId() const
