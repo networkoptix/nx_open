@@ -1746,8 +1746,8 @@
       <translation>組織 ID</translation>
     </message>
     <message>
-      <source>Interval between the Cloud polling HTTP requests to synchronize the data, if zero then the transaction message bus is used</source>
-      <translation>データを同期するためにクラウドが HTTP リクエストをポーリングする間隔。ゼロの場合、トランザクションメッセージバスが使用されます。</translation>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+      <translation>データを同期するためにクラウドが HTTP リクエストをポーリングする間隔。</translation>
     </message>
   </context>
   <context>

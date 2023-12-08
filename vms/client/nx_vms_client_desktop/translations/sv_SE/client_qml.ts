@@ -1707,18 +1707,6 @@
   <context>
     <name>PtzPromoOverlay</name>
     <message>
-      <source>Introducing you
-new PTZ controls</source>
-      <translation>Vi presenterar dig
-nya PTZ-kontroller</translation>
-    </message>
-    <message>
-      <source>Here is a quick presentation
-of what has changed</source>
-      <translation>Här är en snabb presentation
-av vad som har förändrats</translation>
-    </message>
-    <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
       <translation>Dra över någon del av videon
@@ -1737,10 +1725,6 @@ att aktivera PTZ</translation>
       <translation>Använd mushjulet för att zooma</translation>
     </message>
     <message>
-      <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-      <translation>Klicka, dubbelklicka eller dra muspekaren medan du trycker på Skift-tangenten för att använda avancerad PTZ</translation>
-    </message>
-    <message>
       <source>Target Lock Tracking</source>
       <translation>Spårning av mållås</translation>
     </message>
@@ -1751,6 +1735,26 @@ att aktivera PTZ</translation>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation>Du kan aktivera den här guiden igen genom att gå till lokala inställningar &gt; Avancerat &gt; Återställ alla varningar</translation>
+    </message>
+    <message>
+      <source>Introducing
+New PTZ controls</source>
+      <translation>Introducerar
+Nya PTZ-kontroller</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed</source>
+      <translation>Här är en snabbguide
+om vad som har förändrats</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
+      <translation>Klicka, dubbelklicka eller dra
+muspekare samtidigt som du trycker på
+Shift-tangent för att använda Advanced PTZ</translation>
     </message>
   </context>
   <context>

@@ -1696,18 +1696,6 @@
   <context>
     <name>PtzPromoOverlay</name>
     <message>
-      <source>Introducing you
-new PTZ controls</source>
-      <translation>Giới thiệu với bạn
-trình điều khiển PTZ mới</translation>
-    </message>
-    <message>
-      <source>Here is a quick presentation
-of what has changed</source>
-      <translation>Đây là bản báo cáo nhanh
-về những thay đổi gần đây</translation>
-    </message>
-    <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
       <translation>Kéo qua bất kỳ phần nào của video
@@ -1726,10 +1714,6 @@ to activate PTZ</source>
       <translation>Sử dụng con lăn chuột để thu phóng</translation>
     </message>
     <message>
-      <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-      <translation>Nhấp, nhấp đúp hoặc kéo con trỏ chuột cùng với nhấn phím Shift để sử dụng trình PTZ nâng cao</translation>
-    </message>
-    <message>
       <source>Target Lock Tracking</source>
       <translation>Theo dõi khóa mục tiêu</translation>
     </message>
@@ -1740,6 +1724,26 @@ to activate PTZ</source>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation>Bạn có thể bật lại hướng dẫn này bằng cách đi tới Cài đặt cục bộ &gt; Nâng cao &gt; Đặt lại tất cả cảnh báo</translation>
+    </message>
+    <message>
+      <source>Introducing
+New PTZ controls</source>
+      <translation type="unfinished">Introducing
+New PTZ controls</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed</source>
+      <translation type="unfinished">Here is a quick guide
+on what has changed</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
+      <translation type="unfinished">Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</translation>
     </message>
   </context>
   <context>
