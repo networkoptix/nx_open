@@ -489,7 +489,7 @@ void UserGroupsWidget::Private::setupUi()
     deleteSelectedButton->setFlat(true);
     connect(deleteSelectedButton, &QPushButton::clicked, this, &Private::deleteSelected);
 
-    constexpr int kButtonBarHeight = 32;
+    constexpr int kButtonBarHeight = 40;
     selectionControls->setFixedHeight(kButtonBarHeight);
 
     setPaletteColor(selectionControls, QPalette::Window, core::colorTheme()->color("dark11"));
