@@ -603,7 +603,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_statisticsReportTimeCycleAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_statisticsReportUpdateDelayAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_upnpPortMappingEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString>* m_localSystemIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnUuid>* m_localSystemIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_lastMergeMasterIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_lastMergeSlaveIdAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_statisticsReportServerApiAdaptor = nullptr;
