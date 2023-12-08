@@ -93,7 +93,7 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
             const bool leftCustom = isCustomUser(leftUser);
             const bool rightCustom = isCustomUser(rightUser);
             if (leftCustom != rightCustom)
-                return leftCustom;
+                return rightCustom;
 
             return userLessThan(left, right, UserListModel::UserTypeColumn);
         }

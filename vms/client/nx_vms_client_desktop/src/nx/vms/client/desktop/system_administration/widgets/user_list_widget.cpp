@@ -494,7 +494,7 @@ void UserListWidget::Private::setupUi()
     deleteButton->setFlat(true);
     editButton->setFlat(true);
 
-    constexpr int kButtonBarHeight = 32;
+    constexpr int kButtonBarHeight = 40;
     selectionControls->setFixedHeight(kButtonBarHeight);
 
     setPaletteColor(selectionControls, QPalette::Window, core::colorTheme()->color("dark11"));
