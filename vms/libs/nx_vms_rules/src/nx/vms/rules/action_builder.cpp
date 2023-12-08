@@ -401,7 +401,9 @@ void ActionBuilder::processEvent(const EventPtr& event)
     if (!NX_ASSERT(eventDescriptor) || !NX_ASSERT(actionDescriptor))
         return;
 
-    if (isProlonged() && !rules::isProlonged(event))
+    const auto isEventProlonged = rules::isProlonged(event); //< Whether event state is 'started' or 'stopped'.
+    const auto isActionProlonged = isProlonged(); //< Whether action has 'prolonged' flag and duration is not set.
+    if (isActionProlonged && !isEventProlonged)
     {
         // Prolonged action without fixed duration must be started and stopped according to the
         // event state. As instant event does not have such states and not supported.
@@ -414,7 +416,8 @@ void ActionBuilder::processEvent(const EventPtr& event)
     static const auto aggregationKey = [](const EventPtr& e) { return e->aggregationKey(); };
     static const auto eventType = [](const EventPtr& e) { return e->type(); };
 
-    if (m_aggregator
+    if (!isActionProlonged //< Only events for instant or fixed duration action might be aggregated.
+        && m_aggregator //< Action has 'interval' field and interval value more than zero.
         && m_aggregator->aggregate(
             event, (aggregateByType ? eventType : aggregationKey)))
     {
