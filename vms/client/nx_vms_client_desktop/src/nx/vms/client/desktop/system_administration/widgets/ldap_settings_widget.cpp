@@ -122,11 +122,6 @@ struct LdapSettingsWidget::Private
                 };
             });
 
-        // Export TestState enum to QML.
-        qmlRegisterUncreatableType<LdapSettingsWidget>(
-            "nx.vms.client.desktop", 1, 0, "LdapSettings",
-            "Cannot create an instance of LdapSettings.");
-
         quickWidget->setMinimumSize({750, 450});
         quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
         quickWidget->setSource(kLdapSettingsQmlComponentUrl);
