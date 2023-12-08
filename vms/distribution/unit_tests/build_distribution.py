@@ -105,6 +105,7 @@ def get_go_unit_tests_list(tests_directory: str, metainfo):
         "nx_chunk_log_service_ut_service_ut",
         "nx_chunk_log_service_ut_sqlmodel_ut",
         "nx_chunk_log_service_ut_yugabytemodel_ut",
+        "nx_chunk_log_service_ut_mongodbmodel_ut",
         "nx_storage_cleaner_ut_chunklogapi_ut",
         "nx_storage_cleaner_ut_cssapi_ut",
         "nx_storage_cleaner_ut_dao_ut",
