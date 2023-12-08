@@ -647,6 +647,7 @@ Control
                             onClicked:
                             {
                                 model.isParent = !model.isParent
+                                popupObject.close()
                             }
                         }
                     }
