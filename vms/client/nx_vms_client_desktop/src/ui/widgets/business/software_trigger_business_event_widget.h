@@ -15,7 +15,7 @@ namespace nx { namespace vms { namespace event {
 class StringsHelper;
 }}} // namespace nx::vms::event
 
-class QnRequiredPermissionSubjectPolicy;
+class QnRequiredAccessRightPolicy;
 
 class QnSoftwareTriggerBusinessEventWidget: public QnAbstractBusinessParamsWidget
 {
@@ -41,5 +41,5 @@ private:
 private:
     QScopedPointer<Ui::SoftwareTriggerBusinessEventWidget> ui;
     QScopedPointer<nx::vms::event::StringsHelper> m_helper;
-    QScopedPointer<QnRequiredPermissionSubjectPolicy> m_validationPolicy;
+    QScopedPointer<QnRequiredAccessRightPolicy> m_validationPolicy;
 };
