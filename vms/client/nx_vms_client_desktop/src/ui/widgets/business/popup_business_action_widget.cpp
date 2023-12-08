@@ -126,9 +126,8 @@ void QnPopupBusinessActionWidget::updateValidationPolicy()
 
     if (forceAcknowledgement)
     {
-        auto validationPolicy = new QnRequiredPermissionSubjectPolicy(
-            Qn::ManageBookmarksPermission,
-            tr("Manage Bookmarks"));
+        auto validationPolicy = new QnRequiredAccessRightPolicy(
+            nx::vms::api::AccessRight::manageBookmarks);
         validationPolicy->setCameras(
             resourcePool()->getResourcesByIds<QnVirtualCameraResource>(model()->eventResources()));
         setValidationPolicy(validationPolicy);

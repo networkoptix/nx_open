@@ -57,9 +57,23 @@ AccessRightsList::AccessRightsList(QObject* parent):
             .description = common::html::bold(tr("Edit Settings") + ".") + " " +
                 tr("Depending on the resource type it either allows user to modify device settings"
                 " or to control video wall."),
-            .icon = QUrl(kIconsDir + "edit_settings_24x20.svg")}})
+            .icon = QUrl(kIconsDir + "edit_settings_24x20.svg")}}),
+    m_indexLookup(
+        [this]()
+        {
+            QHash<AccessRight, int> result;
+            for (int index = 0; index < m_items.size(); ++index)
+                result.insert(m_items[index].accessRight, index);
+            return result;
+        }())
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+}
+
+AccessRightDescriptor AccessRightsList::get(AccessRight accessRight) const
+{
+    const auto it = m_indexLookup.find(accessRight);
+    return NX_ASSERT(it != m_indexLookup.cend()) ? m_items[*it] : AccessRightDescriptor{};
 }
 
 AccessRightsList* AccessRightsList::instance()

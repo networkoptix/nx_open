@@ -10,11 +10,14 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/shared_resource_pointer.h>
+#include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
+
+class QnResourceAccessSubject;
 
 namespace QnBusiness {
 
@@ -229,18 +232,17 @@ public:
 };
 
 // Subject validation policy when one global permission is required.
-class QnRequiredPermissionSubjectPolicy: public QnSubjectValidationPolicy
+class QnRequiredAccessRightPolicy: public QnSubjectValidationPolicy
 {
-    Q_DECLARE_TR_FUNCTIONS(QnRequiredPermissionSubjectPolicy)
+    Q_DECLARE_TR_FUNCTIONS(QnRequiredAccessRightPolicy)
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    explicit QnRequiredPermissionSubjectPolicy(
-        Qn::Permission requiredPermission,
-        const QString& permissionName = QString(),
+    explicit QnRequiredAccessRightPolicy(
+        nx::vms::api::AccessRight requiredAccessRight,
         bool allowEmptySelection = false);
 
-    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual QValidator::State roleValidity(const QnUuid& groupId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
     virtual QString calculateAlert(bool allUsers, const QSet<QnUuid>& subjects) const override;
 
@@ -248,11 +250,10 @@ public:
     void setCameras(const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras);
 
 private:
-    bool isRoleValid(const QnUuid& roleId) const;
+    bool isSubjectValid(const QnResourceAccessSubject& subject) const;
 
 private:
-    const Qn::Permission m_requiredPermission;
-    const QString m_permissionName;
+    const nx::vms::api::AccessRight m_requiredAccessRight;
     QnSharedResourcePointerList<QnVirtualCameraResource> m_cameras;
 };
 
