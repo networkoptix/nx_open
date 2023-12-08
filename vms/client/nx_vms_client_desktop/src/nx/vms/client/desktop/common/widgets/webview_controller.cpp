@@ -47,6 +47,8 @@
 #include <ui/dialogs/common/password_dialog.h>
 #include <ui/graphics/items/standard/graphics_qml_view.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
 #include <utils/web_downloader.h>
 
 #include "webview_window.h"
@@ -972,18 +974,10 @@ void WebViewController::setCertificateValidator(CertificateValidationFunc valida
 
 void WebViewController::initClientApiSupport(
     WindowContext* context,
-    QnWorkbenchItem* item,
     ClientApiAuthCondition authCondition)
 {
     if (!NX_ASSERT(context))
         return;
-
-    registerApiObjectWithFactory("external",
-        [=](QObject* parent) -> QObject*
-        {
-            using External = integrations::c2p::jsapi::External;
-            return new External(item, parent);
-        });
 
     registerApiObjectWithFactory("vms.tab",
         [=](QObject* parent) -> QObject*
@@ -1019,17 +1013,33 @@ void WebViewController::initClientApiSupport(
                 parent);
         });
 
+    registerApiObjectWithFactory("vms",
+        [](QObject* parent) -> QObject*
+        {
+            return new jsapi::Globals(parent);
+        });
+}
+
+void WebViewController::initClientApiSupport(
+    QnWorkbenchItem* item,
+    ClientApiAuthCondition authCondition)
+{
+    if (!NX_ASSERT(item && item->layout()))
+        return;
+
+    registerApiObjectWithFactory("external",
+        [=](QObject* parent) -> QObject*
+        {
+            return new integrations::c2p::jsapi::External(item, parent);
+        });
+
     registerApiObjectWithFactory("vms.self",
         [=](QObject* parent) -> QObject*
         {
             return new jsapi::Self(item, parent);
         });
 
-    registerApiObjectWithFactory("vms",
-        [](QObject* parent) -> QObject*
-        {
-            return new jsapi::Globals(parent);
-        });
+    initClientApiSupport(item->layout()->windowContext(), authCondition);
 }
 
 void WebViewController::registerMetaType()

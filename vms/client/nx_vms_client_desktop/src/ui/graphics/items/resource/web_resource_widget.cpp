@@ -117,7 +117,7 @@ QnWebResourceWidget::QnWebResourceWidget(
             return ClientApiAuthDialog::isApproved(resource, url);
         };
 
-    controller->initClientApiSupport(windowContext, this->item(), authCondition);
+    controller->initClientApiSupport(this->item(), authCondition);
     controller->setLoadIcon(true);
 }
 

@@ -39,9 +39,7 @@ QnVirtualCameraResourcePtr findCameraByName(QnResourcePool* resourcePool, const 
 
 struct External::Private: public QObject, public WindowContextAware
 {
-    Private(
-        External* q,
-        QnWorkbenchItem* item);
+    Private(External* q, QnWorkbenchItem* item);
 
     void resetC2pLayout(
         const QnVirtualCameraResourceList& cameras,
@@ -52,11 +50,8 @@ struct External::Private: public QObject, public WindowContextAware
     const QPointer<QnWorkbenchItem> widgetItem;
 };
 
-External::Private::Private(
-    External* q,
-    QnWorkbenchItem* item)
-    :
-    WindowContextAware(item->layout()),
+External::Private::Private(External* q, QnWorkbenchItem* item):
+    WindowContextAware(item->layout()->windowContext()),
     q(q),
     layout(item->layout()),
     widgetItem(item)
@@ -153,10 +148,7 @@ void External::Private::resetC2pLayout(
 
 //-------------------------------------------------------------------------------------------------
 
-External::External(
-    QnWorkbenchItem* item,
-    QObject* parent)
-    :
+External::External(QnWorkbenchItem* item, QObject* parent):
     base_type(parent),
     d(new Private(this, item))
 {

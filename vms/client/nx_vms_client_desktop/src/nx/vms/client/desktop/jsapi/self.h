@@ -9,6 +9,8 @@
 
 class QnWorkbenchItem;
 
+namespace nx::vms::client::desktop { class WindowContext; }
+
 namespace nx::vms::client::desktop::jsapi {
 
 /**

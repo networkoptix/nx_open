@@ -58,7 +58,7 @@ int WebViewDialog::showUrl(
     if (enableClientApi && context)
     {
         auto authCondition = [](const QUrl&) { return true; };
-        m_webWidget->controller()->initClientApiSupport(context, /*item*/ nullptr, authCondition);
+        m_webWidget->controller()->initClientApiSupport(context, authCondition);
     }
 
     return exec();
