@@ -60,12 +60,6 @@ NX_BRANDING_API QString supportAddress();
 /** Licensing address. Can be email or web address. */
 NX_BRANDING_API QString licensingAddress();
 
-/** Home web page. Can be empty. */
-NX_BRANDING_API QString homePage();
-
-/** Support web page. Can be empty. */
-NX_BRANDING_API QString supportPage();
-
 /** Directory where all software is installed by default. */
 NX_BRANDING_API QString installationRoot();
 
