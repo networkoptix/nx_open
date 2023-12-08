@@ -16,6 +16,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
@@ -26,6 +27,7 @@
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/resource_properties/user/utils/access_rights_list.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -156,7 +158,7 @@ QString QnRequireCameraPolicy::getText(const QnResourceList& resources, const bo
 
 bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
-    return camera->hasCameraCapabilities(nx::vms::api::DeviceCapability::inputPort);
+    return camera->hasCameraCapabilities(DeviceCapability::inputPort);
 }
 
 QString QnCameraInputPolicy::getText(const QnResourceList &resources, const bool detailed)
@@ -172,7 +174,7 @@ QString QnCameraInputPolicy::getText(const QnResourceList &resources, const bool
 
 bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
-    return camera->hasCameraCapabilities(nx::vms::api::DeviceCapability::outputPort);
+    return camera->hasCameraCapabilities(DeviceCapability::outputPort);
 }
 
 QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const bool detailed)
@@ -673,79 +675,65 @@ bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*u
 }
 
 //-------------------------------------------------------------------------------------------------
-// QnRequiredPermissionSubjectPolicy
+// QnRequiredAccessRightPolicy
 
-QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(
-    Qn::Permission requiredPermission,
-    const QString& permissionName,
+QnRequiredAccessRightPolicy::QnRequiredAccessRightPolicy(
+    AccessRight requiredAccessRight,
     bool allowEmptySelection)
     :
     base_type(allowEmptySelection),
-    m_requiredPermission(requiredPermission),
-    m_permissionName(permissionName)
+    m_requiredAccessRight(requiredAccessRight)
 {
 }
 
-bool QnRequiredPermissionSubjectPolicy::userValidity(const QnUserResourcePtr& user) const
+bool QnRequiredAccessRightPolicy::userValidity(const QnUserResourcePtr& user) const
 {
-    const auto cameraHasPermission =
-        [this, &user](auto camera)
-        {
-            return resourceAccessManager()->hasPermission(user, camera, m_requiredPermission);
-        };
-
-    if (m_cameras.isEmpty())
-    {
-        const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras =
-            resourcePool()->getAllCameras();
-
-        return std::any_of(cameras.begin(), cameras.end(), cameraHasPermission);
-    }
-
-    return std::all_of(m_cameras.begin(), m_cameras.end(), cameraHasPermission);
+    return isSubjectValid(user);
 }
 
-QValidator::State QnRequiredPermissionSubjectPolicy::roleValidity(const QnUuid& roleId) const
+QValidator::State QnRequiredAccessRightPolicy::roleValidity(const QnUuid& groupId) const
 {
-    return isRoleValid(roleId) ? QValidator::Acceptable : QValidator::Invalid;
+    const auto group = userGroupManager()->find(groupId);
+    if (!group)
+        return QValidator::Invalid;
+
+    return isSubjectValid(*group) ? QValidator::Acceptable : QValidator::Invalid;
 }
 
-QnSharedResourcePointerList<QnVirtualCameraResource>
-    QnRequiredPermissionSubjectPolicy::cameras() const
+QnSharedResourcePointerList<QnVirtualCameraResource> QnRequiredAccessRightPolicy::cameras() const
 {
     return m_cameras;
 }
 
-void QnRequiredPermissionSubjectPolicy::setCameras(
+void QnRequiredAccessRightPolicy::setCameras(
     const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras)
 {
     m_cameras = cameras;
 }
 
-bool QnRequiredPermissionSubjectPolicy::isRoleValid(const QnUuid& roleId) const
+bool QnRequiredAccessRightPolicy::isSubjectValid(const QnResourceAccessSubject& subject) const
 {
-    const auto group = userGroupManager()->find(roleId);
-    if (!group)
-        return false;
-
-    const auto cameraHasPermission =
-        [this, groupId = *group](auto camera)
+    const auto hasPermissionForCamera =
+        [=](const QnVirtualCameraResourcePtr& camera)
         {
-            return resourceAccessManager()->hasPermission(groupId, camera, m_requiredPermission);
+            return resourceAccessManager()->hasAccessRights(
+                subject, camera, m_requiredAccessRight);
         };
 
-    if (m_cameras.isEmpty())
-    {
-        const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras =
-            resourcePool()->getAllCameras();
+    if (!m_cameras.isEmpty())
+        return std::all_of(m_cameras.begin(), m_cameras.end(), hasPermissionForCamera);
 
-        return std::any_of(cameras.begin(), cameras.end(), cameraHasPermission);
+    if (resourceAccessManager()->hasAccessRights(
+        subject, kAllDevicesGroupId, m_requiredAccessRight))
+    {
+        return true;
     }
 
-    return std::all_of(m_cameras.begin(), m_cameras.end(), cameraHasPermission);
+    const auto& cameras = resourcePool()->getAllCameras();
+    return std::any_of(cameras.begin(), cameras.end(), hasPermissionForCamera);
 }
 
-QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
+QString QnRequiredAccessRightPolicy::calculateAlert(bool allUsers,
     const QSet<QnUuid>& subjects) const
 {
     using namespace nx::vms::common;
@@ -766,6 +754,8 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
 
     NX_ASSERT(intermediateRoles.empty()); //< Unused in this policy.
 
+    const auto permissionName = AccessRightsList::instance()->get(m_requiredAccessRight).name;
+
     if (invalidRoles.size() > 0)
     {
         if (invalidRoles.size() == 1)
@@ -776,18 +766,18 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
             alert = tr("User group %1 has no %2 permission",
                 "%1 is the name of selected user group, %2 is permission name")
                 .arg(html::bold(group.name))
-                .arg(m_permissionName);
+                .arg(permissionName);
         }
         else if (validRoles.empty())
         {
             alert = tr("Selected user groups have no %1 permission", "%1 is permission name")
-                .arg(m_permissionName);
+                .arg(permissionName);
         }
         else
         {
             alert = tr("%n of %1 selected user groups have no %2 permission",
                 "%1 is number of selected user groups, %2 is permission name", invalidRoles.size())
-                .arg(validRoles.size() + invalidRoles.size()).arg(m_permissionName);
+                .arg(validRoles.size() + invalidRoles.size()).arg(permissionName);
         }
     }
 
@@ -801,18 +791,18 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
             alert += tr("User %1 has no %2 permission",
                 "%1 is the name of selected user, %2 is permission name")
                 .arg(html::bold(invalidUsers.front()->getName()))
-                .arg(m_permissionName);
+                .arg(permissionName);
         }
         else if (validUsers.empty())
         {
             alert += tr("Selected users have no %1 permission", "%1 is permission name")
-                .arg(m_permissionName);
+                .arg(permissionName);
         }
         else
         {
             alert += tr("%n of %1 selected users have no %2 permission",
                 "%1 is number of selected users, %2 is permission name", invalidUsers.size())
-                .arg(validUsers.size() + invalidUsers.size()).arg(m_permissionName);
+                .arg(validUsers.size() + invalidUsers.size()).arg(permissionName);
         }
     }
 
@@ -831,7 +821,7 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& rol
     if (m_layout)
     {
         // Admins have access to all layouts.
-        if (nx::vms::api::kAllPowerUserGroupIds.contains(roleId))
+        if (kAllPowerUserGroupIds.contains(roleId))
             return QValidator::Acceptable;
 
         // For other users access permissions depend on the layout kind.

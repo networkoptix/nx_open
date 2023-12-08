@@ -28,9 +28,8 @@ void SourceUserPicker::onDescriptorSet()
     if (nx::vms::rules::utils::type<nx::vms::rules::SoftTriggerEvent>()
         == parentParamsWidget()->descriptor().id)
     {
-        m_validationPolicy = std::make_unique<QnRequiredPermissionSubjectPolicy>(
-            Qn::SoftTriggerPermission,
-            tr("Soft trigger"));
+        m_validationPolicy = std::make_unique<QnRequiredAccessRightPolicy>(
+            nx::vms::api::AccessRight::userInput);
     }
     else
     {

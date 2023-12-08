@@ -1229,8 +1229,8 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 case ActionType::showPopupAction:
                 {
                     static const QnDefaultSubjectValidationPolicy defaultPolicy;
-                    QnRequiredPermissionSubjectPolicy acknowledgePolicy(
-                        Qn::ManageBookmarksPermission, QString());
+                    QnRequiredAccessRightPolicy acknowledgePolicy(
+                        nx::vms::api::AccessRight::manageBookmarks);
                     acknowledgePolicy.setCameras(
                         resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                             filterEventResources(m_eventResources, m_eventType)));

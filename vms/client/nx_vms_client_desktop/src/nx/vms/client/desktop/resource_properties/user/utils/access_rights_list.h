@@ -37,12 +37,14 @@ public:
     static void registerQmlTypes();
 
     QVector<AccessRightDescriptor> items() const;
+    AccessRightDescriptor get(nx::vms::api::AccessRight accessRight) const;
 
 private:
     explicit AccessRightsList(QObject* parent = nullptr);
 
 private:
     const QVector<AccessRightDescriptor> m_items;
+    const QHash<nx::vms::api::AccessRight, int> m_indexLookup;
 };
 
 } // namespace nx::vms::client::desktop
