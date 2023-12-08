@@ -2446,10 +2446,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Show Intercom Informer</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Do HTTP(S) request</source>
         <translation></translation>
     </message>
