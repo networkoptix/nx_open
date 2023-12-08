@@ -1430,11 +1430,12 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
     if (success)
     {
         m_stateTracker->processInstallTaskSet();
-        QSet<QnUuid> peersComplete = m_stateTracker->peersComplete();
-        QSet<QnUuid> peersFailed = m_stateTracker->peersFailed();
+        const QSet<QnUuid> peersIssued = m_stateTracker->peersIssued();
+        const QSet<QnUuid> peersComplete = m_stateTracker->peersComplete();
+        const QSet<QnUuid> serversComplete = peersComplete - QSet{clientPeerId()};
+        const QSet<QnUuid> peersFailed = m_stateTracker->peersFailed();
 
-        if (m_finishingForcefully
-            || (!peersComplete.empty() && peersComplete != QSet<QnUuid>{clientPeerId()}))
+        if (m_finishingForcefully || !serversComplete.empty() || peersComplete == peersIssued)
         {
             NX_INFO(this, "atFinishUpdateComplete() - installation is complete");
             setTargetState(WidgetUpdateState::complete, peersComplete);
