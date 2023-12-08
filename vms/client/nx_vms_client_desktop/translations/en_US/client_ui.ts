@@ -675,6 +675,10 @@
         <source>Record audio</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Do not send Stop PTZ command</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraHotspotsSettingsWidget</name>
