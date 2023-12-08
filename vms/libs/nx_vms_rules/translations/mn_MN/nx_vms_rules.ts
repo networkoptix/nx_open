@@ -132,7 +132,7 @@
     <name>nx::vms::rules::BuzzerAction</name>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>Дуут дохио</translation>
     </message>
     <message>
       <source>Fixed duration</source>

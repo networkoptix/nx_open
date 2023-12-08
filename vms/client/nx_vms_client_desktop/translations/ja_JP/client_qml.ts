@@ -1696,16 +1696,6 @@
   <context>
     <name>PtzPromoOverlay</name>
     <message>
-      <source>Introducing you
-new PTZ controls</source>
-      <translation>新しいPTZコントロールをご紹介します</translation>
-    </message>
-    <message>
-      <source>Here is a quick presentation
-of what has changed</source>
-      <translation>変更内容を簡単に説明します</translation>
-    </message>
-    <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
       <translation>映像上の任意の箇所をドラッグし
@@ -1724,10 +1714,6 @@ PTZを行います</translation>
       <translation>ズームするには、マウスホイールを使用してください</translation>
     </message>
     <message>
-      <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-      <translation>Shift キーを押しながらクリック、ダブルクリック、ドラッグ操作を行うことで、高度な PTZ を使用できます</translation>
-    </message>
-    <message>
       <source>Target Lock Tracking</source>
       <translation>ターゲットロック追跡</translation>
     </message>
@@ -1738,6 +1724,27 @@ PTZを行います</translation>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation>このガイドを再度有効にするには、[ローカル設定 &gt; アドバンス &gt; すべての警告設定をリセット] を実行してください。</translation>
+    </message>
+    <message>
+      <source>Introducing
+New PTZ controls</source>
+      <translation>
+新しいPTZコントロール
+の紹介</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed</source>
+      <translation>変更内容を
+簡単に説明します</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
+      <translation>Shift キーを押しながら
+クリック、ダブルクリック、ドラッグ操作を行うことで、
+高度な PTZ を使用できます</translation>
     </message>
   </context>
   <context>

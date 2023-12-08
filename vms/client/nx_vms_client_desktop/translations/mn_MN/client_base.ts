@@ -3265,7 +3265,7 @@ to %1</translation>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Таны нэвтрэх хугацаа дууссан байна</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
@@ -9061,7 +9061,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
       <source>Save changes</source>
-      <translation type="unfinished">Save changes</translation>
+      <translation>Өөрчлөлтийг хадгалах уу</translation>
     </message>
     <message>
       <source>Enter your account password</source>

@@ -1802,8 +1802,8 @@
       <translation>Kuruluş Kimliği</translation>
     </message>
     <message>
-      <source>Interval between the Cloud polling HTTP requests to synchronize the data, if zero then the transaction message bus is used</source>
-      <translation>Verileri senkronize etmek için Bulut denetleme HTTP istekleri arasındaki aralık; sıfırsa işlem mesajı veri yolu kullanılır</translation>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
     </message>
   </context>
   <context>

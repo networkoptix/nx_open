@@ -1707,18 +1707,6 @@
   <context>
     <name>PtzPromoOverlay</name>
     <message>
-      <source>Introducing you
-new PTZ controls</source>
-      <translation>Vi introduserer deg for
-nye PTZ-kontrollere</translation>
-    </message>
-    <message>
-      <source>Here is a quick presentation
-of what has changed</source>
-      <translation>Her er en rask presentasjon
-av hva som har endret seg</translation>
-    </message>
-    <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
       <translation>Dra over en hvilken som helst del av videoen
@@ -1737,10 +1725,6 @@ for å aktivere PTZ</translation>
       <translation>Bruk musehjulet for å zoome</translation>
     </message>
     <message>
-      <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-      <translation>Klikk, dobbeltklikk eller dra musepekeren mens du trykker på Shift-tasten for å bruke avansert PTZ</translation>
-    </message>
-    <message>
       <source>Target Lock Tracking</source>
       <translation>Mållåssporing</translation>
     </message>
@@ -1751,6 +1735,26 @@ for å aktivere PTZ</translation>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation>Du kan aktivere denne veiledningen igjen ved å gå til Lokale innstillinger &gt; Avansert &gt; Tilbakestill alle advarsler</translation>
+    </message>
+    <message>
+      <source>Introducing
+New PTZ controls</source>
+      <translation>Vi introduserer
+nye PTZ-kontroller</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed</source>
+      <translation>Her er en hurtigguide
+om hva som har endret seg</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
+      <translation>Klikk, dobbeltklikk eller dra
+musepeker mens du trykker
+Shift-tast for å bruke avansert PTZ</translation>
     </message>
   </context>
   <context>

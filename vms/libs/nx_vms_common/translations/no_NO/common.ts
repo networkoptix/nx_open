@@ -1802,8 +1802,8 @@
       <translation>Organisasjons-ID</translation>
     </message>
     <message>
-      <source>Interval between the Cloud polling HTTP requests to synchronize the data, if zero then the transaction message bus is used</source>
-      <translation>Intervall mellom Cloud polling HTTP-forespørsler om å synkronisere dataene, hvis null, brukes transaksjonsmeldingsbussen</translation>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+      <translation>Intervall mellom Cloud polling HTTP-forespørsler for å synkronisere dataene.</translation>
     </message>
   </context>
   <context>

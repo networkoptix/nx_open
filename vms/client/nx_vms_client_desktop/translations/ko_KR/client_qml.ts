@@ -1696,17 +1696,6 @@
   <context>
     <name>PtzPromoOverlay</name>
     <message>
-      <source>Introducing you
-new PTZ controls</source>
-      <translation>
-새로운 PTZ 컨트롤을 소개합니다</translation>
-    </message>
-    <message>
-      <source>Here is a quick presentation
-of what has changed</source>
-      <translation>변경된 내용의 간단한 프리젠 테이션입니다</translation>
-    </message>
-    <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
       <translation>PTZ를 활성화하려면 비디오
@@ -1725,10 +1714,6 @@ to activate PTZ</source>
       <translation type="unfinished">Use mouse wheel to zoom</translation>
     </message>
     <message>
-      <source>Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag mouse pointer while pressing Shift key to use Advanced PTZ</translation>
-    </message>
-    <message>
       <source>Target Lock Tracking</source>
       <translation type="unfinished">Target Lock Tracking</translation>
     </message>
@@ -1739,6 +1724,26 @@ to activate PTZ</source>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
       <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+    </message>
+    <message>
+      <source>Introducing
+New PTZ controls</source>
+      <translation type="unfinished">Introducing
+New PTZ controls</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed</source>
+      <translation type="unfinished">Here is a quick guide
+on what has changed</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
+      <translation type="unfinished">Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</translation>
     </message>
   </context>
   <context>
