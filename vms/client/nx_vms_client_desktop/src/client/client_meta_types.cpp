@@ -52,6 +52,7 @@
 #include <nx/vms/client/desktop/rules/model_view/rules_sort_filter_proxy_model.h>
 #include <nx/vms/client/desktop/rules/model_view/rules_table_model.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_administration/globals/ldap_settings.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
 #include <nx/vms/client/desktop/system_administration/models/custom_access_summary_model.h>
 #include <nx/vms/client/desktop/system_administration/models/global_permissions_model.h>
@@ -345,4 +346,5 @@ void QnClientMetaTypes::registerQmlTypes()
     workbench::timeline::registerQmlType();
     rules::RulesTableModel::registerQmlType();
     rules::RulesSortFilterProxyModel::registerQmlType();
+    ldap_settings::registerQmlType();
 }

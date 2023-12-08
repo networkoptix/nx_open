@@ -3,7 +3,7 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/api/data/ldap.h>
+#include <nx/vms/client/desktop/system_administration/globals/ldap_settings.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -12,27 +12,9 @@ namespace nx::vms::client::desktop {
 class LdapSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
     using base_type = QnAbstractPreferencesWidget;
-
-public:
-    enum class TestState
-    {
-        initial,
-        connecting,
-        ok,
-        error,
-    };
-    Q_ENUM(TestState)
-
-    enum class Sync
-    {
-        disabled = (int) nx::vms::api::LdapSyncMode::disabled,
-        groupsOnly = (int) nx::vms::api::LdapSyncMode::groupsOnly,
-        usersAndGroups = (int) nx::vms::api::LdapSyncMode::usersAndGroups,
-    };
-    Q_ENUM(Sync)
+    using TestState = ldap_settings::TestState;
 
 public:
     explicit LdapSettingsWidget(QWidget* parent = nullptr);
@@ -60,9 +42,7 @@ public:
         bool ignoreCertErrors);
 
     Q_INVOKABLE void cancelCurrentRequest();
-
     Q_INVOKABLE bool requestLdapReset();
-
     Q_INVOKABLE void requestSync();
 
 protected:
