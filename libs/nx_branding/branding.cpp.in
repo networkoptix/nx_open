@@ -93,16 +93,6 @@ QString licensingAddress()
     return R"(${customization.contact.licensingAddress})";
 }
 
-QString homePage()
-{
-    return R"(${customization.contact.systemWebPages.homePage})";
-}
-
-QString supportPage()
-{
-    return R"(${customization.contact.systemWebPages.supportPage})";
-}
-
 QString installationRoot()
 {
     return R"(${installation_root})";

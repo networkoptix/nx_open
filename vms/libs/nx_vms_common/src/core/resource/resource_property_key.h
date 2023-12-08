@@ -180,6 +180,12 @@ NX_VMS_COMMON_API extern const QString kMetadataStorageIdKey;
 
 } // namespace Server
 
+namespace WebPage {
+
+NX_VMS_COMMON_API extern const QString kSubtypeKey;
+
+} // namespace WebPage
+
 NX_VMS_COMMON_API extern const std::set<QString> kWriteOnlyNames;
 
 // Storage

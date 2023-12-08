@@ -11,7 +11,7 @@
 
 namespace {
 
-static const QString kSubtypePropertyName = "subtype";
+static const QString kSubtypePropertyName = ResourcePropertyKey::WebPage::kSubtypeKey;
 static const QString kProxyDomainAllowListPropertyName = "proxyDomainAllowList";
 static const QString kCertificateCheckPropertyName = "certificateCheck";
 
