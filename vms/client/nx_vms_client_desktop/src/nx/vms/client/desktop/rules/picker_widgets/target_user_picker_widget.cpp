@@ -88,8 +88,8 @@ void TargetUserPicker::createPolicy()
 
         if (acknowledgeField->value() == true)
         {
-            m_policy = std::make_unique<QnRequiredPermissionSubjectPolicy>(
-                Qn::ManageBookmarksPermission);
+            m_policy = std::make_unique<QnRequiredAccessRightPolicy>(
+                nx::vms::api::AccessRight::manageBookmarks);
         }
         else
         {
