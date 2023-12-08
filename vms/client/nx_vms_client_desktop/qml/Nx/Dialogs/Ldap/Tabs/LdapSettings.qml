@@ -78,7 +78,7 @@ Rectangle
 
             continuousSyncEnabled: control.continuousSyncEnabled
 
-            SessionAware.onTryClose: reject()
+            WindowContextAware.onBeforeSystemChanged: reject()
 
             onAccepted:
             {
@@ -113,7 +113,7 @@ Rectangle
             property bool initStartTls: false
             property bool initIgnoreCertErrors: false
 
-            SessionAware.onTryClose: reject()
+            WindowContextAware.onBeforeSystemChanged: reject()
 
             onAccepted:
             {
@@ -168,7 +168,7 @@ Rectangle
             testState: control.testState
             testMessage: control.testMessage
 
-            SessionAware.onTryClose: reject()
+            WindowContextAware.onBeforeSystemChanged: reject()
 
             onAccepted:
             {

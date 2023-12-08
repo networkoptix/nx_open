@@ -93,9 +93,9 @@
 #include <nx/vms/client/desktop/utils/date_validator.h>
 #include <nx/vms/client/desktop/utils/mouse_spy.h>
 #include <nx/vms/client/desktop/utils/server_file_cache.h>
-#include <nx/vms/client/desktop/utils/session_aware_attached.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/utils/window_context_aware_attached.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_payload.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_state.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -278,7 +278,7 @@ void QnClientMetaTypes::registerQmlTypes()
     LookupListsDialog::registerQmlTypes();
     joystick::JoystickManager::registerQmlType();
     TimeDurationSuffixModel::registerQmlType();
-    SessionAware::registerQmlType();
+    WindowContextAwareHelper::registerQmlType();
     KeyboardModifiers::registerQmlType();
     DateValidator::registerQmlType();
     WindowContext::registerQmlType();
