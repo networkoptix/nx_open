@@ -123,6 +123,12 @@ const QString kMetadataStorageIdKey("metadataStorageId");
 
 } // namespace ResourcePropertyKey::Server
 
+namespace WebPage {
+
+const QString kSubtypeKey("subtype");
+
+} // namespace WebPage
+
 const std::set<QString> kWriteOnlyNames{
     kCredentials,
     kDefaultCredentials,
