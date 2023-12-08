@@ -5,20 +5,20 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
 
 #include "detail/globals_structures.h"
 #include "detail/helpers.h"
 
 namespace nx::vms::client::desktop::jsapi {
 
-class Self::Private: public QnWorkbenchContextAware
+class Self::Private: public CurrentSystemContextAware
 {
 public:
-    Private(Self* q, QnWorkbenchItem* item, QObject* parent):
-        QnWorkbenchContextAware(parent),
+    Private(Self* q, QnWorkbenchItem* item):
+        CurrentSystemContextAware(item->layout()->windowContext()),
         q(q),
         m_item(item)
     {
@@ -65,7 +65,7 @@ Error Self::Private::setPreventDefaultContextMenu(bool value)
 
 Self::Self(QnWorkbenchItem* item, QObject* parent):
     QObject(parent),
-    d(new Private(this, item, parent))
+    d(new Private(this, item))
 {
 }
 

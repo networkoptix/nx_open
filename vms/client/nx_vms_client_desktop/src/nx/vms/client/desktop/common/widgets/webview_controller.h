@@ -166,10 +166,15 @@ public:
      * @param authCondition Condition which is checked during the authentication using Client API.
      *     May be used with another controller.
      */
-    void initClientApiSupport(
-        WindowContext* context,
-        QnWorkbenchItem* item,
-        ClientApiAuthCondition authCondition);
+    void initClientApiSupport(WindowContext* context, ClientApiAuthCondition authCondition);
+
+    /**
+     * Initializes Client API.
+     * @param item Workbench item.
+     * @param authCondition Condition which is checked during the authentication using Client API.
+     *     May be used with another controller.
+     */
+    void initClientApiSupport(QnWorkbenchItem* item, ClientApiAuthCondition authCondition);
 
     /** Register the save state metatype for suspend()/resume() methods. */
     static void registerMetaType();

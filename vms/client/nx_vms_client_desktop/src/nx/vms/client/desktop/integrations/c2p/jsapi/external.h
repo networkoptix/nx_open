@@ -6,8 +6,9 @@
 
 #include <nx/utils/impl_ptr.h>
 
-class QnWorkbenchContext;
 class QnWorkbenchItem;
+
+namespace nx::vms::client::desktop { class WindowContext; }
 
 namespace nx::vms::client::desktop::integrations::c2p::jsapi {
 
@@ -20,9 +21,7 @@ class External: public QObject
     using base_type = QObject;
 
 public:
-    External(
-        QnWorkbenchItem* item,
-        QObject* parent = nullptr);
+    External(QnWorkbenchItem* item, QObject* parent = nullptr);
 
     virtual ~External() override;
 
