@@ -685,6 +685,10 @@
       <source>Record audio</source>
       <translation>音声を録音する</translation>
     </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation>PTZ 停止コマンドを送信しない</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

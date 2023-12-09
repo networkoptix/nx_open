@@ -50,7 +50,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Дуусах</translation>
     </message>
   </context>
   <context>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Тусламж</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -135,7 +135,7 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Серверт холбогдох...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
@@ -175,7 +175,7 @@
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation type="unfinished">Video Wall...</translation>
+      <translation>Ханын дэлгэц...</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
@@ -276,7 +276,7 @@
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation type="unfinished">Log in to %1...</translation>
+      <translation>%1-р нэвтэрнэ үү...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
@@ -290,11 +290,11 @@
     </message>
     <message>
       <source>Account Settings...</source>
-      <translation type="unfinished">Account Settings...</translation>
+      <translation>Хувийн тохиргоо...</translation>
     </message>
     <message>
       <source>Create Account...</source>
-      <translation type="unfinished">Create Account...</translation>
+      <translation>Бүртгэл үүсгэх...</translation>
     </message>
     <message>
       <source>Event Rules...</source>
@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Гарах</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -354,7 +354,7 @@
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Нээх</translation>
     </message>
     <message>
       <source>Monitor</source>
@@ -414,7 +414,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Rename</source>
-      <translation type="unfinished">Rename</translation>
+      <translation>Нэр өөрчлөх</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -646,11 +646,11 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Тохиргоо</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Хаах</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -890,7 +890,7 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Өөр серверт холбогдох...</translation>
     </message>
     <message>
       <source>New</source>
@@ -953,7 +953,7 @@
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Rotate to</source>
@@ -1040,7 +1040,7 @@
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Үл мэдэгдэх алдаа.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1549,7 +1549,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Үл мэдэгдэх алдаа</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -1806,7 +1806,7 @@ License Key: %2</translation>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Ачааллаж байна...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -1851,7 +1851,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Санал болгож буй</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -1883,7 +1883,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Үргэлжлүүлэх</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
@@ -1937,7 +1937,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Бүгдийг сонгох</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1945,11 +1945,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Төхөөрөмжүүд</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Камерууд</translation>
     </message>
     <message>
       <source>Device actions</source>
@@ -2039,7 +2039,7 @@ License Key: %2</translation>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Тодорхойгүй</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -2047,7 +2047,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -2357,7 +2357,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Систем</translation>
     </message>
     <message>
       <source>Any Server</source>
@@ -2436,11 +2436,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Төхөөрөмжүүд</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Камерууд</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -2467,7 +2467,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Устгах</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2585,7 +2585,7 @@ License Key: %2</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Болсон</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2681,7 +2681,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Бүгдийг сонгох</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -2743,7 +2743,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -2910,7 +2910,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Салгах</translation>
     </message>
     <message>
       <source>System disconnected from %1</source>
@@ -2937,7 +2937,7 @@ to %1</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Үргэлжлүүлэх</translation>
     </message>
     <message>
       <source>Cannot disconnect the System from %1</source>
@@ -2957,7 +2957,7 @@ to %1</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation type="unfinished">Invalid login or password.</translation>
+      <translation>Нэвтрэх нэр эсвэл нууц үг буруу байна.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
@@ -2969,7 +2969,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Та түр хүлээгээд дахин оролдоно уу.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -2998,7 +2998,7 @@ to %1</translation>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Бүртгэл олдсонгүй</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
@@ -3015,7 +3015,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Та түр хүлээгээд дахин оролдоно уу.</translation>
     </message>
   </context>
   <context>
@@ -3027,18 +3027,18 @@ to %1</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>%1-д холбогдох боломжгүй байна</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Серверт холбогдох</translation>
     </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Хувийн тохиргоо</translation>
     </message>
   </context>
   <context>
@@ -3082,7 +3082,7 @@ to %1</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation type="unfinished">Restart</translation>
+      <translation>Дахин ачааллах</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -3090,7 +3090,7 @@ to %1</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Дахин оролдоно уу</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
@@ -3275,26 +3275,26 @@ to %1</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Үүрэг</translation>
     </message>
   </context>
   <context>
     <name>QnDeprecatedUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Эзэмшигч</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Админ</translation>
     </message>
     <message>
       <source>View live video</source>
@@ -3329,7 +3329,7 @@ to %1</translation>
     <name>QnDeprecatedUserManagementWidget</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Өөрчлөх</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3356,7 +3356,7 @@ to %1</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Аудио кодлогчийг эхлүүлж чадсангүй.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3402,7 +3402,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Бүгдийг сонгох</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3671,7 +3671,7 @@ to %1</translation>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Төрөл</translation>
     </message>
     <message>
       <source>Default state</source>
@@ -3679,12 +3679,12 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Тодорхойгүй</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3704,7 +3704,7 @@ to %1</translation>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Хүчингүй</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
@@ -3807,7 +3807,7 @@ to %1</translation>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3819,7 +3819,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
   </context>
   <context>
@@ -3896,7 +3896,7 @@ to %1</translation>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Төрөл</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -3920,7 +3920,7 @@ to %1</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Болсон</translation>
     </message>
     <message>
       <source>Error</source>
@@ -3932,7 +3932,7 @@ to %1</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Дуусах</translation>
     </message>
     <message>
       <source>License is active</source>
@@ -3985,7 +3985,7 @@ to %1</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Хасах</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4164,7 +4164,7 @@ to %1</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
@@ -4176,7 +4176,7 @@ to %1</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Hi-Res</translation>
     </message>
     <message>
       <source>LIVE</source>
@@ -4192,11 +4192,11 @@ to %1</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O модуль</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Lo-Res</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -4235,11 +4235,11 @@ to %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Дахин тохируулах</translation>
     </message>
     <message>
       <source>Skip</source>
@@ -4247,7 +4247,7 @@ to %1</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Хаах</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -4270,7 +4270,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
@@ -4425,7 +4425,7 @@ to %1</translation>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Hotkey</source>
@@ -4433,7 +4433,7 @@ to %1</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Эхлэл</translation>
     </message>
     <message>
       <source>Details</source>
@@ -4567,7 +4567,7 @@ to %1</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Хүчингүй</translation>
     </message>
   </context>
   <context>
@@ -4648,23 +4648,23 @@ to %1</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Төхөөрөмж</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 ТБ</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 ГБ</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
@@ -4721,7 +4721,7 @@ to %1</translation>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Хаах</translation>
     </message>
     <message>
       <source>Information</source>
@@ -4756,7 +4756,7 @@ to %1</translation>
     </message>
     <message>
       <source>Invalid URL</source>
-      <translation type="unfinished">Invalid URL</translation>
+      <translation>Буруу URL байна</translation>
     </message>
     <message>
       <source>URL already added</source>
@@ -4786,7 +4786,7 @@ to %1</translation>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Тэмдэглэл байхгүй байна</translation>
     </message>
     <message>
       <source>Search</source>
@@ -4797,7 +4797,7 @@ to %1</translation>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -4809,11 +4809,11 @@ to %1</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Шошго</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>Created</source>
@@ -4840,11 +4840,11 @@ to %1</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Бүх төхөөрөмж</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Бүх камерууд</translation>
     </message>
     <message>
       <source>Select devices...</source>
@@ -4863,7 +4863,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Бүх серверүүд</translation>
     </message>
     <message>
       <source>Select Servers...</source>
@@ -5001,7 +5001,7 @@ to %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Нөөц</translation>
     </message>
   </context>
   <context>
@@ -5189,7 +5189,7 @@ to %1</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ОФЛАЙН</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
@@ -5220,7 +5220,7 @@ to %1</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Бүгдийг сонгох</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -5241,15 +5241,15 @@ to %1</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>%n TB</numerusform>
-        <numerusform>%n TB</numerusform>
+      <translation>
+        <numerusform>%n ТБ</numerusform>
+        <numerusform>%n ТБ</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>ТБ</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
@@ -5276,11 +5276,11 @@ to %1</translation>
     <name>QnStorageConfigWidget</name>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Үндсэн</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Нөөц</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
@@ -5320,15 +5320,15 @@ to %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Үлдээх</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
@@ -5349,11 +5349,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Хасах</translation>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Хандах боломжгүй</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
@@ -5369,19 +5369,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Ачааллаж байна...</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Нөөц</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Үндсэн</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 ГБ</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -5417,7 +5417,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 ТБ</translation>
     </message>
     <message>
       <source>smb</source>
@@ -5510,11 +5510,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Хэрэглэгчид</translation>
     </message>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Хамгаалалт</translation>
     </message>
     <message>
       <source>User Management</source>
@@ -5597,7 +5597,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Холбогдох</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -5687,7 +5687,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Аналитик өгөгдөл их хэмжээний зай эзэлдэг.</translation>
     </message>
     <message>
       <source>Remote archive synchronization is available</source>
@@ -5782,15 +5782,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Үүрэг</translation>
     </message>
     <message>
       <source>Email</source>
@@ -5933,7 +5933,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -5949,7 +5949,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Email</source>
@@ -5961,7 +5961,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -6102,11 +6102,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Тэмдэглэл</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Сервер унтарсан байна</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
@@ -6264,7 +6264,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Ханын дэлгэц</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
@@ -6599,7 +6599,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Хасах</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
@@ -6725,7 +6725,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6904,11 +6904,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>UserListModel</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Эзэмшигч</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Админ</translation>
     </message>
     <message>
       <source>View live video</source>
@@ -6951,11 +6951,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Хаах</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Үлдээх</translation>
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
@@ -6986,15 +6986,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Өчигдөр</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Сүүлийн 7 хоног</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Сүүлийн 30 хоног</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
@@ -7251,7 +7251,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Камерууд</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7315,7 +7315,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Тохиргоо</translation>
     </message>
     <message>
       <source>Bandwidth Limit</source>
@@ -7405,7 +7405,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Тэмдэглэл байхгүй байна</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7457,11 +7457,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Нууц үг</translation>
     </message>
   </context>
   <context>
@@ -7716,7 +7716,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Бүх камеруудыг харах</translation>
     </message>
     <message>
       <source>Select Devices</source>
@@ -7755,7 +7755,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Хөдөлгөөн</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -8043,7 +8043,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copy</translation>
+      <translation>Хуулах</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
@@ -8052,7 +8052,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Paste</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Paste</translation>
+      <translation>Буулгах</translation>
     </message>
     <message>
       <source>Paste from Clipboard</source>
@@ -8081,11 +8081,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Хандах боломжгүй</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Ачааллаж байна...</translation>
     </message>
     <message>
       <source>Click to Show Cameras</source>
@@ -8158,7 +8158,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation type="unfinished">OK</translation>
+      <translation>Болсон</translation>
     </message>
   </context>
   <context>
@@ -8195,11 +8195,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Connect</source>
       <comment>Connect current System to cloud</comment>
-      <translation type="unfinished">Connect</translation>
+      <translation>Холбогдох</translation>
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Алдаа гарлаа. Та түр хүлээгээд дахин оролдоно уу.</translation>
     </message>
     <message>
       <source>None of your Servers has connection to %1.</source>
@@ -8244,11 +8244,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Холбогдох</translation>
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Янзлах</translation>
     </message>
     <message>
       <source>Success</source>
@@ -8264,7 +8264,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Шинэ систем</translation>
     </message>
   </context>
   <context>
@@ -8336,7 +8336,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Сервер унтарсан байна</translation>
     </message>
     <message>
       <source>Device search failed</source>
@@ -8452,7 +8452,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation type="unfinished">Motion</translation>
+      <translation>Хөдөлгөөн</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -8701,11 +8701,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation type="unfinished">Folder</translation>
+      <translation>Хавтас</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
@@ -8849,7 +8849,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Хуулах</translation>
     </message>
     <message>
       <source>Copy Link Location</source>
@@ -8933,7 +8933,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ОФЛАЙН</translation>
     </message>
   </context>
   <context>
@@ -8989,7 +8989,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Серверт холбогдох...</translation>
     </message>
     <message>
       <source>Version %1</source>
@@ -9096,7 +9096,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Ашиглах</translation>
     </message>
   </context>
   <context>
@@ -9114,7 +9114,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Сервер унтарсан байна</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
@@ -9212,7 +9212,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Шинэ систем</translation>
     </message>
     <message>
       <source>System was not found.</source>
@@ -9292,7 +9292,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Үл мэдэгдэх алдаа.</translation>
     </message>
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
@@ -9304,7 +9304,7 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Хөдөлгөөн</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -9350,7 +9350,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
     <message>
       <source>Release notes</source>
-      <translation type="unfinished">Release notes</translation>
+      <translation>Хувилбаруудын мэдээлэл</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -9490,7 +9490,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Болсон</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -9506,7 +9506,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
@@ -9530,7 +9530,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Татаж авах</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -9652,7 +9652,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Мэдэгдэл</translation>
     </message>
     <message>
       <source>Calling...</source>
@@ -9682,7 +9682,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name like Nx Cloud</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>%1-д холбогдох боломжгүй байна</translation>
     </message>
   </context>
   <context>
@@ -9805,7 +9805,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Үл мэдэгдэх алдаа.</translation>
     </message>
     <message>
       <source>Unexpected error code.</source>
@@ -9825,7 +9825,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Серверын алдаа.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
@@ -9873,7 +9873,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>Consumption</source>
@@ -9939,7 +9939,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>URL</source>
@@ -10383,7 +10383,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>өдөр</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -10483,16 +10483,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Үргэлжлүүлэх</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n камерууд</numerusform>
+        <numerusform>%n камерууд</numerusform>
       </translation>
     </message>
     <message>
@@ -10540,7 +10540,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>үл мэдэгдэх алдаа</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -10640,22 +10640,22 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Үл мэдэгдэх алдаа</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Хөдөлгөөн</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -10819,11 +10819,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -10843,7 +10843,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Шошго</translation>
     </message>
     <message>
       <source>Description</source>
@@ -10851,7 +10851,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Нээх</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
@@ -10978,7 +10978,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Description</source>
@@ -10997,7 +10997,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserGroupsWidget</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Устгах</translation>
     </message>
   </context>
   <context>
@@ -11017,11 +11017,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Email</source>
@@ -11048,7 +11048,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
@@ -11067,7 +11067,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Хэрэглэгчид</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11094,7 +11094,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -11289,7 +11289,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Хөдөлгөөн</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -11323,7 +11323,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Шинэ систем</translation>
     </message>
   </context>
   <context>
@@ -11350,7 +11350,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Хэрэглэгчид</translation>
     </message>
     <message>
       <source>Other Systems</source>
@@ -11641,7 +11641,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Хэрэглэгчид</translation>
     </message>
     <message>
       <source>Custom Users</source>
@@ -11727,7 +11727,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Email</source>
@@ -11940,7 +11940,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Болсон</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>

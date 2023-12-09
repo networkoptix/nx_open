@@ -2249,7 +2249,7 @@
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>Камерын цаг хэвийн ажиллаж эхэллээ.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -2267,7 +2267,7 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>%1 сүлжээнд multicast хаяг дэмжигдээгүй байна.</translation>
     </message>
     <message>
       <source>Failed to backup file %1</source>
