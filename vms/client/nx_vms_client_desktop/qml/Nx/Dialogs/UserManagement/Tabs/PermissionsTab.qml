@@ -523,7 +523,7 @@ Item
 
         leftPadding: 16
         rightPadding: 16
-        spacing: 16
+        spacing: 8
 
         ContextHintButton
         {
