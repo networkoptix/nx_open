@@ -302,6 +302,9 @@ NX_VMS_COMMON_API extern const QString kDisableRtspMetadataStream;
 // cameras cannot cope with that.
 NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveDisableFastDownload;
 
+// Allow the use of Onvif Profile-G services for remote archive managment.
+NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveEnabled;
+
 // Additional flags that can be passed to gSOAP library.
 NX_VMS_COMMON_API extern const QString kGsoapAdditionalFlags;
 
