@@ -2448,10 +2448,6 @@
       <translation>Échec de la sauvegarde du fichier %1</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>Afficher l'informateur d'interphone</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>Faire une requête HTTP(S)</translation>
     </message>

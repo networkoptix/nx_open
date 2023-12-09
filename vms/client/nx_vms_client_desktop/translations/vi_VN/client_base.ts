@@ -5491,6 +5491,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>System shut down</source>
       <translation>Hệ thống tắt</translation>
     </message>
+    <message>
+      <source>Intercom call</source>
+      <translation type="unfinished">Intercom call</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation type="unfinished">Intercom missed call</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7284,6 +7292,10 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <message>
       <source>Calling...</source>
       <translation>Đang gọi...</translation>
+    </message>
+    <message>
+      <source>Missed Call</source>
+      <translation type="unfinished">Missed Call</translation>
     </message>
   </context>
   <context>

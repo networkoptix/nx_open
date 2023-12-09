@@ -944,6 +944,10 @@
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
       <translation>LDAP サーバーとの継続的同期が無効になっている場合、グループは自動的に同期されません。このグループを更新するには、手動同期を開始してください。</translation>
     </message>
+    <message>
+      <source>This group is not found in the LDAP database.</source>
+      <translation>このグループは LDAP データベースに存在しません。</translation>
+    </message>
   </context>
   <context>
     <name>GroupMembersTab</name>

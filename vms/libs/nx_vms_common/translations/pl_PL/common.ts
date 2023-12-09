@@ -2586,10 +2586,6 @@
       <translation>Nie udało się wykonać kopii zapasowej pliku %1</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation type="unfinished">Show Intercom Informer</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>Wyślij polecenie HTTP</translation>
     </message>

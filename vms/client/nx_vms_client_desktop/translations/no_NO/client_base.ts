@@ -5561,6 +5561,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>System shut down</source>
       <translation type="unfinished">System shut down</translation>
     </message>
+    <message>
+      <source>Intercom call</source>
+      <translation>Intercom samtale</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation>Intercom tapt anrop</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7411,6 +7419,10 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     <message>
       <source>Calling...</source>
       <translation>Ringer...</translation>
+    </message>
+    <message>
+      <source>Missed Call</source>
+      <translation>Ubesvart anrop</translation>
     </message>
   </context>
   <context>

@@ -950,6 +950,10 @@
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
       <translation>När kontinuerlig synkronisering med LDAP-server är inaktiverad synkroniseras inte grupper automatiskt. För att uppdatera den här gruppen, starta en manuell synkronisering.</translation>
     </message>
+    <message>
+      <source>This group is not found in the LDAP database.</source>
+      <translation>Gruppen finns inte i LDAP-databasen.</translation>
+    </message>
   </context>
   <context>
     <name>GroupMembersTab</name>

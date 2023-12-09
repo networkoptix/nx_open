@@ -2446,10 +2446,6 @@
       <translation>Det gick inte att säkerhetskopiera fil %1</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>Visa Intercom Informer</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>Gör HTTP(S)-begäran</translation>
     </message>

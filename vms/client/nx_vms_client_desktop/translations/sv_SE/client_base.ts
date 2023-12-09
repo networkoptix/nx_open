@@ -5561,6 +5561,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>System shut down</source>
       <translation>System avstängt</translation>
     </message>
+    <message>
+      <source>Intercom call</source>
+      <translation>Intercom samtal</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation>Intercom missat samtal</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7412,6 +7420,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Calling...</source>
       <translation>Ringer...</translation>
+    </message>
+    <message>
+      <source>Missed Call</source>
+      <translation>Missat samtal</translation>
     </message>
   </context>
   <context>

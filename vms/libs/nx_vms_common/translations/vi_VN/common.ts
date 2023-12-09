@@ -2376,10 +2376,6 @@
       <translation>Không thể sao lưu tệp %1</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>Hiển thị thông tin liên lạc nội bộ</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>Thực hiện yêu cầu HTTP(S)</translation>
     </message>

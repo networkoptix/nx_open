@@ -5557,6 +5557,14 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>System shut down</source>
       <translation type="unfinished">System shut down</translation>
     </message>
+    <message>
+      <source>Intercom call</source>
+      <translation type="unfinished">Intercom call</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation type="unfinished">Intercom missed call</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7408,6 +7416,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Calling...</source>
       <translation>Bellen...</translation>
+    </message>
+    <message>
+      <source>Missed Call</source>
+      <translation type="unfinished">Missed Call</translation>
     </message>
   </context>
   <context>

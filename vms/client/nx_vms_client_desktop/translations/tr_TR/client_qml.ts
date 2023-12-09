@@ -950,6 +950,10 @@
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
       <translation>LDAP sunucusuyla sürekli senkronizasyon devre dışı bırakıldığında gruplar otomatik olarak senkronize edilmez. Bu grubu güncellemek için manuel senkronizasyon başlatın.</translation>
     </message>
+    <message>
+      <source>This group is not found in the LDAP database.</source>
+      <translation>Bu grup LDAP veritabanında bulunamadı.</translation>
+    </message>
   </context>
   <context>
     <name>GroupMembersTab</name>
@@ -1739,22 +1743,19 @@ herhangi bir bölümü üzerine sürükleyin</translation>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Yeni PTZ kontrolüyle tanışın</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed</translation>
+      <translation>Nelerin değiştiğine dair kısa bir kılavuz</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Gelişmiş PTZ'yi kullanmak için
+Shift tuşuna basarken fare işaretçisini tıklayın, çift tıklayın veya sürükleyin</translation>
     </message>
   </context>
   <context>

@@ -962,6 +962,10 @@
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
       <translation>Когда непрерывная синхронизация с сервером LDAP отключена, группы не синхронизируются автоматически. Чтобы обновить эту группу, инициируйте ручную синхронизацию.</translation>
     </message>
+    <message>
+      <source>This group is not found in the LDAP database.</source>
+      <translation>Эта группа не найдена в базе данных LDAP.</translation>
+    </message>
   </context>
   <context>
     <name>GroupMembersTab</name>
