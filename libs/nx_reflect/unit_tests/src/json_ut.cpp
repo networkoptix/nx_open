@@ -13,8 +13,10 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/reflect/json/serializer.h>
 #include <nx/reflect/json/deserializer.h>
+#include <nx/reflect/json/raw_json_text.h>
+#include <nx/reflect/json/object.h>
+#include <nx/reflect/json/serializer.h>
 
 #include "serialization_acceptance_tests.h"
 
@@ -411,6 +413,14 @@ TEST_F(Json, map_with_stringizable_keys)
     testSerialization(
         R"({"num":12,"t":{"key1":"val1"}})",
         FooStringizableUnorderedMap{12, {{{"key1"}, {"val1"}}}});
+
+    testSerialization(
+        R"({"k1":"v1","k2":"v2"})",
+        std::map<std::string, std::string>{{"k1", "v1"}, {"k2", "v2"}});
+
+    testSerialization(
+        R"({"k1":"v1"})",
+        std::unordered_map<std::string, std::string>{{"k1", "v1"}});
 }
 
 TEST_F(Json, map_keys_are_overwritten_by_deserialization)
@@ -837,6 +847,74 @@ TEST_F(Json, array_with_chrono_duration_is_serialized_as_number_if_asked_explici
     using ms = std::chrono::milliseconds;
     std::vector<DurationAsNumber> v = { DurationAsNumber{.d = ms(1)}, DurationAsNumber{.d = ms(2)} };
     testSerialization("[{\"d\":1},{\"d\":2}]", v);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+struct WithRawJsonText
+{
+    json::RawJsonText foo;
+
+    bool operator==(const WithRawJsonText& rhs) const = default;
+};
+
+NX_REFLECTION_INSTRUMENT(WithRawJsonText, (foo))
+
+TEST_F(Json, RawJsonText)
+{
+    testSerialization("{\"foo\":123}", WithRawJsonText{.foo = {.text = "123"}});
+    testSerialization("{\"foo\":[\"bar\"]}", WithRawJsonText{.foo = {.text = "[\"bar\"]"}});
+
+    testSerialization("123", json::RawJsonText{.text = "123"});
+    testSerialization("{\"foo\":[\"bar\"]}", json::RawJsonText{.text = "{\"foo\":[\"bar\"]}"});
+}
+
+//-------------------------------------------------------------------------------------------------
+
+TEST_F(Json, JsonObject)
+{
+    {
+        json::Object value;
+        value.set("foo", 123);
+        testSerialization("{\"foo\":123}", value);
+    }
+
+    {
+        json::Object value;
+        value.set("bar", FooBuiltInTypes{ .n = 321, .b = false, .d = 1.5 });
+        testSerialization("{\"bar\":{\"n\":321,\"b\":false,\"d\":1.5}}", value);
+    }
+
+    {
+        const auto [value, success] = json::deserialize<json::Object>(R"({"foo":123})");
+        ASSERT_TRUE(success);
+        ASSERT_TRUE(value.contains("foo"));
+        ASSERT_EQ(123, value.get<int>("foo"));
+        ASSERT_FALSE(value.get<std::string>("foo"));
+        ASSERT_FALSE(value.get<int>("bar"));
+    }
+}
+
+class DerivedFromJsonObject:
+    public json::Object
+{
+};
+
+DeserializationResult deserialize(const json::DeserializationContext& ctx, DerivedFromJsonObject* data)
+{
+    return deserialize(ctx, (json::Object*) data);
+}
+
+void serialize(json::SerializationContext* ctx, const DerivedFromJsonObject& data)
+{
+    serialize(ctx, (const json::Object&) data);
+}
+
+TEST_F(Json, DerivedFromJsonObject)
+{
+    DerivedFromJsonObject value;
+    value.set("foo", 123);
+    testSerialization("{\"foo\":123}", value);
 }
 
 } // namespace nx::reflect::test
