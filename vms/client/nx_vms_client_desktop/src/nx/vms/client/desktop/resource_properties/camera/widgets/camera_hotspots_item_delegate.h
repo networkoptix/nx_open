@@ -41,6 +41,8 @@ public:
      */
     static std::optional<int> paletteColorIndexAtPos(const QPoint& pos, const QRect& viewItemRect);
 
+    QRect itemContentsRect(const QModelIndex& index, QAbstractItemView* itemView) const;
+
     virtual void paint(
         QPainter* painter,
         const QStyleOptionViewItem& styleOption,
@@ -50,19 +52,11 @@ public:
         const QStyleOptionViewItem& option,
         const QModelIndex& index) const override;
 
-    virtual QWidget* createEditor(
-        QWidget* parent,
-        const QStyleOptionViewItem& option,
-        const QModelIndex& index) const override;
-
 private:
     void paintColorPicker(
         QPainter* painter,
         const QStyleOptionViewItem& styleOption,
         const QModelIndex& index) const;
-
-signals:
-    void cameraEditorRequested(const QModelIndex& index) const;
 
 protected:
     virtual void initStyleOption(

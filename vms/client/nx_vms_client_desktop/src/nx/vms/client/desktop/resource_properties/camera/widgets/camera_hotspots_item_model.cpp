@@ -63,7 +63,7 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
                 else if (!resourceId.isNull())
                     return tr("Target resource does not exist");
                 else
-                    return tr("Select camera or layout");
+                    return tr("Select Camera or Layout...");
 
             case DeleteButtonColumn:
                 return tr("Delete");
@@ -77,10 +77,7 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
             case TargetColumn:
                 if (resource)
                     return qnResIconCache->icon(resource);
-                else if (!resourceId.isNull())
-                    return qnResIconCache->icon(QnResourceIconCache::Camera);
-                else
-                    return qnResIconCache->icon(QnResourceIconCache::Cameras);
+                break;
 
             case DeleteButtonColumn:
                 return qnSkin->icon("text_buttons/delete_20_deprecated.svg", kIconSubstitutions);
@@ -103,16 +100,6 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
         return static_cast<int>(Qt::PointingHandCursor);
 
     return {};
-}
-
-Qt::ItemFlags CameraHotspotsItemModel::flags(const QModelIndex& index) const
-{
-    auto result = base_type::flags(index);
-
-    if (index.column() == TargetColumn)
-        result.setFlag(Qt::ItemIsEditable);
-
-    return result;
 }
 
 QVariant CameraHotspotsItemModel::headerData(
