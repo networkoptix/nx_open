@@ -81,7 +81,7 @@ Item
     {
         id: mainDelegate
 
-        width: root.width - cellsRow.width - 1
+        width: root.width - cellsRow.width
         height: root.height
 
         highlighted: !!cellsRow.hoveredCell || isHovered //< TreeView delegate's context property.
@@ -393,7 +393,7 @@ Item
                             width: backgroundRect.width + 2
                             height: backgroundRect.height + 2
                             color: "transparent"
-                            border.color: ColorTheme.colors.dark6
+                            border.color: ColorTheme.colors.dark5
                         }
 
                         IconImage

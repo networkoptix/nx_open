@@ -2,6 +2,7 @@
 
 #include "global_permissions_model.h"
 
+#include <QtCore/QCollator>
 #include <QtQml/QtQml>
 
 #include <core/resource/user_resource.h>
@@ -9,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/client/desktop/system_administration/models/members_model.h>
+#include <nx/vms/client/desktop/system_administration/models/members_sort.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -102,16 +104,39 @@ QVariant GlobalPermissionsModel::data(const QModelIndex& index, int role) const
             const QSet<QnUuid> groupIds =
                 m_context->globalPermissionSource(permissions.at(index.row()).first);
 
-            QStringList result;
+            std::vector<nx::vms::api::UserGroupData> groupsData;
 
-            for (const auto& id: groupIds)
+            for (const auto& groupId: groupIds)
             {
-                if (const auto group = m_context->systemContext()->userGroupManager()->find(id))
-                    result << tr("Permission granted by %1 group").arg(html::bold(group->name));
+                if (const auto group = m_context->systemContext()->userGroupManager()->find(groupId))
+                    groupsData.push_back(*group);
             }
 
-            return result.join("<br>");
+            QCollator collator;
+            collator.setCaseSensitivity(Qt::CaseInsensitive);
+            collator.setNumericMode(true);
+
+            std::sort(groupsData.begin(), groupsData.end(),
+                [](const auto& left, const auto& right)
+                {
+                    return ComparableGroup(left) < ComparableGroup(right);
+                });
+
+            if (groupsData.empty())
+                return {};
+
+            const QString groupsInfoTemplate = groupsData.size() == 1
+                ? tr("%1 group", "%1 will be substituted with a user group name")
+                : tr("%1 and %n more groups", "%1 will be substituted with a user group name",
+                    groupsData.size() - 1);
+
+            const QString permisionName = permissions.at(index.row()).second;
+
+            return tr("Inherits %1 permission from",
+                "%1 will be substituted with a permission name").arg(html::bold(permisionName))
+                + " " + groupsInfoTemplate.arg(html::bold(groupsData[0].name));
         }
+
         default:
             return {};
     }
