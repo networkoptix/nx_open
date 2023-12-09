@@ -5493,6 +5493,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>System shut down</source>
       <translation>システムがシャットダウンしました</translation>
     </message>
+    <message>
+      <source>Intercom call</source>
+      <translation>インターホン通話</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation>インターホン不在着信</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7284,6 +7292,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Calling...</source>
       <translation>発信中...</translation>
+    </message>
+    <message>
+      <source>Missed Call</source>
+      <translation>不在着信</translation>
     </message>
   </context>
   <context>

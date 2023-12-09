@@ -2376,10 +2376,6 @@
       <translation>ファイル %1 のバックアップに失敗しました</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>インターホン通知者を表示</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>HTTP(S) リクエストを実行</translation>
     </message>

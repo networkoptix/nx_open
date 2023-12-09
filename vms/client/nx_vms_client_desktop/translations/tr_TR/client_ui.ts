@@ -675,6 +675,10 @@
       <source>Record audio</source>
       <translation>Ses kaydı</translation>
     </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation>PTZ'yi Durdur komutunu göndermeyin</translation>
+    </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>

@@ -5555,6 +5555,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>System shut down</source>
       <translation type="unfinished">System shut down</translation>
     </message>
+    <message>
+      <source>Intercom call</source>
+      <translation>Interkom araması</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation>İnterkom cevapsız arama</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7405,6 +7413,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Calling...</source>
       <translation>Arıyor...</translation>
+    </message>
+    <message>
+      <source>Missed Call</source>
+      <translation>Cevapsız Arama</translation>
     </message>
   </context>
   <context>

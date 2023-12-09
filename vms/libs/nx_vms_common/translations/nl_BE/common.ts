@@ -2446,10 +2446,6 @@
       <translation>Kan geen back-up maken van bestand %1</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>Toon Intercom Informer</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation type="unfinished">Do HTTP(S) request</translation>
     </message>

@@ -5686,6 +5686,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>System shut down</source>
       <translation>Zamknięcie systemu</translation>
     </message>
+    <message>
+      <source>Intercom call</source>
+      <translation type="unfinished">Intercom call</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation type="unfinished">Intercom missed call</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -7651,6 +7659,10 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     <message>
       <source>Calling...</source>
       <translation>Wywoływanie...</translation>
+    </message>
+    <message>
+      <source>Missed Call</source>
+      <translation type="unfinished">Missed Call</translation>
     </message>
   </context>
   <context>

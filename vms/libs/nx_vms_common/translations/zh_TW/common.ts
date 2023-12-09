@@ -2376,10 +2376,6 @@
       <translation>%1 檔案備份失敗</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>顯示對講機通知</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>發送一則HTTP(S)請求</translation>
     </message>

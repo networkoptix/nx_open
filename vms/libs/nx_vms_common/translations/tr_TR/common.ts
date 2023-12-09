@@ -1803,7 +1803,7 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Verileri senkronize etmek için Bulut yoklama HTTP istekleri arasındaki aralık.</translation>
     </message>
   </context>
   <context>
@@ -2444,10 +2444,6 @@
     <message>
       <source>Failed to backup file %1</source>
       <translation>%1 dosyası yedeklenemedi</translation>
-    </message>
-    <message>
-      <source>Show Intercom Informer</source>
-      <translation>İnterkom bilgilendiricisini göster</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
