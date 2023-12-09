@@ -135,7 +135,7 @@ MembershipSettings
                         horizontalAlignment: Text.AlignLeft
                         elide: Text.ElideRight
 
-                        font: Qt.font({pixelSize: 12, weight: Font.Medium})
+                        font: Qt.font({pixelSize: 14, weight: Font.Medium})
                         color: ColorTheme.colors.light16
 
                         text: qsTr("No custom groups yet")
