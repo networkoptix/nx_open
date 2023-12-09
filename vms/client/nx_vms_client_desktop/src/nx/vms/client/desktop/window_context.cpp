@@ -5,7 +5,8 @@
 #include <memory>
 
 #include <QtCore/QPointer>
-#include <QtQml/QQmlEngine> //< For registering types.
+#include <QtQml/QQmlContext>
+#include <QtQml/QQmlEngine>
 
 #include <client/client_startup_parameters.h>
 #include <core/resource/user_resource.h>
@@ -171,6 +172,14 @@ void WindowContext::registerQmlType()
 {
     qmlRegisterUncreatableType<WindowContext>("nx.vms.client.desktop", 1, 0, "WindowContext",
         "Cannot create instance of WindowContext");
+}
+
+WindowContext* WindowContext::fromQmlContext(QObject* object)
+{
+    const auto qmlContext = QQmlEngine::contextForObject(object);
+    return NX_ASSERT(qmlContext)
+        ? qmlContext->contextProperty(kQmlPropertyName).value<WindowContext*>()
+        : nullptr;
 }
 
 QWidget* WindowContext::mainWindowWidget() const

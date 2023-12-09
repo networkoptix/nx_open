@@ -14,7 +14,7 @@ struct SessionAwareAttached::Private: public QnSessionAwareDelegate
     using base_type = QnSessionAwareDelegate;
 
     Private(SessionAwareAttached* sessionAwareAttached, QObject* parent):
-        base_type(parent),
+        base_type(WindowContext::fromQmlContext(parent)),
         q(sessionAwareAttached)
     {
         QObject::connect(windowContext(), &WindowContext::systemChanged, q,
