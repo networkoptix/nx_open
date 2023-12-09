@@ -685,6 +685,10 @@
       <source>Record audio</source>
       <translation type="unfinished">Record audio</translation>
     </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation>Не отправлять команду остановки PTZ</translation>
+    </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>

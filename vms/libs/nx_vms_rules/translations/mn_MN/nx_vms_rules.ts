@@ -5,7 +5,7 @@
     <name>nx::vms::rules::AggregatedEvent</name>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>%1 үйл явдлууд болсон байна</translation>
     </message>
   </context>
   <context>
@@ -21,11 +21,11 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Нөхцөл байдал</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>Event Type</source>
@@ -44,12 +44,12 @@
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Объект илэрсэн</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>&apos;%2&apos; камер дээр %1</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
@@ -57,7 +57,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>Object Type</source>
@@ -72,7 +72,7 @@
     <name>nx::vms::rules::BackupFinishedEvent</name>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>&quot;%1&quot; сервер сервер архивын нөөцлөлт хийж дууслаа</translation>
     </message>
     <message>
       <source>Backup Finished</source>
@@ -106,11 +106,11 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Нөхцөл байдал</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>Input ID</source>
@@ -148,15 +148,15 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation type="unfinished">Device %1 was disconnected</translation>
+      <translation>%1 төхөөрөмж салсан байна</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation type="unfinished">Camera %1 was disconnected</translation>
+      <translation>%1 камер салсан байна</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation type="unfinished">I/O Module %1 was disconnected</translation>
+      <translation>%1 I/O модуль салсан байна</translation>
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
@@ -190,12 +190,12 @@
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>%1 төхөөрөмжийн IP холбогдсонгүй</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>%1 камерын IP холбогдсонгүй</translation>
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
@@ -243,7 +243,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Нөхцөл байдал</translation>
     </message>
     <message>
       <source>Source</source>
@@ -266,11 +266,11 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
@@ -297,11 +297,11 @@
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>&quot;%1&quot; сервер лицензийн асуудалтай байна</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Лицензийн алдаа</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
@@ -320,15 +320,15 @@
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>%1 дээр хөдөлгөөн илэрлээ</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Нөхцөл байдал</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -339,11 +339,11 @@
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue at %1</source>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>%1 дээр сүлжээний алдаа гарлаа</translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Сүлжээний алдаа</translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
@@ -366,11 +366,11 @@
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>Камерын цаг хэвийн ажиллаж эхэллээ.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Төхөөрөмж сүлжээнд хариу өгөхгүй байна.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -388,19 +388,19 @@
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>%1 сүлжээнд multicast хаяг дэмжигдээгүй байна.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Камерын холболт (үндсэн дамжуулалт) саллаа.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Камерын холболт (хоёрдогч дамжуулалт) саллаа.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Төхөөрөмжийн холболт саллаа.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
@@ -446,7 +446,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>Source</source>
@@ -486,7 +486,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Нөхцөл байдал</translation>
     </message>
     <message>
       <source>Server</source>
@@ -545,7 +545,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>&quot;%1&quot; сервер холбогдсонгүй</translation>
     </message>
     <message>
       <source>Server Conflict</source>
@@ -556,30 +556,30 @@
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>&quot;%1&quot; серверийн алдаа</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Серверийн алдаа</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Серверийн холболт саллаа.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Сервер ажиллагаагүй боллоо.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>&quot;%1&quot; сервер ажиллалаа</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Сервер ажиллаа</translation>
     </message>
   </context>
   <context>
@@ -602,19 +602,19 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Нөхцөл байдал</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Камерууд</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Хэрэглэгчид</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Icon</source>
@@ -629,7 +629,7 @@
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Камерууд</translation>
     </message>
     <message>
       <source>Interval of action</source>
@@ -652,35 +652,35 @@
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>%1 дээр хадгалалтын асуудал</translation>
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Хадгалалтын асуудал</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>%1 дээр I/O-н алдаа заалаа.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>%1 дээр бичилт хийхэд HDD/SSD-н хурд хүрэлцэхгүй байна.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>&quot;%1&quot; HDD/SSD диск дүүрсэн байна. Уг диск дээр VMS-тэй хамааралгүй хэт их дата хадгалагдсан байна.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>&quot;%1&quot; дискийн багтаамж дүүрч байна.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>&quot;%1&quot; аналитикын хадгалалт унтарсан байна.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>&quot;%1&quot; аналитикын хадгалалт дүүрч байна.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
@@ -707,7 +707,7 @@
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Камерууд</translation>
     </message>
     <message>
       <source>Also show on source camera</source>

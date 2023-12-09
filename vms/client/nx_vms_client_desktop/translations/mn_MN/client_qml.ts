@@ -180,11 +180,11 @@
     <name>BooleanRadioGroup</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Тийм</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Үгүй</translation>
     </message>
   </context>
   <context>
@@ -292,14 +292,14 @@
     <name>ConnectButton</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Серверт холбогдох</translation>
     </message>
   </context>
   <context>
     <name>ConnectTile</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Серверт холбогдох</translation>
     </message>
   </context>
   <context>
@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Загасан нүд</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -401,11 +401,11 @@
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Болсон</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Цуцлах</translation>
     </message>
   </context>
   <context>
@@ -479,7 +479,7 @@
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Хэмжээ</translation>
     </message>
     <message>
       <source>X Offset</source>
@@ -502,7 +502,7 @@
     <name>GlobalLoaderIndicator</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Ачааллаж байна...</translation>
     </message>
   </context>
   <context>
@@ -589,7 +589,7 @@
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Хадгалах</translation>
     </message>
     <message>
       <source>Previous</source>
@@ -661,7 +661,7 @@
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Камерууд</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -669,7 +669,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Хөдөлгөөн</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -685,7 +685,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Тохиргоо</translation>
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
@@ -705,7 +705,7 @@
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Тэмдэглэл байхгүй байна</translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
@@ -782,15 +782,15 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Холбогдох</translation>
     </message>
     <message>
       <source>Remember me</source>
@@ -812,7 +812,7 @@
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Устгах</translation>
     </message>
   </context>
   <context>
@@ -870,7 +870,7 @@
     <name>PromoPageButtons</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Болсон</translation>
     </message>
     <message>
       <source>Next</source>
@@ -940,11 +940,11 @@ to activate PTZ</translation>
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Нэмэх</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Устгах</translation>
     </message>
   </context>
   <context>
@@ -1023,7 +1023,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Хэрэглэгчид</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -1049,7 +1049,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Хөдөлгөөн</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -1061,7 +1061,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Analytics</source>
-      <translation type="unfinished">Analytics</translation>
+      <translation>Аналитик</translation>
     </message>
   </context>
   <context>
@@ -1112,7 +1112,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Цуцлах</translation>
     </message>
   </context>
   <context>
@@ -1160,7 +1160,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Дахин тохируулах</translation>
     </message>
   </context>
   <context>
@@ -1218,7 +1218,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Таны лиценз хүрэлцэхгүй байна</translation>
     </message>
     <message>
       <source>Server unavailable</source>
@@ -1298,7 +1298,7 @@ to activate PTZ</translation>
     <name>TileMenu</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Өөрчлөх</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -1306,11 +1306,11 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Show</source>
-      <translation type="unfinished">Show</translation>
+      <translation>Харах</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
@@ -1329,15 +1329,15 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Өчигдөр</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Сүүлийн 7 хоног</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Сүүлийн 30 хоног</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
@@ -1381,7 +1381,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Тусламж</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
