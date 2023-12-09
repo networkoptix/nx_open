@@ -55,6 +55,8 @@ public:
     static QString kQmlPropertyName;
     static void registerQmlType();
 
+    static WindowContext* fromQmlContext(QObject* object);
+
     /** Main window. */
     QWidget* mainWindowWidget() const;
 
