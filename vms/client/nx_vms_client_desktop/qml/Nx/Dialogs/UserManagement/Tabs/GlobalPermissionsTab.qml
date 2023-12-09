@@ -74,7 +74,7 @@ Item
                     sourceSize: Qt.size(20, 20)
                     source: "image://svg/skin/user_settings/sharing/group.svg"
                     color: groupMouseArea.containsMouse
-                        ? ColorTheme.colors.light10
+                        ? ColorTheme.colors.light16
                         : ColorTheme.colors.dark13
 
                     MouseArea
