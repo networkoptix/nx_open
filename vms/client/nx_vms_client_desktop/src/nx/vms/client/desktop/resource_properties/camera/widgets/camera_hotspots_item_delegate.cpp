@@ -138,6 +138,32 @@ std::optional<int> CameraHotspotsItemDelegate::paletteColorIndexAtPos(
     return std::nullopt;
 }
 
+QRect CameraHotspotsItemDelegate::itemContentsRect(
+    const QModelIndex& index,
+    QAbstractItemView* itemView) const
+{
+    if (!itemView || !index.isValid())
+        return {};
+
+    QStyleOptionViewItem option;
+    option.widget = itemView;
+    option.rect = itemView->visualRect(index);
+    option.decorationSize =
+        QSize(nx::style::Metrics::kDefaultIconSize, nx::style::Metrics::kDefaultIconSize);
+
+    base_type::initStyleOption(&option, index);
+
+    const auto style = option.widget->style();
+
+    const auto itemTextRect =
+        style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
+
+    const auto itemIconRect =
+        style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
+
+    return itemTextRect.united(itemIconRect).adjusted(1, 1, 1, 1);
+}
+
 void CameraHotspotsItemDelegate::paint(
     QPainter* painter,
     const QStyleOptionViewItem& styleOption,
@@ -168,26 +194,6 @@ QSize CameraHotspotsItemDelegate::sizeHint(
     }
 
     return result;
-}
-
-QWidget* CameraHotspotsItemDelegate::createEditor(
-    QWidget* parent, const
-    QStyleOptionViewItem& option,
-    const QModelIndex& index) const
-{
-    if (index.column() == CameraHotspotsItemModel::TargetColumn)
-    {
-        auto editorButton = new QPushButton(parent);
-        editorButton->setText(index.data(Qt::DisplayRole).toString());
-        editorButton->setStyleSheet(QString("text-align:left; padding-left:%1")
-            .arg(nx::style::Metrics::kTextButtonIconSpacing));
-
-        connect(editorButton, &QPushButton::clicked, this,
-            [this, index] { emit cameraEditorRequested(index); });
-
-        return editorButton;
-    }
-    return base_type::createEditor(parent, option, index);
 }
 
 void CameraHotspotsItemDelegate::paintColorPicker(
@@ -247,6 +253,14 @@ void CameraHotspotsItemDelegate::initStyleOption(
             static const auto kInvalidCameraColor = core::colorTheme()->color("red_core");
             static const auto kSelectedInvalidCameraColor = core::colorTheme()->color("red_l2");
             setupStyleOptionColors(option, kInvalidCameraColor, kSelectedInvalidCameraColor);
+        }
+
+        if (m_hoverTracker && m_hoverTracker->hoveredIndex() == index)
+        {
+            option->palette.setColor(
+                QPalette::Text,
+                option->palette.color(QPalette::HighlightedText));
+            option->icon = option->icon.pixmap(option->rect.size(), QIcon::Selected);
         }
 
         if (!option->state.testFlag(QStyle::State_Enabled))

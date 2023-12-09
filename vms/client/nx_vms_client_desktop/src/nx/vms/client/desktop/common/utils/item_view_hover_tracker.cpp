@@ -4,10 +4,9 @@
 
 #include <QtGui/QHoverEvent>
 
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <utils/common/event_processors.h>
-
-#include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::desktop {
 
@@ -19,35 +18,36 @@ ItemViewHoverTracker::ItemViewHoverTracker(QAbstractItemView* parent):
     m_itemView->setMouseTracking(true);
     m_itemView->setAttribute(Qt::WA_Hover);
 
-    installEventHandler(m_itemView, { QEvent::HoverEnter, QEvent::HoverLeave, QEvent::HoverMove }, this,
+    installEventHandler(
+        m_itemView, {QEvent::HoverEnter, QEvent::HoverLeave, QEvent::HoverMove}, this,
         [this](QObject* /*object*/, QEvent* event)
         {
-            static const QModelIndex kNoHover;
-
             if (!m_itemView->isEnabled() || !m_itemView->model() || !m_itemView->viewport())
-                changeHover(kNoHover);
-
-            switch (event->type())
             {
-                case QEvent::HoverLeave:
-                {
-                    changeHover(kNoHover);
-                    break;
-                }
-
-                case QEvent::HoverEnter:
-                case QEvent::HoverMove:
-                {
-                    QPoint pos = static_cast<QHoverEvent*>(event)->pos();
-                    changeHover(m_itemView->childAt(pos) == m_itemView->viewport() ?
-                        m_itemView->indexAt(m_itemView->viewport()->mapFrom(m_itemView, pos)) :
-                        kNoHover);
-                    break;
-                }
-
-                default:
-                    break;
+                setHoveredIndex({});
+                return;
             }
+
+            if (event->type() == QEvent::HoverLeave)
+            {
+                setHoveredIndex({});
+                return;
+            };
+
+            const auto eventPos = static_cast<QHoverEvent*>(event)->position().toPoint();
+            if (m_itemView->childAt(eventPos) != m_itemView->viewport())
+            {
+                setHoveredIndex({});
+                return;
+            }
+
+            const auto viewportPos = m_itemView->viewport()->mapFrom(m_itemView, eventPos);
+            const auto indexAtPos = m_itemView->indexAt(viewportPos);
+
+            if (!m_hoverMaskPredicate || m_hoverMaskPredicate(indexAtPos, viewportPos))
+                setHoveredIndex(indexAtPos);
+            else
+                setHoveredIndex({});
         });
 }
 
@@ -56,41 +56,42 @@ QModelIndex ItemViewHoverTracker::hoveredIndex() const
     return m_hoveredIndex;
 }
 
-int ItemViewHoverTracker::mouseCursorRole() const
+std::optional<int> ItemViewHoverTracker::mouseCursorRole() const
 {
     return m_mouseCursorRole;
 }
 
-void ItemViewHoverTracker::setMouseCursorRole(int value)
+void ItemViewHoverTracker::setMouseCursorRole(std::optional<int> role)
 {
-    if (value == m_mouseCursorRole)
-        return;
+    m_mouseCursorRole = role;
+}
 
-    m_mouseCursorRole = value;
-
-    if (m_mouseCursorRole != kNoMouseCursorRole)
-        updateMouseCursor();
-    else
-        m_itemView->unsetCursor();
+void ItemViewHoverTracker::setHoverMaskPredicate(const HoverMaskPredicate& predicate)
+{
+    m_hoverMaskPredicate = predicate;
 }
 
 void ItemViewHoverTracker::updateMouseCursor()
 {
-    if (m_hoveredIndex.isValid())
+    if (m_hoveredIndex.isValid() && m_mouseCursorRole)
     {
-        bool ok = false;
-        auto shape = static_cast<Qt::CursorShape>(m_hoveredIndex.data(m_mouseCursorRole).toInt(&ok));
-        if (ok && shape >= 0 && shape <= Qt::LastCursor)
+        const auto cursorShapeData = m_hoveredIndex.data(*m_mouseCursorRole);
+        if (!cursorShapeData.isNull())
         {
-            m_itemView->setCursor(shape);
-            return;
+            bool ok = false;
+            const auto cursorShape = static_cast<Qt::CursorShape>(cursorShapeData.toInt(&ok));
+            if (ok && cursorShape >= 0 && cursorShape <= Qt::LastCursor)
+            {
+                m_itemView->setCursor(cursorShape);
+                return;
+            }
         }
     }
 
     m_itemView->unsetCursor();
 }
 
-void ItemViewHoverTracker::changeHover(const QModelIndex& index)
+void ItemViewHoverTracker::setHoveredIndex(const QModelIndex& index)
 {
     bool selectRows = m_itemView->selectionBehavior() == QAbstractItemView::SelectRows;
     bool selectColumns = m_itemView->selectionBehavior() == QAbstractItemView::SelectColumns;
@@ -103,7 +104,7 @@ void ItemViewHoverTracker::changeHover(const QModelIndex& index)
         bool rowChange = selectRows && index.row() != m_hoveredIndex.row();
         bool columnChange = selectColumns && index.column() != m_hoveredIndex.column();
 
-        /* Emit leave signals and mark row or column rectangle for repaint: */
+        // Emit leave signals and mark row or column rectangle for repaint.
         if (m_hoveredIndex.isValid())
         {
             if (columnChange)
@@ -122,17 +123,20 @@ void ItemViewHoverTracker::changeHover(const QModelIndex& index)
         }
 
         m_hoveredIndex = index;
-        m_itemView->setProperty(style::Properties::kHoveredIndexProperty, QVariant::fromValue(m_hoveredIndex));
+        m_itemView->setProperty(
+            style::Properties::kHoveredIndexProperty, QVariant::fromValue(m_hoveredIndex));
 
-        if (m_mouseCursorRole != kNoMouseCursorRole)
-            updateMouseCursor();
+        updateMouseCursor();
 
         if (index.isValid())
         {
             if (rowChange)
-                m_itemView->setProperty(style::Properties::kHoveredRowProperty, m_hoveredIndex.row());
+            {
+                m_itemView->setProperty(
+                    style::Properties::kHoveredRowProperty, m_hoveredIndex.row());
+            }
 
-            /* Emit enter signals and mark row or column rectangle for repaint: */
+            // Emit enter signals and mark row or column rectangle for repaint.
             emit itemEnter(m_hoveredIndex);
 
             if (rowChange)
@@ -149,7 +153,7 @@ void ItemViewHoverTracker::changeHover(const QModelIndex& index)
         }
         else
         {
-            /* Clear current row index property: */
+            // Clear current row index property.
             if (rowChange)
                 m_itemView->setProperty(style::Properties::kHoveredRowProperty, -1);
         }
