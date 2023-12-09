@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <functional>
+#include <optional>
+
 #include <QtCore/QObject>
 #include <QtWidgets/QAbstractItemView>
 
@@ -16,9 +19,15 @@ public:
 
     QModelIndex hoveredIndex() const;
 
-    int mouseCursorRole() const;
-    void setMouseCursorRole(int value);
-    static constexpr int kNoMouseCursorRole = -1;
+    std::optional<int> mouseCursorRole() const;
+    void setMouseCursorRole(std::optional<int> role);
+
+    /**
+     * Predicate that determines the area within an item that triggers hovered state. If predicate
+     * isn't set, the whole item area triggers hovered state.
+     */
+    using HoverMaskPredicate = std::function<bool(const QModelIndex&, const QPoint&)>;
+    void setHoverMaskPredicate(const HoverMaskPredicate& predicate);
 
 signals:
     void itemEnter(const QModelIndex& index);
@@ -29,7 +38,7 @@ signals:
     void rowLeave(int row);
 
 private:
-    void changeHover(const QModelIndex& index);
+    void setHoveredIndex(const QModelIndex& index);
     QRect columnRect(const QModelIndex& index) const;
     QRect rowRect(const QModelIndex& index) const;
 
@@ -38,7 +47,9 @@ private:
 private:
     QAbstractItemView* const m_itemView = nullptr;
     QPersistentModelIndex m_hoveredIndex;
-    int m_mouseCursorRole = kNoMouseCursorRole;
+    std::optional<int> m_mouseCursorRole;
+
+    HoverMaskPredicate m_hoverMaskPredicate;
 };
 
 } // namespace nx::vms::client::desktop

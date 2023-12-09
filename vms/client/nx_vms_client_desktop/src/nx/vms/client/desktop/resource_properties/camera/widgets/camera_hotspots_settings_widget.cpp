@@ -97,14 +97,20 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
     hotspotsItemViewhoverTracker->setMouseCursorRole(Qn::ItemMouseCursorRole);
     hotspotsDelegate->setItemViewHoverTracker(hotspotsItemViewhoverTracker);
 
+    hotspotsItemViewhoverTracker->setHoverMaskPredicate(
+        [this](const QModelIndex& index, const QPoint& viewportPos)
+        {
+            if (index.column() != CameraHotspotsItemModel::CameraColumn)
+                return true;
+
+            return hotspotsDelegate->itemContentsRect(
+                index, ui->hotspotsItemView).contains(viewportPos);
+        });
+
     ui->hotspotsItemView->setMinimumHeight(kMinimumTableEditorHeight);
     ui->hotspotsItemView->setItemDelegate(hotspotsDelegate.get());
     ui->hotspotsItemView->setModel(hotspotsModel.get());
     ui->hotspotsItemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    ui->hotspotsItemView->setEditTriggers(QAbstractItemView::SelectedClicked);
-
-    q->connect(ui->hotspotsItemView, &QAbstractItemView::doubleClicked,
-        [this](const QModelIndex& index) { selectCameraForHotspot(index.row()); });
 
     auto header = ui->hotspotsItemView->header();
     header->setSectionResizeMode(
@@ -186,10 +192,6 @@ void CameraHotspotsSettingsWidget::Private::selectHotspotsViewRow(std::optional<
     if (row)
     {
         const auto selectionModel = ui->hotspotsItemView->selectionModel();
-
-        if (selectionModel->currentIndex().isValid())
-            ui->hotspotsItemView->closePersistentEditor(selectionModel->currentIndex());
-
         const auto index = hotspotsModel->index(*row, 0);
         ui->hotspotsItemView->scrollTo(index);
         selectionModel->select(index,
@@ -285,6 +287,18 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
             const auto hotspotIndex = index.row();
             auto hotspot = hotspotsEditor->hotspotAt(hotspotIndex);
 
+            if (index.column() == CameraHotspotsItemModel::CameraColumn)
+            {
+                const auto viewportCursorPos =
+                    hotspotsView->viewport()->mapFromGlobal(QCursor::pos());
+
+                if (d->hotspotsDelegate->itemContentsRect(index, hotspotsView)
+                    .contains(viewportCursorPos))
+                {
+                    d->selectCameraForHotspot(index.row());
+                }
+            }
+
             if (index.column() == CameraHotspotsItemModel::ColorPaletteColumn)
             {
                 const auto viewportCursorPos =
@@ -330,12 +344,6 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
             d->ui->hotspotsEditorWidget->setSelectedHotspotIndex(!selection.empty()
                 ? std::optional<int>(selection.indexes().first().row())
                 : std::nullopt);
-        });
-
-    connect(d->hotspotsDelegate.get(), &CameraHotspotsItemDelegate::cameraEditorRequested, this,
-        [this](const QModelIndex& index)
-        {
-            d->selectCameraForHotspot(index.row());
         });
 }
 

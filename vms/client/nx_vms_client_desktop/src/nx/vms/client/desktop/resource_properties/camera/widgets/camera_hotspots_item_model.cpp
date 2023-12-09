@@ -63,7 +63,7 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
                 else if (!cameraId.isNull())
                     return tr("Camera does not exist");
                 else
-                    return tr("Select Camera");
+                    return tr("Select Camera...");
 
             case DeleteButtonColumn:
                 return tr("Delete");
@@ -103,16 +103,6 @@ QVariant CameraHotspotsItemModel::data(const QModelIndex& index, int role) const
         return static_cast<int>(Qt::PointingHandCursor);
 
     return {};
-}
-
-Qt::ItemFlags CameraHotspotsItemModel::flags(const QModelIndex& index) const
-{
-    auto result = base_type::flags(index);
-
-    if (index.column() == CameraColumn)
-        result.setFlag(Qt::ItemIsEditable);
-
-    return result;
 }
 
 QVariant CameraHotspotsItemModel::headerData(
