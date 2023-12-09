@@ -38,53 +38,56 @@ Item
             bottomPadding: 16 - parent.spacing
         }
 
-        Repeater
+        Column
         {
-            model: control.model
+            spacing: 2
+            Layout.leftMargin: -3
 
-            delegate: RowLayout
+            Repeater
             {
-                Layout.leftMargin: -3
-                spacing: 8
+                model: control.model
 
-                CheckBox
+                delegate: RowLayout
                 {
-                    id: viewLogsCheckBox
-
-                    enabled: control.editable
-
-                    text: model.display
-
-                    checkState: model.isChecked ? Qt.Checked : Qt.Unchecked
-                    onCheckStateChanged: model.isChecked = (checkState == Qt.Checked)
-
-                    Layout.alignment: Qt.AlignTop
-                }
-
-                IconImage
-                {
-                    id: inheritedFromIcon
-
-                    property string toolTip: model.toolTip || ""
-                    visible: !!toolTip
-
-                    Layout.alignment: Qt.AlignTop
-                    Layout.topMargin: viewLogsCheckBox.baselineOffset - baselineOffset
-                    baselineOffset: height * 0.7 //< This is a property of this icon type.
-                    sourceSize: Qt.size(20, 20)
-                    source: "image://svg/skin/user_settings/sharing/group.svg"
-                    color: groupMouseArea.containsMouse
-                        ? ColorTheme.colors.light16
-                        : ColorTheme.colors.dark13
-
-                    MouseArea
+                    CheckBox
                     {
-                        id: groupMouseArea
-                        hoverEnabled: true
-                        anchors.fill: parent
+                        id: viewLogsCheckBox
 
-                        GlobalToolTip.text: inheritedFromIcon.toolTip
-                        GlobalToolTip.delay: 0
+                        textLeftPadding: 9
+                        enabled: control.editable
+                        text: model.display
+
+                        checkState: model.isChecked ? Qt.Checked : Qt.Unchecked
+                        onCheckStateChanged: model.isChecked = (checkState == Qt.Checked)
+
+                        Layout.alignment: Qt.AlignTop
+                    }
+
+                    IconImage
+                    {
+                        id: inheritedFromIcon
+
+                        property string toolTip: model.toolTip || ""
+                        visible: !!toolTip
+
+                        Layout.alignment: Qt.AlignTop
+                        Layout.topMargin: viewLogsCheckBox.baselineOffset - baselineOffset
+                        baselineOffset: height * 0.7 //< This is a property of this icon type.
+                        sourceSize: Qt.size(20, 20)
+                        source: "image://svg/skin/user_settings/sharing/group.svg"
+                        color: groupMouseArea.containsMouse
+                            ? ColorTheme.colors.light16
+                            : ColorTheme.colors.dark13
+
+                        MouseArea
+                        {
+                            id: groupMouseArea
+                            hoverEnabled: true
+                            anchors.fill: parent
+
+                            GlobalToolTip.text: inheritedFromIcon.toolTip
+                            GlobalToolTip.delay: 0
+                        }
                     }
                 }
             }

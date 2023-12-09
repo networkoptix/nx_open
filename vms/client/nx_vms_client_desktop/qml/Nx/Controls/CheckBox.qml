@@ -16,6 +16,7 @@ CheckBox
 
     property Item middleItem: null //< An optional item between indicator and text.
     property alias middleSpacing: middleContainer.rightPadding //< Between middleItem and text.
+    property alias textLeftPadding: controlText.leftPadding
     property alias textFormat: controlText.textFormat
     property alias wrapMode: controlText.wrapMode
     property alias elide: controlText.elide
