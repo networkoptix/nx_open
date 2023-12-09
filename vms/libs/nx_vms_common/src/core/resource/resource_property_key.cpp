@@ -233,6 +233,8 @@ const QString kDisableRtspMetadataStream("disableRtspMetadataStream");
 
 const QString kOnvifRemoteArchiveDisableFastDownload("onvifRemoteArchiveDisableFastDownload");
 
+const QString kOnvifRemoteArchiveEnabled("onvifRemoteArchiveEnabled");
+
 const QString kGsoapAdditionalFlags("gsoapAdditionalFlags");
 
 const QString kOnvifIgnoreOutdatedNotifications("onvifIgnoreOutdatedNotifications");
