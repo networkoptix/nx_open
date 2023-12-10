@@ -9010,11 +9010,25 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Permission granted by %1 group</source>
+        <source>Generate events</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Generate events</source>
+        <source>%1 group</source>
+        <comment>%1 will be substituted with a user group name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 and %n more groups</source>
+        <comment>%1 will be substituted with a user group name</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Inherits %1 permission from</source>
+        <comment>%1 will be substituted with a permission name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
