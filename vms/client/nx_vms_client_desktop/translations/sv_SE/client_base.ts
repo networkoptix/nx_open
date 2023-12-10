@@ -2446,13 +2446,6 @@ Licensnyckel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Hantera bokmärken</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
@@ -4215,10 +4208,6 @@ till %1</translation>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-      <source>Manage Bookmarks</source>
-      <translation>Hantera bokmärken</translation>
-    </message>
-    <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>Meddelandet visas tills en av användarna som ser det skapar bokmärke med händelsebeskrivning</translation>
     </message>
@@ -4457,7 +4446,25 @@ till %1</translation>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
+    <name>QnRequiredAccessRightPolicy</name>
+    <message>
+      <source>User group %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user group, %2 is permission name</comment>
+      <translation>Användargrupp %1 har ingen %2 behörighet</translation>
+    </message>
+    <message>
+      <source>Selected user groups have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Valda användargrupper har ingen %1 behörighet</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected user groups have no %2 permission</source>
+      <comment>%1 is number of selected user groups, %2 is permission name</comment>
+      <translation>
+        <numerusform>%n av %1 valda användargrupper har ingen %2 behörighet</numerusform>
+        <numerusform>%n av %1 valda användargrupper har ingen %2 behörighet</numerusform>
+      </translation>
+    </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
@@ -4474,24 +4481,6 @@ till %1</translation>
       <translation>
         <numerusform>%n av %1 valda användare har ingen %2 behörighet</numerusform>
         <numerusform>%n av %1 valda användare har ingen %2 behörighet</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User group %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation>Användargrupp %1 har ingen %2 behörighet</translation>
-    </message>
-    <message>
-      <source>Selected user groups have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Valda användargrupper har ingen %1 behörighet</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected user groups have no %2 permission</source>
-      <comment>%1 is number of selected user groups, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n av %1 valda roller har ingen %2 behörighet</numerusform>
-        <numerusform>%n av %1 valda användargrupper har ingen %2 behörighet</numerusform>
       </translation>
     </message>
   </context>
@@ -4908,13 +4897,6 @@ till %1</translation>
     <message>
       <source>Watermark Matched</source>
       <translation>Vattenstämpel matchad</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>Användarinmatning</translation>
     </message>
   </context>
   <context>
@@ -12734,13 +12716,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Manage</source>
       <translation>Hantera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
-    <message>
-      <source>Soft trigger</source>
-      <translation>Utlösare</translation>
     </message>
   </context>
   <context>

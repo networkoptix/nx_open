@@ -2446,13 +2446,6 @@ Clé de licence : %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Gérer Signets</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
@@ -4215,10 +4208,6 @@ to %1</source>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-      <source>Manage Bookmarks</source>
-      <translation>Gérer Signets</translation>
-    </message>
-    <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>La notification s'affiche jusqu'à ce que l'un des utilisateurs qui le voient crée un signet avec la description de l'événement</translation>
     </message>
@@ -4457,25 +4446,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
-    <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>L'utilisateur %1 n'a pas d'autorisation %2</translation>
-    </message>
-    <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Les utilisateurs sélectionnés n'ont pas d'autorisation %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n de %1 Utilisateur sélectionné n'a pas d'autorisation %2</numerusform>
-        <numerusform>%n de %1 Utilisateurs sélectionnés n'ont pas d'autorisation %2</numerusform>
-      </translation>
-    </message>
+    <name>QnRequiredAccessRightPolicy</name>
     <message>
       <source>User group %1 has no %2 permission</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
@@ -4492,6 +4463,24 @@ to %1</source>
       <translation type="unfinished">
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>L'utilisateur %1 n'a pas d'autorisation %2</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Les utilisateurs sélectionnés n'ont pas d'autorisation %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation>
+        <numerusform>%n de %1 Utilisateur sélectionné n'a pas d'autorisation %2</numerusform>
+        <numerusform>%n de %1 Utilisateurs sélectionnés n'ont pas d'autorisation %2</numerusform>
       </translation>
     </message>
   </context>
@@ -4908,13 +4897,6 @@ to %1</source>
     <message>
       <source>Watermark Matched</source>
       <translation>Le filigrane correspond</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>Entrée utilisateur</translation>
     </message>
   </context>
   <context>
@@ -12736,13 +12718,6 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     <message>
       <source>Manage</source>
       <translation>Gérer</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
-    <message>
-      <source>Soft trigger</source>
-      <translation>Déclencheur</translation>
     </message>
   </context>
   <context>
