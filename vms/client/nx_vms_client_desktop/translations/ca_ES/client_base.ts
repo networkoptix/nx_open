@@ -2446,13 +2446,6 @@ License Key: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Gestiona els marcadors</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
@@ -4214,10 +4207,6 @@ a %1</translation>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-      <source>Manage Bookmarks</source>
-      <translation>Gestiona els marcadors</translation>
-    </message>
-    <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>La notificació es mostrarà fins que un dels usuaris que la vegin creï un marcador amb la descripció de l'esdeveniment</translation>
     </message>
@@ -4456,25 +4445,7 @@ a %1</translation>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
-    <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>L'usuari %1 no té permís %2</translation>
-    </message>
-    <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Els usuaris seleccionats no tenen permís %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n de %1 usuaris seleccionats no tenen permís %2</numerusform>
-        <numerusform>%n de %1 usuaris seleccionats no tenen permís %2</numerusform>
-      </translation>
-    </message>
+    <name>QnRequiredAccessRightPolicy</name>
     <message>
       <source>User group %1 has no %2 permission</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
@@ -4491,6 +4462,24 @@ a %1</translation>
       <translation type="unfinished">
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>L'usuari %1 no té permís %2</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Els usuaris seleccionats no tenen permís %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation>
+        <numerusform>%n de %1 usuaris seleccionats no tenen permís %2</numerusform>
+        <numerusform>%n de %1 usuaris seleccionats no tenen permís %2</numerusform>
       </translation>
     </message>
   </context>
@@ -4907,13 +4896,6 @@ a %1</translation>
     <message>
       <source>Watermark Matched</source>
       <translation>Filigrana coincident</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>Entrada d'usuari</translation>
     </message>
   </context>
   <context>
@@ -12734,13 +12716,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Manage</source>
       <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
-    <message>
-      <source>Soft trigger</source>
-      <translation type="unfinished">Soft trigger</translation>
     </message>
   </context>
   <context>

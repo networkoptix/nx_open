@@ -2506,13 +2506,6 @@ Klucz licencyjny: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Zarządzaj zakładkami</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
@@ -4307,10 +4300,6 @@ to %1</source>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-      <source>Manage Bookmarks</source>
-      <translation>Zarządzaj zakładkami</translation>
-    </message>
-    <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>Powiadomienie będzie wyświetlane, dopóki jeden z użytkowników je zobaczy i utworzy zakładkę z opisem zdarzenia</translation>
     </message>
@@ -4561,7 +4550,27 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
+    <name>QnRequiredAccessRightPolicy</name>
+    <message>
+      <source>User group %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user group, %2 is permission name</comment>
+      <translation>Grupa użytkowników %1 nie ma %2 uprawnień</translation>
+    </message>
+    <message>
+      <source>Selected user groups have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Wybrane grupy użytkowników nie mają uprawnień %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected user groups have no %2 permission</source>
+      <comment>%1 is number of selected user groups, %2 is permission name</comment>
+      <translation>
+        <numerusform>%n z %1 wybranych grup użytkowników nie ma %2 uprawnień</numerusform>
+        <numerusform>%n z %1 wybranych grup użytkowników nie ma %2 uprawnień</numerusform>
+        <numerusform>%n z %1 wybranych grup użytkowników nie ma %2 uprawnień</numerusform>
+        <numerusform>%n z %1 wybranych grup użytkowników nie ma %2 uprawnień</numerusform>
+      </translation>
+    </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
@@ -4580,26 +4589,6 @@ to %1</source>
         <numerusform>%n na %1 z wybranych użytkowników nie ma uprawnienia %2</numerusform>
         <numerusform>%n na %1 z wybranych użytkowników nie ma uprawnienia %2</numerusform>
         <numerusform>%n na %1 z wybranych użytkowników nie ma uprawnienia %2</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User group %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation>Grupa użytkowników %1 nie ma %2 uprawnień</translation>
-    </message>
-    <message>
-      <source>Selected user groups have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Wybrane grupy użytkowników nie mają uprawnień %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected user groups have no %2 permission</source>
-      <comment>%1 is number of selected user groups, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n z %1 wybranych grup użytkowników nie ma %2 uprawnień</numerusform>
-        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
       </translation>
     </message>
   </context>
@@ -5032,13 +5021,6 @@ to %1</source>
     <message>
       <source>Watermark Matched</source>
       <translation>Znak wodny jest prawidłowy</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>Dane użytkownika</translation>
     </message>
   </context>
   <context>
@@ -13091,13 +13073,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <message>
       <source>Manage</source>
       <translation>Zarządzaj</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
-    <message>
-      <source>Soft trigger</source>
-      <translation type="unfinished">Soft trigger</translation>
     </message>
   </context>
   <context>

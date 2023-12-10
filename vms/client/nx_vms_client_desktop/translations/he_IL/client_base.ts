@@ -2506,13 +2506,6 @@ License Key: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>נהל סימניות</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
@@ -4308,10 +4301,6 @@ to %1</source>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-      <source>Manage Bookmarks</source>
-      <translation>נהל סימניות</translation>
-    </message>
-    <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>ההודעה תוצג עד שאחד המשתמשים שיראה אותה ייצור סימניה עם תיאור האירוע</translation>
     </message>
@@ -4562,27 +4551,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
-    <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>למשתמש %1 אין הרשאה %2</translation>
-    </message>
-    <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>למשתמשים שנבחרו אין הרשאה %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
-        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
-        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
-        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
-      </translation>
-    </message>
+    <name>QnRequiredAccessRightPolicy</name>
     <message>
       <source>User group %1 has no %2 permission</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
@@ -4601,6 +4570,26 @@ to %1</source>
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>למשתמש %1 אין הרשאה %2</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>למשתמשים שנבחרו אין הרשאה %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
+        <numerusform>ל %n מתוך %1 המשתמשים שנבחרו אין הרשאת %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5033,13 +5022,6 @@ to %1</source>
     <message>
       <source>Watermark Matched</source>
       <translation>סימן המים תואם</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>קלט משתמש</translation>
     </message>
   </context>
   <context>
@@ -13096,13 +13078,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Manage</source>
       <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
-    <message>
-      <source>Soft trigger</source>
-      <translation type="unfinished">Soft trigger</translation>
     </message>
   </context>
   <context>

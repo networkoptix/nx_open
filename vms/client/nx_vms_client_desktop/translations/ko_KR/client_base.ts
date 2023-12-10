@@ -2416,13 +2416,6 @@ License Key: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>즐겨찾기 관리</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
@@ -4164,10 +4157,6 @@ to %1</source>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-      <source>Manage Bookmarks</source>
-      <translation>즐겨찾기 관리</translation>
-    </message>
-    <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>알림을 보는 사용자 중 한 명이 이벤트 설명과 함께 즐겨찾기를 만들 때까지 표시됩니다.</translation>
     </message>
@@ -4400,24 +4389,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
-    <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>사용자 %1에게는 %2 권한이 없습니다.</translation>
-    </message>
-    <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>선택한 사용자에게는 %1 권한이 없습니다.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>선택한 %1중 %n 사용자에 %2 권한이 없습니다.</numerusform>
-      </translation>
-    </message>
+    <name>QnRequiredAccessRightPolicy</name>
     <message>
       <source>User group %1 has no %2 permission</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
@@ -4433,6 +4405,23 @@ to %1</source>
       <comment>%1 is number of selected user groups, %2 is permission name</comment>
       <translation type="unfinished">
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>사용자 %1에게는 %2 권한이 없습니다.</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>선택한 사용자에게는 %1 권한이 없습니다.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation>
+        <numerusform>선택한 %1중 %n 사용자에 %2 권한이 없습니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -4841,13 +4830,6 @@ to %1</source>
     <message>
       <source>Watermark Matched</source>
       <translation>워터마크가 확인되었습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>사용자 입력</translation>
     </message>
   </context>
   <context>
@@ -12550,13 +12532,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Manage</source>
       <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
-    <message>
-      <source>Soft trigger</source>
-      <translation type="unfinished">Soft trigger</translation>
     </message>
   </context>
   <context>

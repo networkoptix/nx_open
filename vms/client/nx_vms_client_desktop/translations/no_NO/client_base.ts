@@ -2446,13 +2446,6 @@ Lisensnøkkel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Administrer bokmerker</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
@@ -4215,10 +4208,6 @@ til %1</translation>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-      <source>Manage Bookmarks</source>
-      <translation>Administrere bokmerker</translation>
-    </message>
-    <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>Varsel vises frem til en av brukerne som ser det oppretter et bokmerke med hendelsesbeskrivelse</translation>
     </message>
@@ -4457,25 +4446,7 @@ til %1</translation>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
-    <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Bruker %1 har ingen %2 tillatelse</translation>
-    </message>
-    <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Valgte brukere har ingen %1 tillatelse</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n av %1 utvalgte roller har ingen %2 tillatelse</numerusform>
-        <numerusform>%n av %1 utvalgte brukere har ingen %2 tillatelse</numerusform>
-      </translation>
-    </message>
+    <name>QnRequiredAccessRightPolicy</name>
     <message>
       <source>User group %1 has no %2 permission</source>
       <comment>%1 is the name of selected user group, %2 is permission name</comment>
@@ -4492,6 +4463,24 @@ til %1</translation>
       <translation type="unfinished">
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
         <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>Bruker %1 har ingen %2 tillatelse</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Valgte brukere har ingen %1 tillatelse</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation>
+        <numerusform>%n av %1 utvalgte roller har ingen %2 tillatelse</numerusform>
+        <numerusform>%n av %1 utvalgte brukere har ingen %2 tillatelse</numerusform>
       </translation>
     </message>
   </context>
@@ -4908,13 +4897,6 @@ til %1</translation>
     <message>
       <source>Watermark Matched</source>
       <translation>Vannmerke matchet</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>Brukerinndata</translation>
     </message>
   </context>
   <context>
@@ -12731,13 +12713,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>Manage</source>
       <translation>Administrer</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
-    <message>
-      <source>Soft trigger</source>
-      <translation type="unfinished">Soft trigger</translation>
     </message>
   </context>
   <context>

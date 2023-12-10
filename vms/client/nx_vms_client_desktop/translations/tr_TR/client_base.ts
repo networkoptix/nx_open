@@ -2445,13 +2445,6 @@ License Key: %2</source>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Yer imleri yöneticisi</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
@@ -4210,10 +4203,6 @@ to %1</source>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
-      <source>Manage Bookmarks</source>
-      <translation>Yer imleri yöneticisi</translation>
-    </message>
-    <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>Bildirimi gören kullanıcılardan biri etkinlik açıklamasıyla yer imi oluşturana kadar gösterilir.</translation>
     </message>
@@ -4452,7 +4441,25 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
+    <name>QnRequiredAccessRightPolicy</name>
+    <message>
+      <source>User group %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user group, %2 is permission name</comment>
+      <translation>%1 kullanıcı grubunun %2 izni yok</translation>
+    </message>
+    <message>
+      <source>Selected user groups have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Seçilen kullanıcı gruplarının %1 izni yok</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected user groups have no %2 permission</source>
+      <comment>%1 is number of selected user groups, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>Seçilen %1 kullanıcı grubundan %n tanesinin %2 izni yok</numerusform>
+        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
+      </translation>
+    </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
@@ -4469,24 +4476,6 @@ to %1</source>
       <translation>
         <numerusform>%1 in %n i kullanıcısı için %2 izni yok</numerusform>
         <numerusform>%1 in %n i kullanıcısı için %2 izni yok</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User group %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user group, %2 is permission name</comment>
-      <translation>%1 kullanıcı grubunun %2 izni yok</translation>
-    </message>
-    <message>
-      <source>Selected user groups have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Seçilen kullanıcı gruplarının %1 izni yok</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected user groups have no %2 permission</source>
-      <comment>%1 is number of selected user groups, %2 is permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
-        <numerusform>%n of %1 selected user groups have no %2 permission</numerusform>
       </translation>
     </message>
   </context>
@@ -4902,13 +4891,6 @@ to %1</source>
     <message>
       <source>Watermark Matched</source>
       <translation>Filigran Eşleştirildi</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>Kullanıcı girişi</translation>
     </message>
   </context>
   <context>
@@ -12725,13 +12707,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Manage</source>
       <translation>Yönet</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::rules::SourceUserPicker</name>
-    <message>
-      <source>Soft trigger</source>
-      <translation>Yazılımsal tetikleyici</translation>
     </message>
   </context>
   <context>
