@@ -74,6 +74,7 @@ private:
     VariantAnimator* m_hintAnimator = nullptr;
     qreal m_hintVisibility = 0.0; //< Visibility of the hint. 0 - hidden, 1 - displayed.
     QElapsedTimer m_stateTimer;
+    bool m_localStarted = false;
     bool m_unmuteAudioOnStreamingStop = false;
 
     VisualizerData m_visualizerData;

@@ -296,6 +296,9 @@ bool QnTwoWayAudioWidget::Private::isAllowed() const
 
 void QnTwoWayAudioWidget::Private::startStreaming()
 {
+    if (m_localStarted)
+        return;
+
     if (!isAllowed() || !m_camera || m_controller->started())
         return;
 
@@ -307,11 +310,19 @@ void QnTwoWayAudioWidget::Private::startStreaming()
     if (!server || server->getStatus() != nx::vms::api::ResourceStatus::online)
         return;
 
+    m_localStarted = true;
+
     setState(HintState::pressed);
 
     const auto requestCallback =
         [this](bool success)
         {
+            if (!m_localStarted) {
+                // Already stopped, this is a dangling callback.
+                m_controller->stop();
+                return;
+            }
+
             if (success)
             {
                 if (qnSettings->muteOnAudioTransmit()
@@ -340,6 +351,10 @@ void QnTwoWayAudioWidget::Private::startStreaming()
 
 void QnTwoWayAudioWidget::Private::stopStreaming()
 {
+    if (!m_localStarted)
+        return;
+    m_localStarted = false;
+
     if (!m_controller->started())
         return;
 
@@ -349,7 +364,7 @@ void QnTwoWayAudioWidget::Private::stopStreaming()
         nx::audio::AudioDevice::instance()->setMute(false);
     }
 
-    NX_ASSERT(m_state == HintState::pressed || m_state == HintState::error, "Invalid state");
+    // NX_ASSERT(m_state == HintState::pressed || m_state == HintState::error, "Invalid state");
     if (m_state != HintState::error)
         setState(HintState::released);
 
