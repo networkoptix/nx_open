@@ -74,13 +74,25 @@ void QnResourceTitleItem::paint(QPainter* painter,
     const PainterTransformScaleStripper scaleStripper(painter);
     const auto paintRect = scaleStripper.mapRect(rect());
 
-    using namespace nx::vms::client::core;
-    QLinearGradient gradient(0, 0, 0, paintRect.height());
-    gradient.setColorAt(0, colorTheme()->color("camera.titleGradient.top"));
-    gradient.setColorAt(1, colorTheme()->color("camera.titleGradient.bottom"));
-    QBrush brush(gradient);
-    brush.setTransform(QTransform::fromTranslate(0, paintRect.top()));
-    painter->fillRect(paintRect, brush);
+    const auto paintSize = paintRect.size().toSize() * painter->device()->devicePixelRatio();
+
+    if (paintSize != m_backgroundCache.size())
+    {
+        using namespace nx::vms::client::core;
+
+        const QRect imgRect(QPoint(0, 0), paintSize);
+        QImage img(imgRect.width(), imgRect.height(), QImage::Format_RGBA8888_Premultiplied);
+
+        img.fill(Qt::transparent);
+        QLinearGradient gradient(0, 0, 0, imgRect.height());
+        gradient.setColorAt(0, colorTheme()->color("camera.titleGradient.top"));
+        gradient.setColorAt(1, colorTheme()->color("camera.titleGradient.bottom"));
+        QBrush brush(gradient);
+        QPainter(&img).fillRect(imgRect, brush);
+        m_backgroundCache = QPixmap::fromImage(img);
+    }
+
+    painter->drawPixmap(paintRect.toRect(), m_backgroundCache);
 }
 
 void QnResourceTitleItem::setSimpleMode(bool isSimpleMode, bool animate)

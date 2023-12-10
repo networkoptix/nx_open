@@ -37,5 +37,7 @@ private:
     GraphicsLabel* const m_extraInfoLabel;
     bool m_isSimpleMode = false;
 
+    QPixmap m_backgroundCache;
+
     void updateNameLabelElideConstraint();
 };
