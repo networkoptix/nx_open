@@ -16,6 +16,8 @@ RowLayout
     readonly property var textField: textField
     readonly property alias checkBoxWidth: autoCheckBox.implicitWidth
 
+    baselineOffset: textField.y + textField.baselineOffset
+
     function validate() { return textField.validate() }
 
     TextFieldWithValidator
@@ -50,24 +52,19 @@ RowLayout
         }
     }
 
-    Item
+    CheckBox
     {
-        Layout.alignment: Qt.AlignTop
+        id: autoCheckBox
 
-        implicitWidth: autoCheckBox.implicitWidth
-        implicitHeight: textField.textField.implicitHeight
+        Layout.alignment: Qt.AlignBaseline
 
-        CheckBox
+        text: qsTr("Auto")
+
+        // Focus the textField when user unchecks this checkbox.
+        onCheckedChanged:
         {
-            id: autoCheckBox
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: 3
-
-            text: qsTr("Auto")
-
-            // Focus the textField when user unchecks this checkbox.
-            onCheckedChanged: if (!checked && visible) textField.forceActiveFocus()
+            if (!checked && visible)
+                textField.forceActiveFocus()
         }
     }
 }
