@@ -38,6 +38,8 @@ CheckBox
     // Should be used as read-only.
     baselineOffset: topPadding + firstTextLinePositioner.y + fontMetrics.ascent
 
+    focusPolicy: Qt.TabFocus
+
     indicator: Item
     {
         id: indicatorHolder
