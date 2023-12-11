@@ -523,12 +523,12 @@ QnWorkbenchController::QnWorkbenchController(QObject* parent):
                     m_rewindTimer->stop();
                     return;
                 }
-                menu()->trigger(menu::FastForwardAction);
+                menu()->trigger(action::FastForwardAction);
                 navigator()->fastForward();
             }
             else if (m_rewindDirection == ShiftDirection::rewind)
             {
-                menu()->trigger(menu::RewindAction);
+                menu()->trigger(action::RewindAction);
                 navigator()->rewind(false);
             }
         });
@@ -543,12 +543,12 @@ QnWorkbenchController::QnWorkbenchController(QObject* parent):
                     m_rewindTimer->stop();
                     return;
                 }
-                menu()->trigger(menu::FastForwardAction);
+                menu()->trigger(action::FastForwardAction);
                 navigator()->fastForward();
             }
             else if (m_rewindDirection == ShiftDirection::rewind)
             {
-                menu()->trigger(menu::RewindAction);
+                menu()->trigger(action::RewindAction);
                 navigator()->rewind(true);
             }
         });
@@ -965,7 +965,7 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
                 m_rewindShortPressTimer->stop();
                 if (m_rewindDirection == ShiftDirection::rewind)
                 {
-                    menu()->trigger(menu::RewindAction);
+                    menu()->trigger(action::RewindAction);
                     navigator()->rewindOnDoubleClick();
                     return true;
                 }
@@ -986,12 +986,12 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
                     if (navigator()->isLive())
                         return;
 
-                    menu()->trigger(menu::FastForwardAction);
+                    menu()->trigger(action::FastForwardAction);
                     navigator()->fastForward();
                 }
                 else if (m_rewindDirection == ShiftDirection::rewind)
                 {
-                    menu()->trigger(menu::RewindAction);
+                    menu()->trigger(action::RewindAction);
                     navigator()->rewind();
                 }
             }
