@@ -9016,12 +9016,26 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>Olay günlüğünü görüntüleme</translation>
     </message>
     <message>
-      <source>Permission granted by %1 group</source>
-      <translation>%1 grup tarafından verilen izin</translation>
-    </message>
-    <message>
       <source>Generate events</source>
       <translation>Olay oluştur</translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>%1 grup</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>
+        <numerusform>%1 ve %n grup daha</numerusform>
+        <numerusform>%1 ve %n grup daha</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>%1 yetkileri şuradan devralır</translation>
     </message>
   </context>
   <context>
