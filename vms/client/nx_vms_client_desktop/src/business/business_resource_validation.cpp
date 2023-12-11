@@ -26,8 +26,8 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_rights_list.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -711,7 +711,13 @@ void QnRequiredAccessRightPolicy::setCameras(
     m_cameras = cameras;
 }
 
-bool QnRequiredAccessRightPolicy::isSubjectValid(const QnResourceAccessSubject& subject) const
+bool QnRequiredAccessRightPolicy::hasAnyCameraPermission(const QnUserResourcePtr& user) const
+{
+    return isSubjectValid(user, /* allSelectedCamerasRequired*/ false);
+}
+
+bool QnRequiredAccessRightPolicy::isSubjectValid(
+    const QnResourceAccessSubject& subject, bool allSelectedCamerasRequired /* = true*/) const
 {
     const auto hasPermissionForCamera =
         [=](const QnVirtualCameraResourcePtr& camera)
@@ -721,7 +727,11 @@ bool QnRequiredAccessRightPolicy::isSubjectValid(const QnResourceAccessSubject& 
         };
 
     if (!m_cameras.isEmpty())
-        return std::all_of(m_cameras.begin(), m_cameras.end(), hasPermissionForCamera);
+    {
+        return allSelectedCamerasRequired
+            ? std::all_of(m_cameras.begin(), m_cameras.end(), hasPermissionForCamera)
+            : std::any_of(m_cameras.begin(), m_cameras.end(), hasPermissionForCamera);
+    }
 
     if (resourceAccessManager()->hasAccessRights(
         subject, kAllDevicesGroupId, m_requiredAccessRight))
@@ -788,10 +798,19 @@ QString QnRequiredAccessRightPolicy::calculateAlert(bool allUsers,
 
         if (invalidUsers.size() == 1)
         {
-            alert += tr("User %1 has no %2 permission",
-                "%1 is the name of selected user, %2 is permission name")
-                .arg(html::bold(invalidUsers.front()->getName()))
-                .arg(permissionName);
+            const auto& user = invalidUsers.front();
+            const auto kUserHasNoCameraPermissionText =
+                tr("User %1 has no %2 permissions for selected camera",
+                    "%1 is the name of selected user, %2 is permission name")
+                    .arg(html::bold(user->getName()))
+                    .arg(permissionName);
+            const auto kUserHasNoPermissionForSomeCamerasText =
+                tr("User %1 has no %2 permissions for some of selected cameras",
+                    "%1 is the name of the selected user, %2 is the permission name")
+                    .arg(html::bold(user->getName()))
+                    .arg(permissionName);
+            alert += hasAnyCameraPermission(user) ? kUserHasNoPermissionForSomeCamerasText
+                                                  : kUserHasNoCameraPermissionText;
         }
         else if (validUsers.empty())
         {
