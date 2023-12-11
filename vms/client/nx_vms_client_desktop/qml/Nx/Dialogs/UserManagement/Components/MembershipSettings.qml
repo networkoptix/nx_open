@@ -30,6 +30,7 @@ Item
     property bool showDescription: false
 
     property string summaryText: ""
+    property string infoText: ""
     property alias summaryModel: selectedGroupsListView.model
     property alias summarySection: selectedGroupsListView.section
     property alias summaryDelegate: selectedGroupsListView.delegate
@@ -101,16 +102,16 @@ Item
 
             enabled: control.enabled
 
-            header: Item
+            header: Column
             {
                 property alias text: searchField.text
                 width: parent.width
-                height: searchField.height + 16
+                spacing: 8
+                topPadding: 16
 
                 SearchField
                 {
                     id: searchField
-                    y: 16
                     width: parent.width - 16
 
                     onTextChanged:
@@ -122,6 +123,17 @@ Item
                         allGroupsListView.model.setFilterRegularExpression(currentSearchRegExp)
                         selectedGroupsListView.model.setFilterRegularExpression(currentSearchRegExp)
                     }
+                }
+
+                Text
+                {
+                    id: infoTextLabel
+
+                    text: control.infoText
+                    visible: !!text
+                    width: parent.width - 16
+                    wrapMode: Text.WordWrap
+                    color: ColorTheme.windowText
                 }
             }
 

@@ -94,6 +94,9 @@ public:
         editGroup
     };
 
+    static const QString kInfoText;
+    static const QString kToolTipText;
+
 public:
     GroupSettingsDialog(
         DialogType dialogType,
@@ -105,8 +108,10 @@ public:
     bool setGroup(const QnUuid& groupId);
 
     Q_INVOKABLE QString validateName(const QString& text);
-
     Q_INVOKABLE bool isOkClicked() const { return acceptOnSuccess(); }
+
+    Q_PROPERTY(QString kInfoText MEMBER kInfoText CONSTANT)
+    Q_PROPERTY(QString kToolTipText MEMBER kToolTipText CONSTANT)
 
     static void removeGroups(
         QnWorkbenchContext* workbenchContext,
