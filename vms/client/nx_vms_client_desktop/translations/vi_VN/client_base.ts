@@ -8875,12 +8875,25 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <translation>Xem sự kiện</translation>
     </message>
     <message>
-      <source>Permission granted by %1 group</source>
-      <translation>Quyền được cấp bởi nhóm %1</translation>
-    </message>
-    <message>
       <source>Generate events</source>
       <translation>Tạo sự kiện</translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>%1 nhóm</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>
+        <numerusform>%1 và %n nhóm nữa</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Kế thừa %1 quyền từ</translation>
     </message>
   </context>
   <context>

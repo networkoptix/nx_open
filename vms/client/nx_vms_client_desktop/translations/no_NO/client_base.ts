@@ -9022,12 +9022,26 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
       <translation>Vis hendelseslogg</translation>
     </message>
     <message>
-      <source>Permission granted by %1 group</source>
-      <translation type="unfinished">Permission granted by %1 group</translation>
-    </message>
-    <message>
       <source>Generate events</source>
       <translation>Generer hendelser</translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>%1 gruppe</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>
+        <numerusform>%1 og %n grupper til</numerusform>
+        <numerusform>%1 og %n grupper til</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Arver %1 tillatelse fra</translation>
     </message>
   </context>
   <context>

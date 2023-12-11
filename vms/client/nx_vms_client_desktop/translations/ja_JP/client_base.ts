@@ -8876,12 +8876,25 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>イベントログの表示</translation>
     </message>
     <message>
-      <source>Permission granted by %1 group</source>
-      <translation>%1 グループによる権限</translation>
-    </message>
-    <message>
       <source>Generate events</source>
       <translation>イベントの生成</translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>%1 グループ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>
+        <numerusform>%1 ほか %n グループ</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>以下から %1 権限を継承します</translation>
     </message>
   </context>
   <context>

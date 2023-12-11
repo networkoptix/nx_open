@@ -9023,12 +9023,26 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Visa händelselogg</translation>
     </message>
     <message>
-      <source>Permission granted by %1 group</source>
-      <translation>Behörighet beviljad av %1 grupp</translation>
-    </message>
-    <message>
       <source>Generate events</source>
       <translation>Generera händelser</translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>%1 grupp</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>
+        <numerusform>%1 och %n fler grupper</numerusform>
+        <numerusform>%1 och %n fler grupper</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Ärv %1 behörighet från</translation>
     </message>
   </context>
   <context>

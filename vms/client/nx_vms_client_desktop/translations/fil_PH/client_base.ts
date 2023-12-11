@@ -9023,12 +9023,26 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>View event log</translation>
     </message>
     <message>
-      <source>Permission granted by %1 group</source>
-      <translation type="unfinished">Permission granted by %1 group</translation>
-    </message>
-    <message>
       <source>Generate events</source>
       <translation type="unfinished">Generate events</translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">%1 group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Inherits %1 permission from</translation>
     </message>
   </context>
   <context>
