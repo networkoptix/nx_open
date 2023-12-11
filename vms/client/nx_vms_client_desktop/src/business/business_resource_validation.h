@@ -250,7 +250,9 @@ public:
     void setCameras(const QnSharedResourcePointerList<QnVirtualCameraResource>& cameras);
 
 private:
-    bool isSubjectValid(const QnResourceAccessSubject& subject) const;
+    bool isSubjectValid(
+        const QnResourceAccessSubject& subject, bool allSelectedCamerasRequired = true) const;
+    bool hasAnyCameraPermission(const QnUserResourcePtr& user) const;
 
 private:
     const nx::vms::api::AccessRight m_requiredAccessRight;
