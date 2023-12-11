@@ -139,6 +139,8 @@ DialogWithState
                 id: groupsSettings
                 anchors.fill: parent
 
+                infoText: dialog.self ? dialog.self.kInfoText : ""
+
                 model: membersModel
                 editable: dialog.parentGroupsEditable
                 enabled: !dialog.isSaving

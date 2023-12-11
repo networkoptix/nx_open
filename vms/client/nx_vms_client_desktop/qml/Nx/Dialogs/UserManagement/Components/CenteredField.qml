@@ -5,6 +5,7 @@ import QtQuick.Layouts
 
 import Nx
 import Nx.Core
+import Nx.Controls
 
 Item
 {
@@ -22,6 +23,8 @@ Item
     property real labelHeight: 28
 
     property alias hint: textHint.data
+    property alias toolTipText: hintButton.toolTipText
+
     readonly property real labelImplicitWidth: labelRow.width
 
     baselineOffset: label.y + label.baselineOffset
@@ -67,6 +70,13 @@ Item
 
             font: Qt.font({pixelSize: 14, weight: Font.Normal})
             color: ColorTheme.colors.light16
+        }
+
+        ContextHintButton
+        {
+            id: hintButton
+            toolTipText: ""
+            visible: !!toolTipText
         }
 
         Item
