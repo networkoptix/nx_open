@@ -713,7 +713,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
 
             // Do not draw if computer is very slow and we still wanna sync with audio.
-            const bool draw = !ignoreVideo;
+            const bool draw = !ignoreVideo && !vd->flags.testFlag(QnAbstractMediaData::MediaFlags_FCZ);
             const bool shouldPauseWhenIdle =
                 (appContext()->localSettings()->userIdleTimeoutMs() > 0);
 
