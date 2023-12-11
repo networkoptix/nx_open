@@ -184,7 +184,7 @@ R"json(
         { "eventTypeId": ")json" + kGunshotEventType + R"json(" })json"
         + (m_deviceAgentSettings.declareAdditionalEventTypes
             ? (
-                R"json(",
+                R"json(,
         { "eventTypeId": ")json" + kAdditionalEventType + R"json(" },
         { "eventTypeId": ")json" + kAdditionalEventType2 + R"json(" })json"
             )
