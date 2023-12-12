@@ -3126,7 +3126,7 @@ to %1</source>
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation>
-        <numerusform>選択した %1 ユーザーのうち%n 人は %2 ユーザーではなく、モバイル通知を受け取りません。</numerusform>
+        <numerusform>選択された %1 ユーザーのうち %n 名は %2 ユーザーではないため、モバイル通知を受け取りません。</numerusform>
       </translation>
     </message>
   </context>
@@ -4398,30 +4398,30 @@ to %1</source>
     <message>
       <source>Selected user groups have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation>選択したユーザーグループには %1 権限がありません</translation>
+      <translation>選択されたユーザーグループには %1 権限がありません</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected user groups have no %2 permission</source>
       <comment>%1 is number of selected user groups, %2 is permission name</comment>
       <translation>
-        <numerusform>選択されたユーザーグループ %1 のうち %n には %2 権限がありません</numerusform>
+        <numerusform>選択された %1 ユーザーグループのうち、 %n グループには %2 権限がありません</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>ユーザー%1には%2権限がありません</translation>
+      <translation>ユーザー %1 には %2 権限がありません</translation>
     </message>
     <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation>選択したユーザーには%1権限がありません</translation>
+      <translation>選択されたユーザーには %1 権限がありません</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
       <translation>
-        <numerusform>選択した%1個のうち%n個のユーザーに%2権限がありません</numerusform>
+        <numerusform>選択された %1 ユーザーのうち %n 名には %2 権限がありません</numerusform>
       </translation>
     </message>
   </context>
@@ -8894,7 +8894,7 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation>以下から %1 権限を継承します</translation>
+      <translation>以下から %1 権限を継承します: </translation>
     </message>
   </context>
   <context>
