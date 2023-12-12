@@ -174,7 +174,7 @@ void VmsEventSearchWidget::Private::setupTypeSelection()
     using namespace nx::vms::event;
 
     m_typeSelectionButton->setIcon(
-        qnSkin->icon("text_buttons/event_rules_20.svg", kIconSubstitutions));
+        qnSkin->icon("text_buttons/event_rules_20x20.svg", kIconSubstitutions));
 
     auto eventFilterMenu =
         createEventGroupMenu(q->system()->vmsRulesEngine()->eventGroups());
