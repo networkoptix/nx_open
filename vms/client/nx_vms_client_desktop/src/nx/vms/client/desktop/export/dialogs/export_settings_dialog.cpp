@@ -73,7 +73,7 @@ static const nx::vms::client::core::SvgIconColorer::IconSubstitutions
 
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kDisabledIconSubstitutions =
 {
-    {QIcon::Normal, {{kLight16Color, "dark7"}}},
+    {QIcon::Normal, {{kLight16Color, "light16"}}},
 };
 
 template<class Widget>
@@ -296,9 +296,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->timestampButton->setText(tr("Timestamp"));
     ui->timestampButton->setDeactivatedIcon(
         qnSkin->icon("text_buttons/clock_20.svg", kDisabledIconSubstitutions));
-    ui->timestampButton->setIcon(qnSkin->icon("text_buttons/clock_20.svg", kIconSubstitutions));
-    ui->timestampButton->setProperty(kPagePropertyName,
-        QVariant::fromValue(ui->timestampSettingsPage));
+    ui->timestampButton->setIcon(qnSkin->icon(
+        "text_buttons/clock_20.svg", kIconSubstitutions, kCheckedIconSubstitutionsSettings));
+    ui->timestampButton->setProperty(
+        kPagePropertyName, QVariant::fromValue(ui->timestampSettingsPage));
     ui->timestampButton->setProperty(kOverlayPropertyName,
         QVariant::fromValue(ExportOverlayType::timestamp));
 
@@ -308,9 +309,9 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->imageButton->setText(tr("Image"));
     ui->imageButton->setDeactivatedIcon(
         qnSkin->icon("text_buttons/image_20.svg", kDisabledIconSubstitutions));
-    ui->imageButton->setIcon(qnSkin->icon("text_buttons/image_20.svg", kIconSubstitutions));
-    ui->imageButton->setProperty(kPagePropertyName,
-        QVariant::fromValue(ui->imageSettingsPage));
+    ui->imageButton->setIcon(qnSkin->icon(
+        "text_buttons/image_20.svg", kIconSubstitutions, kCheckedIconSubstitutionsSettings));
+    ui->imageButton->setProperty(kPagePropertyName, QVariant::fromValue(ui->imageSettingsPage));
     ui->imageButton->setProperty(kOverlayPropertyName,
         QVariant::fromValue(ExportOverlayType::image));
 
@@ -330,12 +331,11 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->infoButton->setDeactivatedText(tr("Add Info"));
     ui->infoButton->setDeactivationToolTip(tr("Delete Info"));
     ui->infoButton->setText(tr("Info"));
-    ui->infoButton->setDeactivatedIcon(qnSkin->icon("text_buttons/info.png"));
-    ui->infoButton->setIcon(qnSkin->icon(
-        "text_buttons/info_hovered.png",
-        "text_buttons/info_selected.png"));
-    ui->infoButton->setProperty(kPagePropertyName,
-        QVariant::fromValue(ui->infoSettingsPage));
+    ui->infoButton->setDeactivatedIcon(qnSkin->icon("text_buttons/info_20x20.svg", kIconSubstitutions));
+    ui->infoButton->setIcon(qnSkin->icon("text_buttons/info_20x20.svg",
+        kIconSubstitutionsSettings,
+        kCheckedIconSubstitutionsSettings));
+    ui->infoButton->setProperty(kPagePropertyName, QVariant::fromValue(ui->infoSettingsPage));
     ui->infoButton->setProperty(kOverlayPropertyName,
         QVariant::fromValue(ExportOverlayType::info));
 
@@ -379,9 +379,10 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->bookmarkButton->setText(tr("Bookmark Info"));
     ui->bookmarkButton->setDeactivatedIcon(
         qnSkin->icon("text_buttons/bookmark_20.svg", kDisabledIconSubstitutions));
-    ui->bookmarkButton->setIcon(qnSkin->icon("text_buttons/bookmark_20.svg", kIconSubstitutions));
-    ui->bookmarkButton->setProperty(kPagePropertyName,
-        QVariant::fromValue(ui->bookmarkSettingsPage));
+    ui->bookmarkButton->setIcon(qnSkin->icon(
+        "text_buttons/bookmark_20.svg", kIconSubstitutions, kCheckedIconSubstitutionsSettings));
+    ui->bookmarkButton->setProperty(
+        kPagePropertyName, QVariant::fromValue(ui->bookmarkSettingsPage));
     ui->bookmarkButton->setProperty(kOverlayPropertyName,
         QVariant::fromValue(ExportOverlayType::bookmark));
 
