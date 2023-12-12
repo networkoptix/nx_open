@@ -25,6 +25,7 @@
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
+#include <common/common_globals.h>
 #include <common/common_module.h>
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/fallback_ptz_controller.h>
@@ -166,6 +167,12 @@ static const auto kUpdateDetailsInterval = 1s;
 
 static constexpr auto k360VRAspectRatio = 16.0 / 9.0;
 
+static const QColor kLight10Color = "#A5B7C0";
+static const QColor kRedL1 = "#D92A2A";
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kArchiveRecordingSubstitutions = {
+    {QIcon::Normal, {{kLight10Color, "light10"}, {kRedL1, "red_l1"}}},
+};
+
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
 {
@@ -282,6 +289,18 @@ T* findPtzController(QnPtzControllerPtr controller)
     }
     return nullptr;
 }
+
+bool hasArchive(const QnSecurityCamResourcePtr& camera)
+{
+    auto systemContext = SystemContext::fromResource(camera);
+    if (!NX_ASSERT(systemContext))
+        return false;
+
+    const auto footageServers =
+        systemContext->cameraHistoryPool()->getCameraFootageData(camera, true);
+
+    return !footageServers.empty();
+};
 
 } // namespace
 
@@ -1533,8 +1552,23 @@ void QnMediaResourceWidget::updateIconButton()
     if (!d->camera || d->camera->hasFlags(Qn::virtual_camera))
         return;
 
-    const auto icon = m_recordingStatusHelper->icon();
-    m_hudOverlay->playbackPositionItem()->setRecordingIcon(icon.pixmap(QSize(12, 12)));
+    if (d->camera->hasFlags(Qn::server_archive) || hasArchive(d->camera))
+    {
+        QIcon icon;
+        auto rec_state = d->camera->recordingState();
+        if (rec_state == Qn::RecordingState::Off)
+            icon = qnSkin->icon("text_buttons/archive_16.svg", kArchiveRecordingSubstitutions);
+        else if (rec_state == Qn::RecordingState::Scheduled)
+            icon = qnSkin->icon("text_buttons/notrecordingnow_16.svg", kArchiveRecordingSubstitutions);
+        else if (rec_state == Qn::RecordingState::On)
+            icon = qnSkin->icon("text_buttons/recordingnow_16.svg", kArchiveRecordingSubstitutions);
+
+        m_hudOverlay->playbackPositionItem()->setRecordingIcon(icon.pixmap(QSize(12, 12)));
+    }
+    else
+    {
+        m_hudOverlay->playbackPositionItem()->setRecordingIcon({});
+    }
 }
 
 void QnMediaResourceWidget::updateRendererEnabled()
@@ -2428,17 +2462,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     {
         if (!NX_ASSERT(d->camera) || !d->camera->isScheduleEnabled())
             return Qn::IoModuleDisabledOverlay;
-
-        const auto hasArchive = [](const QnSecurityCamResourcePtr& camera)
-        {
-            auto systemContext = SystemContext::fromResource(camera);
-            if (!NX_ASSERT(systemContext))
-                return false;
-
-            const auto footageServers = systemContext->cameraHistoryPool()->
-                getCameraFootageData(camera, true);
-            return !footageServers.empty();
-        };
 
         if (d->isPlayingLive())
         {
