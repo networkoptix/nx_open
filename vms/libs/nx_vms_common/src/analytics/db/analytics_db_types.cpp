@@ -327,6 +327,9 @@ void serializeToParams(const Filter& filter, nx::network::rest::Params* params)
         params->insert(lit("needFullTrack"), "true");
 
     params->insert("sortOrder", nx::reflect::toString(filter.sortOrder));
+
+    if (filter.maxAnalyticsDetails != std::chrono::milliseconds::zero())
+        params->insert("maxAnalyticsDetailsMs", filter.maxAnalyticsDetails);
 }
 
 bool loadFromUrlQuery(
@@ -459,6 +462,9 @@ bool deserializeFromParams(
             return false;
         }
     }
+
+    if (const auto value = params.findValue("maxAnalyticsDetailsMs"))
+        filter->maxAnalyticsDetails = std::chrono::milliseconds(value->toInt());
 
     return true;
 }
