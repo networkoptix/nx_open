@@ -2,6 +2,8 @@
 
 #include "connection_delegate_helper.h"
 
+#include <nx/network/ssl/certificate.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -24,16 +26,15 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
                 mainWindow, OauthLoginDialog::tr("Connect to System"), credentials);
         };
 
-    const auto askToAcceptCertificate =
-        [mainWindow](const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain,
+    const auto askToAcceptCertificates =
+        [mainWindow](
+            const QList<core::TargetCertificateInfo>& certificatesInfo,
             core::CertificateWarning::Reason warningType)
         {
             if (!mainWindow)
                 return false;
 
-            ServerCertificateWarning warning(target, primaryAddress, chain, warningType, mainWindow);
+            ServerCertificateWarning warning(certificatesInfo, warningType, mainWindow);
             warning.exec();
 
             // Dialog uses both standard and custom buttons. Check button role instead of result code.
@@ -41,19 +42,17 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
         };
 
     const auto showCertificateError =
-        [mainWindow](const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain)
+        [mainWindow](const core::TargetCertificateInfo& certificateInfo)
         {
             if (!mainWindow)
                 return;
 
-            ServerCertificateError msg(target, primaryAddress, chain, mainWindow);
+            ServerCertificateError msg(certificateInfo, mainWindow);
             msg.exec();
         };
 
     return std::make_unique<core::RemoteConnectionUserInteractionDelegate>(
-        validateToken, askToAcceptCertificate, showCertificateError);
+        validateToken, askToAcceptCertificates, showCertificateError);
 }
 
 } // namespace nx::vms::client::desktop

@@ -18,38 +18,28 @@ class NX_VMS_CLIENT_CORE_API RemoteConnectionUserInteractionDelegate:
 public:
     using TokenValidator =
         std::function<bool (const nx::network::http::Credentials& credentials)>;
-    using AskUserToAcceptCertificate = std::function<bool (
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& chain,
+    using AskUserToAcceptCertificates = std::function<bool (
+        const QList<TargetCertificateInfo>& certificatesInfo,
         CertificateWarning::Reason warningType)>;
     using ShowCertificateError = std::function<void (
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& chain)>;
+        const TargetCertificateInfo& certificateInfo)>;
 
     RemoteConnectionUserInteractionDelegate(
         TokenValidator validateToken,
-        AskUserToAcceptCertificate askToAcceptCertificate,
+        AskUserToAcceptCertificates askToAcceptCertificates,
         ShowCertificateError showCertificateError,
         QObject* parent = nullptr);
 
     virtual ~RemoteConnectionUserInteractionDelegate() override;
 
     virtual bool acceptNewCertificate(
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& chain) override;
+        const TargetCertificateInfo& certificateInfo) override;
 
     virtual bool acceptCertificateAfterMismatch(
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& chain) override;
+        const TargetCertificateInfo& certificateInfo) override;
 
-    virtual bool acceptCertificateOfServerInTargetSystem(
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& chain) override;
+    virtual bool acceptCertificatesOfServersInTargetSystem(
+        const QList<TargetCertificateInfo>& certificatesInfo) override;
 
     virtual bool request2FaValidation(const nx::network::http::Credentials& credentials) override;
 

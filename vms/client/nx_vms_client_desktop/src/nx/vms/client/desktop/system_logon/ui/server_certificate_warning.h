@@ -9,6 +9,7 @@
 #include <ui/dialogs/common/message_box.h>
 
 namespace nx::vms::api { struct ModuleInformation; }
+namespace nx::vms::client::core { struct TargetCertificateInfo; }
 namespace nx::network { class SocketAddress; }
 
 namespace nx::vms::client::desktop {
@@ -20,9 +21,7 @@ class ServerCertificateWarning: public QnMessageBox
 
 public:
     explicit ServerCertificateWarning(
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& certificates,
+        const QList<core::TargetCertificateInfo>& certificatesInfo,
         core::CertificateWarning::Reason reason,
         QWidget* parent = nullptr);
 };

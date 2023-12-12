@@ -31,12 +31,11 @@ public:
 
     static QString header(
         Reason reason,
-        const nx::vms::api::ModuleInformation& target);
+        const nx::vms::api::ModuleInformation& info,
+        int numberOfServers);
 
     static QString details(
         Reason reason,
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
         ClientType clientType = ClientType::desktop);
 
     static QString advice(

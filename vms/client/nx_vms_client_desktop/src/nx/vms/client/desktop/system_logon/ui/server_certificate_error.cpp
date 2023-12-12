@@ -5,8 +5,7 @@
 #include <QtWidgets/QLabel>
 
 #include <nx/network/socket_common.h>
-#include <nx/network/ssl/certificate.h>
-#include <nx/vms/api/data/module_information.h>
+#include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/system_logon/certificate_warning.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/common/html/html.h>
@@ -17,9 +16,7 @@
 namespace nx::vms::client::desktop {
 
 ServerCertificateError::ServerCertificateError(
-    const nx::vms::api::ModuleInformation& target,
-    const nx::network::SocketAddress& primaryAddress,
-    const nx::network::ssl::CertificateChain& certificates,
+    const core::TargetCertificateInfo& certificateInfo,
     QWidget* parent)
     :
     base_type(parent)
@@ -37,9 +34,7 @@ ServerCertificateError::ServerCertificateError(
         [=, this]
         {
             auto viewer = new ServerCertificateViewer(
-                target,
-                primaryAddress,
-                certificates,
+                certificateInfo,
                 ServerCertificateViewer::Mode::presented,
                 this);
 

@@ -490,12 +490,12 @@ MergeSystemsStatus MergeSystemsTool::verifyTargetCertificate(const Context& ctx)
     if (status == CertificateVerifier::Status::notFound)
     {
         accepted = m_delegate->acceptNewCertificate(
-            ctx.targetInfo, ctx.target, ctx.targetHandshakeChain);
+            {ctx.targetInfo, ctx.target, ctx.targetHandshakeChain});
     }
     else if (status == CertificateVerifier::Status::mismatch)
     {
         accepted = m_delegate->acceptCertificateAfterMismatch(
-            ctx.targetInfo, ctx.target, ctx.targetHandshakeChain);
+            {ctx.targetInfo, ctx.target, ctx.targetHandshakeChain});
     }
 
     if (!accepted)

@@ -127,42 +127,33 @@ struct ConnectionTestingDialog::Private
         }
 
         virtual bool acceptNewCertificate(
-            const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain) override
+            const core::TargetCertificateInfo& certificateInfo) override
         {
             if (!m_owner)
                 return false;
 
             auto guard = m_owner->d->pauseTimer();
-            return m_baseDelegate->acceptNewCertificate(target, primaryAddress, chain);
+            return m_baseDelegate->acceptNewCertificate(certificateInfo);
         }
 
         virtual bool acceptCertificateAfterMismatch(
-            const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain) override
+            const core::TargetCertificateInfo& certificateInfo) override
         {
             if (!m_owner)
                 return false;
 
             auto guard = m_owner->d->pauseTimer();
-            return m_baseDelegate->acceptCertificateAfterMismatch(target, primaryAddress, chain);
+            return m_baseDelegate->acceptCertificateAfterMismatch(certificateInfo);
         }
 
-        virtual bool acceptCertificateOfServerInTargetSystem(
-            const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain) override
+        virtual bool acceptCertificatesOfServersInTargetSystem(
+            const QList<core::TargetCertificateInfo>& certificatesInfo) override
         {
             if (!m_owner)
                 return false;
 
             auto guard = m_owner->d->pauseTimer();
-            return m_baseDelegate->acceptCertificateOfServerInTargetSystem(
-                target,
-                primaryAddress,
-                chain);
+            return m_baseDelegate->acceptCertificatesOfServersInTargetSystem(certificatesInfo);
         }
 
         virtual bool request2FaValidation(

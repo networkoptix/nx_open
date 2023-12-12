@@ -13,6 +13,7 @@
 namespace Ui { class ServerCertificateViewer; }
 
 namespace nx::vms::api { struct ModuleInformation; }
+namespace nx::vms::client::core { struct TargetCertificateInfo; }
 namespace nx::network { class SocketAddress; }
 
 namespace nx::vms::client::desktop {
@@ -36,9 +37,7 @@ public:
     };
 
     ServerCertificateViewer(
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const std::vector<nx::network::ssl::Certificate>& certificates,
+        const core::TargetCertificateInfo& certificateInfo,
         Mode mode,
         QWidget* parent = nullptr);
 
