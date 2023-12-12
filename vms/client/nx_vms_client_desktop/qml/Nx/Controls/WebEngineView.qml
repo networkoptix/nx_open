@@ -82,6 +82,9 @@ Item
 
         anchors.fill: parent
 
+        // Allows to write to the clipboard only in event handlers.
+        settings.javascriptCanAccessClipboard: true
+
         focus: true
 
         url: ""
