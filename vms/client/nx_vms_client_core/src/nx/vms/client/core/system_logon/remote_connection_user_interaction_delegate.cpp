@@ -3,7 +3,6 @@
 #include "remote_connection_user_interaction_delegate.h"
 
 #include <client_core/client_core_module.h>
-#include <nx/network/ssl/certificate.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -11,12 +10,23 @@
 
 namespace nx::vms::client::core {
 
+TargetCertificateInfo::TargetCertificateInfo(
+    const nx::vms::api::ModuleInformation& target,
+    const nx::network::SocketAddress& address,
+    const nx::network::ssl::CertificateChain& chain)
+    :
+    target(target),
+    address(address),
+    chain(chain)
+{
+}
+
 using CertificateValidationLevel = network::server_certificate::ValidationLevel;
 
 struct RemoteConnectionUserInteractionDelegate::Private
 {
     const TokenValidator validateToken;
-    const AskUserToAcceptCertificate askToAcceptCertificate;
+    const AskUserToAcceptCertificates askToAcceptCertificates;
     const ShowCertificateError showCertificateError;
 
     CertificateValidationLevel validationLevel()
@@ -26,36 +36,32 @@ struct RemoteConnectionUserInteractionDelegate::Private
 
     Private(
         TokenValidator validateToken,
-        AskUserToAcceptCertificate askToAcceptCertificate,
+        AskUserToAcceptCertificates askToAcceptCertificates,
         ShowCertificateError showCertificateError);
 
     void tryShowCertificateError(
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& chain);
+        const TargetCertificateInfo& certificateInfo);
 };
 
 RemoteConnectionUserInteractionDelegate::Private::Private(
     TokenValidator validateToken,
-    AskUserToAcceptCertificate askToAcceptCertificate,
+    AskUserToAcceptCertificates askToAcceptCertificates,
     ShowCertificateError showCertificateError)
     :
     validateToken(validateToken),
-    askToAcceptCertificate(askToAcceptCertificate),
+    askToAcceptCertificates(askToAcceptCertificates),
     showCertificateError(showCertificateError)
 {
 }
 
 void RemoteConnectionUserInteractionDelegate::Private::tryShowCertificateError(
-    const nx::vms::api::ModuleInformation& target,
-    const nx::network::SocketAddress& primaryAddress,
-    const nx::network::ssl::CertificateChain& chain)
+    const TargetCertificateInfo& certificateInfo)
 {
     const auto session = qnClientCoreModule->networkModule()->session();
     if (session && session->state() == nx::vms::client::core::RemoteSession::State::reconnecting)
         return;
 
-    showCertificateError(target, primaryAddress, chain);
+    showCertificateError(certificateInfo);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -63,15 +69,15 @@ void RemoteConnectionUserInteractionDelegate::Private::tryShowCertificateError(
 
 RemoteConnectionUserInteractionDelegate::RemoteConnectionUserInteractionDelegate(
     TokenValidator validateToken,
-    AskUserToAcceptCertificate askToAcceptCertificate,
+    AskUserToAcceptCertificates askToAcceptCertificates,
     ShowCertificateError showCertificateError,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(validateToken, askToAcceptCertificate, showCertificateError))
+    d(new Private(validateToken, askToAcceptCertificates, showCertificateError))
 {
     NX_ASSERT(validateToken, "Validate token handler should be specified!");
-    NX_ASSERT(askToAcceptCertificate, "Ask to accept certificate handler should be specified!");
+    NX_ASSERT(askToAcceptCertificates, "Ask to accept certificates handler should be specified!");
     NX_ASSERT(showCertificateError, "Show certificate error handler should be specified!");
 }
 
@@ -80,9 +86,7 @@ RemoteConnectionUserInteractionDelegate::~RemoteConnectionUserInteractionDelegat
 }
 
 bool RemoteConnectionUserInteractionDelegate::acceptNewCertificate(
-    const nx::vms::api::ModuleInformation& target,
-    const nx::network::SocketAddress& primaryAddress,
-    const nx::network::ssl::CertificateChain& chain)
+    const TargetCertificateInfo& certificateInfo)
 {
     switch (d->validationLevel())
     {
@@ -90,11 +94,12 @@ bool RemoteConnectionUserInteractionDelegate::acceptNewCertificate(
             return true;
 
         case CertificateValidationLevel::recommended:
-            return d->askToAcceptCertificate(target, primaryAddress, chain,
+            return d->askToAcceptCertificates(
+                {certificateInfo},
                 CertificateWarning::Reason::unknownServer);
 
         case CertificateValidationLevel::strict:
-            d->tryShowCertificateError(target, primaryAddress, chain);
+            d->tryShowCertificateError(certificateInfo);
             return false;
 
         default:
@@ -104,9 +109,7 @@ bool RemoteConnectionUserInteractionDelegate::acceptNewCertificate(
 }
 
 bool RemoteConnectionUserInteractionDelegate::acceptCertificateAfterMismatch(
-    const nx::vms::api::ModuleInformation& target,
-    const nx::network::SocketAddress& primaryAddress,
-    const nx::network::ssl::CertificateChain& chain)
+    const TargetCertificateInfo& certificateInfo)
 {
     switch (d->validationLevel())
     {
@@ -114,13 +117,12 @@ bool RemoteConnectionUserInteractionDelegate::acceptCertificateAfterMismatch(
             return true;
 
         case CertificateValidationLevel::recommended:
-            return d->askToAcceptCertificate(target,
-                primaryAddress,
-                chain,
+            return d->askToAcceptCertificates(
+                {certificateInfo},
                 CertificateWarning::Reason::invalidCertificate);
 
         case CertificateValidationLevel::strict:
-            d->tryShowCertificateError(target, primaryAddress, chain);
+            d->tryShowCertificateError(certificateInfo);
             return false;
 
         default:
@@ -129,10 +131,8 @@ bool RemoteConnectionUserInteractionDelegate::acceptCertificateAfterMismatch(
     }
 }
 
-bool RemoteConnectionUserInteractionDelegate::acceptCertificateOfServerInTargetSystem(
-    const nx::vms::api::ModuleInformation& target,
-    const nx::network::SocketAddress& primaryAddress,
-    const nx::network::ssl::CertificateChain& chain)
+bool RemoteConnectionUserInteractionDelegate::acceptCertificatesOfServersInTargetSystem(
+    const QList<TargetCertificateInfo>& certificatesInfo)
 {
     switch (d->validationLevel())
     {
@@ -140,9 +140,8 @@ bool RemoteConnectionUserInteractionDelegate::acceptCertificateOfServerInTargetS
             return true;
 
         case CertificateValidationLevel::recommended:
-            return d->askToAcceptCertificate(target,
-                primaryAddress,
-                chain,
+            return d->askToAcceptCertificates(
+                certificatesInfo,
                 CertificateWarning::Reason::serverCertificateChanged);
 
         case CertificateValidationLevel::strict:

@@ -2,6 +2,8 @@
 
 #include "connection_delegate_helper.h"
 
+#include <nx/network/ssl/certificate.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -25,17 +27,16 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
                 parent, OauthLoginDialog::tr("Connect to System"), credentials);
         };
 
-    const auto askToAcceptCertificate =
-        [parentWidget](const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain,
+    const auto askToAcceptCertificates =
+        [parentWidget](
+            const QList<core::TargetCertificateInfo>& certificatesInfo,
             core::CertificateWarning::Reason warningType)
         {
             auto parent = parentWidget();
             if (!parent)
                 return false;
 
-            ServerCertificateWarning warning(target, primaryAddress, chain, warningType, parent);
+            ServerCertificateWarning warning(certificatesInfo, warningType, parent);
             warning.exec();
 
             // Dialog uses both standard and custom buttons. Check button role instead of result code.
@@ -43,20 +44,18 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
         };
 
     const auto showCertificateError =
-        [parentWidget](const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain)
+        [parentWidget](const core::TargetCertificateInfo& certificateInfo)
         {
             auto parent = parentWidget();
             if (!parent)
                 return;
 
-            ServerCertificateError msg(target, primaryAddress, chain, parent);
+            ServerCertificateError msg(certificateInfo, parent);
             msg.exec();
         };
 
     return std::make_unique<core::RemoteConnectionUserInteractionDelegate>(
-        validateToken, askToAcceptCertificate, showCertificateError);
+        validateToken, askToAcceptCertificates, showCertificateError);
 }
 
 } // namespace nx::vms::client::desktop
