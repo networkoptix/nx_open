@@ -22,6 +22,12 @@ const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
 const qreal kBytesInTb = 1024.0 * kBytesInGB;
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSubstitutions = {
+    {QIcon::Normal, {.primary = "light14"}},
+    {QIcon::Active, {.primary = "light15"}},
+    {QIcon::Selected, {.primary = "light13"}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kDeleteThemeSubstitutions = {
     {QIcon::Normal, {.primary = "light16"}},
     {QIcon::Active, {.primary = "light17"}},
     {QIcon::Selected, {.primary = "light15"}},
@@ -365,7 +371,7 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
                 }
 
                 if (canRemoveStorage(storage))
-                    return qnSkin->icon("text_buttons/delete_20.svg", kThemeSubstitutions)
+                    return qnSkin->icon("text_buttons/delete_20.svg", kDeleteThemeSubstitutions)
                         .pixmap(QSize(20, 20));
 
                 if (couldStoreAnalytics(storage))

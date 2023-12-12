@@ -139,8 +139,9 @@ void SelectableTextButton::setDeactivatable(bool value)
         d->deactivateButton.reset(new CloseButton(this));
         d->deactivateButton->setToolTip(d->deactivationToolTip);
 
-        anchorWidgetToParent(
-            d->deactivateButton.data(), Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge, {0, 0, 0, 1});
+        anchorWidgetToParent(d->deactivateButton.data(),
+            Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge,
+            {0, 2, 0, 1}); //< TODO: @pprivalov there are a number of hardcodedmagic numbers, try to deal with them.
 
         connect(d->deactivateButton.data(), &CloseButton::clicked,
             [this]() { setState(State::deactivated); });
