@@ -1,0 +1,6 @@
+{
+    "name": "GoogleTest",
+    "webLink": ["https://github.com/google/googletest/"],
+    "licenseType": "BSD-3-Clause",
+    "licenseLink": ["https://github.com/google/googletest/blob/main/LICENSE"]
+}
