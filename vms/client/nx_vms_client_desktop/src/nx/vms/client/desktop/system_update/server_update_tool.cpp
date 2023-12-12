@@ -35,12 +35,13 @@
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/nx_system_updates_ini.h>
+#include <nx/vms/common/update/start_update_reply.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/synctime.h>
 
-#include "server_updates_model.h"
+#include "peer_state_tracker.h"
 #include "update_verification.h"
 
 using namespace std::chrono;
@@ -469,7 +470,7 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
     m_manualPackages = contents.manualPackages;
 
     bool havePersistentServerWithoutInternet = false;
-    for (const QnUuid& serverId: systemSettings()->targetPersistentUpdateStorage().servers)
+    for (const QnUuid& serverId: m_persistentStorageServers)
     {
         if (const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId))
         {
@@ -553,12 +554,7 @@ QSet<QnUuid> ServerUpdateTool::getTargetsForPackage(const update::Package& packa
 {
     QSet<QnUuid> result = m_packageProperties[package.file].targets;
     if (package.component == update::Component::client)
-    {
-        const QList<QnUuid> persistentStorageServers =
-            systemSettings()->targetPersistentUpdateStorage().servers;
-        result.unite(
-            QSet<QnUuid>(persistentStorageServers.begin(), persistentStorageServers.end()));
-    }
+        result.unite(m_persistentStorageServers);
     return result;
 }
 
@@ -1034,7 +1030,7 @@ bool ServerUpdateTool::requestStartUpdate(
     const nx::vms::common::update::Information& info,
     const QSet<QnUuid>& targets)
 {
-    NX_VERBOSE(this, "requestStartUpdate(%1) - sending /ec2/startUpdate command", info.version);
+    NX_VERBOSE(this, "%1(%2) - sending /ec2/startUpdate command", __func__, info.version);
 
     QSet<QnUuid> servers;
     for (const auto& id: targets)
@@ -1046,37 +1042,42 @@ bool ServerUpdateTool::requestStartUpdate(
 
     if (servers.empty())
     {
-        NX_WARNING(this, "requestStartUpdate(%1) - target list contains no server to update",
-            info.version);
+        NX_WARNING(this, "%1(%2) - target list contains no server to update",
+            __func__, info.version);
     }
 
     const auto connection = connectedServerApi();
     if (!connection)
     {
         m_remoteUpdateStatus = {};
-        NX_ERROR(this, "requestStartUpdate(%1) - no connection to the server", info.version);
+        NX_ERROR(this, "%1(%2) - no connection to the server", __func__, info.version);
         emit startUpdateComplete(false, toString(InternalError::noConnection));
         return false;
     }
 
-    dropAllRequests("requestStartUpdate()");
+    dropAllRequests(__func__);
 
     const auto handleResponse =
-        [this](
-            bool success,
-            rest::Handle /*requestId*/,
-            const rest::ServerConnection::EmptyResponseType& /*response*/)
+        [this](bool success, ::rest::Handle, const nx::network::rest::JsonResult& result)
         {
-            const auto error = success ? InternalError::noError : InternalError::networkError;
             if (success)
             {
                 m_initiatedUpdate = true;
-                saveInternalState();
+
+                const auto reply =
+                    result.deserialized<common::update::StartUpdateReply>();
+                m_persistentStorageServers = QSet(
+                    reply.persistentStorageServers.begin(), reply.persistentStorageServers.end());
+
+                NX_INFO(this, "%1(%2): Update started. Persistent storage servers: %3",
+                    __func__, reply.info.version, m_persistentStorageServers);
             }
+
+            const auto error = success ? InternalError::noError : InternalError::networkError;
             emit startUpdateComplete(success, toString(error));
         };
 
-    connection->postEmptyResult("/ec2/startUpdate",
+    connection->postJsonResult("/ec2/startUpdate",
         network::rest::Params{},
         QJson::serialized(info),
         nx::utils::guarded(this, handleResponse));
