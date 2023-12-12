@@ -48,8 +48,8 @@ Item
     property var externalHoverData //< {indexes[], accessRight, toggledOn, fromSelection}
     property int externalRelevantAccessRights: 0
 
-    readonly property int relevantAccessRights: externalRelevantAccessRights
-        || accessRightsModel.relevantAccessRights
+    readonly property int relevantAccessRights:
+        externalRelevantAccessRights | accessRightsModel.relevantAccessRights
 
     property bool parentNodeSelected: false
 
