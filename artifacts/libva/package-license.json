@@ -1,0 +1,6 @@
+{
+    "name": "libva",
+    "webLink": ["https://github.com/intel/libva"],
+    "licenseType": "MIT",
+    "licenseLink": ["https://github.com/intel/libva/blob/master/COPYING"]
+}

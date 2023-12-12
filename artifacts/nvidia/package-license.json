@@ -1,0 +1,6 @@
+{
+    "name": "NVIDIA VIDEO CODEC SDK",
+    "webLink": ["https://developer.nvidia.com/nvidia-video-codec-sdk"],
+    "licenseType": "NVIDIA EULA",
+    "licenseLink": ["https://developer.download.nvidia.com/compute/cuda/5_5/rel/docs/EULA.pdf"]
+}

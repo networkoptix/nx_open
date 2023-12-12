@@ -1,0 +1,6 @@
+{
+    "name": "moodycamel::ConcurrentQueue",
+    "webLink": ["https://github.com/cameron314/concurrentqueue"],
+    "licenseType": "BSD-2-Clause",
+    "licenseLink": ["https://github.com/cameron314/concurrentqueue/blob/master/LICENSE.md"]
+}
