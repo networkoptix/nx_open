@@ -190,6 +190,7 @@ struct NX_VMS_COMMON_API Filter
     /** Null value treated as any engine. */
     QnUuid analyticsEngineId;
     Options options{};
+    std::chrono::milliseconds maxAnalyticsDetails{};
 
     Filter();
 
