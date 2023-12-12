@@ -195,17 +195,13 @@ struct CameraSettingsDialog::Private: public QObject
 
     void resetChanges()
     {
-        const auto singleCamera = cameras.size() == 1
-            ? cameras.first()
-            : QnVirtualCameraResourcePtr();
-
         store->loadCameras(
             cameras,
             deviceAgentSettingsAdapter,
             analyticsEnginesWatcher,
             advancedParametersManifestManager.get());
 
-        cameraResourceAccessWatcher->setCamera(singleCamera);
+        cameraResourceAccessWatcher->setCameras(cameras);
     }
 
     void handleAction(ui::action::IDType action)
@@ -690,7 +686,9 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     updateScheduleAlert(state);
 
-    d->setOverlayVisible(!state.singleCameraProperties.permissions.testFlag(Qn::WritePermission));
+    d->overlayWidget->setCameraCount(state.devicesCount);
+
+    d->setOverlayVisible(!state.allCamerasEditable);
     static const int kLastTabKey = (int)CameraSettingsTab::expert;
     for (int key = 0; key <= kLastTabKey; ++key)
         setPageVisible(key, state.isPageVisible((CameraSettingsTab)key));

@@ -39,14 +39,23 @@ NoPermissionsOverlayWidget::NoPermissionsOverlayWidget(QWidget* parent):
     layout->addWidget(labelNoAccess);
     layout->setAlignment(labelNoAccess, Qt::AlignHCenter);
 
-    auto labelInfo = new QnWordWrappedLabel();
-    labelInfo->setText("You do not have permission to edit settings of this camera");
-    labelInfo->label()->setAlignment(Qt::AlignHCenter);
+    m_infoLabel = new QnWordWrappedLabel();
+    m_infoLabel->label()->setAlignment(Qt::AlignHCenter);
     font.setPixelSize(14);
     font.setWeight(QFont::Normal);
-    labelInfo->label()->setFont(font);
-    layout->addWidget(labelInfo);
-    layout->setAlignment(labelInfo, Qt::AlignHCenter);
+    m_infoLabel->label()->setFont(font);
+    layout->addWidget(m_infoLabel);
+    layout->setAlignment(m_infoLabel, Qt::AlignHCenter);
+
+    setCameraCount(1);
+}
+
+void NoPermissionsOverlayWidget::setCameraCount(int value)
+{
+    if (value == 1)
+        m_infoLabel->setText(tr("You do not have permission to edit settings of this camera"));
+    else
+        m_infoLabel->setText(tr("You do not have permission to edit settings of some cameras"));
 }
 
 void NoPermissionsOverlayWidget::paintEvent(QPaintEvent*)
