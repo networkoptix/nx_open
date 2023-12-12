@@ -185,6 +185,7 @@ struct EventTile::Private
         else
         {
             QTextDocument doc;
+            doc.setDefaultFont(q->ui->nameLabel->font());
             doc.setHtml(toHtml(title));
             doc.setTextWidth(width);
             WidgetUtils::elideDocumentLines(&doc, kTileTitleLineLimit, true);
