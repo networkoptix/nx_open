@@ -1,0 +1,6 @@
+{
+    "name": "boost.preprocessor",
+    "webLink": ["https://www.boost.org/doc/libs/1_83_0/libs/preprocessor/doc/index.html"],
+    "licenseType": "BSL-1.0",
+    "licenseLink": ["https://www.boost.org/LICENSE_1_0.txt"]
+}
