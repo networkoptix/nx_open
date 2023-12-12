@@ -503,7 +503,7 @@ void StylePrivate::drawTextButton(QPainter* painter,
             option->icon,
             option->direction,
             Qt::AlignLeft | Qt::AlignVCenter,
-            Metrics::kTextButtonIconSpacing,
+            textButtonIconSpacing(widget),
             iconMode);
     }
 

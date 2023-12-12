@@ -238,6 +238,9 @@ struct Properties
      *  descendant.
     */
     static const char* kIsCloseTabButton;
+
+    /** Name of a property to hold custom spacing between icon and text in a button (int). */
+    static const char* kCustomTextButtonIconSpacing;
 };
 
 /** Flags of additional slider features */
@@ -255,6 +258,7 @@ QColor linkColor(const QPalette& palette, bool hovered);
 bool isAccented(const QWidget* widget);
 bool isWarningStyle(const QWidget* widget);
 bool hasTextButtonBackgroundStyle(const QWidget* widget);
+int textButtonIconSpacing(const QWidget* widget);
 
 class RectCoordinates
 {

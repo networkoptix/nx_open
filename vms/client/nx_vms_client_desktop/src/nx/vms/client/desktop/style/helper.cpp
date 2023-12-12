@@ -29,6 +29,7 @@ const char* Properties::kMenuNoMouseReplayArea = "_qn_menuNoMouseReplayArea";
 const char* Properties::kComboBoxPopupWidth = "_qn_comboBoxPopupWidth";
 const char* Properties::kGroupBoxContentTopMargin = "_qn_groupBoxContentTopMargin";
 const char* Properties::kIsCloseTabButton = "_qn_isCloseTabButton";
+const char* Properties::kCustomTextButtonIconSpacing = "_qn_customTextButtonIconSpacing";
 
 bool isDark(const QColor& color)
 {
@@ -76,6 +77,13 @@ TabShape tabShape(const QWidget* widget)
         return TabShape::Default;
 
     return static_cast<TabShape>(widget->property(Properties::kTabShape).toInt());
+}
+
+int textButtonIconSpacing(const QWidget* widget)
+{
+    bool ok = false;
+    const int spacing = widget->property(Properties::kCustomTextButtonIconSpacing).toInt(&ok);
+    return ok ? spacing : Metrics::kTextButtonIconSpacing;
 }
 
 } // namespace nx::style
