@@ -3581,7 +3581,7 @@ QSize Style::sizeFromContents(
             }
 
             if (textButton)
-                result.rwidth() += (hasIcon ? Metrics::kTextButtonIconSpacing : 0);
+                result.rwidth() += hasIcon ? textButtonIconSpacing(widget) : 0;
             else if (hasText)
                 result.rwidth() = qMax(result.rwidth(), Metrics::kMinimumButtonWidth);
             else // Make button at least square
