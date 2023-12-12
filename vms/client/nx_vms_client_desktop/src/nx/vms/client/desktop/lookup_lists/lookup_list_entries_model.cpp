@@ -58,9 +58,9 @@ QVariant LookupListEntriesModel::headerData(
     return QVariant();
 }
 
-int LookupListEntriesModel::rowCount(const QModelIndex& parent) const
+int LookupListEntriesModel::rowCount(const QModelIndex& /*parent*/) const
 {
-    if (!NX_ASSERT(d->data))
+    if (!d->data)
         return 0;
 
     return d->rowsIndexesToShow ? d->rowsIndexesToShow->size() : d->data->rawData().entries.size();
