@@ -9096,6 +9096,14 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes to %1 group</source>
       <translation type="unfinished">Failed to apply changes to %1 group</translation>
     </message>
+    <message>
+      <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
+      <translation>Geçerli grup, bu sekmede seçilen tüm grupların üyesidir ve her birinden izinleri devralır.</translation>
+    </message>
+    <message>
+      <source>Select one or multiple groups from which the current group will inherit permissions</source>
+      <translation>Geçerli grubun izinleri devralacağı bir veya daha fazla grup seçin</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::HintButton</name>

@@ -9103,6 +9103,14 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>Failed to apply changes to %1 group</source>
       <translation>Det gick inte att tillämpa ändringar på %1 grupp</translation>
     </message>
+    <message>
+      <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
+      <translation>Nuvarande grupp är medlem i alla grupper som valts på denna flik och ärver behörigheter från var och en av dem.</translation>
+    </message>
+    <message>
+      <source>Select one or multiple groups from which the current group will inherit permissions</source>
+      <translation>Välj en eller flera grupper från vilka den aktuella gruppen ärver behörigheter</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::HintButton</name>

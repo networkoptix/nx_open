@@ -8955,6 +8955,14 @@ We recommend you not to open this integration. If you understand the risks, you 
       <source>Failed to apply changes to %1 group</source>
       <translation>%1 グループへの変更の適用に失敗しました</translation>
     </message>
+    <message>
+      <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
+      <translation>このグループは、このタブで選択されたすべてのグループのメンバーであり、各グループから権限を継承します。</translation>
+    </message>
+    <message>
+      <source>Select one or multiple groups from which the current group will inherit permissions</source>
+      <translation>このグループの権限の継承元となるグループを 1 つ以上選択してください</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::HintButton</name>

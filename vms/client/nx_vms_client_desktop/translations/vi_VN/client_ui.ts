@@ -673,7 +673,7 @@
     </message>
     <message>
       <source>Record audio</source>
-      <translation type="unfinished">Record audio</translation>
+      <translation>Ghi âm</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
