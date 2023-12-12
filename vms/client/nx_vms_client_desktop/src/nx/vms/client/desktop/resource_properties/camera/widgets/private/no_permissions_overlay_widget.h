@@ -4,6 +4,8 @@
 
 #include <QtWidgets/QWidget>
 
+class QnWordWrappedLabel;
+
 namespace nx::vms::client::desktop {
 
 class NoPermissionsOverlayWidget: public QWidget
@@ -14,8 +16,13 @@ class NoPermissionsOverlayWidget: public QWidget
 public:
     explicit NoPermissionsOverlayWidget(QWidget* parent = nullptr);
 
+    void setCameraCount(int value);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
+
+private:
+    QnWordWrappedLabel* m_infoLabel = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

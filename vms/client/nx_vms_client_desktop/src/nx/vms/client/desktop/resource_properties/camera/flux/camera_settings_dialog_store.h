@@ -96,6 +96,7 @@ public:
     void setHasEventLogPermission(bool value);
     void setHasEditAccessRightsForAllCameras(bool value);
     void setPermissions(Qn::Permissions value);
+    void setAllCamerasEditable(bool value);
     void setSaasInitialized(bool value);
     void setSingleVirtualCameraState(const VirtualCameraState& value);
     void setSingleCameraUserName(const QString& text);
