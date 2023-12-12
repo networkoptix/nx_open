@@ -20,6 +20,7 @@
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/format.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/types/access_rights_types.h>
@@ -109,6 +110,8 @@ struct ResourceAccessRightsModel::Private
 
     QPersistentModelIndex resourceTreeIndex;
     ResourceAccessTreeItem item;
+
+    QSet<QnResourcePtr> ignoredProviders;
 
     QVector<ResourceAccessInfo> info;
     nx::utils::ScopedConnections contextConnections;
@@ -201,6 +204,27 @@ void ResourceAccessRightsModel::setResourceTreeIndex(const QModelIndex& value)
     d->updateInfo();
 
     emit resourceTreeIndexChanged();
+}
+
+QVariant ResourceAccessRightsModel::ignoredProviders() const
+{
+    if (d->ignoredProviders.empty())
+        return {};
+
+    return QVariant::fromValue(
+        QnResourceList{d->ignoredProviders.cbegin(), d->ignoredProviders.cend()});
+}
+
+void ResourceAccessRightsModel::setIgnoredProviders(const QVariant& value)
+{
+    const auto ignoredProviders = nx::utils::toQSet(value.value<QnResourceList>());
+    if (d->ignoredProviders == ignoredProviders)
+        return;
+
+    d->ignoredProviders = ignoredProviders;
+    d->updateInfo();
+
+    emit ignoredProvidersChanged();
 }
 
 ResourceAccessTreeItem::Type ResourceAccessRightsModel::rowType() const
@@ -414,7 +438,7 @@ QVector<ResourceAccessInfo> ResourceAccessRightsModel::Private::calculateInfo() 
                         newInfo.parentResourceGroupId = item.outerSpecialResourceGroupId;
                     }
                 }
-                else
+                else if (!ignoredProviders.contains(provider))
                 {
                     const auto providedVia = providerType(provider.get());
                     if (providerPriority(providedVia) > providerPriority(newInfo.inheritedFrom))
