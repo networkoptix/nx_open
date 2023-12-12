@@ -13,6 +13,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/helpers.h>
+#include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
@@ -47,16 +48,18 @@ QString highlightedText(const QString& text)
 namespace nx::vms::client::desktop {
 
 ServerCertificateViewer::ServerCertificateViewer(
-    const nx::vms::api::ModuleInformation& target,
-    const nx::network::SocketAddress& primaryAddress,
-    const std::vector<nx::network::ssl::Certificate>& certificates,
+    const core::TargetCertificateInfo& certificateInfo,
     Mode mode,
     QWidget *parent)
     :
     ServerCertificateViewer(parent)
 {
     NX_ASSERT(mode != Mode::mismatch); //< Resource pointer is required for mismatch mode.
-    setCertificateData(target, primaryAddress, certificates, mode);
+    setCertificateData(
+        certificateInfo.target,
+        certificateInfo.address,
+        certificateInfo.chain,
+        mode);
 }
 
 ServerCertificateViewer::ServerCertificateViewer(

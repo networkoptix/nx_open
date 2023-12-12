@@ -478,17 +478,17 @@ struct RemoteConnectionFactory::Private
             {
                 if (status == CertificateVerifier::Status::notFound)
                 {
-                    return delegate->acceptNewCertificate(
+                    return delegate->acceptNewCertificate(TargetCertificateInfo{
                         context->moduleInformation,
                         context->address(),
-                        context->handshakeCertificateChain);
+                        context->handshakeCertificateChain});
                 }
                 else if (status == CertificateVerifier::Status::mismatch)
                 {
-                    return delegate->acceptCertificateAfterMismatch(
+                    return delegate->acceptCertificateAfterMismatch(TargetCertificateInfo{
                         context->moduleInformation,
                         context->address(),
-                        context->handshakeCertificateChain);
+                        context->handshakeCertificateChain});
                 }
                 return false;
             };
@@ -920,82 +920,91 @@ struct RemoteConnectionFactory::Private
             return;
 
         NX_VERBOSE(this, "Process received certificates list.");
+
+        QList<TargetCertificateInfo> certificates;
+
+        // Collect Certificates that don't match the pinned ones.
         for (const auto& server: context->serversInfo)
         {
             const auto& serverId = server.id;
             const auto serverUrl = mainServerUrl(server.remoteAddresses, server.port);
 
-            auto storeCertificate =
-                [&](const nx::network::ssl::CertificateChain& chain, CertificateType type)
-                {
-                    if (chain.empty())
-                        return false;
-
-                    const auto currentKey = chain[0].publicKey();
-                    const auto pinnedKey = certificateVerifier->pinnedCertificate(serverId, type);
-
-                    if (currentKey == pinnedKey)
-                        return true;
-
-                    if (!pinnedKey)
-                    {
-                        // A new certificate has been found. Pin it, since the system is trusted.
-                        certificateVerifier->pinCertificate(serverId, currentKey, type);
-                        return true;
-                    }
-
-                    auto accept =
-                        [server, serverUrl, chain]
-                            (AbstractRemoteConnectionUserInteractionDelegate* delegate)
-                        {
-                            return delegate->acceptCertificateOfServerInTargetSystem(
-                                server,
-                                nx::network::SocketAddress::fromUrl(serverUrl),
-                                chain);
-                        };
-                    if (const auto accepted = context->logonData.userInteractionAllowed
-                        && executeInUiThreadSync(context, accept))
-                    {
-                        certificateVerifier->pinCertificate(serverId, currentKey, type);
-                        return true;
-                    }
-
-                    return false;
-                };
-
             auto processCertificate =
                 [&](const std::string& pem, CertificateType type)
                 {
                     if (pem.empty())
-                        return true; //< There is no certificate to process.
+                        return; //< There is no certificate to process.
 
                     const auto chain = nx::network::ssl::Certificate::parse(pem);
 
-                    if (!storeCertificate(chain, type))
-                    {
-                        context->setError(RemoteConnectionErrorCode::certificateRejected);
-                        return false;
-                    }
+                    if (chain.empty())
+                        return; //< The pem value is inavlid.
 
-                    // Certificate has been stored successfully. Add it into the cache.
-                    context->certificateCache->addCertificate(
-                        serverId,
-                        chain[0].publicKey(),
-                        type);
-                    return true;
+                    const auto currentKey = chain[0].publicKey();
+                    const auto pinnedKey = certificateVerifier->pinnedCertificate(serverId, type);
+
+                    if (!pinnedKey)
+                        return; //< Pin a new certificate, since the system itself is trusted.
+
+                    if (currentKey == pinnedKey)
+                        return; //< The given certificate matches the pinned one.
+
+                    // Add certificate to the list of those that need User confirmation.
+                    certificates << TargetCertificateInfo{
+                        server,
+                        nx::network::SocketAddress::fromUrl(serverUrl),
+                        chain};
                 };
 
-            if (!processCertificate(server.certificatePem, CertificateType::autogenerated))
-            {
-                return;
-            }
+            processCertificate(server.certificatePem, CertificateType::autogenerated);
+            processCertificate(server.userProvidedCertificatePem, CertificateType::connection);
+        }
 
-            if (!processCertificate(
-                server.userProvidedCertificatePem,
-                CertificateType::connection))
+        // Ask for User confirmation.
+        auto accept =
+            [certificates]
+                (AbstractRemoteConnectionUserInteractionDelegate* delegate)
             {
-                return;
-            }
+                return delegate->acceptCertificatesOfServersInTargetSystem(certificates);
+            };
+
+        const auto accepted = certificates.isEmpty()
+            || (context->logonData.userInteractionAllowed
+                && executeInUiThreadSync(context, accept));
+
+        if (!accepted)
+        {
+            context->setError(RemoteConnectionErrorCode::certificateRejected);
+            return;
+        }
+
+        // Store the certificates and fill up the cache.
+        for (const auto& server: context->serversInfo)
+        {
+            const auto& serverId = server.id;
+
+            auto storeCertificate =
+                [&](const std::string& pem, CertificateType type)
+                {
+                    if (pem.empty())
+                        return; //< There is no certificate to process.
+
+                    const auto chain = nx::network::ssl::Certificate::parse(pem);
+
+                    if (chain.empty())
+                        return; //< The pem value is inavlid.
+
+                    const auto currentKey = chain[0].publicKey();
+                    const auto pinnedKey = certificateVerifier->pinnedCertificate(serverId, type);
+
+                    if (currentKey != pinnedKey)
+                        certificateVerifier->pinCertificate(serverId, currentKey, type);
+
+                    context->certificateCache->addCertificate(serverId, currentKey, type);
+                };
+
+            storeCertificate(server.certificatePem, CertificateType::autogenerated);
+            storeCertificate(server.userProvidedCertificatePem, CertificateType::connection);
         }
     }
 
