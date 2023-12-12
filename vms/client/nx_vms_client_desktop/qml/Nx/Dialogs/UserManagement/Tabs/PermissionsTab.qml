@@ -195,6 +195,7 @@ Item
 
         property int nextBatchCheckState: Qt.Checked
         property int selectionSize: 0
+        property var selectedLayouts
 
         property var currentSearchRegExp: null
 
@@ -267,6 +268,7 @@ Item
             if (!hoveredColumnAccessRight || !control.editingContext)
             {
                 selectionRelevantAccessRights = 0
+                selectedLayouts = undefined
                 return
             }
 
@@ -283,6 +285,8 @@ Item
 
             selectionRelevantAccessRights =
                 control.editingContext.combinedRelevantAccessRights(selection)
+
+            selectedLayouts = control.editingContext.selectionLayouts(selection)
         }
 
         onSelectionChanged:
@@ -324,6 +328,7 @@ Item
             accessRightDescriptors: control.availableAccessRightDescriptors
             highlightRegExp: tree.currentSearchRegExp
             hoveredColumnAccessRight: tree.hoveredColumnAccessRight
+            externallySelectedLayouts: tree.selectedLayouts
             selectionSize: tree.selectionSize
 
             externalNextCheckState: tree.nextBatchCheckState
