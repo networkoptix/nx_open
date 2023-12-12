@@ -12,6 +12,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/access_rights_resolver.h>
@@ -21,6 +22,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/common/system_context.h>
 
@@ -175,7 +179,6 @@ public:
 public:
     QnUuid currentSubjectId;
     SubjectType currentSubjectType = SubjectType::user;
-    nx::vms::common::SystemContext* systemContext;
     const QPointer<SubjectHierarchy> systemSubjectHierarchy;
     const std::unique_ptr<Hierarchy> currentHierarchy;
     const std::unique_ptr<ProxyAccessRightsManager> accessRightsManager;
@@ -186,19 +189,15 @@ public:
     mutable QSet<QnUuid> currentlyAccessibleIdsCache; //< For filter by permissions.
 
 public:
-    explicit Private(
-        AccessSubjectEditingContext* q,
-        nx::vms::common::SystemContext* systemContext)
-        :
+    explicit Private(AccessSubjectEditingContext* q):
         q(q),
-        systemContext(systemContext),
-        systemSubjectHierarchy(systemContext->accessSubjectHierarchy()),
+        systemSubjectHierarchy(q->systemContext()->accessSubjectHierarchy()),
         currentHierarchy(new Hierarchy()),
-        accessRightsManager(new ProxyAccessRightsManager(systemContext->accessRightsManager())),
+        accessRightsManager(new ProxyAccessRightsManager(q->systemContext()->accessRightsManager())),
         accessRightsResolver(new AccessRightsResolver(
-            systemContext->resourcePool(),
+            q->systemContext()->resourcePool(),
             accessRightsManager.get(),
-            systemContext->globalPermissionsWatcher(),
+            q->systemContext()->globalPermissionsWatcher(),
             currentHierarchy.get(),
             AccessRightsResolver::Mode::editing)),
         notifier(accessRightsResolver->createNotifier())
@@ -238,10 +237,10 @@ public:
         connect(currentHierarchy.get(), &SubjectHierarchy::reset,
             q, &AccessSubjectEditingContext::hierarchyChanged);
 
-        connect(systemContext->resourcePool(), &QnResourcePool::resourcesAdded,
+        connect(q->systemContext()->resourcePool(), &QnResourcePool::resourcesAdded,
             this, &Private::handleResourcesAddedOrRemoved);
 
-        connect(systemContext->resourcePool(), &QnResourcePool::resourcesRemoved,
+        connect(q->systemContext()->resourcePool(), &QnResourcePool::resourcesRemoved,
             this, &Private::handleResourcesAddedOrRemoved);
     }
 
@@ -488,22 +487,18 @@ public:
 // AccessSubjectEditingContext
 
 AccessSubjectEditingContext::AccessSubjectEditingContext(
-    nx::vms::common::SystemContext* systemContext,
+    nx::vms::client::core::SystemContext* systemContext,
     QObject* parent)
     :
     QObject(parent),
-    d(new Private(this, systemContext))
+    nx::vms::client::core::SystemContextAware(systemContext),
+    d(new Private(this))
 {
 }
 
 AccessSubjectEditingContext::~AccessSubjectEditingContext()
 {
     // Required here for forward-declared scoped pointer destruction.
-}
-
-nx::vms::common::SystemContext* AccessSubjectEditingContext::systemContext() const
-{
-    return d->systemContext;
 }
 
 QnUuid AccessSubjectEditingContext::currentSubjectId() const
@@ -541,7 +536,7 @@ void AccessSubjectEditingContext::setCurrentSubject(
     if (!d->currentSubjectId.isNull())
     {
         NX_DEBUG(this, "Current subject's access map is %1",
-            toString(ownResourceAccessMap(), d->systemContext->resourcePool()));
+            toString(ownResourceAccessMap(), resourcePool()));
     }
 }
 
@@ -563,8 +558,7 @@ bool AccessSubjectEditingContext::hasOwnAccessRight(
 void AccessSubjectEditingContext::setOwnResourceAccessMap(
     const ResourceAccessMap& resourceAccessMap)
 {
-    NX_DEBUG(this, "Setting access map to %1",
-        toString(resourceAccessMap, d->systemContext->resourcePool()));
+    NX_DEBUG(this, "Setting access map to %1", toString(resourceAccessMap, resourcePool()));
     d->accessRightsManager->setOwnResourceAccessMap(resourceAccessMap);
 }
 
@@ -843,6 +837,42 @@ Qt::CheckState AccessSubjectEditingContext::combinedOwnCheckState(
     const QModelIndexList& indexes, AccessRight accessRight) const
 {
     return d->combinedOwnCheckState(ownResourceAccessMap(), indexes, accessRight);
+}
+
+QnResourceList AccessSubjectEditingContext::selectionLayouts(
+    const QModelIndexList& selection) const
+{
+    const auto currentUser = accessController()->user();
+    if (!NX_ASSERT(currentUser))
+        return {};
+
+    const auto currentUserId = currentUser->getId();
+
+    QnLayoutResourceList result;
+    for (const auto& index: selection)
+    {
+        const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
+        if (nodeType == ResourceTree::NodeType::layouts)
+        {
+            return resourcePool()->getResources<LayoutResource>(
+                [this, &currentUserId](const LayoutResourcePtr& layout) -> bool
+                {
+                    if (layout->isFile())
+                        return false;
+
+                    const auto layoutId = layout->getParentId();
+                    return layoutId.isNull() || layoutId == currentUserId;
+                });
+        }
+
+        if (const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>())
+        {
+            if (const auto layout = resource.objectCast<QnLayoutResource>())
+                result.push_back(layout);
+        }
+    }
+
+    return result;
 }
 
 QnResourceList AccessSubjectEditingContext::getGroupResources(const QnUuid& resourceGroupId) const

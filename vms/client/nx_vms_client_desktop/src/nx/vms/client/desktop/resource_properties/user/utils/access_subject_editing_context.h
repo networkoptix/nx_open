@@ -11,6 +11,7 @@
 #include <core/resource_access/resource_access_map.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/system_context_aware.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_model_adapter.h>
 
 namespace nx::vms::common { class SystemContext; }
@@ -80,7 +81,9 @@ struct NX_VMS_CLIENT_DESKTOP_API ResourceAccessTreeItem
     Q_GADGET
 };
 
-class NX_VMS_CLIENT_DESKTOP_API AccessSubjectEditingContext: public QObject
+class NX_VMS_CLIENT_DESKTOP_API AccessSubjectEditingContext:
+    public QObject,
+    public nx::vms::client::core::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -91,11 +94,9 @@ class NX_VMS_CLIENT_DESKTOP_API AccessSubjectEditingContext: public QObject
 
 public:
     explicit AccessSubjectEditingContext(
-        nx::vms::common::SystemContext* systemContext, QObject* parent = nullptr);
+        nx::vms::client::core::SystemContext* systemContext, QObject* parent = nullptr);
 
     virtual ~AccessSubjectEditingContext() override;
-
-    nx::vms::common::SystemContext* systemContext() const;
 
     /** A current subject being edited. */
     QnUuid currentSubjectId() const;
@@ -182,6 +183,8 @@ public:
 
     Q_INVOKABLE Qt::CheckState combinedOwnCheckState(const QModelIndexList& indexes,
         nx::vms::api::AccessRight accessRight) const;
+
+    Q_INVOKABLE QnResourceList selectionLayouts(const QModelIndexList& selection) const;
 
     Q_INVOKABLE void modifyAccessRights(const QModelIndexList& indexes,
         nx::vms::api::AccessRights modifiedRightsMask, bool value, bool withDependent);
