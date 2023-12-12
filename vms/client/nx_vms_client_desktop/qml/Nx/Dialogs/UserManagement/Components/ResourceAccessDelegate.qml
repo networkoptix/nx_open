@@ -48,6 +48,8 @@ Item
     property var externalHoverData //< {indexes[], accessRight, toggledOn, fromSelection}
     property int externalRelevantAccessRights: 0
 
+    property var externallySelectedLayouts
+
     readonly property int relevantAccessRights:
         externalRelevantAccessRights | accessRightsModel.relevantAccessRights
 
@@ -98,6 +100,15 @@ Item
         context: root.editingContext
         resourceTreeIndex: root.resourceTreeIndex
         accessRightsList: root.accessRightDescriptors.map(item => item.accessRight)
+
+        // If a resource selection contains both layouts and resources that are their items,
+        // and a remove operation is highlighted, then the future state inheritance for those
+        // resources should not display layouts as they're getting the permission removed as well.
+
+        ignoredProviders:
+            root.externallySelectedAccessRight && root.externalNextCheckState == Qt.Unchecked
+                ? root.externallySelectedLayouts
+                : undefined
     }
 
     Row
