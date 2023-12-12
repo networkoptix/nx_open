@@ -104,19 +104,13 @@ class RemoteConnectionFactoryTest: public ::testing::Test
     class UserInteractionDelegate: public AbstractRemoteConnectionUserInteractionDelegate
     {
         virtual bool acceptNewCertificate(
-            const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain) override { return true; }
+            const TargetCertificateInfo& certificateInfo) override { return true; }
 
         virtual bool acceptCertificateAfterMismatch(
-            const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain) override { return true; }
+            const TargetCertificateInfo& certificateInfo) override { return true; }
 
-        virtual bool acceptCertificateOfServerInTargetSystem(
-            const nx::vms::api::ModuleInformation& target,
-            const nx::network::SocketAddress& primaryAddress,
-            const nx::network::ssl::CertificateChain& chain) override { return true; }
+        virtual bool acceptCertificatesOfServersInTargetSystem(
+            const QList<TargetCertificateInfo>& certificatesInfo) override { return true; }
 
         virtual bool request2FaValidation(const nx::network::http::Credentials& credentials)
             override { return true; }

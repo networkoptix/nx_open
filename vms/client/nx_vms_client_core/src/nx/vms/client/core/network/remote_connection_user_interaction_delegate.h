@@ -3,14 +3,29 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QSharedPointer>
 
+#include <nx/network/ssl/certificate.h>
 #include <nx/network/ssl/helpers.h>
+#include <nx/vms/api/data/module_information.h>
 
-namespace nx::vms::api { struct ModuleInformation; }
 namespace nx::network { class SocketAddress; }
 namespace nx::network::http { class Credentials; }
 
 namespace nx::vms::client::core {
+
+struct NX_VMS_CLIENT_CORE_API TargetCertificateInfo
+{
+public:
+    TargetCertificateInfo(
+        const nx::vms::api::ModuleInformation& target,
+        const nx::network::SocketAddress& primaryAddress,
+        const nx::network::ssl::CertificateChain& chain);
+
+    nx::vms::api::ModuleInformation target;
+    nx::network::SocketAddress address;
+    nx::network::ssl::CertificateChain chain;
+};
 
 class NX_VMS_CLIENT_CORE_API AbstractRemoteConnectionUserInteractionDelegate: public QObject
 {
@@ -28,27 +43,21 @@ public:
      * @return Whether the certificate is accepted.
      */
     virtual bool acceptNewCertificate(
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& chain) = 0;
+        const TargetCertificateInfo& certificateInfo) = 0;
 
     /**
      * Show warning about pinned certificate mismatch. Will be executed in the delegate's thread.
      * @return Whether the certificate must be accepted and pinned instead of the old one.
      */
     virtual bool acceptCertificateAfterMismatch(
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& chain) = 0;
+        const TargetCertificateInfo& certificateInfo) = 0;
 
     /**
      * Show warning about pinned certificate mismatch. Will be executed in the delegate's thread.
      * @return Whether the certificate must be accepted and pinned instead of the old one.
      */
-    virtual bool acceptCertificateOfServerInTargetSystem(
-        const nx::vms::api::ModuleInformation& target,
-        const nx::network::SocketAddress& primaryAddress,
-        const nx::network::ssl::CertificateChain& chain) = 0;
+    virtual bool acceptCertificatesOfServersInTargetSystem(
+        const QList<TargetCertificateInfo>& certificatesInfo) = 0;
 
     /**
      * Show OAUTH dialog with request for second factor for cloud access token validation.
