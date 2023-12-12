@@ -437,7 +437,7 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::calculateSupportedEventTypes(
             for (const auto& supportedType: deviceAgentManifest.supportedTypes)
             {
                 if (supportedType.objectTypeId.isEmpty() && !supportedType.eventTypeId.isEmpty())
-                    result.insert(supportedType.objectTypeId);
+                    result.insert(supportedType.eventTypeId);
             }
 
             return result;
