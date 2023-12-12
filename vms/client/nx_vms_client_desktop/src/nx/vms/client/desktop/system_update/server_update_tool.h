@@ -360,6 +360,8 @@ private:
     QSet<QnUuid> m_serversAreInstalling;
     QnUuid m_systemId;
 
+    QSet<QnUuid> m_persistentStorageServers;
+
     rest::Handle m_settingsRequest = 0;
 };
 
