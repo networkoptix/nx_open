@@ -1014,6 +1014,17 @@ CameraSettingsDialogStateReducer::State CameraSettingsDialogStateReducer::setPer
     return state;
 }
 
+CameraSettingsDialogStateReducer::State CameraSettingsDialogStateReducer::setAllCamerasEditable(
+    State state,
+    bool value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    state.allCamerasEditable = value;
+
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setSaasInitialized(
     State state,
     bool value)

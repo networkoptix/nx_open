@@ -80,6 +80,7 @@ public:
     static State setHasEventLogPermission(State state, bool value);
     static State setHasEditAccessRightsForAllCameras(State state, bool value);
     static State setPermissions(State state, Qn::Permissions value);
+    static State setAllCamerasEditable(State state, bool value);
     static State setSaasInitialized(State state, bool value);
     static State setSingleVirtualCameraState(State state, const VirtualCameraState& value);
 
