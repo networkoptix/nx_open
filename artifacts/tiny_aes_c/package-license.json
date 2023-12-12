@@ -1,0 +1,6 @@
+{
+    "name": "Tiny AES in C",
+    "webLink": ["https://github.com/kokke/tiny-AES-c"],
+    "licenseType": "Unlicense",
+    "licenseLink": ["https://github.com/kokke/tiny-AES-c/blob/master/unlicense.txt"]
+}
