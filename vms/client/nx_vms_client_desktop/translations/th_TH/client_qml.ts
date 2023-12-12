@@ -1732,22 +1732,22 @@ to activate PTZ</translation>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>แนะนำ
+การควบคุม PTZ ใหม่</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed</translation>
+      <translation>นี่คือคำแนะนำโดยย่อ
+เกี่ยวกับสิ่งที่เปลี่ยนแปลงไป</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>คลิก, ดับเบิลคลิก หรือลากตัวชี้เมาส์
+ในขณะที่กดปุ่ม Shift
+เพื่อใช้Adcanced PTZ</translation>
     </message>
   </context>
   <context>

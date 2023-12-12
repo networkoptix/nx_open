@@ -8954,6 +8954,14 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <source>Failed to apply changes to %1 group</source>
       <translation>Không thể áp dụng các thay đổi cho nhóm %1</translation>
     </message>
+    <message>
+      <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
+      <translation type="unfinished">Current group is a member of all groups selected on this tab and inherits permissions from each of them.</translation>
+    </message>
+    <message>
+      <source>Select one or multiple groups from which the current group will inherit permissions</source>
+      <translation type="unfinished">Select one or multiple groups from which the current group will inherit permissions</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::HintButton</name>
