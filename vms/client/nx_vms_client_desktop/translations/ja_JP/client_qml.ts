@@ -1842,7 +1842,7 @@ Shift key to use Advanced PTZ</source>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation>以下から %1 権限を継承します</translation>
+      <translation>以下から %1 権限を継承します: </translation>
     </message>
     <message>
       <source>Already inherited from</source>

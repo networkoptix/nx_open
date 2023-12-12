@@ -174,7 +174,7 @@
     <message>
       <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>このシステムにログインするには、 %2 で「%1 アカウントでログインするたびに認証コードを要求する」を無効にします。</translation>
+      <translation>このシステムにログインするには、 %2 で「%1 アカウントでログインするたびに確認コードを要求する」を無効にします。</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>

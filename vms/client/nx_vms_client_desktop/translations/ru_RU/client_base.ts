@@ -9315,13 +9315,13 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>Группа %1</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 и еще %n групп</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
