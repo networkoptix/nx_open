@@ -260,7 +260,7 @@ public:
     ControlBar* const selectionControls{new ControlBar(q)};
 
     QPushButton* const deleteButton{new QPushButton(
-        qnSkin->icon("text_buttons/delete_20.svg", kTextButtonColors),
+        qnSkin->icon("text_buttons/trash_20.svg", kTextButtonColors),
         tr("Delete"),
         selectionControls)};
 
@@ -493,6 +493,13 @@ void UserListWidget::Private::setupUi()
 
     deleteButton->setFlat(true);
     editButton->setFlat(true);
+    auto font = deleteButton->font();
+    font.setPixelSize(14);
+    deleteButton->setFont(font);
+    editButton->setFont(font);
+
+    deleteButton->setProperty(nx::style::Properties::kCustomTextButtonIconSpacing, 4);
+    editButton->setProperty(nx::style::Properties::kCustomTextButtonIconSpacing, 4);
 
     constexpr int kButtonBarHeight = 40;
     selectionControls->setFixedHeight(kButtonBarHeight);
