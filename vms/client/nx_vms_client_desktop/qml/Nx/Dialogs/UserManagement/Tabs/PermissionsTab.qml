@@ -265,7 +265,10 @@ Item
         function updateSelectionInfo()
         {
             if (!hoveredColumnAccessRight || !control.editingContext)
+            {
+                selectionRelevantAccessRights = 0
                 return
+            }
 
             const selection = tree.selection()
 
