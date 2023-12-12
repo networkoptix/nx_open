@@ -26,14 +26,16 @@ Certain fields are supported by some of the controls.
     value in the GUI immediately (or with some delay in the case of TextField-like fields) triggers
     sending a request to the Server, without waiting for the confirmation with the "Apply" button.
     The request executes the code of the Active Setting handler of the entity being set up by these
-    Settings. The setting values sent in such a request are not meant to be "applied" (stored in a
-    database) - they are intended only for preparing a proper reply to the user, which may include
-    an adjusted Settings Model, adjusted values of the GUI controls, and a message to be shown to
-    the user or a URL to be opened in the web browser. The main purpose of Active settings is to
-    give the entities being set up a way to change the Settings Model and values on-the-fly,
-    providing a better user experience. An example could be an Active combo-box which lists the
-    supported measurement units, and the handler code which converts the entered value into the
-    selected unit.
+    Settings. Note that if the Settings dialog is shown before the entity is created, no Active
+    Setting requests will be fired before the user clicks "Apply" and the entity is created. The
+    setting values sent in such a request are not meant to be "applied" (stored in a database) -
+    they are intended only for preparing a proper reply to the user, which may include an adjusted
+    Settings Model, adjusted values of the GUI controls, and a message to be shown to the user or a
+    URL to be opened in the web browser. The main purpose of Active settings is to give the
+    entities being set up a way to change the Settings Model and values on-the-fly, providing a
+    better user experience. An example could be an Active combo-box which lists the supported
+    measurement units, and the handler code which converts the entered value into the selected
+    unit.
 
     ATTENTION: The "Active Setting" feature requires the reaction with the entity that the settings
     are intended for, like an Analytics Engine or a Device Agent. In certain scenarios, this entity
