@@ -4,8 +4,10 @@ import QtQuick
 import QtQuick.Controls
 import QtQml.Models
 
+import Nx
 import Nx.Controls
-
+import Nx.Core
+import nx.vms.client.core
 import nx.vms.client.desktop
 
 Control
@@ -25,7 +27,8 @@ Control
         pagesModel.append({
             "title": qsTr("Introducing\nNew PTZ controls"),
             "text": qsTr("Here is a quick guide\non what has changed"),
-            "imageUrl": ""
+            "imageUrl": "",
+            "titlePixelSize": FontConfig.xLarge.pixelSize
         })
 
         if (showBasics)
@@ -68,7 +71,8 @@ Control
             pagesModel.append({
                 "title": qsTr("Target Lock Tracking"),
                 "text": qsTr("Alt + Click to follow object"),
-                "imageUrl": "image://svg/skin/promo/ptz_promo_tracking.svg"
+                "imageUrl": "image://svg/skin/promo/ptz_promo_tracking.svg",
+                "titlePixelSize": FontConfig.normal.pixelSize
             })
         }
 
@@ -117,6 +121,7 @@ Control
                             imageUrl: model.imageUrl
                             title: model.title
                             text: model.text
+                            titlePixelSize: model.titlePixelSize
                             verticalAlignment: model.imageUrl ? Qt.AlignVCenter : Qt.AlignTop
                         }
                     }

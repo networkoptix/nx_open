@@ -15,6 +15,7 @@ Item
     property alias title: titleItem.text
     property alias imageUrl: imageItem.source
     property alias text: textItem.text
+    property int titlePixelSize: FontConfig.normal.pixelSize
 
     property int verticalAlignment: Qt.AlignTop
 
@@ -38,31 +39,15 @@ Item
 
         width: promoPage.width
 
-        spacing: 8
-
-        Text
-        {
-            id: titleItem
-
-            Layout.fillWidth: true
-
-            horizontalAlignment: Text.AlignHCenter
-
-            wrapMode: Text.Wrap
-            font.weight: Font.Medium
-            font.pixelSize: 16
-
-            color: ColorTheme.colors.light4
-            visible: !!text
-        }
+        spacing: promoPage.imageUrl == "" ? 16 : 8
 
         Item
         {
             Layout.alignment: Qt.AlignHCenter
             Layout.fillHeight: true
 
-            width: 240
-            Layout.maximumHeight: 67
+            width: 200
+            Layout.maximumHeight: 75
 
             Image
             {
@@ -74,6 +59,22 @@ Item
 
                 visible: source !== ""
             }
+        }
+
+        Text
+        {
+            id: titleItem
+
+            Layout.fillWidth: true
+
+            horizontalAlignment: Text.AlignHCenter
+
+            wrapMode: Text.Wrap
+            font.weight: Font.Medium
+            font.pixelSize: promoPage.titlePixelSize
+
+            color: ColorTheme.colors.light4
+            visible: !!text
         }
 
         Text
@@ -91,7 +92,7 @@ Item
             font.weight: Font.Normal
             font.pixelSize: FontConfig.normal.pixelSize
 
-            color: ColorTheme.colors.light4
+            color: ColorTheme.colors.light10
 
             visible: !!text
         }
