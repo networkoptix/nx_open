@@ -26,9 +26,10 @@ public:
         SystemContext* systemContext,
         menu::Manager* menu,
         QObject* parent);
+
     virtual ~CameraSettingsResourceAccessWatcher() override;
 
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
+    void setCameras(const QnVirtualCameraResourceList& cameras);
 
 private:
     class Private;

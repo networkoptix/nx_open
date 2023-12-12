@@ -226,6 +226,15 @@ void CameraSettingsDialogStore::setPermissions(Qn::Permissions value)
         });
 }
 
+void CameraSettingsDialogStore::setAllCamerasEditable(bool value)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setAllCamerasEditable(std::move(state), value);
+        });
+}
+
 void CameraSettingsDialogStore::setSaasInitialized(bool value)
 {
     d->executeAction(
