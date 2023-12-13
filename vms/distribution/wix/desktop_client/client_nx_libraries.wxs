@@ -3,6 +3,7 @@
     <Fragment>
         <ComponentGroup Id="client_nx_libraries" Source="${bin_source_dir}" Directory="InstallDirRoot">
             <Component><File Name="nx_media.dll" KeyPath="yes"/></Component>
+            <Component><File Name="nx_pathkit.dll" KeyPath="yes"/></Component>
             <Component><File Name="nx_vms_client_core.dll" KeyPath="yes"/></Component>
             <Component><File Name="nx_vms_client_desktop.dll" KeyPath="yes"/></Component>
             <Component><File Name="nx_vms_applauncher_api.dll" KeyPath="yes"/></Component>

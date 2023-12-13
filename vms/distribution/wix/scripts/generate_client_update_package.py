@@ -63,6 +63,7 @@ nx_libraries = [
     'nx_vms_applauncher_api',
     'nx_media_core',
     'nx_media',
+    'nx_pathkit',
     'nx_rtp',
     'nx_codec',
     'nx_utils',

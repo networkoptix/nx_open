@@ -133,6 +133,7 @@ if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
     if(withDesktopClient OR withMediaServer OR withTestCamera)
         set(libs_debug_dependencies
             nx_network
+            nx_pathkit
             nx_utils
             nx_fusion
             nx_reflect
@@ -154,6 +155,9 @@ if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
 
         if(TARGET nx_media)
             list(APPEND libs_debug_dependencies nx_media)
+        endif()
+        if(TARGET nx_pathkit)
+            list(APPEND libs_debug_dependencies nx_pathkit)
         endif()
         if(TARGET nx_vms_json_rpc)
             list(APPEND libs_debug_dependencies nx_vms_json_rpc)

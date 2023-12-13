@@ -123,6 +123,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         qthttpserver
         nx_kit
         nx_monitoring
+        nx_pathkit
         hidapi::hidapi
         range-v3::range-v3
     FOLDER client/libs
