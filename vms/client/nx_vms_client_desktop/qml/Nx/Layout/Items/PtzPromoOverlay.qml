@@ -26,9 +26,8 @@ Control
 
         pagesModel.append({
             "title": qsTr("Introducing\nNew PTZ controls"),
-            "text": qsTr("Here is a quick guide\non what has changed"),
+            "text": qsTr("Here is a quick guide\non what has changed."),
             "imageUrl": "",
-            "titlePixelSize": FontConfig.xLarge.pixelSize
         })
 
         if (showBasics)
@@ -69,10 +68,9 @@ Control
         if (showTargetLock)
         {
             pagesModel.append({
-                "title": qsTr("Target Lock Tracking"),
-                "text": qsTr("Alt + Click to follow object"),
-                "imageUrl": "image://svg/skin/promo/ptz_promo_tracking.svg",
-                "titlePixelSize": FontConfig.normal.pixelSize
+                "title": "",
+                "text": qsTr("To use Target Lock Tracking,\nPress Alt + Click to follow object"),
+                "imageUrl": "image://svg/skin/promo/ptz_promo_tracking.svg"
             })
         }
 
@@ -121,7 +119,6 @@ Control
                             imageUrl: model.imageUrl
                             title: model.title
                             text: model.text
-                            titlePixelSize: model.titlePixelSize
                             verticalAlignment: model.imageUrl ? Qt.AlignVCenter : Qt.AlignTop
                         }
                     }

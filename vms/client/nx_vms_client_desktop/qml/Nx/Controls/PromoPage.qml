@@ -15,7 +15,6 @@ Item
     property alias title: titleItem.text
     property alias imageUrl: imageItem.source
     property alias text: textItem.text
-    property int titlePixelSize: FontConfig.normal.pixelSize
 
     property int verticalAlignment: Qt.AlignTop
 
@@ -71,7 +70,7 @@ Item
 
             wrapMode: Text.Wrap
             font.weight: Font.Medium
-            font.pixelSize: promoPage.titlePixelSize
+            font.pixelSize: FontConfig.xLarge.pixelSize
 
             color: ColorTheme.colors.light4
             visible: !!text
@@ -92,7 +91,7 @@ Item
             font.weight: Font.Normal
             font.pixelSize: FontConfig.normal.pixelSize
 
-            color: ColorTheme.colors.light10
+            color: promoPage.imageUrl == "" ? ColorTheme.colors.light4 : ColorTheme.colors.light10
 
             visible: !!text
         }
