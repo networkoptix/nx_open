@@ -207,6 +207,5 @@ protected:
 
 protected:
     unsigned int m_runNumber;
-    int m_serverOfflineTimeout;
     bool m_manualCameraListChanged;
 };
