@@ -7569,10 +7569,6 @@ We recommend you not to open this integration. If you understand the risks, you 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7590,6 +7586,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     </message>
     <message>
         <source>Pointed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Camera...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10109,6 +10109,17 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
         <source>You do not have any layouts</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+        <source>You do not have permission to edit settings of this camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have permission to edit settings of some cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
