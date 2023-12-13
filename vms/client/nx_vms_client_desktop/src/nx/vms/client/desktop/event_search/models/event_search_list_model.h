@@ -4,15 +4,20 @@
 
 #include <vector>
 
-#include <nx/vms/client/desktop/event_search/models/abstract_async_search_list_model.h>
+#include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/event_search/models/abstract_attributed_event_model.h>
 #include <nx/vms/event/event_fwd.h>
+
+class QnWorkbenchContext;
 
 namespace nx::vms::client::desktop {
 
-class EventSearchListModel: public AbstractAsyncSearchListModel
+class WindowContext;
+
+class EventSearchListModel: public core::AbstractAttributedEventModel
 {
     Q_OBJECT
-    using base_type = AbstractAsyncSearchListModel;
+    using base_type = core::AbstractAttributedEventModel;
 
     Q_PROPERTY(nx::vms::api::EventType selectedEventType READ selectedEventType
         WRITE setSelectedEventType NOTIFY selectedEventTypeChanged)
@@ -22,7 +27,7 @@ class EventSearchListModel: public AbstractAsyncSearchListModel
 
 public:
     explicit EventSearchListModel(WindowContext* context, QObject* parent = nullptr);
-    virtual ~EventSearchListModel() override = default;
+    virtual ~EventSearchListModel() override;
 
     nx::vms::api::EventType selectedEventType() const;
     void setSelectedEventType(nx::vms::api::EventType value);
@@ -37,13 +42,26 @@ public:
     virtual bool isConstrained() const override;
     virtual bool hasAccessRights() const override;
 
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    virtual QVariant data(const QModelIndex& index, int role) const override;
+
+    virtual bool requestFetch(
+        const core::FetchRequest& request,
+        const FetchCompletionHandler& completionHandler) override;
+
+    virtual void clearData() override;
+
+    virtual QnTimePeriod truncateToRelevantTimePeriod() { return {}; }
+    virtual void truncateToMaximumCount() {}
+
 signals:
     void selectedEventTypeChanged();
     void selectedSubTypeChanged();
 
 private:
-    class Private;
-    Private* const d;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

@@ -2,16 +2,22 @@
 
 #include "simple_motion_search_list_model.h"
 
+#include <QtCore/QSharedPointer>
+
 // QMenu is the only widget allowed in Right Panel item models.
 // It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
+#include <camera/camera_data_manager.h>
 #include <core/resource/camera_resource.h>
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/event_search/models/fetched_data.h>
+#include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -22,40 +28,113 @@
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/time/formatter.h>
+#include <recording/time_period_list.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 
-using namespace std::chrono;
+namespace nx::vms::client::desktop {
 
 using nx::vms::client::core::MotionSelection;
-
-namespace nx::vms::client::desktop {
+using MenuPtr = QSharedPointer<QMenu>;
+using namespace nx::vms::api;
+using namespace std::chrono;
 
 namespace {
 
-static constexpr qreal kPreviewTimeFraction = 0.5;
-
-microseconds midTime(const QnTimePeriod& period, qreal fraction = kPreviewTimeFraction)
+struct Facade
 {
-    return period.isInfinite()
-        ? microseconds(DATETIME_NOW)
-        : microseconds(milliseconds(qint64(period.startTimeMs + period.durationMs * fraction)));
-}
+    using Type = QnTimePeriod;
+    using TimeType = milliseconds;
 
-milliseconds startTime(const QnTimePeriod& period)
-{
-    return period.startTime();
-}
+    static auto startTime(const Type& period)
+    {
+        return period.startTime();
+    }
+
+    static auto id(const Type& period)
+    {
+        return period.startTimeMs;
+    }
+
+    static bool equal(const Type& left, const Type& right)
+    {
+        return left == right;
+    }
+};
 
 } // namespace
 
+struct SimpleMotionSearchListModel::Private
+{
+    SimpleMotionSearchListModel* const q;
+
+    core::CachingCameraDataLoaderPtr loader;
+    MotionSelection filterRegions;
+    std::deque<QnTimePeriod> data; //< Descending order by start time.
+
+    void updateMotionPeriods(qint64 startTimeMs);
+
+    QnTimePeriodList periods() const; //< Periods from the loader.
+
+    MenuPtr contextMenu(const QnTimePeriod& chunk) const;
+};
+
+void SimpleMotionSearchListModel::Private::updateMotionPeriods(qint64 startTimeMs)
+{
+    if (q->fetchInProgress() || q->isFilterDegenerate())
+        return;
+
+    if (data.empty())
+    {
+        q->clear(); //< Will emit dataNeeded signal.
+        return;
+    }
+
+    if (const auto interestPeriod = q->interestTimePeriod(); !interestPeriod->contains(startTimeMs))
+        return; //< Do not update if new data is outside of interest period.
+
+    q->fetchData({.direction = core::EventSearch::FetchDirection::newer,
+        .centralPointUs = microseconds(Facade::startTime(data.at(data.size() / 2)))});
+}
+
+QnTimePeriodList SimpleMotionSearchListModel::Private::periods() const
+{
+    if (!loader)
+        return {};
+
+    if (const auto period = q->interestTimePeriod(); period.has_value())
+        return loader->periods(Qn::MotionContent).intersected(*period);
+
+    return {};
+}
+
+MenuPtr SimpleMotionSearchListModel::Private::contextMenu(const QnTimePeriod& chunk) const
+{
+    const auto camera = q->navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera || !ResourceAccessManager::hasPermissions(camera, Qn::ManageBookmarksPermission))
+        return {};
+
+    QSharedPointer<QMenu> menu(new QMenu());
+    menu->addAction(tr("Bookmark it..."),
+        [this, camera, chunk]()
+        {
+            q->menu()->triggerForced(menu::AddCameraBookmarkAction,
+                menu::Parameters(camera).withArgument(Qn::TimePeriodRole, chunk));
+        });
+
+    return menu;
+}
+
 SimpleMotionSearchListModel::SimpleMotionSearchListModel(WindowContext* context, QObject* parent):
-    base_type(context, parent)
+    base_type(context->system(), parent),
+    WindowContextAware(context),
+    d(new Private{.q = this})
 {
     setOfflineAllowed(true);
 
@@ -63,25 +142,32 @@ SimpleMotionSearchListModel::SimpleMotionSearchListModel(WindowContext* context,
         this, &AbstractSearchListModel::clear);
 }
 
+SimpleMotionSearchListModel::~SimpleMotionSearchListModel()
+{
+}
+
 MotionSelection SimpleMotionSearchListModel::filterRegions() const
 {
-    return m_filterRegions;
+    return d->filterRegions;
 }
 
 void SimpleMotionSearchListModel::setFilterRegions(const MotionSelection& value)
 {
-    if (m_filterRegions == value)
+    if (d->filterRegions == value)
         return;
 
     clear();
-    m_filterRegions = value;
+    d->filterRegions = value;
     emit filterRegionsChanged();
 }
 
 bool SimpleMotionSearchListModel::isFilterEmpty() const
 {
-    return std::all_of(m_filterRegions.cbegin(), m_filterRegions.cend(),
-        [](const QRegion& region) { return region.isEmpty(); });
+    return std::all_of(d->filterRegions.cbegin(), d->filterRegions.cend(),
+        [](const QRegion& region)
+        {
+            return region.isEmpty();
+        });
 }
 
 void SimpleMotionSearchListModel::clearFilterRegions()
@@ -108,7 +194,9 @@ bool SimpleMotionSearchListModel::hasAccessRights() const
 
 int SimpleMotionSearchListModel::rowCount(const QModelIndex& parent) const
 {
-    return parent.isValid() ? 0 : int(m_data.size());
+    return parent.isValid()
+        ? 0
+        : d->data.size();
 }
 
 QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) const
@@ -116,7 +204,7 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
     if (!isValid(index))
         return {};
 
-    const auto& chunk = m_data[index.row()];
+    const auto& chunk = d->data[index.row()];
     switch (role)
     {
         case Qt::DisplayRole:
@@ -128,23 +216,23 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
         case Qn::HelpTopicIdRole:
             return rules::eventHelpId(vms::api::EventType::cameraMotionEvent);
 
-        case Qn::TimestampRole:
+        case core::TimestampRole:
             return QVariant::fromValue(chunk.startTime());
 
-        case Qn::DurationRole:
+        case core::DurationRole:
             return QVariant::fromValue(chunk.duration());
 
-        case Qn::ResourceRole:
+        case core::ResourceRole:
             return QVariant::fromValue(navigator()->currentResource());
 
-        case Qn::ResourceListRole:
+        case core::ResourceListRole:
             if (auto resource = navigator()->currentResource())
                 return QVariant::fromValue(QnResourceList({resource}));
             return {};
 
-        case Qn::DescriptionTextRole:
+        case core::DescriptionTextRole:
         {
-            if (!ini().showDebugTimeInformationInRibbon)
+            if (!core::ini().showDebugTimeInformationInEventSearchData)
                 return QString();
 
             // Not translatable debug string.
@@ -154,18 +242,26 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
                 text::HumanReadable::timeSpan(chunk.duration())).toQString();
         }
 
-        case Qn::PreviewTimeRole:
-            return QVariant::fromValue(midTime(chunk));
+        case core::PreviewTimeRole:
+        {
+            static constexpr qreal kPreviewFraction = 0.5;
+
+            if (chunk.isInfinite())
+                return QVariant::fromValue(microseconds(DATETIME_NOW));
+
+            return QVariant::fromValue(microseconds(milliseconds(
+                static_cast<qint64>(chunk.startTimeMs + chunk.durationMs * kPreviewFraction))));
+        }
 
         case Qn::ForcePrecisePreviewRole:
             return true;
 
-        case Qn::PreviewStreamSelectionRole:
+        case core::PreviewStreamSelectionRole:
             return QVariant::fromValue(
                 nx::api::ImageRequest::StreamSelectionMode::sameAsMotion);
 
         case Qn::CreateContextMenuRole:
-            return QVariant::fromValue(contextMenu(chunk));
+            return QVariant::fromValue(d->contextMenu(chunk));
 
         default:
             return base_type::data(index, role);
@@ -174,13 +270,13 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
 
 void SimpleMotionSearchListModel::clearData()
 {
-    ScopedReset reset(this, !m_data.empty());
+    ScopedReset reset(this, !d->data.empty());
 
-    if (m_loader)
-        m_loader->disconnect(this);
+    if (d->loader)
+        d->loader->disconnect(this);
 
-    m_data.clear();
-    m_loader.reset();
+    d->data.clear();
+    d->loader.reset();
 
     const auto resource = navigator()->currentResource();
     if (!resource)
@@ -192,277 +288,73 @@ void SimpleMotionSearchListModel::clearData()
 
     if (const auto mediaResource = resource.dynamicCast<QnMediaResource>())
     {
-        m_loader = systemContext->cameraDataManager()->loader(
-            mediaResource,
-            /*createIfNotExists*/ true);
+        d->loader = systemContext->cameraDataManager()->loader(
+            mediaResource, /*createIfNotExists*/ true);
     }
 
-    if (!m_loader)
+    if (!d->loader)
         return;
 
     const auto updatePeriods =
         [this](Qn::TimePeriodContent type, qint64 startTimeMs)
         {
             if (type == Qn::MotionContent)
-                updateMotionPeriods(startTimeMs);
+                d->updateMotionPeriods(startTimeMs);
         };
 
-    connect(m_loader.data(), &core::CachingCameraDataLoader::periodsChanged,
+    connect(d->loader.data(), &core::CachingCameraDataLoader::periodsChanged,
         this, updatePeriods, Qt::DirectConnection);
 }
 
-void SimpleMotionSearchListModel::requestFetch()
+bool SimpleMotionSearchListModel::requestFetch(
+    const core::FetchRequest& request,
+    const FetchCompletionHandler& completionHandler)
 {
-    if (!m_loader || m_fetchInProgress)
-        return;
+    if (!d->loader )
+        return false;
 
-    QnScopedValueRollback<bool> progressRollback(&m_fetchInProgress, true);
+    using namespace core;
+    using namespace core::event_search;
+    using namespace std::chrono;
 
-    NX_VERBOSE(this, "Fetching more (%1)", QVariant::fromValue(fetchDirection()).toString());
+    auto fetchedPeriods = d->periods();
+    if (const auto interestPeriod = interestTimePeriod())
+        fetchedPeriods = fetchedPeriods.intersected(*interestPeriod);
 
-    const auto periods = this->periods();
-    const int oldCount = int(m_data.size());
-    FetchResult result = FetchResult::complete;
+    const auto itSplitPoint = std::lower_bound(
+        fetchedPeriods.begin(), fetchedPeriods.end(),
+        duration_cast<milliseconds>(request.centralPointUs),
+        event_search::detail::Predicate<Facade>::lowerBound());
 
-    ScopedFetchCommit scopedFetch(this, fetchDirection(), &result);
+    const int leftPartSize = std::distance(fetchedPeriods.begin(), itSplitPoint);
+    const int rightPartSize = std::distance(itSplitPoint, fetchedPeriods.end());
+    const int partSize = maximumCount() / 2;
 
-    QnTimePeriod fetchedPeriod(relevantTimePeriod());
-    if (periods.empty())
+    auto boundedPeriods = std::deque<QnTimePeriod>(
+        fetchedPeriods.begin() + std::max(leftPartSize - partSize, 0),
+        itSplitPoint + std::min(rightPartSize, partSize));
+
+    if (request.direction == EventSearch::FetchDirection::older)
     {
-        NX_VERBOSE(this, "Loader contains no chunks");
-    }
-    else
-    {
-        NX_VERBOSE(this, "Loader contains %1 chunks, time range:\n    from: %2\n    to: %3",
-            periods.size(),
-            nx::utils::timestampToDebugString(periods.front().startTime()),
-            nx::utils::timestampToDebugString(periods.back().startTime()));
-    }
-
-    if (fetchDirection() == FetchDirection::earlier)
-    {
-        const auto begin = m_data.empty()
-            ? periods.crbegin()
-            : std::upper_bound(periods.crbegin(), periods.crend(), m_data.back().startTime(),
-                [](milliseconds left, const QnTimePeriod& right)
-                {
-                    return left > right.startTime();
-                });
-
-        if (!m_data.empty())
-            fetchedPeriod.truncate(m_data.back().startTimeMs);
-
-        const int remaining = periods.crend() - begin;
-        const int delta = qMin(remaining, fetchBatchSize());
-        if (delta < remaining)
-        {
-            result = FetchResult::incomplete;
-            fetchedPeriod.truncateFront(begin->startTimeMs);
-        }
-
-        NX_VERBOSE(this, "Fetched %1 chunks", delta);
-
-        addToFetchedTimeWindow(fetchedPeriod);
-        if (delta > 0)
-        {
-            ScopedInsertRows insertRows(this, oldCount, oldCount + delta - 1);
-            m_data.insert(m_data.end(), begin, begin + delta);
-        }
-    }
-    else
-    {
-        NX_ASSERT(fetchDirection() == FetchDirection::later);
-
-        const auto end = m_data.empty()
-            ? periods.crend()
-            : std::lower_bound(periods.crbegin(), periods.crend(), m_data.front().startTime(),
-                [](const QnTimePeriod& left, milliseconds right)
-                {
-                    return left.startTime() > right;
-                });
-
-        if (!m_data.empty())
-            fetchedPeriod.truncateFront(m_data.front().startTimeMs + 1);
-
-        if (end != periods.crend() && *end != m_data.front())
-            emit dataChanged(index(0), index(0));
-
-        const int remaining = end - periods.crbegin();
-        const int delta = qMin(remaining, fetchBatchSize());
-        if (delta < remaining)
-        {
-            result = FetchResult::incomplete;
-            fetchedPeriod.truncate((end - 1)->startTimeMs + 1);
-        }
-
-        NX_VERBOSE(this, "Fetched %1 chunks", delta);
-
-        addToFetchedTimeWindow(fetchedPeriod);
-        if (delta > 0)
-        {
-            ScopedInsertRows insertRows(this, 0, delta - 1);
-            m_data.insert(m_data.begin(), end - delta, end);
-        }
+        // Reverse order since we expect data in descending order for older fetch requests.
+        std::reverse(boundedPeriods.begin(), boundedPeriods.end());
     }
 
-    if (rowCount() > maximumCount())
-    {
-        NX_VERBOSE(this, "Truncating to maximum count");
-        truncateToMaximumCount();
-    }
+    auto fetchedData = makeFetchedData<Facade>(d->data, boundedPeriods, request);
+    updateEventSearchData<Facade>(this, d->data, fetchedData, request.direction);
+    completionHandler(EventSearch::FetchResult::complete, fetchedData.ranges,
+        core::timeWindow<Facade>(d->data));
+    return true;
 }
 
-void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
+bool SimpleMotionSearchListModel::cancelFetch()
 {
-    if (!NX_ASSERT(!m_fetchInProgress) || isFilterDegenerate())
-        return;
-
-    if (m_data.empty())
-    {
-        clear(); //< Will emit dataNeeded signal.
-        return;
-    }
-
-    QnScopedValueRollback<bool> progressRollback(&m_fetchInProgress, true);
-
-    // Received startTimeMs covers newly added chunks, but not potentially modified last chunk.
-    // This is a workaround.
-    if (!m_data.empty())
-        startTimeMs = std::clamp(startTimeMs, m_data.back().startTimeMs, m_data.front().startTimeMs);
-
-    NX_VERBOSE(this, "Updating, from %1, old item count = %2",
-        nx::utils::timestampToDebugString(startTimeMs),
-        m_data.size());
-
-    NX_ASSERT(!fetchedTimeWindow().isNull());
-
-    const auto periods = this->periods();
-    const QnTimePeriod updatedPeriod(startTimeMs, QnTimePeriod::kInfiniteDuration);
-    const QnTimePeriod periodToUpdate = updatedPeriod.intersected(fetchedTimeWindow());
-
-    static const auto ascendingLowerBoundPredicate =
-        [](const QnTimePeriod& left, milliseconds right) { return left.startTime() < right; };
-
-    static const auto ascendingUpperBoundPredicate =
-        [](milliseconds left, const QnTimePeriod& right) { return left < right.startTime(); };
-
-    // `m_data` is sorted by timestamp in descending order, `periods` is sorted in ascending order.
-
-    // We iterate over relevant subparts of both collections in parallel,
-    // synchronizing `m_data` with data from `periods`.
-
-    const auto sourceBegin = std::lower_bound(periods.cbegin(), periods.cend(),
-        periodToUpdate.startTime(), ascendingLowerBoundPredicate);
-
-    const auto sourceEnd = std::upper_bound(periods.cbegin(), periods.cend(),
-        periodToUpdate.endTime(), ascendingUpperBoundPredicate);
-
-    const int updateSize = sourceEnd - sourceBegin;
-    if ((updateSize - rowCount()) > maximumCount())
-    {
-        NX_WARNING(this, "Unexpected update, count = %1, resetting.", updateSize);
-        progressRollback.rollback();
-        clear(); //< Will emit dataNeeded signal.
-        return;
-    }
-
-    const auto targetBegin = std::lower_bound(m_data.rbegin(), m_data.rend(),
-        periodToUpdate.startTime(), ascendingLowerBoundPredicate);
-
-    // Statistics.
-    int numAdded = 0;
-    int numRemoved = 0;
-    int numUpdated = 0;
-
-    int i = m_data.rend() - targetBegin - 1;
-    for (auto source = sourceBegin; source != sourceEnd; ++source, --i)
-    {
-        if (i < 0 || source->startTime() < m_data[i].startTime())
-        {
-            ++i;
-            ScopedInsertRows insertRows(this, i, i);
-            m_data.insert(m_data.begin() + i, *source);
-            ++numAdded;
-        }
-        else if (source->startTime() > m_data[i].startTime())
-        {
-            ScopedRemoveRows removeRows(this, i, i);
-            m_data.erase(m_data.begin() + i);
-            ++numRemoved;
-        }
-        else if (source->duration() != m_data[i].duration())
-        {
-            const auto modelIndex = index(i);
-            m_data[i].durationMs = source->durationMs;
-            emit dataChanged(modelIndex, modelIndex);
-            ++numUpdated;
-        }
-    }
-
-    if (i >= 0)
-    {
-        ScopedRemoveRows removeRows(this, 0, i);
-        m_data.erase(m_data.begin(), m_data.begin() + i + 1);
-        numRemoved += i + 1;
-    }
-
-    NX_VERBOSE(this, "Added %1, removed %2, updated %3 chunks", numAdded, numRemoved, numUpdated);
-
-    if (!m_data.empty())
-    {
-        addToFetchedTimeWindow(QnTimePeriod::fromInterval(
-            m_data.back().startTime(), m_data.front().startTime()));
-    }
-
-    if (rowCount() > maximumCount())
-    {
-        NX_VERBOSE(this, "Truncating to maximum count");
-        truncateToMaximumCount();
-    }
-    else if (rowCount() < fetchBatchSize())
-    {
-        progressRollback.rollback();
-        requestFetch();
-    }
+    return false;
 }
 
 bool SimpleMotionSearchListModel::isFilterDegenerate() const
 {
-    return !m_loader || !navigator()->currentResource()->hasFlags(Qn::motion);
-}
-
-void SimpleMotionSearchListModel::truncateToRelevantTimePeriod()
-{
-    this->truncateDataToTimePeriod(m_data, &startTime, relevantTimePeriod());
-}
-
-void SimpleMotionSearchListModel::truncateToMaximumCount()
-{
-    this->truncateDataToMaximumCount(m_data, &startTime);
-}
-
-QnTimePeriodList SimpleMotionSearchListModel::periods() const
-{
-    return m_loader
-        ? m_loader->periods(Qn::MotionContent).intersected(relevantTimePeriod())
-        : QnTimePeriodList();
-}
-
-QSharedPointer<QMenu> SimpleMotionSearchListModel::contextMenu(const QnTimePeriod& chunk) const
-{
-    const auto camera = navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
-    if (!camera || !ResourceAccessManager::hasPermissions(camera, Qn::ManageBookmarksPermission))
-        return {};
-
-    QSharedPointer<QMenu> menu(new QMenu());
-    menu->addAction(tr("Bookmark it..."),
-        [this, camera, chunk]()
-        {
-            this->menu()->triggerForced(menu::AddCameraBookmarkAction,
-                menu::Parameters(camera).withArgument(Qn::TimePeriodRole, chunk));
-        });
-
-    return menu;
+    return !d->loader || !navigator()->currentResource()->hasFlags(Qn::motion);
 }
 
 } // namespace nx::vms::client::desktop
