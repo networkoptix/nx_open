@@ -438,6 +438,23 @@ bool QnFfmpegVideoDecoder::decode(
         }
     }
 
+    if (m_config.forceRgbaFormat && got_picture && outFrame->format != AV_PIX_FMT_RGBA)
+    {
+        CLVideoDecoderOutput tmpFrame;
+        tmpFrame.reallocate(outFrame->width, outFrame->height, AV_PIX_FMT_RGBA);
+        if (data)
+            tmpFrame.pkt_dts = data->timestamp;
+        if (outFrame->convertTo(&tmpFrame))
+        {
+            outFrame->copyFrom(&tmpFrame);
+            outFrame->fillRightEdge();
+            outFrame->sample_aspect_ratio = getSampleAspectRatio();
+            outFrame->flags = m_lastFlags;
+            outFrame->channel = m_lastChannelNumber;
+            return m_context->pix_fmt != AV_PIX_FMT_NONE;
+        }
+    }
+
     if (got_picture)
     {
         outFrame->format = CLVideoDecoderOutput::fixDeprecatedPixelFormat(m_context->pix_fmt);
