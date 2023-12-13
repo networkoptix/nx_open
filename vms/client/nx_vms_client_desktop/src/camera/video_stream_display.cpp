@@ -469,6 +469,10 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
         DecoderConfig config;
         config.mtDecodePolicy = toEncoderPolicy(mtDecoding);
         config.forceGrayscaleDecoding = nx::vms::client::desktop::ini().grayscaleDecoding;
+        // TODO: #ikulaychuk detect actual scene backend.
+        config.forceRgbaFormat =
+            QString(nx::vms::client::desktop::ini().graphicsApi) == "software"
+                || QString(nx::vms::client::desktop::ini().sceneRendering) == "qpainter";
         decoder = new QnFfmpegVideoDecoder(config, /*metrics*/ nullptr, data);
     }
     decoder->setLightCpuMode(m_decodeMode);
