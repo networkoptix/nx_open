@@ -231,6 +231,7 @@ private:
 
     bool m_inactive = false;
 
+    bool m_performanceInfoVisible = false;
     QPointer<PerformanceInfoWidget> m_performanceInfoWidget;
     QPointer<QnDebugProxyLabel> m_debugOverlayLabel;
 
