@@ -67,7 +67,6 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager(
     m_ready(false),
     m_state(InitialSearch),
     m_discoveryUpdateIdx(0),
-    m_serverOfflineTimeout(QnMediaServerResource::kMinFailoverTimeoutMs),
     m_manualCameraListChanged(false)
 {
     m_threadPool.setMaxThreadCount(resourceManagementIni().maxResourceDiscoveryThreadCount);
