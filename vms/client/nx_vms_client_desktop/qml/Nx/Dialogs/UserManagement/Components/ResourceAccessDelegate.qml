@@ -136,10 +136,17 @@ Item
                     hoverEnabled: true
                     acceptedButtons: Qt.LeftButton
 
-                    GlobalToolTip.enabled: cell.relevant
+                    GlobalToolTip.enabled: cell.relevant && root.hoveredCell === cell
 
-                    GlobalToolTip.text:
-                        root.editingEnabled ? normalTooltipText() : readonlyTooltipText()
+                    Binding on GlobalToolTip.text
+                    {
+                        value: root.editingEnabled
+                            ? cell.normalTooltipText()
+                            : cell.readonlyTooltipText()
+
+                        when: cell.GlobalToolTip.enabled
+                        restoreMode: Binding.RestoreNone
+                    }
 
                     function readonlyTooltipText()
                     {
@@ -380,8 +387,8 @@ Item
                         if (!cell.relevant || !root.editingEnabled || cell !== root.hoveredCell)
                             return
 
-                        root.triggered(cell)
                         cellsRow.hoveredCell = null
+                        root.triggered(cell)
                     }
 
                     Rectangle
