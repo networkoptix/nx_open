@@ -104,6 +104,7 @@ void SystemSettings::initialize()
 
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
+        NX_VERBOSE(this, "System settings successfully initialized");
         m_admin = user;
         for (auto adaptor: m_allAdaptors)
             adaptor->setResource(user);
