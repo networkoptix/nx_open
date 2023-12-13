@@ -3,6 +3,7 @@
 #include "log_settings_dialog.h"
 #include "ui_log_settings_dialog.h"
 
+#include <QtGui/QFont>
 #include <QtWidgets/QPushButton>
 
 #include <nx/utils/unicode_chars.h>
@@ -35,7 +36,8 @@ const std::chrono::seconds kDontSplitByTime{0};
 static const QColor kLight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
+    {QIcon::Active, {{kLight16Color, "light15"}}},
+    {QIcon::Selected, {{kLight16Color, "light17"}}},
 };
 
 bool setValueToGuiElements(unsigned long long value, QSpinBox* spin, QComboBox* combo)
@@ -180,6 +182,9 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
     resetButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     resetButton->setFlat(true);
     resetButton->setText(tr("Reset to Default"));
+    QFont font = resetButton->font();
+    font.setBold(false);
+    resetButton->setFont(font);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     setAccentStyle(okButton);

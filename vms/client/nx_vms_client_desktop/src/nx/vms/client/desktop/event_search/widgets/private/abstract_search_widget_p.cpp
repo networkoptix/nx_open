@@ -69,8 +69,8 @@ static const QColor kLight16Color = "#698796";
 static const QColor kDark17Color = "#53707F";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{kLight16Color, "light16"}, {kDark17Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}, {kDark17Color, "light17"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}, {kDark17Color, "light15"}}},
+    {QIcon::Active, {{kLight16Color, "light15"}, {kDark17Color, "light15"}}},
+    {QIcon::Selected, {{kLight16Color, "light17"}, {kDark17Color, "light17"}}},
 };
 
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kCheckedIconSubstitutions = {
