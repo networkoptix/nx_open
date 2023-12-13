@@ -18,6 +18,7 @@ struct DecoderConfig
 {
     MultiThreadDecodePolicy mtDecodePolicy = MultiThreadDecodePolicy::autoDetect;
     bool forceGrayscaleDecoding = false; //< Force grayscale decoding if true. Don't change current value if false.
+    bool forceRgbaFormat = false; //< Forces YUV -> RGB conversion on decoder thread.
 };
 
 //!Abstract interface. Every video decoder MUST implement this interface.
