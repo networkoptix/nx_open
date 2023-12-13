@@ -1804,7 +1804,13 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
 
     if (isAnalyticsModeEnabled())
     {
-        d->analyticsController->updateAreas(timestamp, channel);
+        // Avoid adding/removing scene items inside scene painting functions.
+        executeDelayedParented(
+            [this, timestamp, channel]()
+            {
+                d->analyticsController->updateAreas(timestamp, channel);
+            },
+            this);
         paintAnalyticsObjectsDebugOverlay(duration_cast<milliseconds>(timestamp), painter, rect);
     }
 
