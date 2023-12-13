@@ -156,6 +156,16 @@ QString underlined(const QString& text)
     return tagged(text, "u");
 }
 
+QString underlinedColored(const QString& text, const QColor& color)
+{
+    static const QString kTag =
+        "<span style=\"text-decoration:underline;text-decoration-color:%1;\">%2</span>";
+    if (text.isEmpty())
+        return QString();
+
+    return kTag.arg(color.name(), text);
+}
+
 QString paragraph(const QString& text)
 {
     return tagged(text, "p");

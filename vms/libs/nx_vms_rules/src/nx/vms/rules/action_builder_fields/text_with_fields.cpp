@@ -21,8 +21,6 @@ namespace {
 
 using FormatFunction = std::function<QString(const AggregatedEventPtr&, common::SystemContext*)>;
 
-static const QChar kFunctionPrefix = '@';
-
 QStringList toStringList(const QVariant& value)
 {
     return value.canConvert<QStringList>() ? value.toStringList() : QStringList();
@@ -205,20 +203,95 @@ FormatFunction formatFunction(const QString& name)
 
 } // namespace
 
+struct TextWithFields::Private
+{
+    QString text;
+    TextWithFields* const q;
+    QList<ValueDescriptor> values;
+
+
+    void parseText()
+    {
+        values.clear();
+
+        bool inSub = false;
+        int start = 0, cur = 0;
+
+        while (cur != text.size())
+        {
+            if (text[cur] == '{')
+            {
+                if (start != cur)
+                {
+                    values += {
+                        .type = FieldType::Text,
+                        .value = text.mid(start, cur - start),
+                        .start = start,
+                        .length = cur - start,
+                    };
+                }
+                start = cur;
+                inSub = true;
+            }
+
+            if (text[cur] == '}' && inSub)
+            {
+                if (start + 1 != cur)
+                {
+                    ValueDescriptor desc = {.type = FieldType::Substitution,
+                        .value = text.mid(start + 1, cur - start - 1),
+                        .start = start};
+                    desc.length = desc.value.size() + 2;
+                    desc.correct = kFormatFunctions.contains(desc.value);
+                    values += desc;
+                }
+                else
+                {
+                    // Empty brackets.
+                    values += {
+                        .type = FieldType::Text,
+                        .value = "{}",
+                        .start = start,
+                    };
+
+                }
+                start = cur + 1;
+                inSub = false;
+            }
+
+            ++cur;
+        }
+
+        if (start < text.size())
+        {
+            values += {.type = FieldType::Text,
+                .value = text.mid(start),
+                .start = start,
+                .length = text.size() - start};
+        }
+
+        emit q->parseFinished(values);
+    }
+};
+
 TextWithFields::TextWithFields(common::SystemContext* context):
-    common::SystemContextAware(context)
+    common::SystemContextAware(context),
+    d(new Private{.q = this})
+{
+}
+
+TextWithFields::~TextWithFields()
 {
 }
 
 QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
 {
     QString result;
-
-    for (int i = 0; i < m_values.size(); ++i)
+    for (auto& value: d->values)
     {
-        if (m_types[i] == FieldType::Substitution)
+        if (value.type == FieldType::Substitution)
         {
-            const auto& name = m_values[i];
+            const auto& name = value.value;
             if (const auto function = formatFunction(name))
             {
                 result += function(eventAggregator, systemContext());
@@ -240,7 +313,7 @@ QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
         else
         {
             // It's just a text, add it to the result.
-            result += m_values[i];
+            result += value.value;
         }
     }
 
@@ -249,61 +322,21 @@ QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
 
 QString TextWithFields::text() const
 {
-    return m_text;
+    return d->text;
+}
+
+void TextWithFields::parseText()
+{
+    d->parseText();
 }
 
 void TextWithFields::setText(const QString& text)
 {
-    if (m_text == text)
+    if (d->text == text)
         return;
 
-    m_text = text;
-
-    m_types.clear();
-    m_values.clear();
-
-    bool inSub = false;
-    int start = 0, cur = 0;
-
-    while (cur != text.size())
-    {
-        if (text[cur] == '{')
-        {
-            if (start != cur)
-            {
-                m_types += FieldType::Text;
-                m_values += text.mid(start, cur - start);
-            }
-            start = cur;
-            inSub = true;
-        }
-
-        if (text[cur] == '}' && inSub)
-        {
-            if (start + 1 != cur)
-            {
-                m_types += FieldType::Substitution;
-                m_values += text.mid(start + 1, cur - start - 1);
-            }
-            else
-            {
-                // Empty brackets.
-                m_types += FieldType::Text;
-                m_values += "{}";
-            }
-            start = cur + 1;
-            inSub = false;
-        }
-
-        ++cur;
-    }
-
-    if (start < text.size())
-    {
-        m_types += FieldType::Text;
-        m_values += text.mid(start);
-    }
-
+    d->text = text;
+    d->parseText();
     emit textChanged();
 }
 

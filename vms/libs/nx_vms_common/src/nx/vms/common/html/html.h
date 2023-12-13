@@ -62,6 +62,8 @@ NX_VMS_COMMON_API QString italic(const QString& text);
 /** <u>text</u> */
 NX_VMS_COMMON_API QString underlined(const QString& text);
 
+NX_VMS_COMMON_API QString underlinedColored(const QString& text, const QColor& color);
+
 /** <p>text</p> */
 NX_VMS_COMMON_API QString paragraph(const QString& text);
 
