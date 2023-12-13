@@ -38,6 +38,7 @@
 #include "target_layout_picker_widget.h"
 #include "target_user_picker_widget.h"
 #include "text_lookup_picker_widget.h"
+#include "text_with_fields_picker_widget.h"
 #include "volume_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {

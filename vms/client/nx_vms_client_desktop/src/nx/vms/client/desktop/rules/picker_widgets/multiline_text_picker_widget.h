@@ -5,9 +5,11 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QTextEdit>
 
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
 
 #include "../utils/completer.h"
+#include "field_picker_widget.h"
 #include "picker_widget.h"
 #include "picker_widget_utils.h"
 #include "plain_picker_widget.h"
@@ -35,8 +37,6 @@ public:
         m_textEdit->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         contentLayout->addWidget(m_textEdit);
 
-        m_completer = new Completer{wordsToComplete(), m_textEdit, this};
-
         m_contentWidget->setLayout(contentLayout);
 
         connect(
@@ -46,11 +46,10 @@ public:
             &MultilineTextPickerWidget<F>::onTextChanged);
     }
 
-private:
-    BASE_COMMON_USINGS
-
+protected:
     QTextEdit* m_textEdit{nullptr};
-    Completer* m_completer{nullptr};
+
+    BASE_COMMON_USINGS
 
     virtual void onDescriptorSet() override
     {
@@ -58,7 +57,7 @@ private:
         m_textEdit->setPlaceholderText(m_fieldDescriptor->description);
     };
 
-    void updateUi() override
+    virtual void updateUi() override
     {
         if (m_textEdit->toPlainText() == theField()->text())
             return;
@@ -69,21 +68,8 @@ private:
 
     void onTextChanged()
     {
-        theField()->setText(m_textEdit->toPlainText());
-    }
-
-    QStringList wordsToComplete() const
-    {
-        return {};
+        theField()->setText(nx::vms::common::html::toPlainText(m_textEdit->toPlainText()));
     }
 };
-
-using TextWithFieldsPicker = MultilineTextPickerWidget<vms::rules::TextWithFields>;
-
-template<>
-QStringList TextWithFieldsPicker::wordsToComplete() const
-{
-    return vms::rules::TextWithFields::availableFunctions();
-}
 
 } // namespace nx::vms::client::desktop::rules
