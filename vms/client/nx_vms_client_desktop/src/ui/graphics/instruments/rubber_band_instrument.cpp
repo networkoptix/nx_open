@@ -56,16 +56,13 @@ public:
 
     /* We can also implement shape(), but most probably there is no point. */
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) override {
-        if (widget != m_viewport)
-            return; /* Draw it on source viewport only. */
-
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget*) override {
         ensureRects();
 
         if (m_rubberBandRect.isEmpty())
             return;
 
-        QPalette palette = widget->palette();
+        QPalette palette = m_viewport->palette();
         QColor highlight = palette.color(QPalette::Active, QPalette::Highlight);
 
         QnScopedPainterTransformRollback transformRollback(painter, QTransform());

@@ -119,10 +119,7 @@ public:
 
     /* We can also implement shape(), but most probably there is no point. */
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) override {
-        if (widget != m_viewport)
-            return; /* Draw it on source viewport only. */
-
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget*) override {
         if(target() == nullptr)
             return; /* Target may get suddenly deleted. */
 

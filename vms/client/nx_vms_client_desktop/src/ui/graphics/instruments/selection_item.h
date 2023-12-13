@@ -39,8 +39,6 @@ public:
      */
     QWidget *viewport() const;
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
 private:
     /** Origin of the selection item, in parent coordinates. */
     QPointF m_origin;

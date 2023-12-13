@@ -85,14 +85,6 @@ QWidget *SelectionItem::viewport() const {
     return m_viewport;
 }
 
-void SelectionItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    if (m_viewport && widget != m_viewport)
-        return; /* Draw it on source viewport only. */
-
-    base_type::paint(painter, option, widget);
-}
-
-
 // -------------------------------------------------------------------------- //
 // FixedArSelectionItem
 // -------------------------------------------------------------------------- //
