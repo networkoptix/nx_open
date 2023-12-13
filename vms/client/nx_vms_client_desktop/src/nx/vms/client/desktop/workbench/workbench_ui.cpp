@@ -7,6 +7,7 @@
 
 #include <QtCore/QMargins>
 #include <QtGui/QAction>
+#include <QtQuick/QQuickItem>
 #include <QtWidgets/QGraphicsLayout>
 
 #include <qt_graphics_items/graphics_widget.h>
@@ -54,6 +55,7 @@
 #include <ui/graphics/items/generic/gui_elements_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
+#include <ui/graphics/view/graphics_view.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
@@ -1638,16 +1640,27 @@ void WorkbenchUi::createDebugWidget()
 
 bool WorkbenchUi::isPerformanceInfoVisible() const
 {
-    return m_performanceInfoWidget->isVisible();
+    return m_performanceInfoVisible;
 }
 
 void WorkbenchUi::setPerformanceInfoVisible(bool performanceInfoVisible)
 {
-    if (performanceInfoVisible == isPerformanceInfoVisible())
+    if (performanceInfoVisible == m_performanceInfoVisible)
         return;
 
-    m_performanceInfoWidget->setVisible(performanceInfoVisible);
-    m_performanceInfoWidget->setText({});
+    m_performanceInfoVisible = performanceInfoVisible;
+
+    if (auto quickWidget = qobject_cast<QnGraphicsView*>(
+        m_controlsWidget->scene()->views().first())->quickWidget())
+    {
+        quickWidget->rootObject()->setProperty("performanceInfoVisible", performanceInfoVisible);
+    }
+
+    if (m_performanceInfoWidget)
+    {
+        m_performanceInfoWidget->setVisible(performanceInfoVisible);
+        m_performanceInfoWidget->setText({});
+    }
 
     action(menu::ShowFpsAction)->setChecked(performanceInfoVisible);
     appContext()->performanceMonitor()->setVisible(performanceInfoVisible);
@@ -1663,6 +1676,16 @@ void WorkbenchUi::updateFpsGeometry()
     qreal right = m_notifications && m_notifications->isVisible()
         ? m_notifications->geometry().left()
         : m_controlsWidgetRect.right();
+
+    if (auto quickWidget = qobject_cast<QnGraphicsView*>(
+        m_controlsWidget->scene()->views().first())->quickWidget())
+    {
+        quickWidget->rootObject()->setProperty("notificationsPanelX", right);
+        return;
+    }
+
+    if (!m_performanceInfoWidget)
+        return;
 
     QRectF titleEffectiveGeometry = (m_title && m_title->isVisible())
         ? m_title->effectiveGeometry()
@@ -1680,17 +1703,22 @@ void WorkbenchUi::updateFpsGeometry()
 
 void WorkbenchUi::createFpsWidget()
 {
-    m_performanceInfoWidget = new PerformanceInfoWidget{m_controlsWidget, {}, windowContext()};
-    m_performanceInfoWidget->setText("....");
-    m_performanceInfoWidget->setVisible(false); // Visibility is controlled via setFpsVisible() method.
+    if (!qobject_cast<QnGraphicsView*>(m_controlsWidget->scene()->views().first())->quickWidget())
+    {
+        m_performanceInfoWidget = new PerformanceInfoWidget{m_controlsWidget, {}, windowContext()};
+        m_performanceInfoWidget->setText("....");
+        m_performanceInfoWidget->setVisible(false); // Visibility is controlled via setFpsVisible() method.
 
-    updateFpsGeometry();
-    setPaletteColor(m_performanceInfoWidget, QPalette::Window, Qt::transparent);
-    setPaletteColor(m_performanceInfoWidget, QPalette::WindowText, QColor(63, 159, 216));
-    display()->setLayer(m_performanceInfoWidget, QnWorkbenchDisplay::MessageBoxLayer);
+        updateFpsGeometry();
+        setPaletteColor(m_performanceInfoWidget, QPalette::Window, Qt::transparent);
+        setPaletteColor(m_performanceInfoWidget, QPalette::WindowText, QColor(63, 159, 216));
+        display()->setLayer(m_performanceInfoWidget, QnWorkbenchDisplay::MessageBoxLayer);
 
-    m_connections << connect(action(menu::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setPerformanceInfoVisible);
-    m_connections << connect(m_performanceInfoWidget, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
+        m_connections << connect(m_performanceInfoWidget, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
+    }
+
+    m_connections << connect(action(menu::ShowFpsAction), &QAction::toggled,
+        this, &WorkbenchUi::setPerformanceInfoVisible);
 
     setDebugInfoVisible(ini().developerMode);
 }
