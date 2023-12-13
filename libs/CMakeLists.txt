@@ -15,6 +15,10 @@ add_subdirectory(nx_sql)
 add_subdirectory(nx_utils)
 add_subdirectory(nx_zip)
 
+if(withDesktopClient)
+    add_subdirectory(nx_pathkit)
+endif()
+
 if(withMediaServer OR withDesktopClient OR openSourceBuild)
     add_subdirectory(nx_monitoring)
 endif()

@@ -182,6 +182,7 @@ class NxOpenConan(ConanFile):
 
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#569759f2f39447fe3dbef070243585cc")
+            self.requires("pathkit/d776371" "#d1516a12d5e1e70fc8253a501acb3a7f")
 
             if not self.isEdge1:
                 self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
