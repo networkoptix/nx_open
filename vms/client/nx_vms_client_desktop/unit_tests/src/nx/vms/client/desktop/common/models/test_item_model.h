@@ -1,21 +1,17 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#pragma once
+
 #include <iostream>
 
-#include <QtGui/QStandardItemModel>
+#include <nx/vms/client/core/common/models/standard_item_model.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
 
-// QStandardItemModel with a moveRows operation.
-class TestItemModel: public QStandardItemModel
+class TestItemModel: public nx::vms::client::core::StandardItemModel
 {
-    Q_DECLARE_PRIVATE(QAbstractItemModel)
-
 public:
-    virtual bool moveRows(const QModelIndex& sourceParent, int sourceRow, int count,
-        const QModelIndex& destinationParent, int destinationChild) override;
-
     QModelIndex buildIndex(std::initializer_list<int> indices) const;
 };
 
