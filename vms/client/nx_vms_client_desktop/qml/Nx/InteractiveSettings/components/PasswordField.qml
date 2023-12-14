@@ -39,10 +39,10 @@ TextFieldBase
 
             focusPolicy: Qt.NoFocus
 
-            icon.color: hovered ? ColorTheme.highlight: ColorTheme.buttonText
+            icon.color: hovered ? ColorTheme.colors.light1: ColorTheme.colors.light4
             icon.source: showPassword.checked
-                ? "image://svg/skin/text_buttons/eye_open.svg"
-                : "image://svg/skin/text_buttons/eye_close.svg"
+                ? "image://svg/skin/text_buttons/eye_open_20.svg"
+                : "image://svg/skin/text_buttons/eye_closed_20.svg"
         }
     }
 }
