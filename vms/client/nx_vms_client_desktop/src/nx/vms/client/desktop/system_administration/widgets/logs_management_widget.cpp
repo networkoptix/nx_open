@@ -25,8 +25,14 @@ namespace {
 static const QColor kLight16Color = "#698796";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
     {QIcon::Normal, {{kLight16Color, "light16"}}},
-    {QIcon::Active, {{kLight16Color, "light17"}}},
-    {QIcon::Selected, {{kLight16Color, "light15"}}},
+    {QIcon::Active, {{kLight16Color, "light15"}}},
+    {QIcon::Selected, {{kLight16Color, "light17"}}},
+};
+
+static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kDownloadSettingsSubstitutions = {
+    {QIcon::Normal, {{kLight16Color, "light10"}}},
+    {QIcon::Active, {{kLight16Color, "light9"}}},
+    {QIcon::Selected, {{kLight16Color, "light11"}}},
 };
 
 } // namespace
@@ -119,8 +125,15 @@ void LogsManagementWidget::setupUi()
     header->setSectionResizeMode(
         LogsManagementModel::Columns::StatusColumn, QHeaderView::ResizeToContents);
 
-    ui->downloadButton->setIcon(qnSkin->icon("text_buttons/download_20.svg", kIconSubstitutions));
-    ui->settingsButton->setIcon(qnSkin->icon("text_buttons/settings_20.svg", kIconSubstitutions));
+    QFont font = ui->downloadButton->font();
+    font.setBold(false);
+    ui->downloadButton->setFont(font);
+    ui->settingsButton->setFont(font);
+
+    ui->downloadButton->setIcon(
+        qnSkin->icon("text_buttons/download_20.svg", kDownloadSettingsSubstitutions));
+    ui->settingsButton->setIcon(
+        qnSkin->icon("text_buttons/settings_20.svg", kDownloadSettingsSubstitutions));
     ui->resetButton->setIcon(qnSkin->icon("text_buttons/reload_20.svg", kIconSubstitutions));
     ui->openFolderButton->setIcon(qnSkin->icon("text_buttons/newfolder.svg"));
 

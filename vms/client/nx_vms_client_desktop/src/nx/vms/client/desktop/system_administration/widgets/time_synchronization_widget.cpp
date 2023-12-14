@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/resource/server.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -48,6 +49,11 @@ static constexpr int kDateFontPixelSize = 14;
 static constexpr auto kDateFontWeight = QFont::Bold;
 static constexpr int kZoneFontPixelSize = 14;
 static constexpr auto kZoneFontWeight = QFont::Normal;
+
+static const QColor kDark10Color = "#303F47";
+static const core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
+    {QIcon::Normal, {{kDark10Color, "dark10"}}}
+};
 
 } // namespace
 
@@ -249,7 +255,9 @@ void TimeSynchronizationWidget::setupUi()
     ui->syncWithInternetCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->syncWithInternetCheckBox->setForegroundRole(QPalette::ButtonText);
 
-    ui->placeholderImageLabel->setPixmap(qnSkin->pixmap("placeholders/time_placeholder.svg", true, QSize(128, 128)));
+    ui->placeholderImageLabel->setPixmap(
+        qnSkin->icon("placeholders/time_placeholder.svg", kIconSubstitutions)
+            .pixmap(QSize(128, 128)));
 
     QFont font;
     font.setPixelSize(kTimeFontPixelSize);
