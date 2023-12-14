@@ -7823,10 +7823,6 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
       <translation type="unfinished">Camera does not exist</translation>
     </message>
     <message>
-      <source>Select Camera</source>
-      <translation>Wybierz kamerę</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Usuń</translation>
     </message>
@@ -7845,6 +7841,10 @@ Zalecamy nie otwierać tej integracji. Jeśli rozumiesz ryzyko, możesz otworzy�
     <message>
       <source>Pointed</source>
       <translation type="unfinished">Pointed</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>Wybierz kamerę...</translation>
     </message>
   </context>
   <context>
@@ -10428,6 +10428,17 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     <message>
       <source>You do not have any layouts</source>
       <translation>Nie masz żadnych układów</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation type="unfinished">You do not have permission to edit settings of some cameras</translation>
     </message>
   </context>
   <context>

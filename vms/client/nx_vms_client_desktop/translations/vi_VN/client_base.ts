@@ -7453,10 +7453,6 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
       <translation>Camera không tồn tại</translation>
     </message>
     <message>
-      <source>Select Camera</source>
-      <translation>Chọn camera</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Xóa bỏ</translation>
     </message>
@@ -7475,6 +7471,10 @@ Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu 
     <message>
       <source>Pointed</source>
       <translation>Chỉ điểm</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>Chọn camera...</translation>
     </message>
   </context>
   <context>
@@ -9968,6 +9968,17 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <message>
       <source>You do not have any layouts</source>
       <translation>Bạn không có bất kỳ bố cục nào</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation type="unfinished">You do not have permission to edit settings of some cameras</translation>
     </message>
   </context>
   <context>

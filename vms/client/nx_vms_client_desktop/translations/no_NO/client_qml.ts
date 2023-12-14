@@ -1613,8 +1613,12 @@
       <translation>Bruk %1 eller %2 for å velge flere ressurser, eller %3 for å fjerne valget</translation>
     </message>
     <message>
-      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
+      <translation>Ressurstabell gir deg en oversikt over bruker- eller gruppetillatelser og lar deg tildele tillatelser for spesifikke ressurser.</translation>
+    </message>
+    <message>
+      <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation>Hvis du velger en tillatelse som avhenger av en annen tillatelse, vil begge tillatelsene bli gitt automatisk.</translation>
     </message>
   </context>
   <context>

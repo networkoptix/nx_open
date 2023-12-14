@@ -7575,10 +7575,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>Kamera mevcut değil</translation>
     </message>
     <message>
-      <source>Select Camera</source>
-      <translation>Kamera Seç</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Sil</translation>
     </message>
@@ -7597,6 +7593,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Pointed</source>
       <translation type="unfinished">Pointed</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>Kamera Seç...</translation>
     </message>
   </context>
   <context>
@@ -9698,7 +9698,7 @@ Yeterince günlük topladıktan sonra Günlük Düzeyini varsayılan ayarına d�
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
-      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+      <translation>Devam etmeden önce %1 ile iletişime geçmeniz önerilir.</translation>
     </message>
   </context>
   <context>
@@ -10120,6 +10120,17 @@ Zorlayabilirsiniz, ancak CPU yükünü önemli ölçüde artırabilir.</translat
     <message>
       <source>You do not have any layouts</source>
       <translation>Herhangi bir ekran düzeniniz yok</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation>Bu kameranın ayarlarını düzenleme izniniz yok</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation>Bazı kameraların ayarlarını düzenleme izniniz yok</translation>
     </message>
   </context>
   <context>
