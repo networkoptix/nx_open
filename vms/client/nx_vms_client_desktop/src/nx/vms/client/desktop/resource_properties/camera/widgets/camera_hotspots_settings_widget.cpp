@@ -35,7 +35,9 @@ static constexpr auto kMinimumTableEditorHeight = 112;
 
 static const QColor kBasicColor = "#A5B7C0";
 static const nx::vms::client::core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
-    {QnIcon::Normal, {{kBasicColor, "light10"}}},
+    {QnIcon::Normal, {{kBasicColor, "light4"}}},
+    {QnIcon::Active, {{kBasicColor, "light3"}}},
+    {QnIcon::Selected, {{kBasicColor, "light5"}}},
 };
 
 } // namespace
