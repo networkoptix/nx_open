@@ -1904,11 +1904,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>โทรศัพท์</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>อีเมล:</translation>
     </message>
   </context>
   <context>
@@ -7453,10 +7453,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation type="unfinished">Camera does not exist</translation>
     </message>
     <message>
-      <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>ลบ</translation>
     </message>
@@ -7475,6 +7471,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Pointed</source>
       <translation type="unfinished">Pointed</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation type="unfinished">Select Camera...</translation>
     </message>
   </context>
   <context>
@@ -9971,6 +9971,17 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation type="unfinished">You do not have permission to edit settings of some cameras</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
     <message>
       <source>User management for organization users is available only at the organization level, not the system level</source>
@@ -10549,13 +10560,13 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 กลุ่ม</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 และอีก %n กลุ่ม</numerusform>
       </translation>
     </message>
   </context>

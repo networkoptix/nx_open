@@ -1604,8 +1604,12 @@
       <translation>%1 または %2 を使用して複数リソースを選択、 %3 を使用して選択をクリア</translation>
     </message>
     <message>
-      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation>「リソース」テーブルには、ユーザーまたはグループの権限の概要が表示され、特定のリソースに権限を割り当てることができます。別の権限に依存する権限を選択すると、両方の権限が自動的に付与されます。</translation>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
+      <translation>リソーステーブルにはユーザーまたはグループの権限の概要が表示され、また特定のリソースに対して権限を割り当てることができます。</translation>
+    </message>
+    <message>
+      <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation>別の権限に依存する権限を選択すると、両方の権限が自動的に付与されます。</translation>
     </message>
   </context>
   <context>

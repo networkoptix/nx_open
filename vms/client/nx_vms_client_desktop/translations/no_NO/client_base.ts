@@ -7581,10 +7581,6 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
       <translation type="unfinished">Camera does not exist</translation>
     </message>
     <message>
-      <source>Select Camera</source>
-      <translation>Velg kamera</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Slett</translation>
     </message>
@@ -7603,6 +7599,10 @@ Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, k
     <message>
       <source>Pointed</source>
       <translation>Punkt</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>Velg kamera...</translation>
     </message>
   </context>
   <context>
@@ -10126,6 +10126,17 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     <message>
       <source>You do not have any layouts</source>
       <translation>Du har ingen oppsett</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation>Du har ikke tillatelse til å redigere innstillingene for dette kameraet</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation>Du har ikke tillatelse til å redigere innstillingene for enkelte kameraer</translation>
     </message>
   </context>
   <context>

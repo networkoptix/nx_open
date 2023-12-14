@@ -1631,8 +1631,12 @@
       <translation>Используйте %1 или %2, чтобы выбрать несколько ресурсов, или %3, чтобы очистить выбор</translation>
     </message>
     <message>
-      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
+      <translation>Таблица ресурсов дает вам обзор прав пользователя или группы и позволяет вам назначить разрешения для определенных ресурсов.</translation>
+    </message>
+    <message>
+      <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation>Если вы выберете разрешение, которое зависит от другого разрешения, оба разрешения будут предоставлены автоматически.</translation>
     </message>
   </context>
   <context>

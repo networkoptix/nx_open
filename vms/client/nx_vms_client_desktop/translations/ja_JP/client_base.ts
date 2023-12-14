@@ -7453,10 +7453,6 @@ We recommend you not to open this integration. If you understand the risks, you 
       <translation>カメラが存在しません</translation>
     </message>
     <message>
-      <source>Select Camera</source>
-      <translation>カメラ選択</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>削除</translation>
     </message>
@@ -7475,6 +7471,10 @@ We recommend you not to open this integration. If you understand the risks, you 
     <message>
       <source>Pointed</source>
       <translation>ポイント</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>カメラ選択...</translation>
     </message>
   </context>
   <context>
@@ -9969,6 +9969,17 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>You do not have any layouts</source>
       <translation>レイアウトがありません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation>このカメラの設定を編集する権限がありません</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation>一部のカメラの設定を編集する権限がありません</translation>
     </message>
   </context>
   <context>

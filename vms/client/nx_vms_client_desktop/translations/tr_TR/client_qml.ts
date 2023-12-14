@@ -1613,8 +1613,12 @@
       <translation>Birden fazla kaynak seçmek için %1 veya %2, seçimi temizlemek için %3 kullanın</translation>
     </message>
     <message>
-      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation>Kaynaklar tablosu size kullanıcı veya grup izinlerine ilişkin genel bir bakış sunar ve belirli kaynaklar için izinler atamanıza olanak tanır. Başka bir izne bağlı bir izin seçerseniz her iki izin de otomatik olarak verilecektir.</translation>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
+      <translation>Kaynaklar tablosu size kullanıcı veya grup izinlerine ilişkin genel bir bakış sunar ve belirli kaynaklar için izinler atamanıza olanak tanır.</translation>
+    </message>
+    <message>
+      <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation>Başka bir izne bağlı bir izin seçerseniz her iki izin de otomatik olarak verilecektir.</translation>
     </message>
   </context>
   <context>

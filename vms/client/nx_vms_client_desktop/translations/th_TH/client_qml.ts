@@ -1604,8 +1604,12 @@
       <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
     </message>
     <message>
-      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources. If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
+      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+    </message>
+    <message>
+      <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
     </message>
   </context>
   <context>
@@ -1841,7 +1845,7 @@ Shift key to use Advanced PTZ</source>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>สืบทอด %1 สิทธิ์จาก</translation>
     </message>
     <message>
       <source>Already inherited from</source>

@@ -7582,10 +7582,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Kameran finns inte</translation>
     </message>
     <message>
-      <source>Select Camera</source>
-      <translation>Välj kamera</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Radera</translation>
     </message>
@@ -7604,6 +7600,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Pointed</source>
       <translation>Tyckt</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>Välj kamera...</translation>
     </message>
   </context>
   <context>
@@ -10127,6 +10127,17 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <message>
       <source>You do not have any layouts</source>
       <translation>Du har inga layouter</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation>Du har inte behörighet att redigera inställningarna för den här kameran</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation>Du har inte behörighet att redigera inställningar för vissa kameror</translation>
     </message>
   </context>
   <context>
