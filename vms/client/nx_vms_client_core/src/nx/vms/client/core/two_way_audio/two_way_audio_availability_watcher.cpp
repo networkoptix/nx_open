@@ -29,7 +29,7 @@ struct TwoWayAudioAvailabilityWatcher::Private
 
 void TwoWayAudioAvailabilityWatcher::Private::updateAudioOutput()
 {
-    const auto camera = (sourceCamera && sourceCamera->hasTwoWayAudio()
+    const auto camera = (sourceCamera && sourceCamera->audioOutputDevice()->hasTwoWayAudio()
         ? sourceCamera->audioOutputDevice()
         : QnSecurityCamResourcePtr()).dynamicCast<QnVirtualCameraResource>();
 
