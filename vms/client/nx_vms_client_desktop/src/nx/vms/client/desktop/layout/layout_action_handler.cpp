@@ -704,6 +704,9 @@ void LayoutActionHandler::convertLayoutToShared(const LayoutResourcePtr& layout)
     if (!NX_ASSERT(layout && user && layout->getParentId() == user->getId()))
         return;
 
+    if (!ui::messages::Resources::convertLayoutToShared(mainWindowWidget()))
+        return;
+
     layout->setParentId({});
     system()->layoutSnapshotManager()->save(layout);
 
