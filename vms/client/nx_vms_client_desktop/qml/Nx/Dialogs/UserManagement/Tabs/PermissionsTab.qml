@@ -33,6 +33,8 @@ Item
 
     property bool advancedMode: true
 
+    property real rehoverDistance: 4
+
     readonly property var availableAccessRightDescriptors:
         Array.prototype.slice.call(AccessRightsList.items) //< Deep copy to JS for optimization.
 
@@ -87,6 +89,7 @@ Item
 
                     text: modelData.name
                     interactive: control.editingEnabled && tree.hasSelection
+                    rehoverDistance: control.rehoverDistance
 
                     GlobalToolTip.text: modelData.description
 
@@ -330,6 +333,7 @@ Item
             hoveredColumnAccessRight: tree.hoveredColumnAccessRight
             externallySelectedLayouts: tree.selectedLayouts
             selectionSize: tree.selectionSize
+            rehoverDistance: control.rehoverDistance
 
             externalNextCheckState: tree.nextBatchCheckState
             externalHoverData: tree.hoverData
