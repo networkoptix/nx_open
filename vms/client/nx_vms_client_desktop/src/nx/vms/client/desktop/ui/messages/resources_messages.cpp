@@ -17,9 +17,11 @@
 #include <core/resource/videowall_matrix_index.h>
 #include <core/resource/webpage_resource.h>
 #include <nx/branding.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/models/resource/resource_list_model.h>
@@ -110,6 +112,31 @@ bool Resources::sharedLayoutEdit(QWidget* parent)
         tr("Changes will affect other users"),
         tr("This layout is shared with other users, so you change it for them too."),
         QnResourceList(), /*useResources*/ false);
+}
+
+bool Resources::convertLayoutToShared(QWidget* parent)
+{
+    if (showOnceSettings()->convertLayoutToShared())
+        return true;
+
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setText(nx::format("<span style='font-weight: medium;'>%1</span>", nx::format(
+        tr("All members of %1 and %2 groups will get access to this layout",
+            "%1 and %2 will be substituted with user group names"),
+        nx::vms::common::PredefinedUserGroups::find(nx::vms::api::kAdministratorsGroupId)->name,
+        nx::vms::common::PredefinedUserGroups::find(nx::vms::api::kPowerUsersGroupId)->name)));
+    messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+    messageBox.addButton(tr("Convert", "Converting layout to shared"),
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+    messageBox.setCheckBoxEnabled();
+
+    const auto result = messageBox.exec();
+
+    if (messageBox.isChecked())
+        showOnceSettings()->convertLayoutToShared = true;
+
+    return (result != QDialogButtonBox::Cancel);
 }
 
 bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayouts,
