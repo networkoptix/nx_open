@@ -14,9 +14,10 @@ Item
     property alias text: caption.text
     property alias color: icon.color
 
-    property int textMargin: 4
-
     property bool interactive: false
+    property real rehoverDistance: 1
+
+    property int textMargin: 4
 
     readonly property alias hovered: mouseArea.hovered
     readonly property bool interactiveHovered: interactive && hovered
@@ -34,13 +35,25 @@ Item
 
         property bool hovered: false
 
-        onClicked:
+        property point clickPos
+
+        onClicked: (mouse) =>
         {
             if (!item.interactiveHovered)
                 return
 
             item.clicked()
             hovered = false
+            clickPos = Qt.point(mouse.x, mouse.y)
+        }
+
+        onPositionChanged: (mouse) =>
+        {
+            if (hovered || mouse.buttons != 0)
+                return
+
+            if (Math.abs(mouse.x - clickPos.x) + Math.abs(mouse.y - clickPos.y) >= rehoverDistance)
+                hovered = true
         }
 
         // Clicks temporarily disable hover.

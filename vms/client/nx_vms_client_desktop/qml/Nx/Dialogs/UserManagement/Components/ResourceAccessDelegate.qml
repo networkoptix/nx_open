@@ -26,6 +26,8 @@ Item
 
     required property var editingContext
 
+    required property real rehoverDistance
+
     property bool editingEnabled: true
 
     property bool automaticDependencies: false
@@ -135,6 +137,8 @@ Item
 
                     hoverEnabled: true
                     acceptedButtons: Qt.LeftButton
+
+                    property point clickPos
 
                     GlobalToolTip.enabled: cell.relevant && root.hoveredCell === cell
 
@@ -382,13 +386,26 @@ Item
                             cellsRow.hoveredCell = null
                     }
 
-                    onClicked:
+                    onClicked: (mouse) =>
                     {
                         if (!cell.relevant || !root.editingEnabled || cell !== root.hoveredCell)
                             return
 
                         cellsRow.hoveredCell = null
+                        cell.clickPos = Qt.point(mouse.x, mouse.y)
                         root.triggered(cell)
+                    }
+
+                    onPositionChanged: (mouse) =>
+                    {
+                        if (cellsRow.hoveredCell || mouse.buttons != 0)
+                            return
+
+                        if (Math.abs(mouse.x - clickPos.x) + Math.abs(mouse.y - clickPos.y)
+                            >= rehoverDistance)
+                        {
+                            cellsRow.hoveredCell = cell
+                        }
                     }
 
                     Rectangle
