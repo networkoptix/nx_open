@@ -37,6 +37,9 @@ public:
      */
     Property<bool> sharedLayoutEdit{this, "sharedLayoutEdit"};
 
+    /** Warning which is displayed when a private layout is being converted to shared. */
+    Property<bool> convertLayoutToShared{this, "convertLayoutToShared"};
+
     /** Warning which is displayed when removing multiple items from a Layout or a Showreel. */
     Property<bool> removeItemsFromLayout{this, "removeItemsFromLayout"};
 

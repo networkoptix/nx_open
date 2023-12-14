@@ -22,6 +22,7 @@ public:
     static bool overrideShowreel(QWidget* parent);
 
     static bool sharedLayoutEdit(QWidget* parent);
+    static bool convertLayoutToShared(QWidget* parent);
 
     static bool deleteLayouts(QWidget* parent, const QnResourceList& sharedLayouts,
         const QnResourceList& personalLayouts);
