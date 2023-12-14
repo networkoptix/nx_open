@@ -75,9 +75,9 @@ Window
         color: ColorTheme.colors.dark9
         visible: d.pluginTabsShown
 
-        leftPadding: 8
-        rightPadding: 8
-        topPadding: 5
+        leftPadding: 16
+        rightPadding: 16
+        topPadding: 1
         spacing: 16
 
         function selectEngine(engineId)
@@ -100,7 +100,8 @@ Window
             text: engine ? engine.name : qsTr("Any plugin")
             compact: false
 
-            textHeight: 19
+            textHeight: 13
+            topPadding: 14
             underlineHeight: 2
             inactiveUnderlineColor: "transparent"
             font: Qt.font({pixelSize: 12, weight: Font.Normal})
