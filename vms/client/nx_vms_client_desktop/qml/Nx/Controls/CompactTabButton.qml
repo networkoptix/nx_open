@@ -56,7 +56,9 @@ TabButton
     bottomPadding: 8
     spacing: 4
 
-    width: !tabButton.compact || isCurrent ? implicitWidth : (leftPadding + image.width + spacing)
+    width: !tabButton.compact || isCurrent
+        ? Math.ceil(implicitWidth)
+        : (leftPadding + image.width + spacing)
     clip: true
 
     onActiveFocusChanged: frame.requestPaint()
