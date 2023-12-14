@@ -1,6 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-find_package(Qt6 COMPONENTS Multimedia ShaderTools REQUIRED)
+find_package(Qt6 COMPONENTS Multimedia ShaderTools Test REQUIRED)
 
 set(qt_helpers_root "${open_source_root}/artifacts/qt_helpers/src")
 file(GLOB_RECURSE qt_helpers_sources "${qt_helpers_root}/qt_helpers/*")
