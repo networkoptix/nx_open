@@ -21,7 +21,7 @@ PasswordPreviewButton::PasswordPreviewButton(QWidget* parent):
     base_type(parent)
 {
     setFlat(true);
-    setIcon(qnSkin->icon("text_buttons/eye_close.svg", "text_buttons/eye_open.svg"));
+    setIcon(qnSkin->icon("text_buttons/eye_closed_20.svg", "text_buttons/eye_open_20.svg"));
     setFixedSize(core::Skin::maximumSize(icon()));
     setCheckable(true);
     updateVisibility();
