@@ -1726,14 +1726,6 @@ to activate PTZ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Target Lock Tracking</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Alt + Click to follow object</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1743,14 +1735,19 @@ New PTZ controls</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Here is a quick guide
-on what has changed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Here is a quick guide
+on what has changed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
